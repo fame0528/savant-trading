@@ -1,0 +1,68 @@
+# Protocol Config — Project-specific configuration for ECHO Protocol
+#
+# QUICK START: Change these 3 lines for your project:
+#   1. language:       "rust" | "typescript" | "python" | "go" | "java" | "csharp"
+#   2. commands.build: your compile/build command
+#   3. commands.test:  your test runner command
+
+project:
+  name: "savant-trading"
+  description: "Automated crypto trading engine — Kraken exchange"
+  version: "0.1.0"
+
+language: "rust"
+
+commands:
+  build: "cargo build"
+  test: "cargo test"
+  type_check: "cargo check"
+  lint: "cargo clippy -- -D warnings"
+  format: "cargo fmt"
+  clean: "cargo clean"
+
+paths:
+  src: "src/"
+  tests: "tests/"
+  docs: "docs/"
+  dev: "dev/"
+  findings: "dev/findings/"
+  session_summaries: "dev/session-summaries/"
+  plans: "dev/plans/"
+  learnings: "dev/LEARNINGS.md"
+  baselines: "dev/baselines/"
+
+quality:
+  max_file_lines: 300
+  max_function_lines: 50
+  max_line_length: 100
+  max_complexity: 10
+  max_params: 4
+  max_comment_density: 0.33
+  max_nesting_depth: 3
+
+# Naming rules: see coding-standards/{language}.md
+
+testing:
+  fuzz_enabled: false
+  mutation_enabled: false
+  coverage_threshold: 80
+  test_timeout: 30
+  parallel_tests: true
+
+fid:
+  auto_create: true
+  severity_levels: ["critical", "high", "medium", "low"]
+  max_open_fids: 20
+
+perfection_loop:
+  max_iterations: 10
+  change_threshold: 0.10
+  convergence_threshold: 0.02
+  convergence_passes: 2
+  oscillation_limit: 3
+
+session:
+  auto_summary: true
+  summary_interval: 30
+  max_session_hours: 4
+  autonomy_level: 3  # 1=Guided, 2=Supervised, 3=Autonomous (default)
