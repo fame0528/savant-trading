@@ -1,11 +1,3 @@
-# STARTER PROMPT — Activate ECHO Protocol in Any Agent
-
-Copy the prompt below into your AI agent's system prompt or first message to
-activate the ECHO Protocol. It forces the agent to prove it read the docs by
-listing specific laws by number and name.
-
----
-
 ## Universal Starter Prompt
 
 ```

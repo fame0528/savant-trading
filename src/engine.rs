@@ -147,7 +147,11 @@ pub async fn run(config: AppConfig) -> anyhow::Result<()> {
             config.risk.max_positions,
             config.risk.min_rr_ratio,
         ),
-        include_str!("agent/prompts/strategy_knowledge.md"),
+        &format!(
+            "{}\n\n---\n\n{}",
+            include_str!("agent/prompts/strategy_knowledge.md"),
+            include_str!("agent/prompts/echo_rules.md")
+        ),
         &prompts::default_output_format(),
     );
 
@@ -249,9 +253,14 @@ pub async fn run(config: AppConfig) -> anyhow::Result<()> {
         }
     }
 
-    // Initial insight fetch
-    info!("Fetching initial market insight...");
-    let _ = insight.refresh(&config.trading.pairs[0]).await;
+    // Initial insight fetch (all pairs)
+    info!(
+        "Fetching initial market insight for {} pairs...",
+        config.trading.pairs.len()
+    );
+    for pair in &config.trading.pairs {
+        let _ = insight.refresh(pair).await;
+    }
 
     info!(
         "Starting main loop (interval: {}s, autonomy: {:?})...",
@@ -262,9 +271,11 @@ pub async fn run(config: AppConfig) -> anyhow::Result<()> {
     loop {
         tick += 1;
 
-        // Refresh insight every 5 ticks
+        // Refresh insight every 5 ticks (all pairs)
         if tick.is_multiple_of(5) {
-            let _ = insight.refresh(&config.trading.pairs[0]).await;
+            for pair in &config.trading.pairs {
+                let _ = insight.refresh(pair).await;
+            }
         }
 
         for pair in &config.trading.pairs {
@@ -309,6 +320,7 @@ pub async fn run(config: AppConfig) -> anyhow::Result<()> {
                 // === AI BRAIN — PRIMARY DECISION MAKER ===
                 let market_ctx = insight.cached().clone();
                 let positions: Vec<Position> = paper.positions().values().cloned().collect();
+                let recent_trades = paper.closed_trades().to_vec();
 
                 let ctx = FullContext {
                     candles: &candle_data,
@@ -319,6 +331,11 @@ pub async fn run(config: AppConfig) -> anyhow::Result<()> {
                     positions: &positions,
                     account: paper.account(),
                     pair,
+                    recent_trades: if recent_trades.is_empty() {
+                        None
+                    } else {
+                        Some(&recent_trades)
+                    },
                 };
 
                 match agent.evaluate(&ctx).await {
@@ -703,6 +720,7 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
         positions: &[],
         account: paper.account(),
         pair: &pair,
+        recent_trades: None,
     };
 
     let user_message = savant_trading::agent::context_builder::build_user_message_static(&ctx);

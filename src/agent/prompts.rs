@@ -54,7 +54,7 @@ impl PromptComposer {
     pub fn compose(&self, knowledge_units: &[&KnowledgeUnit]) -> String {
         let mut parts: Vec<String> = Vec::new();
 
-        // Add fixed layers (base_identity, risk_constraints, strategy_knowledge)
+        // Add fixed layers (base_identity, risk_constraints, strategy_knowledge, echo_rules)
         for layer in &self.layers {
             if layer.name != "output_format" {
                 parts.push(layer.content.clone());
@@ -63,7 +63,8 @@ impl PromptComposer {
 
         // Add dynamic knowledge layer
         if !knowledge_units.is_empty() {
-            let mut knowledge_section = String::from("## Relevant Trading Knowledge\n\n");
+            let mut knowledge_section =
+                String::from("## Relevant Trading Knowledge (From 11 Curated Transcripts)\n\n");
             for unit in knowledge_units {
                 knowledge_section.push_str(&format!(
                     "### [{}] {}\n{}\n\n",

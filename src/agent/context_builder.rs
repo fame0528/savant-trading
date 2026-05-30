@@ -6,7 +6,7 @@
 use crate::agent::knowledge::{KnowledgeBase, MarketCondition};
 use crate::agent::prompts::PromptComposer;
 use crate::core::types::{
-    AccountState, Candle, IndicatorValues, MarketRegime, Position, VolumeProfile,
+    AccountState, Candle, IndicatorValues, MarketRegime, Position, TradeRecord, VolumeProfile,
 };
 use crate::insight::MarketContext;
 
@@ -20,6 +20,7 @@ pub struct FullContext<'a> {
     pub positions: &'a [Position],
     pub account: &'a AccountState,
     pub pair: &'a str,
+    pub recent_trades: Option<&'a [TradeRecord]>,
 }
 
 /// Build the system prompt and user message for the LLM.
@@ -152,6 +153,67 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
         ctx.account.drawdown_pct * 100.0,
         ctx.account.open_positions
     ));
+
+    // Trade history (if available from journal)
+    if let Some(trades) = ctx.recent_trades {
+        if !trades.is_empty() {
+            msg.push_str("\n## Recent Trade History\n");
+            let wins = trades.iter().filter(|t| t.pnl > 0.0).count();
+            let losses = trades.iter().filter(|t| t.pnl <= 0.0).count();
+            let avg_win = if wins > 0 {
+                trades
+                    .iter()
+                    .filter(|t| t.pnl > 0.0)
+                    .map(|t| t.pnl)
+                    .sum::<f64>()
+                    / wins as f64
+            } else {
+                0.0
+            };
+            let avg_loss = if losses > 0 {
+                trades
+                    .iter()
+                    .filter(|t| t.pnl <= 0.0)
+                    .map(|t| t.pnl)
+                    .sum::<f64>()
+                    / losses as f64
+            } else {
+                0.0
+            };
+            let profit_factor = if avg_loss != 0.0 {
+                (avg_win * wins as f64) / (avg_loss.abs() * losses as f64)
+            } else {
+                f64::INFINITY
+            };
+
+            for (i, trade) in trades.iter().take(10).enumerate() {
+                msg.push_str(&format!(
+                    "{}. {} {} @ {:.2} → {:.2} | PnL: ${:.2} ({:.1}%) | {}\n",
+                    i + 1,
+                    trade.pair,
+                    if trade.pnl > 0.0 { "WIN" } else { "LOSS" },
+                    trade.entry_price,
+                    trade.exit_price,
+                    trade.pnl,
+                    trade.pnl_pct,
+                    trade.closed_at.format("%Y-%m-%d")
+                ));
+            }
+            msg.push_str(&format!(
+                "\nSummary: {}W/{}L ({:.0}% WR) | Avg Win: ${:.2} | Avg Loss: ${:.2} | PF: {:.2}\n",
+                wins,
+                losses,
+                if wins + losses > 0 {
+                    wins as f64 / (wins + losses) as f64 * 100.0
+                } else {
+                    0.0
+                },
+                avg_win,
+                avg_loss,
+                profit_factor
+            ));
+        }
+    }
 
     msg.push_str("\n## Decision Required\n");
     msg.push_str(

@@ -100,6 +100,14 @@ impl AgentOrchestrator {
             self.config.knowledge_token_budget,
         );
 
+        info!(
+            "ai_context | prompt_chars={} | knowledge_budget={} | pair={} | regime={:?}",
+            system_prompt.len(),
+            self.config.knowledge_token_budget,
+            ctx.pair,
+            ctx.regime
+        );
+
         // Call LLM with retries
         let mut last_error = String::new();
         for attempt in 0..self.config.max_retries {

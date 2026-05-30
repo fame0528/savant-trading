@@ -1,6 +1,6 @@
 [package]
 name = "savant-trading"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 description = "Automated crypto trading engine — Kraken exchange"
 

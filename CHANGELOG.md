@@ -5,6 +5,30 @@ All notable changes to Savant Trading will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] — 2026-05-30
+
+### Added
+
+- **ECHO Protocol in system prompt** — Trading rules from ECHO.md + transcript-derived rules embedded in AI prompt
+  - Sell into strength (80% at 10-20% gain)
+  - 3 consecutive losses = stop for the day
+  - Don't marry positions
+  - Four-factor performance model
+  - Session awareness (kill zones)
+  - Compound strategy (risk profits on directional days)
+- **Trade history in AI context** — Last 10 trades + performance summary injected into prompt
+  - Win rate, average win/loss, profit factor
+  - Individual trade details with entry/exit/PnL
+  - Cold start: omit if no trades yet
+- **Multi-pair insight refresh** — Insight now refreshes for ALL configured pairs, not just the first
+- **Structured logging** — AI context logged with prompt chars, knowledge budget, pair, regime
+
+### Changed
+
+- `FullContext` struct now includes `recent_trades: Option<&[TradeRecord]>`
+- System prompt includes ECHO rules alongside strategy knowledge
+- Knowledge section header: "From 11 Curated Transcripts"
+
 ## [0.2.0] — 2026-05-30
 
 ### Added
