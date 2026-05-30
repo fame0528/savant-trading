@@ -399,3 +399,130 @@ fn uuid() -> String {
         (nanos as u32) ^ pid
     )
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_position(id: &str, entry: f64, sl: f64, tp1: f64, tp2: f64, tp3: f64) -> Position {
+        Position {
+            id: id.to_string(),
+            pair: "BTC/USD".to_string(),
+            side: Side::Long,
+            entry_price: entry,
+            current_price: entry,
+            quantity: 1.0,
+            stop_loss: sl,
+            take_profit_1: tp1,
+            take_profit_2: tp2,
+            take_profit_3: tp3,
+            unrealized_pnl: 0.0,
+            risk_amount: entry - sl,
+            strategy_name: "test".to_string(),
+            opened_at: Utc::now(),
+            scale_level: ScaleLevel::Full,
+        }
+    }
+
+    #[test]
+    fn stop_loss_full_close() {
+        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let pos = make_position("p1", 100.0, 95.0, 105.0, 110.0, 115.0);
+        trader.positions.insert(pos.id.clone(), pos);
+
+        let mut prices = HashMap::new();
+        prices.insert("BTC/USD".to_string(), 94.0);
+
+        let closed = trader.check_stops(&prices);
+        assert_eq!(closed.len(), 1);
+        assert!(closed[0].notes.contains("Stop loss"));
+        assert!(trader.positions.is_empty());
+    }
+
+    #[test]
+    fn tp1_scales_out_50_percent() {
+        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let pos = make_position("p1", 100.0, 95.0, 105.0, 110.0, 115.0);
+        trader.positions.insert(pos.id.clone(), pos);
+
+        let mut prices = HashMap::new();
+        prices.insert("BTC/USD".to_string(), 106.0);
+
+        let closed = trader.check_stops(&prices);
+        assert_eq!(closed.len(), 1);
+        assert_eq!(closed[0].quantity, 0.5);
+        assert!(closed[0].notes.contains("TP1"));
+
+        // Remaining position should be at Scaled50 with SL moved to break-even
+        let remaining = trader.positions.get("p1").unwrap();
+        assert_eq!(remaining.scale_level, ScaleLevel::Scaled50);
+        assert_eq!(remaining.stop_loss, 100.0); // break-even
+        assert_eq!(remaining.quantity, 1.0); // quantity unchanged on original
+    }
+
+    #[test]
+    fn tp2_scales_out_after_tp1() {
+        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let mut pos = make_position("p1", 100.0, 95.0, 105.0, 110.0, 115.0);
+        pos.scale_level = ScaleLevel::Scaled50;
+        pos.stop_loss = 100.0; // already at break-even
+        trader.positions.insert(pos.id.clone(), pos);
+
+        let mut prices = HashMap::new();
+        prices.insert("BTC/USD".to_string(), 111.0);
+
+        let closed = trader.check_stops(&prices);
+        assert_eq!(closed.len(), 1);
+        assert_eq!(closed[0].quantity, 0.6); // 60% of remaining
+        assert!(closed[0].notes.contains("TP2"));
+
+        let remaining = trader.positions.get("p1").unwrap();
+        assert_eq!(remaining.scale_level, ScaleLevel::Scaled80);
+    }
+
+    #[test]
+    fn tp3_full_close_after_scale_out() {
+        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let mut pos = make_position("p1", 100.0, 95.0, 105.0, 110.0, 115.0);
+        pos.scale_level = ScaleLevel::Scaled80;
+        pos.stop_loss = 100.0;
+        trader.positions.insert(pos.id.clone(), pos);
+
+        let mut prices = HashMap::new();
+        prices.insert("BTC/USD".to_string(), 116.0);
+
+        let closed = trader.check_stops(&prices);
+        assert_eq!(closed.len(), 1);
+        assert_eq!(closed[0].quantity, 1.0);
+        assert!(closed[0].notes.contains("TP3"));
+        assert!(trader.positions.is_empty());
+    }
+
+    #[test]
+    fn stop_at_break_even_after_tp1() {
+        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let mut pos = make_position("p1", 100.0, 95.0, 105.0, 110.0, 115.0);
+        pos.scale_level = ScaleLevel::Scaled50;
+        pos.stop_loss = 100.0; // break-even
+        trader.positions.insert(pos.id.clone(), pos);
+
+        let mut prices = HashMap::new();
+        prices.insert("BTC/USD".to_string(), 99.0);
+
+        let closed = trader.check_stops(&prices);
+        assert_eq!(closed.len(), 1);
+        assert!(closed[0].notes.contains("Stop loss"));
+        assert!(trader.positions.is_empty());
+    }
+
+    #[test]
+    fn uuid_format_is_valid() {
+        let id = uuid();
+        let parts: Vec<&str> = id.split('-').collect();
+        assert_eq!(parts.len(), 4);
+        for part in parts {
+            assert_eq!(part.len(), 8);
+            assert!(u32::from_str_radix(part, 16).is_ok());
+        }
+    }
+}

@@ -5,6 +5,24 @@ All notable changes to Savant Trading will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] — 2026-05-30
+
+### Added
+
+- **Glass House — Obsidian vault integration** — Bidirectional vault sync for transparent trading state
+  - `VaultWriter` — Projects engine state into Obsidian vault as structured markdown
+    - Trades/ — Daily trade logs with entry/exit/PnL
+    - Decisions/ — AI decision logs with reasoning
+    - Portfolio/ — Balance history, equity curve
+    - Knowledge/ — Knowledge unit index
+    - INDEX.md — Master index with wiki-links
+  - `VaultWatcher` — Monitors vault for user edits
+    - Lessons/ — Editable ground truth ingested by engine
+    - Injection defense — Scans for 14 prompt injection patterns
+    - Invisible unicode detection
+  - `VaultConfig` — Configurable vault path, sync interval, max files
+  - `.obsidian/appearance.json` — Dark theme, cyan accent (#00d5ff)
+
 ## [0.3.1] — 2026-05-30
 
 ### Added

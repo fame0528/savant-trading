@@ -22,3 +22,4 @@ pub mod insight;
 pub mod monitor;
 pub mod risk;
 pub mod strategy;
+pub mod vault;
