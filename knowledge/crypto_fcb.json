@@ -1,0 +1,146 @@
+[
+  {
+    "id": "crypto-fcb-001",
+    "source": "crypto-full-course-beginners",
+    "topic": "Sentiment",
+    "conditions": ["ExtremeFear", "ExtremeGreed"],
+    "content": "FEAR & GREED INDEX (0-100): 0-25 = Extreme Fear (historically best buying opportunities — when everyone is terrified, that's when you buy). 26-45 = Fear. 46-55 = Neutral. 56-75 = Greed. 76-100 = Extreme Greed (market overheated, reduce exposure, take profits). When index hits single digits, it's almost ALWAYS a buying opportunity. When above 90, be very cautious — smart money is distributing to retail. Don't use in isolation — combine with technicals and volume. Updates daily from alternative.me.",
+    "priority": 5
+  },
+  {
+    "id": "crypto-fcb-002",
+    "source": "crypto-full-course-beginners",
+    "topic": "MacroAnalysis",
+    "conditions": ["BtcDominant", "AltSeason"],
+    "content": "BTC DOMINANCE: BTC's share of total crypto market cap. RISING dominance = money flowing into BTC, altcoins weakening — stay in BTC. FALLING dominance = money flowing into altcoins (alt season approaching). BTC.D above 60% = BTC season, avoid alts. BTC.D below 40% = alt season, rotate into quality alts. STABLECOIN DOMINANCE: rising = capital sitting on sidelines (bearish). Falling = capital deploying (bullish). Track on TradingView: BTC.D and USDT.D.",
+    "priority": 5
+  },
+  {
+    "id": "crypto-fcb-003",
+    "source": "crypto-full-course-beginners",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SUPPORT & RESISTANCE: Most traded price levels where orders cluster. Look for levels price tested 2-3 times with clear rejections. Broken support BECOMES resistance and vice versa. Use limit orders at these levels for better entries. Don't place orders exactly at the level — place slightly before (front-run). Round numbers ($60,000, $3,000) act as psychological S/R. Previous all-time highs are extremely strong resistance.",
+    "priority": 4
+  },
+  {
+    "id": "crypto-fcb-004",
+    "source": "crypto-full-course-beginners",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "TRENDLINES: Connect higher lows (uptrend) or lower highs (downtrend). Minimum 3 touches for valid trendline. More touches = stronger. Break of trendline = potential reversal. Don't force trendlines — if they don't fit naturally, they're not valid. Combine with volume: break on high volume is more significant. Steep trendlines break faster than gradual ones. A trendline respected 5+ times is a MAJOR level.",
+    "priority": 3
+  },
+  {
+    "id": "crypto-fcb-005",
+    "source": "crypto-full-course-beginners",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "MOVING AVERAGES: 20 MA = short-term trend, dynamic S/R in strong trends. 50 MA = medium-term, institutional level. 200 MA = long-term, major S/R. GOLDEN CROSS = 50 crosses above 200 (bullish long-term signal). DEATH CROSS = 50 crosses below 200 (bearish). In crypto, golden/death crosses are LAGGING — by the time they trigger, much of the move has happened. Use as confirmation, not primary signal. Price bouncing off 20 MA in a strong trend = continuation.",
+    "priority": 3
+  },
+  {
+    "id": "crypto-fcb-006",
+    "source": "crypto-full-course-beginners",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "STOP LOSSES (Three Types): 1) FULL EXIT — close entire position at stop level. 2) PARTIAL EXIT — sell portion at target, let rest ride with stop at break-even. 3) TRAILING STOP — follows price at fixed distance, locks in profit as price moves favorably. Place stops below support (long) or above resistance (short). ATR-based stops: stop distance = 1.5-2x ATR (adapts to volatility). ALWAYS use stop losses — no exceptions. A trade without a stop is a gamble.",
+    "priority": 5
+  },
+  {
+    "id": "crypto-fcb-007",
+    "source": "crypto-full-course-beginners",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "RISK MANAGEMENT RULES: Risk max 1% of portfolio per trade. 3 consecutive losses = done for the day. Calculate position size BEFORE entering: size = (account_balance × risk_pct) / (entry - stop_loss). Take partial profits at key levels (TP1=50%, TP2=30%, TP3=20%). Scale into WINNING positions, NEVER into losing ones. Keep 20-30% in stablecoins for opportunities. Never invest more than you can afford to lose.",
+    "priority": 5
+  },
+  {
+    "id": "crypto-fcb-008",
+    "source": "crypto-full-course-beginners",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "CHART PATTERNS: Head & Shoulders = bearish reversal, sell when breaks neckline with volume. Inverse H&S = bullish reversal. Double Top = bearish reversal after failed breakout. Double Bottom = bullish reversal. Rising Wedge = bearish (expect breakdown). Falling Wedge = bullish. Ascending Triangle = bullish continuation (flat top, rising bottom). Descending Triangle = bearish continuation. Cup & Handle = bullish continuation.",
+    "priority": 3
+  },
+  {
+    "id": "crypto-fcb-009",
+    "source": "crypto-full-course-beginners",
+    "topic": "Sentiment",
+    "conditions": ["ExtremeFear", "ExtremeGreed"],
+    "content": "LIQUIDATION HEATMAPS: Show where leveraged positions will be liquidated. Price tends to MOVE TOWARD liquidation clusters — exchanges profit from liquidations. Use CoinGlass. When large liquidations cluster at a specific level, expect price to HUNT that level before reversing. Long liquidation cluster below = expect dip. Short liquidation cluster above = expect pump. This is one of the most reliable signals in crypto.",
+    "priority": 5
+  },
+  {
+    "id": "crypto-fcb-010",
+    "source": "crypto-full-course-beginners",
+    "topic": "Sentiment",
+    "conditions": ["ExtremeFear", "ExtremeGreed"],
+    "content": "EXCHANGE FLOWS: Bullish = coins moving OFF exchanges (people holding, reducing sell pressure). Bearish = coins moving ONTO exchanges (preparing to sell). STABLECOIN INFLOW to exchanges = buying pressure building. Outflow = capital leaving. WHALE TRACKING: Large wallet movements signal institutional activity. Follow wallets with 1000+ BTC. Use Arkham Intelligence, Whale Alert, Nansen.ai.",
+    "priority": 4
+  },
+  {
+    "id": "crypto-fcb-011",
+    "source": "crypto-full-course-beginners",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "RSI (Relative Strength Index): Momentum oscillator (0-100). Above 70 = overbought (potential sell). Below 30 = oversold (potential buy). STRONGEST SIGNAL = DIVERGENCE: price makes higher high but RSI makes lower high = bearish divergence (sell). Price makes lower low but RSI makes higher low = bullish divergence (buy). RSI divergence at key S/R levels is extremely powerful. Don't use RSI alone — combine with trend and volume.",
+    "priority": 4
+  },
+  {
+    "id": "crypto-fcb-012",
+    "source": "crypto-full-course-beginners",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "VOLUME ANALYSIS: Rising price + rising volume = strong uptrend (hold). Rising price + FALLING volume = weak uptrend (take profits, reversal likely). Falling price + rising volume = strong downtrend (don't buy). Falling price + falling volume = weak downtrend (potential bottom forming). Volume spikes at key levels = institutional activity. Breakout on LOW volume = likely to fail. ALWAYS check volume before entering.",
+    "priority": 4
+  },
+  {
+    "id": "crypto-fcb-013",
+    "source": "crypto-full-course-beginners",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "RISK-REWARD CALCULATION: Risk = entry - stop loss. Reward = take profit - entry. R:R = reward / risk. Only take trades with minimum 1:2 R:R. With 50% win rate and 1:2 R:R = profitable. With 40% win rate and 1:3 R:R = very profitable. The math works in your favor with good R:R even with mediocre win rate. NEVER take 1:1 trade — fees alone eat your edge. Target 1:3 or better for swing trades.",
+    "priority": 5
+  },
+  {
+    "id": "crypto-fcb-014",
+    "source": "crypto-full-course-beginners",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "MACD (Moving Average Convergence Divergence): Shows relationship between two moving averages. MACD line = 12 EMA - 26 EMA. Signal line = 9 EMA of MACD. BULLISH: MACD crosses above signal line. BEARISH: MACD crosses below signal line. MACD HISTOGRAM = difference between MACD and signal — growing histogram = strengthening momentum. MACD DIVERGENCE at extremes is a powerful reversal signal.",
+    "priority": 3
+  },
+  {
+    "id": "crypto-fcb-015",
+    "source": "crypto-full-course-beginners",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "BOLLINGER BANDS: Middle band = 20 SMA. Upper band = 20 SMA + 2 standard deviations. Lower band = 20 SMA - 2 standard deviations. SQUEEZE = bands contract = low volatility = big move coming. BREAKOUT = price breaks above upper band (bullish) or below lower band (bearish). Mean reversion: price touching upper band in a ranging market = sell signal. Price touching lower band = buy signal. In trending markets, price can ride the band.",
+    "priority": 3
+  },
+  {
+    "id": "crypto-fcb-016",
+    "source": "crypto-full-course-beginners",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "FIBONACCI RETRACEMENT: Key levels: 23.6%, 38.2%, 50%, 61.8%, 78.6%. After a strong move, price often retraces to 38.2% or 61.8% before continuing. 61.8% (golden ratio) is the most significant retracement level. Draw from swing low to swing high (uptrend) or swing high to swing low (downtrend). Use Fibonacci levels as entry zones — especially when they align with S/R, order blocks, or FVGs.",
+    "priority": 3
+  },
+  {
+    "id": "crypto-fcb-017",
+    "source": "crypto-full-course-beginners",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "MARKET CYCLES IN CRYPTO: 4-year cycle tied to Bitcoin halving. ACCUMULATION (0-6 months post-halving): quiet, smart money buying, low retail interest. MARKUP (6-18 months): price rises, media attention, retail enters. DISTRIBUTION (18-24 months): euphoria, everyone is a genius, 'this time is different'. MARKDOWN (24-36 months): bear market, capitulation, 'crypto is dead'. Position accordingly — accumulate in markdown, distribute in markup.",
+    "priority": 4
+  },
+  {
+    "id": "crypto-fcb-018",
+    "source": "crypto-full-course-beginners",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "ALTCOIN SELECTION CRITERIA: 1) Strong team with track record. 2) Working product (not just whitepaper). 3) Active development (GitHub commits). 4) Real users/adoption. 5) Tokenomics (supply, inflation, burn mechanisms). 6) Narrative alignment (is it in a hot narrative?). 7) Exchange listings (more listings = more liquidity). 8) Market cap relative to peers. Avoid: anonymous teams, no product, purely hype-driven, excessive token unlocks.",
+    "priority": 3
+  }
+]

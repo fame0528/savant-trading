@@ -1,0 +1,66 @@
+[
+  {
+    "id": "brian-jung-001",
+    "source": "crypto-brian-jung-2026-strategy",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "MACRO CATALYSTS (in order of impact): 1) BITCOIN HALVING (every 4 years) — supply shock, historically leads to bull run 12-18 months after. 2024 halving = expect bull run through 2025-2026. 2) FOMC MEETINGS — rate cuts = bullish for risk assets. Rate hikes = bearish. Watch Fed dot plot. 3) ETF APPROVALS — spot BTC ETF opened institutional floodgates Jan 2024. 4) REGULATION — clear regulation = institutional confidence. 5) GLOBAL LIQUIDITY — when central banks print, crypto rallies. Track M2 money supply.",
+    "priority": 5
+  },
+  {
+    "id": "brian-jung-002",
+    "source": "crypto-brian-jung-2026-strategy",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "NARRATIVE ROTATION: Crypto moves in narrative cycles. Layer 1s → DeFi → NFTs → AI tokens → RWA → Gaming → Meme coins. Identify which narrative is in favor via CoinGecko categories. Rotate into narrative LEADERS, not laggards. When a narrative goes parabolic (300%+ in weeks), it's near the top. Each cycle has 2-3 dominant narratives. Being in the RIGHT narrative matters more than picking the right coin within a narrative.",
+    "priority": 4
+  },
+  {
+    "id": "brian-jung-003",
+    "source": "crypto-brian-jung-2026-strategy",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "PORTFOLIO ALLOCATION: 50-60% BTC (core, never below 40%). 20-30% ETH. 10-20% quality altcoins (narrative plays). Keep 10-20% stablecoins for dips. Take profits on the way up in tranches (25% at each target). Never invest more than you can afford to lose. Use hardware wallet for long-term. DCA: dollar cost average weekly/monthly. Accumulate during fear, distribute during greed.",
+    "priority": 4
+  },
+  {
+    "id": "brian-jung-004",
+    "source": "crypto-brian-jung-2026-strategy",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "MARKET CYCLES (4-Year): Phase 1 (Post-Halving Accumulation): 0-6 months, quiet, smart money buying. Phase 2 (Markup): 6-18 months, price rises, media attention, retail enters. Phase 3 (Distribution): 18-24 months, euphoria, 'this time is different'. Phase 4 (Markdown): 24-36 months, bear market, capitulation. We are in Phase 2-3 of the 2024 cycle. Position accordingly.",
+    "priority": 4
+  },
+  {
+    "id": "brian-jung-005",
+    "source": "crypto-brian-jung-2026-strategy",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "BTC DOMINANCE AS ROTATION SIGNAL: When BTC.D rising → stay in BTC, alts underperform. When BTC.D starts falling after BTC rally → signal to rotate into alts. Rotation order: BTC rallies first → ETH follows → large caps → mid caps → small caps → meme coins (euphoria top). BTC.D break below key support = alt season confirmed. Break above key resistance = back to BTC season.",
+    "priority": 4
+  },
+  {
+    "id": "brian-jung-006",
+    "source": "crypto-brian-jung-2026-strategy",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "STABLECOIN STRATEGY: Keep 10-20% in stablecoins (USDC preferred over USDT — more transparent, regulated). When market crashes (Fear & Greed < 15), deploy stablecoins into BTC/ETH at key support levels. When market euphoric (F&G > 85), convert profits to stablecoins. Stablecoins are your DRY POWDER — don't be fully invested. The best opportunities come when everyone else is forced to sell.",
+    "priority": 4
+  },
+  {
+    "id": "brian-jung-007",
+    "source": "crypto-brian-jung-2026-strategy",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "ETF IMPACT: Spot BTC ETF (approved Jan 2024) opened floodgates for institutional money. Institutions can now get BTC exposure through traditional brokerage accounts. ETH ETF next in line. ETF flows are a leading indicator: large daily inflows = bullish (institutions buying). Large outflows = bearish (institutions selling). Track ETF flow data on SoSoValue or similar platforms.",
+    "priority": 3
+  },
+  {
+    "id": "brian-jung-008",
+    "source": "crypto-brian-jung-2026-strategy",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "GLOBAL LIQUIDITY: Crypto is highly correlated with global liquidity (M2 money supply). When central banks expand balance sheets (QE), crypto rallies. When they contract (QT), crypto struggles. Track: Fed balance sheet, M2 money supply, global central bank policy. Rate CUT cycle = bullish for crypto (cheaper money flows into risk assets). Rate HIKE cycle = bearish. Currently in a rate cut cycle = supportive for crypto.",
+    "priority": 4
+  }
+]

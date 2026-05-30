@@ -1,0 +1,122 @@
+[
+  {
+    "id": "fabio-amt-001",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "THREE-STEP MODEL (Trend Following — NY Session): Step 1 MARKET STATE: only trade when OUT of balance. In balance = stay out. Step 2 LOCATION: swing points + low volume nodes. Set alert BELOW LVN, don't place limit orders. Wait to SEE aggression first. Step 3 EXECUTION: big aggressive orders (bubbles). Seller aggression → short. Stop ABOVE aggression candle. Target: previous balance area / POC. FULL exit at target — 70% reversal probability.",
+    "priority": 5
+  },
+  {
+    "id": "fabio-amt-002",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "VolumeProfile",
+    "conditions": ["Ranging", "LowVolatility"],
+    "content": "MEAN REVERSION MODEL (London/Consolidation): Market state = balance. DO NOT take first swing — wait for SECOND swing. First breakout happens → wait for retracement. Location = swing extreme + LVN. Look for seller aggression. Target = POC (NOT the extreme — low probability). Stop: 1-2 ticks BELOW the high (not above). Above = many orders, market accelerates through, you lose extra ticks. Getting taken out before acceleration saves 5-6 ticks per trade.",
+    "priority": 5
+  },
+  {
+    "id": "fabio-amt-003",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "VolumeProfile",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "VOLUME PROFILE CONCEPTS: LVN = lack of volume = price continues through. Good reaction level. Value area = 70% of volume. POC = highest volume level. Market seeks balance → target POC and value area, not extremes. Out of balance = searching for new balance. Profile tells you WHERE you are before applying any strategy. Without profile = caging an animal not made for a cage.",
+    "priority": 5
+  },
+  {
+    "id": "fabio-amt-004",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "CVD (Cumulative Volume Delta): Leading indicator for break-even timing. CVD = benchmark for volume pressure. When CVD pushes up aggressively and leg is building → move to break even BEFORE price action traders. Price action traders wait for price to break a level. CVD shows the narrative BEFORE price creates the effect. Use CVD to decide when to move stop — don't wait for price confirmation.",
+    "priority": 4
+  },
+  {
+    "id": "fabio-amt-005",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "RISK MANAGEMENT: Per-trade: 0.25% personal, 0.5-1% competition. Max daily loss: 2% (~8 stop-losses). R:R minimum 1:2.5, common 1:5, occasional 1:10-1:20. Strategy=33%, Mindset=33%, Risk=33%. Commission heavy — 600 executions/quarter costs 10-20%. Don't over-execute. Build profit day by day. On directional days, risk profits from 10 trades — no downside. Start micros, build 2-4 years.",
+    "priority": 5
+  },
+  {
+    "id": "fabio-amt-006",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "EDGE DECAY ADVANTAGE: Price action suffers edge decay when volatility changes. Order flow = NO edge decay because you watch the true nature of the market. EXERCISE that improved win rate 4-5%: On retracement, zoom into order flow. Watch CVD and orders. If heavy aggression at level + CVD diverging = movement not supported, reversal probability high. This info comes BEFORE price stops you out.",
+    "priority": 4
+  },
+  {
+    "id": "fabio-amt-007",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "Execution",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "LIVE TRADE — London Trend Following: Market out of balance on 5m. Order flow filter activated (20-30 contracts NQ for London). Momentum building before breakout — small orders in balance, then aggressive buying. Entry at LVN: plot profile from swing start to end, find LVN. Retracement near LVN + aggression = trigger. THE MORE YOU WAIT after LVN, riskier. In fast, close fast. When sellers fight back → move stop to profit.",
+    "priority": 4
+  },
+  {
+    "id": "fabio-amt-008",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "Execution",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "LIVE TRADE — NY Full Execution: Price takes low before session open, deep discount area. Aggressive sellers appear but buyers absorb them. Narrative was long. Market took the low, then validated first squeeze level. Entry on 1m: candle closes above consolidation box with full body. Stop below big buyer orders. Risk $260, potential $1,100 = 1:5 R:R. High breaks → catalyst kicks in → risk-free within seconds.",
+    "priority": 4
+  },
+  {
+    "id": "fabio-amt-009",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "Execution",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "SQUEEZE MECHANICS: Aggressive sellers step in → next step is recovery (squeeze) or follow-through (reversal). Red seller orders at top are underwater. When they need to close → market jumps. Each closed sell creates more upward momentum. You can see the pain building BEFORE the price move. Squeeze in London but 3x LARGER in New York. Scale out half when aggressive sellers step in — protect while keeping exposure for second squeeze.",
+    "priority": 4
+  },
+  {
+    "id": "fabio-amt-010",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "Execution",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "TRAILING STOP PHILOSOPHY: Don't move to break even too fast. NASDAQ at session open: first drive → pullback → real move. If risk-free too quickly, market spikes you out at LVN then rockets up. Wait for FULL BODY CANDLE accepting the high before trailing. When you see candle acceptance → trail aggressively. Scale out half when aggressive sellers step in.",
+    "priority": 4
+  },
+  {
+    "id": "fabio-amt-011",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "CONSOLIDATION DAYS: Model doesn't work in compression. Goal = make money OR close at break-even. If mean-reverting day and you close break-even = great. Wait for explosion days — real money is made there. Monday/Friday = worst days (lower profit factor). If stop on second model attempt + full consolidation → stop for the day. Protect profit.",
+    "priority": 3
+  },
+  {
+    "id": "fabio-amt-012",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "DON'T MARRY YOUR POSITION: Change narrative the moment data tells you to. Ego keeps you in bias — resist it. Market doesn't care about your opinion. 'Buy low, sell high' is meaningless without context. Low compared to what? When buyers pay higher price to push down, there is no discount/premium. Trust only people with verification — live analysis, live trading, track records.",
+    "priority": 3
+  },
+  {
+    "id": "fabio-amt-013",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PRE-MARKET PREPARATION: Mark biggest delta volume (buy and sell sides, different colors). Know which levels get tapped at open. From buy side: swing low → level with most volume. From sell side: same. Expected reactions within first 15-20 min. 5m for analysis, 1m for execution. NEVER trade 10-20 min before session opens — volatility range changes by session. London model ≠ New York alpha.",
+    "priority": 4
+  },
+  {
+    "id": "fabio-amt-014",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "Execution",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "COMPOUND STRATEGY (World Championship): Build profit for the day. On directional days, RISK THE PROFIT from 10 trades. Day closes → profit locked as equity, can't risk it. Next day resets. This is how 500%+ return in 12 months was achieved — accumulating daily profits, then on best days, aggressive shots with no downside. 2,400 executions in 12 months is more statistically valuable than 30 long-term trades.",
+    "priority": 5
+  },
+  {
+    "id": "fabio-amt-015",
+    "source": "scalping-fabio-valentina-amt",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "THREE LEVELS OF ANALYSIS: 1) LAGGING — indicators (MACD, RSI, Stochastic) — derivatives of price, always follow. 2) REAL-TIME — price action — watching what's happening as an effect. 3) LEADING — volume — watching the narrative BEFORE price creates it. Volume is the only leading indicator. CVD moves before price. Aggression appears before the breakout. If you're using lagging indicators, you're always behind.",
+    "priority": 5
+  }
+]
