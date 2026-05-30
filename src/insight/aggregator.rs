@@ -146,9 +146,9 @@ impl InsightAggregator {
             self.cached.flows = flows::fetch_flows(&self.client, None).await;
         }
 
-        // News — CoinGecko trending + CryptoPanic (if key available)
+        // News — CoinGecko trending (free, no key)
         if self.config.news_sentiment_enabled {
-            self.cached.news = news::fetch_news(&self.client, None).await;
+            self.cached.news = news::fetch_news(&self.client).await;
         }
 
         // RSS feeds — 8 free feeds, parsed with quick-xml

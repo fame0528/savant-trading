@@ -1,32 +1,19 @@
 //! Breaking news and social sentiment data.
 //!
-//! Uses CoinGecko trending (free, no key) as primary source.
-//! CryptoPanic integration available with API key.
+//! Uses CoinGecko trending (free, no key) for social sentiment.
+//! RSS feeds (in rss.rs) provide actual news coverage.
 
 use serde::{Deserialize, Serialize};
-use tracing::{debug, info, warn};
-
-/// A single news item.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct NewsItem {
-    pub title: String,
-    pub source: String,
-    pub url: Option<String>,
-    pub sentiment: Option<f64>, // -1.0 to 1.0
-    pub timestamp: Option<String>,
-    pub coins: Vec<String>,
-}
+use tracing::{info, warn};
 
 /// News and social sentiment data.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct NewsData {
-    /// Overall sentiment score (-1.0 to 1.0)
+    /// Overall sentiment score (-1.0 to 1.0) derived from trending coin price changes
     pub sentiment_score: Option<f64>,
     /// Trending coins by social volume
     pub trending_coins: Vec<TrendingCoin>,
-    /// Recent breaking news
-    pub breaking_news: Vec<NewsItem>,
-    /// Trending topics/hashtags
+    /// Trending topics/hashtags (top symbols)
     pub trending_topics: Vec<String>,
 }
 
@@ -69,24 +56,15 @@ struct CoinGeckoTrendingData {
 
 /// Fetch news and social sentiment data.
 ///
-/// Uses CoinGecko trending (free, no key) as primary.
-/// Uses CryptoPanic (requires key) for news if available.
-pub async fn fetch_news(client: &reqwest::Client, api_key: Option<&str>) -> NewsData {
+/// Uses CoinGecko trending (free, no key) to derive social sentiment.
+/// Actual news coverage comes from RSS feeds (see rss.rs).
+pub async fn fetch_news(client: &reqwest::Client) -> NewsData {
     let mut data = NewsData::default();
 
-    // Always fetch CoinGecko trending (free)
+    // Fetch CoinGecko trending (free, no key)
     fetch_coingecko_trending(client, &mut data).await;
 
-    // Try CryptoPanic if key is available
-    if let Some(key) = api_key {
-        if !key.is_empty() {
-            fetch_cryptopanic(client, key, &mut data).await;
-        }
-    } else {
-        debug!("CryptoPanic API key not configured — using CoinGecko trending only");
-    }
-
-    // Derive sentiment from trending data
+    // Derive sentiment from trending coin price changes
     if !data.trending_coins.is_empty() {
         let avg_change: f64 = data
             .trending_coins
@@ -97,6 +75,12 @@ pub async fn fetch_news(client: &reqwest::Client, api_key: Option<&str>) -> News
 
         // Normalize to -1.0 to 1.0 range (clamp at ±10%)
         data.sentiment_score = Some((avg_change / 10.0).clamp(-1.0, 1.0));
+
+        info!(
+            "News sentiment: {:.2} (avg trending change: {:.2}%)",
+            data.sentiment_score.unwrap_or(0.0),
+            avg_change
+        );
     }
 
     data
@@ -162,94 +146,5 @@ async fn fetch_coingecko_trending(client: &reqwest::Client, data: &mut NewsData)
             }
         }
         Err(e) => warn!("CoinGecko trending API request failed: {}", e),
-    }
-}
-
-/// Fetch news from CryptoPanic (requires API key).
-async fn fetch_cryptopanic(client: &reqwest::Client, api_key: &str, data: &mut NewsData) {
-    let url = format!(
-        "https://cryptopanic.com/api/v1/posts/?auth_token={}&public=true&kind=news&filter=hot",
-        api_key
-    );
-
-    match client.get(&url).send().await {
-        Ok(resp) => {
-            if !resp.status().is_success() {
-                warn!("CryptoPanic API returned HTTP {}", resp.status());
-                return;
-            }
-
-            if let Ok(json) = resp.json::<serde_json::Value>().await {
-                if let Some(results) = json.get("results").and_then(|r| r.as_array()) {
-                    for item in results.iter().take(10) {
-                        let title = item
-                            .get("title")
-                            .and_then(|t| t.as_str())
-                            .unwrap_or("")
-                            .to_string();
-
-                        let source = item
-                            .get("source")
-                            .and_then(|s| s.get("title"))
-                            .and_then(|t| t.as_str())
-                            .unwrap_or("unknown")
-                            .to_string();
-
-                        let url = item
-                            .get("url")
-                            .and_then(|u| u.as_str())
-                            .map(|s| s.to_string());
-
-                        let published = item
-                            .get("published_at")
-                            .and_then(|p| p.as_str())
-                            .map(|s| s.to_string());
-
-                        let coins: Vec<String> = item
-                            .get("currencies")
-                            .and_then(|c| c.as_array())
-                            .map(|arr| {
-                                arr.iter()
-                                    .filter_map(|c| c.get("code").and_then(|c| c.as_str()))
-                                    .map(|s| s.to_string())
-                                    .collect()
-                            })
-                            .unwrap_or_default();
-
-                        // Parse sentiment from votes
-                        let votes = item.get("votes");
-                        let positive = votes
-                            .and_then(|v| v.get("positive"))
-                            .and_then(|v| v.as_i64())
-                            .unwrap_or(0);
-                        let negative = votes
-                            .and_then(|v| v.get("negative"))
-                            .and_then(|v| v.as_i64())
-                            .unwrap_or(0);
-                        let total = positive + negative;
-                        let sentiment = if total > 0 {
-                            Some((positive as f64 - negative as f64) / total as f64)
-                        } else {
-                            None
-                        };
-
-                        data.breaking_news.push(NewsItem {
-                            title,
-                            source,
-                            url,
-                            sentiment,
-                            timestamp: published,
-                            coins,
-                        });
-                    }
-
-                    info!(
-                        "CryptoPanic: {} news items fetched",
-                        data.breaking_news.len()
-                    );
-                }
-            }
-        }
-        Err(e) => warn!("CryptoPanic API request failed: {}", e),
     }
 }

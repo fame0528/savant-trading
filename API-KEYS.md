@@ -1,6 +1,6 @@
 # API Keys Reference
 
-All data sources are **free, no keys required**. Optional keys unlock additional features.
+**All data sources are free, no keys required.** The system works fully out of the box.
 
 ---
 
@@ -32,20 +32,9 @@ All data sources are **free, no keys required**. Optional keys unlock additional
 
 ---
 
-## Optional (Enhanced Features)
-
-| Service | What It Adds | Signup | Env Var |
-|---------|-------------|--------|---------|
-| CryptoPanic | Aggregated news with sentiment scoring | https://cryptopanic.com/developers/ | `CRYPTOPANIC_API_KEY` |
-
----
-
 ## .env Template
 
 ```bash
-# === Optional (enhanced features) ===
-CRYPTOPANIC_API_KEY=
-
 # === OpenGateway (AI provider — has built-in defaults) ===
 OPENGATEWAY_API_KEY=
 
