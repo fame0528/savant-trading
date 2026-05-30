@@ -3,6 +3,7 @@ use tracing::{info, warn};
 
 use savant_trading::core::config::AppConfig;
 
+mod api;
 mod engine;
 
 #[tokio::main]
@@ -21,12 +22,27 @@ async fn main() -> anyhow::Result<()> {
         AppConfig::default()
     });
 
-    if args.get(1).map(|s| s.as_str()) == Some("report") {
-        return savant_trading::monitor::report::print_report(&config.trading.database_url).await;
+    match args.get(1).map(|s| s.as_str()) {
+        Some("report") => {
+            return savant_trading::monitor::report::print_report(&config.trading.database_url)
+                .await;
+        }
+        Some("--dry-run") => {
+            info!("=== SAVANT DRY RUN ===");
+            return engine::dry_run(config).await;
+        }
+        Some("--api") => {
+            info!("=== SAVANT API SERVER ===");
+            return api::start_server(config).await;
+        }
+        Some("--help") | Some("-h") => {
+            print_help();
+            return Ok(());
+        }
+        _ => {}
     }
 
-    info!("=== SAVANT TRADING ENGINE v0.1.0 ===");
-
+    info!("=== SAVANT TRADING ENGINE v0.2.0 ===");
     info!(
         "Mode: {}",
         if config.mode.paper_trading {
@@ -39,4 +55,15 @@ async fn main() -> anyhow::Result<()> {
     info!("Starting balance: ${:.2}", config.trading.starting_balance);
 
     engine::run(config).await
+}
+
+fn print_help() {
+    println!("SAVANT TRADING ENGINE v0.2.0");
+    println!();
+    println!("USAGE:");
+    println!("  savant                 Start trading engine");
+    println!("  savant --dry-run       Run one AI decision cycle and print full pipeline");
+    println!("  savant --api           Start REST API server for dashboard");
+    println!("  savant report          Print performance report");
+    println!("  savant --help          Show this help");
 }

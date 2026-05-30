@@ -547,3 +547,215 @@ pub async fn run(config: AppConfig) -> anyhow::Result<()> {
         time::sleep(Duration::from_secs(interval_seconds)).await;
     }
 }
+
+/// Dry-run: make ONE AI call and print the full pipeline output.
+pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
+    let kraken = KrakenClient::new(&config.exchange.rest_url);
+    let pair = config
+        .trading
+        .pairs
+        .first()
+        .cloned()
+        .unwrap_or_else(|| "BTC/USD".to_string());
+
+    // 1. Fetch market data
+    println!("\n=== SAVANT DRY RUN ===");
+    println!("Pair: {}", pair);
+    println!(
+        "Time: {}",
+        chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC")
+    );
+
+    println!("\n--- MARKET DATA ---");
+    let mut candles = kraken
+        .get_ohlc(
+            &pair,
+            parse_timeframe_minutes(&config.trading.timeframe),
+            None,
+        )
+        .await
+        .unwrap_or_default();
+    if candles.len() > 1 {
+        candles.pop();
+    }
+
+    if candles.is_empty() {
+        println!("ERROR: No candle data available");
+        return Ok(());
+    }
+
+    let indicators = savant_trading::data::indicators::IndicatorEngine::calculate_all(
+        &candles,
+        config.strategy.regime.adx_period,
+    );
+
+    let regime_detector = RegimeDetector::new(
+        config.strategy.regime.adx_period,
+        config.strategy.regime.adx_trending_threshold,
+        config.strategy.regime.adx_ranging_threshold,
+        config.strategy.regime.atr_volatility_multiplier,
+    );
+    let regime = regime_detector.detect(&indicators, &candles);
+
+    let profile = savant_trading::data::indicators::IndicatorEngine::volume_profile(
+        &candles,
+        config.strategy.mean_reversion.profile_periods.min(50),
+    );
+
+    if let Some(last) = candles.last() {
+        println!(
+            "Candle: O={:.2} H={:.2} L={:.2} C={:.2} V={:.2}",
+            last.open, last.high, last.low, last.close, last.volume
+        );
+    }
+    println!(
+        "Indicators: EMA_FAST={:?} EMA_SLOW={:?} RSI={:?} ATR={:?} ADX={:?} VWAP={:?}",
+        indicators.ema_fast,
+        indicators.ema_slow,
+        indicators.rsi,
+        indicators.atr,
+        indicators.adx,
+        indicators.vwap
+    );
+    println!("Regime: {:?}", regime);
+
+    // 2. Fetch insight
+    println!("\n--- INSIGHT ---");
+    let insight_config = InsightConfig {
+        funding_rate_enabled: config.insight.funding_rate_enabled,
+        liquidation_enabled: config.insight.liquidation_enabled,
+        fear_greed_enabled: config.insight.fear_greed_enabled,
+        btc_dominance_enabled: config.insight.btc_dominance_enabled,
+        exchange_flows_enabled: config.insight.exchange_flows_enabled,
+        news_sentiment_enabled: config.insight.news_sentiment_enabled,
+        rss_enabled: config.insight.rss_enabled,
+        rss_max_items: config.insight.rss_max_items,
+    };
+    let mut insight = InsightAggregator::new(insight_config);
+    let market_ctx = insight.refresh(&pair).await.clone();
+    println!("{}", market_ctx.summary());
+
+    // 3. Knowledge selection
+    println!("\n--- KNOWLEDGE SELECTION ---");
+    let knowledge_base = load_knowledge_base();
+    let conditions = savant_trading::agent::context_builder::determine_conditions_static(
+        regime,
+        market_ctx.sentiment.fear_greed_index,
+        market_ctx.funding.funding_rate,
+    );
+    let selected = knowledge_base.select(&conditions, config.ai.knowledge_token_budget);
+    println!("Conditions: {:?}", conditions);
+    println!(
+        "Selected {} of {} units:",
+        selected.len(),
+        knowledge_base.len()
+    );
+    for (i, unit) in selected.iter().enumerate().take(10) {
+        println!(
+            "  {}. {} ({}) — priority {}",
+            i + 1,
+            unit.id,
+            unit.source,
+            unit.priority
+        );
+    }
+
+    // 4. Build prompt
+    println!("\n--- PROMPT ---");
+    let composer = PromptComposer::new(
+        &prompts::default_base_identity(),
+        &format!(
+            "Max risk per trade: {}% | Max daily loss: {}% | Max drawdown: {}% | Max positions: {} | Min R:R: {}",
+            config.risk.max_risk_per_trade * 100.0,
+            config.risk.max_daily_loss * 100.0,
+            config.risk.max_drawdown * 100.0,
+            config.risk.max_positions,
+            config.risk.min_rr_ratio,
+        ),
+        include_str!("agent/prompts/strategy_knowledge.md"),
+        &prompts::default_output_format(),
+    );
+    let system_prompt = composer.compose(&selected);
+    println!("System prompt: {} chars", system_prompt.len());
+    println!("Knowledge units injected: {}", selected.len());
+
+    // 5. Build context and call LLM
+    println!("\n--- LLM CALL ---");
+    let llm_config = LlmConfig {
+        endpoint: config.ai.endpoint.clone(),
+        model: config.ai.model.clone(),
+        api_key: std::env::var(&config.ai.api_key_env).unwrap_or_default(),
+        max_tokens: config.ai.max_tokens,
+        temperature: config.ai.temperature,
+    };
+
+    let paper = PaperTrader::new(
+        config.trading.starting_balance,
+        config.trading.fee_rate,
+        config.trading.slippage_pct,
+    );
+    let ctx = FullContext {
+        candles: &candles,
+        indicators: &indicators,
+        regime,
+        volume_profile: Some(&profile),
+        market_context: &market_ctx,
+        positions: &[],
+        account: paper.account(),
+        pair: &pair,
+    };
+
+    let user_message = savant_trading::agent::context_builder::build_user_message_static(&ctx);
+    println!("User message: {} chars", user_message.len());
+
+    // Call LLM
+    let provider = savant_trading::agent::provider::LlmProvider::new(llm_config);
+    let messages = vec![savant_trading::agent::provider::Message {
+        role: "user".to_string(),
+        content: user_message,
+    }];
+
+    match provider.chat(&system_prompt, &messages).await {
+        Ok(response) => {
+            println!("\n--- LLM RESPONSE ---");
+            println!("{}", response);
+
+            // Parse decision
+            let current_price = candles.last().map(|c| c.close).unwrap_or(0.0);
+            match savant_trading::agent::decision_parser::parse_decision(
+                &response,
+                current_price,
+                config.ai.price_tolerance_pct,
+            ) {
+                Ok(decision) => {
+                    println!("\n--- PARSED DECISION ---");
+                    println!("Action: {:?}", decision.action);
+                    println!("Pair: {}", decision.pair);
+                    println!("Side: {:?}", decision.side);
+                    println!("Entry: {:.2}", decision.entry_price);
+                    println!("Stop Loss: {:.2}", decision.stop_loss);
+                    println!(
+                        "TP1: {:.2} | TP2: {:.2} | TP3: {:.2}",
+                        decision.take_profit_1, decision.take_profit_2, decision.take_profit_3
+                    );
+                    println!("Position Size: {:.1}%", decision.position_size_pct);
+                    println!("Confidence: {:.0}%", decision.confidence * 100.0);
+                    println!("R:R: {:.2}", decision.risk_reward);
+                    println!("Reasoning: {}", decision.reasoning);
+                    println!("Knowledge Sources: {:?}", decision.knowledge_sources);
+                }
+                Err(e) => {
+                    println!("\n--- PARSE ERROR ---");
+                    println!("Failed to parse LLM response: {}", e);
+                }
+            }
+        }
+        Err(e) => {
+            println!("\n--- LLM ERROR ---");
+            println!("Failed to call LLM: {}", e);
+        }
+    }
+
+    println!("\n=== DRY RUN COMPLETE ===");
+    Ok(())
+}

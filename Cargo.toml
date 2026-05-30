@@ -1,6 +1,6 @@
 [package]
 name = "savant-trading"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2021"
 description = "Automated crypto trading engine — Kraken exchange"
 
@@ -33,6 +33,10 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # Error handling
 thiserror = "2"
 anyhow = "1"
+
+# REST API
+axum = "0.8"
+tower-http = { version = "0.6", features = ["cors"] }
 
 # Time
 chrono = { version = "0.4", features = ["serde"] }

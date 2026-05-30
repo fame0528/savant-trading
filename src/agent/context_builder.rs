@@ -41,24 +41,35 @@ pub fn build_context(
     let system_prompt = composer.compose(&knowledge_units);
 
     // 4. Build user message with current market data
-    let user_message = build_user_message(ctx);
+    let user_message = build_user_message_static(ctx);
 
     (system_prompt, user_message)
 }
 
 /// Determine current market conditions from context.
 fn determine_conditions(ctx: &FullContext) -> Vec<MarketCondition> {
+    determine_conditions_static(
+        ctx.regime,
+        ctx.market_context.sentiment.fear_greed_index,
+        ctx.market_context.funding.funding_rate,
+    )
+}
+
+/// Static version of determine_conditions for use outside FullContext.
+pub fn determine_conditions_static(
+    regime: MarketRegime,
+    fear_greed: Option<u32>,
+    funding_rate: Option<f64>,
+) -> Vec<MarketCondition> {
     let mut conditions = Vec::new();
 
-    // Regime-based conditions
-    match ctx.regime {
+    match regime {
         MarketRegime::Trending => conditions.push(MarketCondition::Trending),
         MarketRegime::Ranging => conditions.push(MarketCondition::Ranging),
         MarketRegime::Volatile => conditions.push(MarketCondition::HighVolatility),
     }
 
-    // Sentiment-based conditions
-    if let Some(fg) = ctx.market_context.sentiment.fear_greed_index {
+    if let Some(fg) = fear_greed {
         if fg < 25 {
             conditions.push(MarketCondition::ExtremeFear);
         } else if fg > 75 {
@@ -66,34 +77,17 @@ fn determine_conditions(ctx: &FullContext) -> Vec<MarketCondition> {
         }
     }
 
-    // Funding rate extremes
-    if let Some(fr) = ctx.market_context.funding.funding_rate {
+    if let Some(fr) = funding_rate {
         if fr.abs() > 0.01 {
             conditions.push(MarketCondition::FundingRateExtreme);
         }
     }
 
-    // Liquidation clusters
-    if ctx
-        .market_context
-        .liquidation
-        .long_liquidation_cluster
-        .is_some()
-        || ctx
-            .market_context
-            .liquidation
-            .short_liquidation_cluster
-            .is_some()
-    {
-        conditions.push(MarketCondition::LiquidationCluster);
-    }
-
-    // Always include — the AI always needs execution and risk knowledge
     conditions
 }
 
 /// Build the user message containing current market data.
-fn build_user_message(ctx: &FullContext) -> String {
+pub fn build_user_message_static(ctx: &FullContext) -> String {
     let mut msg = String::new();
 
     msg.push_str(&format!("## Current Market Data — {}\n\n", ctx.pair));

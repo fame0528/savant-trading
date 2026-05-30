@@ -5,6 +5,41 @@ All notable changes to Savant Trading will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] — 2026-05-30
+
+### Added
+
+- **Dry-run test mode** — `savant --dry-run` runs one AI decision cycle and prints full pipeline output
+  - Market data (candles, indicators, regime)
+  - Insight (Fear & Greed, BTC Dominance, funding rates, RSS)
+  - Knowledge selection (conditions → matched units)
+  - System prompt (composed with knowledge injection)
+  - LLM response (raw JSON from mimo v2.5 pro)
+  - Parsed decision (action, entry, stop, targets, confidence, reasoning)
+- **REST API server** — `savant --api` starts axum server on localhost:8080
+  - 13 endpoints: status, config, portfolio, positions, trades, decisions, insight, knowledge, risk, session, engine control
+  - All responses use `{data, error, timestamp}` envelope
+  - Localhost-only binding (no external access)
+- **External knowledge loading** — `knowledge/` directory at project root
+  - Engine loads from `knowledge/` first, falls back to embedded
+  - 11 JSON files with 141 knowledge units
+  - Editable without recompiling
+- **Help command** — `savant --help` shows usage
+
+### Changed
+
+- Version bumped to 0.2.0
+- CLI now supports: `savant` (trade), `savant --dry-run`, `savant --api`, `savant report`, `savant --help`
+- `context_builder.rs` — `determine_conditions` and `build_user_message` now have static versions for dry-run use
+- `axum = "0.8"` and `tower-http = "0.6"` added for REST API
+
+### Dependencies
+
+| Dependency | Status | Notes |
+|------------|--------|-------|
+| `axum` | NEW | REST API server |
+| `tower-http` | NEW | CORS support |
+
 ## [0.1.2] — 2026-05-30
 
 ### Added
