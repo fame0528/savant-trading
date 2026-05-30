@@ -5,6 +5,24 @@ All notable changes to Savant Trading will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] — 2026-05-30
+
+### Added
+
+- **Session-aware trading** — Engine knows what trading session is active
+  - Asian (7 PM - 2 AM EST): low volume, ranging, 0.5x position size
+  - London (2 AM - 5 AM EST): high volume, reversals, 1.0x
+  - New York (7 AM - 10 AM EST): highest volume, continuations, 1.0x
+  - London/NY Overlap (8 AM - 10 AM EST): peak volume, 1.2x
+  - Off-hours: 0.3x position size, avoid new entries
+  - Kill zone detection: London, NY, Overlap are high-probability windows
+  - Session context injected into AI prompt
+
+### Changed
+
+- `core/session.rs` — New module: session detection, behavior, position size multiplier
+- `context_builder.rs` — Session info added to AI user message
+
 ## [0.3.0] — 2026-05-30
 
 ### Added

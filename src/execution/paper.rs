@@ -5,7 +5,7 @@ use tracing::{info, warn};
 
 use crate::core::error::ExecutionError;
 use crate::core::types::{
-    AccountState, Order, OrderStatus, OrderType, Position, Side, TradeRecord,
+    AccountState, Order, OrderStatus, OrderType, Position, ScaleLevel, Side, TradeRecord,
 };
 use crate::execution::engine::ExecutionEngine;
 
@@ -48,25 +48,18 @@ impl PaperTrader {
     pub fn check_stops(&mut self, prices: &HashMap<String, f64>) -> Vec<TradeRecord> {
         let mut closed = Vec::new();
         let mut to_remove = Vec::new();
+        let mut to_update: Vec<(String, f64, ScaleLevel)> = Vec::new();
 
         for (id, pos) in &self.positions {
             if let Some(&price) = prices.get(&pos.pair) {
+                // Check stop loss — full close
                 let hit_stop = match pos.side {
                     Side::Long => price <= pos.stop_loss,
                     Side::Short => price >= pos.stop_loss,
                 };
 
-                let hit_tp1 = match pos.side {
-                    Side::Long => price >= pos.take_profit_1,
-                    Side::Short => price <= pos.take_profit_1,
-                };
-
-                if hit_stop || hit_tp1 {
-                    let raw_exit = if hit_stop {
-                        pos.stop_loss
-                    } else {
-                        pos.take_profit_1
-                    };
+                if hit_stop {
+                    let raw_exit = pos.stop_loss;
                     let slippage = raw_exit * self.slippage_pct;
                     let exit_price = match pos.side {
                         Side::Long => raw_exit - slippage,
@@ -91,25 +84,172 @@ impl PaperTrader {
                         strategy_name: pos.strategy_name.clone(),
                         opened_at: pos.opened_at,
                         closed_at: Utc::now(),
-                        notes: if hit_stop {
-                            "Stop loss hit".to_string()
-                        } else {
-                            "Take profit 1 hit".to_string()
-                        },
+                        notes: format!("Stop loss hit ({:?})", pos.scale_level),
                     };
 
-                    if self.account.balance + pnl < 0.0 {
-                        warn!(
-                            "Trade would push balance negative: balance={:.2}, pnl={:.2}",
-                            self.account.balance, pnl
-                        );
-                    }
                     self.account.balance += pnl;
                     self.account.daily_pnl += pnl;
                     self.closed_trades.push(trade.clone());
                     closed.push(trade);
                     to_remove.push(id.clone());
+                    continue;
                 }
+
+                // Check take-profit levels with scale-out
+                match pos.scale_level {
+                    ScaleLevel::Full => {
+                        // Check TP1: close 50%, move SL to break-even
+                        let hit_tp1 = match pos.side {
+                            Side::Long => price >= pos.take_profit_1,
+                            Side::Short => price <= pos.take_profit_1,
+                        };
+
+                        if hit_tp1 {
+                            let scale_qty = pos.quantity * 0.5;
+                            let raw_exit = pos.take_profit_1;
+                            let slippage = raw_exit * self.slippage_pct;
+                            let exit_price = match pos.side {
+                                Side::Long => raw_exit - slippage,
+                                Side::Short => raw_exit + slippage,
+                            };
+                            let exit_fee = exit_price * scale_qty * self.fee_rate;
+                            let pnl = match pos.side {
+                                Side::Long => (exit_price - pos.entry_price) * scale_qty - exit_fee,
+                                Side::Short => {
+                                    (pos.entry_price - exit_price) * scale_qty - exit_fee
+                                }
+                            };
+                            let pnl_pct = pnl / (pos.entry_price * scale_qty) * 100.0;
+
+                            let trade = TradeRecord {
+                                id: uuid(),
+                                pair: pos.pair.clone(),
+                                side: pos.side,
+                                entry_price: pos.entry_price,
+                                exit_price,
+                                quantity: scale_qty,
+                                pnl,
+                                pnl_pct,
+                                strategy_name: pos.strategy_name.clone(),
+                                opened_at: pos.opened_at,
+                                closed_at: Utc::now(),
+                                notes: "TP1 hit — scale out 50%, SL → break-even".to_string(),
+                            };
+
+                            self.account.balance += pnl;
+                            self.account.daily_pnl += pnl;
+                            self.closed_trades.push(trade.clone());
+                            closed.push(trade);
+
+                            // Remaining 50%: move SL to break-even, advance scale level
+                            to_update.push((id.clone(), pos.entry_price, ScaleLevel::Scaled50));
+                        }
+                    }
+                    ScaleLevel::Scaled50 => {
+                        // Check TP2: close 60% of remaining (30% of original)
+                        let hit_tp2 = match pos.side {
+                            Side::Long => price >= pos.take_profit_2,
+                            Side::Short => price <= pos.take_profit_2,
+                        };
+
+                        if hit_tp2 {
+                            let scale_qty = pos.quantity * 0.6;
+                            let raw_exit = pos.take_profit_2;
+                            let slippage = raw_exit * self.slippage_pct;
+                            let exit_price = match pos.side {
+                                Side::Long => raw_exit - slippage,
+                                Side::Short => raw_exit + slippage,
+                            };
+                            let exit_fee = exit_price * scale_qty * self.fee_rate;
+                            let pnl = match pos.side {
+                                Side::Long => (exit_price - pos.entry_price) * scale_qty - exit_fee,
+                                Side::Short => {
+                                    (pos.entry_price - exit_price) * scale_qty - exit_fee
+                                }
+                            };
+                            let pnl_pct = pnl / (pos.entry_price * scale_qty) * 100.0;
+
+                            let trade = TradeRecord {
+                                id: uuid(),
+                                pair: pos.pair.clone(),
+                                side: pos.side,
+                                entry_price: pos.entry_price,
+                                exit_price,
+                                quantity: scale_qty,
+                                pnl,
+                                pnl_pct,
+                                strategy_name: pos.strategy_name.clone(),
+                                opened_at: pos.opened_at,
+                                closed_at: Utc::now(),
+                                notes: "TP2 hit — scale out 60% of remaining".to_string(),
+                            };
+
+                            self.account.balance += pnl;
+                            self.account.daily_pnl += pnl;
+                            self.closed_trades.push(trade.clone());
+                            closed.push(trade);
+
+                            // Remaining 40%: advance to Scaled80
+                            to_update.push((id.clone(), pos.stop_loss, ScaleLevel::Scaled80));
+                        }
+                    }
+                    ScaleLevel::Scaled80 => {
+                        // Check TP3: close remaining 100%
+                        let hit_tp3 = match pos.side {
+                            Side::Long => price >= pos.take_profit_3,
+                            Side::Short => price <= pos.take_profit_3,
+                        };
+
+                        if hit_tp3 {
+                            let raw_exit = pos.take_profit_3;
+                            let slippage = raw_exit * self.slippage_pct;
+                            let exit_price = match pos.side {
+                                Side::Long => raw_exit - slippage,
+                                Side::Short => raw_exit + slippage,
+                            };
+                            let exit_fee = exit_price * pos.quantity * self.fee_rate;
+                            let pnl = match pos.side {
+                                Side::Long => {
+                                    (exit_price - pos.entry_price) * pos.quantity - exit_fee
+                                }
+                                Side::Short => {
+                                    (pos.entry_price - exit_price) * pos.quantity - exit_fee
+                                }
+                            };
+                            let pnl_pct = pnl / (pos.entry_price * pos.quantity) * 100.0;
+
+                            let trade = TradeRecord {
+                                id: uuid(),
+                                pair: pos.pair.clone(),
+                                side: pos.side,
+                                entry_price: pos.entry_price,
+                                exit_price,
+                                quantity: pos.quantity,
+                                pnl,
+                                pnl_pct,
+                                strategy_name: pos.strategy_name.clone(),
+                                opened_at: pos.opened_at,
+                                closed_at: Utc::now(),
+                                notes: "TP3 hit — full close".to_string(),
+                            };
+
+                            self.account.balance += pnl;
+                            self.account.daily_pnl += pnl;
+                            self.closed_trades.push(trade.clone());
+                            closed.push(trade);
+                            to_remove.push(id.clone());
+                        }
+                    }
+                    ScaleLevel::Closed => {}
+                }
+            }
+        }
+
+        // Apply scale-level and stop-loss updates
+        for (id, new_sl, new_scale) in to_update {
+            if let Some(pos) = self.positions.get_mut(&id) {
+                pos.stop_loss = new_sl;
+                pos.scale_level = new_scale;
             }
         }
 
@@ -248,7 +388,14 @@ fn uuid() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
     let t = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_nanos();
-    format!("{:x}", t)
+        .unwrap_or_default();
+    let nanos = t.as_nanos();
+    let pid = std::process::id();
+    format!(
+        "{:08x}-{:08x}-{:08x}-{:08x}",
+        (nanos >> 96) as u32,
+        (nanos >> 64) as u32,
+        (nanos >> 32) as u32,
+        (nanos as u32) ^ pid
+    )
 }

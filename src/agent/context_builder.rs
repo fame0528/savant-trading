@@ -5,6 +5,7 @@
 
 use crate::agent::knowledge::{KnowledgeBase, MarketCondition};
 use crate::agent::prompts::PromptComposer;
+use crate::core::session;
 use crate::core::types::{
     AccountState, Candle, IndicatorValues, MarketRegime, Position, TradeRecord, VolumeProfile,
 };
@@ -114,6 +115,9 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
 
     // Regime
     msg.push_str(&format!("Regime: {:?}\n", ctx.regime));
+
+    // Session
+    msg.push_str(&format!("{}\n", session::session_context()));
 
     // Volume profile
     if let Some(vp) = ctx.volume_profile {

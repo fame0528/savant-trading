@@ -33,7 +33,8 @@ async fn main() -> anyhow::Result<()> {
         }
         Some("--api") => {
             info!("=== SAVANT API SERVER ===");
-            return api::start_server(config).await;
+            let shared = api::SharedEngineData::new();
+            return api::start_server(config, shared).await;
         }
         Some("--help") | Some("-h") => {
             print_help();

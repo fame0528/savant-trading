@@ -73,12 +73,11 @@ pub fn parse_decision(
     let min_price = current_price - tolerance;
     let max_price = current_price + tolerance;
 
-    if decision.entry_price <= 0.0 {
-        return Err(ParseError::MissingField("entry_price".to_string()));
-    }
-
     // Only validate prices for non-Hold decisions
     if decision.action != TradeAction::Hold {
+        if decision.entry_price <= 0.0 {
+            return Err(ParseError::MissingField("entry_price".to_string()));
+        }
         validate_price("entry_price", decision.entry_price, min_price, max_price)?;
         validate_price("stop_loss", decision.stop_loss, min_price, max_price)?;
         validate_price(
