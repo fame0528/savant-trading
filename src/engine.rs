@@ -184,9 +184,8 @@ pub async fn run(config: AppConfig) -> anyhow::Result<()> {
         btc_dominance_enabled: config.insight.btc_dominance_enabled,
         exchange_flows_enabled: config.insight.exchange_flows_enabled,
         news_sentiment_enabled: config.insight.news_sentiment_enabled,
-        funding_api_key: None,
-        liquidation_api_key: None,
-        news_api_key: None,
+        rss_enabled: config.insight.rss_enabled,
+        rss_max_items: config.insight.rss_max_items,
     };
     let mut insight = InsightAggregator::new(insight_config);
     info!("Insight aggregator initialized");

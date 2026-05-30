@@ -5,6 +5,40 @@ All notable changes to Savant Trading will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] — 2026-05-30
+
+### Added
+
+- **RSS News Pipeline** — 15 free RSS feeds parsed with `quick-xml`, scored by relevance to trading pairs
+  - Crypto-native: Cointelegraph, CoinDesk, CryptoSlate, Decrypt, CryptoNews, CryptoPotato, CryptoBreaking
+  - DeFi: The Defiant, SmartLiquidity
+  - Institutional: Blockworks, Bitcoin Magazine, Ethereum 2.0
+  - Mainstream: Yahoo Finance, CNBC (macro context)
+  - Regional: KriptoNovini
+- **Kraken Futures Integration** — Funding rates, open interest, mark prices from `futures.kraken.com` (free, no key)
+- **Liquidation Risk Assessment** — Derived from futures data: mark/index spread, funding extremes, OI concentration
+- **On-chain Data** — Block height, mempool size, 24h tx count from blockchain.info (free, no key)
+- **CoinGecko Trending** — Trending coins with price changes, used as social sentiment proxy
+- **API-KEYS.md** — Reference document with all endpoints, signup links, and env var names
+
+### Changed
+
+- All insight modules now use **free APIs only** — no paid API keys required
+- CoinGlass replaced with Kraken Futures (free, no geo-block)
+- All insight sources enabled by default in config
+- 15 RSS feeds (up from 0)
+
+### Removed
+
+- CoinGlass API dependency (not free)
+- CryptoQuant API dependency (not free — blockchain.info used instead)
+- API key fields from InsightConfig (all sources free now)
+
+### Fixed
+
+- FID-015 Perfection Loop: `quick-xml` dependency validated, all API endpoints verified
+- Cargo.toml: `quick-xml = "0.37"` added for RSS/XML parsing
+
 ## [0.1.1] — 2026-05-30
 
 ### Changed

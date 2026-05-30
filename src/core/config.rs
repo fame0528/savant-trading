@@ -38,6 +38,8 @@ pub struct InsightConfig {
     pub btc_dominance_enabled: bool,
     pub exchange_flows_enabled: bool,
     pub news_sentiment_enabled: bool,
+    pub rss_enabled: bool,
+    pub rss_max_items: usize,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -196,12 +198,14 @@ impl Default for AppConfig {
                 max_tokens: 4096,
             },
             insight: InsightConfig {
-                funding_rate_enabled: false,
-                liquidation_enabled: false,
+                funding_rate_enabled: true,
+                liquidation_enabled: true,
                 fear_greed_enabled: true,
                 btc_dominance_enabled: true,
-                exchange_flows_enabled: false,
-                news_sentiment_enabled: false,
+                exchange_flows_enabled: true,
+                news_sentiment_enabled: true,
+                rss_enabled: true,
+                rss_max_items: 10,
             },
         }
     }
