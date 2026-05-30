@@ -95,11 +95,7 @@ impl KnowledgeBase {
         let mut matching: Vec<&KnowledgeUnit> = self
             .units
             .iter()
-            .filter(|unit| {
-                unit.conditions
-                    .iter()
-                    .any(|c| conditions.contains(c))
-            })
+            .filter(|unit| unit.conditions.iter().any(|c| conditions.contains(c)))
             .collect();
 
         // Sort by priority descending

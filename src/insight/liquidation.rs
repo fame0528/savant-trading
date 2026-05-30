@@ -17,7 +17,7 @@ pub struct LiquidationData {
 ///
 /// Uses CoinGlass API (may require API key).
 pub async fn fetch_liquidation(
-    client: &reqwest::Client,
+    _client: &reqwest::Client,
     _symbol: &str,
     _api_key: Option<&str>,
 ) -> LiquidationData {

@@ -5,6 +5,35 @@ All notable changes to Savant Trading will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] — 2026-05-30
+
+### Changed
+
+- **Knowledge Base Expansion** — 88 → 141 knowledge units (+60%)
+  - `ai_claude_bot.json`: 5 → 20 units (HMM math, feature engineering, walk-forward, circuit breakers, dashboard)
+  - `tjr_smc.json`: 15 → 19 units (partial FVG fills, rejection candles, engulfing, trailing stop models)
+  - `crypto_fcb.json`: 13 → 18 units (MACD, Bollinger Bands, Fibonacci, altcoin selection, market cycles)
+  - `pradeep_ep.json`: 12 → 15 units (delayed EP, continuation EP, sector rotation)
+  - `juvier_daytrading.json`: 6 → 12 units (displacement candles, breaker blocks, Asian range, London vs NY)
+  - `warrior_trading.json`: 6 → 10 units (gap fill probability, short selling, morning vs afternoon)
+  - `brian_jung.json`: 5 → 8 units (stablecoin strategy, ETF impact, global liquidity)
+  - `ai_competition.json`: 3 → 10 units (all 15 bot strategies, risk tier analysis, evolution methodology)
+  - `hybrid_scalping.json`: 4 → 8 units (multi-TF scalping, session-specific, fee optimization)
+  - `cathie_wood.json`: 4 → 6 units (Tesla robotaxi, humanoid robots, demographics)
+  - `fabio_amt.json`: 15 → 15 units (refined with more specific execution details)
+
+### Fixed
+
+- FID-001, FID-002, FID-003 status corrected from "analyzed" to "fixed"
+- FID-007 status set to "superseded" (absorbed into FID-013)
+- All 13 FIDs have proper Perfection Loop audits
+
+### Verified
+
+- Fear & Greed API: `GET https://api.alternative.me/fng/?limit=1` → `23 (Extreme Fear)` — free, no key
+- CoinGecko API: `GET https://api.coingecko.com/api/v3/global` → `BTC.D: 57.44%` — free, no key
+- Build: `cargo clippy -- -D warnings` zero warnings, `cargo fmt --check` clean
+
 ## [0.1.0] — 2026-05-30
 
 ### Added

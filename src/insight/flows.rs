@@ -16,10 +16,7 @@ pub struct FlowData {
 /// Fetch exchange flow data.
 ///
 /// Uses CryptoQuant free tier or Glassnode.
-pub async fn fetch_flows(
-    client: &reqwest::Client,
-    _api_key: Option<&str>,
-) -> FlowData {
+pub async fn fetch_flows(_client: &reqwest::Client, _api_key: Option<&str>) -> FlowData {
     // TODO: Implement CryptoQuant or Glassnode API
     // For now return empty — will be populated when API key is configured
     FlowData::default()

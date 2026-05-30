@@ -26,10 +26,7 @@ pub struct NewsData {
 /// Fetch news and social sentiment.
 ///
 /// Uses LunarCrush API or custom scraper.
-pub async fn fetch_news(
-    client: &reqwest::Client,
-    _api_key: Option<&str>,
-) -> NewsData {
+pub async fn fetch_news(_client: &reqwest::Client, _api_key: Option<&str>) -> NewsData {
     // TODO: Implement LunarCrush or alternative news API
     // For now return empty — will be populated when API key is configured
     NewsData::default()

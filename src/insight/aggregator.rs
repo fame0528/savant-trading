@@ -1,7 +1,6 @@
 //! Unified market context — combines all insight sources into a single struct.
 
 use serde::{Deserialize, Serialize};
-use tracing::warn;
 
 use crate::insight::flows::{self, FlowData};
 use crate::insight::funding_rates::{self, FundingData};
@@ -39,7 +38,11 @@ impl MarketContext {
         let mut parts = Vec::new();
 
         if let Some(fg) = self.sentiment.fear_greed_index {
-            let label = self.sentiment.fear_greed_label.as_deref().unwrap_or("Unknown");
+            let label = self
+                .sentiment
+                .fear_greed_label
+                .as_deref()
+                .unwrap_or("Unknown");
             parts.push(format!("Fear & Greed: {} ({})", fg, label));
         }
 
@@ -121,11 +124,8 @@ impl InsightAggregator {
 
         // News
         if self.config.news_sentiment_enabled {
-            self.cached.news = news::fetch_news(
-                &self.client,
-                self.config.news_api_key.as_deref(),
-            )
-            .await;
+            self.cached.news =
+                news::fetch_news(&self.client, self.config.news_api_key.as_deref()).await;
         }
 
         &self.cached

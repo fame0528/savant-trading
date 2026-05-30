@@ -61,7 +61,7 @@ pub fn parse_decision(
     // Extract JSON from response (may be wrapped in markdown code blocks)
     let json_str = extract_json(response);
 
-    let decision: TradeDecision = serde_json::from_str(&json_str)?;
+    let decision: TradeDecision = serde_json::from_str(json_str)?;
 
     // Validate required fields
     if decision.pair.is_empty() {
@@ -79,12 +79,7 @@ pub fn parse_decision(
 
     // Only validate prices for non-Hold decisions
     if decision.action != TradeAction::Hold {
-        validate_price(
-            "entry_price",
-            decision.entry_price,
-            min_price,
-            max_price,
-        )?;
+        validate_price("entry_price", decision.entry_price, min_price, max_price)?;
         validate_price("stop_loss", decision.stop_loss, min_price, max_price)?;
         validate_price(
             "take_profit_1",
@@ -142,12 +137,7 @@ fn extract_json(response: &str) -> &str {
 }
 
 /// Validate a price is within the acceptable range.
-fn validate_price(
-    field: &str,
-    value: f64,
-    min: f64,
-    max: f64,
-) -> Result<(), ParseError> {
+fn validate_price(field: &str, value: f64, min: f64, max: f64) -> Result<(), ParseError> {
     if value < min || value > max {
         Err(ParseError::HallucinatedPrice {
             field: field.to_string(),

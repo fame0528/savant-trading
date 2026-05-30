@@ -181,6 +181,28 @@ impl Default for AppConfig {
             mode: ModeConfig {
                 paper_trading: true,
             },
+            ai: AiConfig {
+                provider: "opengateway".into(),
+                endpoint: "https://opengateway.gitlawb.com/v1".into(),
+                model: "mimo-v2.5-pro".into(),
+                api_key_env: "OPENGATEWAY_API_KEY".into(),
+                autonomy_level: 3,
+                max_decisions_per_hour: 5,
+                context_window_candles: 100,
+                knowledge_token_budget: 8000,
+                price_tolerance_pct: 10.0,
+                max_retries: 3,
+                temperature: 0.7,
+                max_tokens: 4096,
+            },
+            insight: InsightConfig {
+                funding_rate_enabled: false,
+                liquidation_enabled: false,
+                fear_greed_enabled: true,
+                btc_dominance_enabled: true,
+                exchange_flows_enabled: false,
+                news_sentiment_enabled: false,
+            },
         }
     }
 }

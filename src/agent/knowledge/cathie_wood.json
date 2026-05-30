@@ -1,0 +1,50 @@
+[
+  {
+    "id": "cathie-wood-001",
+    "source": "macro-cathie-wood-ark-invest",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "5 INNOVATION PLATFORMS: 1) Robotics (autonomous systems, humanoid robots). 2) Energy Storage (batteries, EVs). 3) AI (biggest disruption in history). 4) Blockchain (Bitcoin, digital assets, finternet). 5) Multiomic Sequencing (gene editing, CRISPR). These CONVERGE — Tesla = robotics + energy + AI. Convergence could push GDP growth from 3% to 7.3% annually. Wright's Law: technology is deflationary, costs fall with each doubling of production.",
+    "priority": 3
+  },
+  {
+    "id": "cathie-wood-002",
+    "source": "macro-cathie-wood-ark-invest",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "BITCOIN $1.5M FORECAST: ARK bought at $250 (2015). Three building blocks: 1) Institutional investment (barely started, only ~1M BTC remaining). 2) Digital gold (young people prefer digital over physical). 3) Emerging market insurance (BTC hedge for countries with bad fiscal policy). Spot BTC ETF Jan 2024 = institutional floodgates. BTC base layer NOT hacked since 2009. 'Bitcoin is a new asset class — first truly new one since equities in the 1600s.'",
+    "priority": 3
+  },
+  {
+    "id": "cathie-wood-003",
+    "source": "macro-cathie-wood-ark-invest",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "TESLA ROBOTAXI THESIS: ARK's largest position. Tesla = largest AI project on Earth. Autonomous taxi ecosystem worth $8-10T in revenue in 5-10 years. Current Uber: $2-4/mile. Tesla autonomous: $25 cents/mile at scale. Two phases: Austin launch (June 2025, Model Y as autonomous taxi), Cyber Cab launch (2026, purpose-built). Stock target: $2,600 (90% from robotaxi platform). Humanoid robots NOT included in target — that's additional upside.",
+    "priority": 3
+  },
+  {
+    "id": "cathie-wood-004",
+    "source": "macro-cathie-wood-ark-invest",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "AI INVESTMENT STACK: Chips (Nvidia, TSMC) → Inference (Groq) → Platform Software (Palantir) → Applications (Tesla, CRISPR) → Infrastructure (Coinbase). Biggest returns come from APPLICATION layer, not chip layer. Nvidia alone = too concentrated. If Nvidia's valuation is correct, there will be many other winners. ARK shifted toward Tesla and Palantir as different AI value chain layers.",
+    "priority": 3
+  },
+  {
+    "id": "cathie-wood-005",
+    "source": "macro-cathie-wood-ark-invest",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "HUMANOID ROBOTS ($26T MARKET): Same convergence as robotaxis (robotics + energy + AI). Elon thinks humanoid robot business will DWARF robotaxi. At Cybercab event, robots were tethered/remote-controlled. Since then, Tesla UNTETHERED them. If a robot has dexterity + AI overlay = 'what about humans?' ARK's $2,600 Tesla target has NOTHING for humanoid robots — that's pure additional upside.",
+    "priority": 3
+  },
+  {
+    "id": "cathie-wood-006",
+    "source": "macro-cathie-wood-ark-invest",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "DEMOGRAPHICS & PRODUCTIVITY: Developed world faces population collapse — falling fertility in China, Japan, Europe, US. Baby boomers retiring, smaller generations follow. Productivity is going to be ESSENTIAL. If we can't find human beings, we need productivity to fill the gap. AI and robotics are not threats to employment — they're NECESSITIES for maintaining economic output. This is the macro thesis driving all of ARK's investments.",
+    "priority": 3
+  }
+]

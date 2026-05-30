@@ -64,11 +64,7 @@ impl LlmProvider {
     ///
     /// `system` is the system prompt. `messages` is the conversation history.
     /// Returns the assistant's response text.
-    pub async fn chat(
-        &self,
-        system: &str,
-        messages: &[Message],
-    ) -> Result<String, LlmError> {
+    pub async fn chat(&self, system: &str, messages: &[Message]) -> Result<String, LlmError> {
         let mut all_messages = vec![Message {
             role: "system".to_string(),
             content: system.to_string(),

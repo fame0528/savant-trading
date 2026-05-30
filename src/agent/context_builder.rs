@@ -5,7 +5,9 @@
 
 use crate::agent::knowledge::{KnowledgeBase, MarketCondition};
 use crate::agent::prompts::PromptComposer;
-use crate::core::types::{AccountState, Candle, IndicatorValues, MarketRegime, Position, VolumeProfile};
+use crate::core::types::{
+    AccountState, Candle, IndicatorValues, MarketRegime, Position, VolumeProfile,
+};
 use crate::insight::MarketContext;
 
 /// Full context for a single AI evaluation tick.
@@ -72,8 +74,16 @@ fn determine_conditions(ctx: &FullContext) -> Vec<MarketCondition> {
     }
 
     // Liquidation clusters
-    if ctx.market_context.liquidation.long_liquidation_cluster.is_some()
-        || ctx.market_context.liquidation.short_liquidation_cluster.is_some()
+    if ctx
+        .market_context
+        .liquidation
+        .long_liquidation_cluster
+        .is_some()
+        || ctx
+            .market_context
+            .liquidation
+            .short_liquidation_cluster
+            .is_some()
     {
         conditions.push(MarketCondition::LiquidationCluster);
     }
@@ -130,8 +140,12 @@ fn build_user_message(ctx: &FullContext) -> String {
         for pos in ctx.positions {
             msg.push_str(&format!(
                 "- {} {} @ {:.2} | SL: {:.2} | TP1: {:.2} | PnL: {:.2}\n",
-                pos.pair, pos.side as u8, pos.entry_price, pos.stop_loss,
-                pos.take_profit_1, pos.unrealized_pnl
+                pos.pair,
+                pos.side as u8,
+                pos.entry_price,
+                pos.stop_loss,
+                pos.take_profit_1,
+                pos.unrealized_pnl
             ));
         }
     }
@@ -146,7 +160,9 @@ fn build_user_message(ctx: &FullContext) -> String {
     ));
 
     msg.push_str("\n## Decision Required\n");
-    msg.push_str("Analyze the above data and provide your trade decision in the specified JSON format.\n");
+    msg.push_str(
+        "Analyze the above data and provide your trade decision in the specified JSON format.\n",
+    );
 
     msg
 }

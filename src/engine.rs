@@ -3,6 +3,13 @@ use std::time::Duration;
 use tokio::time;
 use tracing::{error, info, warn};
 
+use savant_trading::agent::context_builder::FullContext;
+use savant_trading::agent::knowledge::KnowledgeBase;
+use savant_trading::agent::orchestrator::{
+    AgentConfig, AgentOrchestrator, AgentResult, AutonomyLevel,
+};
+use savant_trading::agent::prompts::{self, PromptComposer};
+use savant_trading::agent::provider::LlmConfig;
 use savant_trading::core::config::AppConfig;
 use savant_trading::core::types::{Candle, Position, ScaleLevel, Side};
 use savant_trading::data::indicators::IndicatorEngine;
@@ -10,6 +17,7 @@ use savant_trading::data::kraken::KrakenClient;
 use savant_trading::data::market_data::MarketDataStore;
 use savant_trading::execution::engine::ExecutionEngine;
 use savant_trading::execution::paper::PaperTrader;
+use savant_trading::insight::aggregator::{InsightAggregator, InsightConfig};
 use savant_trading::monitor::journal::TradeJournal;
 use savant_trading::monitor::metrics::PerformanceMetrics;
 use savant_trading::risk::circuit_breaker::{CircuitBreaker, CircuitBreakerResult};
@@ -41,6 +49,42 @@ pub fn parse_timeframe_minutes(tf: &str) -> u32 {
         "1d" => 1440,
         _ => 5,
     }
+}
+
+/// Load knowledge base from JSON files in src/agent/knowledge/.
+fn load_knowledge_base() -> KnowledgeBase {
+    let knowledge_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("src")
+        .join("agent")
+        .join("knowledge");
+
+    let mut all_units = Vec::new();
+
+    if let Ok(entries) = std::fs::read_dir(&knowledge_dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) == Some("json") {
+                match std::fs::read_to_string(&path) {
+                    Ok(json) => match KnowledgeBase::from_json(&json) {
+                        Ok(kb) => {
+                            let count = kb.len();
+                            all_units.extend_from_slice(kb.all());
+                            info!(
+                                "Loaded {} knowledge units from {:?}",
+                                count,
+                                path.file_name()
+                            );
+                        }
+                        Err(e) => warn!("Failed to parse {:?}: {}", path.file_name(), e),
+                    },
+                    Err(e) => warn!("Failed to read {:?}: {}", path.file_name(), e),
+                }
+            }
+        }
+    }
+
+    info!("Knowledge base loaded: {} total units", all_units.len());
+    KnowledgeBase::new(all_units)
 }
 
 pub async fn run(config: AppConfig) -> anyhow::Result<()> {
@@ -90,6 +134,64 @@ pub async fn run(config: AppConfig) -> anyhow::Result<()> {
         }
     }
 
+    // === AI AGENT SETUP ===
+    let knowledge_base = load_knowledge_base();
+
+    let composer = PromptComposer::new(
+        &prompts::default_base_identity(),
+        &format!(
+            "Max risk per trade: {}% | Max daily loss: {}% | Max drawdown: {}% | Max positions: {} | Min R:R: {}",
+            config.risk.max_risk_per_trade * 100.0,
+            config.risk.max_daily_loss * 100.0,
+            config.risk.max_drawdown * 100.0,
+            config.risk.max_positions,
+            config.risk.min_rr_ratio,
+        ),
+        include_str!("agent/prompts/strategy_knowledge.md"),
+        &prompts::default_output_format(),
+    );
+
+    let autonomy = match config.ai.autonomy_level {
+        1 => AutonomyLevel::Suggest,
+        2 => AutonomyLevel::Confirm,
+        _ => AutonomyLevel::Autonomous,
+    };
+
+    let llm_config = LlmConfig {
+        endpoint: config.ai.endpoint.clone(),
+        model: config.ai.model.clone(),
+        api_key: std::env::var(&config.ai.api_key_env).unwrap_or_default(),
+        max_tokens: config.ai.max_tokens,
+        temperature: config.ai.temperature,
+    };
+
+    let agent_config = AgentConfig {
+        autonomy_level: autonomy,
+        max_decisions_per_hour: config.ai.max_decisions_per_hour,
+        knowledge_token_budget: config.ai.knowledge_token_budget,
+        price_tolerance_pct: config.ai.price_tolerance_pct,
+        max_retries: config.ai.max_retries,
+    };
+
+    let mut agent = AgentOrchestrator::new(llm_config, agent_config, knowledge_base, composer);
+    info!("AI agent initialized: {:?} mode, mimo v2.5 pro", autonomy);
+
+    // === INSIGHT SETUP ===
+    let insight_config = InsightConfig {
+        funding_rate_enabled: config.insight.funding_rate_enabled,
+        liquidation_enabled: config.insight.liquidation_enabled,
+        fear_greed_enabled: config.insight.fear_greed_enabled,
+        btc_dominance_enabled: config.insight.btc_dominance_enabled,
+        exchange_flows_enabled: config.insight.exchange_flows_enabled,
+        news_sentiment_enabled: config.insight.news_sentiment_enabled,
+        funding_api_key: None,
+        liquidation_api_key: None,
+        news_api_key: None,
+    };
+    let mut insight = InsightAggregator::new(insight_config);
+    info!("Insight aggregator initialized");
+
+    // === RULE-BASED STRATEGIES (parallel signals, not primary brain) ===
     let momentum = MomentumStrategy::new(
         config.strategy.momentum.ema_period,
         config.strategy.momentum.volume_spike_multiplier,
@@ -148,11 +250,23 @@ pub async fn run(config: AppConfig) -> anyhow::Result<()> {
         }
     }
 
-    info!("Starting main loop (interval: {}s)...", interval_seconds);
+    // Initial insight fetch
+    info!("Fetching initial market insight...");
+    let _ = insight.refresh(&config.trading.pairs[0]).await;
+
+    info!(
+        "Starting main loop (interval: {}s, autonomy: {:?})...",
+        interval_seconds, autonomy
+    );
     let mut tick = 0u64;
 
     loop {
         tick += 1;
+
+        // Refresh insight every 5 ticks
+        if tick.is_multiple_of(5) {
+            let _ = insight.refresh(&config.trading.pairs[0]).await;
+        }
 
         for pair in &config.trading.pairs {
             let candles_result = kraken
@@ -193,95 +307,186 @@ pub async fn run(config: AppConfig) -> anyhow::Result<()> {
                     config.strategy.mean_reversion.profile_periods.min(50),
                 ));
 
-                let mut signals = Vec::new();
+                // === AI BRAIN — PRIMARY DECISION MAKER ===
+                let market_ctx = insight.cached().clone();
+                let positions: Vec<Position> = paper.positions().values().cloned().collect();
 
-                if let Some(sig) = momentum
-                    .evaluate(&candle_data, &indicators, regime, profile.as_ref())
-                    .await
-                {
-                    signals.push(sig);
-                }
-                if let Some(sig) = mean_rev
-                    .evaluate(&candle_data, &indicators, regime, profile.as_ref())
-                    .await
-                {
-                    signals.push(sig);
-                }
+                let ctx = FullContext {
+                    candles: &candle_data,
+                    indicators: &indicators,
+                    regime,
+                    volume_profile: profile.as_ref(),
+                    market_context: &market_ctx,
+                    positions: &positions,
+                    account: paper.account(),
+                    pair,
+                };
 
-                for signal in signals {
-                    match circuit_breaker.check(paper.account()) {
-                        CircuitBreakerResult::Triggered(reason) => {
-                            warn!("Signal blocked: {}", reason);
-                            continue;
+                match agent.evaluate(&ctx).await {
+                    AgentResult::Decision(decision) => {
+                        info!(
+                            "AI DECISION: {:?} {} {} @ {:.2} | SL: {:.2} | TP1: {:.2} | Conf: {:.0}% | R:R: {:.2} | Reason: {}",
+                            decision.action,
+                            decision.pair,
+                            decision.side as u8,
+                            decision.entry_price,
+                            decision.stop_loss,
+                            decision.take_profit_1,
+                            decision.confidence * 100.0,
+                            decision.risk_reward,
+                            decision.reasoning,
+                        );
+
+                        // Execute if autonomous
+                        if matches!(autonomy, AutonomyLevel::Autonomous) {
+                            match circuit_breaker.check(paper.account()) {
+                                CircuitBreakerResult::Triggered(reason) => {
+                                    warn!("AI decision blocked by circuit breaker: {}", reason);
+                                }
+                                CircuitBreakerResult::Ok => {
+                                    let ps = position_sizer.calculate(
+                                        paper.account(),
+                                        decision.entry_price,
+                                        decision.stop_loss,
+                                        decision.take_profit_1,
+                                        decision.side,
+                                    );
+
+                                    if let Some(ps) = ps {
+                                        let order = paper
+                                            .place_order(
+                                                &decision.pair,
+                                                decision.side,
+                                                ps.quantity,
+                                                Some(decision.entry_price),
+                                            )
+                                            .await;
+
+                                        match order {
+                                            Ok(_) => {
+                                                let pos = Position {
+                                                    id: format!("ai-{}", tick),
+                                                    pair: decision.pair.clone(),
+                                                    side: decision.side,
+                                                    entry_price: decision.entry_price,
+                                                    current_price: decision.entry_price,
+                                                    quantity: ps.quantity,
+                                                    stop_loss: decision.stop_loss,
+                                                    take_profit_1: decision.take_profit_1,
+                                                    take_profit_2: decision.take_profit_2,
+                                                    take_profit_3: decision.take_profit_3,
+                                                    unrealized_pnl: 0.0,
+                                                    risk_amount: ps.risk_amount,
+                                                    strategy_name: "ai-agent".to_string(),
+                                                    opened_at: chrono::Utc::now(),
+                                                    scale_level: ScaleLevel::Full,
+                                                };
+                                                paper.positions_mut().insert(pos.id.clone(), pos);
+                                                paper.account_mut().open_positions =
+                                                    paper.positions().len();
+                                                paper.account_mut().trades_today += 1;
+                                                info!("AI position opened: {}", decision.pair);
+                                            }
+                                            Err(e) => error!("AI order failed: {}", e),
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        CircuitBreakerResult::Ok => {}
                     }
-
-                    let ps = position_sizer.calculate(
-                        paper.account(),
-                        signal.entry_price,
-                        signal.stop_loss,
-                        signal.take_profit_1,
-                        signal.side,
-                    );
-
-                    let ps = match ps {
-                        Some(p) => p,
-                        None => {
-                            info!("Signal rejected: {} {}", signal.pair, signal.side as u8);
-                            continue;
+                    AgentResult::Hold => {
+                        // AI says hold — check rule-based strategies as comparison
+                        if let Some(sig) = momentum
+                            .evaluate(&candle_data, &indicators, regime, profile.as_ref())
+                            .await
+                        {
+                            info!(
+                                "RULE SIGNAL (comparison): {} {} @ {:.2} | {}",
+                                sig.pair, sig.side as u8, sig.entry_price, sig.strategy_name,
+                            );
                         }
-                    };
-
-                    info!(
-                        "SIGNAL: {} {} @ {:.2} | SL: {:.2} | TP1: {:.2} | Qty: {:.8} | R:R: {:.2} | {}",
-                        signal.pair,
-                        if matches!(signal.side, Side::Long) { "LONG" } else { "SHORT" },
-                        signal.entry_price,
-                        signal.stop_loss,
-                        signal.take_profit_1,
-                        ps.quantity,
-                        ps.rr_ratio,
-                        signal.strategy_name,
-                    );
-
-                    let order = paper
-                        .place_order(
-                            &signal.pair,
-                            signal.side,
-                            ps.quantity,
-                            Some(signal.entry_price),
-                        )
-                        .await;
-
-                    match order {
-                        Ok(_) => {
-                            let pos = Position {
-                                id: format!("pos-{}", tick),
-                                pair: signal.pair.clone(),
-                                side: signal.side,
-                                entry_price: signal.entry_price,
-                                current_price: signal.entry_price,
-                                quantity: ps.quantity,
-                                stop_loss: signal.stop_loss,
-                                take_profit_1: signal.take_profit_1,
-                                take_profit_2: signal.take_profit_2,
-                                take_profit_3: signal.take_profit_3,
-                                unrealized_pnl: 0.0,
-                                risk_amount: ps.risk_amount,
-                                strategy_name: signal.strategy_name.clone(),
-                                opened_at: chrono::Utc::now(),
-                                scale_level: ScaleLevel::Full,
-                            };
-                            paper.positions_mut().insert(pos.id.clone(), pos);
-                            paper.account_mut().open_positions = paper.positions().len();
-                            paper.account_mut().trades_today += 1;
-                            info!("Position opened: {}", signal.pair);
+                    }
+                    AgentResult::Fallback => {
+                        warn!("AI in fallback — using rule-based strategies");
+                        let mut signals = Vec::new();
+                        if let Some(sig) = momentum
+                            .evaluate(&candle_data, &indicators, regime, profile.as_ref())
+                            .await
+                        {
+                            signals.push(sig);
                         }
-                        Err(e) => error!("Order failed: {}", e),
+                        if let Some(sig) = mean_rev
+                            .evaluate(&candle_data, &indicators, regime, profile.as_ref())
+                            .await
+                        {
+                            signals.push(sig);
+                        }
+
+                        for signal in signals {
+                            match circuit_breaker.check(paper.account()) {
+                                CircuitBreakerResult::Triggered(reason) => {
+                                    warn!("Fallback signal blocked: {}", reason);
+                                    continue;
+                                }
+                                CircuitBreakerResult::Ok => {}
+                            }
+
+                            let ps = position_sizer.calculate(
+                                paper.account(),
+                                signal.entry_price,
+                                signal.stop_loss,
+                                signal.take_profit_1,
+                                signal.side,
+                            );
+
+                            if let Some(ps) = ps {
+                                let order = paper
+                                    .place_order(
+                                        &signal.pair,
+                                        signal.side,
+                                        ps.quantity,
+                                        Some(signal.entry_price),
+                                    )
+                                    .await;
+
+                                if order.is_ok() {
+                                    let pos = Position {
+                                        id: format!("fallback-{}", tick),
+                                        pair: signal.pair.clone(),
+                                        side: signal.side,
+                                        entry_price: signal.entry_price,
+                                        current_price: signal.entry_price,
+                                        quantity: ps.quantity,
+                                        stop_loss: signal.stop_loss,
+                                        take_profit_1: signal.take_profit_1,
+                                        take_profit_2: signal.take_profit_2,
+                                        take_profit_3: signal.take_profit_3,
+                                        unrealized_pnl: 0.0,
+                                        risk_amount: ps.risk_amount,
+                                        strategy_name: signal.strategy_name.clone(),
+                                        opened_at: chrono::Utc::now(),
+                                        scale_level: ScaleLevel::Full,
+                                    };
+                                    paper.positions_mut().insert(pos.id.clone(), pos);
+                                    paper.account_mut().open_positions = paper.positions().len();
+                                    info!("Fallback position opened: {}", signal.pair);
+                                }
+                            }
+                        }
+                    }
+                    AgentResult::PendingConfirmation(decision) => {
+                        info!(
+                            "AI PENDING CONFIRMATION: {:?} {} {} @ {:.2} — use 'savant confirm {}' to execute",
+                            decision.action, decision.pair, decision.side as u8,
+                            decision.entry_price, tick,
+                        );
+                    }
+                    AgentResult::Error(e) => {
+                        warn!("AI error: {}", e);
                     }
                 }
 
+                // Check stops for all positions
                 let mut prices = HashMap::new();
                 if let Some(last) = store.last() {
                     prices.insert(pair.clone(), last.close);
@@ -314,11 +519,16 @@ pub async fn run(config: AppConfig) -> anyhow::Result<()> {
             let trades = paper.closed_trades();
             let metrics = PerformanceMetrics::calculate(trades);
             info!(
-                "[STATUS] Balance: ${:.2} | Equity: ${:.2} | DD: {:.1}% | {}",
+                "[STATUS] Balance: ${:.2} | Equity: ${:.2} | DD: {:.1}% | AI: {} | {}",
                 account.balance,
                 account.equity,
                 account.drawdown_pct * 100.0,
-                metrics
+                if agent.is_fallback() {
+                    "FALLBACK"
+                } else {
+                    "ACTIVE"
+                },
+                metrics,
             );
             if let Some(ref j) = journal {
                 if let Err(e) = j

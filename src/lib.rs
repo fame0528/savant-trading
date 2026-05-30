@@ -1,21 +1,24 @@
-//! Savant Trading Engine — automated crypto trading system for Kraken exchange.
+//! Savant Trading Engine — AI-native autonomous crypto trading system for Kraken exchange.
 //!
-//! Built in Rust with tokio async runtime. Synthesized from expert trader
-//! knowledge covering momentum, volume profile, order flow, risk management,
-//! and market regime detection.
+//! Built in Rust with tokio async runtime. The AI agent (mimo v2.5 pro) IS the brain,
+//! informed by 11 curated trading transcripts and live market insight data.
 //!
 //! # Architecture
 //!
+//! - `agent` — AI brain: knowledge injection, system prompts, LLM provider, decision engine
 //! - `core` — Configuration, types, errors, events
 //! - `data` — Market data fetching and indicator calculations
-//! - `strategy` — Signal generation (momentum, mean reversion, regime)
-//! - `risk` — Position sizing, stops, circuit breakers
+//! - `insight` — Live market context (sentiment, funding, liquidation, flows, news)
+//! - `strategy` — Rule-based strategies (optional parallel signals)
+//! - `risk` — Position sizing, stops, circuit breakers (independent of AI)
 //! - `execution` — Paper trading and live execution
 //! - `monitor` — Trade journal and performance metrics
 
+pub mod agent;
 pub mod core;
 pub mod data;
 pub mod execution;
+pub mod insight;
 pub mod monitor;
 pub mod risk;
 pub mod strategy;

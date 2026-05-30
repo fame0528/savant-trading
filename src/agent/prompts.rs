@@ -67,7 +67,9 @@ impl PromptComposer {
             for unit in knowledge_units {
                 knowledge_section.push_str(&format!(
                     "### [{}] {}\n{}\n\n",
-                    unit.source, unit.topic_as_str(), unit.content
+                    unit.source,
+                    unit.topic_as_str(),
+                    unit.content
                 ));
             }
             parts.push(knowledge_section);
@@ -97,7 +99,8 @@ pub fn default_base_identity() -> String {
 - Never risk more than the configured max risk per trade.
 - Always provide a confidence score (0.0 to 1.0) based on setup quality.
 - Always cite which knowledge sources informed your decision.
-- If no high-quality setup exists, output a HOLD decision."#.to_string()
+- If no high-quality setup exists, output a HOLD decision."#
+        .to_string()
 }
 
 /// Default output format prompt.
@@ -124,7 +127,8 @@ Respond with ONLY a JSON object (no markdown, no explanation before/after):
 }
 ```
 
-For HOLD decisions, set all prices to 0.0 and position_size_pct to 0.0."#.to_string()
+For HOLD decisions, set all prices to 0.0 and position_size_pct to 0.0."#
+        .to_string()
 }
 
 impl KnowledgeUnit {

@@ -17,7 +17,7 @@ pub struct FundingData {
 ///
 /// Uses CoinGlass API (may require API key) or falls back to Coinalyze.
 pub async fn fetch_funding(
-    client: &reqwest::Client,
+    _client: &reqwest::Client,
     _symbol: &str,
     _api_key: Option<&str>,
 ) -> FundingData {

@@ -1,0 +1,154 @@
+[
+  {
+    "id": "tjr-smc-001",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "FAIR VALUE GAP (FVG) — Bullish: candle[i-2].high < candle[i].low. Rapid upward movement creating supply/demand imbalance. Market often returns to fill gaps before continuing. ONLY trade unfilled FVGs. When price revisits and closes through → mark as filled, invalid. Best FVGs aligned with higher timeframe trend direction.",
+    "priority": 5
+  },
+  {
+    "id": "tjr-smc-002",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "FVG — Bearish: candle[i-2].low > candle[i].high. Rapid downward movement. Price retraces back into gap before continuing down. Use as short entry zones when aligned with bearish higher TF bias. FVGs at round numbers or previous structure = higher probability. BPR (Balanced Price Range) = overlapping FVGs = very strong level.",
+    "priority": 5
+  },
+  {
+    "id": "tjr-smc-003",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "FVG PARTIAL FILLS: When price enters a FVG but doesn't fully close through it = partial fill. The unfilled portion of the gap is still valid. If price enters 50% of the FVG and reverses, the remaining 50% is the active zone. The deeper the partial fill without full invalidation, the stronger the eventual reaction. Use the unfilled portion as your entry zone.",
+    "priority": 4
+  },
+  {
+    "id": "tjr-smc-004",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "ORDER BLOCKS: Last opposing candle before strong impulsive move. Bullish OB = last bearish candle before 3+ bullish candles that break structure. Price returns to this level for institutional entries. More institutional than simple S/R. Look for ABSORPTION (high volume + no follow-through) at OB for confirmation. Broken OB becomes a breaker block.",
+    "priority": 5
+  },
+  {
+    "id": "tjr-smc-005",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "BREAKER BLOCKS: Order block that has been BROKEN — price closed through it. Level flips from support to resistance or vice versa. Powerful because trapped traders from original OB are now underwater. When price returns to a breaker → expect strong reaction. Use as secondary confirmation — FVG aligned with breaker = highest probability entry zone.",
+    "priority": 4
+  },
+  {
+    "id": "tjr-smc-006",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "LIQUIDITY SWEEPS: Price takes out obvious highs/lows (where stops cluster) then reverses. Smart money targets retail stops. Entry: sweep + reversal confirmation candle. Stop: beyond sweep level. Liquidity pools: round numbers, session highs/lows, obvious swings, equal highs/lows. Bigger pool = stronger expected reversal.",
+    "priority": 5
+  },
+  {
+    "id": "tjr-smc-007",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "LIQUIDITY GRABS: More violent than sweeps — price spikes through a level to grab stops, then IMMEDIATELY reverses with momentum. Faster reversal after grab = stronger signal. Asian session high/low during London/NY open = extremely common and tradeable. Stop goes just beyond grab level. Target: opposite side of range or next liquidity pool.",
+    "priority": 4
+  },
+  {
+    "id": "tjr-smc-008",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "BREAK OF STRUCTURE (BOS): Break of previous swing high in uptrend (or swing low in downtrend) = trend continuation confirmed. Use BOS for trend confirmation before entries. BOS on higher TF (1h, 4h) more significant than lower TF (5m, 15m). ALWAYS trade in direction of most recent BOS on your execution timeframe.",
+    "priority": 5
+  },
+  {
+    "id": "tjr-smc-009",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "CHANGE OF CHARACTER (CHoCH): First break AGAINST the trend = potential reversal. Uptrend CHoCH = price breaks below most recent swing low. Downtrend CHoCH = price breaks above most recent swing high. CHoCH is a WARNING — tighten stops or exit. Do NOT counter-trend trade without CHoCH confirmation. After CHoCH, wait for pullback to broken level for entry in new direction.",
+    "priority": 5
+  },
+  {
+    "id": "tjr-smc-010",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "KILLZONE TRADING: London KZ (2-5 AM EST) and NY KZ (7-10 AM EST) = institutional activity peaks. London: look for sweeps of Asian range, enter on reversal. NY: continuation of London OR reversal if significant news. Don't trade outside killzones — volume drops, spreads widen, lower probability. First 15 min of each KZ = ANALYSIS, not execution.",
+    "priority": 4
+  },
+  {
+    "id": "tjr-smc-011",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "MULTI-TIMEFRAME CONFLUENCE: 4h/1h for overall bias (trend, major levels). 15m for setup identification (FVGs, OBs, liquidity zones). 5m/1m for precise entry. A 5m setup aligned with 1h bias = much higher probability. NEVER trade against 4h trend. 4h bullish → only longs on 15m/5m. 4h bearish → only shorts.",
+    "priority": 5
+  },
+  {
+    "id": "tjr-smc-012",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "PREVIOUS DAY LEVELS: Mark PDH (previous day high), PDL (previous day low), PWH (previous week high), PWL (previous week low). Major liquidity pools. Price often sweeps these before reversing. PDH/PDL especially important during first 2 hours of NY session. Sweep PDH + immediate reversal = strong short. Sweep PDL + reversal = strong long. Combine with FVG/OB at same level for highest probability.",
+    "priority": 4
+  },
+  {
+    "id": "tjr-smc-013",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "ENTRY REFINEMENT: After identifying bias (4h) and setup zone (15m FVG/OB), drop to 5m for entry. On 5m: 1) Price reaches setup zone. 2) BOS in trade direction on 5m. 3) Pullback to 5m FVG or OB within the 15m zone. 4) Enter on pullback with stop below 5m structure. Tight stop (10-20 pips), not 50-100. If stop too wide = setup not refined enough.",
+    "priority": 5
+  },
+  {
+    "id": "tjr-smc-014",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "RISK MANAGEMENT (TJR): Risk 0.5-1% per trade. 3 consecutive losses = done for day. Target 1:2 minimum R:R. Trail to break-even after 1R. Scale out 50% at TP1, rest with trailing stop. Only trade during high-volume sessions (NY 7-10, London 2-5). Avoid first 5-15 min of session open — wait for structure. Higher TF for bias, lower TF for execution.",
+    "priority": 5
+  },
+  {
+    "id": "tjr-smc-015",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "MIXED CANDLES: Candle with both significant buying AND selling — long upper AND lower wicks. Indicates indecision. After strong move, mixed candle at key level (FVG, OB, resistance) = move may be exhausted. Don't enter on mixed candles — wait for next candle to confirm direction. Mixed candles at liquidity pools especially significant — shows battle at critical level.",
+    "priority": 3
+  },
+  {
+    "id": "tjr-smc-016",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "DECISION POINT (DP): Level where price made a significant decision — strong rejection or breakout. Identified by candle with long wick on one side, small body on other. DPs act as strong S/R. At round numbers or session levels = especially powerful. Use DPs as additional confirmation when aligned with FVGs or OBs. DPs are essentially one-candle order blocks.",
+    "priority": 3
+  },
+  {
+    "id": "tjr-smc-017",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "REJECTION CANDLE ENTRIES: Pin bar / hammer / shooting star at key level. Long lower wick at support = buyers defending = bullish. Long upper wick at resistance = sellers defending = bearish. Enter on close of rejection candle. Stop beyond the wick. The longer the wick relative to body, the stronger the rejection. Rejection at FVG + order block = triple confluence.",
+    "priority": 4
+  },
+  {
+    "id": "tjr-smc-018",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "ENGULFING CANDLES: Bullish engulfing = green candle's body completely engulfs previous red candle's body. Bearish engulfing = opposite. Engulfing at key level = strong reversal signal. The bigger the engulfing candle relative to previous candles, the stronger the signal. Engulfing + FVG + order block at same level = maximum confluence entry.",
+    "priority": 4
+  },
+  {
+    "id": "tjr-smc-019",
+    "source": "daytrading-tjr-complete-guide",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "TRAILING STOP MODELS: 1) Structure-based: trail below each new higher low (long) or above each new lower high (short). 2) EMA-based: trail below 9 EMA or 20 EMA. 3) ATR-based: trail at entry + (ATR × multiplier). Structure-based is most reliable in trending markets. EMA-based works in strong trends. ATR-based adapts to volatility. Choose based on market condition.",
+    "priority": 4
+  }
+]

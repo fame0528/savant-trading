@@ -79,7 +79,10 @@ impl AgentOrchestrator {
     pub async fn evaluate(&mut self, ctx: &FullContext<'_>) -> AgentResult {
         // Check rate limit
         if self.decisions_this_hour >= self.config.max_decisions_per_hour {
-            info!("Agent rate limited — {} decisions this hour", self.decisions_this_hour);
+            info!(
+                "Agent rate limited — {} decisions this hour",
+                self.decisions_this_hour
+            );
             return AgentResult::Hold;
         }
 

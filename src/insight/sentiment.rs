@@ -16,25 +16,18 @@ pub struct SentimentData {
 }
 
 /// Fetch Fear & Greed Index from alternative.me (free, no auth).
-pub async fn fetch_fear_greed(
-    client: &reqwest::Client,
-) -> Option<(u32, String)> {
+pub async fn fetch_fear_greed(client: &reqwest::Client) -> Option<(u32, String)> {
     let url = "https://api.alternative.me/fng/?limit=1";
     let resp = client.get(url).send().await.ok()?;
     let json: serde_json::Value = resp.json().await.ok()?;
     let data = json.get("data")?.get(0)?;
     let value: u32 = data.get("value")?.as_str()?.parse().ok()?;
-    let label = data
-        .get("value_classification")?
-        .as_str()?
-        .to_string();
+    let label = data.get("value_classification")?.as_str()?.to_string();
     Some((value, label))
 }
 
 /// Fetch BTC dominance from CoinGecko (free, no auth).
-pub async fn fetch_btc_dominance(
-    client: &reqwest::Client,
-) -> Option<(f64, f64)> {
+pub async fn fetch_btc_dominance(client: &reqwest::Client) -> Option<(f64, f64)> {
     let url = "https://api.coingecko.com/api/v3/global";
     let resp = client.get(url).send().await.ok()?;
     let json: serde_json::Value = resp.json().await.ok()?;
