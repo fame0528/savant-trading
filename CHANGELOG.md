@@ -5,6 +5,18 @@ All notable changes to Savant Trading will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-05-30
+
+### Added
+
+- **Dashboard UI** — Next.js 16 + React 19 + TypeScript 5, matching Savant design system
+  - 11 pages: Overview, Transactions, AI Decisions, Portfolio, Insight, Knowledge, Risk, Session, Settings
+  - CSS Modules with Savant design tokens (`#00d5ff` accent, glass morphism, JetBrains Mono + Inter)
+  - 3-column layout: sidebar (280px), main content, right panel
+  - Ambient background with radial gradients
+  - Custom scrollbars, glass panels, accent glow effects
+  - All pages build successfully (`npm run build`)
+
 ## [0.2.1] — 2026-05-30
 
 ### Added

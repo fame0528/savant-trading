@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+
+:root {
+  /* === Savant Design Tokens === */
+  --accent: #00d5ff;
+  --accent-dim: rgba(0, 213, 255, 0.3);
+  --accent-glow: 0 0 10px rgba(0, 213, 255, 0.3);
+  --bg: #050505;
+  --bg-panel: #0a0a0a;
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --border: rgba(0, 213, 255, 0.1);
+  --border-strong: rgba(0, 213, 255, 0.25);
+  --text: #e0e0e0;
+  --text-dim: #666;
+  --text-bright: #fff;
+  --success: #00ff88;
+  --error: #ff4444;
+  --warning: #ffaa00;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-body: 'Inter', sans-serif;
+  --glass-blur: blur(12px);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --sidebar-width: 280px;
+  --right-panel-width: min(750px, 45vw);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-dim);
+}
+
+/* === Glass Panel === */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* === Accent Text === */
+.accent {
+  color: var(--accent);
+  text-shadow: var(--accent-glow);
+}
+
+/* === Status Colors === */
+.positive { color: var(--success); }
+.negative { color: var(--error); }
+.warning { color: var(--warning); }
+
+/* === Mono Text === */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+/* === Links === */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+a:hover {
+  opacity: 0.8;
+}
+
+/* === Buttons === */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: var(--accent-glow);
+}
+.btn-primary {
+  background: rgba(0, 213, 255, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* === Cards === */
+.card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* === Tables === */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.table td {
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+.table tr:hover td {
+  background: var(--bg-hover);
+}
+
+/* === Gauge === */
+.gauge {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-glass);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.gauge-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+.gauge-fill.ok { background: var(--success); }
+.gauge-fill.warning { background: var(--warning); }
+.gauge-fill.danger { background: var(--error); }
+
+/* === Badge === */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+.badge-success { background: rgba(0, 255, 136, 0.1); color: var(--success); }
+.badge-error { background: rgba(255, 68, 68, 0.1); color: var(--error); }
+.badge-warning { background: rgba(255, 170, 0, 0.1); color: var(--warning); }
+.badge-info { background: rgba(0, 213, 255, 0.1); color: var(--accent); }
+
+/* === Ambient Background === */
+.ambient-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(0, 213, 255, 0.03) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 20%, rgba(0, 213, 255, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
