@@ -10,6 +10,7 @@ pub mod harness;
 pub mod lob;
 pub mod mock;
 pub mod report;
+pub mod run_report;
 pub mod scenarios;
 pub mod schema;
 pub mod simulator;
