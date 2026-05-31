@@ -71,12 +71,159 @@ pub struct SandboxSummary {
     pub passed: usize,
     pub failed: usize,
     pub avg_score: f64,
+    pub weighted_avg_score: f64,
     pub avg_tier_1_pass_rate: f64,
     pub avg_tier_2_score: f64,
     pub avg_tier_3_score: f64,
     pub worst_category: String,
     pub best_category: String,
     pub results: Vec<ScenarioResult>,
+}
+
+/// Generate an always-hold benchmark — grades every scenario as "Hold" to prove
+/// the AI adds value vs doing nothing.
+pub fn always_hold_benchmark(scenarios: &[super::scenarios::Scenario]) -> Vec<ScenarioResult> {
+    scenarios
+        .iter()
+        .map(|s| {
+            let grade = super::harness::grade_scenario_deterministic(
+                s,
+                "Hold",
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                "Always-hold benchmark — no trade taken",
+            );
+            ScenarioResult {
+                scenario_id: s.id.clone(),
+                scenario_name: s.name.clone(),
+                category: s.category.clone(),
+                difficulty: s.difficulty.clone(),
+                action_taken: "Hold".into(),
+                grade,
+                latency_ms: 0,
+            }
+        })
+        .collect()
+}
+
+/// Check if score dropped >threshold vs last N runs.
+/// Returns Some(warning_message) if regression detected.
+pub fn check_regression(
+    current_score: f64,
+    recent_scores: &[f64],
+    threshold_pct: f64,
+) -> Option<String> {
+    if recent_scores.is_empty() {
+        return None;
+    }
+    let avg: f64 = recent_scores.iter().sum::<f64>() / recent_scores.len() as f64;
+    if avg > 0.0 {
+        let drop_pct = (avg - current_score) / avg;
+        if drop_pct > threshold_pct {
+            return Some(format!(
+                "REGRESSION WARNING: Score dropped {:.1}% vs rolling avg ({:.2} → {:.2})",
+                drop_pct * 100.0,
+                avg,
+                current_score
+            ));
+        }
+    }
+    None
+}
+pub fn difficulty_weight(difficulty: &str) -> f64 {
+    match difficulty {
+        "Easy" => 1.0,
+        "Medium" => 1.5,
+        "Hard" => 2.0,
+        "Extreme" => 3.0,
+        _ => 1.0,
+    }
+}
+
+/// α-trimmed mean: sort scores, drop k from each end, average the rest.
+/// With n=5 and k=1 (20% trim), drops min and max, averages middle 3.
+/// Resistant to outlier hallucinations and lucky runs.
+pub fn alpha_trimmed_mean(scores: &[f64], trim_pct: f64) -> f64 {
+    if scores.is_empty() {
+        return 0.0;
+    }
+    if scores.len() <= 2 {
+        return scores.iter().sum::<f64>() / scores.len() as f64;
+    }
+
+    let mut sorted = scores.to_vec();
+    sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+
+    let k = ((scores.len() as f64) * trim_pct).floor() as usize;
+    let k = k.min((scores.len() - 1) / 2);
+
+    if k == 0 {
+        return sorted.iter().sum::<f64>() / sorted.len() as f64;
+    }
+
+    let trimmed = &sorted[k..sorted.len() - k];
+    trimmed.iter().sum::<f64>() / trimmed.len() as f64
+}
+
+/// Aggregate multiple run results using α-trimmed mean on scores.
+/// Each scenario gets `runs_per_scenario` results, trimmed mean applied.
+pub fn aggregate_multi_run(
+    all_results: Vec<Vec<ScenarioResult>>,
+    trim_pct: f64,
+) -> Vec<ScenarioResult> {
+    if all_results.is_empty() {
+        return vec![];
+    }
+    if all_results.len() == 1 {
+        return all_results.into_iter().next().unwrap();
+    }
+
+    let scenario_count = all_results[0].len();
+    let mut aggregated = Vec::with_capacity(scenario_count);
+
+    for i in 0..scenario_count {
+        let scores: Vec<f64> = all_results
+            .iter()
+            .filter_map(|run| run.get(i))
+            .map(|r| r.grade.total_score)
+            .collect();
+
+        let t1_scores: Vec<f64> = all_results
+            .iter()
+            .filter_map(|run| run.get(i))
+            .map(|r| if r.grade.tier_1_compliance { 1.0 } else { 0.0 })
+            .collect();
+
+        let t2_scores: Vec<f64> = all_results
+            .iter()
+            .filter_map(|run| run.get(i))
+            .map(|r| r.grade.tier_2_rr_score)
+            .collect();
+
+        let t3_scores: Vec<f64> = all_results
+            .iter()
+            .filter_map(|run| run.get(i))
+            .map(|r| r.grade.tier_3_reasoning_score)
+            .collect();
+
+        let trimmed_total = alpha_trimmed_mean(&scores, trim_pct);
+        let trimmed_t1 = alpha_trimmed_mean(&t1_scores, trim_pct);
+        let trimmed_t2 = alpha_trimmed_mean(&t2_scores, trim_pct);
+        let trimmed_t3 = alpha_trimmed_mean(&t3_scores, trim_pct);
+
+        // Use the first run's metadata, replace scores with trimmed means
+        let mut result = all_results[0][i].clone();
+        result.grade.total_score = trimmed_total;
+        result.grade.tier_1_compliance = trimmed_t1 >= 0.5;
+        result.grade.tier_2_rr_score = trimmed_t2;
+        result.grade.tier_3_reasoning_score = trimmed_t3;
+
+        aggregated.push(result);
+    }
+
+    aggregated
 }
 
 impl SandboxSummary {
@@ -117,6 +264,17 @@ impl SandboxSummary {
             0.0
         };
 
+        // Difficulty-weighted average score
+        let (weighted_sum, weight_total) = results.iter().fold((0.0, 0.0), |(ws, wt), r| {
+            let w = difficulty_weight(&r.difficulty);
+            (ws + r.grade.total_score * w, wt + w)
+        });
+        let weighted_avg_score = if weight_total > 0.0 {
+            weighted_sum / weight_total
+        } else {
+            0.0
+        };
+
         // Find worst/best category
         let mut category_scores: std::collections::HashMap<String, Vec<f64>> =
             std::collections::HashMap::new();
@@ -152,6 +310,7 @@ impl SandboxSummary {
             passed,
             failed,
             avg_score,
+            weighted_avg_score,
             avg_tier_1_pass_rate: avg_tier_1,
             avg_tier_2_score: avg_tier_2,
             avg_tier_3_score: avg_tier_3,
@@ -173,6 +332,10 @@ impl SandboxSummary {
             self.avg_tier_1_pass_rate * 100.0
         ));
         report.push_str(&format!("Average Score: {:.2} / 1.00\n", self.avg_score));
+        report.push_str(&format!(
+            "Weighted Score: {:.2} / 1.00 (difficulty-weighted)\n",
+            self.weighted_avg_score
+        ));
         report.push_str(&format!(
             "Passed: {} / {}\n",
             self.passed, self.total_scenarios
