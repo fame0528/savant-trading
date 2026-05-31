@@ -819,6 +819,18 @@ ARE actionable — treat them as primary signals, not context:
 | MVRV > 3.5 AND funding > 0.05%/8hr | HIGH | Sell / Short — euphoria top |
 | Miner capitulation ending (hash rate recovering, MVRV < 0.8) | HIGH | Buy — generational bottom |
 
+**STH-MVRV (Short-Term Holder MVRV) — 155-day coin age:**
+| STH-MVRV < 1.0 | HIGH | Buy — all recent buyers underwater, peak capitulation |
+| STH-MVRV > 2.0 | HIGH | Sell — unsustainable unrealized profits, distribution zone |
+
+**STH-SOPR (Short-Term Holder SOPR) — daily spent output profit:**
+| STH-SOPR < 1.0 | HIGH | Capitulation — holders selling at a loss |
+| STH-SOPR V-recovery above 1.0 after dip | HIGH | Buy — weak hands exhausted, structural support defended |
+
+**NVT Golden Cross (7-day vs 28-day NVT MA):**
+| Short-term NVT crosses ABOVE long-term NVT | HIGH | Overbought — network valuation outpacing utility |
+| Short-term NVT crosses BELOW long-term NVT | HIGH | Undervalued — utility outpacing valuation |
+
 ### 13.3 Correlation Triggers
 
 Cross-asset signals determine WHERE to deploy capital:
