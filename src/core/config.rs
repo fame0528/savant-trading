@@ -64,8 +64,16 @@ pub struct TradingConfig {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+pub struct RiskTier {
+    pub balance: f64,
+    pub risk_pct: f64,
+}
+
+#[derive(Debug, Clone, Deserialize)]
 pub struct RiskConfig {
     pub max_risk_per_trade: f64,
+    #[serde(default)]
+    pub dynamic_risk_tiers: Vec<RiskTier>,
     pub max_daily_loss: f64,
     pub max_drawdown: f64,
     pub max_positions: usize,
@@ -162,6 +170,20 @@ impl Default for AppConfig {
             },
             risk: RiskConfig {
                 max_risk_per_trade: 0.01,
+                dynamic_risk_tiers: vec![
+                    RiskTier {
+                        balance: 100.0,
+                        risk_pct: 0.03,
+                    },
+                    RiskTier {
+                        balance: 500.0,
+                        risk_pct: 0.02,
+                    },
+                    RiskTier {
+                        balance: 999999.0,
+                        risk_pct: 0.01,
+                    },
+                ],
                 max_daily_loss: 0.03,
                 max_drawdown: 0.10,
                 max_positions: 3,

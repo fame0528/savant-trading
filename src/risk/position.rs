@@ -1,8 +1,14 @@
 use crate::core::types::{AccountState, Side};
 
+pub struct RiskTier {
+    pub balance: f64,
+    pub risk_pct: f64,
+}
+
 pub struct PositionSizer {
     max_risk_per_trade: f64,
     min_rr_ratio: f64,
+    dynamic_risk_tiers: Vec<RiskTier>,
 }
 
 impl PositionSizer {
@@ -10,7 +16,37 @@ impl PositionSizer {
         Self {
             max_risk_per_trade,
             min_rr_ratio,
+            dynamic_risk_tiers: vec![
+                RiskTier {
+                    balance: 100.0,
+                    risk_pct: 0.03,
+                },
+                RiskTier {
+                    balance: 500.0,
+                    risk_pct: 0.02,
+                },
+                RiskTier {
+                    balance: 999999.0,
+                    risk_pct: 0.01,
+                },
+            ],
         }
+    }
+
+    pub fn with_tiers(mut self, tiers: Vec<RiskTier>) -> Self {
+        self.dynamic_risk_tiers = tiers;
+        self
+    }
+
+    /// Get the effective risk % for the current balance.
+    /// At small balances, uses higher risk to overcome fee friction.
+    pub fn effective_risk_pct(&self, balance: f64) -> f64 {
+        for tier in &self.dynamic_risk_tiers {
+            if balance <= tier.balance {
+                return tier.risk_pct;
+            }
+        }
+        self.max_risk_per_trade
     }
 
     pub fn calculate(
@@ -21,7 +57,8 @@ impl PositionSizer {
         take_profit: f64,
         side: Side,
     ) -> Option<PositionSize> {
-        let risk_amount = account.balance * self.max_risk_per_trade;
+        let risk_pct = self.effective_risk_pct(account.balance);
+        let risk_amount = account.balance * risk_pct;
 
         let risk_per_unit = match side {
             Side::Long => entry - stop_loss,

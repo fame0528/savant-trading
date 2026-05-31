@@ -18,6 +18,16 @@ slippage_pct = 0.0005
 
 [risk]
 max_risk_per_trade = 0.01
+# Dynamic risk scaling: at small balances, higher risk % to overcome fee friction
+# Tiers: balance_threshold → risk_pct
+# $50-$100: 3% ($1.50-3.00 risk) — minimum viable for Kraken micro-orders
+# $100-$500: 2% ($2.00-10.00 risk)
+# $500+: 1% ($5.00+ risk) — standard risk management
+dynamic_risk_tiers = [
+    { balance = 100.0, risk_pct = 0.03 },
+    { balance = 500.0, risk_pct = 0.02 },
+    { balance = 999999.0, risk_pct = 0.01 },
+]
 max_daily_loss = 0.03
 max_drawdown = 0.10
 max_positions = 3

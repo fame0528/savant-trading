@@ -55,6 +55,7 @@ pub enum ParseError {
 /// Parse a JSON string into a TradeDecision.
 ///
 /// Validates that prices are within reasonable bounds.
+/// Uses multi-pass repair: strict parse → json-repair crate → partial extraction.
 pub fn parse_decision(
     response: &str,
     current_price: f64,
@@ -64,27 +65,33 @@ pub fn parse_decision(
     let json_str = extract_json(response);
 
     // Normalize action field — LLMs sometimes return UPPERCASE
-    let normalized = json_str
-        .replace("\"action\": \"HOLD\"", "\"action\": \"Hold\"")
-        .replace("\"action\": \"BUY\"", "\"action\": \"Buy\"")
-        .replace("\"action\": \"SELL\"", "\"action\": \"Sell\"")
-        .replace("\"action\": \"CLOSE\"", "\"action\": \"Close\"")
-        .replace("\"action\": \"ADJUSTSTOP\"", "\"action\": \"AdjustStop\"")
-        .replace("\"action\":\"HOLD\"", "\"action\":\"Hold\"")
-        .replace("\"action\":\"BUY\"", "\"action\":\"Buy\"")
-        .replace("\"action\":\"SELL\"", "\"action\":\"Sell\"")
-        .replace("\"action\":\"CLOSE\"", "\"action\":\"Close\"")
-        .replace("\"action\":\"ADJUSTSTOP\"", "\"action\":\"AdjustStop\"")
-        .replace("\"side\": \"LONG\"", "\"side\": \"Long\"")
-        .replace("\"side\": \"SHORT\"", "\"side\": \"Short\"")
-        .replace("\"side\":\"LONG\"", "\"side\":\"Long\"")
-        .replace("\"side\":\"SHORT\"", "\"side\":\"Short\"")
-        .replace("\"side\": \"long\"", "\"side\": \"Long\"")
-        .replace("\"side\": \"short\"", "\"side\": \"Short\"")
-        .replace("\"side\": \"\"", "\"side\": \"Long\"")
-        .replace("\"side\":\"\"", "\"side\":\"Long\"");
+    let normalized = normalize_llm_json(json_str);
 
-    let decision: TradeDecision = serde_json::from_str(&normalized)?;
+    // Try strict parse first, then repair, then partial extraction
+    let decision = match serde_json::from_str::<TradeDecision>(&normalized) {
+        Ok(d) => d,
+        Err(strict_err) => {
+            // Pass 2: manual repair — fix truncated strings, unclosed brackets
+            let repaired = repair_json_string(&normalized);
+            match serde_json::from_str::<TradeDecision>(&repaired) {
+                Ok(d) => d,
+                Err(repair_err) => {
+                    // Pass 3: partial extraction — salvage what we can
+                    match partial_extract(&normalized) {
+                        Some(d) => d,
+                        None => {
+                            tracing::debug!(
+                                "JSON parse failed after all passes. strict={}, repair={}",
+                                strict_err,
+                                repair_err
+                            );
+                            return Err(ParseError::InvalidJson(strict_err));
+                        }
+                    }
+                }
+            }
+        }
+    };
 
     // Validate required fields
     if decision.pair.is_empty() {
@@ -189,6 +196,138 @@ fn extract_json(response: &str) -> &str {
     }
 
     trimmed
+}
+
+/// Normalize LLM JSON output — fix common casing issues.
+fn normalize_llm_json(json: &str) -> String {
+    json.replace("\"action\": \"HOLD\"", "\"action\": \"Hold\"")
+        .replace("\"action\": \"BUY\"", "\"action\": \"Buy\"")
+        .replace("\"action\": \"SELL\"", "\"action\": \"Sell\"")
+        .replace("\"action\": \"CLOSE\"", "\"action\": \"Close\"")
+        .replace("\"action\": \"ADJUSTSTOP\"", "\"action\": \"AdjustStop\"")
+        .replace("\"action\":\"HOLD\"", "\"action\":\"Hold\"")
+        .replace("\"action\":\"BUY\"", "\"action\":\"Buy\"")
+        .replace("\"action\":\"SELL\"", "\"action\":\"Sell\"")
+        .replace("\"action\":\"CLOSE\"", "\"action\":\"Close\"")
+        .replace("\"action\":\"ADJUSTSTOP\"", "\"action\":\"AdjustStop\"")
+        .replace("\"side\": \"LONG\"", "\"side\": \"Long\"")
+        .replace("\"side\": \"SHORT\"", "\"side\": \"Short\"")
+        .replace("\"side\":\"LONG\"", "\"side\":\"Long\"")
+        .replace("\"side\":\"SHORT\"", "\"side\":\"Short\"")
+        .replace("\"side\": \"long\"", "\"side\": \"Long\"")
+        .replace("\"side\": \"short\"", "\"side\": \"Short\"")
+        .replace("\"side\": \"\"", "\"side\": \"Long\"")
+        .replace("\"side\":\"\"", "\"side\": \"Long\"")
+}
+
+/// Manual JSON repair — fix truncated strings, unclosed brackets, trailing commas.
+fn repair_json_string(json: &str) -> String {
+    let mut s = json.to_string();
+
+    // Fix: unclosed string at end (truncated response)
+    let quote_count = s.matches('"').count();
+    if !quote_count.is_multiple_of(2) {
+        s.push('"');
+    }
+
+    // Fix: missing closing braces
+    let open_braces = s.matches('{').count();
+    let close_braces = s.matches('}').count();
+    for _ in 0..(open_braces.saturating_sub(close_braces)) {
+        s.push('}');
+    }
+
+    // Fix: missing closing brackets
+    let open_brackets = s.matches('[').count();
+    let close_brackets = s.matches(']').count();
+    for _ in 0..(open_brackets.saturating_sub(close_brackets)) {
+        s.push(']');
+    }
+
+    // Fix: trailing comma before closing brace
+    s = s.replace(",}", "}").replace(",]", "]");
+
+    // Fix: single quotes to double quotes (but not inside strings)
+    // Simple heuristic: replace ' with " if not inside a string context
+    let mut result = String::with_capacity(s.len());
+    let mut in_string = false;
+    let mut prev_char = ' ';
+    for c in s.chars() {
+        if c == '"' && prev_char != '\\' {
+            in_string = !in_string;
+            result.push(c);
+        } else if c == '\'' && !in_string {
+            result.push('"');
+        } else {
+            result.push(c);
+        }
+        prev_char = c;
+    }
+
+    result
+}
+
+/// Partial extraction — salvage valid fields from broken JSON.
+/// Builds a TradeDecision from whatever fields we can extract.
+fn partial_extract(json: &str) -> Option<TradeDecision> {
+    let value: serde_json::Value = serde_json::from_str(json).ok()?;
+
+    let action_str = value.get("action")?.as_str()?;
+    let action = match action_str {
+        "Buy" | "BUY" | "buy" => TradeAction::Buy,
+        "Sell" | "SELL" | "sell" => TradeAction::Sell,
+        "Hold" | "HOLD" | "hold" => TradeAction::Hold,
+        "Close" | "CLOSE" | "close" => TradeAction::Close,
+        _ => return None,
+    };
+
+    Some(TradeDecision {
+        action,
+        pair: value
+            .get("pair")
+            .and_then(|v| v.as_str())
+            .unwrap_or("BTC/USD")
+            .to_string(),
+        side: Side::Long,
+        entry_price: value
+            .get("entry_price")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(0.0),
+        stop_loss: value
+            .get("stop_loss")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(0.0),
+        take_profit_1: value
+            .get("take_profit_1")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(0.0),
+        take_profit_2: value
+            .get("take_profit_2")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(0.0),
+        take_profit_3: value
+            .get("take_profit_3")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(0.0),
+        position_size_pct: value
+            .get("position_size_pct")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(0.0),
+        confidence: value
+            .get("confidence")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(0.5),
+        reasoning: value
+            .get("reasoning")
+            .and_then(|v| v.as_str())
+            .unwrap_or("Partial extraction")
+            .to_string(),
+        knowledge_sources: vec![],
+        risk_reward: value
+            .get("risk_reward")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(0.0),
+    })
 }
 
 /// Validate a price is within the acceptable range.
