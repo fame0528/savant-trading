@@ -169,24 +169,28 @@ impl Default for AppConfig {
                 slippage_pct: 0.0005,
             },
             risk: RiskConfig {
-                max_risk_per_trade: 0.01,
+                max_risk_per_trade: 0.20,
                 dynamic_risk_tiers: vec![
                     RiskTier {
-                        balance: 100.0,
-                        risk_pct: 0.03,
+                        balance: 500.0,
+                        risk_pct: 0.20,
                     },
                     RiskTier {
-                        balance: 500.0,
-                        risk_pct: 0.02,
+                        balance: 5000.0,
+                        risk_pct: 0.10,
+                    },
+                    RiskTier {
+                        balance: 50000.0,
+                        risk_pct: 0.05,
                     },
                     RiskTier {
                         balance: 999999.0,
-                        risk_pct: 0.01,
+                        risk_pct: 0.02,
                     },
                 ],
-                max_daily_loss: 0.03,
-                max_drawdown: 0.10,
-                max_positions: 3,
+                max_daily_loss: 0.20,
+                max_drawdown: 0.40,
+                max_positions: 5,
                 min_rr_ratio: 1.5,
             },
             strategy: StrategyConfig {

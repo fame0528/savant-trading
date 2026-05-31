@@ -18,16 +18,20 @@ impl PositionSizer {
             min_rr_ratio,
             dynamic_risk_tiers: vec![
                 RiskTier {
-                    balance: 100.0,
-                    risk_pct: 0.03,
+                    balance: 500.0,
+                    risk_pct: 0.20,
                 },
                 RiskTier {
-                    balance: 500.0,
-                    risk_pct: 0.02,
+                    balance: 5000.0,
+                    risk_pct: 0.10,
+                },
+                RiskTier {
+                    balance: 50000.0,
+                    risk_pct: 0.05,
                 },
                 RiskTier {
                     balance: 999999.0,
-                    risk_pct: 0.01,
+                    risk_pct: 0.02,
                 },
             ],
         }
@@ -109,31 +113,31 @@ mod tests {
 
     #[test]
     fn position_sizer_basic() {
-        let sizer = PositionSizer::new(0.01, 1.5);
-        let account = make_account(1000.0);
+        let sizer = PositionSizer::new(0.20, 1.5);
+        let account = make_account(50.0);
         let result = sizer.calculate(&account, 100.0, 95.0, 110.0, Side::Long);
         assert!(result.is_some());
         let ps = result.unwrap();
-        assert_eq!(ps.risk_amount, 10.0);
+        assert_eq!(ps.risk_amount, 10.0); // 20% of 50
         assert_eq!(ps.quantity, 2.0);
     }
 
     #[test]
     fn position_sizer_rr_too_low() {
-        let sizer = PositionSizer::new(0.01, 1.5);
-        let account = make_account(1000.0);
+        let sizer = PositionSizer::new(0.20, 1.5);
+        let account = make_account(50.0);
         let result = sizer.calculate(&account, 100.0, 95.0, 102.0, Side::Long);
         assert!(result.is_none());
     }
 
     #[test]
     fn position_sizer_short() {
-        let sizer = PositionSizer::new(0.01, 1.5);
-        let account = make_account(1000.0);
+        let sizer = PositionSizer::new(0.20, 1.5);
+        let account = make_account(50.0);
         let result = sizer.calculate(&account, 100.0, 105.0, 90.0, Side::Short);
         assert!(result.is_some());
         let ps = result.unwrap();
-        assert_eq!(ps.risk_amount, 10.0);
+        assert_eq!(ps.risk_amount, 10.0); // 20% of 50
     }
 
     #[test]

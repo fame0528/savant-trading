@@ -17,20 +17,20 @@ fee_rate = 0.0026
 slippage_pct = 0.0005
 
 [risk]
-max_risk_per_trade = 0.01
-# Dynamic risk scaling: at small balances, higher risk % to overcome fee friction
-# Tiers: balance_threshold → risk_pct
-# $50-$100: 3% ($1.50-3.00 risk) — minimum viable for Kraken micro-orders
-# $100-$500: 2% ($2.00-10.00 risk)
-# $500+: 1% ($5.00+ risk) — standard risk management
+max_risk_per_trade = 0.20
+# Position allocation — how much of the bankroll goes into each trade
+# At $50 with 5 max positions: each position = $10 (20% of bankroll)
+# The bot should be FULLY DEPLOYED, not sitting on cash
+# risk_pct = position allocation per trade (not stop-loss distance)
 dynamic_risk_tiers = [
-    { balance = 100.0, risk_pct = 0.03 },
-    { balance = 500.0, risk_pct = 0.02 },
-    { balance = 999999.0, risk_pct = 0.01 },
+    { balance = 500.0, risk_pct = 0.20 },    # 5 positions × 20% = 100% deployed
+    { balance = 5000.0, risk_pct = 0.10 },    # 5 positions × 10% = 50% deployed
+    { balance = 50000.0, risk_pct = 0.05 },   # 5 positions × 5% = 25% deployed
+    { balance = 999999.0, risk_pct = 0.02 },  # 5 positions × 2% = 10% deployed
 ]
-max_daily_loss = 0.03
-max_drawdown = 0.10
-max_positions = 3
+max_daily_loss = 0.20
+max_drawdown = 0.40
+max_positions = 5
 min_rr_ratio = 1.5
 
 [strategy.momentum]

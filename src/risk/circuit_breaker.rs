@@ -95,36 +95,36 @@ mod tests {
 
     #[test]
     fn circuit_breaker_ok() {
-        let cb = CircuitBreaker::new(0.03, 0.10, 3);
+        let cb = CircuitBreaker::new(0.20, 0.40, 5);
         let account = make_account(100.0, 100.0, -1.0, 0.01, 1);
         assert!(!cb.check(&account).is_triggered());
     }
 
     #[test]
     fn circuit_breaker_daily_loss() {
-        let cb = CircuitBreaker::new(0.03, 0.10, 3);
-        let account = make_account(100.0, 100.0, -5.0, 0.01, 1);
+        let cb = CircuitBreaker::new(0.20, 0.40, 5);
+        let account = make_account(100.0, 100.0, -21.0, 0.01, 1);
         assert!(cb.check(&account).is_triggered());
     }
 
     #[test]
     fn circuit_breaker_drawdown() {
-        let cb = CircuitBreaker::new(0.03, 0.10, 3);
-        let account = make_account(90.0, 90.0, -1.0, 0.15, 1);
+        let cb = CircuitBreaker::new(0.20, 0.40, 5);
+        let account = make_account(59.0, 59.0, -1.0, 0.45, 1);
         assert!(cb.check(&account).is_triggered());
     }
 
     #[test]
     fn circuit_breaker_max_positions() {
-        let cb = CircuitBreaker::new(0.03, 0.10, 3);
-        let account = make_account(100.0, 100.0, 0.0, 0.0, 3);
+        let cb = CircuitBreaker::new(0.20, 0.40, 5);
+        let account = make_account(100.0, 100.0, 0.0, 0.0, 5);
         assert!(cb.check(&account).is_triggered());
     }
 
     #[test]
     fn circuit_breaker_at_limit() {
-        let cb = CircuitBreaker::new(0.03, 0.10, 3);
-        let account = make_account(100.0, 100.0, -3.0, 0.0, 2);
+        let cb = CircuitBreaker::new(0.20, 0.40, 5);
+        let account = make_account(100.0, 100.0, -20.0, 0.0, 2);
         assert!(cb.check(&account).is_triggered());
     }
 }
