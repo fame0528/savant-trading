@@ -12,3 +12,4 @@ pub mod mock;
 pub mod report;
 pub mod scenarios;
 pub mod schema;
+pub mod simulator;
