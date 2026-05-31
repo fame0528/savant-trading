@@ -1,0 +1,66 @@
+[
+  {
+    "id": "exec-001",
+    "source": "coinapi-rest-vs-websocket",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "REST VS WEBSOCKET — Latency Tradeoffs: REST = stateless polling. Opens connection, sends HTTP headers, waits, downloads, closes. High latency (100s of ms). Blind between polls. Aggressive polling triggers rate limits → IP bans. WebSocket = persistent bidirectional pipeline. Single TCP handshake, then exchange pushes data frames with zero HTTP overhead. Live Level 2 order book deltas in single-digit milliseconds. RULE: Use REST for infrequent operations (account balance, historical data). Use WebSocket for real-time data (order book, trades, ticker). NEVER poll REST for real-time market data.",
+    "priority": 5
+  },
+  {
+    "id": "exec-002",
+    "source": "kraken-websocket-sync",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "WEBSOCKET ORDER BOOK SYNC — Reconnection Logic: WebSocket connections silently drop during network lag. If a single Level 2 update packet is dropped, local order book state becomes CORRUPTED. Defensive architecture: 1) Detect sequence discontinuities in message stream. 2) Immediately sever WebSocket connection. 3) Query fresh order book snapshot via REST. 4) Re-initialize WebSocket stream to re-sync. 5) Wrap in try/except with infinite reconnection loop and explicit timeouts. NEVER trust a WebSocket order book without sequence number verification. The order book is the MOST CRITICAL data structure — corruption = wrong trades.",
+    "priority": 5
+  },
+  {
+    "id": "exec-003",
+    "source": "simplified-rate-limiting",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "RATE LIMIT MANAGEMENT ACROSS EXCHANGES: Each exchange has different rate limits. Kraken: 15-20 calls/second depending on endpoint. Binance: 1200 weight/minute. Exceeding limits = temporary IP ban = execution failure at worst possible moment. Implementation: 1) Use unified library (CCXT) with built-in rate limiting. 2) Track remaining quota in real-time. 3) Implement exponential backoff on 429 responses. 4) Prioritize critical calls (order placement) over data calls (OHLC). 5) Cache data that doesn't need real-time freshness. Rate limiting is NOT optional — it's a core execution requirement.",
+    "priority": 4
+  },
+  {
+    "id": "exec-004",
+    "source": "kraken-fee-tiers",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "KRAKEN FEE TIER OPTIMIZATION: Kraken Pro tiers: 0-50K 30d volume = 0.16% maker / 0.26% taker. 50K-100K = 0.14% / 0.24%. 100K-250K = 0.12% / 0.22%. 250K-500K = 0.10% / 0.20%. 500K-1M = 0.08% / 0.18%. 1M+ = 0.00% / 0.10%. Kraken Futures: 0.02% maker / 0.05% taker (all tiers). Optimization: 1) Front-load volume to hit higher tiers. 2) Use post-only limit orders for maker fee. 3) Use Futures for short-term trades (lower fees). 4) Factor 0.52% round-trip taker fee into EVERY R:R calculation. A 1:2 R:R trade with 0.52% fees is actually 1:1.48.",
+    "priority": 4
+  },
+  {
+    "id": "exec-005",
+    "source": "post-only-limit-orders",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "LowVolatility"],
+    "content": "POST-ONLY LIMIT ORDERS FOR MAKER FEE CAPTURE: Post-only = limit order that REJECTS if it would immediately fill (ensures maker status). Use when: 1) You don't need immediate execution. 2) Spread is wide enough to profit from. 3) You're scalping and fee difference is the edge. Example: BTC at $100,000 bid / $100,010 ask. Place post-only bid at $100,000. If filled, you paid 0.16% maker fee instead of 0.26% taker. On $10,000 trade = $10 saved. Over 1000 trades = $10,000 saved. For scalping strategies, maker vs taker fee is often the ENTIRE edge.",
+    "priority": 4
+  },
+  {
+    "id": "exec-006",
+    "source": "ccxt-rate-limit-integration",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "CCXT RATE LIMIT INTEGRATION: CCXT is the unified exchange library with built-in rate limiting. Enable with: exchange.enableRateLimit = true. CCXT spaces out requests automatically to comply with each exchange's rules. Benefits: 1) No manual rate tracking needed. 2) Handles different limits per endpoint. 3) Automatic retry on rate limit errors. 4) Works across 100+ exchanges with same API. Drawback: Python-based (use ccxt for prototyping, native Rust for production). For Rust: implement manual rate limiting with token bucket algorithm. Track remaining quota from response headers.",
+    "priority": 3
+  },
+  {
+    "id": "exec-007",
+    "source": "websocket-packet-loss",
+    "topic": "Execution",
+    "conditions": ["HighVolatility"],
+    "content": "WEBSOCKET PACKET LOSS DETECTION & RE-SYNC: During high volatility, WebSocket connections are most likely to drop packets. Detection: 1) Monitor sequence numbers — any gap = packet loss. 2) Monitor heartbeat timestamps — stale heartbeat = connection dead. 3) Monitor data freshness — if latest trade timestamp >5s old = connection issue. Re-sync protocol: 1) Close WebSocket immediately. 2) Wait 1 second. 3) Fetch fresh order book snapshot via REST. 4) Reconnect WebSocket with new subscription. 5) Verify first 3 messages match REST snapshot. 6) Resume normal operation. This must be automated — manual reconnection during a flash crash = catastrophic losses.",
+    "priority": 4
+  },
+  {
+    "id": "exec-008",
+    "source": "kraken-websocket-v2",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "KRAKEN WEBSOCKET V2 PROTOCOL: Kraken WS v2 uses JSON messages over wss://ws.kraken.com/v2. Subscribe to: 1) ticker (real-time price). 2) book (Level 2 order book, configurable depth). 3) trade (real-time trades). 4) ohlc (candle updates). Message format: {'method': 'subscribe', 'params': {'channel': 'book', 'symbol': ['BTC/USD'], 'depth': 10}}. Heartbeat: Exchange sends ping, client must respond with pong. Reconnection: On heartbeat timeout, reconnect and re-subscribe. Rate limits: Max 5 concurrent subscriptions per connection. Use multiple connections for more pairs.",
+    "priority": 4
+  }
+]

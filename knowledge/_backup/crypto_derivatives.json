@@ -1,0 +1,98 @@
+[
+  {
+    "id": "deriv-001",
+    "source": "bitmex-funding-arbitrage",
+    "topic": "Execution",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "FUNDING RATE ARBITRAGE (Cash-and-Carry): Market-neutral strategy: BUY spot + SHORT equivalent perpetual futures. Delta-neutral = immunized against directional price movement. Captures continuous funding payments. During euphoric bull markets, funding rates easily exceed 100% annualized = essentially risk-free return. Execution: 1) Buy 1 BTC spot. 2) Short 1 BTC perpetual. 3) Collect funding every 8 hours. 4) Close both when funding normalizes. Risk: Exchange counterparty risk, margin requirements, funding rate can turn negative. Best when funding >0.1% per 8h period.",
+    "priority": 5
+  },
+  {
+    "id": "deriv-002",
+    "source": "cross-exchange-funding-spread",
+    "topic": "Execution",
+    "conditions": ["HighVolatility"],
+    "content": "FUNDING RATE CONVERGENCE ACROSS EXCHANGES: Different exchanges show different funding rates for the same asset. Example: Binance shows 0.08% funding, dYdX shows 0.02%. Strategy: Short on Binance (receive 0.08%), Long on dYdX (pay 0.02%), capture 0.06% spread. This is cross-exchange funding arbitrage. Requirements: Multi-exchange accounts, sufficient margin on both, ability to manage margin requirements independently. Risk: Withdrawal delays, exchange downtime, margin calls on one side. Best during high volatility when funding rate divergence is largest.",
+    "priority": 4
+  },
+  {
+    "id": "deriv-003",
+    "source": "liquidation-cascade-mechanics",
+    "topic": "RiskManagement",
+    "conditions": ["HighVolatility"],
+    "content": "LIQUIDATION CASCADE MECHANICS: When leveraged positions fail maintenance margin → exchange forcibly closes via market orders → drives price further against other leveraged traders → sequential margin calls in domino effect. Cascade amplification: 1) Initial liquidation triggers. 2) Market sell pressure pushes price down. 3) Adjacent liquidation levels hit. 4) More forced selling. 5) Repeat until leverage is flushed. Cascades are VIOLENT and FAST — they create 10-20% moves in minutes. They are also PREDICTABLE by mapping liquidation clusters. After cascade completes, price typically V-shapes as forced selling exhausts.",
+    "priority": 5
+  },
+  {
+    "id": "deriv-004",
+    "source": "liquidation-heatmap-trading",
+    "topic": "Execution",
+    "conditions": ["HighVolatility"],
+    "content": "LIQUIDATION HEATMAP TRADING: Liquidation heatmaps show where dense clusters of leveraged positions will be forcibly closed. Price is MAGNETICALLY ATTRACTED to liquidation clusters because exchanges profit from liquidations. Strategy: 1) Identify dense liquidation cluster below current price. 2) Wait for price to approach cluster. 3) Enter long AFTER liquidation cascade completes (not before). 4) Target the next liquidation cluster above. Key: Don't try to catch the falling knife — wait for the cascade to EXHAUST. Volume spike + rapid reversal = cascade complete. Tools: Coinglass, Hyblock Capital.",
+    "priority": 5
+  },
+  {
+    "id": "deriv-005",
+    "source": "oi-price-divergence",
+    "topic": "OrderFlow",
+    "conditions": ["HighVolatility", "Trending"],
+    "content": "OPEN INTEREST + PRICE DIVERGENCE: Rising OI + Rising Price = new money entering longs (trend continuation). Rising OI + Falling Price = new money entering shorts (bearish). Falling OI + Rising Price = short covering (less sustainable rally). Falling OI + Falling Price = long liquidation (less sustainable decline). CRITICAL SIGNAL: When significant divergence emerges between spot volume and derivatives OI, violent mean-reversion moves materialize within 48-72 hours. Example: Price rising on declining OI = rally on short covering, not genuine demand — expect reversal.",
+    "priority": 5
+  },
+  {
+    "id": "deriv-006",
+    "source": "perp-vs-spot-guide",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "PERPETUAL FUTURES VS SPOT — When to Use Each: SPOT: No funding costs, no liquidation risk, actual ownership. Best for: long-term holding, DCA, when you want to withdraw to cold storage. PERPETUAL: Leverage available, can short, funding rate mechanism. Best for: short-term trading, hedging, when you need leverage. RULE: If holding >30 days, spot is almost always better (funding costs compound). If <7 days, perp is better (no slippage, can short). NEVER use perps for long-term holds — the funding drain will erode returns. Hybrid: Buy spot + short perp for delta-neutral yield.",
+    "priority": 4
+  },
+  {
+    "id": "deriv-007",
+    "source": "leverage-reflexivity-loop",
+    "topic": "RiskManagement",
+    "conditions": ["ExtremeGreed", "HighVolatility"],
+    "content": "LEVERAGE REFLEXIVITY LOOP: Positive feedback cycle in perpetual markets: Higher prices → more leveraged longs → higher funding → more buying pressure → higher prices. This loop persists until: 1) Funding becomes prohibitive vs expected return, OR 2) Minor price correction triggers liquidations. The DANGER: when aggregate OI rises alongside positive funding, the market is building a liquidation bomb. The larger the OI and the higher the funding, the MORE violent the eventual cascade. Warning signs: funding >0.1% per 8h, OI at all-time highs, price at resistance.",
+    "priority": 5
+  },
+  {
+    "id": "deriv-008",
+    "source": "basis-trade-guide",
+    "topic": "Execution",
+    "conditions": ["Trending"],
+    "content": "BASIS TRADE — Spot Long + Perp Short: The basis = perpetual price - spot price. When basis is positive (contango), you earn funding by being short perp. When basis is negative (backwardation), you earn funding by being long perp. Execution: Buy spot at $100, short perp at $102. Basis = $2 (2%). As expiry approaches or funding normalizes, basis converges to 0. You capture the $2 spread regardless of price direction. Annualized yield during euphoria can exceed 50-100%. Risk: Exchange risk, margin requirements, basis can WIDEN before converging.",
+    "priority": 4
+  },
+  {
+    "id": "deriv-009",
+    "source": "oi-divergence-mean-reversion",
+    "topic": "Execution",
+    "conditions": ["HighVolatility"],
+    "content": "48-72 HOUR MEAN REVERSION AFTER OI DIVERGENCE: When significant divergence emerges between spot volume and derivatives OI, violent mean-reversion moves typically materialize within a predictable 48-72 hour window. Setup: Spot volume declining while OI increasing = leverage building on thinning liquidity. OR: Spot volume spiking while OI declining = forced liquidation happening. Entry: Position for mean reversion once divergence reaches extreme (2+ standard deviations from mean). Timing: The 48-72 hour window is based on funding rate cycles (8h intervals × 6-9 cycles).",
+    "priority": 4
+  },
+  {
+    "id": "deriv-010",
+    "source": "kraken-fee-structure",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "KRAKEN FEE STRUCTURE & OPTIMIZATION: Kraken Pro: Maker 0.16% / Taker 0.26% at base tier. High-volume tiers can reach 0.00% maker / 0.12% taker. Kraken Futures: Maker 0.02% / Taker 0.05%. Fee optimization: 1) Use LIMIT orders (post-only) to capture maker fee. 2) For scalping, the fee difference (0.16% vs 0.26%) is the difference between profit and loss. 3) Volume-based tiers reset monthly — front-load trading volume. 4) Consider Kraken Futures for short-term trades (lower fees). 5) Factor fees into every R:R calculation — a 1:2 R:R trade with 0.52% round-trip fees needs extra edge.",
+    "priority": 4
+  },
+  {
+    "id": "deriv-011",
+    "source": "cross-exchange-funding-arb",
+    "topic": "Execution",
+    "conditions": ["HighVolatility"],
+    "content": "CROSS-EXCHANGE FUNDING SPREAD ARBITRAGE: Same asset, different exchanges, different funding rates. Strategy: Short the high-funding venue, long the low-funding venue. Example: Binance BTC funding = 0.1%, dYdX BTC funding = 0.02%. Short Binance, Long dYdX. Net receive = 0.08% every 8 hours. Requirements: Accounts on both exchanges, sufficient margin, fast rebalancing. Risk management: Monitor margin on BOTH sides independently. If one side approaches liquidation, close both immediately. Best during high volatility when funding divergences are largest.",
+    "priority": 3
+  },
+  {
+    "id": "deriv-012",
+    "source": "liquidation-cluster-targets",
+    "topic": "Execution",
+    "conditions": ["HighVolatility"],
+    "content": "LIQUIDATION CLUSTER PRICE TARGETS: Dense liquidation clusters act as price MAGNETS. Strategy: Map the largest liquidation clusters above and below current price. These are your directional targets. If the largest cluster is below price at $95,000 and price is at $98,000 → bearish bias, target $95,000. After the cluster is swept, the NEXT cluster above becomes the target. The cascade creates a V-shape: price sweeps the cluster, liquidations trigger, then price reverses to the next cluster. This is the 'liquidity grab' pattern that ICT/SMC traders describe — but the MECHANISM is liquidation cascades, not institutional manipulation.",
+    "priority": 4
+  }
+]

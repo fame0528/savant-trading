@@ -1,0 +1,50 @@
+# === Secrets — NEVER commit ===
+.env
+.env.*
+*.key
+*.pem
+credentials.json
+
+# === Agent runtime state ===
+dev/session-summaries/
+dev/findings/
+dev/plans/
+dev/baselines/
+
+# Keep LEARNINGS.md tracked — cross-session knowledge
+!dev/LEARNINGS.md
+
+# === Build artifacts ===
+/target
+*.o
+*.d
+
+# === Data (runtime-generated) ===
+/data/
+*.db
+*.db-shm
+*.db-wal
+
+# === Knowledge source books (1.8GB, too large for git) ===
+knowledge/books/
+knowledge/_backup/
+
+# === Firebase ===
+firebase-debug.log
+.firebaserc
+firebase.json
+
+# === Vault ===
+savant-vault/
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

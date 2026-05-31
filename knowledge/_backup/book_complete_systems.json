@@ -1,0 +1,1602 @@
+[
+  {
+    "id": "book-sys-001",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "TRIPLE SCREEN SYSTEM — Screen 1 (weekly): Use trend-following indicators (MACD-Histogram, weekly EMA) to make strategic long/short decision. Only trade in direction of weekly trend. Screen 2 (daily): Use oscillators (Force Index, Stochastic, Elder-ray) to identify countertrend entry points — buy dips in uptrends, sell rallies in downtrends. Screen 3 (intraday): Use breakout techniques for precision entry. Buy when daily uptick confirms weekly buy + daily dip. The Factor of Five links timeframes: each is ~5x the next lower.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-002",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "ELDER-RAY — Measures Bull Power (High - 13-day EMA) and Bear Power (Low - 13-day EMA). BUY SIGNAL: In uptrend (rising EMA), Bear Power turns negative then ticks up — forces you to buy value. SELL/SHORT: In downtrend (falling EMA), Bull Power turns positive then ticks down. Profit target: distance from EMA equal to average Bull/Bear Power. Combine with trend direction from weekly chart.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-003",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "FORCE INDEX = Price Change × Volume. Raw Force Index is jagged; use 2-day EMA for entries, 13-day EMA for trend. BUY: 2-day Force Index dips to new low in uptrend (shows selling climax — entry opportunity). SELL: 2-day Force Index rallies to new high in downtrend. 13-day EMA above zero = bulls control; below zero = bears control. Divergences between price and Force Index give strong reversal signals.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-004",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "MACD-HISTOGRAM — Slope of MACD-Histogram is more important than its level. Rising slope = bulls gaining momentum; falling slope = bears gaining. BEST SIGNAL: Divergence — prices make new high but MACD-Histogram makes lower peak = bearish divergence, strong sell signal. New low in price with higher MACD-Histogram low = bullish divergence. Wait for second peak/trough to form before acting — premature action is the main danger.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-005",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Ranging"],
+    "content": "STOCHASTIC — Measures capacity of bulls/bears to close prices near range extremes. Use 5-7 day window. Reference lines at 15 (oversold) and 85 (overbought). BUY when Stochastic traces bullish divergence near lower reference line. SELL on bearish divergence near upper reference line. CRITICAL RULE: Do NOT buy when Stochastic above 85 or short when below 15 — these 'no-go' zones prevent chasing trends.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-006",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "MOVING AVERAGES — Rising MA = crowd bullish, falling = bearish. Use 22-day EMA for daily, 26-week for weekly charts. MAs work well in trends but give whipsaws in ranges. Key signals: price crossing MA, two MAs crossing each other, MA slope change. Day-traders should average (O+H+L+C)/4 instead of just close. Wider MAs = fewer signals but more reliable; shorter MAs = more sensitive but more whipsaws.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-007",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "IMPULSE SYSTEM — Color bars: GREEN (both MA rising and MACD-Histogram rising) = buy, RED (both falling) = sell, BLUE (conflicting) = caution. NEVER go long on red bars, never short on green bars. Use for entry timing on lower timeframe: buy pullbacks to green bars in uptrend, sell rallies to red bars in downtrend. Identifies trend momentum at a glance.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-008",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "2% RULE — Limit loss on any single trade to 2% of equity. Calculate: Account equity × 2% = max dollar risk. Divide by risk per share = max shares. $50K account → $1,000 max risk. Buy at $20, stop at $18 = $2 risk/share → max 500 shares (practical: 400 to cover commissions/slippage). Professionals risk LESS than 2%. Measure equity first of each month. NEVER violate this rule — it is your shark repellent.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-009",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "6% RULE — If monthly equity drops 6% below last month's close, STOP ALL TRADING for remainder of month. Close all positions, go to sidelines. This protects from piranha death — many small losses that destroy account. Calculates total open risk: if 3 trades at 2% risk each = 6% max exposure, no new trades until one moves stop to breakeven. Forces you to stop losing streaks like an institutional trading manager would.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-010",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "OK-TO-TRADE SPREADSHEET — Before trading any futures market, calculate: 2% of account = max risk. Measure SafeZone indicator (22-day EMA), translate to dollars. Do NOT trade any market whose average noise level exceeds 1% of your equity. Column setup: Market | Contract Value | SafeZone | SafeZone×2 | 2% of Account | OK to Trade? This prevents trading markets too volatile for your account size.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-011",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "KANGAROO TAILS — Three-bar reversal pattern: narrow bar, extremely wide bar (the tail), narrow bar. Tail points in direction of recent trend, market jumps OPPOSITE. BUY when tail hangs down (go long near base, stop halfway down tail). SHORT when tail points up (go short near base, stop halfway up). Works on any timeframe. Tail shows market tested a price level and rejected it — exchange members seeking maximum volume.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-012",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "FALSE BREAKOUTS — Professional fishing expeditions to run stops. Upside false breakout: market rises above resistance, sucks in buyers, reverses sharply back below. Downside false: falls below support, attracts shorts, rallies back above. BEST TRADES occur after false breakouts — trade back into range with stop at the extreme of the false breakout. If stopped on a false breakout, re-enter. Professionals attempt multiple entries.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-013",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SUPPORT/RESISTANCE PSYCHOLOGY — Former support becomes resistance and vice versa due to emotional memory. Traders who bought at 80 and watched it fall to 60 will sell at 70 to 'get out even.' Those who missed buying at 80 will buy if it returns. Draw lines across congestion area EDGES, not extreme points. Support/resistance are flexible like wire fences, not glass walls — expect false breakouts around them.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-014",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SAFE ENTRY RULES — 1) Trade only in direction of weekly trend (Triple Screen). 2) Wait for oscillator signal on daily chart confirming pullback. 3) Enter when daily Impulse System confirms. 4) Place stop at recent swing extreme beyond your entry. 5) Risk ≤2% per trade. 6) Total open risk ≤6%. 7) Only trade markets where noise level <1% of equity. 8) Use limit orders near support/resistance, not market orders.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-015",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "EXITING TRADES — Three types of exits: 1) Protective stop (safety net, never widen). 2) Trailing stop (locks in profits — use SafeZone or channel breakouts). 3) Profit target (at channel lines or where average Bull/Bear Power reaches). Take partial profits at upper/lower channel, trail remainder. Move stop to breakeven after first target hit. Exit when trend-following indicator reverses or Impulse System turns against you.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-016",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "CHANNELS — Draw parallel lines: uptrend line along lows, channel line along highs. Prices failing to reach channel line = trend weakening. Prices exceeding channel line = trend accelerating. Profit targets: sell at upper channel in uptrend, cover at lower channel in downtrend. Channel width projects minimum move after breakout. Redraw channels as trends accelerate — steep channels break easily.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-017",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TRIANGLES — Congestion area where trend pauses. Upper boundary = where sellers overpower buyers. Lower = where buyers overpower sellers. Converging boundaries signal imminent breakout. Ascending triangle (flat top, rising bottom) usually breaks up. Descending triangle usually breaks down. Symmetrical triangle — give benefit of doubt to preceding trend. Breakout direction more reliable with volume expansion.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-018",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "DOUBLE TOPS/BOTTOMS — Double top: two approximately equal peaks with trough between. Only confirmed on break below trough with increased volume. At second peak, watch indicators for bearish divergence (lower high on indicator while price equals first peak). Double bottom mirror image. Many apparent double tops are consolidation — wait for neckline break. Dead cat bounce often occurs between two bottoms.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-019",
+    "source": "elder-come-into-trading-room",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "COMMITMENTS OF TRADERS (COT) — Compare hedger positions to historical norms. Hedgers are today's smart money (not big traders). If hedgers normally hold 90% shorts but currently hold 70%, that's wildly bullish. Look for extreme divergence between hedgers and small traders — join the hedgers. Use COT data to confirm technical signals, not as standalone indicator. Small traders are often gamblers and losers.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-020",
+    "source": "elder-come-into-trading-room",
+    "topic": "MacroAnalysis",
+    "conditions": ["HighVolatility"],
+    "content": "SUPPLY vs DEMAND MARKETS — Supply-driven markets are fast and furious (hurricane hits coffee, OPEC cuts oil). Demand-driven markets are quiet and slow. Trend traders profit most in supply-driven markets; swing traders in demand-driven. Watch weather, planted acreage, warehouse stocks for agricultural commodities. Channels must be redrawn and tactics adjusted as seasons change from supply to demand-driven conditions.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-021",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "CONTANGO AND INVERSION — Normally nearby futures months are cheaper (contango = cost of carry). When front months become pricier than faraway = INVERSION, one of the strongest fundamental bull signals — real shortage exists. Scan commodity closing prices for inversions. Monitor premiums (differences between delivery months) for narrowing/widening. Interest rate futures always inverted (normal for that sector).",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-022",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "POSITION SIZING — Never trade a market whose noise level exceeds 1% of your equity. Calculate: 2% of account ÷ risk per share = max position. Reduce position size when in drawdown. Use Equal Value method for stocks: divide capital equally by dollar value of positions. For futures: calculate contract value and compare to account size. Beginners start with cheapest liquid markets (corn, sugar, copper).",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-023",
+    "source": "elder-come-into-trading-room",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "THREE Ms OF TRADING — Mind (disciplined psychology), Method (technical analysis), Money (management). Without all three, success impossible. Amateurs think about profits; professionals think about losses. The goal is to make the best trades — money is secondary. When you feel fear or joy, use it as signal to tighten discipline and follow your system. Your system was developed when calm — follow it when emotional.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-024",
+    "source": "elder-come-into-trading-room",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "DISCRETIONARY vs SYSTEM TRADING — System traders achieve more consistent results but best traders use discretionary. Professional system trader monitors system like a hawk, knows difference between normal drawdown and system deterioration. Automatic systems don't work because market follows imperfect laws of mass psychology, not physics. Use backtested components but retain judgment for combining them. All mechanical systems eventually self-destruct.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-025",
+    "source": "elder-come-into-trading-room",
+    "topic": "Backtesting",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SYSTEM TESTING — Only valid method: go through historical data one day at a time, write signals for next day, then click forward to see results. Download minimum 2 years of data. Write system rules at top of spreadsheet. Track entry/exit dates and prices. Printouts of backtested parameters provide false sense of security — nothing prepares you for 5 consecutive real-money losses. Test each indicator and rule individually before combining.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-026",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TRADING RECORD — Track: date, instrument, long/short, entry date/price, stop, target, exit date/price, % gain/loss, R-multiple. Include: which screens triggered, emotional state, market conditions. Calculate equity curve — if it rises left to right, system works. Review trades weekly. Keep diary with screenshots. Separate best setups from worst. Record reasons for each trade BEFORE entry, not after.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-027",
+    "source": "elder-come-into-trading-room",
+    "topic": "RegimeDetection",
+    "conditions": ["Trending", "Ranging"],
+    "content": "MARKET THERMOMETER — Measures distance between today's high and low compared to exponential average of that distance. Identifies whether market is in trending or ranging state. Rising thermometer = heating up (trending), falling = cooling (consolidating). Use to select appropriate indicator type: trending markets → use trend-following tools; ranging → use oscillators. Prevents applying wrong indicator to current market regime.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-028",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "DECISION-MAKING TREE — Branch 1: Determine weekly trend (up/down/flat). Branch 2: Identify daily oscillator signals in direction of weekly trend. Branch 3: Check Impulse System for confirmation. Branch 4: Calculate position size using 2% rule. Branch 5: Set stop, target, and entry. Branch 6: If stopped out, check if re-entry warranted. All branches connected to trunk: inviolate risk control rules. Adapt branches to market conditions.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-029",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "BUSINESSMAN'S RISK vs LOSS — A businessman's risk exposes you to normal equity fluctuation. A loss threatens your prosperity and survival. You MUST draw the line between them and never cross it. The line is the 2% rule. If your stop loss per share × number of shares exceeds 2% of account, either reduce shares or skip the trade entirely. This single distinction separates professionals from amateurs.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-030",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SPREAD TRADING — Buy one delivery month, sell another in same market (or long one/short related market). Much safer than directional trades with lower margin. Corn rising faster than wheat → ranchers switch feed → spread reverts to norm. Spread traders bet against deviations for return to normalcy. Not a single good how-to book exists — professionals have kept amateurs out. Excellent risk management tool for reducing directional exposure.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-031",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "ADX (Directional System) — Helps identify new bull markets. Rising ADX = trend strengthening, regardless of direction. Falling ADX = trend weakening, market entering range. Use to decide between trend-following and oscillator strategies. ADX above 25 = trending market, use trend-following tools. ADX below 20 = ranging, use oscillators. Combine with Elder-ray and Force Index for Triple Screen confirmation.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-032",
+    "source": "elder-come-into-trading-room",
+    "topic": "Sentiment",
+    "conditions": ["Trending", "Ranging"],
+    "content": "BULLISH CONSENSUS — Gauge of overall market bullishness/bearishness. When 80%+ bullish, market is near top — contrary indicator. When 80%+ bearish, market near bottom. Compare to Commitments of Traders data. The crowd is usually wrong at extremes. Use as one input in Triple Screen methodology — misc indicators gauge mood. Combine with technical signals for highest-probability entries at sentiment extremes.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-033",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PYRAMIDING — Add to winning positions ONLY. Each new position smaller than previous. Move stops to breakeven on earlier positions before adding. Maintain overall risk within 2% of account per trade, 6% total. Use trailing stops based on SafeZone indicator. Pyramid when Impulse System confirms on each new timeframe. Never add to losing positions — this is the hallmark of amateur destruction.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-034",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TRADER'S SPREADSHEET — Monthly tracking: opening equity, deposits/withdrawals, closing equity, monthly % gain/loss, YTD return. Per-trade: date, market, direction, entry, stop, target, exit, profit/loss, R-multiple, commission, net. Calculate: win rate, average winner/loser, largest winner/loser, max drawdown, expectancy per trade, profit factor. Plot equity curve monthly. If curve rises left to right, system works.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-035",
+    "source": "elder-come-into-trading-room",
+    "topic": "RegimeDetection",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SUPPLY-DRIVEN vs DEMAND-DRIVEN REGIMES — Supply shocks create fast, volatile moves (weather, geopolitics). Demand changes create slow, quiet trends. Identify regime by: 1) VIX/volatility level. 2) News flow intensity. 3) Channel width. Narrow channels = demand-driven → use swing strategies. Wide channels = supply-driven → use trend following. Adjust indicator parameters and profit targets to match regime.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-036",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "FACTOR OF FIVE — Timeframe relationship: 1 week ≈ 5 trading days, 1 month ≈ 5 weeks, 1 hour ≈ 10-min segments (5), each 10-min ≈ 2-min bars (5). Choose your timeframe, immediately go up one level for strategic direction. Day traders: 30-min + 5-min charts. Swing traders: weekly + daily. Never use more than 3 timeframes — adding more only clutters decision-making. Each higher timeframe is one order of magnitude.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-037",
+    "source": "elder-come-into-trading-room",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "AMATEUR vs PROFESSIONAL MINDSET — Amateurs: chase trades, one attempt, freeze on losses, average down, predict market. Professionals: multiple entry attempts, cut losses quickly, never average down, react to market. If stopped on false breakout, pros re-enter; amateurs stay out. Pros risk less than 2%, amateurs want more leverage. When amateurs and professionals disagree, side with professionals.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-038",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["SessionClose"],
+    "content": "END-OF-DAY ROUTINE — 1) Update charts with day's data. 2) Recalculate all indicators. 3) Mark support/resistance levels. 4) Update trading spreadsheet. 5) Write diary entry with emotions and observations. 6) Set alerts for next day. 7) Review any open positions and adjust stops. 8) Plan tomorrow's potential trades. This routine prevents impulsive morning decisions and ensures systematic approach.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-039",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "RSI (Relative Strength Index) — Based on closing prices, tracks behavior of market professionals who dominate at closing time. Overbought above 70, oversold below 30. Best used for divergences: price new high + RSI lower high = bearish divergence. In strong trends, RSI can stay overbought/oversold for extended periods. Combine with trend direction — only take RSI buy signals in uptrends, sell signals in downtrends.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-040",
+    "source": "elder-come-into-trading-room",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "FLOOR AND CEILING — Fundamentals put floor (cost of production) and ceiling (cost of substitution) under commodities. Gold below production cost → miners stop digging → supply shrinks → price rises. Sugar too expensive → demand switches to other sweeteners. Same price areas serve as floor year after year WITHOUT inflation adjustment. Few trade against these levels due to psychological difficulty of buying crashed markets or shorting hot ones.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-041",
+    "source": "elder-come-into-trading-room",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "OPEN INTEREST — Rising open interest in trending market = more winners AND more losers entering = trend likely continues. Falling open interest = winners cashing out, losers quitting = trend weakening. In uptrend: rising OI confirms, falling OI warns. In downtrend: rising OI confirms bearishness. Combine with volume analysis — both rising together = strongest confirmation of trend continuation.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-042",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Ranging"],
+    "content": "WILLIAMS %R — Oscillator similar to Stochastic, especially useful for showing when to pyramid winning positions. Ranges 0 to -100. Above -20 = overbought, below -80 = oversold. Best use: in trending markets, use Williams %R oversold readings as pyramiding signals in direction of established trend. Confirms Force Index signals for adding to winning positions at pullback points.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-043",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "CHOOSING WHAT TO TRADE — For stocks: trade liquid names, 100+ stocks from major exchanges, minimum daily volume. For futures: start in markets you understand fundamentally, in your time zone. Don't trade expensive markets with small accounts — random noise in S&P can be deadly. Beginners: corn, sugar, copper. Create spreadsheet comparing contract values. Never trade 24-hour markets from a single time zone.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-044",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "MONTHLY EQUITY RESET — Calculate total equity (cash + positions at market value) on first of each month. 2% risk is based on THIS number, not peak equity. If account grows from $100K to $105K, next month's max risk = $2,100 per trade, $6,300 total. If drops to $95K, max risk = $1,900 per trade, $5,700 total. Auto-adjusts position size with account performance. Never recalculate mid-month except for the 6% emergency stop.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-045",
+    "source": "elder-come-into-trading-room",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "INSTITUTIONAL vs PRIVATE TRADER — Institutional traders have managers enforcing discipline: max risk per trade + max monthly drawdown. When they go independent, they lose without external discipline. Private traders need their OWN equivalent: 2% Rule (replaces per-trade limit) + 6% Rule (replaces monthly limit). Social pressure from peers in trading room = additional motivation. Create your own external accountability structures.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-046",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "ACTION PLAN — Write before each trading session: 1) Market conditions assessment. 2) Key levels (support/resistance/channels). 3) Indicator readings on multiple timeframes. 4) Potential setups with specific triggers. 5) Position sizes pre-calculated. 6) Stop and target levels defined. 7) Maximum number of trades for the day. 8) Conditions that would keep you OUT of the market. Follow the plan without deviation.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-047",
+    "source": "elder-come-into-trading-room",
+    "topic": "Backtesting",
+    "conditions": ["Trending", "Ranging"],
+    "content": "BACKTESTING PROTOCOL — Minimum 2 years historical data. Split into development (first 60%) and validation (last 40%). Walk forward one day at a time — never peek ahead. Record each signal, entry, exit, P&L. After development phase: test on out-of-sample data. If performance degrades significantly, system is curve-fit. Track: win rate, avg winner/loser, max consecutive losses, max drawdown, profit factor, expectancy per dollar risked.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-048",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending"],
+    "content": "DAY-TRADING RULES — Use 30-min and 5-min charts (Factor of Five). Weekly chart is essentially irrelevant for day-trading. Focus on highest-volume hours: first and last hour of regular session. Don't chase — if you miss an entry, wait for next setup. Set maximum daily loss limit (1-2% of account). Stop after 3 consecutive losses. Always use stop losses — no exceptions. Take profits at channel lines on intraday charts.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-049",
+    "source": "elder-come-into-trading-room",
+    "topic": "Sentiment",
+    "conditions": ["ExtremeFear"],
+    "content": "PANIC AND CAPITULATION — When a stock drops on panic volume (massive spike), smart money begins accumulating. Kangaroo tails at bottoms mark capitulation. Dead cat bounce follows crash, then slow grind to second bottom — sustainable rise begins from there. Volume spike = most intense selling = often marks bottom. Don't buy the panic directly — wait for tail confirmation and Impulse System to shift from red to blue.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-050",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PENNANTS — Tight weave of prices after sharp move (flagpole). When pennant flies in direction of preceding trend = usually sharp reversal. When pennant flies AGAINST preceding trend = consolidation, trend continues. Place entries above or below pennant boundary based on expected direction. Breakout direction from pennant is the trade. Volume should decrease during pennant formation, expand on breakout.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-051",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "DEFENSE AGAINST FALSE BREAKOUTS — If in position during false breakout: 1) Reduce trading size. 2) Place wider stops. 3) Be ready to reposition if stopped. 4) Consider buying protective puts (long) or calls (short) during high volatility. 5) If stopped on false breakout, don't be shy about re-entering — professionals attempt multiple entries. Your small position size (2% rule) gives you the flexibility to do all this.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-052",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "CONFLUENCE ZONES — Strongest signals occur when multiple factors align: 1) Support/resistance level. 2) Channel line. 3) Moving average. 4) Fibonacci retracement. 5) Psychological round number. 6) Prior swing point. The more factors converging at one price level, the more significant that level. Trade with maximum position size at high-confluence zones, reduced size at isolated levels.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-053",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "TRENDLINE RULES — Draw uptrendlines across higher lows, downtrendlines across lower highs. Minimum 2 points, 3rd confirms validity. More touches = more valid. Angle reflects emotional temperature: >60° unsustainable, break leads to major reversals. Draw trendlines across congestion area edges, not extreme points. Longest-held trendlines produce most significant breaks when violated.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-054",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TRADE MANAGEMENT HIERARCHY — 1) Never violate 2% per trade. 2) Never violate 6% monthly. 3) Only trade in direction of weekly trend. 4) Wait for daily oscillator pullback signal. 5) Confirm with Impulse System. 6) Enter with limit order at planned level. 7) Set stop BEFORE entry. 8) Take partial profits at first target. 9) Trail stop on remainder. 10) Exit if weekly trend reverses.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-055",
+    "source": "elder-come-into-trading-room",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "OVERCOMING SELF-DESTRUCTIVENESS — Keep trading diary tracking emotions. When aware of fear or joy, use it as signal to tighten discipline. Separate self-worth from trading results. Review both winning and losing trades objectively. Develop pre-trade rituals. Paper trade during losing streaks. Never revenge trade. Trust your methodology — it was built when you were calm. The market rewards patience and punishes impulsiveness.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-056",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "MULTIPLE TIMEFRAME CONFIRMATION — Before entry: 1) Weekly chart gives direction (up/down). 2) Daily chart gives timing (oversold in uptrend = buy). 3) Intraday chart gives precision (breakout above intraday resistance = entry). Always start analysis at highest timeframe and work down. If higher timeframe signal missing, do NOT trade regardless of lower timeframe signals. Higher timeframe ALWAYS overrides lower.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-057",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "STOP PLACEMENT — Place stops based on technical levels, not arbitrary percentages. Use SafeZone indicator: measure average noise, place stop beyond noise level. Minimum: stop must be beyond 1× average noise. Never move stop against your position. Accept the stop loss amount BEFORE entering. If stop would risk >2% of account, skip the trade. Wider stops = fewer whipsaws but need smaller position to fit 2% rule.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-058",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "INDICATOR COMBINATION RULES — Must combine: 1) Trend-following indicator (MA, MACD lines, ADX) to identify direction. 2) Oscillator (Force Index, Stochastic, Elder-ray) to time entries. 3) Volume/mood indicator (COT, Bullish Consensus) for confirmation. Never use two indicators from same group — they'll confirm each other's weaknesses. Different groups' negatives should filter each other while positives remain.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-059",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "6% RULE WORKED EXAMPLE — $100K account, start of month: max risk $2K/trade, $6K/month. Buy stock A ($2K risk). Buy stock B ($2K risk). Buy stock C ($2K risk). Total = 6% exposed. Can't buy stock D yet. Stock A rallies, stop moved above breakeven → current risk = 4% (B+C only). NOW can buy stock D. Stock B hits stop, loses $2K. Current risk = 4% (C+D). Stock E still attractive but CANNOT buy — already at 4% + $2K loss = 6% limit.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-060",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "MARKET CYCLES — Four phases: Accumulation (smart money buying, sideways), Markup (uptrend begins), Distribution (smart money selling, sideways), Markdown (downtrend begins). Identify current phase to select strategy. Volume-price relationship reveals phase: low volume + tight range = accumulation; rising volume + rising price = markup; high volume + sideways = distribution; rising volume + falling price = markdown.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-061",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["SessionOpen"],
+    "content": "OPENING GAP PLAY — Check premarket volume on key stocks (MSFT, INTC, GE, C) by 9:20 AM ET. Volume <30K shares each = 85% chance gap fills same day. Volume 50K+ = only 60% chance fills, but 85% chance midpoint hit. RULES: 1) Trade only Tue-Fri. 2) Gaps within R1-S1 pivot levels. 3) No trading Mondays or expiration/first day of month. 4) Entry at open. 5) Target = previous close (gap fill). 6) Stop = 1.5:1 R:R for small gaps, 1:1 for large gaps.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-062",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PIVOT POINT CALCULATIONS — Pivot = (H+L+C)/3. R1 = 2×Pivot - Low. R2 = Pivot + (High-Low). R3 = R1 + (High-Low). S1 = 2×Pivot - High. S2 = Pivot - (High-Low). S3 = S1 - (High-Low). Use settlement price for close (only close that matters). Calculate daily, weekly, monthly levels. Midpoints between daily levels for additional support/resistance. Markets test daily pivot 90% of the time each day.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-063",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PIVOT TRADING RULES — TRENDING DAY: Fade first touch of daily pivot (buy dips to pivot support, sell rallies to pivot resistance). First target = next pivot level. Trail stop after first target hit. CHOPPY DAY: Target 10 YM points / 1 ES point on half position. Trail stop on rest. R2/S2 usually = dead high/low of day (90% chance market won't close beyond). NEVER fade moves to R3/S3 — too extreme. Stop trading pivots after 2 consecutive losers.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-064",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SQUEEZE PLAY — Bollinger Bands inside Keltner Channels = squeeze (low volatility, energy building). Red dots = squeeze active but not fired. When Bollinger expands outside Keltner = squeeze FIRES (high volatility release). Use with TTM Waves: C wave (longest period) determines trend direction. A wave (shortest) for timing. Only take squeeze in direction of C wave. 'Porsche setup' = all waves aligned; 'Pinto' = conflicting signals.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-065",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["SessionOpen", "SessionClose"],
+    "content": "3:52 PLAY — At 3:30 PM ET, market makes directional move. Traders chase it, entering late. By 3:52, late chasers are underwater and getting stopped out, pushing market further against them. TRADE: At 3:52, go OPPOSITE the 3:30 move. Stop: 2 ES points or 20 YM points. Exit at 4:13 PM (21-minute time limit). This exploits the mass psychology of late entries and forced liquidations. Works on ES and YM. If not crystal clear, skip it.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-066",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "TTM WAVES — Three momentum waves: A (shortest period, short-term), B (medium), C (longest period, long-term). All oscillate around zero. BUY when: C wave above zero (bullish trend), squeeze fires long, A wave dips below zero then crosses back up. SELL when: C wave below zero, squeeze fires short, A wave rises above zero then falls back. Never fight the C wave — it determines the dominant trend direction.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-067",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TTM TREND BARS — Paint bars based on average price of prior 6 bars vs current bar's range. BLUE (bullish): average of 6 bars in upper half of range = buying pressure. RED (bearish): average in lower half = selling pressure. Best for EXIT management rather than entry. Two consecutive red bars in a long trade = exit signal. Two consecutive blue bars in short trade = cover signal. Combine with squeeze for complete system.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-068",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TICK FADE — When $TICK reaches extreme readings (>+600 or <-600), fade the move. BUY on $TICK <-600 with tight stop. SELL on $TICK >+600. Additional rules: 1) Check daily trend first — don't fade if strong trend day. 2) Use 144-tick chart for entry. 3) If $TICK extreme + gap already filling = stronger signal. 4) Last half-hour less reliable for tick fades. 5) On YM, look for $TICK >+800 or <-800 for confirmation.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-069",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SCALPER TRADE RULES — For ES: use 233-tick chart. Enter on scalper buy/sell signal at pivot levels. First target: 1-2 ES points on half position. Move stop to breakeven after first target. Trail with 4-point stop on remainder. For YM: 10-point first target, 20-point stop. Scalp trades generate monthly income; swing trades create wealth. After 2 consecutive losers on pivots, done for the day.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-070",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["SessionOpen"],
+    "content": "PREMARKET CHECKLIST — Sunday: Review monthly, weekly charts and MACD/stochastic direction. Update squeeze status (N=neutral, R=red dot, S=sell, B=buy) for each market/timeframe. Daily: Check where market closed vs daily pivot. Note key levels. Review 60-min RSI divergences. Check 200-period EMA as major support/resistance. Plan for gap/no-gap scenarios. Set alerts at key pivot levels before open.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-071",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "PROPULSION PLAY — Swing trade using 8/21-period EMA crossover. BUY: 8 EMA crosses above 21 EMA, wait for pullback to 8 EMA, enter with limit order. TARGET: 8% profit using GTC order. STOP: Below 21 EMA. EXIT: Two consecutive red TTM trend bars. Best for stocks with strong fundamentals + technical setup. Place orders night before, check at end of day. Don't watch intraday — removes emotional interference.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-072",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "BOX PLAY (Forex) — Identify overnight range (Asian session) for major currency pairs. Trade breakouts from the box during London/NY overlap. BUY: price breaks above box high with volume. SELL: breaks below box low. Stop: opposite side of box. Target: width of box projected from breakout. Most effective on EUR/USD, GBP/USD, USD/JPY. Avoid during low-volatility Asian sessions for entry.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-073",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "REVERSAL PLAY (HOLP/LOHP) — HOLP = High of Low Period, LOHP = Low of High Period. After extended trend, identify period where price stalls. BUY: when market makes new low within consolidation then reverses above the HOLP level. SELL: when market makes new high in consolidation then reverses below LOHP. Don't buy 'because it's cheap' — wait for reversal confirmation. Combine with TTM trend bar color change.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-074",
+    "source": "carter-mastering-the-trade",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SCALE-OUT STRATEGY — Enter full position. At first target: sell half, move stop to breakeven on remainder. At second target: sell half of remaining, move stop to entry on final quarter. Let last quarter run with trailing stop or until exit signal. This captures guaranteed profit on early targets while allowing runners on the rest. Don't trail stops aggressively on full position — gets you stopped out on wiggles.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-075",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "ANCHOR CHARTS — Use monthly and weekly charts as 'anchor' to determine dominant trend before intraday trading. Monthly MACD direction overrides weekly and daily. If monthly MACD in buy, focus on long side for swing trades even if daily sells. Weekly MACD in buy = morning gap downs become buying opportunities. Mixed (monthly bullish, weekly bearish) = sell signals on weekly create buying opportunities for longer timeframe.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-076",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TRADE MANAGEMENT SOFTWARE — Use platform that auto-calculates stops and targets per setup. Once entry placed, software manages: initial stop (e.g., 10 ticks), first target (e.g., 1 point), auto-trailing stop after targets hit, auto position reduction at each target. Eliminates manual errors and emotional decisions during trade. Can manage multiple positions across markets simultaneously. Click 'Flatten' button to close all at once if needed.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-077",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "FIBONACCI CLUSTERS — Calculate Fibonacci retracement levels from multiple recent swings. Where levels from different swings cluster together = powerful support/resistance. Use 38.2%, 50%, 61.8% retracements. Clusters work on all timeframes from 3-min to monthly. Combine with pivot levels — confluence of Fibonacci cluster + pivot = extremely strong level. These act as support/resistance for intraday and swing entries.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-078",
+    "source": "carter-mastering-the-trade",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "BEGINNER POSITION SIZING — Start with ONE contract on YM or ONE ES contract. Max account risk: 1% per trade. Calculate: $25K account = $250 max risk per trade. YM stop of 20 points = $10 risk per contract = max 25 contracts theoretically, but practically 1-2 contracts while learning. Goal: make a living, not a killing. Don't trade 60 ES contracts on a $100K account — you'll soon be trading 6 contracts with what's left.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-079",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Ranging"],
+    "content": "CHOPPY MARKET IDENTIFICATION — Markets are choppy when: 1) Trading in narrow, low-volume range. 2) Moving averages flat/whipsawing. 3) $TICK readings stay between -400 and +400. 4) No follow-through on breakouts. In choppy markets: ONLY fade pivot levels (don't trade breakouts). Use smaller targets (10 YM / 1 ES point). If gap play + pivot play + choppy day = often the only safe trades available.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-080",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "TRENDING DAY IDENTIFICATION — Trending days: 1) Strong opening gap with volume. 2) $TICK readings consistently above +400 or below -400. 3) Price stays above/below VWAP all day. 4) Pullbacks are shallow and brief. 5) Moving averages trending in one direction. On trending days: use pivot levels as pullback entry points, not fade targets. First target = next pivot level. Trail stop on rest for larger move.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-081",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["SessionOpen", "SessionClose"],
+    "content": "TRADING DAY STRUCTURE — First 2 hours (9:30-11:30 AM ET): highest probability setups — gap plays, pivot fades, early trend entries. Midday (11:30 AM - 2:00 PM): low probability — choppy, choppy, choppy. Only 5-min squeeze setups acceptable. Final 2 hours (2:00-4:00 PM): trend resumption or 3:52 play. NEVER initiate new positions after 3:30 PM ET. Close any open positions at market by 3:58 PM (stocks) or 4:10 PM (futures).",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-082",
+    "source": "carter-mastering-the-trade",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PHASE IV TRADING — Phase I: destined to lose (overconfident, overtrade). Phase II: fear-based (everything turns to crap). Phase III: Holy Grail search (indicator addiction). Phase IV: learning NOT to lose money. Key transition: understand that setup win rate means nothing without proper R:R and position sizing. A 99% win rate setup with 100:1 stop/target ratio will destroy you. Focus on process, not outcome. Use plateau money management method.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-083",
+    "source": "carter-mastering-the-trade",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PAIN AND SUFFERING OF MARKET PARTICIPANTS — Every trade has a loser on the other side. Understanding WHO is getting hurt and WHY gives you edge. Gap down hurts: overnight longs (getting stopped out) and shorts from prior day (taking profits). Your gap fill trade profits from their forced liquidation. Pivot reversals hurt: breakout traders who chased the move. Always identify the pain point — that's where your edge lives.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-084",
+    "source": "carter-mastering-the-trade",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "STOP WIDE ENOUGH TO WIN — Gap plays with tight stops (<30% win rate) destroy accounts. Wider stops on high-probability setups (>80% win rate) produce consistent profits. Gap play: use 1.5:1 R:R for small gaps, 1:1 for large. DON'T trail stops aggressively on gap plays — parameters set in place, walk away. Don't tweak parameters mid-trade. Many traders fail because stops are too tight, not too wide.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-085",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "ENTRY FINESSE — Avoid market orders — opens door to bad habits. Use limit orders at pre-identified support/resistance levels. Place orders BEFORE the market reaches your level. Set audio alerts at key levels so you can focus elsewhere. Either orders get hit or they don't — no chasing. If you miss an entry, let it go. System naturally enforces professional mindset: pre-planned, anti-impulsive entries only.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-086",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "MINI-SIZED DOW (YM) SPECIFIC — New traders do better with YM than ES. More exaggerated moves, cleaner technical patterns. Key levels: round numbers (psychological), prior day H/L/C, pivot levels. Use 144-tick chart for pivot entries. Hedging: if eCBOT goes down, take opposite position in ES or use ES buy/sell stops at YM stop equivalent. YM tick fade: use $TICK readings at +/-800 for YM entries (wider threshold than ES).",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-087",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TRADING JOURNAL SCORECARD — Score each trade on TWO scales: 1) Profitability (win/loss). 2) Execution quality (did you follow your plan?). Track average for both categories daily. Grade by method used (gaps, pivots, squeeze). Track 'impulse plays' separately — trades not in your plan. Review monthly for patterns. Track: consecutive losers, morning wins vs losses, recovery from early losses, time of day performance.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-088",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "RSI DIVERGENCE ON 60-MIN — On 60-min chart, look for RSI making higher highs while price hasn't made higher highs = bullish divergence (RSI leading market higher). Price makes lower lows but RSI makes higher lows = bullish divergence. These divergences identify path of least resistance for next trading session. Combine with daily and weekly MACD direction for highest-probability swing trade entries.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-089",
+    "source": "carter-mastering-the-trade",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PLATEAU MONEY MANAGEMENT — After 10% drawdown from equity peak, reduce position size by 50%. After 20% drawdown, trade minimum size. Only increase size after account returns to new equity high. This prevents catastrophic drawdowns during losing streaks while allowing full participation during winning streaks. Creates natural equity curve that trends upward with controlled pullbacks.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-090",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "MIXED MARKET HANDLING — When monthly bullish but weekly bearish (or vice versa): sell signals on weekly create BUYING opportunities for longer-term. This is because the monthly trend is dominant. When mixed: reduce position size, use tighter targets, focus on shorter-duration trades. The conflict will resolve — either weekly catches up to monthly or monthly reverses. Trade smaller during conflicts.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-091",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "KELTNER CHANNELS + BOLLINGER BANDS — When Bollinger Bands contract INSIDE Keltner Channels = SQUEEZE (volatility contraction). This identifies periods of low volatility that precede explosive moves. When Bollinger expands outside Keltner = squeeze fires, volatility expansion begins. Trade in direction of momentum after squeeze fires. Red dots on squeeze indicator = building. First colored dot after red = fire signal.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-092",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SETUP SELECTION — Different setups work in different conditions. Gap plays: best first trade of day. Pivots: best in all conditions (fade on choppy, pullback on trending). 3:52 play: end of day only. Squeeze: works during midday doldrums. Propulsion: overnight swing trades. Find setups that fit YOUR personality. Some traders make a living on gaps alone. Key: master ONE setup before adding others. Focus produces consistency.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-093",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["SessionOpen"],
+    "content": "GAP VOLUME FILTER — At 9:20 AM ET, check premarket volume on MSFT, INTC, GE, C. If ALL under 30K shares = high-probability gap fill (85%). If ANY above 50K = moderate probability (60%), but midpoint still 85%. Low volume = market not interested in the news, gap will fill. High volume = market taking news seriously, gap may not fill but midpoint likely. If confusing, still take the trade — overall probabilities favor fills.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-094",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "MOVING AVERAGE CROSSOVER SYSTEM — 8-period EMA crossing above 21-period EMA = bullish. 8 crossing below 21 = bearish. On daily charts for swing trades. On 60-min for intraday bias. On 5-min for squeeze confirmation. The 200-period EMA = major support/resistance — enough to stop entire market crashes. Price above 200 EMA = bullish backdrop. Price below = bearish backdrop. Use as context, not primary signal.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-095",
+    "source": "carter-mastering-the-trade",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "OPTION DELTA FOR DIRECTIONAL PLAYS — When buying options, use delta 0.70 or better for directional plays. Higher delta = option moves more like stock. Buy in-the-money options with at least 2 weeks before expiration. If uncertain, go out to next month — it's like insurance. Use squeeze signals on underlying for timing. Options limit risk to premium paid while providing leverage on directional moves.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-096",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["SessionOpen", "SessionClose"],
+    "content": "TWO TRADING WINDOWS — Professional structure: 6:30-8:30 AM Pacific (9:30-11:30 AM ET) and 11:00 AM-1:00 PM Pacific (2:00-4:00 PM ET). Exceptions: management of existing trades from morning, 5-minute squeeze setups. Don't initiate new positions outside these windows. The midday gap (11:30 AM - 2:00 PM ET) is for research, journaling, and preparation. NOT for trading. This structure prevents overtrading and preserves capital.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-097",
+    "source": "carter-mastering-the-trade",
+    "topic": "Sentiment",
+    "conditions": ["ExtremeFear", "ExtremeGreed"],
+    "content": "$TICK EXTREME READINGS — $TICK >+600 = strong buying pressure, extreme greed. $TICK <-600 = strong selling, extreme fear. On YM, use wider thresholds (>+800, <-800). Extreme $TICK + gap fill nearly complete = very strong fade signal. Extreme $TICK readings near end of day = exhaustion, likely reversal. Watch for $TICK divergence: market making new highs but $TICK not confirming = weakness.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-098",
+    "source": "carter-mastering-the-trade",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "DRAWDOWN RULES — After 3 consecutive losers: stop trading for the day, review what went wrong. After 5 consecutive losers: stop for the week. After 10% account drawdown: reduce position size 50%. After 20%: minimum position size only. After 25%: close all positions, take 1-2 week break. Return to paper trading until 20+ profitable simulated trades. Then return with half previous size.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-099",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "VWAP (Volume Weighted Average Price) — Price above VWAP = bullish intraday bias. Price below VWAP = bearish. Institutional benchmark — funds aim to buy below VWAP, sell above. Use as dynamic support/resistance. In trending days, price stays on one side of VWAP all day. In choppy, price oscillates around VWAP. Pivot levels near VWAP = higher significance confluence zone for entries.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-100",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "MONEY MANAGEMENT PLAN — Maximum position size: 6 contracts per $100K account. Scale: $50K=3, $75K=5, $100K=6, $150K=8, $200K=10. In/out all at once for entries, scale out for exits. First half target: 1-2 ES points or 10-20 YM points. Second half: trail or open target. Risk/reward minimum 1:1.5 for gap plays, 3:1 for trending pivot setups. Goal: make a living, not a killing.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-101",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PUT/CALL RATIO — PC ratio >1.0 = more puts than calls = bearish sentiment (contrarian bullish). PC ratio <0.7 = more calls = bullish sentiment (contrarian bearish). Best signals at extremes. PC ratio on ISEE (ISE Sentiment Index) more useful than CBOE because it measures opening transactions only. Rising PC ratio during rally = smart money buying protection = caution. Falling PC during decline = smart money selling puts = bottom forming.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-102",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PING PONG PLAY — Trade between established support and resistance levels in range-bound markets. BUY at support with stop just below. SELL at resistance with stop just above. Target: opposite side of range. Works best on stocks in clear channels. Use 8/21 EMA for trend within range. If 8 EMA trending up within range, favor longs at support. If trending down, favor shorts at resistance. Exit if range breaks.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-103",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "MACD + STOCHASTIC COMBINATION — On weekly/daily charts: MACD gives trend direction, Stochastic gives overbought/oversold timing. BUY when weekly MACD in buy AND daily Stochastic oversold and turning up. SELL when weekly MACD in sell AND daily Stochastic overbought and turning down. Monthly MACD rolling over = major trend change warning. This multi-timeframe combination filters false signals.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-104",
+    "source": "carter-mastering-the-trade",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "EMOTIONAL MANAGEMENT — Emotions are fine at weddings and funerals, NOT in trading. If you feel urge to chase, step away from screen. Greed causes overtrading and holding too long. Fear prevents taking valid setups or causes premature exits. Solution: pre-define risk, position size, and ALL exits before entering. When emotional, you are the signal to STOP trading. Walk away. Come back with your plan, not your feelings.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-105",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "HEALTH AND TRADING — Physical health directly impacts trading performance. Regular exercise reduces cortisol (stress hormone). Proper sleep prevents emotional decision-making. Caffeine creates artificial alertness followed by crashes. Mercury fillings may affect cognition. Trader health checklist: sleep 7-8 hours, exercise daily, eat clean, limit caffeine, manage stress through routine. A healthy body supports a disciplined mind.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-106",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "EXPECTANCY FORMULA — Expectancy = (Win% × Avg Win) - (Loss% × Avg Loss). Per dollar risked: E = (PW × AW/PL) - 1, where PW=prob win, AW/PL=avg win/avg loss. Positive expectancy required — any system with negative expectancy loses over time. Most important: not how often you win, but how much you win when right vs lose when wrong. A 40% win rate with 3:1 reward/risk beats 80% win rate with 1:3 R:R.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-107",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "R-MULTIPLES — R = initial risk on a trade (distance from entry to initial stop). All trades measured as multiples of R. If risk $500 and make $1,500 = 3R winner. If risk $500 and lose $500 = 1R loser. If risk $500 and lose $250 = 0.5R loser. Track distribution of R-multiples across all trades. Healthy system: average winner >> average loser. Look for occasional huge winners (10R+) that compensate for many small losers.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-108",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "POSITION SIZING — THE MOST IMPORTANT FACTOR. Four models: 1) One unit per fixed amount of money (simplest but ignores volatility). 2) Equal value units (equal $ exposure per position). 3) Percent risk model (risk fixed % of equity per trade — most common). 4) Percent volatility model (equalize volatility exposure per position). Position sizing accounts for MOST of the variation in trading performance between traders.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-109",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PERCENT RISK MODEL — Risk X% of total equity per trade. Calculate: Equity × Risk% ÷ (Entry - Stop) = position size. Most popular: 0.5-1% risk per trade. With $100K and 1% risk: max $1,000 risk per trade. If stop is $2 away, buy 500 shares. This model automatically adjusts size: bigger positions when winning, smaller when losing. Anti-martingale strategy. Best reward-to-risk at ~0.5-1% for most systems.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-110",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PERCENT VOLATILITY MODEL — Limit exposure to current market volatility to X% of equity. Use ATR (Average True Range) as volatility measure. Calculate: Equity × Volatility% ÷ ATR = position size. Equalizes risk across different-volatility instruments. At 0.5% volatility: $100K account ÷ ($500 ATR) = 200 shares max. More sophisticated than percent risk model. Best allocation: 0.5-1.0% per position for most systems.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-111",
+    "source": "tharp-trade-your-way",
+    "topic": "Backtesting",
+    "conditions": ["Trending", "Ranging"],
+    "content": "RANDOM ENTRY EXPERIMENT — Tom Basso tested: random coin-flip entry + good exits + position sizing = consistently profitable system. Proves entry is LEAST important component. Even random entries can be profitable with: 1) Trailing stop exit that limits losses. 2) Position sizing that takes advantage of winning streaks. 3) Anti-martingale sizing (increase on wins, decrease on losses). Entry only needs to be slightly better than random.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-112",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SQN (System Quality Number) — SQN = (Average R / Std Dev of R) × √(Number of trades). Measures system quality factoring in reward-to-risk consistency and sample size. SQN >1.6 = tradeable. SQN >2.0 = good. SQN >3.0 = excellent. SQN >5.0 = holy grail territory. Position sizing can be optimized using SQN. Higher SQN = more aggressive position sizing tolerable. Track SQN monthly to monitor system health.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-113",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "ANTI-MARTINGALE vs MARTINGALE — Martingale: increase bet after loss (dangerous — leads to ruin). Anti-martingale: increase bet after win (correct approach). ALL professional position sizing is anti-martingale. The Ralph Vince study: 40 PhDs played positive-expectancy game; 95% LOST money due to poor position sizing. You can have a winning system and still lose by betting too much. Never double down after losses.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-114",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "DRAWDOWN vs RECOVERY TABLE — 10% loss needs 11% gain. 20% loss needs 25% gain. 30% loss needs 43% gain. 40% loss needs 67% gain. 50% loss needs 100% gain. Beyond 50% = almost impossible recovery. This is WHY position sizing matters more than entry. If you risk too much and lose, your chances of full recovery are very slim. Protect equity at all costs — it's your working capital.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-115",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "MAXIMUM ADVERSE EXCURSION (MAE) — Track the maximum amount each trade goes against you before hitting target. Plot MAE for all winners and losers separately. Winners rarely go beyond a certain MAE threshold (e.g., 1.5 ATR). Losers regularly exceed it. Use MAE to set optimal stop: just beyond the MAE threshold of winning trades. This allows tighter stops than arbitrary levels while keeping winners intact.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-116",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "STOP TYPES — 1) Dollar stops: fixed $ amount, unpredictable to others but don't confuse with position sizing. 2) Percent retracement: sell if price retraces X% (common but often arbitrary). 3) Volatility stops: ATR-based, among the best — beyond market noise. 4) Dev-stops: ATR + standard deviation (1σ for tight, 2σ for wide). 5) Channel breakout: exit on new 10-day low/21-day trailing. 6) Time stops: exit if no profit in X days.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-117",
+    "source": "tharp-trade-your-way",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "BEST ENTRY TECHNIQUES — 1) Channel breakout >40 days (Donchian). 2) Volatility breakout: single day move ~0.8× ATR. 3) Large single-bar move in direction of trend. 4) ADX above 30 (trending market confirmed). 5) Moving average crossover with filter. Key insight: few entry techniques show reliability much better than random over 20+ day holding periods. Focus on EXITS and POSITION SIZING instead.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-118",
+    "source": "tharp-trade-your-way",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "THE HOLY GRAIL IS YOU — Most people look for a mysterious system. The real Holy Grail: understanding yourself — your biases, objectives, risk tolerance, time availability, emotional triggers. Different people need different systems based on their personality. A system that works for one person may fail for another because of psychological compatibility. Self-knowledge comes BEFORE system design.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-119",
+    "source": "tharp-trade-your-way",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "JUDGMENTAL BIASES — 1) Reliability bias: overvaluing high win rates. 2) Lotto bias: seeking huge wins with tiny probability. 3) Representation bias: assuming small samples represent whole. 4) Randomness bias: finding patterns in noise. 5) Need-to-understand bias: must have reason for every trade. 6) Conservatism bias: slow to update beliefs. 7) Law of small numbers bias: small samples reliable. Awareness is first step to overcoming.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-120",
+    "source": "tharp-trade-your-way",
+    "topic": "Backtesting",
+    "conditions": ["Trending", "Ranging"],
+    "content": "12 STEPS TO SYSTEM DEVELOPMENT — 1) Take inventory (objectives, capital, time). 2) Develop open mind. 3) Determine objectives. 4) Choose timeframe. 5) Study best historical moves. 6) Identify concept behind moves. 7) Add stops and transaction costs. 8) Add profit exits, calculate expectancy. 9) Look for huge reward trades. 10) Optimize with position sizing. 11) Determine improvements. 12) Worst-case scenario mental planning.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-121",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SIX KEYS TO INVESTMENT SUCCESS — 1) System with positive expectancy. 2) Trade that system consistently. 3) Position sizing to maximize expectancy while staying in game. 4) Opportunity factor (how often you trade). 5) Transaction costs per trade. 6) Starting capital adequacy. Most people focus only on #1. The HOLY GRAIL is understanding that position sizing (#3) determines MOST of your success or failure.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-122",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SNOW FIGHT METAPHOR — Each trade = snowball thrown at wall. White snow = profits, black snow = losses. Net effect on wall = your equity change. THREE variables: 1) Reliability (probability of white vs black). 2) Reward-to-risk (size of white vs black). 3) Opportunity (how many snowballs = frequency). Multiply all three = expectancy. Position sizing = how many walls you're building simultaneously. All three variables matter, not just reliability.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-123",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TIGHT vs WIDE STOPS — Tight stops: 1) Smaller losses when wrong. 2) Multiple re-entry attempts for big moves. 3) Bigger R-multiples on winners. BUT: decrease reliability, increase transaction costs, can miss major moves. Wide stops: 1) Fewer whipsaws. 2) Better reliability. 3) Lower transaction costs. BUT: bigger losses when wrong. Optimal: use MAE analysis to find minimum effective stop distance. Don't use arbitrary numbers.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-124",
+    "source": "tharp-trade-your-way",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "TREND FOLLOWING CONCEPT — Core: capture large moves in trending markets. Accept many small losses for occasional large wins. Let winners run, cut losers short. Don't predict, react. Enter on breakouts or pullbacks to MAs. Use trailing stops to exit. Never limit profits with fixed targets. Position size smaller (1% risk) for more volatility. Best markets: commodities, currencies, stock indices. Works because markets trend ~30% of time.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-125",
+    "source": "tharp-trade-your-way",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Ranging"],
+    "content": "MEAN REVERSION CONCEPT — Core: prices revert to average over time. Buy oversold, sell overbought. Works best in ranging markets. Strategies: Bollinger Band bounces, RSI extremes (<30 or >70), support/resistance bounces, pairs trading. Risk: catching falling knives in strong trends. Requires strict stops. Opposite of trend following. Identify ranging market first (ADX <20, clear S/R levels) before applying mean reversion.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-126",
+    "source": "tharp-trade-your-way",
+    "topic": "Backtesting",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TRANSACTION COST REALITY — Seldom see a system that over many years produces profits much bigger than its transaction costs. If system generates $1M net profit, it probably generates >$1M in transaction costs. This is why tight stops can destroy profitability — the frequent trading generates enormous costs. Factor in: commissions, slippage, bid-ask spread, market impact. Calculate transaction costs as % of total P&L. Target: costs <50% of gross profit.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-127",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "ONE UNIT PER FIXED AMOUNT — Model 1: Buy 1 contract per $X equity. Example: 1 contract per $100K. Limitations: 1) Not all instruments are alike (corn vs S&P). 2) Can't increase exposure rapidly. 3) Always takes position even in poor opportunities. 4) Treats all investments equally. Worst model but most common among beginners. Should be replaced with percent risk or percent volatility model for professional results.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-128",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "EQUAL VALUE UNITS — Model 2: Divide capital equally by dollar value of positions. $50K account ÷ 5 positions = $10K per position. Advantage: see exactly how much leverage you're carrying. $10K controlling $50K = 5:1 leverage. Disadvantage: small account = slow growth. Advantage: risk spread equally. Track total product value and leverage ratio at all times. Good for stock portfolios where you want equal weighting.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-129",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "POSITION SIZING IMPACT EXAMPLES — Same 55/21 channel breakout system on Dow stocks over 5.5 years: Fixed 100 shares/$100K = 1.75% annual return, 7.13% max DD. Fixed amount $100K = 1.75% return. Equal leverage 2% = 8.66% return, 22% DD. 1% risk model = 20.92% return, 14.14% DD. 0.5% volatility = 17.52% return, 7.15% DD. Position sizing model choice DRAMATICALLY changes same system's results.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-130",
+    "source": "tharp-trade-your-way",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "DONCHIAN CHANNEL BREAKOUT — Entry: new 20-day high = buy, new 20-day low = sell/short. Exit: 10-day trailing stop (new 10-day low exits long, new 10-day high exits short). This is the Turtle system. Simple, robust, works across many markets. Trend following at its purest. Trade many uncorrelated markets simultaneously. Each market gets equal position size via volatility model. Expect many small losses, occasional huge winners.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-131",
+    "source": "tharp-trade-your-way",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "ADAPTIVE MOVING AVERAGE (Kaufman) — AMA adjusts speed based on market efficiency. Efficiency ratio = net price change ÷ sum of all price changes over period. High efficiency (trending) = fast MA. Low efficiency (noisy) = slow MA. Trade: buy when AMA turns up, sell when turns down. Add filter: % × standard deviation of 1-day AMA changes over 20 days. Best for markets that alternate between trending and choppy conditions.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-132",
+    "source": "tharp-trade-your-way",
+    "topic": "Backtesting",
+    "conditions": ["Trending", "Ranging"],
+    "content": "OVERFITTING DANGER — Optimizing a system to fit historical data perfectly = curve fitting. System will fail on new data. Prevention: 1) Split data into development and validation sets. 2) Test on multiple markets/timeframes. 3) Simpler systems are more robust. 4) Fewer parameters = less curve fitting. 5) If system works perfectly on historical data, it's probably overfit. 6) Walk-forward analysis is best validation method.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-133",
+    "source": "tharp-trade-your-way",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "MULTIPLE EXIT STRATEGY — Use simple concepts for each exit component: 1) Catastrophic stop (wide, based on volatility). 2) Trailing stop (locks in profit, lets winners run). 3) Time stop (exit if no profit in X periods). 4) Profit target (for partial position). Each exit serves different purpose. Don't use one exit for all purposes. Simplicity in each component = robustness. Multiple exits = meets multiple objectives simultaneously.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-134",
+    "source": "tharp-trade-your-way",
+    "topic": "Backtesting",
+    "conditions": ["Trending", "Ranging"],
+    "content": "ENTRY EVALUATION — 95% of traders focus on finding great entries. Yet entry is LEAST important component. Few entries beat random significantly over 20-day holding period. Best entries: channel breakout >40 days, volatility breakout 0.8×ATR, large single-bar move. But even these only slightly improve reliability. Focus instead on: exits (determine R), position sizing (determines profit magnitude), and expectancy (the complete picture).",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-135",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "POSITION SIZING FOR STOCKS — O'Neil's CANSLIM: own 4-5 stocks ($20K-$160K), 3 stocks ($5K-$20K), 2 stocks (<$5K). This is equal-units approach. Better: use percent risk model. $100K account, 1% risk: each stock position sized so initial stop × shares = $1,000. Example: Stock at $50 with stop at $48 (2-point risk) = 500 shares = $25,000 position. Total portfolio risk: 5 positions × 1% = 5% max exposure.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-136",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "OPPORTUNITY FACTOR — Frequency of trading dramatically affects returns. Same expectancy: 100 trades/day = massive annual return. 100 trades/year = modest return. BUT: more opportunity = more transaction costs. Optimize: find system with highest (expectancy × opportunity) / transaction costs. Don't confuse activity with profitability. Overtrading kills accounts through costs. Undertrading leaves money on table. Find your optimal frequency.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-137",
+    "source": "tharp-trade-your-way",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SELF-SABOTAGE PATTERNS — 1) Not taking valid setups (fear). 2) Moving stops against you (hope). 3) Adding to losers (denial). 4) Taking profits too early (fear of losing gains). 5) Revenge trading after loss (anger). 6) Overtrading (boredom/addiction). 7) System hopping (frustration). Solution: write rules BEFORE trading, follow them exactly, review weekly for deviations. Track emotional state with each trade.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-138",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "COST OF DRAWDOWNS — 20% drawdown requires 25% gain to recover. Professional traders aim for <10% max drawdown. If your system has 25% expected drawdown, you need 33% gain just to break even. Use Monte Carlo simulation to estimate worst-case drawdown. Key: your position sizing determines drawdown magnitude MORE than your entry quality. Reduce position sizing when in drawdown. Increase only after new equity high.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-139",
+    "source": "tharp-trade-your-way",
+    "topic": "Backtesting",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PROBABILITY MATRIX — Build table showing distribution of R-multiples for your system. Rows = winning R-multiples (1R, 2R, 3R, 5R, 8R, 13R, 25R). Columns = losing R-multiples. Each cell = probability of that outcome. Calculate: Σ(positive R × probability) - Σ(negative R × probability) = expectancy per dollar risked. Use this to compare systems objectively. System with best probability matrix wins regardless of win rate.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-140",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "KAUFMAN'S DRAWDOWN PROBABILITIES — With optimized position sizing: 16% chance of 10% drawdown. 2.5% chance of 20% drawdown. 0.5% chance of 30% drawdown. If you'd be in serious trouble at 20% loss, trade only a portion of allocated capital. Use these probabilities to size your overall exposure. Your psychology determines how much drawdown you can tolerate — design position sizing to match your pain threshold.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-141",
+    "source": "tharp-trade-your-way",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "FUNDAMENTAL ANALYSIS FOR TRADING — Avoid doing your own fundamental analysis. Use published data from specialized firms. Fundamentals tell direction and magnitude of future price moves, rarely timing. Combine with technical for entry timing. Most useful for: identifying which markets to trade (not when). Key data: supply/demand balance, inventory levels, economic indicators. Fundamentals put a floor and ceiling under markets.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-142",
+    "source": "tharp-trade-your-way",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SEASONAL TENDENCIES — Certain markets show consistent seasonal patterns. Grains: cheapest after harvest (supply plentiful), spikes during planting (weather uncertainty). Energy: heating oil bullish in winter. Use seasonal patterns as SETUP conditions, not standalone signals. Always filter through technical analysis — seasonal tendency + technical confirmation = higher probability. Patterns shift year to year; don't mechanically trade calendar patterns.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-143",
+    "source": "tharp-trade-your-way",
+    "topic": "Backtesting",
+    "conditions": ["Trending", "Ranging"],
+    "content": "WORST-CASE SCENARIO PLANNING — Before trading any system: 1) Calculate maximum consecutive losses expected. 2) Estimate maximum drawdown from Monte Carlo. 3) Determine if you can psychologically and financially survive it. 4) Plan response: reduce size, stop trading, switch to paper. 5) Rehearse mentally how you'll respond when drawdown occurs. 6) Write it down as rules. The time to plan for disaster is BEFORE it happens.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-144",
+    "source": "tharp-trade-your-way",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "ORDER EXECUTION — Know your system inside out. Communicate strategy type to your broker: trend followers want real breakouts, not tests. Use discretion on execution: if market just testing new high with few traders, don't want fill. Good broker understands your intent and helps execute accordingly. For limit orders: place at pre-identified levels before market reaches them. Chase nothing. If you miss a trade, next one is coming.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-145",
+    "source": "tharp-trade-your-way",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "OBJECTIVES BEFORE SYSTEM — Your objectives determine EVERYTHING: timeframe, markets, risk per trade, position sizing, type of system. Must know: monthly return target, max acceptable drawdown, time available for trading, capital available, psychological risk tolerance. Without clear objectives, you'll chase random systems. Write objectives first. A system that doesn't match your objectives will fail even if technically profitable.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-146",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "GALLACHER'S VOLATILITY-ADJUSTED SIZING — Calculate each market's volatility in dollar terms. Set base unit at volatility equivalent. If corn = $500 volatility, S&P = $5000, then S&P gets 1/10th the position of corn for equal risk exposure. This is superior to fixed-amount models because it normalizes risk across different markets. One contract per $X of volatility-adjusted equity.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-147",
+    "source": "tharp-trade-your-way",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "CHANNEL BREAKOUT EXIT — Enter on 20-day channel breakout (new high/low). Exit on 10-day channel breakout (opposite side). This is both stop and profit-taking exit. Advantage: gives prices lots of room, well beyond noise. Disadvantage: gives back lots of profits because stop IS the exit. Solution: use channel breakout as catastrophic stop, add separate trailing stop and profit target for partial positions.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-148",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "MARGIN OF SAFETY IN POSITION SIZING — Never use full Kelly Criterion — it's too aggressive. Use half-Kelly or quarter-Kelly for real trading. Kelly = W - (1-W)/R where W=win rate, R=avg win/avg loss. Half-Kelly produces 75% of full Kelly's growth with much less drawdown. Your edge must be calculated from sufficient sample size (>100 trades). Recalculate Kelly periodically as your system's statistics evolve.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-149",
+    "source": "tharp-trade-your-way",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SIMPLICITY PRINCIPLE — Simple concepts work best in system design. Complexity leads to curve fitting and failure in live trading. If you can't explain your system in one paragraph, it's too complex. Simple setups, simple entries, simple exits, simple position sizing rules. Each component should be understandable independently. Multiple simple components combined > one complex system. If it breaks under pressure, simplify further.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-150",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "COMPOUND EFFECT OF POSITION SIZING — Over 5.5 years of Dow stocks: same system, 5 models. No position sizing (100 shares): $87K profit. Fixed amount: $237K (1.75% annual). Equal leverage 2%: $410K (8.66%). 1% risk: $1.84M (20.92%). 0.5% volatility: $1.44M (17.52%). Position sizing transformed identical system from mediocre to spectacular. This is the most important chapter in any trading book.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-151",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "RECTANGLES — Horizontal support and resistance forming a trading range. Price bounces between parallel lines. Volume tends to decrease during rectangle formation. Breakout direction usually continues prior trend. Volume must expand on breakout for confirmation. Target: rectangle height projected from breakout. False breakouts common — wait for close beyond boundary with volume before entering.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-152",
+    "source": "elder-come-into-trading-room",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "SEASONAL TRADING — Grains cheapest after harvest (supply plentiful, demand known). Spring planting season most likely for price spikes (weather uncertainty). Freezing spells bullish for heating oil. Orange juice frosts used to cause wild runups but Brazil production dampened effect. DON'T mechanically trade calendar patterns — they shift. Always filter seasonal tendencies through technical analysis for timing confirmation.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-153",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "LIMIT MOVES IN FUTURES — Most futures have daily limits beyond which prices cannot move. String of limit days = terrifying, loser stuck unable to get out while account destroyed. Fears overdone: limit moves' heyday was 1970s inflation. Defense: 1) Don't over-leverage. 2) Diversify across uncorrelated markets. 3) Keep position sizes small enough to survive multiple limit moves. 4) Use options for catastrophic protection.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-154",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "BEGINNER, SEMIPRO, PRO PROGRESSION — Beginner: small account, learning, paper trading, 0.5% risk per trade. Semipro: consistent profits, growing account, 1% risk, beginning to trade for income. Pro: full-time, multiple strategies, 1-2% risk, trading is primary income. Each level requires different position sizing, different markets, different expectations. Don't skip stages — the market punishes premature ambition.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-155",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "DEAD CAT BOUNCE — After a crash or sharp decline, prices rally briefly (bounce) then resume decline to test or break the original low. The bounce is not bullishness — it's simply a reaction to oversold conditions. Volume during bounce is typically low. Don't buy the bounce — wait for second bottom. If second bottom holds with lower volume = potential double bottom. If second bottom breaks = continuation lower.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-156",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["SessionOpen"],
+    "content": "MONDAY RULE — Mondays have lowest probability of gap fills (55-60%). Most breakaway gaps happen on Mondays due to weekend developments. Typically pass on fading Monday gaps. Let markets 'settle in' before looking for setups. First trading day of month and expiration day also have low fill probability (55-60%). Exception: if premarket volume is very low on these days, still worth taking.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-157",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SECTOR SORTER LIST (SSL) — Rank sectors by relative strength. Identify where big money is flowing. Use to find strongest/weakest sectors for new positions. Strong sectors in strong market = best candidates for longs. Weak sectors in weak market = best for shorts. Avoid: weak sectors in strong market (laggards) and strong sectors in weak market (false leaders). Use Decision Point website for comprehensive SSL data.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-158",
+    "source": "carter-mastering-the-trade",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TRAILING STOP MANAGEMENT — Full-position trailing stops get you stopped on wiggles. BETTER: 1) Enter full position. 2) First target hit: sell half, move stop to breakeven. 3) Second target: sell half of remaining, stop to entry. 4) Last quarter: use exit signal (TTM trend bars), NOT trailing stop. This reduces risk to breakeven on remainder while allowing runners. Typical runner: 2-3× first target on trending days.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-159",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "DON'T CHASE — If you miss an entry, let it go. The system produces signals regularly — there will be another one. Chasing entries at extended prices violates risk/reward parameters and puts you on the wrong side of the psychology. Those who chase become the 'pain' that others profit from. If the move is already underway, wait for pullback to a pivot level or moving average for next entry opportunity.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-160",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "MOMENTUM INDEX OSCILLATOR — Measures rate of change relative to volatility. Values above zero = bullish momentum. Below zero = bearish. Divergences between momentum and price = strong reversal signals. Use with squeeze: momentum index rising while squeeze forming = high probability long. Falling momentum during squeeze = high probability short. Combines well with TTM waves for multi-timeframe confirmation.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-161",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "NO SINGLE INDICATOR GUARANTEES VICTORY — Trend-following indicators catch trends but produce whipsaws in ranges. Oscillators identify tops/bottoms in ranges but give premature countertrend signals in trends. All indicators are building blocks. Good system uses several tools, combining them so negative features filter each other out while positives remain. Choose indicators like choosing a car — based on personal preferences and needs.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-162",
+    "source": "elder-come-into-trading-room",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "POVERTY AND INTEGRITY IN TRADING — A trader who managed nearly $1 billion said his poverty forced him to stick to his system because he had to explain his approach to investors who gave him money. It would have been unconscionable to deviate. Lesson: accountability to others enforces discipline. Create external accountability — trading partner, journal public, mentor. Your poverty (small account) can work for you by forcing conservative sizing.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-163",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "DOLLAR STOP LIMITATIONS — Dollar stops: psychologically easy (decide how much you'll lose), not predictable by others, good when beyond MAE. BUT: people confuse dollar stops with position sizing and ignore the 'how much' question. Setting $1,000 stop on $100K account = 1% risk — that's position sizing, not stop placement. Your stop should be based on MARKET STRUCTURE (volatility, S/R), not on how much you want to lose.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-164",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TIME STOPS — If position doesn't move in your favor within X periods, exit. Rationale: if market hasn't responded to your signal, the edge may be gone. Reduces opportunity cost of dead money. Typical: 5-10 bars for swing trades, 20-50 bars for position trades. Combine with trailing stop: time stop activates only if position is at or below entry after X periods. Don't use alone — pair with volatility or structural stop.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-165",
+    "source": "tharp-trade-your-way",
+    "topic": "Backtesting",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SYSTEM DETERIORATION MONITORING — Track system expectancy monthly. If expectancy drops below zero for 3 consecutive months, investigate. Possible causes: 1) Market regime change. 2) System overfit to past data. 3) Random losing streak. 4) Execution errors. Response: reduce position size 50%, analyze recent trades for patterns, paper trade to verify, consider shelving system. Professional system traders constantly monitor and adapt.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-166",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SHORTING RULES — Stocks have uptick rule (can only short after price ticks up). Futures have no uptick rule — much easier to short. In stocks, most traders are long; short interest rarely double digits. In futures, short interest always 100% (every long has a matching short). Must feel comfortable shorting to trade futures. Use Triple Screen: short when weekly trend is down, daily oscillator shows overbought, intraday confirms.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-167",
+    "source": "carter-mastering-the-trade",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TRADE FOR A LIVING vs MAKE A KILLING — Beginners want to make a killing. Professionals want to make a living. Position sizing: 6 contracts per $100K maximum. Scale: $50K=3, $75K=5, $100K=6. Goal: consistent monthly income, not lottery wins. Those who try to make a killing end up killing their account. Small consistent gains compound. A $100K account making 3% monthly = $42K annual. That's a living.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-168",
+    "source": "tharp-trade-your-way",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "NEURAL NETWORKS FOR TRADING — Can find complex nonlinear relationships in data. BUT: extremely prone to curve fitting, require massive data sets, often fail in live trading. Most useful as ONE input in system, not standalone. Use for pattern recognition (e.g., classify market regime) rather than direct signal generation. If neural network produces spectacular backtest results, it's probably overfit. Be very skeptical.",
+    "priority": 2
+  },
+  {
+    "id": "book-sys-169",
+    "source": "tharp-trade-your-way",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "ARBITRAGE CONCEPTS — Take advantage of price discrepancies between related instruments. Simultaneous buy/sell reduces directional risk. Examples: calendar spreads, inter-market spreads, ETF vs components. Low risk per trade but requires speed, low commissions, and significant capital. Most profitable when markets are most volatile and dislocations are greatest. Not suitable for small accounts due to thin margins.",
+    "priority": 2
+  },
+  {
+    "id": "book-sys-170",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "CURRENCY BOX PLAY — Identify Asian session range (overnight box). Trade breakouts during London/NY overlap. BUY above box high, SELL below box low. Stop: middle of box or opposite side. Target: box width projected from breakout. Works best on EUR/USD, GBP/USD. Combine with squeeze indicator — if squeeze fires in direction of box breakout, highest probability trade. Avoid during thin Asian session for entries.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-171",
+    "source": "carter-mastering-the-trade",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "HEDGING TRAPPED POSITIONS — If platform goes down with open YM position: 1) Take opposite position in ES to hedge (long 2 YM = sell 2 ES). 2) Or place ES sell stop at price equivalent to YM stop level. This protects if market hits stop while you can't access YM. If market moves your way, you still participate. Always have backup plan for technology failure. Never have open positions without a hedge capability.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-172",
+    "source": "elder-come-into-trading-room",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TRADING FOR FREEDOM — You can be free: live and work anywhere, be independent from routine, answer to nobody. But freedom requires innate traits: discipline, risk tolerance, facility with numbers. Discipline = choosing what you want MOST over what you want NOW. Without discipline, no system works. With discipline, even a mediocre system produces profits. Freedom is earned through thousands of disciplined decisions.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-173",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "40 PhD STUDY — Ralph Vince gave 40 PhDs a computer game with positive expectancy. 95% of them LOST money. Why? They didn't understand position sizing and bet too much after losses. This proves: 1) Intelligence doesn't guarantee trading success. 2) Position sizing is THE most important factor. 3) Even positive-expectancy systems fail with wrong sizing. 4) Anti-martingale sizing (bet less after losses) is counter-intuitive but essential.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-174",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["SessionOpen"],
+    "content": "GAP PLAY RISK/REWARD — For gaps under 40 YM or 4 ES points: use 1.5:1 stop-to-target ratio (e.g., 20-pt gap = 30-pt stop). For gaps over 40 YM or 4 ES points: use 1:1 ratio (e.g., 45-pt gap = 45-pt stop). Target: gap fill (previous close). For moderate premarket volume: split target — half at 50% gap fill, half at full fill. Only ONE gap play per day. If stopped, gap play is OVER for the day. No trailing stops.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-175",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "COMEBACK TRADE CHECKLIST — After significant losses: 1) Have you taken a break? (min 24-48 hours). 2) Is position size reduced 50%? 3) Is this your BEST setup type? 4) Have you calculated and accepted the risk? 5) Is stop loss in place BEFORE entry? 6) Are you emotionally calm? 7) Is this the highest-probability scenario available? If any answer is NO, do NOT trade. Return to basics. Focus on quality over quantity.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-176",
+    "source": "carter-mastering-the-trade",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PERSONAL INTEGRITY IN TRADING — Your word to yourself matters. If you set a rule (stop at X, no more than 3 trades/day), breaking it destroys self-trust. Each broken rule makes the next one easier to break. Each kept rule strengthens discipline. Write rules down. Post them where you can see them. If you violate a rule, write down WHY in journal. Pattern recognition of your rule-breaking is first step to eliminating it.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-177",
+    "source": "tharp-trade-your-way",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Ranging"],
+    "content": "SPREAD TRADING FOR SYSTEMS — Spreads are less volatile than outright positions. Lower margin requirements. Bet against deviations for return to normalcy. Example: if corn-wheat spread widens abnormally, short corn/long wheat for reversion. Use technical analysis on the spread itself (trendlines, MAs, RSI). Excellent for traders who want lower-risk, more consistent returns. Can be automated. Often overlooked by amateurs.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-178",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "THE ORGANIZED TRADER — Maintain: 1) Trader's spreadsheet (equity tracking). 2) Trading diary (emotions, observations, lessons). 3) Action plan (prepared before each session). 4) System rules written and posted. 5) Book of charts with annotated setups. Organization eliminates impulsive decisions. If your trading area is messy, your trading will be messy. Treat trading as a business with documentation, records, and review processes.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-179",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PERCENT RETRACEMENT STOPS — Set stop at X% below entry price (common: 7-10% for stocks). Problem: $10 stock with 10% stop = $1 stop. $100 stock with 10% stop = $10 stop. Same percentage, wildly different dollar risk and R-multiples. Use only if based on MAE analysis showing actual retracement patterns. Better: volatility-based (ATR) stops adapt to each instrument's noise level. Never use arbitrary percentage without statistical backing.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-180",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SCALP vs SWING DISTINCTION — Scalp trades: generate monthly income, small consistent gains, high frequency, tight stops, 1-2 point targets. Swing trades: create wealth, larger moves, lower frequency, wider stops, 8%+ targets. Both needed: scalps pay bills, swings build accounts. Don't confuse them. Scalp in morning session, swing trades held overnight. Different mindsets for each. Document which type each trade is BEFORE entry.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-181",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PRICE HAS MEMORY — Previous highs/lows act as support/resistance because traders remember their entry prices. The longer a level was traded, the more significant. Round numbers ($50, $100) act as psychological barriers. When price returns to old levels, some traders add positions while others exit — creating S/R. Emotional memory can persist for months or even years. Use this to identify high-probability reaction zones.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-182",
+    "source": "tharp-trade-your-way",
+    "topic": "Backtesting",
+    "conditions": ["Trending", "Ranging"],
+    "content": "WALK-FORWARD ANALYSIS — Best validation method. 1) Optimize system on first 20% of data. 2) Test on next 5% (out-of-sample). 3) Re-optimize including that 5%. 4) Test on next 5%. 5) Repeat through all data. Tracks system performance as if traded live with periodic re-optimization. Reveals true performance, not curve-fit fantasy. If walk-forward results significantly worse than full-sample optimization = overfit system.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-183",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "8/21 EMA CROSS FOR SWING TRADES — On daily chart: 8 EMA crossing above 21 EMA = bullish momentum shift. Wait for pullback to 8 EMA as entry. Stop below 21 EMA. Target: 8% using GTC order. Two consecutive TTM trend red bars = exit early. Best when combined with squeeze indicator (squeeze fires after pullback = highest probability). Works on stocks and ETFs. Place orders night before, check at end of day only.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-184",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["HighVolatility"],
+    "content": "VOLATILITY ADAPTATION — When market volatility increases: 1) Reduce position size automatically (2% rule forces this). 2) Widen stops beyond new noise level. 3) Don't trade markets whose noise exceeds 1% of equity. 4) Consider using options for protection (buy puts on longs, calls on shorts). 5) Reduce number of open positions. 6) Tighten 6% rule threshold if desired. Let the rules adapt your behavior to changing conditions.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-185",
+    "source": "tharp-trade-your-way",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SYSTEM DESIGN IS PERSONAL — Different traders need different systems based on: risk tolerance, available time, capital, personality type, market knowledge. A trend follower who needs action will fail — they need to accept boredom. A cautious person trading momentum will fail — they need mean reversion. Design your system around WHO YOU ARE, not what looks good on paper. Test for psychological compatibility before live trading.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-186",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "144-TICK CHART — Primary chart for pivot level entries on YM. 144 = Fibonacci number. Shows enough detail for entry timing without noise of smaller charts. Add 8/21 EMA for trend within timeframe. Use for: pivot fades on choppy days, pullback entries on trending days. Scalper buy/sell signals on 233-tick ES can confirm YM entries at pivot levels. Confirmation should occur within 15-20 minutes or close position.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-187",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "DEV-STOP (Cynthia Kase) — Calculate ATR standard deviation over 30 days. Level 1 stop: ATR + 1σ + 10% correction. Level 2 stop: ATR + 2σ + 20% correction. Addresses non-normal distribution of prices (skewed right). Tighter than pure volatility stops but incorporates probability. 1σ encompasses ~67% of prices, 2σ ~97%. Use level 1 for aggressive systems, level 2 for conservative.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-188",
+    "source": "elder-come-into-trading-room",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "PAPER TRADING TRANSITION — If losses exceed 15-20%, switch to paper trading. Rebuild confidence with simulated trades. Prove system still works without risking real money. Return to live trading only after 20+ profitable paper trades with following: 1) Entry and exit at realistic prices (include slippage). 2) Position size as if real. 3) Emotional engagement (treat it seriously). Paper trading without rules is worthless — simulate everything.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-189",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["SessionClose"],
+    "content": "WEEKLY REVIEW PROCESS — Sunday: 1) Review all trades from past week. 2) Score execution quality (not just P&L). 3) Update squeeze status table for all markets/timeframes. 4) Review monthly/weekly/daily chart stack for trend direction. 5) Identify key levels for coming week. 6) Note any economic events (FOMC, earnings). 7) Update trading plan if needed. 8) Set mental scenarios for different market conditions. 9) Rest — Monday often best skipped.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-190",
+    "source": "tharp-trade-your-way",
+    "topic": "Backtesting",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SAMPLE SIZE REQUIREMENTS — Minimum 100 trades for statistical significance. 30 trades = preliminary assessment only. Track: win rate, avg R-multiple, standard deviation of R, max consecutive losses, max drawdown, expectancy, SQN. Small samples produce misleading results — a system with 30 trades and 70% win rate may have 40% win rate over 500 trades. Don't optimize on small samples. Walk-forward testing extends effective sample size.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-191",
+    "source": "carter-mastering-the-trade",
+    "topic": "Sentiment",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TRIN (Arms Index) — TRIN = (Advancing Issues/Declining Issues) ÷ (Advancing Volume/Declining Volume). TRIN >1.0 = more volume flowing into declining stocks = bearish. TRIN <1.0 = bullish. Extreme readings: >2.0 = panic selling (potential bottom), <0.5 = euphoric buying (potential top). Closing TRIN numbers more valuable than intraday. Trend of TRIN over several days indicates underlying market health or deterioration.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-192",
+    "source": "carter-mastering-the-trade",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "OPTION IMPLIED VOLATILITY CRUSH — After events (earnings, FOMC), implied volatility collapses even if stock moves your direction. Buy options BEFORE events when IV is relatively low. Sell options BEFORE events when IV is high. 'Look, Ma, they're panicking!' — high IV means options are expensive, good to sell. Low IV means options are cheap, good to buy. Check IV rank (current vs 52-week range) before any option trade.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-193",
+    "source": "elder-come-into-trading-room",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "DAY-TRADING TIMEFRAMES — Use 30-min for trend identification, 5-min for entry timing (Factor of Five). If 30-min and 5-min disagree, stay out. Add 3-min for ultra-precise entries if needed but be careful of noise. Weekly chart is essentially irrelevant for day trading. Focus on highest-volume hours: first 90 minutes and last 60 minutes. Middle of day = choppy, low-probability. Set maximum daily loss at 1-2% of account.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-194",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "LEVERAGE TRACKING — Always know your total leverage ratio. Equal value model: if 5 positions each worth $50K on $50K account = $250K exposure = 5:1 leverage. Track this number daily. Leverage amplifies both gains AND losses. Professional traders typically operate at 2-4:1 for stocks, 5-10:1 for futures. If leverage exceeds your comfort level, reduce positions. Leverage is the silent account killer — track it religiously.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-195",
+    "source": "carter-mastering-the-trade",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "FIVE-MINUTE SQUEEZE TRADE RULES — Use on @YM continuous contract, 5-min timeframe. Only trade during midday doldrums (11:30 AM - 2:00 PM ET) when other setups are unavailable. Red dots = squeeze active, waiting. First dot after red = fire signal. Enter in direction of TTM waves alignment. Stop: below recent swing low/high. Target: next pivot level or trail with TTM trend bar exit. Don't fight the C wave direction.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-196",
+    "source": "elder-come-into-trading-room",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "MAXIMUM POSITIONS — At 2% risk per trade and 6% monthly limit, maximum 3 simultaneous positions with full risk. If risk 1% per trade, can have 6 positions. More positions = more diversification but more complexity. Don't exceed your ability to monitor and manage. Each new position reduces available risk for remaining trades. Consider correlation: 3 correlated positions act as one big position for risk purposes.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-197",
+    "source": "tharp-trade-your-way",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "BENCHMARK COMPARISON — Always compare system returns to a benchmark: risk-free rate + equity risk premium. If your system returns 15% but benchmark returns 12%, your edge is only 3%. Factor in: time spent, stress, transaction costs, drawdowns. A 15% return with 20% max drawdown may not justify the effort vs passive indexing at 12%. Calculate risk-adjusted return: Sharpe ratio, Sortino ratio, SQN for apples-to-apples comparison.",
+    "priority": 3
+  },
+  {
+    "id": "book-sys-198",
+    "source": "carter-mastering-the-trade",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "KEY PRICE LEVELS HIERARCHY — 1) All-time highs/lows (strongest). 2) 52-week highs/lows. 3) Prior month H/L/C. 4) Prior week H/L/C. 5) Prior day H/L/C (pivot basis). 6) Intraday session H/L. 7) Round numbers. 8) Fibonacci retracement levels. 9) Moving averages (200, 50, 21, 8). Confluence of multiple levels at same price = strongest support/resistance. Always know where you are relative to these levels.",
+    "priority": 4
+  },
+  {
+    "id": "book-sys-199",
+    "source": "elder-come-into-trading-room",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging"],
+    "content": "THE MARKET IS A CROWD — Market is not mechanical or electronic — it's a huge crowd acting under imperfect laws of mass psychology. Physics and mathematics help, but decisions MUST account for psychology. This is why fully automatic systems fail. The crowd has moods, panics, euphoria, regret, hope. Technical indicators measure crowd behavior quantitatively. Always ask: what is the crowd feeling right now? Your edge comes from understanding this.",
+    "priority": 5
+  },
+  {
+    "id": "book-sys-200",
+    "source": "tharp-trade-your-way",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SIMULTANEOUS MULTIPLE EXITS — Design each exit for specific purpose: 1) Catastrophic stop (worst case, wide, rarely hit). 2) Trailing stop (locks profit, lets runners develop). 3) Time stop (removes dead money). 4) Profit target 1 (partial position, small). 5) Profit target 2 (partial, medium). All can be simple individually. Multiple simple exits work better than one complex exit. Each exit independently tested and validated.",
+    "priority": 4
+  }
+]

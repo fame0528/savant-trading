@@ -1,0 +1,66 @@
+[
+  {
+    "id": "hybrid-scalp-001",
+    "source": "daytrading-hybrid-super-scalping",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "HEIKIN ASHI + 100 EMA STRATEGY: Use Heikin Ashi candles with 100 EMA on 2-5 minute chart. Long when: HA candle green, price above 100 EMA, HA has NO lower wick (strong momentum). Short when: HA candle red, price below 100 EMA, HA has NO upper wick. Exit when HA changes color. The ABSENCE of a wick is the KEY signal — shows one-sided momentum. Regular candles have noise; Heikin Ashi smooths it.",
+    "priority": 4
+  },
+  {
+    "id": "hybrid-scalp-002",
+    "source": "daytrading-hybrid-super-scalping",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "HIGH-VOLUME DOJI ENTRIES: Doji (open=close) at key S/R with HIGH VOLUME = battle between buyers and sellers. Doji at support with high volume → often precedes reversal up. Doji at resistance with high volume → often precedes reversal down. Higher volume = more significant signal. Combine with HA direction and 100 EMA. Enter on NEXT candle after doji in trend direction.",
+    "priority": 4
+  },
+  {
+    "id": "hybrid-scalp-003",
+    "source": "daytrading-hybrid-super-scalping",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "PROP FIRM SCALING: Start with evaluation ($50K-$100K). Pass by hitting profit target (8-10%) with max daily loss (4-5%). Trade only during high-volume sessions. Micro lots during eval, standard after passing. Rules: don't trade first 5 min, max 2-3 trades/day during eval, stop after 2 consecutive losses. ACCOUNT GROWTH: increase size only after 2 consecutive profitable weeks. Never increase after a loss.",
+    "priority": 4
+  },
+  {
+    "id": "hybrid-scalp-004",
+    "source": "daytrading-hybrid-super-scalping",
+    "topic": "Execution",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "SCALPING ENTRY CHECKLIST: 1) Price above/below 100 EMA? (trend). 2) HA candle color aligned? (momentum). 3) No wick on relevant side? (strong momentum). 4) Volume above average? (institutional participation). 5) At a key level? (S/R, VWAP, round number). All 5 = enter. Any missing = skip. Quality over quantity — 3 perfect trades beat 10 mediocre ones.",
+    "priority": 4
+  },
+  {
+    "id": "hybrid-scalp-005",
+    "source": "daytrading-hybrid-super-scalping",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "MULTI-TIMEFRAME SCALPING: Use 15m for trend direction and key levels. Use 5m for setup identification. Use 1m or 2m for precise entry. Only scalp in the direction of the 15m trend. If 15m is bullish, only take long scalps on 5m/1m. If 15m is bearish, only take short scalps. Never counter-trend scalp — the trend will run you over.",
+    "priority": 4
+  },
+  {
+    "id": "hybrid-scalp-006",
+    "source": "daytrading-hybrid-super-scalping",
+    "topic": "Execution",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "SESSION-SPECIFIC SCALPING: LONDON (2-5 AM EST): higher volatility, wider ranges, good for breakout scalps. NY OPEN (9:30-11 AM EST): highest volume, best for momentum scalps. NY MIDDAY (11 AM - 2 PM EST): lower volume, tighter ranges, good for mean reversion scalps. NY CLOSE (3-4 PM EST): volume picks up again, good for trend continuation. Adjust strategy to session.",
+    "priority": 3
+  },
+  {
+    "id": "hybrid-scalp-007",
+    "source": "daytrading-hybrid-super-scalping",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "FEE OPTIMIZATION FOR HIGH-FREQUENCY: Scalping generates many trades — fees compound. Use limit orders (maker fee) instead of market orders (taker fee) when possible. Maker fee is typically 50-75% cheaper than taker. If your strategy allows it, post limit orders at the bid/ask instead of crossing the spread. Over hundreds of trades, this saves significant capital. Track your fee-to-profit ratio.",
+    "priority": 3
+  },
+  {
+    "id": "hybrid-scalp-008",
+    "source": "daytrading-hybrid-super-scalping",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "EMA AS DYNAMIC SUPPORT: In a strong trend, price bounces off the 9 EMA or 20 EMA repeatedly. Each bounce is a potential entry. The first bounce is highest probability. If price breaks below the 9 EMA but holds the 20 EMA = trend still intact. If price breaks below both 9 and 20 EMA = trend weakening, tighten stops or exit. The 100 EMA is the TREND FILTER — price must be above/below for trade direction.",
+    "priority": 3
+  }
+]

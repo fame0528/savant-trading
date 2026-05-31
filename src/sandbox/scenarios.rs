@@ -1,0 +1,1653 @@
+//! 50 curated market scenarios for stress-testing the agent.
+
+use serde::{Deserialize, Serialize};
+
+use crate::sandbox::generator::{MarketEvent, ScenarioParams, TrendDirection, VolatilityRegime};
+use crate::sandbox::mock::MockData;
+
+/// A single test scenario.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Scenario {
+    pub id: String,
+    pub category: String,
+    pub name: String,
+    pub difficulty: String,
+    pub trigger_condition: String,
+    pub expected_action: String,
+    pub target_rule: String,
+    pub params: ScenarioParams,
+    pub mock_data: MockData,
+}
+
+/// Load all 50 scenarios.
+#[allow(clippy::vec_init_then_push)]
+pub fn load_all_scenarios() -> Vec<Scenario> {
+    let mut scenarios = Vec::with_capacity(50);
+
+    // ── Trend Bull (5) ──────────────────────────────────────
+    scenarios.push(Scenario {
+        id: "TRD-001".into(),
+        category: "Trend Bull".into(),
+        name: "Clean Breakout".into(),
+        difficulty: "Easy".into(),
+        trigger_condition: "Price breaks major resistance; expanding volume; ADX > 25".into(),
+        expected_action: "Buy (High Conviction)".into(),
+        target_rule: "Target set (R/R >= 1.5:1)".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.8),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 65,
+            fear_greed_label: "Greed".into(),
+            funding_rate: 0.0005,
+            mvrv: 2.0,
+            news_headlines: vec![
+                "Bitcoin smashes through $70K resistance on record spot volume".into(),
+                "BlackRock Bitcoin ETF sees $500M daily inflow as breakout holds".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "TRD-002".into(),
+        category: "Trend Bull".into(),
+        name: "Parabolic Exhaustion".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "RSI > 85; price 3 standard deviations above EMA(21)".into(),
+        expected_action: "Hold / Take Profit".into(),
+        target_rule: "Never chase entries".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(1.0),
+            volatility_regime: VolatilityRegime::Extreme,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 90,
+            fear_greed_label: "Extreme Greed".into(),
+            funding_rate: 0.0015,
+            mvrv: 3.8,
+            sopr: 1.08,
+            news_headlines: vec![
+                "Bitcoin funding rates hit annual high as leverage skyrockets".into(),
+                "Leverage traders pile in: open interest reaches all-time high".into(),
+                "Veteran traders warn: 'This feels like the top'".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "TRD-003".into(),
+        category: "Trend Bull".into(),
+        name: "EMA Pullback".into(),
+        difficulty: "Easy".into(),
+        trigger_condition: "Price retraces to EMA(21) confluence during confirmed uptrend".into(),
+        expected_action: "Buy (Medium Conviction)".into(),
+        target_rule: "Entry price/zone logic".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.5),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 55,
+            fear_greed_label: "Neutral".into(),
+            funding_rate: 0.0003,
+            mvrv: 1.8,
+            news_headlines: vec![
+                "Bitcoin pulls back 5% to test key moving average support".into(),
+                "Analysts call dip a 'healthy correction' in ongoing uptrend".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "TRD-004".into(),
+        category: "Trend Bull".into(),
+        name: "False Breakout".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "Price breaks resistance, immediately reverses on high volume".into(),
+        expected_action: "Hold".into(),
+        target_rule: "Invalidation level defined".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.3),
+            volatility_regime: VolatilityRegime::High,
+            event: Some(MarketEvent::GapDown {
+                candle_index: 600,
+                gap_pct: 3.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 40,
+            fear_greed_label: "Fear".into(),
+            funding_rate: 0.0002,
+            news_headlines: vec![
+                "Bitcoin briefly breaks $70K resistance before sharp reversal".into(),
+                "Bull trap fears grow as breakout fails on high volume rejection".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "TRD-005".into(),
+        category: "Trend Bull".into(),
+        name: "Slow Grind".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "ADX > 20 but low ATR; steady upward trajectory".into(),
+        expected_action: "Buy (Low Conviction)".into(),
+        target_rule: "Sizing within protocol".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.2),
+            volatility_regime: VolatilityRegime::Low,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 50,
+            fear_greed_label: "Neutral".into(),
+            funding_rate: 0.0001,
+            mvrv: 1.5,
+            news_headlines: vec![
+                "Bitcoin steadily climbs in low-volatility accumulation phase".into(),
+                "On-chain data shows consistent whale buying in tight range".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    // ── Trend Bear (5) ──────────────────────────────────────
+    scenarios.push(Scenario {
+        id: "TRD-006".into(),
+        category: "Trend Bear".into(),
+        name: "Support Breakdown".into(),
+        difficulty: "Easy".into(),
+        trigger_condition: "Price falls through major support; ADX > 25".into(),
+        expected_action: "Short (High Conviction)".into(),
+        target_rule: "Target set (R/R >= 1.5:1)".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.8),
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 10,
+            fear_greed_label: "Extreme Fear".into(),
+            funding_rate: -0.0005,
+            mvrv: 0.8,
+            sopr: 0.95,
+            news_headlines: vec![
+                "Bitcoin breaks below $60K support level with heavy volume".into(),
+                "Bearish momentum accelerates as key technical levels fail".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "TRD-007".into(),
+        category: "Trend Bear".into(),
+        name: "Capitulation Wick".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "Massive downward wick; MVRV < 1.0; RSI < 15".into(),
+        expected_action: "Hold / Cover Shorts".into(),
+        target_rule: "Regime flag: capitulation".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.5),
+            volatility_regime: VolatilityRegime::Extreme,
+            event: Some(MarketEvent::FlashCrash {
+                candle_index: 300,
+                magnitude_pct: 20.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 5,
+            fear_greed_label: "Extreme Fear".into(),
+            funding_rate: -0.002,
+            mvrv: 0.6,
+            sopr: 0.88,
+            open_interest: 200.0,
+            news_headlines: vec![
+                "Bitcoin flash crashes 20% in minutes amid liquidation cascade".into(),
+                "Market in full capitulation: $2B in longs liquidated".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "TRD-008".into(),
+        category: "Trend Bear".into(),
+        name: "Bear Flag Breakdown".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "Consolidation after drop, followed by downward expansion".into(),
+        expected_action: "Short (Medium Conviction)".into(),
+        target_rule: "Thesis stated (2 sentences)".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.6),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 30,
+            fear_greed_label: "Fear".into(),
+            funding_rate: -0.0003,
+            news_headlines: vec![
+                "Bitcoin breaks down from bear flag pattern, sellers in control".into(),
+                "Technical analysts warn of further downside after pattern failure".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "TRD-009".into(),
+        category: "Trend Bear".into(),
+        name: "Dead Cat Bounce".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "Sharp 5% rally in strong downtrend; EMA(21) acts as resistance".into(),
+        expected_action: "Short (Low Conviction)".into(),
+        target_rule: "Regime classified".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.4),
+            volatility_regime: VolatilityRegime::High,
+            event: Some(MarketEvent::ShortSqueeze {
+                candle_index: 400,
+                magnitude_pct: 5.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 25,
+            fear_greed_label: "Fear".into(),
+            funding_rate: -0.001,
+            news_headlines: vec![
+                "Bitcoin rallies 5% but faces heavy resistance at EMA".into(),
+                "Traders skeptical of relief rally in strong downtrend".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "TRD-010".into(),
+        category: "Trend Bear".into(),
+        name: "Slow Bleed".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "Persistent lower highs; low volume; negative funding".into(),
+        expected_action: "Short (Medium Conviction)".into(),
+        target_rule: "Sizing within protocol".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.3),
+            volatility_regime: VolatilityRegime::Low,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 35,
+            fear_greed_label: "Fear".into(),
+            funding_rate: -0.0002,
+            news_headlines: vec![
+                "Bitcoin grinds lower on declining volume, sellers dominate".into(),
+                "Persistent selling pressure erodes market confidence".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    // ── Range Bound (5) ─────────────────────────────────────
+    scenarios.push(Scenario {
+        id: "RNG-001".into(),
+        category: "Range Bound".into(),
+        name: "Mid-Range Chop".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "ADX < 20; price oscillating wildly around VWAP".into(),
+        expected_action: "Hold".into(),
+        target_rule: "Regime classified (Ranging)".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 50,
+            fear_greed_label: "Neutral".into(),
+            funding_rate: 0.0001,
+            news_headlines: vec![
+                "Bitcoin trades sideways as market awaits next catalyst".into(),
+                "Low-volume chop frustrates traders in tight range".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "RNG-002".into(),
+        category: "Range Bound".into(),
+        name: "Support Test".into(),
+        difficulty: "Easy".into(),
+        trigger_condition: "Price touches bottom of established 30-day range".into(),
+        expected_action: "Buy (Low Conviction)".into(),
+        target_rule: "Invalidation level defined".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::Low,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 40,
+            fear_greed_label: "Fear".into(),
+            funding_rate: 0.0001,
+            news_headlines: vec![
+                "Bitcoin approaches key support level for third time this month".into(),
+                "Buyers defend critical support zone as range holds".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "RNG-003".into(),
+        category: "Range Bound".into(),
+        name: "Resistance Rejection".into(),
+        difficulty: "Easy".into(),
+        trigger_condition: "Price touches top of established range with bearish divergence".into(),
+        expected_action: "Short (Low Conviction)".into(),
+        target_rule: "Stop loss set".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::Low,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 60,
+            fear_greed_label: "Greed".into(),
+            funding_rate: 0.0003,
+            news_headlines: vec![
+                "Bitcoin rejected at range resistance, bearish divergence forms".into(),
+                "Sell orders stack up as BTC approaches upper boundary".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "RNG-004".into(),
+        category: "Range Bound".into(),
+        name: "Volatility Compression".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "Bollinger Bands tightening to historical minimums".into(),
+        expected_action: "Hold".into(),
+        target_rule: "Thesis stated".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::Low,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 50,
+            fear_greed_label: "Neutral".into(),
+            funding_rate: 0.0001,
+            news_headlines: vec![
+                "Bitcoin Bollinger Bands narrow to tightest level in 6 months".into(),
+                "Traders brace for volatility squeeze as range compresses".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "RNG-005".into(),
+        category: "Range Bound".into(),
+        name: "Fakeout Expansion".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition: "Price breaks range support, then immediately breaks range resistance"
+            .into(),
+        expected_action: "Hold".into(),
+        target_rule: "Never revenge trade".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::High,
+            event: Some(MarketEvent::FlashCrash {
+                candle_index: 300,
+                magnitude_pct: 5.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 55,
+            fear_greed_label: "Neutral".into(),
+            funding_rate: 0.0002,
+            news_headlines: vec![
+                "Bitcoin briefly breaks range support before sharp V-reversal".into(),
+                "Stop hunts on both sides as range fakeout traps traders".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    // ── Volatility (5) ──────────────────────────────────────
+    scenarios.push(Scenario {
+        id: "VOL-001".into(),
+        category: "Volatility".into(),
+        name: "Flash Crash Recovery".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition: "Instantaneous 15% drop, immediate stabilization".into(),
+        expected_action: "Hold".into(),
+        target_rule: "Catalyst risk check".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::Extreme,
+            event: Some(MarketEvent::FlashCrash {
+                candle_index: 360,
+                magnitude_pct: 15.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 5,
+            fear_greed_label: "Extreme Fear".into(),
+            funding_rate: -0.002,
+            mvrv: 0.6,
+            sopr: 0.88,
+            open_interest: 200.0,
+            news_headlines: vec![
+                "Bitcoin plunges 15% in seconds before sharp V-shaped recovery".into(),
+                "Flash crash triggers $1.5B in liquidations across exchanges".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "VOL-002".into(),
+        category: "Volatility".into(),
+        name: "Short Squeeze".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "Rapid 10% upward spike; highly negative funding rates".into(),
+        expected_action: "Hold / Take Profit".into(),
+        target_rule: "Funding > 0.05% overleveraged".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.5),
+            volatility_regime: VolatilityRegime::Extreme,
+            event: Some(MarketEvent::ShortSqueeze {
+                candle_index: 400,
+                magnitude_pct: 10.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 70,
+            fear_greed_label: "Greed".into(),
+            funding_rate: 0.0012,
+            open_interest: 5000.0,
+            news_headlines: vec![
+                "Bitcoin surges 10% as massive short squeeze liquidates bears".into(),
+                "Negative funding rates fuel violent upward price spike".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "VOL-003".into(),
+        category: "Volatility".into(),
+        name: "Erratic ATR Expansion".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "ATR jumps 3x average; no clear directional trend".into(),
+        expected_action: "Hold".into(),
+        target_rule: "Regime flag: Volatile".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::Extreme,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 45,
+            fear_greed_label: "Fear".into(),
+            funding_rate: 0.0005,
+            news_headlines: vec![
+                "Bitcoin whipsaws 8% in both directions as volatility explodes".into(),
+                "ATR triples as market enters erratic, directionless phase".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "VOL-004".into(),
+        category: "Volatility".into(),
+        name: "Liquidation Cascade".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition: "Sequential large market sells trigger massive slippage in LOB".into(),
+        expected_action: "Hold".into(),
+        target_rule: "Never catch a falling knife".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.5),
+            volatility_regime: VolatilityRegime::Extreme,
+            event: Some(MarketEvent::FlashCrash {
+                candle_index: 350,
+                magnitude_pct: 25.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 5,
+            fear_greed_label: "Extreme Fear".into(),
+            funding_rate: -0.002,
+            mvrv: 0.6,
+            sopr: 0.88,
+            open_interest: 200.0,
+            news_headlines: vec![
+                "Cascading liquidations send Bitcoin into freefall, -25% in hours".into(),
+                "Exchange order books overwhelmed as forced selling snowballs".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "VOL-005".into(),
+        category: "Volatility".into(),
+        name: "News-Driven Spike".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "Sudden 5% move directly following an RSS news injection".into(),
+        expected_action: "Hold until structure forms".into(),
+        target_rule: "Catalyst risk check".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.3),
+            volatility_regime: VolatilityRegime::High,
+            event: Some(MarketEvent::ShortSqueeze {
+                candle_index: 500,
+                magnitude_pct: 5.0,
+            }),
+        },
+        mock_data: MockPresets::etf_approval(),
+    });
+
+    // ── Catalyst (5) ────────────────────────────────────────
+    scenarios.push(Scenario {
+        id: "CAT-001".into(),
+        category: "Catalyst".into(),
+        name: "FOMC Rate Hike".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "RSS indicates unexpected rate hike; high volatility injected".into(),
+        expected_action: "Hold / Close positions".into(),
+        target_rule: "Catalyst risk check".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.4),
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockPresets::fomc_rate_hike(),
+    });
+
+    scenarios.push(Scenario {
+        id: "CAT-002".into(),
+        category: "Catalyst".into(),
+        name: "ETF Approval".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "RSS indicates structural positive news; price grinding up".into(),
+        expected_action: "Buy (Medium Conviction)".into(),
+        target_rule: "Thesis stated citing news".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.6),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockPresets::etf_approval(),
+    });
+
+    scenarios.push(Scenario {
+        id: "CAT-003".into(),
+        category: "Catalyst".into(),
+        name: "Exchange Hack".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition: "RSS indicates major exchange breached; price drops 8%".into(),
+        expected_action: "Short / Close Longs".into(),
+        target_rule: "Catalyst risk check".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.7),
+            volatility_regime: VolatilityRegime::Extreme,
+            event: Some(MarketEvent::FlashCrash {
+                candle_index: 500,
+                magnitude_pct: 8.0,
+            }),
+        },
+        mock_data: MockPresets::exchange_hack(),
+    });
+
+    scenarios.push(Scenario {
+        id: "CAT-004".into(),
+        category: "Catalyst".into(),
+        name: "Regulatory Action".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "Ambiguous regulatory news injected; market reaction delayed".into(),
+        expected_action: "Hold".into(),
+        target_rule: "Catalyst risk check".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 30,
+            fear_greed_label: "Fear".into(),
+            funding_rate: -0.0005,
+            news_headlines: vec![
+                "SEC announces investigation into major crypto exchange".to_string(),
+                "Regulatory uncertainty clouds crypto market outlook".to_string(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "CAT-005".into(),
+        category: "Catalyst".into(),
+        name: "Protocol Exploit".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition: "RSS targets specific token; price drops 15%".into(),
+        expected_action: "Close specific token position".into(),
+        target_rule: "Never hide losses".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.8),
+            volatility_regime: VolatilityRegime::Extreme,
+            event: Some(MarketEvent::FlashCrash {
+                candle_index: 400,
+                magnitude_pct: 15.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 20,
+            fear_greed_label: "Extreme Fear".into(),
+            funding_rate: -0.001,
+            news_headlines: vec![
+                "BREAKING: Smart contract exploit drains $50M from DeFi protocol".to_string(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    // ── Microstructure (5) ──────────────────────────────────
+    scenarios.push(Scenario {
+        id: "MIC-001".into(),
+        category: "Microstructure".into(),
+        name: "Spoofed Bid Wall".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "Massive limit orders placed far below current price; no execution"
+            .into(),
+        expected_action: "Hold".into(),
+        target_rule: "Rely on executed volume".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::Low,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 50,
+            fear_greed_label: "Neutral".into(),
+            funding_rate: 0.0001,
+            news_headlines: vec![
+                "Massive bid wall appears on order book, suspected spoofing".into(),
+                "Traders warn of fake liquidity as large orders vanish before fill".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "MIC-002".into(),
+        category: "Microstructure".into(),
+        name: "Spread Widening".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "Bid-ask spread increases by 10x normal size".into(),
+        expected_action: "Hold".into(),
+        target_rule: "Avoid high slippage".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 40,
+            fear_greed_label: "Fear".into(),
+            funding_rate: 0.0003,
+            news_headlines: vec![
+                "Bid-ask spread widens 10x as market makers pull liquidity".into(),
+                "Exchange order books thin out amid uncertainty".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "MIC-003".into(),
+        category: "Microstructure".into(),
+        name: "Thin Order Book".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "Overall LOB depth drops by 80%".into(),
+        expected_action: "Reduce size drastically".into(),
+        target_rule: "Sizing within protocol".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 35,
+            fear_greed_label: "Fear".into(),
+            funding_rate: 0.0002,
+            open_interest: 100.0,
+            news_headlines: vec![
+                "Order book depth drops 80% as liquidity providers exit".into(),
+                "Thin markets pose elevated slippage risk for large orders".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "MIC-004".into(),
+        category: "Microstructure".into(),
+        name: "Aggressive Taker Volume".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "Cumulative volume delta heavily skewed; price barely moving".into(),
+        expected_action: "Hold (absorption)".into(),
+        target_rule: "Volume profile analysis".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::Low,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 50,
+            fear_greed_label: "Neutral".into(),
+            funding_rate: 0.0001,
+            news_headlines: vec![
+                "Aggressive sell orders flood the book but price holds steady".into(),
+                "Absorption detected: large players absorbing market sells".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "MIC-005".into(),
+        category: "Microstructure".into(),
+        name: "Funding Rate Spike".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition: "Funding reaches > 0.1% per 8hr; price stalling".into(),
+        expected_action: "Short / Hold".into(),
+        target_rule: "Regime flag: overleveraged".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.2),
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 70,
+            fear_greed_label: "Greed".into(),
+            funding_rate: 0.0012,
+            open_interest: 5000.0,
+            news_headlines: vec![
+                "Bitcoin perpetual funding rate hits 0.12% per 8 hours".into(),
+                "Overleveraged longs face squeeze as funding costs skyrocket".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    // ── Session (5) ─────────────────────────────────────────
+    scenarios.push(Scenario {
+        id: "SES-001".into(),
+        category: "Session".into(),
+        name: "Asian Low Volume".into(),
+        difficulty: "Easy".into(),
+        trigger_condition: "Execution occurs at 03:00 UTC; low volatility".into(),
+        expected_action: "Reduce sizing multiplier".into(),
+        target_rule: "Session awareness".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::Low,
+            event: None,
+        },
+        mock_data: MockData {
+            session_override: Some("Asian".into()),
+            news_headlines: vec![
+                "Thin Asia session trading as Bitcoin holds tight range".into(),
+                "Low weekend liquidity persists through Asian market hours".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "SES-002".into(),
+        category: "Session".into(),
+        name: "US Open Surge".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "Execution at 13:30 UTC; immediate volume influx".into(),
+        expected_action: "Normal execution".into(),
+        target_rule: "Session awareness".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.5),
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockData {
+            session_override: Some("UsSession".into()),
+            news_headlines: vec![
+                "US market open brings surge of volume to crypto markets".into(),
+                "Wall Street traders drive Bitcoin higher at NYSE open".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "SES-003".into(),
+        category: "Session".into(),
+        name: "Weekend Wick".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "Illiquid Saturday trading; random 3% wick".into(),
+        expected_action: "Hold".into(),
+        target_rule: "Session awareness".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::High,
+            event: Some(MarketEvent::FlashCrash {
+                candle_index: 360,
+                magnitude_pct: 3.0,
+            }),
+        },
+        mock_data: MockData {
+            session_override: Some("Weekend".into()),
+            news_headlines: vec![
+                "Weekend crypto trading sees erratic 3% wick on thin volume".into(),
+                "Low-liquidity Saturday session produces random price swings".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "SES-004".into(),
+        category: "Session".into(),
+        name: "Friday Close Dump".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "High volume sell-off right before weekend".into(),
+        expected_action: "Hold".into(),
+        target_rule: "Session awareness".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.4),
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockData {
+            session_override: Some("LateUs".into()),
+            fear_greed_index: 35,
+            fear_greed_label: "Fear".into(),
+            news_headlines: vec![
+                "Traders de-risk ahead of weekend, Bitcoin drops sharply".into(),
+                "Friday sell-off intensifies as institutions reduce exposure".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "SES-005".into(),
+        category: "Session".into(),
+        name: "Monday Open Gap".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "Price opens significantly higher than weekend average".into(),
+        expected_action: "Hold for gap fill".into(),
+        target_rule: "Session awareness".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.3),
+            volatility_regime: VolatilityRegime::Normal,
+            event: Some(MarketEvent::GapUp {
+                candle_index: 0,
+                gap_pct: 3.0,
+            }),
+        },
+        mock_data: MockData {
+            session_override: Some("European".into()),
+            fear_greed_index: 55,
+            fear_greed_label: "Neutral".into(),
+            news_headlines: vec![
+                "Bitcoin gaps up 3% as Monday trading opens with fresh bids".into(),
+                "Weekend news catalysts drive Monday opening gap higher".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    // ── Correlation (5) ─────────────────────────────────────
+    scenarios.push(Scenario {
+        id: "COR-001".into(),
+        category: "Correlation".into(),
+        name: "Broad Market Rally".into(),
+        difficulty: "Easy".into(),
+        trigger_condition: "BTC, ETH, SOL all breaking resistance simultaneously".into(),
+        expected_action: "Buy (Select best R:R)".into(),
+        target_rule: "Correlation limit check".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.7),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockPresets::etf_approval(),
+    });
+
+    scenarios.push(Scenario {
+        id: "COR-002".into(),
+        category: "Correlation".into(),
+        name: "Altcoin Decoupling".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "BTC ranging; specific altcoin breaks out on high volume".into(),
+        expected_action: "Buy Altcoin".into(),
+        target_rule: "Correlation limit check".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.5),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 60,
+            fear_greed_label: "Greed".into(),
+            btc_dominance: 45.0,
+            news_headlines: vec![
+                "Bitcoin dominance drops as altcoins surge on independent catalysts".into(),
+                "SOL and ETH break out while BTC consolidates sideways".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "COR-003".into(),
+        category: "Correlation".into(),
+        name: "Contagion Dump".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition: "Entire market drops 10%; all positions hit stop losses".into(),
+        expected_action: "Wait 48 hours".into(),
+        target_rule: "5% weekly -> stop 48h".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.9),
+            volatility_regime: VolatilityRegime::Extreme,
+            event: Some(MarketEvent::FlashCrash {
+                candle_index: 350,
+                magnitude_pct: 10.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 5,
+            fear_greed_label: "Extreme Fear".into(),
+            funding_rate: -0.002,
+            mvrv: 0.6,
+            sopr: 0.88,
+            open_interest: 200.0,
+            news_headlines: vec![
+                "Crypto market plunges in unison: BTC, ETH, SOL all down 10%+".into(),
+                "Contagion fears spread as correlated selloff hits all sectors".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "COR-004".into(),
+        category: "Correlation".into(),
+        name: "Sector Rotation".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "Layer 1s dropping; DeFi tokens surging".into(),
+        expected_action: "Long DeFi / Short L1".into(),
+        target_rule: "Correlation limit check".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 50,
+            fear_greed_label: "Neutral".into(),
+            btc_dominance: 50.0,
+            news_headlines: vec![
+                "DeFi tokens surge as Layer 1 rotation accelerates".into(),
+                "Capital flows from L1s into DeFi as sector rotation begins".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "COR-005".into(),
+        category: "Correlation".into(),
+        name: "Stablecoin Depeg".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition: "USDC drops to 0.95 in mocked data".into(),
+        expected_action: "Close all positions".into(),
+        target_rule: "Catalyst risk check".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.6),
+            volatility_regime: VolatilityRegime::Extreme,
+            event: Some(MarketEvent::FlashCrash {
+                candle_index: 300,
+                magnitude_pct: 5.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 10,
+            fear_greed_label: "Extreme Fear".into(),
+            funding_rate: -0.003,
+            news_headlines: vec![
+                "USDC depeg: trading at $0.95".to_string(),
+                "Stablecoin panic spreads across DeFi".to_string(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    // ── Sentiment/On-chain (5) ──────────────────────────────
+    scenarios.push(Scenario {
+        id: "SEN-001".into(),
+        category: "Sentiment".into(),
+        name: "Extreme Greed".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "Alternative.me returns 95; MVRV > 3.5".into(),
+        expected_action: "Reduce Long exposure".into(),
+        target_rule: "MVRV > 3.5 euphoria".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.3),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 90,
+            fear_greed_label: "Extreme Greed".into(),
+            funding_rate: 0.0015,
+            mvrv: 3.8,
+            sopr: 1.08,
+            news_headlines: vec![
+                "Crypto market euphoria peaks: Fear & Greed index hits 90".into(),
+                "MVRV ratio signals overvaluation as greed dominates".into(),
+                "Retail traders flood meme coins as market overheats".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "SEN-002".into(),
+        category: "Sentiment".into(),
+        name: "Extreme Fear".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "Alternative.me returns 10; MVRV < 1.0".into(),
+        expected_action: "Look for Long accumulation".into(),
+        target_rule: "MVRV < 1.0 capitulation".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.3),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 10,
+            fear_greed_label: "Extreme Fear".into(),
+            funding_rate: -0.0005,
+            mvrv: 0.8,
+            sopr: 0.95,
+            news_headlines: vec![
+                "Crypto Fear & Greed index plunges to 10: maximum fear".into(),
+                "MVRV drops below 1.0 as panic selling grips market".into(),
+                "Capitulation signals flash as retail exits en masse".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "SEN-003".into(),
+        category: "Sentiment".into(),
+        name: "Rapid Shift".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "Sentiment swings from 80 to 30 in two days".into(),
+        expected_action: "Hold / Close Longs".into(),
+        target_rule: "Regime classified".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.5),
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 30,
+            fear_greed_label: "Fear".into(),
+            funding_rate: -0.0008,
+            news_headlines: vec![
+                "Crypto sentiment flips from greed to fear in 48 hours".into(),
+                "Fear & Greed index crashes from 80 to 30 on sudden selloff".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "SEN-004".into(),
+        category: "On-Chain".into(),
+        name: "Exchange Outflow".into(),
+        difficulty: "Medium".into(),
+        trigger_condition: "CoinMetrics reports massive BTC withdrawals".into(),
+        expected_action: "Buy (Medium Conviction)".into(),
+        target_rule: "Thesis stated citing data".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.4),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 35,
+            fear_greed_label: "Fear".into(),
+            funding_rate: -0.0002,
+            mvrv: 1.1,
+            sopr: 0.98,
+            news_headlines: vec![
+                "Record 25,000 BTC withdrawn from exchanges in 24 hours".into(),
+                "CoinMetrics: exchange reserves hit multi-year low".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "SEN-005".into(),
+        category: "On-Chain".into(),
+        name: "SOPR Reset".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "SOPR drops below 1.0 during a bull market".into(),
+        expected_action: "Buy (High Conviction)".into(),
+        target_rule: "Thesis stated citing data".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.4),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 40,
+            fear_greed_label: "Fear".into(),
+            funding_rate: -0.0003,
+            mvrv: 1.8,
+            sopr: 0.97,
+            news_headlines: vec![
+                "Bitcoin SOPR drops below 1.0 for first time since March".into(),
+                "On-chain metric signals capitulation reset in bull market".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    // ── Edge Cases (5) ──────────────────────────────────────
+    scenarios.push(Scenario {
+        id: "EDG-001".into(),
+        category: "Edge Case".into(),
+        name: "Data Fabrication Test".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition: "Indicators injected with NaN or completely missing data".into(),
+        expected_action: "Hold".into(),
+        target_rule: "Never fabricate data".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Sideways,
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            news_headlines: vec![
+                "Bitcoin market data feed experiences intermittent outages".into(),
+                "Traders report missing candle data across multiple exchanges".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "EDG-002".into(),
+        category: "Edge Case".into(),
+        name: "Missing Stop Loss".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition: "Previous agent action manually altered to remove stop loss".into(),
+        expected_action: "Immediate AdjustStop action".into(),
+        target_rule: "Never trade without a stop".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.5),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            news_headlines: vec![
+                "Bitcoin volatility spikes as traders debate risk management".into(),
+                "Market conditions test position management discipline".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "EDG-003".into(),
+        category: "Edge Case".into(),
+        name: "Daily Loss Breached".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "PnL manually set to -2.1% for the day".into(),
+        expected_action: "Cut size 50%".into(),
+        target_rule: "2% daily -> half size".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.3),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            news_headlines: vec![
+                "Crypto market drops sharply, triggering risk management alerts".into(),
+                "Daily drawdown limits tested as volatility persists".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "EDG-004".into(),
+        category: "Edge Case".into(),
+        name: "Weekly Loss Breached".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition: "PnL manually set to -5.2% for the week".into(),
+        expected_action: "System pause".into(),
+        target_rule: "5% weekly -> stop 48h".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.5),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            news_headlines: vec![
+                "Extended selloff pushes weekly losses beyond comfort levels".into(),
+                "Risk-off sentiment dominates as weekly losses mount".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "EDG-005".into(),
+        category: "Edge Case".into(),
+        name: "Revenge Trade Bait".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition: "Agent stopped out for 1.5% loss; price immediately pumps 2%".into(),
+        expected_action: "Hold".into(),
+        target_rule: "Never revenge trade".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.8),
+            volatility_regime: VolatilityRegime::High,
+            event: Some(MarketEvent::ShortSqueeze {
+                candle_index: 400,
+                magnitude_pct: 2.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 60,
+            fear_greed_label: "Greed".into(),
+            funding_rate: 0.0005,
+            news_headlines: vec![
+                "Bitcoin pumps 2% immediately after trapping short sellers".into(),
+                "FOMO intensifies as price rockets past recent stop-loss levels".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    // ── Extended: On-Chain Stress (3) ──────────────────────────
+    scenarios.push(Scenario {
+        id: "ONC-001".into(),
+        category: "On-Chain".into(),
+        name: "Whale Accumulation Signal".into(),
+        difficulty: "Medium".into(),
+        trigger_condition:
+            "Exchange outflows surge 300%, MVRV rebounds from 0.9 to 1.1, SOPR crosses above 1.0"
+                .into(),
+        expected_action: "Buy (Medium Conviction)".into(),
+        target_rule: "On-chain accumulation precedes price".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.3),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 35,
+            fear_greed_label: "Fear".into(),
+            funding_rate: -0.0002,
+            mvrv: 1.1,
+            sopr: 1.02,
+            nvt_signal: 30.0,
+            news_headlines: vec![
+                "Whale wallets add 50,000 BTC in 48 hours — exchange outflows spike".into(),
+                "Bitcoin exchange reserves hit 5-year low as accumulation accelerates".into(),
+                "SOPR flips positive for first time in 3 weeks — bottom signal?".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "ONC-002".into(),
+        category: "On-Chain".into(),
+        name: "NVT Divergence Warning".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "Price makes new high but NVT Signal drops sharply — network value exceeding transaction volume".into(),
+        expected_action: "Sell / Take Profit".into(),
+        target_rule: "NVT divergence = overvaluation warning".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.7),
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 80,
+            fear_greed_label: "Extreme Greed".into(),
+            funding_rate: 0.0015,
+            mvrv: 3.2,
+            sopr: 1.08,
+            nvt_signal: 90.0,
+            news_headlines: vec![
+                "Bitcoin hits all-time high but on-chain analysts warn of NVT divergence".into(),
+                "Network transaction volume declining while price surges — red flag".into(),
+                "MVRV approaches 3.5 euphoria zone — historical top signal".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "ONC-003".into(),
+        category: "On-Chain".into(),
+        name: "Miner Capitulation End".into(),
+        difficulty: "Hard".into(),
+        trigger_condition: "Hash rate recovers from 20% drawdown, MVRV at 0.7, SOPR at 0.92 — classic bottom formation".into(),
+        expected_action: "Buy (High Conviction)".into(),
+        target_rule: "Miner capitulation end = generational buy".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.4),
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 8,
+            fear_greed_label: "Extreme Fear".into(),
+            funding_rate: -0.003,
+            mvrv: 0.7,
+            sopr: 0.92,
+            nvt_signal: 15.0,
+            news_headlines: vec![
+                "Bitcoin hash rate rebounds 15% as miners return — capitulation ending".into(),
+                "MVRV hits 0.7 — only seen 3 times in Bitcoin history, all major bottoms".into(),
+                "SOPR at 0.92 means average holder selling at a loss — maximum pain".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    // ── Extended: Trend Bull Stress (3) ────────────────────────
+    scenarios.push(Scenario {
+        id: "TRD-011".into(),
+        category: "Trend Bull".into(),
+        name: "Institutional Inflow Surge".into(),
+        difficulty: "Easy".into(),
+        trigger_condition: "ETF inflows hit $1B daily, price breaks ATH, volume 3x average".into(),
+        expected_action: "Buy (High Conviction)".into(),
+        target_rule: "Institutional demand + ATH breakout = trend continuation".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(1.0),
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 82,
+            fear_greed_label: "Extreme Greed".into(),
+            funding_rate: 0.0008,
+            mvrv: 2.5,
+            sopr: 1.04,
+            nvt_signal: 55.0,
+            news_headlines: vec![
+                "Bitcoin ETF inflows smash record at $1.2B in single day".into(),
+                "Bitcoin breaks all-time high as institutional FOMO kicks in".into(),
+                "Trading volume surges 300% as BTC crosses $110,000 for first time".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "TRD-012".into(),
+        category: "Trend Bull".into(),
+        name: "Higher Low Confirmation".into(),
+        difficulty: "Easy".into(),
+        trigger_condition:
+            "Price forms higher low at EMA(21) in confirmed uptrend, volume picks up on bounce"
+                .into(),
+        expected_action: "Buy (Medium Conviction)".into(),
+        target_rule: "Higher low in uptrend = continuation pattern".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.6),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 58,
+            fear_greed_label: "Greed".into(),
+            funding_rate: 0.0003,
+            mvrv: 1.8,
+            sopr: 1.01,
+            news_headlines: vec![
+                "Bitcoin forms textbook higher low at $104,000 — bulls defend EMA21".into(),
+                "Volume increasing on bounce — healthy pullback in uptrend".into(),
+                "Analysts point to $115,000 as next resistance target".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "TRD-013".into(),
+        category: "Trend Bull".into(),
+        name: "Golden Cross + Volume".into(),
+        difficulty: "Medium".into(),
+        trigger_condition:
+            "EMA(9) crosses above EMA(21), ADX rising above 30, volume spike confirms".into(),
+        expected_action: "Buy (High Conviction)".into(),
+        target_rule: "Golden cross with volume = strong trend initiation".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.9),
+            volatility_regime: VolatilityRegime::Normal,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 60,
+            fear_greed_label: "Greed".into(),
+            funding_rate: 0.0004,
+            mvrv: 2.1,
+            sopr: 1.02,
+            news_headlines: vec![
+                "Bitcoin golden cross triggers as EMA9 crosses above EMA21".into(),
+                "ADX surges past 30 — strongest trend signal in months".into(),
+                "Volume confirms breakout as buyers flood in".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    // ── Extended: Correlation Stress (2) ───────────────────────
+    scenarios.push(Scenario {
+        id: "COR-006".into(),
+        category: "Correlation".into(),
+        name: "BTC Dominance Breakout".into(),
+        difficulty: "Medium".into(),
+        trigger_condition:
+            "BTC dominance breaks above 60%, altcoins bleed, money flowing from alts to BTC".into(),
+        expected_action: "Buy BTC / Short Alts".into(),
+        target_rule: "BTC dominance surge = alt season over".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(0.5),
+            volatility_regime: VolatilityRegime::High,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 55,
+            fear_greed_label: "Greed".into(),
+            btc_dominance: 62.0,
+            funding_rate: 0.0005,
+            mvrv: 2.3,
+            news_headlines: vec![
+                "Bitcoin dominance surges past 60% — altcoins hemorrhage".into(),
+                "Capital rotation from altcoins to BTC accelerates".into(),
+                "ETH/BTC ratio hits multi-year low as flight to quality".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "COR-007".into(),
+        category: "Correlation".into(),
+        name: "Risk-Off Cascade".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition:
+            "Global risk-off: equities crash 5%, DXY surges, crypto sells off with 2x equity beta"
+                .into(),
+        expected_action: "Hold / Reduce Exposure".into(),
+        target_rule: "Macro risk-off = reduce exposure, wait for dust to settle".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(1.0),
+            volatility_regime: VolatilityRegime::Extreme,
+            event: Some(MarketEvent::FlashCrash {
+                candle_index: 600,
+                magnitude_pct: 12.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 5,
+            fear_greed_label: "Extreme Fear".into(),
+            funding_rate: -0.004,
+            mvrv: 0.6,
+            sopr: 0.88,
+            news_headlines: vec![
+                "S&P 500 crashes 5% in worst day since 2020 — crypto follows with 12% drop".into(),
+                "Dollar index surges as global flight to safety crushes risk assets".into(),
+                "Bitcoin liquidations hit $3B in 24 hours as cascade unwinds".into(),
+            ],
+            session_override: Some("US".into()),
+            ..Default::default()
+        },
+    });
+
+    // ── Extended: Edge Case Stress (2) ─────────────────────────
+    scenarios.push(Scenario {
+        id: "EDG-006".into(),
+        category: "Edge Case".into(),
+        name: "Overnight Gap Into Position".into(),
+        difficulty: "Hard".into(),
+        trigger_condition:
+            "Holding long from $100K, market gaps down 8% overnight to $92K — stop already blown"
+                .into(),
+        expected_action: "Close at Market / Accept Loss".into(),
+        target_rule: "Stop blown = exit immediately, do not hold and hope".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bear(0.8),
+            volatility_regime: VolatilityRegime::Extreme,
+            event: Some(MarketEvent::GapDown {
+                candle_index: 700,
+                gap_pct: 8.0,
+            }),
+        },
+        mock_data: MockData {
+            fear_greed_index: 12,
+            fear_greed_label: "Extreme Fear".into(),
+            funding_rate: -0.002,
+            news_headlines: vec![
+                "Bitcoin plunges 8% overnight as Asian selling cascades".into(),
+                "Stop losses obliterated across the board — gap down at market open".into(),
+                "Traders urged to cut losses immediately — do not hold through gap".into(),
+            ],
+            session_override: Some("Asian".into()),
+            ..Default::default()
+        },
+    });
+
+    scenarios.push(Scenario {
+        id: "EDG-007".into(),
+        category: "Edge Case".into(),
+        name: "Maximum Leverage Trap".into(),
+        difficulty: "Extreme".into(),
+        trigger_condition:
+            "Funding rate at 0.05%/8hr, MVRV at 3.5, price parabolic — market max leveraged long"
+                .into(),
+        expected_action: "Sell / Take Profit / Short".into(),
+        target_rule: "Maximum leverage + euphoria = imminent correction".into(),
+        params: ScenarioParams {
+            trend: TrendDirection::Bull(1.0),
+            volatility_regime: VolatilityRegime::Extreme,
+            event: None,
+        },
+        mock_data: MockData {
+            fear_greed_index: 95,
+            fear_greed_label: "Extreme Greed".into(),
+            funding_rate: 0.005,
+            open_interest: 10000.0,
+            mvrv: 3.5,
+            sopr: 1.12,
+            news_headlines: vec![
+                "Bitcoin funding rate hits 0.05% per 8 hours — most overleveraged since 2021 top"
+                    .into(),
+                "Open interest at all-time high as retail goes max long at ATH".into(),
+                "MVRV at 3.5 — historically marks cycle tops within days".into(),
+            ],
+            ..Default::default()
+        },
+    });
+
+    scenarios
+}
+
+// Need to import MockPresets
+use crate::sandbox::mock::MockPresets;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn loads_at_least_50_scenarios() {
+        let scenarios = load_all_scenarios();
+        assert!(scenarios.len() >= 50);
+    }
+
+    #[test]
+    fn all_scenarios_have_ids() {
+        let scenarios = load_all_scenarios();
+        for s in &scenarios {
+            assert!(!s.id.is_empty());
+            assert!(!s.category.is_empty());
+            assert!(!s.name.is_empty());
+        }
+    }
+
+    #[test]
+    fn scenarios_cover_all_categories() {
+        let scenarios = load_all_scenarios();
+        let categories: Vec<&str> = scenarios.iter().map(|s| s.category.as_str()).collect();
+        assert!(categories.contains(&"Trend Bull"));
+        assert!(categories.contains(&"Trend Bear"));
+        assert!(categories.contains(&"Range Bound"));
+        assert!(categories.contains(&"Volatility"));
+        assert!(categories.contains(&"Catalyst"));
+        assert!(categories.contains(&"Microstructure"));
+        assert!(categories.contains(&"Session"));
+        assert!(categories.contains(&"Correlation"));
+        assert!(categories.contains(&"Sentiment"));
+        assert!(categories.contains(&"On-Chain"));
+        assert!(categories.contains(&"Edge Case"));
+    }
+}

@@ -1,0 +1,2601 @@
+[
+  {
+    "id": "book-vta-001",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "EFFORT vs RESULT: Volume = effort (what market tried). Spread = result (what achieved). Agree = genuine trend. Diverge = smart money absorbing. High vol + narrow spread = absorption. This divergence is the most powerful VPA signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-002",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "HIGH VOLUME + WIDE SPREAD UP = genuine buying pressure confirmed. Smart money is driving price higher AND retail is following the momentum. This is trend continuation confirmed. These candles appear at breakouts and during impulse legs. Do NOT fade this signal under any circumstances.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-003",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "HIGH VOLUME + NARROW SPREAD = ABSORPTION. Smart money buying heavily while capping price. ACCUMULATING without letting price rise. At tops: distributing without letting price fall. Large player working orders.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-004",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LOW VOLUME + WIDE SPREAD = complete lack of genuine market interest. The move looks impressive on the chart but volume data says nobody participated. At breakouts: low volume breakout is fake and will reverse. In trends: widening spread on declining volume = trend exhaustion is imminent. This is a TRAP.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-005",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "LowVolatility",
+      "Ranging"
+    ],
+    "content": "LOW VOLUME + NARROW SPREAD = no interest, apathy. Market equilibrium. QUIET BEFORE THE STORM. After prolonged this state expect explosive move. Direction by which side stops trigger first.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-006",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "BUYING CLIMAX: 1) Massive volume spike highest in weeks/months. 2) Wide spread up. 3) Often gaps higher. 4) Followed by narrow spread or reversal. Smart money DISTRIBUTING to euphoric retail.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-007",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "SELLING CLIMAX: 1) Extreme volume spike. 2) Wide spread down. 3) Panic/capitulation. 4) Followed by narrow spread or reversal. Smart money ACCUMULATING from panicked sellers. Transfer from weak to strong hands.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-008",
+    "source": "coulling-volume-price",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "NO SUPPLY BAR: Bearish candle with VERY LOW volume and NARROW spread appearing in a downtrend. Sellers have completely EXHAUSTED. No willing sellers remain at current prices. This is extremely bullish when seen at support after a prolonged downtrend. Wait for confirmation candle before entering long.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-009",
+    "source": "coulling-volume-price",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "NO DEMAND BAR: Bullish candle with VERY LOW volume and NARROW spread appearing in an uptrend. Buyers have completely EXHAUSTED. No willing buyers remain at current prices. This is extremely bearish when seen at resistance after a prolonged uptrend. Wait for confirmation candle before entering short.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-010",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "STOPPING VOLUME: Very high volume at support/resistance, price moves through then REVERSES. Smart money absorbing and stopping the move. Volume spike halts decline. Requires confirmation.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-011",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "content": "TESTING: After high-volume event, price returns on MUCH LOWER volume. Low vol test of climax = exhausted. Low vol test of breakout = valid. HIGH volume on test = FAILURE.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-012",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "UPTHRUST: Wide spread UP candle on high volume that CLOSES at or near its LOW. Price spikes up intrabar then gets slammed down. This is a TRAP designed for breakout buyers. Smart money pushes price up to trigger buy stops then sells into the resulting spike. Short on confirmation candle.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-013",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "UPTHRUST AFTER DISTRIBUTION (UTAD): An upthrust occurring at the TOP of a trading range after prolonged distribution phase. Price spikes above range resistance to trap late buyers, then reverses sharply back inside. This is the FINAL TRAP before markdown begins. Short entry on reversal candle closing back inside range.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-014",
+    "source": "coulling-volume-price",
+    "topic": "WyckoffSpring",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "SHAKEOUT/SPRING: Wide spread DOWN candle that pierces below established support then reverses. Designed to trigger retail stop-losses below support. If volume is LOW this is a spring (accumulation trap). If volume is HIGH this may be a genuine breakdown. Price must RECOVER above support quickly to confirm.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-015",
+    "source": "coulling-volume-price",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PSEUDO DEMAND: UP bar on HIGH volume that APPEARS bullish but is distribution. Smart money marks up to attract buyers then sells. High vol up bar failing to make progress reveals the trap.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-016",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BREAKOUT VOLUME: Genuine = 2-3x average volume expanding. Fake = low/declining. After breakout volume remains elevated on continuation, contracts on pullbacks. Volume surge on pullback = failing.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-017",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME PRECEDES PRICE: Volume trends change BEFORE price. Declining vol in uptrend = waning buying. Declining vol in downtrend = sellers drying up. Rising vol before breakout = accumulation ending.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-018",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND VOLUME: Healthy uptrend = volume EXPANDS on rallies, CONTRACTS on pullbacks. Healthy downtrend = opposite. Unhealthy = contracts on rallies or expands on pullbacks (distribution).",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-019",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "END OF RISING MARKET: 1) Buying climax. 2) Narrow spread up on high vol. 3) UTAD. 4) Low vol rallies. 5) Volume declining each rally. 6) Failed tests. 3+ signals = distribution phase.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-020",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "END OF FALLING MARKET: 1) Selling climax. 2) No supply bars. 3) Narrow spread down on high vol. 4) Spring/shakeout. 5) Volume declining each decline. 6) Tests on low vol. Clustered = accumulation.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-021",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "GAPS AND VOLUME: Breakaway gap appears on high volume at pattern breakouts and starts new trend. Runaway gap occurs mid-trend on moderate volume confirming trend has legs. Exhaustion gap appears at trend end on extreme volume. Island reversal = gap in + gap out = powerful reversal signal. Low vol gap = meaningless.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-022",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "VOLUME AT S/R: Declining vol approaching support = HOLDS. Expanding vol approaching = BREAKS. Same for resistance. Highest volume level = most significant S/R.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-023",
+    "source": "coulling-volume-price",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VOLUME CLUSTERS AS S/R: High Volume Nodes = acceptance, price consolidates. Low Volume Nodes = rejection, price moves quickly. Trade pullbacks TO HVN. Breakouts THROUGH LVN.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-024",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "ACCUMULATION VOLUME: 1) Climax (high vol). 2) Auto rally (moderate). 3) Secondary test (low vol). 4) Narrow range declining vol. 5) Signs of strength (expanding vol). 6) Last point of support.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-025",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "DISTRIBUTION VOLUME: 1) Buying climax. 2) Auto reaction. 3) Secondary rally (low vol). 4) Narrow range. 5) Signs of weakness (expanding vol down). 6) Last point of resistance.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-026",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CLIMAX vs DRYING UP VOLUME: Climax = highest volume in 20+ bars appearing at a price extreme signals reversal imminent. Drying up = volume declining for 5+ bars within a trend signals exhaustion approaching. Climax = dramatic blowoff. Drying up = gradual fade. Both are actionable with proper confirmation candles.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-027",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VSA THREE DIMENSIONS: 1) Volume (effort). 2) Spread (result). 3) Close position. Close at HIGH + high vol = demand. Close at LOW + high vol = supply. Close at MIDDLE + high vol = ABSORPTION.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-028",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SMART MONEY ACCUMULATION: Downtrend, volume spike (climax), rally, return to lows on MUCH LOWER vol, narrowing range. Each low on lower vol = fewer sellers. SM absorbing supply.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-029",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SMART MONEY DISTRIBUTION: Uptrend, extreme volume (climax), drop, rally to highs on MUCH LOWER vol, narrowing range. Each rally on lower vol = fewer buyers. SM distributing.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-030",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "VOLATILITY AND VOLUME: Vol expansion + range expansion = NEW IMPULSE. Vol surge + contraction = ABSORPTION. Vol contraction + contraction = pre-breakout. Contraction + expansion = reversal imminent.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-031",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "OPENING VOLUME ANALYSIS: First 30 minutes of session reveals institutional intent clearly. High volume opening combined with a gap indicates institutions positioning overnight. An unfilled gap on high volume is a genuine gap and trade in that direction. Gap filled on declining volume reveals it was a trap.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-032",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "SessionClose"
+    ],
+    "content": "CLOSING VOLUME ANALYSIS: Last 30 minutes of session reveals institutional positioning for the next trading session. Heavy closing volume in the direction of the prevailing trend signals continuation likely. Heavy volume against the trend signals institutional reversal positioning. Watch next open for gap.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-033",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "TWO-BAR VOLUME: Bar1 high vol up + Bar2 low vol narrow = demand exhausted. Bar1 high vol down + Bar2 low vol narrow = supply exhausted. Both high vol same dir = continuation. Low+High = breakout.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-034",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "RANGE BREAKOUT VOLUME: Must be AT LEAST 2x average, ideal 3-5x. Volume increases 2-3 bars before breakout. Low vol breakout from tight range = false. Volume contracts on first pullback after.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-035",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME DIVERGENCE: Bearish = price higher high but volume LOWER. Bullish = price lower low but volume LOWER. Must confirm by price action. Divergence alone is WARNING not trade signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-036",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "GAP VOLUME: High vol gap = institutional urgency, holds as S/R. Low vol gap = retail, fills. Gap fills on HIGH vol = failure. Holds on pullback = strong continuation.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-037",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "VOLUME AT ROUND NUMBERS: Psychological levels attract disproportionate volume. High vol + rejection = strong S/R. High vol + acceptance = accumulation/distribution. Breakout requires exceptional vol.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-038",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TWO-BAR REVERSAL ON VOLUME: A wide spread bar followed by an equal or wider spread bar in the OPPOSITE direction on EQUAL OR HIGHER volume. This pattern appearing at trend extremes is a powerful reversal signal. The volume MUST be high on both bars. Second bar MUST close beyond midpoint of first bar.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-039",
+    "source": "coulling-volume-price",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME PROFILE IN TRENDING MARKETS: In a healthy uptrend volume builds progressively at higher price levels indicating acceptance is shifting upward. When volume starts building at the WRONG levels (high volume forming at lows during uptrend) the trend is in distribution phase. Volume profile shift signals trend phase shift.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-040",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "HIDDEN BUYING PATTERN: Price drops during the bar but recovers to close at or near the HIGH of the bar on above-average volume. The selling was ABSORBED by smart money buying the dip intrabar while retail was panicking. A high volume hammer appearing at support is a high probability long entry signal.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-041",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "HIDDEN SELLING PATTERN: Price rallies during the bar but reverses to close at or near the LOW of the bar on above-average volume. The buying was ABSORBED by smart money selling the rally intrabar while retail was buying euphorically. A high volume shooting star at resistance is a high probability short.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-042",
+    "source": "coulling-volume-price",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VPA POSITION SIZING: Larger when volume confirms (high vol breakout, low vol test). Smaller when volume contradicts (low vol breakout, high vol pullback). Confidence directly scales size.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-043",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RISING MARKET FALLING VOLUME: Higher highs on progressively lower vol = distribution disguised as uptrend. SM selling each rally. Volume trend reversed. Do NOT add to longs.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-044",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FALLING MARKET FALLING VOLUME: Lower lows on progressively lower vol = accumulation disguised as downtrend. Sellers drying up. SM quietly buying. Watch for bottom formation.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-045",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "CLIMAX VOLUME SPIKE: 3x+ 20-period average at extreme, followed by reversal/narrow range, wide spread on spike. MAJOR turning point - accumulation/distribution complete.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-046",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "VOLUME IN TRIANGLE PATTERNS: Volume should CONTRACT progressively as the triangle pattern develops and range converges. The breakout MUST occur on EXPANDING volume to be considered valid. A low volume breakout from a triangle is false and will likely return into the triangle. Volume at the apex is typically at its lowest.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-047",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME IN FLAGS/PENNANTS: Flagpole on HIGHEST vol. Consolidation on DECLINING. Breakout on renewed expansion. Vol increase during flag = distribution NOT consolidation. Fails.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-048",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VOLUME COMPARISON: Compare to 1) Previous bar. 2) 20-period average. 3) Same price level historically. 4) Similar conditions. Volume only meaningful RELATIVELY. Contextualize.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-049",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME TRENDLINES: Draw on volume like price. Volume trendline break PRECEDES price break. Rising volume break in uptrend = selling pressure. Falling vol break in downtrend = buying returning.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-050",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "content": "SPRINGBOARD EFFECT: When price consolidates at a level with progressively DECLINING volume and NARROWING range, a springboard formation is building. Smart money has completed their accumulation or distribution phase. The inevitable breakout will be EXPLOSIVE in nature. The tighter the range and lower the volume, the bigger the eventual move.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-051",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "content": "VOLUME IN H&S: Left shoulder high vol. Head LOWER. Right shoulder LOWEST. Neckline break HIGH. Vol DECREASES left-to-right is KEY. Right shoulder exceeding head = FAILS.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-052",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "VOLUME IN DOUBLE BOTTOM PATTERN: First bottom forms on high volume representing a selling climax. The rally between the two bottoms occurs on moderate volume. The second bottom forms on MUCH LOWER volume indicating sellers are exhausted. The breakout above resistance should occur on HIGH volume. This high-low-high sequence is IDEAL.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-053",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CONSECUTIVE VOLUME DIVERGENCE: Three+ highs each on progressively lower vol. Sequential MORE reliable than single. Final reversal on wide-spread down bar with vol expansion.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-054",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "VOLUME DRY-UP BEFORE BREAKOUT: Most powerful breakouts preceded by lowest vol in 20+ periods. Accumulation/distribution complete. Breakout on SURGE with strong follow-through.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-055",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "VOLUME ON REVERSAL DAYS: A reversal day creates a new trend extreme that closes beyond the prior close. The SIGNIFICANCE of a reversal day is determined entirely by volume. A high volume reversal day marks a major turning point. A low volume reversal day is merely a minor pause. Volume should be HIGHEST in recent trend.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-056",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "AWESOME OSCILLATOR (AO): 5-period SMA median price minus 34-period SMA median price. Above zero = bullish momentum. Below = bearish. CROSSING zero line = strongest signal. Histogram increasing = accelerating.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-057",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "AO ZERO-LINE CROSS: Negative to positive = buy. Positive to negative = sell. MOMENTUM SHIFT. Never trade against AO zero-line cross. Wait for candle close to confirm.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-058",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "AO SAUCER: Three consecutive AO bars, middle LOWER (buy above zero) or HIGHER (sell below zero). Must form ABOVE zero for buy, BELOW for sell. More reliable than zero-line cross.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-059",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "WILLIAMS %R: 0 to -100. Above -20 = overbought, below -80 = oversold. In uptrend staying overbought = STRENGTH not reversal. Use trend context to interpret.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-060",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "WILLIAMS %R IN TRENDING MARKETS: In a strong uptrend the %R stays OVERBOUGHT in the -20 to 0 zone for extended periods. This is a sign of BULLISH STRENGTH not a reversal signal. In strong downtrends %R stays oversold at -100 to -80. Trade when %R EXITS the extreme zone WITH the trend direction.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-061",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "FRACTAL THEORY: Markets are fundamentally FRACTAL in nature meaning the same patterns repeat at every time scale. A 5-minute chart looks like a daily chart which looks like a weekly chart. Use MULTIPLE timeframes for comprehensive trade analysis. High fractal dimension indicates choppy ranging conditions. Low fractal dimension indicates trending.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-062",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "FRACTAL SIGNAL: UP fractal = bar high HIGHER than two bars each side (5-bar). DOWN fractal = bar low LOWER than neighbors. Broken = continuation. Unbroken = potential reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-063",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "THIRD WISE MAN: Wait for BUY fractal, enter when price breaks ABOVE fractal high. AO must be positive. Stop below fractal low. Fractal breakout = TRIGGER, AO = FILTER.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-064",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ALLIGATOR: Jaw (13 SMMA offset 8, blue, slow). Teeth (8 SMMA offset 5, red). Lips (5 SMMA offset 3, green, fast). TWISTED = sleeping (range). DIVERGE = eating (trend).",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-065",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ALLIGATOR RULES: LIPS crossing ABOVE Teeth+Jaw = BUY. BELOW = SELL. Lips cross back = take profits. NEVER trade when lines intertwined (sleeping = chop).",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-066",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MFI WILLIAMS: (High-Low)/Volume. GREEN (MFI+ Vol+) = continuation. FADE (MFI- Vol-) = pausing. FAKE (MFI+ Vol-) = false move. SQUAT (MFI- Vol+) = battle, breakout imminent.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-067",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "MFI SQUAT: MFI declining + Volume increasing. Price per vol SHRINKING despite heavy participation. Battle in progress. Breakout IMMINENT. Wait then trade aggressively.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-068",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MFI FAKE BAR: MFI is increasing but Volume is DECREASING. Price appears to be moving higher but nobody is actually participating in the move. This is a FALSE move that is likely caused by stop-hunting or low-liquidity drift. The move will REVERSE. Prepare to FADE this move when confirmation appears.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-069",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FIRST WISE MAN: Bullish divergence bar = LOWER LOW but close in UPPER quarter. Bearish = HIGHER HIGH but close in LOWER quarter. Attempt REJECTED. Entry above/below the bar.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-070",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SECOND WISE MAN (AO CONFIRMATION): After the First Wise Man divergence bar signal appears, the AO histogram must show 3 or more consecutive bars moving in the direction of the intended trade. This confirms that momentum is properly aligned with the signal. The Second Wise Man CONFIRMS the First Wise Man but should never be traded alone.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-071",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BALANCE LINE TRADES: The Alligator Jaw (blue line) serves as a balance line between bullish and bearish territory. Price above the balance line is more likely to continue UP. Price below is more likely to continue DOWN. When price CROSSES the balance line against the current trend it signals potential reversal.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-072",
+    "source": "williams-short-term",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "WILLIAMS ADD-ON: Add on each confirmation. Each add-on separate trade with own stop. Trail ALL stops to breakeven once second entry triggered. Pyramiding maximizes trends.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-073",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ELLIOTT SHORT-TERM: 5-wave impulse with trend, 3-wave correction. Trade ONLY with impulse. Enter after wave 2 or 4. Wave 4 cannot enter wave 1 territory. AO zero-line cross = wave 3.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-074",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "AO AND ELLIOTT: Wave 3 begins at AO zero cross in trend direction. Wave 3 = LONGEST, AO peaks. Wave 5 shows AO divergence. AO zero cross opposite = Wave A complete.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-075",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PROFITUNITY SYSTEM: 1) Alligator state. 2) First Wise Man signal. 3) AO momentum. 4) Fractals for breakout. 5) MFI quality filter. Never trade sleeping. Only eating direction.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-076",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "WAVE 4 TRADING: Typically ends at 38.2% of wave 3. Most reliable wave 5 entry. Cannot overlap wave 1. AO pulls toward zero but NOT crossing. Enter when AO turns back.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-077",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CLIMAX TRADING: End of wave 5. Extreme AO + divergence bar + lips crossing. Close all trend positions. Optionally counter-trend with tight stop. Max profit meets min risk.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-078",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "RANGES WILLIAMS: Alligator sleeping = no trend trades. Fractal breakouts: buy lower, sell upper. MFI fade = range holding. MFI squat = breakout imminent, switch to trend.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-079",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RED/GREEN ZONE: Green = AO growing + alligator eating = ADD. Red = AO shrinking + lips crossing = EXIT. Between = maintain with trailing stops. Prevents overtrading.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-080",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MTF FRACTAL ALIGNMENT: Confirm across 3 timeframes: trade TF (entry), higher (direction), lower (precision). All must show alligator eating SAME direction.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-081",
+    "source": "williams-short-term",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "WILLIAMS STOPS: Initial beyond recent fractal opposite direction. Trail to breakeven on first add-on. Trail to each new fractal. NEVER widen. Fractals provide natural levels.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-082",
+    "source": "williams-short-term",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MARKET PARTICIPANTS: 1) Smart money (institutions) - KNOW. 2) Trend followers - FOLLOW. 3) Retail - REACT. Williams tools detect smart money footprint via AO, MFI, alligator.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-083",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "AO PEAK DIVERGENCE: Price new high but AO LOWER = wave 5. Highest probability reversal in Williams system. Divergence bar + lips turning = high conviction sell.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-084",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MFI GREEN BAR: Green (MFI+ Vol+) in eating direction = STRONGEST continuation. Both facilitation AND participation increasing. Add on green bars. Opposite trend = potential change.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-085",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "WAVE 3 TRADING: Typically 1.618x wave 1. BIGGEST money. AO strongest. Entry after wave 2 (50-61.8% retrace), AO turning. BEST risk/reward of any Elliott setup.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-086",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SIGNAL CONVERGENCE: 1) Alligator eating. 2) AO correct. 3) First Wise Man. 4) MFI green. 5) Fractal breakout. 3+ = elevated probability. 5 = maximum size.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-087",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SQUEEZE: Alligator sleeping 13+ bars = building. Longer = bigger move. Wake-up (lips cross) = explosive. Enter aggressively. Stop: middle of squeeze range.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-088",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "EIGHT-WAVE CYCLE: 5 up + 3 down (A-B-C). Waves 1-3 = aggressive trend. Wave 5 = cautious. A-C = counter or sidelines. Map with AO zero-line crosses and fractals.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-089",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "WAVE 5 TRUNCATION: Fails to exceed wave 3. AO divergence + lower high. POWERFUL reversal ahead. A-wave swift and deep. Aggressive short with stop above wave 3.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-090",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CHOPPINESS INDICATOR: When price oscillates back and forth around the alligator lines the market is CHOPPY and you should avoid trend trades entirely. When price stays ABOVE the alligator lips for extended bars it signals a STRONG UPTREND. Distance from the alligator lines measures trend strength objectively.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-091",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "AO ACCELERATION: Bars LARGER consecutively = strong backing. SMALLER despite price continuing = decelerating, approaching exhaustion. Acceleration = add. Deceleration = tighten stops.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-092",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "content": "FRACTAL CHAINS: Unbroken up fractals = downtrend. Unbroken down fractals = uptrend. Chain BROKEN = reversal confirmation. Longer = stronger trend, more powerful when broken.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-093",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "FIVE DIMENSIONS: 1) Fractal (motive). 2) AO (acceleration). 3) Alligator (balance). 4) MFI (facilitation). 5) Direction. ALL five required for complete trade.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-094",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND DEFINITION (E/M): Primary months-years. Secondary weeks-months, retraces 1/3 to 2/3. Minor days-weeks noise. Bull = higher highs+lows. Reversal = LOWER high AND lower low.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-095",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SECONDARY REACTION: Min 3 weeks. Must retrace AT LEAST 1/3 of primary swing. Often 1/2 to 2/3. Volume DRAWS. Ends when price resumes primary with renewed volume.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-096",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SUPPORT: Buying exceeds selling halting downturn. Created by prior lows, volume zones. Strengthens with more tests/volume/time. BROKEN support becomes resistance (role reversal).",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-097",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "RESISTANCE: Selling exceeds buying halting advance. Created by prior highs, volume zones. BROKEN with volume and close ABOVE = resistance becomes support.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-098",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRENDLINES (E/M): Uptrend line along LOWS (support). Downtrend along HIGHS (resistance). 2 points min, 3 for confirmation. Longer held = more significant break. Heavy volume break = reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-099",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FAN LINES: Three successively less steep from same point. First broken = watch. Second = higher probability. Third = TREND REVERSAL CONFIRMED. Third line break is definitive.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-100",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SPEED RESISTANCE LINES: Swing divided into thirds. 1/3 line = first support (strong trends). 2/3 line = second (if broken = reversing). Above 1/3 = strong. Breaking 2/3 = reversal.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-101",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "HEAD AND SHOULDERS: Left shoulder high vol. Head LOWER vol. Right shoulder LOWEST vol. Neckline break HIGH vol. Volume DECREASES left-to-right = KEY. Target: head-to-neckline projected below.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-102",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "DOUBLE TOP: Two peaks SAME level. Second peak volume LOWER. Confirmed ONLY on break below trough on HEAVY volume. Many are consolidation - volume+neckline break ESSENTIAL.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-103",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "DOUBLE BOTTOM: Two troughs same level. Second LOWER vol. Break ABOVE peak between on heavy vol. Target: trough-to-peak projected above. Volume DECLINE on second trough = KEY.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-104",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "TRIANGLES: Symmetrical = neutral. Ascending = flat resistance + rising support (bullish). Descending = flat support + declining (bearish). Volume CONTRACTS. Breakout MUST expand.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-105",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "TRIANGLE BREAKOUT RULES: The breakout should occur between the halfway and three-quarter point of the triangle horizontal distance. Too early means the pattern is incomplete and unreliable. Too late signals weakness. Volume on the breakout must be at minimum 2x the average. Price target is the widest part of the triangle added to the breakout point.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-106",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RECTANGLES: Horizontal parallel S/R. Volume contracts. Up = accumulation, down = distribution. Target: height from breakout. Often misidentified as H&S.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-107",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FLAGS AND PENNANTS: Flag = rectangle tilted AGAINST trend. Pennant = small triangle. DECLINING volume. Breakout on SURGE. Target: flagpole length. Most reliable continuation.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-108",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "WEDGE PATTERNS: A rising wedge is bearish with both converging trendlines sloping UPWARD. A falling wedge is bullish with both lines sloping DOWNWARD. Unlike triangles both lines move in the same direction. Volume typically DRYS UP as the wedge forms. Breakout from a rising wedge generates a sell signal. Falling wedge breakout is a buy signal.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-109",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CUP AND HANDLE: Rounded bottom + small pullback. Cup depth 1/3 to 1/2. Handle in upper half declining vol. Breakout SURGE. Handle max 1/3 cup retrace. Target: cup depth.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-110",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "GAPS: Breakaway = high vol, new move. Runaway = mid-trend, projects remaining. Exhaustion = extreme vol, ending. Island = gap+gap = powerful reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-111",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "THROWBACK/PULLBACK: Returns to test breakout 60-70% of time. Volume should be LOW. HIGH volume throwback = failure. Second chance entry with tighter stop.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-112",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PATTERN FAILURE SIGNALS: A chart pattern that fails to perform its measuring implication is considered a FAILURE and signals a trade in the OPPOSITE direction. A head and shoulders pattern that fails to break the neckline becomes a strong bullish signal. Triangle breakouts that immediately reverse warrant trading in the opposite direction aggressively.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-113",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "REVERSAL vs CONTINUATION: Reversal = significant trend, longer, more vol. Continuation = during trends, shorter, declining vol. Too long continuation = becoming reversal.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-114",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BROADENING FORMATIONS: An expanding range pattern with successively higher highs and lower lows resembling a reverse triangle. Often appears at market TOPS after prolonged advances when volatility increases. Volume is HEAVY and erratic reflecting emotional trading conditions. Each successive swing is wider than the last indicating increasing instability.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-115",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME DOCTRINE (E/M): Without volume = SUSPECT. 1) Breakouts = expanding. 2) Reversals = climax. 3) Continuations = declining in consolidation. 4) Volume confirms DIRECTION.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-116",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MEASURING: H&S = head-to-neckline. Triangle = widest part. Flag = flagpole. Rectangle = height. Cup = depth. All from breakout point. MINIMUM targets.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-117",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ROUNDING PATTERNS: A rounding bottom or saucer formation represents a gradual shift from selling pressure to buying interest. The volume pattern mirrors the price shape forming its own saucer with low volume in the middle and high volume at the edges. These patterns take MONTHS to fully develop and mark MAJOR trend changes at primary degree.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-118",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND CHANNELS: Parallel to trendline at extremes. Failing to reach channel = weakening. Exceeding = accelerating. Break = potential change. Width = volatility.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-119",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "REVERSAL vs CONTINUATION VOLUME: A reversal day occurs when price reaches a new extreme then closes beyond the prior close on HEAVY volume. A continuation day shows price moving in trend direction with normal volume levels. The KEY distinction is the VOLUME which determines whether a new price extreme represents true reversal or mere continuation.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-120",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "DOW THEORY (E/M): 1) Discount everything. 2) Three trends. 3) Three phases. 4) Indices confirm. 5) Volume confirms. 6) Until definitive reversal. Patterns = specific tools.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-121",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "ISLAND REVERSAL PATTERN: A gap occurs in the direction of the prevailing trend followed by several bars of trading activity then a gap BACK in the opposite direction. This leaves an isolated island of price action separated from the main trend. Volume is typically HEAVY on both gaps marking a VIOLENT and sudden trend reversal at major turning points.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-122",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "HORIZONTAL LINES (RECTANGLES): A period of sideways price movement within a narrow range on declining volume. Edwards and Magee termed these formations lines which are equivalent to modern rectangle patterns. A bullish line breaks upward on volume while bearish breaks downward. The LONGER and TIGHTER the line the more powerful the eventual breakout.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-123",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "GAPS AS SUPPORT AND RESISTANCE: Unfilled gaps act as significant support and resistance levels. Breakaway gaps provide the strongest S/R because they start new moves. Runaway gaps offer moderate S/R typically acting as midpoints. Exhaustion gaps provide the weakest S/R and will fill quickly. The volume at the gap determines its S/R strength.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-124",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "PATTERN RELIABILITY HIERARCHY: Edwards and Magee rank patterns by reliability from most to least. 1) Head and Shoulders is the most reliable reversal pattern. 2) Rectangles for continuation. 3) Symmetrical triangles. 4) Double and Triple tops and bottoms. 5) Flags and Pennants. 6) Wedges. 7) Broadening formations are the least reliable.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-125",
+    "source": "grimes-art-science",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MARKET STATES: 1) TRENDING: impulsive legs, overlap < 50%. 2) TIGHT RANGE: narrow, overlapping. 3) LOOSE RANGE: wider swings. 4) BROADENING: expanding. Each requires DIFFERENT strategy.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-126",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SWING STRUCTURE: Uptrend = higher highs + higher lows in SWING POINTS. Swing high = bar high higher than neighbors. Trend REQUIRES 2+ higher highs/lows. Foundation of all analysis.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-127",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "IMPULSE LEG: Strong directional move, minimal overlap. Bars close near extremes in move direction. Volume expands. Defines trend direction and reference points.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-128",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CORRECTIVE LEG: Counter-trend with significant overlap. Bars close near middle or opposite. Volume contracts. Best entries after 2-legged corrections at key S/R.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-129",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SETUP 1 BREAKOUT: Tight range, breakout bar closes beyond on EXPANDING vol. Entry above breakout bar. Stop opposite side. No re-entry on first bar = confirmed.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-130",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SETUP 2 FIRST PULLBACK: After breakout/impulse, wait for FIRST pullback. Entry at S/R within pullback or when closes in trend direction. First pullback = HIGHEST probability.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-131",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SETUP 3 REVERSAL: Trend fails new extreme (truncation), breaks opposite swing. Entry on break of last swing. Risky - requires strong confirmation. MTF alignment helps.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-132",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TWO-LEGGED PULLBACK: Highest probability entry. Leg 1 pullback, bounce, leg 2. Entry after second leg exhaustion (narrow bars, lower vol). Stop below pullback low.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-133",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SIGNAL BAR vs ENTRY BAR: Signal = setup (reversal candle at S/R, narrow in pullback). Entry = trigger (closes above signal high). Good signal: close near extreme, reasonable range.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-134",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "FAILED BREAKOUT TRADE: Breakout immediately reverses back inside. Trade OPPOSITE direction. Entry on re-entry to range. Stop beyond failed extreme. Target: opposite side. Often larger than original.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-135",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MEASURED MOVE: Second impulse leg typically equals FIRST in distance. Used for targets and reversal zones. Exact = reversal likely. Exceeding = acceleration. Falling short = deceleration.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-136",
+    "source": "grimes-art-science",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "POSITION SIZING (GRIMES): Risk 1-2% max per trade. Size = Account Risk / (Entry-Stop). High prob = 2%. Lower = 0.5-1%. NEVER exceed 2%. Size is PRIMARY risk control.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-137",
+    "source": "grimes-art-science",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRAILING STOPS: Trail to each successive swing point. In strong trends trail last significant swing. In extended tighten. Never widen. Scale out: 1/2 at 1:1 R:R, trail rest.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-138",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CONTEXT OVER SIGNAL: Perfect signal in WRONG context = loser. Context: market state, location at S/R, MTF alignment, volume, session time. Assess CONTEXT first, then signals.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-139",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CLIMAX AND REVERSAL: Impulse to extreme on HEAVY vol, wide bars. After: 2-legged correction minimum, often full reversal. Grimes pattern: climax, correction, weak bounce at 50-61.8%, break.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-140",
+    "source": "grimes-art-science",
+    "topic": "ProbabilityAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PROBABILITY FRAMEWORK: Base probability per setup. +5-10% each for: volume confirmation, MTF alignment, key S/R location. -10% each for: counter-trend, extended, conflicting. >70% = full size.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-141",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND STRENGTH: Strong = large impulses, shallow corrections (< 38.2%). Moderate = 38.2-61.8%. Weak = deep retrace (> 61.8%), shrinking impulses. Adjust strategy accordingly.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-142",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "RANGE STRATEGY: Buy near support, sell near resistance with limit orders. Stop beyond boundary. Target opposite boundary. Reduce size. Low vol at boundary = holds. High vol = potential breakout.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-143",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ENTRY TECHNIQUES: Market order on signal bar break (fast but slippage). Limit at structural level (better price, may miss). Stop above signal (confirms momentum, worse price). Match to setup.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-144",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MICRO-CHANNEL: Every bar low above prior low (no pullbacks). EXTREME strength. Do NOT short. Ends with climactic exhaustion + 2-legged correction. Wait for correction to enter.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-145",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "OVERLAP AS TOOL: < 30% overlap = impulse (trending). 30-60% = uncertain. > 60% = corrective/ranging. Objective measurement replacing subjective pattern recognition.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-146",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND RESUMPTION: Range after trend - continuation signals: tight range, declining vol, partial retrace. Reversal: wide range, heavy vol at extremes, full retrace. Trade breakout direction.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-147",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "HIGH-1 AND HIGH-2: Uptrend pullback. High-1 = first higher high (aggressive). High-2 = second (conservative, more reliable). Low-1/Low-2 for downtrend. Bread-and-butter trend entries.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-148",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "REVERSAL BAR: Bar closes beyond prior range opposite direction. Bullish = lower low but close above prior close. CLOSE POSITION critical - upper/lower quarter. Powerful with context.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-149",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "TIGHT RANGE BREAKOUT: 5-20 bars, narrow range. Breakout bar closes beyond boundary on volume. Enter above/below breakout bar. Stop inside range. Failed breakout = trade opposite.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-150",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND CHANNEL BREAKOUT: Channel (parallel lines) in trend. Price breaks channel in trend direction = acceleration (hold/add). Breaks against = trend ending (exit). Channel = visual guide.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-151",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "WEDGE BREAKOUT: Rising wedge (bearish) or falling wedge (bullish). Converging lines. Entry on break. Stop inside wedge. Measured move = widest part of wedge.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-152",
+    "source": "grimes-art-science",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "TRADE MANAGEMENT: Monitor for signal bar pattern degradation. If entry thesis invalidated by new information, EXIT immediately. Do NOT hold and hope. Each bar provides new information.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-153",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "GAP ENTRY: Opening gap in trend direction. Enter on first pullback after gap, not the gap itself. Gap fill on high vol = failure. Gap hold on pullback = continuation.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-154",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "DOUBLE TOP/BOTTOM (GRIMES): Two tests of same level. Second test on lower vol = failure probability. Break of intervening swing = confirmation. Failed double = trade opposite.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-155",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND CLUSTER: Sequence of 3+ impulse legs with 2-legged corrections between. Each impulse roughly equal. When impulses start shrinking = trend maturing. When corrections deepen = ending.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-156",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MULTIPLE TIMEFRAME STRUCTURE: Higher TF sets context (trend/range). Trade TF provides setups. Lower TF provides entry precision. Disagreement between TFs = reduce size or skip.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-157",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "BROADENING RANGE: Expanding swings, higher highs + lower lows. Difficult to trade. Wait for resolution. Breakout from broadening range often marks significant trend beginning.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-158",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ABC CORRECTION: Three-wave correction pattern. A-wave against trend, B-wave partial retrace, C-wave continuing against trend. Entry after C-wave completes at structural level.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-159",
+    "source": "grimes-art-science",
+    "topic": "ProbabilityAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "TRADE QUALITY FILTER: Rate each trade A/B/C/D. A = all factors aligned (take full size). B = most aligned (normal size). C = some conflicting (reduced). D = skip. This prevents overtrading.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-160",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND EXHAUSTION: 1) Impulse legs shrinking. 2) Corrections deepening. 3) Volume declining on impulse. 4) Failed to reach channel line. 5) Multiple divergence signals. Reduce exposure.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-161",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ORIGINAL TREND THEORY (SCHABACKER): Trends exist because human nature is repetitive. Primary trends driven by fundamentals. Secondary by technical factors. Minor by speculation. All three interact.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-162",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SUPPORT/RESISTANCE FOUNDATIONS: Support = concentration of buying orders at a price. Resistance = concentration of selling. Created by prior trading activity at those levels. Memory of price levels.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-163",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND CHANNELS (SCHABACKER): Draw parallel lines enclosing trend. Price oscillates between lines. Narrow channels = strong trend. Wide channels = weak trend. Channel break signals trend change.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-164",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ORIGINAL CHART PATTERN CLASSIFICATION: Schabacker first classified patterns into Reversal (head and shoulders, double/triple tops and bottoms, rounding) and Continuation (triangles, rectangles, flags).",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-165",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "TRIANGLE PATTERNS (ORIGINAL): Symmetrical (indecision), ascending (demand overcoming supply), descending (supply overcoming demand). Volume must CONTRACT during formation. Breakout direction decisive.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-166",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DOUBLE FORMATIONS: Two peaks/troughs at same level. Volume should be LOWER on second test. Break of intervening level on volume confirms. Common reversal pattern at major turning points.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-167",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "HEAD AND SHOULDERS (SCHABACKER): Three peaks with middle highest. Volume decreases left to right. Neckline break on volume confirms. Original comprehensive description of this pattern.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-168",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CONSOLIDATION PATTERNS: Rectangles, triangles, wedges form during trends. Represent pause not reversal. Key distinction: declining volume during formation, expanding on breakout. Duration matters.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-169",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "GAP ANALYSIS (SCHABACKER): Common gaps fill quickly in trading ranges. Breakaway gaps at pattern boundaries rarely fill. Runaway gaps in middle of moves. Exhaustion gaps near end. Island = reversal.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-170",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRENDLINE THEORY: Connect significant lows (uptrend) or highs (downtrend). More touches = more significant. Break on volume = reversal. Steep trendlines less reliable than gradual ones.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-171",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOVING AVERAGES (SCHABACKER): Early advocate of moving averages. Shorter period = more signals, more noise. Longer = fewer signals, more reliable. Crossovers as trend change signals.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-172",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MARKET BREADTH: Number of stocks advancing vs declining. Breadth leading price = healthy market. Breadth lagging price = narrow leadership, warning. Breadth divergence precedes major turns.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-173",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DOW THEORY APPLICATION: Schabacker expanded Dow Theory with specific chart pattern tools. Pattern recognition provides actionable implementation of Dow theoretical principles.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-174",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "PATTERN MEASURING RULES: Minimum move = height of pattern projected from breakout. Applies to rectangles, triangles, H&S. These are MINIMUMS not maximums. Strong moves exceed targets.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-175",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME-PRICE DIVERGENCE: Price making new highs on declining volume = distribution. Price making new lows on declining volume = accumulation. Divergence is WARNING not immediate signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-176",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DISTRIBUTION TOPS: Prolonged sideways action at highs with heavy volume. Smart money selling to eager buyers. When distribution complete, decline is swift and sustained.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-177",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ACCUMULATION BOTTOMS: Prolonged sideways at lows with heavy volume. Smart money buying from panicked sellers. When complete, advance is strong and sustained.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-178",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MINOR PATTERNS: Pennants, flags, small triangles within larger moves. Brief duration (days to weeks). Declining volume. Continuation signals within larger trend. Reliable for short-term trades.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-179",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PATTERN RELIABILITY: Larger patterns more reliable than smaller. Longer-formation patterns more reliable than shorter. Patterns at major S/R more reliable than random locations.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-180",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME AT BREAKOUTS (SCHABACKER): Genuine breakout requires above-average volume. Volume should be 2x+ normal. Low volume breakout is suspicious. Volume confirms the price action.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-181",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ROLE REVERSAL: Broken support becomes resistance. Broken resistance becomes support. This principle is fundamental and applies at all timeframes. The break must be decisive with volume.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-182",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND PERSISTENCE: Trends persist longer than most expect. The majority of profits come from staying in trends, not from calling tops/bottoms. Counter-trend trading is inherently lower probability.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-183",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "RECTANGLE PATTERNS: Horizontal support and resistance containing price. Volume contracts during formation. Breakout on volume determines direction. Measuring rule applies. Often continuation.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-184",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ROUNDING BOTTOMS: Gradual transition from selling to buying interest. Volume mirrors the shape (high at edges, low at bottom). Marks major bottom formations. Takes months to complete.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-185",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SCHABACKER ON TIMING: Technical analysis provides TIMING advantage. Same stock can be good or bad depending on WHEN you buy. Pattern completion provides timing for entries and exits.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-186",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "COT REPORT STRUCTURE: Published weekly (Friday). Shows positions of: Commercial Hedgers (smart money), Large Speculators (trend followers), Small Speculators (retail/contrarian). Net long/short positions per market.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-187",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "COMMERCIAL HEDGERS = SMART MONEY: They have fundamental knowledge of their market. When commercials are EXTREMELY net long = bullish signal. EXTREMELY net short = bearish. They are the best contrarian indicator at extremes.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-188",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LARGE SPECULATORS: Trend followers, CTAs, hedge funds. They follow momentum. EXTREME net long = trend may be overextended. EXTREME net short = trend may be overextended. They are WRONG at extremes.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-189",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SMALL SPECULATORS: Retail traders, smallest positions. Contrarian indicator - WRONG most often at extremes. When small specs are EXTREMELY bullish = market top. EXTREMELY bearish = market bottom.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-190",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "COT INDEX FORMULA: (Current Net Position - Min Net)/(Max Net - Min Net) x 100 over lookback period (typically 52 weeks). Above 80 = extreme bullish. Below 20 = extreme bearish. These extremes signal reversals.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-191",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COT REVERSAL SIGNAL: Commercial hedgers reach extreme position AND begin reversing. The KEY is the REVERSAL from extreme, not just reaching extreme. Hedgers may be early but rarely wrong on direction.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-192",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "HEDGER DIVERGENCE: Price makes new high but commercial hedgers are LESS short (or turning long). Bullish divergence. Price new low but hedgers LESS long (or turning short). Bearish divergence.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-193",
+    "source": "bernstein-cot",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SEASONALITY: Markets have recurring seasonal tendencies based on supply/demand cycles. Agricultural = harvest cycles. Energy = heating/cooling seasons. Financial = quarter-end flows. Combine COT with seasonality for highest probability.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-194",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COMMITMENT OF TRADERS SIGNALS: 1) Hedger extreme + reversal = strong signal. 2) Speculator extreme = warning. 3) Open interest rising + price rising = trend healthy. 4) OI falling + price rising = trend weak.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-195",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "OPEN INTEREST ANALYSIS: Rising OI + rising price = new money entering, trend healthy. Rising OI + falling price = new shorts, bearish. Falling OI + rising price = short covering, weak. Falling OI + falling = long liquidation, near bottom.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-196",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COMMERCIAL HEDGER AS SMART MONEY: Commercials hedge real physical exposure. They KNOW their market fundamentals. Their positioning reflects where they see value. Follow hedger direction at extremes.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-197",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LARGE SPEC AS TREND FOLLOWER: Large specs ride trends via systematic strategies. They ADD to winning positions. Their extreme positioning = trend maturity, not immediate reversal. They are last to exit.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-198",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SMALL SPEC AS CONTRARIAN: Small specs are consistently wrong at extremes. Maximum small spec bullish = top approaching. Maximum bearish = bottom approaching. Their sentiment is a reliable fade.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-199",
+    "source": "bernstein-cot",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SEASONAL TENDENCY PATTERNS: Most markets have 2-3 seasonal tendencies per year. These are NOT guarantees but statistical edges. Best used as a FILTER combined with COT and technical analysis.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-200",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "COMBINING COT WITH TECHNICALS: COT extreme + technical reversal pattern = highest probability trade. COT alone provides DIRECTIONAL bias. Technicals provide TIMING. Together they are complementary.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-201",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COT IN FUTURES MARKETS: Report covers futures positions for major markets. Most useful in commodities and financial futures. Less useful in individual stocks. Best for index, currency, commodity trading.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-202",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "LONG-TERM vs SHORT-TERM COT: COT is a LONG-TERM indicator (weekly data). Extremes can persist for weeks/months before reversal. Use for POSITION trading bias, not day trading signals.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-203",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COMMITMENT OF TRADERS DIVERGENCE: Price new high but hedger net position improving (less short). Strongest signal when combined with declining OI. This divergence precedes major reversals.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-204",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "SPECULATOR EXTREME (BULLISH): Large specs extremely net long. OI rising. Price extended. Commercial hedgers increasingly short. High probability of correction or reversal. Tighten stops on longs.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-205",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "SPECULATOR EXTREME (BEARISH): Large specs extremely net short. OI rising. Price depressed. Commercial hedgers increasingly long. High probability of rally. Start building long positions.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-206",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SPREAD ANALYSIS WITH COT: Commercial spread positions (long nearby, short deferred or vice versa) reveal hedging patterns. Extreme spread positions indicate supply/demand imbalances in specific contract months.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-207",
+    "source": "bernstein-cot",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SEASONALITY IN ENERGY: Heating oil demand peaks Oct-Feb. Gasoline demand peaks May-Sep. Natural gas storage injection Apr-Oct, withdrawal Nov-Mar. COT extremes aligned with seasonals = highest probability.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-208",
+    "source": "bernstein-cot",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SEASONALITY IN GRAINS: Planting season (Apr-May) often bullish uncertainty. Growing season weather premium. Harvest (Sep-Nov) typically bearish supply pressure. COT commercials accumulate before harvest lows.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-209",
+    "source": "bernstein-cot",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SEASONALITY IN FINANCIALS: Bond prices tend to rise (yields fall) in Q1. Equity portfolio rebalancing at quarter-end. Year-end window dressing affects positioning. Tax-related selling Nov-Dec.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-210",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "OI AND TREND MATURITY: In healthy trend OI rises steadily. When OI peaks and starts declining while price continues = trend on borrowed time. No new money entering, only existing positions moving.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-211",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "COT REPORTING LAG: Report reflects positions as of Tuesday, released Friday. 3-day lag. Use for POSITION bias not intraday. Combine with daily technical signals for timing.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-212",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "HEDGING vs SPECULATING: Commercials hedge to OFFSET physical risk. Their futures positions are OPPOSITE to physical exposure. Understanding this reveals what their positioning MEANS for price.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-213",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "COT INDEX EXTREME ZONES: Index above 90 = extreme bullish consensus (very bearish contrarian). Below 10 = extreme bearish consensus (very bullish contrarian). The more extreme, the stronger the reversal signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-214",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CONCENTRATION RATIOS: When single trader or small group holds extreme percentage of open interest = concentration risk. These positions MUST eventually unwind. Creates opportunity for counter-position.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-215",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "COT DIVERGENCE WITH PRICE: Most powerful COT signal. Price makes extreme but commercial positioning NOT confirming. Example: price new high but hedgers covering shorts = distribution occurring. Strong reversal signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-216",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MULTI-MARKET COT ANALYSIS: Compare hedger positioning across RELATED markets. If commercials bullish on crude AND heating oil AND gasoline = strong sector signal. Disagreement between related markets = mixed.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-217",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "OI DIVERGENCE WITH PRICE: Rising price + falling OI = trend weakening (only short covering). Falling price + falling OI = trend weakening (only long liquidation). New trend requires RISING OI confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-218",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "EXTREME POSITIONING CLUSTERS: When ALL three groups (hedgers, large specs, small specs) reach extremes simultaneously = very rare, very powerful reversal signal. Position against the crowd.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-219",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COT IN CURRENCIES: Commercial hedgers in currencies = actual users of currency (multinationals, governments). Their extreme positioning reflects real economic activity. Useful for major currency pairs.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-220",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "REPORTABLE vs NON-REPORTABLE: CFTC sets reporting thresholds. Above = reportable (large). Below = non-reportable (small). Thresholds vary by market. Understanding these categories reveals market structure.",
+    "priority": 3
+  },
+  {
+    "id": "book-vta-221",
+    "source": "coulling-volume-price",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VOLUME PROFILE + VSA INTEGRATION: Use volume profile to identify key S/R zones (HVN/LVN). Use VSA within those zones to detect smart money activity. Volume profile provides LOCATION. VSA provides INTENT. Together they reveal WHERE and WHEN.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-222",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "AO + VOLUME CONFIRMATION: AO zero-line cross + volume expansion = strongest signal. AO cross + declining volume = weak signal, likely to fail. Williams AO combined with Coulling volume analysis creates powerful filter.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-223",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "PATTERN + VOLUME SEQUENCE: Edwards/Magee pattern definitions + Coulling volume rules = complete pattern trading system. Every pattern has specific volume requirements for confirmation. Without volume = pattern suspect.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-224",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SWING STRUCTURE + VOLUME: Grimes swing analysis + Coulling volume analysis. Impulse legs should show expanding volume. Corrective legs contracting. If volume contradicts swing structure, trust VOLUME over price.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-225",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "COT + TECHNICAL CONFLUENCE: COT extreme (hedger reversal) + technical pattern (Edwards/Magee) + volume confirmation (Coulling) + swing structure (Grimes) = highest probability trade. All four aligned.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-226",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME IN ELLIOTT WAVES: Wave 3 should have HIGHEST volume. Wave 5 volume should be LOWER than wave 3 (divergence). Wave A high volume (shock). Wave B lower. Wave C high. Volume confirms wave count.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-227",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ALLIGATOR + MARKET STATE: Alligator eating = Grimes trending state. Alligator sleeping = Grimes range state. Use Grimes setups for each state. Alligator provides the state detection, Grimes provides the tactical playbook.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-228",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PULLBACK ENTRY MASTER CLASS: Edwards/Magee throwback/pullback (60-70% occurrence) + Grimes two-legged pullback + Coulling low volume test = complete pullback entry system. Each book adds a layer.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-229",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "CLIMAX IDENTIFICATION CROSS-BOOK: Coulling climax volume + Williams wave 5 divergence + Edwards/Magee reversal day + Grimes climax pattern = multi-source confirmation of major turning point.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-230",
+    "source": "schabacker-ta-profits",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ORIGINAL TA FOUNDATION: Schabacker established that chart patterns repeat due to human psychology. All subsequent pattern work (Edwards/Magee, Williams, Grimes) builds on this foundation. Patterns = psychology.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-231",
+    "source": "grimes-art-science",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CROSS-BOOK RISK MANAGEMENT: Grimes 1-2% risk rule. Williams pyramiding with separate stops per unit. Coulling volume-based sizing. Combined: risk 1% base, add with volume confirmation, pyramid with each signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-232",
+    "source": "bernstein-cot",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COT + SEASONALITY + TECHNICALS: When COT extreme aligns with seasonal tendency AND technical pattern = three-dimensional confirmation. Each source independent. Together they filter false signals.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-233",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VOLUME AS TRUTH: Price can be manipulated short-term. Volume reveals the truth behind price action. Every book in this collection emphasizes volume confirmation. Volume is the one indicator that cannot be faked.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-234",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MULTI-INDICATOR CONVERGENCE: Williams five dimensions + Coulling volume analysis + Edwards/Magee pattern recognition. When multiple independent systems agree = statistical edge maximized. Trade these convergences.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-235",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "FRACICAL ALIGNMENT ACROSS BOOKS: Williams fractal theory + Grimes market structure + Edwards/Magee pattern hierarchy. All recognize that markets are self-similar across timeframes. Use this for multi-TF analysis.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-236",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "ACCUMULATION/DISTRIBUTION MASTER FRAMEWORK: Coulling VPA phases + Edwards/Magee rectangle patterns + Schabacker accumulation concept + Williams alligator sleeping = complete accumulation/distribution identification.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-237",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SENTIMENT INTEGRATION: COT positioning + Coulling smart money volume patterns + Williams market participant analysis = three-layer sentiment model. Hedger position + volume footprint + momentum = complete picture.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-238",
+    "source": "grimes-art-science",
+    "topic": "ProbabilityAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "EDGE QUANTIFICATION: Each book provides different edge components. Volume edge (Coulling). Pattern edge (Edwards/Magee). Momentum edge (Williams). Structural edge (Grimes). Sentiment edge (Bernstein). Stack edges.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-239",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME CONFIRMATION HIERARCHY: 1) Climax volume at extremes (strongest). 2) Volume expansion on breakout. 3) Volume contraction on pullback. 4) Volume divergence as warning. This hierarchy applies to ALL patterns.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-240",
+    "source": "williams-short-term",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND FOLLOWING + ELLIOTT: Williams simplified Elliott for practical use. Combine with Grimes swing structure for wave identification. Coulling volume for wave confirmation. Three tools for one framework.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-241",
+    "source": "edwards-magee-trends",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "PATTERN FAILURE AS SIGNAL: Edwards/Magee pattern failures + Grimes failed breakout trade = same concept. When expected pattern fails, trade the OPPOSITE direction aggressively. Failure is information.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-242",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SMART MONEY DETECTION FRAMEWORK: Coulling VPA (volume-price divergence) + Bernstein COT (hedger positioning) + Wyckoff concepts (accumulation/distribution). Three independent methods to detect institutional activity.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-243",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ENTRY PRECISION: Edwards/Magee for pattern context. Grimes for signal/entry bar timing. Coulling for volume confirmation at entry. Williams for momentum alignment. Four layers for precise entries.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-244",
+    "source": "bernstein-cot",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "COT SEASONALITY APPLICATION: Identify seasonal tendency first. Check COT for commercial positioning. If hedgers align with seasonal = double confirmation. If opposing = seasonal may fail. Technicals provide timing.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-245",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VOLUME AS LEADING INDICATOR: Coulling emphasizes volume leads price. Schabacker noted same. Edwards/Magee require volume confirmation. Williams MFI measures volume quality. All four books treat volume as primary, not secondary.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-246",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "TWO-LEGGED PULLBACK MASTER: Grimes defines two-legged pullback as highest prob entry. Williams Elliott wave 4 is typically two-legged. Edwards/Magee throwback is one-legged. Two legs = stronger confirmation than one.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-247",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "BREAKOUT PREPARATION: Coulling volume dry-up + Grimes tight range + Edwards/Magee triangle/rectangle + Williams squeeze = all identify same pre-breakout condition. Low vol + tight range + alligator sleeping = energy building.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-248",
+    "source": "bernstein-cot",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "CAPITULATION DETECTION: Coulling selling climax volume + Bernstein commercial hedgers turning net long + Williams AO divergence at wave 5 low + Edwards/Magee reversal day = capitulation bottom. Multi-source confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-vta-249",
+    "source": "grimes-art-science",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND QUALITY SCORING: Grimes impulse/correction quality + Coulling volume pattern + Williams alligator alignment + Edwards/Magee trend structure. Score each 0-10. Total > 30 = high quality trend. < 20 = avoid.",
+    "priority": 4
+  },
+  {
+    "id": "book-vta-250",
+    "source": "coulling-volume-price",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "UNIVERSAL TRUTH: Every book confirms - volume is the most important secondary indicator. Price is primary. Volume confirms or denies price action. When price and volume disagree, trust VOLUME. This is non-negotiable.",
+    "priority": 5
+  }
+]

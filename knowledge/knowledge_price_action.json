@@ -1,0 +1,3132 @@
+[
+  {
+    "id": "pa-001",
+    "source": "wyckoff",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "tags": [
+      "wyckoff-accumulation",
+      "volume-analysis",
+      "btc-core"
+    ],
+    "content": "WYCKOFF ACCUMULATION — Phases A-E: SC extreme vol → AR sets range high. Phase B: SM accumulates in range. Phase C: THE SPRING — false drop below support LOW volume. HIGHEST PROBABILITY entry. Phase D: SOS break above AR high expanding vol. Phase E: Markup. KEY: Spring must be LOW vol — high vol = real breakdown.",
+    "priority": 5
+  },
+  {
+    "id": "pa-002",
+    "source": "wyckoff",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "tags": [
+      "wyckoff-distribution",
+      "volume-analysis",
+      "btc-core"
+    ],
+    "content": "WYCKOFF DISTRIBUTION — Mirror at tops. BC extreme vol → AR sets range low. Phase B: SM distributes. Phase C: THE UTAD — spike above resistance LOW volume, traps late buyers. Phase D: SOW break below AR low. Phase E: Markdown. UTAD must be LOW vol.",
+    "priority": 5
+  },
+  {
+    "id": "pa-003",
+    "source": "wyckoff",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "tags": [
+      "wyckoff-spring",
+      "entry-rules",
+      "stop-placement",
+      "btc-core"
+    ],
+    "content": "SPRING ENTRY — 1) Price below support. 2) Volume LOW. 3) Rapid recovery above support. 4) SOS expanding vol. Entry: After recovery + confirmation candle. Stop: Below Spring low. Target: Range high. Spring = institutional stop-hunt to fill orders.",
+    "priority": 5
+  },
+  {
+    "id": "pa-004",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "effort-vs-result",
+      "fundamental-rule"
+    ],
+    "content": "EFFORT vs RESULT — Volume = effort. Spread = result. Agree = genuine trend. Diverge = absorbing. High vol + narrow spread = absorption. Most powerful VPA signal.",
+    "priority": 5
+  },
+  {
+    "id": "pa-005",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "absorption",
+      "institutional"
+    ],
+    "content": "HIGH VOL + NARROW SPREAD = ABSORPTION — SM buying while capping price. At tops: distributing without letting fall. Tighter spread on high vol = larger institutional order. The #1 signal for detecting smart money activity.",
+    "priority": 5
+  },
+  {
+    "id": "pa-006",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "tags": [
+      "volume-analysis",
+      "climax",
+      "distribution"
+    ],
+    "content": "BUYING CLIMAX — 1) Massive vol spike (highest in weeks). 2) Wide spread up. 3) Often gaps. 4) Followed by narrow spread or reversal. SM DISTRIBUTING. Crypto: highest hourly vol in 30+ days at cycle high + extreme positive funding.",
+    "priority": 5
+  },
+  {
+    "id": "pa-007",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "tags": [
+      "volume-analysis",
+      "climax",
+      "accumulation"
+    ],
+    "content": "SELLING CLIMAX — 1) Extreme vol spike. 2) Wide spread down. 3) Panic/capitulation. 4) Followed by narrow spread or reversal. SM ACCUMULATING. Crypto: highest daily vol in 90+ days + massive liquidation cascade.",
+    "priority": 5
+  },
+  {
+    "id": "pa-008",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "testing",
+      "confirmation"
+    ],
+    "content": "TESTING — After high-vol event, price returns on MUCH LOWER vol. Low vol test of climax = exhausted (reversal). Low vol test of breakout = valid (continuation). HIGH vol on test = FAILURE. Most important volume confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "pa-009",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "breakout",
+      "confirmation"
+    ],
+    "content": "BREAKOUT VOLUME — Genuine: 2-3x average expanding. Fake: low/declining. After breakout: elevated on continuation, contracts on pullbacks. Vol surge on pullback = FAILING. Compare to 20-period avg on spot volume.",
+    "priority": 5
+  },
+  {
+    "id": "pa-010",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "leading-indicator"
+    ],
+    "content": "VOLUME PRECEDES PRICE — Volume trends change BEFORE price. Declining vol in uptrend = waning buying. Declining vol in downtrend = sellers drying up. Rising vol before breakout = accumulation ending.",
+    "priority": 5
+  },
+  {
+    "id": "pa-011",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "three-dimensions",
+      "framework"
+    ],
+    "content": "VSA THREE DIMENSIONS — 1) Volume (effort). 2) Spread (result). 3) Close position. Close HIGH + high vol = demand. Close LOW + high vol = supply. Close MIDDLE + high vol = ABSORPTION. Evaluate all three.",
+    "priority": 5
+  },
+  {
+    "id": "pa-012",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "support-resistance",
+      "breakout-prediction"
+    ],
+    "content": "VOLUME AT S/R — Declining vol approaching support = HOLDS. Expanding vol approaching = BREAKS. Same for resistance. Highest vol level = most significant S/R.",
+    "priority": 5
+  },
+  {
+    "id": "pa-013",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "head-and-shoulders",
+      "reversal"
+    ],
+    "content": "HEAD AND SHOULDERS — Most reliable reversal. Left shoulder high vol, head LOWER, right shoulder LOWEST. Neckline break HIGH vol. Volume DECREASES left-to-right = KEY. Target: head-to-neckline projected. Right shoulder exceeding head = FAILS.",
+    "priority": 5
+  },
+  {
+    "id": "pa-014",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "chart-pattern",
+      "flags-pennants",
+      "continuation"
+    ],
+    "content": "FLAGS & PENNANTS — Highest probability continuation. Declining vol, SURGE on breakout. Target: flagpole length. High & Tight Flags ranked #1 overall (69% avg rise, 1% failure).",
+    "priority": 5
+  },
+  {
+    "id": "pa-015",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "candlestick",
+      "confirmation-rule",
+      "fundamental"
+    ],
+    "content": "CONFIRMATION RULE — Always wait for confirmation. Bullish: close above pattern high. Bearish: close below pattern low. Without = potential only. #1 rule for candlestick trading. Patience prevents losses.",
+    "priority": 5
+  },
+  {
+    "id": "pa-016",
+    "source": "orderflow",
+    "topic": "OrderFlow",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "liquidation-cascades",
+      "crypto-adapted"
+    ],
+    "content": "LIQUIDATION CASCADES — 1) Price hits liquidation level. 2) Forced selling. 3) More liquidations. 4) Liquidity vacuum. 5) MM stabilizes. Entry: Buy V-recovery when OI dropped 20%+. Crypto's Wyckoff Springs.",
+    "priority": 5
+  },
+  {
+    "id": "pa-017",
+    "source": "orderflow",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-profile",
+      "hvnodes",
+      "lvnodes"
+    ],
+    "content": "VOLUME PROFILE S/R — HVN = acceptance, consolidates. LVN = rejection, moves quickly. Pullbacks TO HVN. Breakouts THROUGH LVN. POC = fair value. Value Area H/L = boundaries.",
+    "priority": 5
+  },
+  {
+    "id": "pa-018",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "market-structure",
+      "swing-analysis",
+      "trend-definition"
+    ],
+    "content": "SWING STRUCTURE — Uptrend = HH + HL in swing points. Downtrend = LH + LL. Trend REQUIRES 2+ swings. Foundation of all analysis.",
+    "priority": 5
+  },
+  {
+    "id": "pa-019",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "market-structure",
+      "context-over-signal"
+    ],
+    "content": "CONTEXT OVER SIGNAL — Perfect signal in WRONG context = loser. Context: market state, S/R location, MTF alignment, volume, session. Assess CONTEXT first, then signals.",
+    "priority": 5
+  },
+  {
+    "id": "pa-020",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "price-action-pullback",
+      "high1-high2"
+    ],
+    "content": "H1/H2 ENTRIES — H1: First pullback in bull trend, buy above its high. H2: Second pullback (two-legged), more reliable. Often at trendline/MA. L1/L2 for downtrend. Bread-and-butter trend entries.",
+    "priority": 5
+  },
+  {
+    "id": "pa-021",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-structure",
+      "two-legged-pullback"
+    ],
+    "content": "TWO-LEGGED PULLBACK — Highest probability entry. Leg 1, bounce, leg 2. Entry after 2nd leg exhaustion (narrow bars, lower vol). Stop below pullback low. Most corrections have two legs.",
+    "priority": 5
+  },
+  {
+    "id": "pa-022",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-structure",
+      "failed-signal"
+    ],
+    "content": "FAILED SIGNAL / TRAP — Entry bar reverses, trapping traders. Trade trap in opposite direction. Failed moves = FAST opposite moves. Trapped traders exiting = momentum. Most breakouts fail.",
+    "priority": 5
+  },
+  {
+    "id": "pa-023",
+    "source": "risk",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "position-sizing",
+      "percent-risk"
+    ],
+    "content": "PERCENT RISK SIZING — Equity × Risk% ÷ (Entry-Stop) = position. Standard 0.5-1%. Auto-adjusts: bigger winning, smaller losing. Anti-martingale. Position sizing THE most important factor.",
+    "priority": 5
+  },
+  {
+    "id": "pa-024",
+    "source": "risk",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "2-percent-rule",
+      "max-risk"
+    ],
+    "content": "2% RULE — Never risk >2% per trade. $100K = $2,000 max. Calculate before entry. Professionals risk LESS. If stop would risk >2%, reduce size or skip.",
+    "priority": 5
+  },
+  {
+    "id": "pa-025",
+    "source": "risk",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "drawdown-rules",
+      "survival"
+    ],
+    "content": "DRAWDOWN RULES — 3 losers: stop day. 5: stop week. 10% DD: reduce 50%. 20%: minimum size. 25%: close all, break. Capital preservation > profit.",
+    "priority": 5
+  },
+  {
+    "id": "pa-026",
+    "source": "edwards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "support-resistance",
+      "role-reversal"
+    ],
+    "content": "ROLE REVERSAL — Broken support = resistance. Broken resistance = support. All timeframes. Break with volume. Retest = entry with stop beyond. Most reliable when tested multiple times before breaking.",
+    "priority": 5
+  },
+  {
+    "id": "pa-027",
+    "source": "wyckoff",
+    "topic": "Execution",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "tags": [
+      "wyckoff-utad",
+      "entry-rules"
+    ],
+    "content": "UTAD SHORT — Spike above resistance LOW vol, reverses. Entry: Short after falls below resistance + vol confirm. Stop: Above UTAD high. Target: Range low. HIGH vol breakout = genuine, do NOT short.",
+    "priority": 4
+  },
+  {
+    "id": "pa-028",
+    "source": "wyckoff",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "tags": [
+      "wyckoff-spring",
+      "crypto-adapted"
+    ],
+    "content": "CRYPTO SPRING — BTC: 1) Drop below key support. 2) Liquidation cascades. 3) Vol spikes then dries up. 4) Recovery within 1-3 candles. 5) OI decreases. Entry: Buy recovery. Stop: Below spring 1-2 ATR. Expect 5-15% below support.",
+    "priority": 4
+  },
+  {
+    "id": "pa-029",
+    "source": "wyckoff",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "tags": [
+      "wyckoff-distribution",
+      "crypto-adapted"
+    ],
+    "content": "CRYPTO DISTRIBUTION — BTC tops: 1) Parabolic on declining vol. 2) BC on highest vol months. 3) Drop then weak rally. 4) Lower highs. 5) UTAD (low vol). 6) Break below. Whale wallets to exchanges + extreme funding = distribution.",
+    "priority": 4
+  },
+  {
+    "id": "pa-030",
+    "source": "wyckoff",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "wyckoff-composite-operator",
+      "crypto-adapted"
+    ],
+    "content": "COMPOSITE OPERATOR CRYPTO — ETF custodians, MicroStrategy, whales accumulate/distribute over weeks-months. 1) Accumulate during fear. 2) Distribute during euphoria. 3) Create ranges. 4) Use springs/UTADs. Whale wallet balance reveals.",
+    "priority": 4
+  },
+  {
+    "id": "pa-031",
+    "source": "wyckoff",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "wyckoff-sos",
+      "confirmation"
+    ],
+    "content": "SIGN OF STRENGTH — After Spring: 1) Breaks AR high. 2) Expanding vol. 3) Pullbacks low vol. 4) Higher highs. Entry: First pullback after SOS. Stop: Below last higher low. Validates Spring was trap.",
+    "priority": 4
+  },
+  {
+    "id": "pa-032",
+    "source": "orderflow",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "footprint-charts",
+      "stacked-imbalances"
+    ],
+    "content": "STACKED IMBALANCES — Buy:sell ratio >3:1 across 3+ price levels. Become reliable S/R. Aggressive buyers defend zone. Use as pullback entry zones.",
+    "priority": 4
+  },
+  {
+    "id": "pa-033",
+    "source": "orderflow",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "tags": [
+      "open-interest",
+      "crypto-adapted"
+    ],
+    "content": "OI + PRICE — Rising OI + rising price = healthy. Rising OI + falling = new shorts. Falling OI + rising = covering (weak). Falling + falling = liquidation (near bottom). New trend requires RISING OI.",
+    "priority": 4
+  },
+  {
+    "id": "pa-034",
+    "source": "orderflow",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "tags": [
+      "open-interest",
+      "divergence"
+    ],
+    "content": "OI DIVERGENCE — Rising price + falling OI = weakening (only covering). Falling price + falling OI = weakening (only liquidation). New ATH with declining OI = spot-driven without leverage conviction.",
+    "priority": 4
+  },
+  {
+    "id": "pa-035",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "trend-health"
+    ],
+    "content": "HEALTHY TREND VOL — Uptrend: vol EXPANDS rallies, CONTRACTS pullbacks. Downtrend: opposite. Unhealthy = contracts on rallies or expands on pullbacks = distribution/accumulation.",
+    "priority": 4
+  },
+  {
+    "id": "pa-036",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "divergence"
+    ],
+    "content": "VOLUME DIVERGENCE — Bearish: price HH but vol LOWER. Bullish: price LL but vol LOWER. Confirm by price action. Divergence = WARNING not signal. 3+ consecutive = stronger.",
+    "priority": 4
+  },
+  {
+    "id": "pa-037",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "climax-spike"
+    ],
+    "content": "CLIMAX VOLUME — 3x+ 20-period avg at extreme, then reversal/narrow range. MAJOR turning point. Crypto: highest vol bar in 50+ periods at cycle extreme = climactic reversal.",
+    "priority": 4
+  },
+  {
+    "id": "pa-038",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "tags": [
+      "volume-analysis",
+      "no-supply"
+    ],
+    "content": "NO SUPPLY — Bearish candle, VERY LOW vol, NARROW spread in downtrend. Sellers EXHAUSTED. Bullish at support after decline. Entry: Buy confirmation above bar high. Stop: Below bar low.",
+    "priority": 4
+  },
+  {
+    "id": "pa-039",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "tags": [
+      "volume-analysis",
+      "no-demand"
+    ],
+    "content": "NO DEMAND — Bullish candle, VERY LOW vol, NARROW spread in uptrend. Buyers EXHAUSTED. Bearish at resistance after advance. Entry: Short confirmation below bar low. Stop: Above bar high.",
+    "priority": 4
+  },
+  {
+    "id": "pa-040",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "tags": [
+      "volume-analysis",
+      "upthrust"
+    ],
+    "content": "UPTHRUST — Wide spread UP high vol, CLOSES near LOW. Spike up then slammed. TRAP for buyers. Short confirmation below upthrust low. Stop: Above high.",
+    "priority": 4
+  },
+  {
+    "id": "pa-041",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "tags": [
+      "volume-analysis",
+      "spring"
+    ],
+    "content": "SHAKEOUT/SPRING — Wide spread DOWN piercing below support then reversing. Low vol = spring (trap). High vol = real breakdown. Must RECOVER above support quickly. Buy recovery.",
+    "priority": 4
+  },
+  {
+    "id": "pa-042",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "tags": [
+      "volume-analysis",
+      "dry-up-breakout"
+    ],
+    "content": "VOL DRY-UP BEFORE BREAKOUT — Most powerful breakouts preceded by lowest vol in 20+ periods. A/D complete. Breakout on SURGE. Declining exchange vol + BB squeeze + flat OI in crypto.",
+    "priority": 4
+  },
+  {
+    "id": "pa-043",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "rising-falling-vol"
+    ],
+    "content": "RISING MKT + FALLING VOL — HH on progressively lower vol = distribution. SM selling each rally. Volume trend reversed. Do NOT add to longs. Tighten stops.",
+    "priority": 4
+  },
+  {
+    "id": "pa-044",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "falling-falling-vol"
+    ],
+    "content": "FALLING MKT + FALLING VOL — LL on progressively lower vol = accumulation. Sellers drying up. SM buying. Watch for bottom. Crypto: declining exchange reserves + declining spot vol at lows.",
+    "priority": 4
+  },
+  {
+    "id": "pa-045",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "chart-pattern",
+      "h-s-performance"
+    ],
+    "content": "H&S TOPS — Avg decline 29% bear, 34% bull. Failure 1% bear. Throwback 64%. Vol increases on breakdown. Complex (multiple shoulders) similar. Ranked #6 bear.",
+    "priority": 4
+  },
+  {
+    "id": "pa-046",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "chart-pattern",
+      "inverse-h-s"
+    ],
+    "content": "INVERSE H&S — Avg rise 30% bear, 41% bull. Failure 4%. Pullback 51%. Vol increases on breakout. Buy above neckline. Most reliable bottom reversal.",
+    "priority": 4
+  },
+  {
+    "id": "pa-047",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "double-bottom"
+    ],
+    "content": "DOUBLE BOTTOM — A&A (two narrow V): 37% bull, strongest. E&E (two rounded): 36%, ranked #6. Confirmed on break above confirmation high. Vol lower on second test = KEY.",
+    "priority": 4
+  },
+  {
+    "id": "pa-048",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "double-top"
+    ],
+    "content": "DOUBLE TOP — E&E (two rounded): 25% bear decline, failure 2%, very reliable. Second peak vol LOWER. Confirmed on break below confirmation low.",
+    "priority": 4
+  },
+  {
+    "id": "pa-049",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "triangles"
+    ],
+    "content": "TRIANGLE BREAKOUT — Symmetrical: neutral. Ascending: bullish. Descending: bearish. Vol CONTRACTS. Breakout 1/2-3/4 of triangle. Vol 2x+ avg. Target: widest part projected.",
+    "priority": 4
+  },
+  {
+    "id": "pa-050",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "throwback-pullback"
+    ],
+    "content": "THROWBACK/PULLBACK — 62% bull breakouts throwback. 54% bear pullback. Avg retrace 48%, 10-15 days. Resumes 67% of time. Buy throwback at breakout level. HIGH vol throwback = failure.",
+    "priority": 4
+  },
+  {
+    "id": "pa-051",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "failure-signal"
+    ],
+    "content": "PATTERN FAILURE — Pattern failing its measuring implication signals OPPOSITE direction. H&S failing neckline = strong bullish. Triangle breakout reversing = trade opposite. Failure is information.",
+    "priority": 4
+  },
+  {
+    "id": "pa-052",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "engulfing"
+    ],
+    "content": "BULLISH/BEARISH ENGULFING — White engulfs black after downtrend (bullish). Black engulfs white (bearish). Three criteria: trend, wraps, opposite colors. Stronger if first small, second large. Heavy vol increases significance.",
+    "priority": 4
+  },
+  {
+    "id": "pa-053",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "hammer"
+    ],
+    "content": "HAMMER — Small body at top, long lower shadow (2-3x body) after downtrend. Requires bullish confirmation (close above hammer high). Strong at support. Crypto: wick >3x body = reversal.",
+    "priority": 4
+  },
+  {
+    "id": "pa-054",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "morning-evening-star"
+    ],
+    "content": "MORNING/EVENING STAR — Three-candle reversal. Star = indecision. More powerful if doji. Vol increases on third candle. Key reversal at S/R.",
+    "priority": 4
+  },
+  {
+    "id": "pa-055",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "candlestick",
+      "candle-sr"
+    ],
+    "content": "CANDLE S/R — Bearish engulfing/dark cloud highs = resistance. Bullish engulfing/piercing lows = support. Cluster at same level = very strong zone. Long upper shadows = resistance. Long lower = support.",
+    "priority": 4
+  },
+  {
+    "id": "pa-056",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "gap-windows"
+    ],
+    "content": "GAP/WINDOW — Rising window: continuation, gap = support. Falling window: gap = resistance. Three windows = exhausted but valid until last closed. Fill on high vol = failure. CME BTC gaps fill ~90%.",
+    "priority": 4
+  },
+  {
+    "id": "pa-057",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-bar",
+      "reversal-bar"
+    ],
+    "content": "REVERSAL BAR — Bull: close above open/midpoint, lower tail 1/3-1/2 bar. Bear: mirror. Followed by strong entry bar. Strongest at S/R. Entry above/below. Stop beyond extreme.",
+    "priority": 4
+  },
+  {
+    "id": "pa-058",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-bar",
+      "two-bar-reversal"
+    ],
+    "content": "TWO-BAR REVERSAL — Bull: bear + bull closing above both opens. Bear: mirror. Entry on break of 2nd bar. Stop beyond pattern. Most common reversal all timeframes.",
+    "priority": 4
+  },
+  {
+    "id": "pa-059",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-bar",
+      "inside-bar"
+    ],
+    "content": "INSIDE BAR — Range within prior. Contraction. Breakout setup either direction. ii = tighter. iii = tightest, highest prob. Stop orders both sides.",
+    "priority": 4
+  },
+  {
+    "id": "pa-060",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-structure",
+      "measured-move"
+    ],
+    "content": "MEASURED MOVE — Leg 2 = Leg 1 distance. All timeframes. Exact = reversal likely. Exceeding = acceleration. Short = deceleration. Most common target method.",
+    "priority": 4
+  },
+  {
+    "id": "pa-061",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-structure",
+      "s-r-flip"
+    ],
+    "content": "S/R FLIP — Broken support = resistance. Broken resistance = support. Retest = 'last kiss' entry. Stop beyond level. More touches before break = stronger flip.",
+    "priority": 4
+  },
+  {
+    "id": "pa-062",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "price-action-structure",
+      "breakout-pullback-entry"
+    ],
+    "content": "BREAKOUT PULLBACK — After strong breakout bar, wait 1-3 bars pullback (<50% of breakout). Enter on first trend-direction bar. Stop beyond breakout bar. High probability.",
+    "priority": 4
+  },
+  {
+    "id": "pa-063",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-structure",
+      "climax-reversal"
+    ],
+    "content": "CLIMAX REVERSAL — Extended trend + 5+ trend bars, huge bar + immediate reversal. Don't chase. Wait for 2-legged correction. Often followed by range, not immediate reversal.",
+    "priority": 4
+  },
+  {
+    "id": "pa-064",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-structure",
+      "breakout-test"
+    ],
+    "content": "BREAKOUT TEST — After breakout, pullback to test level. Holds = continuation. Breaks back = reversal. Buy/sell test. Stop beyond. Higher probability than chasing.",
+    "priority": 4
+  },
+  {
+    "id": "pa-065",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-structure",
+      "failed-h2-l2"
+    ],
+    "content": "FAILED H2/L2 — When H2/L2 fails, becomes strong OPPOSITE signal. Failed bear setup = strong bull. Trade failure with tight stop beyond failed signal.",
+    "priority": 4
+  },
+  {
+    "id": "pa-066",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "market-structure",
+      "impulse-correction"
+    ],
+    "content": "IMPULSE vs CORRECTIVE — Impulse: <30% overlap, closes near extremes, vol expands. Corrective: >60% overlap, closes middle, vol contracts. 30-60% = uncertain.",
+    "priority": 4
+  },
+  {
+    "id": "pa-067",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "tags": [
+      "setup",
+      "failed-breakout"
+    ],
+    "content": "FAILED BREAKOUT SETUP — Breakout reverses immediately. Trade OPPOSITE. Entry on re-entry to range. Stop beyond failed extreme. Target: opposite side. Often larger than original.",
+    "priority": 4
+  },
+  {
+    "id": "pa-068",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "market-structure",
+      "multi-timeframe"
+    ],
+    "content": "MTF STRUCTURE — Higher TF: context. Trade TF: setups. Lower TF: precision. Disagreement = reduce size or skip. Higher ALWAYS overrides lower.",
+    "priority": 4
+  },
+  {
+    "id": "pa-069",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "tags": [
+      "tight-range-breakout"
+    ],
+    "content": "TIGHT RANGE BREAKOUT — 5-20 bars, narrow range. Breakout closes beyond on volume. Enter above/below. Stop inside range. Failed = trade opposite. Powerful reversal.",
+    "priority": 4
+  },
+  {
+    "id": "pa-070",
+    "source": "volman",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action",
+      "body-analysis"
+    ],
+    "content": "CANDLE BODY READING — Large body = conviction. Small = indecision. Close near high = bullish, near low = bearish. Growing = strengthening. Shrinking = weakening.",
+    "priority": 4
+  },
+  {
+    "id": "pa-071",
+    "source": "volman",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action",
+      "drill-down-entry"
+    ],
+    "content": "DRILL-DOWN — HTF for bias, LTF for entry. 60min + 5min. Only when aligned. Checklist: 1) HTF direction. 2) Pullback to S/R. 3) Rejection candle. 4) Enter on break. 5) Stop beyond zone.",
+    "priority": 4
+  },
+  {
+    "id": "pa-072",
+    "source": "volman",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action",
+      "pullback-entry"
+    ],
+    "content": "PULLBACK ENTRY — Wait for trend, enter on pullback. 1-3 candles, <50% of impulse. First reversal candle in trend direction. Stop beyond extreme. BE at 1:1.",
+    "priority": 4
+  },
+  {
+    "id": "pa-073",
+    "source": "volman",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action",
+      "false-break"
+    ],
+    "content": "FALSE BREAK — Price breaks then reverses. Enter counter-breakout. Stop beyond false extreme. Target: opposite side. More convincing = stronger reversal. More profitable than real breakouts.",
+    "priority": 4
+  },
+  {
+    "id": "pa-074",
+    "source": "volman",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action",
+      "confluence"
+    ],
+    "content": "CONFLUENCE ZONES — Prior S/R + round number + MA + trendline + Fibonacci at same level. More = stronger. Single-factor weaker. 3+ = highest probability.",
+    "priority": 4
+  },
+  {
+    "id": "pa-075",
+    "source": "edwards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "support-resistance",
+      "trendlines"
+    ],
+    "content": "TRENDLINES — Uptrend along LOWS. Downtrend along HIGHS. 2 points min, 3 confirms. More touches = valid. Longer = more significant break. Heavy vol break = reversal.",
+    "priority": 4
+  },
+  {
+    "id": "pa-076",
+    "source": "edwards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "support-resistance",
+      "channels"
+    ],
+    "content": "TREND CHANNELS — Parallel to trendline. Failing to reach = weakening. Exceeding = accelerating. Break = potential change. Sell at upper in uptrend. Redraw as accelerates.",
+    "priority": 4
+  },
+  {
+    "id": "pa-077",
+    "source": "edwards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "gaps",
+      "classification"
+    ],
+    "content": "GAP TYPES — 1) Common: fills, avoid. 2) Breakaway: high vol, new trend. 3) Runaway: mid-trend. 4) Exhaustion: extreme vol, end. 5) Island: gap+gap = reversal. Low vol gap = meaningless.",
+    "priority": 4
+  },
+  {
+    "id": "pa-078",
+    "source": "williams",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "alligator",
+      "trend-detection"
+    ],
+    "content": "ALLIGATOR — Jaw (13 SMMA offset 8). Teeth (8 offset 5). Lips (5 offset 3). TWISTED = sleeping (no trades). DIVERGE = eating (trend). Lips cross above Teeth+Jaw = BUY. Below = SELL.",
+    "priority": 4
+  },
+  {
+    "id": "pa-079",
+    "source": "risk",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "stop-placement",
+      "atr-based"
+    ],
+    "content": "ATR-BASED STOPS — 1.5-2x ATR(14). Adapts to volatility. High vol = wider, smaller position. Low vol = tighter, larger. Place beyond technical barriers. NEVER widen. If >2%, skip.",
+    "priority": 4
+  },
+  {
+    "id": "pa-080",
+    "source": "risk",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "scale-out",
+      "profit-taking"
+    ],
+    "content": "SCALE-OUT — Full entry. First target: sell half, stop to BE. Second: half remainder, stop to entry. Trail last quarter. Guaranteed profit + runners.",
+    "priority": 4
+  },
+  {
+    "id": "pa-081",
+    "source": "risk",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "6-percent-rule",
+      "monthly-limit"
+    ],
+    "content": "6% RULE — Monthly equity drops 6% below last month's close → STOP ALL TRADING. Close positions. Prevents many small losses destroying account.",
+    "priority": 4
+  },
+  {
+    "id": "pa-082",
+    "source": "elder",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "impulse-system",
+      "color-bars"
+    ],
+    "content": "IMPULSE SYSTEM — GREEN (MA up + MACD-Hist up) = buy only. RED = sell only. BLUE = caution. Never long on red, short on green. Buy pullbacks to green bars.",
+    "priority": 4
+  },
+  {
+    "id": "pa-083",
+    "source": "elder",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "triple-screen",
+      "multi-timeframe"
+    ],
+    "content": "TRIPLE SCREEN — Weekly: trend direction. Daily: oscillator pullback. Intraday: precision breakout. Factor of Five (~5x). Higher ALWAYS overrides lower.",
+    "priority": 4
+  },
+  {
+    "id": "pa-084",
+    "source": "carter",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "squeeze-play",
+      "volatility-contraction"
+    ],
+    "content": "SQUEEZE PLAY — BB inside KC = squeeze (energy building). BB expands outside = FIRES. Use momentum wave for direction. Only dominant wave direction. Tighter = bigger move.",
+    "priority": 4
+  },
+  {
+    "id": "pa-085",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "confluence",
+      "entry-filter"
+    ],
+    "content": "CONFLUENCE IS KING — Single signals fail. Highest probability: 1) S/R zone. 2) Trend. 3) Candle pattern. 4) Indicator. 5) Session. 3+ = take. <3 = skip.",
+    "priority": 4
+  },
+  {
+    "id": "pa-086",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-hierarchy"
+    ],
+    "content": "PA HIERARCHY — 1) Structure (trend/range). 2) Levels (S/R). 3) Patterns (signals). Always this order. Never skip to patterns without context.",
+    "priority": 4
+  },
+  {
+    "id": "pa-087",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "second-entry"
+    ],
+    "content": "SECOND ENTRY — Second attempt higher probability. First resistance test fails = second more likely to break. Failed H2 = strong bull. Failed L2 = strong bear.",
+    "priority": 4
+  },
+  {
+    "id": "pa-088",
+    "source": "crypto",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "tags": [
+      "funding-rates",
+      "sentiment"
+    ],
+    "content": "FUNDING RATE — Positive = longs paying (crowded). Negative = shorts. Extreme positive (>0.1%) = correction probability (squeeze). Extreme negative = short squeeze. Funding + OI divergence = strongest.",
+    "priority": 4
+  },
+  {
+    "id": "pa-089",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "divergence",
+      "warning"
+    ],
+    "content": "DIVERGENCE — Price HH + RSI/MACD LH = bearish warning. Price LL + oscillator HL = bullish. Strongest at S/R. WARNING not signal. Wait for price confirmation.",
+    "priority": 4
+  },
+  {
+    "id": "pa-090",
+    "source": "wizards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "breakout",
+      "tight-consolidation"
+    ],
+    "content": "UNEXPLAINED BREAKOUTS — Nobody understands reason = good risk/reward. LESS explanation = MORE significant. Everyone observing = higher false signal odds. Unexplained from tight ranges = institutional.",
+    "priority": 4
+  },
+  {
+    "id": "pa-091",
+    "source": "wizards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "failed-moves"
+    ],
+    "content": "FAILED MOVES = FAST OPPOSITE — Market not responding to bullish news = strong bearish. Not responding to bearish = strong bullish. Failure is the signal. Trade opposite aggressively.",
+    "priority": 4
+  },
+  {
+    "id": "pa-092",
+    "source": "wyckoff",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "wyckoff-accumulation",
+      "ar-range"
+    ],
+    "content": "AUTOMATIC RALLY — After SC, first rally on moderate vol sets range high. AR = resistance during Phase B. SC low = support. Trade within SC-AR until Phase C/D.",
+    "priority": 3
+  },
+  {
+    "id": "pa-093",
+    "source": "orderflow",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "tags": [
+      "volume-spread-analysis",
+      "smart-money"
+    ],
+    "content": "VSA CORE — No Supply: low vol + narrow spread + close near high at support = buy. No Demand: mirror at resistance = sell. Stopping Volume: high vol at support, narrow spread. Effort vs Result: high vol narrow spread = reversal.",
+    "priority": 3
+  },
+  {
+    "id": "pa-094",
+    "source": "orderflow",
+    "topic": "OrderFlow",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "tags": [
+      "bid-ask-spread",
+      "liquidity"
+    ],
+    "content": "BID-ASK SPREAD — Narrowing = liquidity, trending. Widening = uncertainty. Trade breakouts when narrow. Fade when wide. Crypto: thin book = rapid moves through zone.",
+    "priority": 3
+  },
+  {
+    "id": "pa-095",
+    "source": "orderflow",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-profile",
+      "vsa-integration"
+    ],
+    "content": "VP + VSA — VP for S/R zones (HVN/LVN). VSA within zones for SM intent. VP = LOCATION. VSA = INTENT. Together = WHERE and WHEN.",
+    "priority": 3
+  },
+  {
+    "id": "pa-096",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "trend-confirmation"
+    ],
+    "content": "HIGH VOL + WIDE SPREAD UP — Genuine buying. SM driving + retail following. At breakouts and impulse legs. Do NOT fade. Continuation confirmed.",
+    "priority": 3
+  },
+  {
+    "id": "pa-097",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "trap"
+    ],
+    "content": "LOW VOL + WIDE SPREAD = TRAP — Looks impressive but nobody participated. Low vol breakout = fake. Widening spread on declining vol = exhaustion.",
+    "priority": 3
+  },
+  {
+    "id": "pa-098",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "LowVolatility",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "squeeze"
+    ],
+    "content": "LOW VOL + NARROW SPREAD — No interest, QUIET BEFORE STORM. After prolonged = explosive move. Direction by which stops trigger first.",
+    "priority": 3
+  },
+  {
+    "id": "pa-099",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "tags": [
+      "volume-analysis",
+      "utad"
+    ],
+    "content": "UTAD — Spike above resistance after prolonged distribution to trap late buyers, reverses. FINAL TRAP before markdown. Short on reversal candle closing back inside range.",
+    "priority": 3
+  },
+  {
+    "id": "pa-100",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "healthy-trend"
+    ],
+    "content": "HEALTHY TREND — Vol expands on rallies, contracts on pullbacks. Opposite = unhealthy. Any deviation = weakening.",
+    "priority": 3
+  },
+  {
+    "id": "pa-101",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "reversal-spike"
+    ],
+    "content": "CLIMAX VOLUME — 3x+ 20-period avg at extreme + reversal/narrow range. MAJOR turning point. Highest vol in 50+ bars at extreme.",
+    "priority": 3
+  },
+  {
+    "id": "pa-102",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "position-sizing"
+    ],
+    "content": "VPA SIZING — Larger when vol confirms (high vol breakout). Smaller when contradicts. Base 1% + 0.5% per confirmation factor.",
+    "priority": 3
+  },
+  {
+    "id": "pa-103",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "tags": [
+      "volume-analysis",
+      "springboard"
+    ],
+    "content": "SPRINGBOARD — Declining vol + narrowing range = SM completed A/D. Breakout EXPLOSIVE. Tighter + lower vol = bigger move. Enter aggressively on breakout.",
+    "priority": 3
+  },
+  {
+    "id": "pa-104",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "comparison"
+    ],
+    "content": "VOL COMPARISON — Compare to: 1) Prior bar. 2) 20-period avg. 3) Same level historically. 4) Similar conditions. Only meaningful RELATIVELY.",
+    "priority": 3
+  },
+  {
+    "id": "pa-105",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "gaps"
+    ],
+    "content": "GAP VOLUME — High vol gap = institutional, holds as S/R. Low vol = retail, fills. Fill on high vol = failure. Hold on pullback = continuation.",
+    "priority": 3
+  },
+  {
+    "id": "pa-106",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "two-bar-reversal-vol"
+    ],
+    "content": "TWO-BAR REVERSAL VOL — Wide spread bar + equal/wider opposite on equal/higher vol at extreme = powerful reversal. Second bar MUST close beyond midpoint of first.",
+    "priority": 3
+  },
+  {
+    "id": "pa-107",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "hidden-buying"
+    ],
+    "content": "HIDDEN BUYING — Price drops then recovers to close near HIGH on above-average vol. Selling ABSORBED intrabar. High vol hammer at support = high prob long.",
+    "priority": 3
+  },
+  {
+    "id": "pa-108",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "hidden-selling"
+    ],
+    "content": "HIDDEN SELLING — Price rallies then reverses to close near LOW on above-average vol. Buying ABSORBED intrabar. High vol shooting star at resistance = high prob short.",
+    "priority": 3
+  },
+  {
+    "id": "pa-109",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "gaps-volume"
+    ],
+    "content": "GAPS AND VOLUME — Breakaway: high vol at pattern break. Runaway: mid-trend moderate. Exhaustion: extreme vol at end. Island: gap+gap = reversal. Low vol gap = meaningless.",
+    "priority": 3
+  },
+  {
+    "id": "pa-110",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "triangles"
+    ],
+    "content": "VOL IN TRIANGLES — CONTRACTS during formation. Breakout MUST expand. Low vol breakout = false, returns inside. Vol at apex = lowest.",
+    "priority": 3
+  },
+  {
+    "id": "pa-111",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "flags-pennants-vol"
+    ],
+    "content": "VOL IN FLAGS — Flagpole highest vol. Consolidation declining. Breakout renewed expansion. Vol increase during flag = distribution, fails.",
+    "priority": 3
+  },
+  {
+    "id": "pa-112",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "volume-trendline"
+    ],
+    "content": "VOLUME TRENDLINES — Draw on volume like price. Vol trendline break PRECEDES price break. Rising vol break in uptrend = selling pressure.",
+    "priority": 3
+  },
+  {
+    "id": "pa-113",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "cup-handle"
+    ],
+    "content": "CUP AND HANDLE — U-shaped + shallow handle. Cup depth 1/3-1/2. Handle declining vol, max 1/3 cup retrace. Breakout SURGE. Target: cup depth. 47% avg rise bull.",
+    "priority": 3
+  },
+  {
+    "id": "pa-114",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "chart-pattern",
+      "wedges"
+    ],
+    "content": "WEDGES — Rising = bearish. Falling = bullish. Vol DRYS UP. Unlike triangles, both lines same direction. Target: widest part.",
+    "priority": 3
+  },
+  {
+    "id": "pa-115",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "rectangles"
+    ],
+    "content": "RECTANGLES — Horizontal S/R. Vol contracts. Breakout on volume. Target: height from breakout. Often continuation. Wait for close beyond boundary.",
+    "priority": 3
+  },
+  {
+    "id": "pa-116",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "performance-rules"
+    ],
+    "content": "PERFORMANCE RULES — 1) Lowest failure = best. 2) Heavy breakout vol. 3) Throwbacks hurt 6-8%. 4) Tall > short. 5) Wider swings = stronger. 6) Narrow breakouts fail.",
+    "priority": 3
+  },
+  {
+    "id": "pa-117",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "chart-pattern",
+      "dead-cat-bounce"
+    ],
+    "content": "DEAD CAT BOUNCE — Drop 20%+, bounce 15-20% in 4-8 days, resume decline. Bounce vol low. Sell into bounce. Decline continues 30%+.",
+    "priority": 3
+  },
+  {
+    "id": "pa-118",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "island-reversal"
+    ],
+    "content": "ISLAND REVERSAL — Gap in trend direction, isolated, gap BACK. Vol heavy on both gaps. Powerful reversal at major turns.",
+    "priority": 3
+  },
+  {
+    "id": "pa-119",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "measured-move"
+    ],
+    "content": "MEASURED MOVE — Two legs separated by correction. Second = first ~60%. Use first leg for target. Retracement 49% (down), 27% (up).",
+    "priority": 3
+  },
+  {
+    "id": "pa-120",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "chart-pattern",
+      "broadening"
+    ],
+    "content": "BROADENING — Expanding range (megaphone). Often at TOPS. Vol heavy, erratic. Each swing wider. Wait for resolution. Breakout = significant trend start.",
+    "priority": 3
+  },
+  {
+    "id": "pa-121",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "triple-bottom-top"
+    ],
+    "content": "TRIPLE BOTTOMS/TOPS — Three equal lows/highs. Vol decreases on each test. Buy above resistance / Short below support. 37% avg rise (bottoms), 24% decline (tops).",
+    "priority": 3
+  },
+  {
+    "id": "pa-122",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "pipe-horn"
+    ],
+    "content": "PIPE/HORN PATTERNS — Two parallel spikes. Pipe bottom ranked #2 overall bull (39% rise). Pipe top #3 bear (27% decline). Buy above / Short below.",
+    "priority": 3
+  },
+  {
+    "id": "pa-123",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "candlestick",
+      "doji"
+    ],
+    "content": "DOJI — Open = close. After extended move = reversal warning. Dragonfly = bullish. Gravestone = bearish. At S/R after trend = actionable.",
+    "priority": 3
+  },
+  {
+    "id": "pa-124",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "dark-cloud-piercing"
+    ],
+    "content": "DARK CLOUD / PIERCING — Dark cloud: opens above prior high, closes >50% into body. Piercing: mirror. More penetration = stronger. Bearish engulfing is stronger version.",
+    "priority": 3
+  },
+  {
+    "id": "pa-125",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "three-soldiers-crows"
+    ],
+    "content": "THREE SOLDIERS/CROWS — Three consecutive long candles same direction. Opens within prior body. Strong continuation. Rare but powerful.",
+    "priority": 3
+  },
+  {
+    "id": "pa-126",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "harami"
+    ],
+    "content": "HARAMI — Large + small within prior body. Momentum shift. Harami cross (doji second) = stronger. Always requires confirmation.",
+    "priority": 3
+  },
+  {
+    "id": "pa-127",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "marubozu"
+    ],
+    "content": "MARUBOZU — Long body, no shadows. White: total bull control. Black: total bear control. Strong continuation or reversal by context. Don't fade.",
+    "priority": 3
+  },
+  {
+    "id": "pa-128",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "shooting-star-hanging-man"
+    ],
+    "content": "SHOOTING STAR / HANGING MAN — Small body, long upper shadow after uptrend. Rejection of higher prices. Hanging man needs bearish confirmation next day.",
+    "priority": 3
+  },
+  {
+    "id": "pa-129",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "price-action-bar",
+      "trend-bar"
+    ],
+    "content": "TREND BAR — Body >60% of range. Close near extreme. One side in control. Stronger beyond prior extremes. Series = strong trend, don't fade.",
+    "priority": 3
+  },
+  {
+    "id": "pa-130",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "price-action-structure",
+      "micro-channel"
+    ],
+    "content": "MICRO-CHANNEL — Every bar low above prior (5-10 bars). EXTREME strength. Don't short. Don't buy breakout (climax). Wait for correction.",
+    "priority": 3
+  },
+  {
+    "id": "pa-131",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-structure",
+      "magnet-levels"
+    ],
+    "content": "MAGNET LEVELS — Price gravitates to: prior swing H/L, round numbers, open, prior day H/L. Use for targets. Opening price = intraday magnet.",
+    "priority": 3
+  },
+  {
+    "id": "pa-132",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "price-action-structure",
+      "spike-channel"
+    ],
+    "content": "SPIKE AND CHANNEL — Strong breakout + shallow channel. Buy pullback to channel bottom. Spike retrace 50%+ = ending. Channel break against = trend change.",
+    "priority": 3
+  },
+  {
+    "id": "pa-133",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-structure",
+      "barb-wire"
+    ],
+    "content": "BARB WIRE — 3+ bars with significant overlap. Choppy. AVOID. Wait for breakout. Often after strong move. Place stops beyond range.",
+    "priority": 3
+  },
+  {
+    "id": "pa-134",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "price-action-structure",
+      "trend-from-open"
+    ],
+    "content": "TREND FROM OPEN — Strong directional from open, minimal pullbacks. Enter on first small pullback. Don't fight. First 2-3 trend bars = confirmed.",
+    "priority": 3
+  },
+  {
+    "id": "pa-135",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-structure",
+      "gap-open"
+    ],
+    "content": "GAP OPEN — Gap with trend = continuation. Fade against. Fill ~70% common. Breakaway ~30%. Doesn't fill in 3 bars = strong direction.",
+    "priority": 3
+  },
+  {
+    "id": "pa-136",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "setup",
+      "breakout-setup"
+    ],
+    "content": "BREAKOUT SETUP — Tight range, breakout closes beyond on expanding vol. Entry above/below. Stop opposite side. Failed = trade opposite.",
+    "priority": 3
+  },
+  {
+    "id": "pa-137",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "setup",
+      "first-pullback"
+    ],
+    "content": "FIRST PULLBACK — After breakout/impulse, wait for first pullback. Entry at S/R within pullback or when closes in trend direction. Highest probability.",
+    "priority": 3
+  },
+  {
+    "id": "pa-138",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "market-structure",
+      "trend-exhaustion"
+    ],
+    "content": "TREND EXHAUSTION — 1) Impulses shrinking. 2) Corrections deepening. 3) Vol declining on impulse. 4) Failed channel line. 5) Divergences. 3+ = reduce.",
+    "priority": 3
+  },
+  {
+    "id": "pa-139",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "probability",
+      "trade-quality-filter"
+    ],
+    "content": "TRADE QUALITY — A = all aligned (full size). B = most (normal). C = some conflicting (reduced). D = skip. Prevents overtrading.",
+    "priority": 3
+  },
+  {
+    "id": "pa-140",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "range-trading"
+    ],
+    "content": "RANGE STRATEGY — Buy support, sell resistance with limits. Stop beyond boundary. Target opposite. Reduce size. Low vol at boundary = holds. High vol = breakout.",
+    "priority": 3
+  },
+  {
+    "id": "pa-141",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "trend-strength"
+    ],
+    "content": "TREND STRENGTH — Strong: large impulses, <38.2% retrace. Moderate: 38.2-61.8%. Weak: >61.8%, shrinking. Strong = aggressive, weak = defensive.",
+    "priority": 3
+  },
+  {
+    "id": "pa-142",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "overlap-measurement"
+    ],
+    "content": "OVERLAP REGIME — <30% = impulse (trending). 30-60% = uncertain. >60% = corrective/ranging. Objective measurement for strategy selection.",
+    "priority": 3
+  },
+  {
+    "id": "pa-143",
+    "source": "volman",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action",
+      "reaction-candle"
+    ],
+    "content": "REACTION CANDLE AT S/R — Strong bullish candle at support, body closes upper half. Entry above candle. Stop below zone. Mirror at resistance. HTF alignment increases probability.",
+    "priority": 3
+  },
+  {
+    "id": "pa-144",
+    "source": "volman",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action",
+      "session-analysis"
+    ],
+    "content": "SESSION ANALYSIS — London open: direction. NY open: confirm/reverse. Overlap: highest vol. Afternoon: ranging. Crypto: US drives BTC. London = breakout catalyst.",
+    "priority": 3
+  },
+  {
+    "id": "pa-145",
+    "source": "volman",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action",
+      "candle-sequence"
+    ],
+    "content": "CANDLE SEQUENCE — 3+ consecutive same color = that direction. Alternating = ranging. Growing bodies = strengthening. Shrinking = weakening.",
+    "priority": 3
+  },
+  {
+    "id": "pa-146",
+    "source": "edwards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "support-resistance",
+      "fan-lines"
+    ],
+    "content": "FAN LINES — Three successively less steep from same point. First = watch. Second = higher probability. Third = REVERSAL CONFIRMED.",
+    "priority": 3
+  },
+  {
+    "id": "pa-147",
+    "source": "edwards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "support-resistance",
+      "round-numbers"
+    ],
+    "content": "ROUND NUMBER S/R — Psychological levels attract vol. High vol + rejection = strong. High vol + acceptance = A/D. Breakout requires exceptional vol.",
+    "priority": 3
+  },
+  {
+    "id": "pa-148",
+    "source": "williams",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "fractal",
+      "breakout"
+    ],
+    "content": "FRACTAL — UP: bar high > 2 bars each side. DOWN: mirror. Broken = continuation. BUY on break above. SELL below. Fractal + AO positive = strongest.",
+    "priority": 3
+  },
+  {
+    "id": "pa-149",
+    "source": "williams",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "awesome-oscillator",
+      "zero-cross"
+    ],
+    "content": "AO ZERO CROSS — Neg to pos = buy. Pos to neg = sell. Never trade against. Wait for candle close. Increasing = accelerating.",
+    "priority": 3
+  },
+  {
+    "id": "pa-150",
+    "source": "williams",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "divergence-bar",
+      "first-wise-man"
+    ],
+    "content": "DIVERGENCE BAR — Bull: lower low, close in upper quarter. Bear: higher high, close in lower quarter. Entry above/below bar. Strongest at S/R.",
+    "priority": 3
+  },
+  {
+    "id": "pa-151",
+    "source": "williams",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "mfi",
+      "four-states"
+    ],
+    "content": "MFI STATES — GREEN (MFI+ Vol+): continuation. FADE (MFI- Vol-): pausing. FAKE (MFI+ Vol-): false, reverses. SQUAT (MFI- Vol+): breakout imminent.",
+    "priority": 3
+  },
+  {
+    "id": "pa-152",
+    "source": "williams",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "profitunity-system"
+    ],
+    "content": "CONVERGENCE — 1) Alligator eating. 2) AO correct. 3) Divergence bar. 4) MFI green. 5) Fractal breakout. 3+ = elevated prob. 5 = max size.",
+    "priority": 3
+  },
+  {
+    "id": "pa-153",
+    "source": "nekritin",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "naked-trading",
+      "zones"
+    ],
+    "content": "S/R ZONES — Areas of repeated reversal. Line charts to find. Old > new (memory). Market scars. Width = timeframe. More touches = stronger.",
+    "priority": 3
+  },
+  {
+    "id": "pa-154",
+    "source": "nekritin",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "naked-trading",
+      "last-kiss"
+    ],
+    "content": "LAST KISS — After break through zone, wait for retest. Enter on retest. Stop beyond. Confirms breakout. 60-70% occurrence. Better than chasing.",
+    "priority": 3
+  },
+  {
+    "id": "pa-155",
+    "source": "nekritin",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "naked-trading",
+      "big-shadow"
+    ],
+    "content": "BIG SHADOW — Range engulfs prior at zone. Bullish at support = buy. Bearish at resistance = sell. Enter on break. Stop at opposite end.",
+    "priority": 3
+  },
+  {
+    "id": "pa-156",
+    "source": "nekritin",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "naked-trading",
+      "kangaroo-tail"
+    ],
+    "content": "KANGAROO TAIL — Long-wick at zone, small body. Longer wick = stronger. Enter on body break. Stop at tail tip. Trendy (with-trend) > counter-trend.",
+    "priority": 3
+  },
+  {
+    "id": "pa-157",
+    "source": "nekritin",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "naked-trading",
+      "zone-mtf"
+    ],
+    "content": "ZONE MTF — Weekly/daily for zones. 4H/1H for entries. Line chart for zones, candlestick for entries. Multi-TF confluence increases probability.",
+    "priority": 3
+  },
+  {
+    "id": "pa-158",
+    "source": "williams",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "elliott-wave",
+      "wave-3"
+    ],
+    "content": "WAVE 3 — 1.618x wave 1. BIGGEST money. AO strongest. Entry after wave 2 (50-61.8% retrace), AO turning. Best risk/reward. Cannot be shortest impulse.",
+    "priority": 3
+  },
+  {
+    "id": "pa-159",
+    "source": "williams",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "elliott-wave",
+      "wave-5-truncation"
+    ],
+    "content": "WAVE 5 TRUNCATION — Fails to exceed wave 3. AO divergence + lower high. Powerful reversal. Short with stop above wave 3.",
+    "priority": 3
+  },
+  {
+    "id": "pa-160",
+    "source": "brooks",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "gaps",
+      "gap-fill"
+    ],
+    "content": "GAP FILL — Common ~70%. Breakaway ~30%. Trade fill then reassess. 3 bars no fill = strong direction. CME BTC gaps ~90% fill.",
+    "priority": 3
+  },
+  {
+    "id": "pa-161",
+    "source": "carter",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "pivot-points"
+    ],
+    "content": "PIVOT POINTS — Pivot = (H+L+C)/3. R1 = 2P-L. S1 = 2P-H. Test daily pivot 90%. R2/S2 = dead H/L. Pivot + round number + MA = strongest confluence.",
+    "priority": 3
+  },
+  {
+    "id": "pa-162",
+    "source": "carter",
+    "topic": "PriceAction",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "tags": [
+      "gap-play"
+    ],
+    "content": "OPENING GAP — Low premarket vol = 85% fill. High vol = 60%. Tue-Fri only, within pivots. Entry at open, target prior close. Monday 55-60%.",
+    "priority": 3
+  },
+  {
+    "id": "pa-163",
+    "source": "brooksdolan",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "trend-id",
+      "moving-averages"
+    ],
+    "content": "TREND ID — 200 SMA: above = uptrend, below = downtrend. 50 SMA intermediate. Golden cross = major bullish. Death cross = major bearish.",
+    "priority": 3
+  },
+  {
+    "id": "pa-164",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "pullback-entry",
+      "ema-bounce"
+    ],
+    "content": "EMA PULLBACK — 20 EMA = dynamic support in uptrend. Pullback + bounce. Entry on bullish candle at EMA. Stop below swing. ADX>25 for confirmation.",
+    "priority": 3
+  },
+  {
+    "id": "pa-165",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-is-primary"
+    ],
+    "content": "PRICE IS PRIMARY — All indicators lag price. Price action at zones = faster info. Use indicators for confirmation only. Market speaks through bars.",
+    "priority": 3
+  },
+  {
+    "id": "pa-166",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "session-analysis",
+      "crypto-adapted"
+    ],
+    "content": "SESSION-BASED PA — Asian: quiet. London: trend initiation. NY overlap: highest vol. Afternoon: ranging. Crypto: US drives BTC. London = breakout.",
+    "priority": 3
+  },
+  {
+    "id": "pa-167",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "trend-resumption"
+    ],
+    "content": "TREND RESUMPTION — After pause: continuation = tight range, declining vol. Reversal = wide range, heavy vol. Trade breakout direction.",
+    "priority": 3
+  },
+  {
+    "id": "pa-168",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "reversal-day"
+    ],
+    "content": "REVERSAL DAY — Opens near extreme, closes opposite after trend. Daily/weekly significant. High vol = MAJOR turn. Low vol = minor pause.",
+    "priority": 3
+  },
+  {
+    "id": "pa-169",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "channel-break"
+    ],
+    "content": "CHANNEL BREAK — Break with trend = acceleration (hold). Break against = trend ending (exit). Narrow = strong trend. Wide = weak.",
+    "priority": 3
+  },
+  {
+    "id": "pa-170",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "inside-day-breakout"
+    ],
+    "content": "INSIDE DAY BREAKOUT — 2+ inside days. Buy above / sell below range. Stop-and-reverse opposite. Compression before expansion.",
+    "priority": 3
+  },
+  {
+    "id": "pa-171",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "adx-filter"
+    ],
+    "content": "ADX FILTER — >25 = trending (trend tools). <20 = ranging (oscillators). 20-25 = transition, reduce size. Rising = strengthening. Falling = weakening.",
+    "priority": 3
+  },
+  {
+    "id": "pa-172",
+    "source": "risk",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "time-stops"
+    ],
+    "content": "TIME STOPS — No profit in expected timeframe = exit. Loss after 1-2 weeks = wrong. Even breakeven after time = probably wrong. Complements price stops.",
+    "priority": 3
+  },
+  {
+    "id": "pa-173",
+    "source": "psychology",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "process-over-outcome"
+    ],
+    "content": "PROCESS OVER OUTCOME — Execute plan not P&L. Good process + bad outcome = correct trade. Track execution quality separately from profitability.",
+    "priority": 3
+  },
+  {
+    "id": "pa-174",
+    "source": "psychology",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "no-setup-no-trade"
+    ],
+    "content": "NO SETUP = NO TRADE — Only when all criteria met. Quality > quantity. Patience is edge. No clear setup = best trade is no trade.",
+    "priority": 3
+  },
+  {
+    "id": "pa-175",
+    "source": "psychology",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "failed-moves-sentiment"
+    ],
+    "content": "FAILED MOVES — Market 'should' do something but doesn't = trade opposite. Not responding to news = opposite direction signal. Failure is information.",
+    "priority": 3
+  },
+  {
+    "id": "pa-176",
+    "source": "wizards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "trend-following"
+    ],
+    "content": "TREND FOLLOWING — Go with trend. Whatever method, get in when major trend exists. Consistency > particular characteristics. 15-30% of time = profits.",
+    "priority": 3
+  },
+  {
+    "id": "pa-177",
+    "source": "wizards",
+    "topic": "PriceAction",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "contrarian"
+    ],
+    "content": "CONTRARIAN AT EXTREMES — Best at new highs (sell). Worst at new lows (buy). Best money at turns. Need technical confirmation.",
+    "priority": 3
+  },
+  {
+    "id": "pa-178",
+    "source": "wizards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "patience"
+    ],
+    "content": "DO NOTHING — Most people always playing. Wait until money lying in corner, pick it up. Trade as little as possible.",
+    "priority": 3
+  },
+  {
+    "id": "pa-179",
+    "source": "crypto",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "exchange-flows"
+    ],
+    "content": "EXCHANGE FLOW — Inflows = selling pressure. Outflows = accumulation. Sustained outflows during decline = SM accumulating. Inflows during rally = distribution.",
+    "priority": 3
+  },
+  {
+    "id": "pa-180",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "volume-analysis",
+      "elliott-waves"
+    ],
+    "content": "VOL IN ELLIOTT — Wave 3 highest vol. Wave 5 lower (divergence). Wave A high. Wave B lower. Wave C high. Volume confirms wave count.",
+    "priority": 2
+  },
+  {
+    "id": "pa-181",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "rounding"
+    ],
+    "content": "ROUNDING BOTTOMS/TOPS — Gradual U/inverted U. Vol mirrors shape. Months to complete. Major trend changes. Buy on breakout above rim.",
+    "priority": 2
+  },
+  {
+    "id": "pa-182",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "measured-move-detail"
+    ],
+    "content": "MEASURED MOVE DETAIL — Second leg equals first ~60%. Use first leg height for target. Classic swing pattern on all timeframes.",
+    "priority": 2
+  },
+  {
+    "id": "pa-183",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "rising-three"
+    ],
+    "content": "RISING/FALLING THREE — Long candle, three small within range, then another long. Continuation. Fifth confirms. Three small = brief pause.",
+    "priority": 2
+  },
+  {
+    "id": "pa-184",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "abandoned-baby"
+    ],
+    "content": "ABANDONED BABY — Rare: star gaps away, next gaps back. Very rare and reliable. Strongest at S/R extremes.",
+    "priority": 2
+  },
+  {
+    "id": "pa-185",
+    "source": "williams",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "elliott-wave",
+      "wave-4"
+    ],
+    "content": "WAVE 4 — Ends 38.2% of wave 3. Most reliable wave 5 entry. Cannot overlap wave 1. AO pulls to zero. Enter when AO turns back.",
+    "priority": 2
+  },
+  {
+    "id": "pa-186",
+    "source": "edwards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "support-resistance",
+      "channels-detail"
+    ],
+    "content": "CHANNEL DETAIL — Width = volatility. Narrow channels = strong trend. Wide = weak. Exceeding = climax. Break = potential trend change.",
+    "priority": 2
+  },
+  {
+    "id": "pa-187",
+    "source": "orderflow",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "order-book",
+      "liquidity"
+    ],
+    "content": "ORDER BOOK — Large walls can be pulled (spoofing). REAL = persisting >5 minutes. Thin = rapid movement. Thick = stalls. Wall removal before price = trap.",
+    "priority": 2
+  },
+  {
+    "id": "pa-188",
+    "source": "crypto",
+    "topic": "OrderFlow",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "tags": [
+      "liquidation-heatmap"
+    ],
+    "content": "LIQUIDATION HEATMAP — Price gravitates to liquidation clusters. Long pool below = drop magnet. Short pool above = rise magnet. Trade toward clusters.",
+    "priority": 2
+  },
+  {
+    "id": "pa-189",
+    "source": "wizards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "friday-close"
+    ],
+    "content": "FRIDAY CLOSE — Strong Friday close at yearly highs significant. Don't hold short with loss at Friday high. Weekend gap favors trend.",
+    "priority": 2
+  },
+  {
+    "id": "pa-190",
+    "source": "wizards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "time-stop-wizards"
+    ],
+    "content": "TIME-BASED WRONGNESS — Loss after 1-2 weeks = clearly wrong. Breakeven after time = probably wrong. Don't hold dead positions.",
+    "priority": 2
+  },
+  {
+    "id": "pa-191",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "divergence-detail"
+    ],
+    "content": "DIVERGENCE DETAIL — 3+ consecutive divergences = stronger warning. Must wait for price confirmation. Divergence alone never sufficient.",
+    "priority": 2
+  },
+  {
+    "id": "pa-192",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volman-indicators"
+    ],
+    "content": "VOLMAN ON INDICATORS — All lag price. Derive from price. Why use derivative when you can read source? Confirm only, never lead.",
+    "priority": 2
+  },
+  {
+    "id": "pa-193",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "bar-patterns-outside"
+    ],
+    "content": "OUTSIDE BAR — Range engulfs prior. Expansion/volatility. Closes near extreme = continuation. Closes near middle = neutral. oo pattern = very volatile.",
+    "priority": 2
+  },
+  {
+    "id": "pa-194",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "belt-hold"
+    ],
+    "content": "BELT-HOLD — White: long white opens at low in downtrend. Black: long black opens at high in uptrend. Strong single-bar reversal. More reliable on daily+.",
+    "priority": 2
+  },
+  {
+    "id": "pa-195",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "chart-pattern",
+      "scallop-patterns"
+    ],
+    "content": "SCALLOPS — Ascending/descending J-shaped patterns. Each scallop trends higher/lower. Ascending inverted scallop: 43% avg rise bull.",
+    "priority": 2
+  },
+  {
+    "id": "pa-196",
+    "source": "bulkowski",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "chart-pattern",
+      "three-falling-rising"
+    ],
+    "content": "THREE FALLING PEAKS / RISING VALLEYS — Each peak lower (bearish) or each valley higher (bullish). Short below valley / Buy above peak between.",
+    "priority": 2
+  },
+  {
+    "id": "pa-197",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-analysis",
+      "two-bar-vol"
+    ],
+    "content": "TWO-BAR VOL — Bar1 high vol up + Bar2 low vol narrow = demand exhausted. Bar1 high vol down + Bar2 low vol narrow = supply exhausted. Both high same dir = continuation.",
+    "priority": 2
+  },
+  {
+    "id": "pa-198",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "abc-correction"
+    ],
+    "content": "ABC CORRECTION — A-wave against trend, B-wave partial retrace, C-wave continuing. Entry after C-wave at structural level. Most common corrective pattern.",
+    "priority": 2
+  },
+  {
+    "id": "pa-199",
+    "source": "volman",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action",
+      "bias-reset"
+    ],
+    "content": "BIAS RESET — Reset at session start. Don't carry yesterday's bias. First 30-60 min establishes new. HH/HL = bullish. LH/LL = bearish. Neutral until proven.",
+    "priority": 2
+  },
+  {
+    "id": "pa-200",
+    "source": "volman",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action",
+      "partial-profits"
+    ],
+    "content": "PARTIAL PROFITS — Take 50% at 1:1 R:R. Trail remainder. Reduces emotional pressure. Ensures winner even on reversal. Standard for active traders.",
+    "priority": 2
+  },
+  {
+    "id": "pa-201",
+    "source": "brooksdolan",
+    "topic": "PriceAction",
+    "conditions": [
+      "Ranging"
+    ],
+    "tags": [
+      "range-trading"
+    ],
+    "content": "RANGE TRADING — If price bounced off same S/R 3+ times, it's a range. Buy support, sell resistance. Stop beyond range. Target opposite end. ADX <25.",
+    "priority": 2
+  },
+  {
+    "id": "pa-202",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "counterattack-lines"
+    ],
+    "content": "COUNTERATTACK LINES — Strong trend, opposite candle opens with gap but closes at prior close. Bullish: gaps down recovers. Bearish: gaps up fades. Moderate reversal.",
+    "priority": 2
+  },
+  {
+    "id": "pa-203",
+    "source": "nison",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "candlestick",
+      "tweezers"
+    ],
+    "content": "TWEEZERS — Two+ candles with equal highs (top) or lows (bottom). Minor reversal. More significant with other patterns. Equal H/L = strong level.",
+    "priority": 2
+  },
+  {
+    "id": "pa-204",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-stall"
+    ],
+    "content": "STALL PATTERN — Price moves to level then pauses with 2-3 small bodies. Equilibrium at level. Breakout direction from stall continues. Enter on breakout bar.",
+    "priority": 2
+  },
+  {
+    "id": "pa-205",
+    "source": "carter",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "ttm-waves"
+    ],
+    "content": "TTM WAVES — A (short-term), B (medium), C (long-term) around zero. BUY: C above zero + squeeze fires long + A dips then crosses up. Never fight C wave.",
+    "priority": 2
+  },
+  {
+    "id": "pa-206",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volman-trade-review"
+    ],
+    "content": "TRADE REVIEW — Review every trade for setup quality, entry, management. A/B/C categorization. Only A setups when starting. Track win rate by quality.",
+    "priority": 2
+  },
+  {
+    "id": "pa-207",
+    "source": "edwards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "trend-theory",
+      "background"
+    ],
+    "content": "TREND THEORY — Primary: months-years. Secondary: weeks-months (1/3-2/3 retrace). Minor: days-weeks. Bull = HH+HL. Reversal = LH+LL. Foundation of Western TA.",
+    "priority": 1
+  },
+  {
+    "id": "pa-208",
+    "source": "schabacker",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "ta-foundation",
+      "background"
+    ],
+    "content": "SCHABACKER FOUNDATION — Chart patterns repeat due to human psychology. All subsequent pattern work builds on this. Patterns = psychology made visible.",
+    "priority": 1
+  },
+  {
+    "id": "pa-209",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "volume-truth",
+      "philosophy"
+    ],
+    "content": "VOLUME AS TRUTH — Price can be manipulated short-term. Volume reveals truth. Every source emphasizes volume confirmation. Volume = one indicator that cannot be faked.",
+    "priority": 1
+  },
+  {
+    "id": "pa-210",
+    "source": "grimes",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "fractal-theory",
+      "background"
+    ],
+    "content": "FRACTAL THEORY — Markets fundamentally fractal. Same patterns at every timeframe. 5-min looks like daily looks like weekly. Use MTF analysis. High fractal dim = choppy. Low = trending.",
+    "priority": 1
+  },
+  {
+    "id": "pa-211",
+    "source": "edwards",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "dow-theory",
+      "background"
+    ],
+    "content": "DOW THEORY — 1) Discount everything. 2) Three trends. 3) Three phases. 4) Indices confirm. 5) Volume confirms. 6) Until definitive reversal. Patterns = specific tools.",
+    "priority": 1
+  },
+  {
+    "id": "pa-212",
+    "source": "schabacker",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "pattern-reliability",
+      "background"
+    ],
+    "content": "PATTERN RELIABILITY — Larger > smaller. Longer formation > shorter. At major S/R > random locations. Edwards/Magee rank: 1) H&S. 2) Rectangles. 3) Symmetrical triangles. 4) Double/triple. 5) Flags/pennants. 6) Wedges. 7) Broadening.",
+    "priority": 1
+  },
+  {
+    "id": "pa-213",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "psychology-patterns",
+      "background"
+    ],
+    "content": "WHY PATTERNS WORK — Human nature is repetitive. Greed and fear create recognizable footprints. Institutional behavior forced by size creates predictable patterns. Self-fulfilling prophecy (everyone watching same levels).",
+    "priority": 1
+  },
+  {
+    "id": "pa-214",
+    "source": "schabacker",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "pattern-classification",
+      "background"
+    ],
+    "content": "PATTERN TYPES — Reversal: H&S, double/triple tops/bottoms, rounding. Continuation: triangles, rectangles, flags, pennants, wedges. Too long continuation = becoming reversal.",
+    "priority": 1
+  },
+  {
+    "id": "pa-215",
+    "source": "coulling",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "smart-money-detection",
+      "background"
+    ],
+    "content": "SM DETECTION FRAMEWORK — Coulling VPA (volume-price divergence) + COT (hedger positioning) + Wyckoff (A/D) = three independent methods for institutional activity detection.",
+    "priority": 1
+  },
+  {
+    "id": "pa-216",
+    "source": "multi",
+    "topic": "PriceAction",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "price-action-principle",
+      "philosophy"
+    ],
+    "content": "PA PRINCIPLE — Price is the ultimate indicator. Everything needed is in the bars. No lagging indicators needed. Market speaks through price. Learn by studying bar-by-bar action.",
+    "priority": 1
+  }
+]

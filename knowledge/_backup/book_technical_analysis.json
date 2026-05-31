@@ -1,0 +1,3493 @@
+[
+  {
+    "id": "book-ta-001",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DOW THEORY — SIX PRINCIPLES: 1) Market Discounts Everything. 2) Three Trends: Primary (months-years), Secondary (weeks-months, 33-66% retracement), Minor (days-weeks). 3) Primary Has Three Phases: Accumulation, Public Participation, Distribution. 4) Indices Must Confirm Each Other (industrials + transports). 5) Volume Confirms Trend. 6) Trend Intact Until Definitive Reversal. Primary bull signal: BOTH industrials and transports close above prior significant high.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-002",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND DEFINITION — Uptrend: higher highs + higher lows. Downtrend: lower highs + lower lows. Reversal requires violation of prior swing low (uptrend) or swing high (downtrend). Minor trend = days-weeks. Intermediate = weeks-months. Primary = months-years. Each level analyzed separately - minor reversal does NOT imply primary change.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-003",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SUPPORT/RESISTANCE — Support: buying overwhelms selling at a price level. Resistance: selling overwhelms buying. Prior highs become resistance, prior lows become support. BROKEN support becomes resistance and vice versa (role reversal). More tests without break = stronger level. High volume at the level confirms significance.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-004",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRENDLINES — Uptrend line: along higher lows (min 2 points, 3rd confirms). Downtrend line: along lower highs. VALID trendline requires 3+ touches. More touches = more valid. Break = CLOSE below trendline (not just intraday). Steep trendlines break easily. Angle >45 degrees is unsustainable. The LONGER a trendline holds, the more significant the break.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-005",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CHANNELS — Parallel line opposite the trendline. Uptrend: connect highs for channel line, lows for trendline. Prices failing to reach channel line = trend weakening. Prices exceeding channel line = trend accelerating. Channel break = trend exhaustion. Width of channel projects minimum move after breakout.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-006",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "HEAD AND SHOULDERS TOP — Most reliable reversal. Left Shoulder (high volume), Head (lower volume), Right Shoulder (much lower volume). NECKLINE connects two lows between head/shoulders. CONFIRMATION: close below neckline on EXPANDED volume. TARGET: head-to-neckline distance projected downward from breakout. Declining volume across shoulders = critical confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-007",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "INVERSE H&S (BOTTOM) — Mirror of H&S top. Volume CRITICAL: breakout above neckline MUST expand. Left shoulder heavy selling, head similar, right shoulder DRAMATICALLY reduced volume = exhaustion. TARGET: head-low-to-neckline distance projected upward. Pullback to neckline (~50% of time) = secondary entry.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-008",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "DOUBLE TOP — Two approximately equal highs with trough between. CONFIRMED only on break below trough (neckline) with increased volume. Tops should be 1+ month apart. Second top on LOWER volume = more likely genuine. TARGET: peaks-to-neckline distance projected down. Many apparent double tops are consolidation - wait for neckline break, do NOT anticipate.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-009",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "DOUBLE BOTTOM — Two approximately equal lows with peak between. Confirmed on break ABOVE peak (neckline) on increased volume. Second low volume < first low = selling exhaustion. Lows 1+ month apart. TARGET: lows-to-neckline distance projected up. Pullback to neckline ~50-60% of time = secondary entry.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-010",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "TRIPLE TOPS/BOTTOMS — Three approximately equal highs/lows. Volume progressively DECREASES on each test. Confirmation requires breakout beyond support/resistance on increased volume. Target measured same as double patterns. Triple patterns take LONGER to form, making them more significant when confirmed. Failure rate ~10% after confirmation.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-011",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "SYMMETRICAL TRIANGLE — Converging trendlines: lower highs + higher lows. Volume diminishes during formation. Breakout between 1/2 and 3/4 of triangle width. Directionally NEUTRAL - breakout direction is key. CONFIRMATION: breakout on EXPANDED volume. TARGET: widest triangle point projected from breakout. In uptrend, breaks upward ~75% of time.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-012",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "ASCENDING TRIANGLE — Flat resistance above + rising support (higher lows) below. BULLISH regardless of prior trend. Volume decreases during formation. BREAKOUT above flat resistance on heavy volume CONFIRMS. TARGET: widest point projected upward. Flat resistance = sellers at fixed price being overwhelmed by increasingly aggressive buyers.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-013",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "DESCENDING TRIANGLE — Flat support below + declining resistance (lower highs) above. BEARISH regardless of prior trend. Volume decreases during formation. BREAKOUT below flat support on heavy volume confirms. TARGET: widest point projected downward. Flat support = buyers at fixed price overwhelmed by increasingly aggressive sellers.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-014",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BULL FLAG — Sharp near-vertical rise (flagpole) then slight downward parallelogram on REDUCED volume. Breakout UPWARD on increased volume. TARGET: flagpole length projected from breakout. Duration 1-3 weeks. Among most reliable continuation patterns. Volume CONTRACT during flag, EXPAND on breakout.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-015",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BEAR FLAG — Sharp decline (flagpole) then slight upward parallelogram on reduced volume. Breakout DOWNWARD on increased volume. TARGET: flagpole length projected downward. Duration 1-3 weeks. Volume must CONTRACT during flag and EXPAND on breakout. Without volume confirmation, pattern suspect.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-016",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PENNANT — Like flag but shaped as small symmetrical triangle (converging trendlines, not parallel). Preceded by sharp move (flagpole). Volume contracts during formation. Breakout in direction of prior trend on expanded volume. TARGET: flagpole length projected from breakout. Duration 1-3 weeks. >85% reliability.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-017",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "RECTANGLE — Price bounces between parallel horizontal support/resistance. Can be continuation or reversal. Volume decreases during formation. Breakout direction determines type. TARGET: rectangle height from breakout. Wait for CLOSE beyond boundary on volume - false breakouts common. 3+ months = more significant.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-018",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "WEDGE — Rising wedge: both trendlines slope up and converge. Bearish in uptrends (reversal) and downtrends (continuation). Falling wedge: both slope down, converge. Bullish in downtrends (reversal) and uptrends (continuation). Volume progressively decreases. Both trendlines slope same direction (unlike triangles). Duration 3-4 weeks.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-019",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CUP AND HANDLE — Rounded bottom (U-shaped, not V) + small pullback (handle). Handle on RIGHT side, slight downward drift on LOW volume. BREAKOUT above handle resistance on heavy volume. Cup depth: 1/3 to 1/2 of prior advance. Handle retraces no more than 1/3-1/2 of cup depth. TARGET: cup depth projected upward.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-020",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "GAPS — FOUR TYPES: 1) Common: in congestion, quickly filled, no significance. 2) Breakaway: at pattern breakout, heavy volume, often NOT filled. 3) Runaway/Measuring: middle of trends, continuation. 4) Exhaustion: near end of trend, heavy volume, quickly filled. ISLAND REVERSAL: exhaustion + breakaway gap opposite = powerful reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-021",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOVING AVERAGES — Periods: 10-day (short), 40-day (intermediate), 200-day (long-term). 200-day MA = primary trend filter. Golden Cross: 50-day crosses above 200-day = major buy. Death Cross: 50-day crosses below 200-day = major sell. MAs act as dynamic support in uptrends, resistance in downtrends. Whipsaw risk highest in sideways markets.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-022",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MA ENVELOPES — Two lines at fixed % above/below MA (typically 5% around 200-day SMA). Upper envelope touch = overbought. Lower touch = oversold. Breakout ABOVE envelope = strong bullish (not sell). Breakout BELOW = strong bearish (not buy). Adjust % per security volatility. Identifies overextension from mean.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-023",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MACD — 12-day EMA minus 26-day EMA = MACD line. 9-day EMA of MACD = Signal line. BUY: MACD crosses above Signal. SELL: crosses below. HISTOGRAM = MACD minus Signal - shows momentum acceleration. Divergence between histogram and price = early warning. Centerline crossover (MACD crossing zero) confirms trend change.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-024",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "content": "RSI (Wilder, 14-period) — Range 0-100. Overbought >70, Oversold <30. Strong uptrend: RSI 40-80 (adjust OB to 80). Strong downtrend: RSI 20-60 (adjust OS to 20). DIVERGENCE: price new high + RSI lower high = top. Price new low + RSI higher low = bottom. FAILURE SWING: RSI crosses 70, pulls back, rallies fails 70 = sell.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-025",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "content": "STOCHASTICS — %K (fast) and %D (slow, 3-period SMA of %K). Default: 14-period %K, 3-period smoothing. OB >80, OS <20. SELL: %K crosses below %D above 80. BUY: %K crosses above %D below 20. Most effective in RANGING markets. In trends, can remain OB/OS. Filter: only trade signals in direction of larger trend.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-026",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "WILLIAMS %R — Inverted stochastic. Range 0 to -100. OB above -20, OS below -80. Default 14-period. Buy: %R crosses above -80. Sell: %R crosses below -20. Leading indicator - signals BEFORE price reversal. Best with trend-following filter. Identifies short-term overbought/oversold conditions.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-027",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ADX — Measures trend STRENGTH, not direction. 0-100. ADX >25 = trending. ADX <20 = ranging. ADX >40 = extreme trend (exhaustion possible). RISING ADX = trend strengthening. FALLING = weakening. +DI above -DI = bullish. -DI above +DI = bearish. ADX is the FILTER - use to SELECT strategy type.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-028",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "content": "CCI (Lambert) — Measures deviation from mean. Default 20-period. CCI >+100 = overbought/strong uptrend. CCI <-100 = oversold/strong downtrend. Zero-line crossover: above zero = bullish momentum, below = bearish. Divergence at extremes = reversal warning. Effective for cyclical turns in commodities and futures.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-029",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "BOLLINGER BANDS — Middle: 20-SMA. Upper: 20-SMA + 2 std dev. Lower: 20-SMA - 2 std dev. Bands CONTRACT in low volatility, EXPAND in high. Price riding upper band in strong uptrend is NOT bearish. SQUEEZE (narrowest in 6 months) precedes explosive move. %B = where price is relative to bands (0=lower, 1=upper).",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-030",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "OBV (On-Balance Volume) — Cumulative: add volume on up days, subtract on down days. OBV must CONFIRM price trend. Bearish divergence: price new high, OBV fails = distribution. Bullish divergence: price new low, OBV holds = accumulation. OBV often LEADS price - breakout in OBV before price signals coming direction.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-031",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ACCUMULATION/DISTRIBUTION LINE — Like OBV but weights volume by close position within range. Close near high = accumulation. Close near low = distribution. A/D diverging from price = key warning. Price new high + A/D line NOT = distribution under surface = bearish. More sophisticated than OBV.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-032",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VOLUME — FOUNDATIONAL: Volume expands in direction of prevailing trend. Uptrend: volume up on rallies, down on pullbacks. Downtrend: volume up on declines, down on bounces. VOLUME PRECEDES PRICE: heavy volume at bottoms = accumulation. Drying volume at tops = distribution. Climactic volume + rapid price change = climax = reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-033",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "VOLUME CLIMAX — Selling Climax: extremely heavy volume + sharp decline = potential bottom. Smart money absorbs panic selling. Buying Climax: extreme volume + sharp advance at top = euphoric buying absorbed. After climax: expect RETRACEMENT. Climax volume should be HIGHEST in months - more extreme = more significant reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-034",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FIBONACCI RETRACEMENTS — Key levels: 38.2%, 50%, 61.8%. After significant move, expect retracement to one level. 38.2% = shallow (strong trend). 50% = normal (most common). 61.8% = deep (golden ratio). Retracement >61.8% = trend may be over. ENTRY: buy 38.2-61.8% zone, stop below 61.8%.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-035",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FIBONACCI EXTENSIONS — Project targets beyond 100%: 161.8%, 261.8%, 423.6%. Wave C = 161.8% of wave A (common). Wave 3 = 161.8% of wave 1. Wave 5 = 61.8% or 100% of wave 1. Best when MULTIPLE Fibonacci levels converge at same price = confluence zone.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-036",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ELLIOTT WAVE — IMPULSE RULES: Wave 2 NEVER >100% of wave 1. Wave 3 NEVER shortest impulse wave. Wave 4 NEVER enters wave 1 territory (except diagonals). CORRECTIVE: 3-wave A-B-C. 5-3 pattern repeats at every degree (fractal). Corrective waves harder to predict than impulse waves.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-037",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ELLIOTT WAVE RELATIONSHIPS — Wave 2: 50% or 61.8% of wave 1. Wave 3: 161.8% of wave 1. Wave 4: 38.2% of wave 3. Wave 5: 61.8% of wave 1 OR equal to wave 1. Wave A: 38.2%/50%/61.8% of wave 5. Wave B: 38.2%/50% of wave A. Wave C: 61.8%/100%/161.8% of wave A.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-038",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ELLIOTT CORRECTIVE PATTERNS — Zigzag (5-3-5): sharp, steep, B retraces 38.2-50% of A. Flat (3-3-5): sideways, B = 100% of A. Triangle (3-3-3-3-3): converging in wave 4 or B. Irregular Flat: B exceeds start of A, C exceeds end of A. Combination: two/three corrections connected by X wave.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-039",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "POINT AND FIGURE — X (rising) and O (falling) columns. BOX SIZE determines sensitivity. 3-box reversal standard. Buy: X column exceeds previous X high. Sell: O column drops below previous O low. PRICE TARGETS: horizontal count method. No time axis.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-040",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CANDLESTICK DOJI — Open approx Close. Indicates indecision. At top after uptrend = bearish warning. At bottom after downtrend = bullish warning. Types: Long-legged (extreme indecision), Gravestone (bearish at tops - rejection of highs), Dragonfly (bullish at bottoms - rejection of lows). Doji at S/R levels carries more weight.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-041",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "HAMMER and HANGING MAN — Small real body at TOP + long lower shadow (2-3x body). Hammer at BOTTOM of downtrend = bullish reversal. Hanging Man at TOP of uptrend = bearish reversal. CONFIRMATION REQUIRED: next candle must confirm direction. Without confirmation, just potential signals - do NOT trade in isolation.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-042",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ENGULFING PATTERNS — Bullish: at bottom, white candle body COMPLETELY engulfs prior black candle body. Bearish: at top, black body completely engulfs prior white body. Volume increase on engulfing candle. More significant after prolonged trend. Longer engulfing body = stronger signal. MOST reliable at S/R or Fibonacci levels.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-043",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MORNING/EVENING STAR — Three-candle reversals. Morning Star (bullish): 1) Long bearish candle. 2) Small-bodied star gapping down. 3) Long bullish closing above midpoint of first. Evening Star (bearish): mirror at top. Heavy volume on 1st and 3rd candles. Doji star variant = even stronger signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-044",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PIERCING LINE and DARK CLOUD — Piercing (bullish at bottom): black candle, then white opens below prior low, closes ABOVE midpoint of black. Dark Cloud (bearish at top): white candle, then black opens above prior high, closes BELOW midpoint of white. Heavy volume on 2nd candle. Deeper penetration = stronger.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-045",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "THREE WHITE SOLDIERS / THREE BLACK CROWS — Three White: 3 consecutive long bullish candles, each closing near high, opening within prior body. Three Black: 3 consecutive long bearish candles, each closing near low. No gaps between. Small shadows. At trend extremes = powerful signals.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-046",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "HARAMI — Opposite of engulfing: small candle contained within prior larger body. Bullish harami at bottom: small white inside large black. Bearish at top: small black inside large white. Momentum slowing. Less powerful than engulfing - needs confirmation. Harami cross (doji inside) = stronger than regular harami.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-047",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SHOOTING STAR and INVERTED HAMMER — Shooting Star at TOP: small body at low, long upper shadow (2-3x body). Rejection of higher prices = bearish. Inverted Hammer at BOTTOM: same shape after downtrend = potential bullish reversal. Both REQUIRE confirmation candle.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-048",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "TWEEZER TOPS/BOTTOMS — Two or more candles with identical highs (tops) or lows (bottoms). Price rejected at same level twice. Most effective at known S/R levels. Combine with other candlestick patterns for confirmation. Rare as standalone but powerful as supplementary signal.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-049",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INTERMARKET ANALYSIS — 1) USD and Commodities: INVERSELY correlated. 2) Commodities and Bonds: INVERSELY correlated (rising commodities = inflation = lower bond prices). 3) Bonds and Stocks: POSITIVELY correlated long-term. 4) Dollar and Stocks: complex, generally positive short-term. RELATIONSHIPS BREAK DOWN during crises.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-050",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "A/D LINE (Advance/Decline) — Cumulative daily advances minus declines. Must CONFIRM new market highs. Index new high + A/D line NOT = BEARISH divergence (narrowing leadership). A/D line new high BEFORE index = bullish. Leading indicator of major tops and bottoms.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-051",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ARMS INDEX (TRIN) — (Advancing/Declining Issues) / (Advancing/Declining Volume). TRIN <1.0 = bullish. >1.0 = bearish. >1.5 = oversold. <0.5 = overbought. Extreme >2.0 or <0.3 = panic/euphoria = short-term reversal. 10-day MA of TRIN: <0.80 = bullish, >1.20 = bearish.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-052",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "NEW HIGHS-NEW LOWS — Tracks 52-week highs vs lows. Expanding new highs = broad strength. New highs CONTRACTING while index rises = bearish divergence. New lows expanding at bottom = final washout. Cumulative NH-NL line is powerful leading indicator.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-053",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SEASONAL PATTERNS — Strongest: Nov-April (Sell in May). Weakest: Sept (worst), Aug, May. January Effect: small-caps outperform. Monday = weakest day. Friday = strongest. First/last days of month = bullish. Pre-holiday = bullish. Presidential cycle: Year 3 strongest, Year 2 weakest.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-054",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "10/40-DAY MA SYSTEM — Buy: 10-day EMA crosses above 40-day EMA. Sell: crosses below. Filter: only buy when price above 200-day MA. Only sell when below 200-day. Triple MA system dramatically reduces false signals. Generates fewer whipsaws than shorter combinations.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-055",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "RSI FAILURE SWING — Bullish: RSI falls below 30, rallies above 30, pulls back stays above 30, breaks above prior RSI high = BUY. Bearish: RSI above 70, falls below 70, rallies fails 70, breaks below prior RSI low = SELL. More reliable than simple OB/OS readings.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-056",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MACD HISTOGRAM DIVERGENCE — Histogram = MACD minus Signal. Bars getting shorter while price continues trend = MOMENTUM divergence. Histogram divergence PRECEDES MACD line crossover. Two consecutive declining histogram peaks while price new high = early sell signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-057",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME CONFIRMATION OF BREAKOUTS — Breakout WITHOUT volume increase is SUSPECT. Valid breakout: volume 50%+ above average, ideally 100%+. Low-volume breakouts = false breakouts that reverse. Larger pattern = more volume needed. Volume is SINGLE most important breakout confirmation factor.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-058",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "OPEN INTEREST (Futures) — Rising OI + rising price = bullish (new longs). Rising OI + falling price = bearish (new shorts). Falling OI + rising price = bearish (short covering). Falling OI + falling price = bullish (long liquidation). Analyze with volume and price.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-059",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "BOLLINGER SQUEEZE STRATEGY — When BB contract inside Keltner Channels (BB width < KC width) = volatility squeeze. Entry: price breaks out of squeeze (BB expand outside KC). Direction = breakout direction. Stop: opposite band or recent swing. Catches beginning of major moves.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-060",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "RATE OF CHANGE (ROC) — ((Close - Close N periods ago) / Close N periods ago) x 100. Default 12-period. Positive = bullish momentum. Negative = bearish. Zero-line crossover = trend change. Divergence = early warning. Extreme readings = mean reversion.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-061",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PARABOLIC SAR — Trailing stop + reversal. Dot below price = uptrend (stop). Dot above = downtrend (stop). ACCELERATES as trend progresses. Initial AF: 0.02, increment: 0.02, max: 0.20. Best in trending - whipsaws in ranges. Use ADX >25 filter. Provides DEFINITIVE stop-loss level.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-062",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ICHIMOKU CLOUD — Tenkan (9p midpoint), Kijun (26p midpoint), Senkou Span A (avg projected 26p ahead), Senkou Span B (52p midpoint projected ahead), Chikou (close projected 26p back). Price above cloud = bullish. Below = bearish. Tenkan/Kijun cross = signal. Cloud color change = trend change.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-063",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ATR (Average True Range) — True Range = max(High-Low, |High-Prior Close|, |Low-Prior Close|). ATR(14) standard. Uses: 1) Position sizing: risk / ATR = shares. 2) Trailing stop: Close - 2xATR (long). 3) Volatility filter: trade breakouts when ATR expanding. ATR CONTRACTION precedes expansion.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-064",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "+DI/-DI DIRECTIONAL INDICATORS — +DI measures upward movement. -DI measures downward. BUY: +DI crosses above -DI. SELL: -DI crosses above +DI. Spread between DIs indicates trend strength. ADX measures STRENGTH of dominant DI. +DI/-DI crossover + ADX >25 = high-confidence signal.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-065",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MONEY FLOW INDEX (MFI) — Volume-weighted RSI. Uses typical price x volume. Default 14-period. OB >80, OS <20. Divergence at extremes = powerful reversal. Incorporates volume unlike RSI. MFI <10 at bottom = extreme selling. MFI >90 at top = extreme buying.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-066",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FIBONACCI TIME ZONES — Vertical lines at Fibonacci intervals (1,1,2,3,5,8,13,21,34,55,89) from significant turning point. Potential trend changes near these lines. Multiple zones converging = more significant. LESS reliable than price retracements - use as supplementary timing only.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-067",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VWAP — Volume Weighted Average Price. Institutional benchmark. Above VWAP = bullish, below = bearish. Std dev bands (1, 2, 3 sigma) like Bollinger Bands. Institutions buy below VWAP, sell above. First 30-60 minutes establish VWAP anchor - key S/R for session.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-068",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "PUT/CALL RATIO — CBOE equity P/C = Put vol / Call vol. >1.0 = extreme fear = contrarian BUY. <0.5 = extreme euphoria = contrarian SELL. 10-day MA: >0.85 = oversold, <0.60 = overbought. CONTRARIAN indicator. Smoothed version more reliable.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-069",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "VIX — CBOE Volatility Index (30-day implied vol). VIX >30 = high fear = potential bottom. VIX <15 = complacency = top forming. Spike >40 = extreme panic = tradeable bottom. VIX compression (<12) = volatility expansion coming. Inverse to S&P 500.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-070",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "A/D VOLUME LINE — Total volume in advancing vs declining stocks. Bearish divergence: market new high + A/D Volume NOT = distribution. More meaningful than simple A/D counts. Institutional selling shows in A/D volume divergence before price breaks.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-071",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "KELTNER CHANNELS — Middle: 20-EMA. Upper: EMA + 2xATR(10). Lower: EMA - 2xATR(10). Smoother than Bollinger Bands. Breakout above upper = strong bullish. Below lower = strong bearish. BB inside KC = squeeze. Price closing outside KC 5+ bars = extreme trend.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-072",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DONCHIAN CHANNELS — Upper: highest high of N periods (default 20). Lower: lowest low of N periods. Breakout above upper = buy. Below lower = sell. Stop: 10-day opposite extreme. Core of Turtle Trading. Simple and robust trend-following. Works all markets/timeframes.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-073",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CHAIKIN OSCILLATOR — MACD formula applied to A/D line: 3-day EMA of A/D minus 10-day EMA of A/D. Positive and rising = strong accumulation. Negative and falling = distribution. Divergence with price = trend change warning. More sensitive than OBV.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-074",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PIVOT POINTS — P = (H+L+C)/3. S1 = 2P-H. S2 = P-(H-L). R1 = 2P-L. R2 = P+(H-L). Above pivot = bullish bias. Below = bearish. S1/R1 first targets. S2/R2 extreme. From PRIOR session. Widely watched by institutional traders.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-075",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "S/R CLUSTER ZONES — When MULTIPLE methods converge at similar price: Fibonacci + prior swing + MA + trendline + pivot = HIGH-PROBABILITY reversal zone. More methods converge = stronger zone. Trade clusters with tight stops just beyond. Highest probability reversal areas.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-076",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RSI + MACD DIVERGENCE CONFIRMATION — RSI divergence AND MACD histogram simultaneous divergence = extremely high probability reversal. BOTH must diverge together. Third: volume declining. Triple divergence marks major tops/bottoms. Wait for trendline break before entry.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-077",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RELATIVE STRENGTH (RS) — RS = Security Price / Benchmark. RISING = outperforming. FALLING = underperforming. RS is LEADING - turns before price. RS breakouts often precede price breakouts. Sector RS rotation identifies institutional favor.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-078",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MULTIPLE TIMEFRAME ANALYSIS — Rule of 4-6 between timeframes. LONGER timeframe = trend to trade. INTERMEDIATE = signal. SHORTER = precise entry. Example: Weekly uptrend + Daily pullback to support + Intraday reversal = high-probability long. Never trade against larger timeframe.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-079",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SECTOR ROTATION — Early Recovery: Financials, Consumer Discretionary. Mid Cycle: Technology, Industrials. Late Cycle: Energy, Materials, Staples. Recession: Utilities, Healthcare, Staples. RS of sector ETFs vs S&P 500 reveals cycle phase. Rotation PRECEDES index moves.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-080",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "YIELD CURVE — Normal: long rates > short = expansion. Inverted: short > long = recession signal (6-18 month lead). Flat: transition. Steepening: recovery. Flattening: slowdown. Monitor 10-year minus 2-year Treasury spread. Inversions preceded EVERY US recession since 1950.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-081",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TURTLE TRADING — Entry: 20-day breakout. Exit: 10-day opposite. Sizing: 1 ATR = 1% equity. Stop: 2 ATR. Pyramid: add at 0.5 ATR intervals, max 4 units. Move stop to breakeven after first add. System 2: 55-day entry, 20-day exit. Core: cut losers, let winners run.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-082",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "HARMONIC PATTERNS — GARTLEY: AB=61.8% of XA, D at 78.6% of XA = ENTRY. BUTTERFLY: AB=78.6% of XA, D at 127.2-161.8% beyond X. BAT: D at 88.6% of XA. CRAB: D at 161.8% of XA. PRZ = convergence of all Fibonacci measurements.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-083",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "STOCHASTIC RSI — Stochastic formula applied to RSI values. More sensitive than RSI. Default: 14-period RSI, 14-period stochastic, 3-period smoothing. OB >80, OS <20. More responsive = more signals but more noise. Combine with 200-day MA trend filter.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-084",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "McCLELLAN OSCILLATOR — 19-day EMA of (Adv-Decl) minus 39-day EMA of same. Zero crossover = breadth trend change. Positive + rising = broad strength. >+100 = overbought. <-100 = oversold. SUMMATION INDEX (cumulative) confirms long-term breadth trends.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-085",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND REVERSAL CHECKLIST — 1) Trendline broken (close beyond). 2) Prior swing point violated. 3) MA crossover (50/200). 4) Volume confirmation. 5) Momentum divergence (RSI/MACD). 6) Breadth divergence (A/D line). Minimum 3 for high-confidence reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-086",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BULL MARKET CORRECTIONS — Intermediate corrections typically retrace 33-66% of prior advance. <33% = strong trend. >66% = potential reversal. Duration: 1/3 to 2/3 of prior advance. Volume during correction should be LESS than advance. Often end at rising 200-day MA.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-087",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "FIBONACCI ARC and FAN — Arcs: semicircles at 38.2%, 50%, 61.8% providing curved S/R. Fan: trendlines through 38.2%, 50%, 61.8% levels = dynamic S/R. Where fan lines cluster with price = high probability support. Add TIME dimension to Fibonacci analysis.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-088",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOVING AVERAGE RIBBON — Multiple MAs (10,20,30,40,50). All aligned in uptrend = STRONG trend (fan expanding). MAs converging = trendless. Ribbon EXPANSION = trend in force. CONTRACTION = potential reversal. Visual trend strength representation.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-089",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DEMARK TD SEQUENTIAL — Count of 9 consecutive candles closing above/below close 4 candles earlier. Completed 9-count = exhaustion. Perfected 9-count (8 or 9 candle high exceeds 6 and 7 highs) more reliable. Identifies END of trends, not beginning.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-090",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "SQUEEZE MOMENTUM — BB inside KC = squeeze ON. BB expand outside KC = squeeze fires. Momentum histogram (linear regression) shows direction. Green rising during release = long. Red falling = short. Squeeze identifies SETUP, momentum identifies DIRECTION.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-091",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ROLE REVERSAL — BROKEN support becomes resistance. BROKEN resistance becomes support. Level must be violated significantly. Volume on break confirms. More times tested before breaking = stronger role reversal. Fundamental principle applying to all S/R types.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-092",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE TARGETS CONFLUENCE — 1) Measured move (pattern height from breakout). 2) Fibonacci extension (161.8%). 3) Prior S/R levels. 4) Round numbers. 3+ methods at same price = high-confidence target. Partial profits at first target, trail stop. Define targets BEFORE entry.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-093",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CMF (Chaikin Money Flow) — 20-period calculation: (((Close-Low)-(High-Close))/(High-Low))xVolume, summed / volume summed. Range -1 to +1. >0 = buying pressure. <0 = selling. >+0.25 = strong buying. <-0.25 = strong selling. Normalized, bounded, comparable across securities.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-094",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BREADTH THRUST — 10-day EMA of Advances/(Advances+Declines) exceeds 0.615 = strong thrust = BULLISH. Historically, thrusts near bottoms preceded 12-18 month rallies. Very rare signal (<10 per decade). Indicates sudden broad participation shift.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-095",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CENTRAL PIVOT RANGE (CPR) — Pivot=(H+L+C)/3. BC=(H+L)/2. TC=(P-BC)+P. Narrow CPR = trending (yesterday was decisive). Wide CPR = ranging. Open above TC = bullish. Below BC = bearish. WIDTH indicates expected volatility.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-096",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "WOLFE WAVES — 5-wave channel pattern. Wave 5: false break beyond wave 3 trendline = ENTRY. Target: line connecting waves 1 and 4 projected forward. Wave 5 traps breakout traders, creating high-probability reversal. Key: wave 5 must exceed trendline.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-097",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE/VOLUME DIVERGENCE — Most powerful analytical tool. Bearish: price new high + volume declining = distribution. Bullish: price new low + volume declining = exhaustion. Multi-timeframe divergences most powerful. Wait for PRICE CONFIRMATION (pattern break) before acting.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-098",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COMMODITY SELECTION INDEX (CSI) — ATR(14) x Sqrt(Contract Value) x Margin factor. Highest CSI = most favorable commodities. Trade top 5-8 by CSI. Re-evaluate monthly. Allocates capital to best risk/reward based on current conditions.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-099",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "LINEAR REGRESSION CHANNEL — Best-fit line with parallel channel at 1-2 std dev. Upper channel = overbought. Lower = oversold. R-Squared >0.8 = strong trend. Breakout from channel = acceleration or reversal. Slope indicates direction and steepness.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-100",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME RATE OF CHANGE — ((Current Vol - Vol N periods ago) / Vol N periods ago) x 100. VROC spikes accompany climactic action. At bottoms: VROC spikes = selling climax. Declining VROC during trend = losing participation = potential reversal.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-101",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PATTERN RELIABILITY (Statistical) — H&S top: ~83% success on neckline break with volume. Inverse H&S: ~81%. Double top: ~72%. Ascending triangle: ~77% bullish. Descending: ~73% bearish. Symmetrical: ~75% continuation. Flags/pennants: ~85%+. These assume proper confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-102",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MEASURED MOVE — Method 1: Pattern height from breakout. H&S: head-to-neckline from breakout. Triangle: widest part. Method 2: Prior impulse from correction end (AB=CD). Method 3: Fibonacci 161.8%. Measured move = MINIMUM target. Use as FIRST profit target.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-103",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "GAP ANALYSIS — Common: in congestion, filled quickly. Breakaway: at pattern boundary, heavy volume, start of trend. Runaway: middle of trends, continuation. Exhaustion: near end, heavy volume, filled quickly. Runaway gap = halfway point of move. Island reversal = most powerful reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-104",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "H&S FAILURE PATTERNS — Fails when: 1) Volume NOT declining from left to right shoulder. 2) Right shoulder HIGHER than left. 3) Price fails below neckline, reverses up. FAILED H&S = extremely bullish (bear trap). Measuring: right shoulder low to neckline distance UPWARD.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-105",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "TRIANGLE BREAKOUT RULES — Breakout between 1/2 and 3/4 of width for reliability. First 1/2 = premature. After 3/4 = less powerful. Volume MUST expand significantly. Low volume breakout = likely false. Throwback/pullback ~60% within 1-2 weeks = SECONDARY entry.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-106",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PENNANT vs FLAG — Pennant: converging trendlines (small symm triangle). Flag: parallel lines against trend. Both need flagpole + declining volume. Pennants break sooner (5-15 days) vs flags (1-3 weeks). Both target = flagpole length. >85% reliability.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-107",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "RECTANGLE EXTENDED — 3+ months = more significant. Volume decreases during, increases on breakout. FALSE breakout rule: break on below-average volume = expect reversal. Min 5 touches of boundaries. Wider rectangle = larger projected move.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-108",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CUP WITH HANDLE (Bulkowski research) — Ideal cup depth: 12-33%. Duration: 7-65 weeks. Handle: 1-2 weeks min. Handle in UPPER half of cup. Handle depth: max 12-15%. Breakout volume: 50%+ above 50-day avg. Handle should drift DOWN - upward handle = less reliable.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-109",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM CONCEPTS — Momentum = rate of price change. Zero-line crossover = trend change. MOMENTUM LEADS PRICE - peaks/troughs before price. Longer lookback = more significant but delayed. Divergence = MOST important signal - warns of exhaustion before reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-110",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MA AS DYNAMIC S/R — Price pulls back to rising MA. Common: 20-EMA (short-term), 50-SMA (swing), 200-SMA (position). Each test that holds STRENGTHENS. Break below MA held 3+ times = more significant. Slope indicates trend strength - steeper = stronger.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-111",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRIPLE MA SYSTEM — 4-13-40 week system. Buy: 4-week crosses above both 13 and 40-week. Sell: crosses below both. Filters ~40% of false signals vs dual system but misses early moves. EMAs respond faster than SMA. Reduces whipsaws significantly.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-112",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "BB PERCENTAGE BWIDTH — (Upper-Lower)/Middle. <0.05 = squeeze = breakout imminent. Record-low = most powerful squeeze. Historical lows = 80%+ probability of large move in 2-4 weeks. Rising BWIDTH confirms trend. Falling during trend = exhaustion.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-113",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "RSI ZONE METHOD — Uptrend: RSI oscillates 40-80 (40 = support). Downtrend: 20-60 (60 = resistance). Adjust OB/OS to 80/20 in strong trends. ZONE approach superior to thresholds. RSI above 80 in uptrend = acceleration, NOT sell. Break below 40 = weakening.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-114",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VWAP STD DEV BANDS — 1st: VWAP +/- 1 sigma. 2nd: +/- 2 sigma. 3rd: +/- 3 sigma. At 1 sigma: normal. 2 sigma: significant, reversion likely. 3 sigma: extreme, high-probability reversion. Price reverts to VWAP ~70% during normal sessions.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-115",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "OSCILLATOR SIGNALS IN RANGES — When ADX <20 (no trend). Buy: RSI <30 + Stochastic <20 + price at support. Sell: RSI >70 + Stochastic >80 + price at resistance. Multiple confirmation dramatically improves. MA crossovers produce WHIPSAWS in ranges - avoid.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-116",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BREAKOUT VALIDATION — 1) Close beyond S/R (not just intraday). 2) Volume 50%+ above 50-day avg. 3) Follow-through next 1-2 bars. 4) Retest holds. 5) Multiple timeframes confirm. All 5 = ~90% success. 1-2 only = ~50%. Volume is SINGLE most important factor.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-117",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ADX EXTENDED — >20 + rising = trend developing, use trend-following. >40 = extreme, watch exhaustion. >50 = very strong, do NOT fade. Declining from >40 = tighten stops. Crossing above 20 = new trend beginning. Below 40 = take profits. Best for STRATEGY SELECTION.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-118",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "SENTIMENT CONTRARIAN — Majority bullish = near top. Bearish = near bottom. AAII: >60% bulls = caution, >60% bears = opportunity. P/C >1.0 = fear = buy. VIX >30 = fear. <15 = complacency. COT: commercials at extremes. Use as timing tool, not primary signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-119",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COT COMMERCIAL HEDGING — Weekly report. Commercial hedgers = smart money. NET LONG = bottom signal. NET SHORT = top. Large Speculators (funds) typically WRONG at extremes. Use 3-year lookback for extreme positioning. Multiple weeks at extreme = stronger signal.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-120",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BREADTH THRUST INDICATORS — 10-day A/D thrust: EMA of Adv/(Adv+Dec) >0.615 = bullish thrust. 10-day TRIN MA: <0.80 = bullish, >1.20 = bearish. Net New Highs expanding = broad strength. CONTRACTING while index rises = bearish divergence.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-121",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CONFIRMATION/DIVERGENCE CORE — All indicators should CONFIRM price. Bearish: price higher high, indicator lower high = distribution. Bullish: price lower low, indicator higher low = accumulation. RS divergence = sector rotation. Multi-week divergences most reliable.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-122",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CANDLESTICK FAILURE — Failed patterns MORE powerful than successful. Hammer FAILS (below low) = very bearish. Morning star FAILS = continuation. Bearish engulfing FAILS (above high) = strong bullish. FAILURE traps wrong-side traders, fueling opposite move.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-123",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ELLIOTT ALTERNATION — If wave 2 is sharp (zigzag), wave 4 will be sideways (flat/triangle). Wave 2: 50-61.8% of wave 1. Wave 4: 38.2% of wave 3. Should not overlap (except diagonals). Simple wave 2 = complex wave 4. Helps predict wave 4 shape BEFORE it unfolds.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-124",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ELLIOTT WAVE 3 — Largest, most powerful. Highest volume, strongest momentum, gap openings. MUST be longer than wave 1. CANNOT be shortest impulse wave - INVIOLABLE RULE. 161.8% extension of wave 1 = most common target. Bulk of profits in wave 3.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-125",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ELLIOTT WAVE 5 DIVERGENCE — Shows momentum divergence (RSI, MACD). Wave 5 = 61.8% of wave 1 or equal. Truncated 5th: fails to exceed wave 3 high = very bearish. Wave 5 on declining volume = normal. Ending diagonal in wave 5 = powerful reversal.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-126",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ELLIOTT WAVE 4 SUPPORT ZONE — Wave 4 ends in price territory of prior wave 4 of one lesser degree. Provides precise support zone. Wave 4 retraces 38.2% of wave 3 most commonly. Should not overlap wave 1 territory. If it does, count is wrong.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-127",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "NORMALIZED INDICATORS — Normalize for cross-asset comparison. PPO = ((12-EMA-26-EMA)/26-EMA)x100. ATR/Close x 100 = percentage volatility. Relative volume = current vol / 20-day avg. Essential for multi-asset portfolio analysis and comparison.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-128",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE ACTION MULTI-TIMEFRAME — Weekly candle high/low/close vs daily. Weekly close above prior weekly high = bullish. Daily engulfing within weekly range = less significant. Daily engulfing at weekly S/R = more significant. LARGER timeframe level = more significance.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-129",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VOLATILITY REGIME — ATR(14) as % of price: <1% = low vol (mean reversion). 1-3% = normal (trend-following). >3% = high vol (wider stops, smaller positions). ATR percentile rank over 252 days: <20th = compression (breakout imminent). >80th = expansion (exhaustion possible).",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-130",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE STRUCTURE — Swing analysis: define using 3-bar or fractal pivots. Swing high: lower high both sides. Swing low: higher low both sides. Uptrend = higher swing highs + higher swing lows. Break of swing low in uptrend = potential reversal. MINIMUM change for new trend.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-131",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PATTERN SIZE AND SIGNIFICANCE — Larger patterns (longer duration, wider range) produce larger moves. H&S over 6 months > H&S over 3 weeks. Rule: magnitude of move proportional to pattern size. Time = cause, price move = effect.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-132",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MA SELECTION — SMA: equal weighting, more lag, fewer whipsaws. EMA: recent weighting, faster, more whipsaws. WMA: linear weighting. DEMA/TEMA: less lag. Position: SMA 200. Swing: EMA 50. Day: EMA 20. No single MA universally best.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-133",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME — ACCUMULATION/DISTRIBUTION DAY: Up day with higher volume than prior up day = accumulation. Down day with higher volume than prior down day = distribution. Track: 3-5 consecutive distribution days near top = institutional selling. 3-5 accumulation days near bottom = buying.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-134",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "OBV SIGNALS — OBV new high BEFORE price = bullish (accumulation). OBV new low BEFORE price = bearish. OBV trendline break = early warning of price trend change. Analyze OBV with its OWN trendlines and S/R, independent of price.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-135",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "OSCILLATOR BOUNDS IN TRENDS — Strong uptrend: oscillators spend more time OB (RSI 50-80). Strong downtrend: more time OS (RSI 20-60). Adjust thresholds: uptrend OB = 80, OS = 40. Downtrend OB = 60, OS = 20. Fixed 70/30 in strong trends = premature signals.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-136",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CUMULATIVE VOLUME INDEX — CVI = cumulative (advancing vol - declining vol). CVI should confirm index highs. CVI new high before index = bullish. CVI diverging at highs = distribution. More robust than A/D line. Major tops show CVI divergence 2-4 weeks before price break.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-137",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SECTOR RS ROTATION — RS = Sector ETF / SPY. RS rising = outperforming. RS breaking to new high = leadership. Rotate into 2-3 top RS sectors. Sector rotation leads index by 1-3 months. Use 10-week and 40-week RS MAs for signals.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-138",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FIBONACCI CLUSTER ZONES — Calculate multiple Fib measurements from DIFFERENT swing points. Where 38.2%, 50%, 61.8% from different swings converge = extremely strong S/R. More measurements converging = higher probability. Use 3+ swing points per asset.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-139",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "DISTANCE FROM MA — ((Price - MA)/MA)x100. >10% above 200-SMA = extended, mean reversion likely. >20% above = extremely extended. <-10% below = oversold. SPX >10% above 200-SMA underperforms over next 3 months vs when near or below.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-140",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME TREND — Rising 20-day MA of volume = increasing participation = trend health. Falling volume during advance = distribution warning. Volume should expand at BREAKOUTS and contract during CONSOLIDATIONS. 50-day avg = institutional benchmark for normal.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-141",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "GAP TRADING RULES — Common: fade (trade to fill). Breakaway: trade in direction. Runaway: add to position. Exhaustion: close position (reversal imminent). Fading breakaway gaps has ~70% failure rate. Gaps in thinly traded markets less reliable.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-142",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MARKET PHASE IDENTIFICATION — Phase 1 (Accumulation): low vol, tight range, low volume, bearish sentiment. Phase 2 (Markup): rising prices, expanding volume. Phase 3 (Distribution): high vol, wide range, extreme volume, euphoria. Phase 4 (Markdown): declining prices, expanding volume on declines. Each phase needs different strategy.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-143",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PATTERN QUALITY SCORING — Score: 1) Duration (longer = higher). 2) Volume confirmation. 3) Clarity of boundaries. 4) Prior trend. 5) Breakout volume. 6) Throwback behavior. Sum: >80% = high confidence. 50-80% = moderate. <50% = avoid. Systematic pattern evaluation.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-144",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "SENTIMENT DATA — II survey: >55% bulls = excessive optimism. >55% bears = pessimism. Bull-bear spread >20% = overbought. <-20% = oversold. Margin debt: rising = fuel, extreme = fragility. Short interest: high + rising = potential squeeze fuel.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-145",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FIBONACCI EXTENSION TARGETS — Wave 3 = 1.618 x Wave 1. Wave 5 = 1.618 x (Wave 0-3) or 0.618 x Wave 1. Wave C = 1.618 x Wave A. ABC corrections: C = A (equality) or C = 1.618 x A. C=A is most common in zigzags.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-146",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CORRELATION ANALYSIS — Positive (>0.7): limited diversification. Negative (<-0.3): hedge potential. Correlation BREAKDOWN during crises (all become +1.0). 20-day rolling for short-term, 60-day for intermediate. Dynamic correlation better than static. Regime shifts signal market stress.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-147",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PRICE LEVEL PSYCHOLOGY — Round numbers ($50, $100, $10K BTC) act as psychological S/R. Institutions place orders at round numbers. Options strikes cluster there creating gamma exposure. Closer to round number = stronger influence. Break of major round number = psychological shift.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-148",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM POSITION SIZING — Momentum confirming trend (RSI 50-70, MACD positive, ADX >25): normal/increased size. Momentum diverging: reduce 50%. Momentum against position: close or minimum. Size PROPORTIONAL to signal confidence.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-149",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "INDICATOR PERIOD SELECTION — Short (7-10): more signals, more noise, day trading. Medium (14-21): balanced, swing. Long (40-50): fewer signals, more reliable, position. Match period to trading horizon. Wrong period for timeframe = #1 indicator misuse.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-150",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MULTIPLE INDICATOR CONFLUENCE — RSI oversold + MACD bullish crossover + Fib support + volume climax + candlestick reversal = MAXIMUM confluence. Each confirming factor exponentially increases probability. Minimum 3 independent signals for entry. More than 5 = extremely high probability.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-151",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "BB PERCENT B (%B) — %B = (Price-Lower)/(Upper-Lower). >1.0 = above upper band. <0 = below lower. %B crossing 0.8 + volume surge = breakout buy. Below 0.2 + volume = breakdown sell. %B diverging at bands = reversal warning.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-152",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "STOP-LOSS METHODOLOGY — 1) Pattern-based: below pattern low. 2) ATR: entry - 2xATR(14). 3) Percentage: varies by volatility. 4) MA-based: below key MA. 5) Volatility-adjusted: wider in high vol. ATR stop most adaptive. Stop at LOGICAL invalidation point, not arbitrary $.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-153",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "POSITION SIZING — Shares = (Account Risk $) / (Entry - Stop). Account Risk = Account x Risk% (1-2%). Example: $100K, 1% = $1000 risk. Entry $50, Stop $48 = $2 risk. Shares = 500. Ensures CONSISTENT risk across all trades regardless of price or volatility.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-154",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "WHIPSAW REDUCTION — 1) Require CLOSE beyond level. 2) % filter (break exceeds level by 1-3%). 3) Time filter (hold for 2-3 bars). 4) Volume filter (50-day avg). 5) Combine methods. Close + volume + 2-bar confirmation reduces whipsaws ~60%.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-155",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE ACTION — HIGHER TIMEFRAME CANDLES — Weekly candle engulfs multiple daily candles. Weekly hammer or doji at support = much more significant than daily. When daily signal aligns with weekly signal = dramatically higher probability. Always check the LARGER timeframe candle pattern first.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-156",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "KST INDICATOR (Know Sure Thing) — Pring composite momentum. Four ROC periods smoothed: ROC(10)x1 + ROC(15)x2 + ROC(20)x3 + ROC(30)x4. Signal: 9-period SMA of KST. BUY: KST crosses above signal. SELL: crosses below. Captures ALL cycle lengths. Long-term: monthly ROC(9,12,18,24) with 6-month signal.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-157",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM PRINCIPLES — 1) Momentum LEADS price. 2) Extremes indicate OB/OS. 3) Zero-line crossover confirms trend. 4) DIVERGENCE = most powerful early warning. 5) Momentum in direction of larger trend is more significant. Use multiple momentum timeframes.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-158",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ROC DETAILED — ((Close/Close N periods ago)-1)x100. Positive = bullish. Negative = bearish. Zero crossover = trend change. Short-term: 12-period. Intermediate: 26-period. Long-term: 52-week. ROC at extreme positive = overbought. Extreme negative = oversold. Divergence = primary signal.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-159",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM DIVERGENCE DEPTH — Bearish: 2-3 higher price highs while momentum lower highs. Each successive divergence MORE significant. First = warning. Second = high probability. Third = almost certain reversal. Wait for trendline break as trigger.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-160",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MACD HISTOGRAM (Pring) — Rising histogram = increasing bullish momentum. Falling = bearish. Histogram crossing zero = crossover imminent. TWO CONSECUTIVE declining peaks while price new high = most reliable momentum divergence. Histogram is LEADING indicator for MACD crossover.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-161",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SMOOTHED ROC — Apply MA to ROC to reduce noise. 10-period SMA of 12-period ROC. Crosses zero with less whipsaw. Trade-off: more lag. Eliminates false zero crossovers. 2-period SMA of ROC often sufficient smoothing.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-162",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE MOMENTUM — Close - Close N periods ago. Simplest momentum. Positive = bullish. Negative = bearish. Zero crossover = direction change. Divergence = early warning. 12-period standard for swing. Foundation for ROC, MACD, and others.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-163",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BOLLINGER BANDS (Pring) — Uptrend: price between middle and upper band. Touch middle = buy opportunity. Touch upper = NOT sell (trend riding). Downtrend: between middle and lower. Touch middle = sell opportunity. SQUEEZE precedes directional breakout.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-164",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRING SPECIAL K — Long-term composite. 6-month ROC x1 + 12-month x2 + 18-month x3 + 24-month x4. Signal: 9-month SMA. Crosses = major cyclical turns. Special K turns BEFORE the market - one of best long-term leading indicators.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-165",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND IDENTIFICATION (Pring) — Primary: 200-day MA + Monthly momentum. Intermediate: 50-day MA + Weekly momentum. Short-term: 20-day MA + Daily momentum. ALL three agree = highest confidence. Short-term against intermediate = correction. Intermediate against primary = potential reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-166",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "THREE MOMENTUM INDICATOR RULE — Use THREE different momentum indicators (RSI, MACD, ROC). All three = highest probability. Two of three = moderate. One of three = low, avoid. Different periods: short (RSI 10), intermediate (MACD 12/26), long (ROC 26). Confluence = strongest.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-167",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE CYCLES — Short: 4-week. Intermediate: 6-month. Long: 4-year (presidential). Cycle troughs = best buying. Cycles stretch/compress ~25%. Estimate next trough by averaging prior distances. Not exact - combine with momentum for timing.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-168",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM AND TREND CONFIRMATION — New price high/low MUST be confirmed by new momentum high/low. Price new high + momentum NOT = divergence = warning. Price new high + momentum new high = confirmed, continue. Absence of confirmation = reduce exposure.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-169",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MA ENVELOPES (Pring) — 5% envelopes around 65-day SMA. Upper envelope after extended rise = potential top. Lower after decline = potential bottom. Envelope breakouts in direction of trend = continuation. Against = reversal. Adjust % per historical volatility.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-170",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "YIELD CURVE AND STOCKS — Steep curve (long >> short) = early bull. Flat/inverted = late cycle, defensive. Curve leads stocks by 6-12 months. Curve steepening after inversion = buy signal. 10-year minus 2-year standard measure. Monitor monthly.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-171",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BOND-STOCK ROTATION — Bonds lead stocks at turning points. Bond prices rising while stocks falling = early recovery. Bond prices falling while stocks rising = warning. Treasury market 'smarter' at inflection points. Monitor 10-year yield trend.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-172",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COMMODITY-BOND RELATIONSHIP — Rising commodities = inflation expectations = bond prices fall. Falling commodities = deflation = bonds rise. CRB Index vs 10-year yield. Divergence = potential monetary policy inflection. Commodities LEAD bonds 3-6 months.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-173",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RS ANALYSIS (Pring) — RS = Security / Benchmark. Plot separately. RS BREAKOUT = about to outperform. RS BREAKDOWN = underperform. RS trendline analysis same as price. Sector RS rotation: identify rising RS sectors, allocate capital there.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-174",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MONTHLY MOMENTUM — Monthly charts with 12-month ROC or 12-month RSI for primary trend. Monthly momentum above zero = bull. Below = bear. Monthly divergence = major top/bottom (2-3x per decade). MOST important timeframe for position traders.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-175",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "WEEKLY MOMENTUM — Weekly charts with 26-week ROC or 13-week RSI. Weekly zero crossover = intermediate trend change. Weekly divergence = multi-month correction/recovery. Filters daily noise while responsive to intermediate moves. Most useful for swing traders.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-176",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRING HIERARCHY — 1) Monthly KST/Special K for primary. 2) Monthly MACD for cycles. 3) Monthly RSI for OB/OS. 4) Weekly momentum for intermediate. 5) Daily for timing. START with monthly, work down. Never take daily signal against monthly momentum.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-177",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM FAILURE SWINGS — Tops: peak, pullback, rally fails prior peak, breaks pullback low = SELL. Bottoms: trough, rally, fall holds above trough, breaks rally high = BUY. More reliable than simple OB/OS. Swing within momentum shows exhaustion.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-178",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "STOCHASTICS (Pring) — Full: %K period, %K slowing, %D period. Pring: 21,3,3 for less noise. OB >80, OS <20. Uptrend: only buy OS signals. Downtrend: only sell OB. Divergence at extremes = highest probability. Slow preferred over fast.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-179",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRIPLE CONFIRMATION FOR MAJOR TOPS — 1) Monthly momentum divergence. 2) Weekly momentum breaking down. 3) Daily price breaking key support. All THREE aligning = highest probability major top. Has marked every significant top since 1900.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-180",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRIPLE CONFIRMATION FOR MAJOR BOTTOMS — 1) Monthly momentum higher low while price lower low. 2) Weekly momentum crossing above zero. 3) Daily price breaking key resistance. All three = highest probability bottom. Rare but extremely profitable.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-181",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BREADTH-CONFIRMED MOMENTUM — A/D line momentum (13-week ROC) should confirm market momentum. Market new high + breadth momentum NOT = narrowing leadership = distribution. Breadth momentum often turns BEFORE market. Zero crossover = broad trend change.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-182",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM AND VOLUME — Volume momentum: 13-week ROC of weekly volume. Expanding in trend direction = confirmed. Declining during advance = distribution. Spiking at bottom = selling climax. Price momentum + volume momentum = more powerful than either alone.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-183",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRING BAROMETER — 6 indicators: Long-term KST, 12-month ROC, Industrial production, Yield curve, Credit spreads, Stock/bond ratio. Score each +1/0/-1. >+3 = strong bull. <-3 = strong bear. Composite reduces single-indicator false signals.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-184",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INFLATION-ADJUSTED ANALYSIS — Real (inflation-adjusted) prices show true trend. Stocks in real terms can differ from nominal. Real commodity prices: CRB/CPI. Real commodities rising = inflationary. Falling = deflationary. Reveals trends hidden by inflation.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-185",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INTERMARKET CONFIRMATION CHECKLIST — Stock top: 1) Bonds falling. 2) Commodities rising. 3) Dollar weakening. 4) Credit spreads widening. Stock bottom: 1) Bonds rising. 2) Commodities falling. 3) Dollar strengthening. 4) Spreads narrowing. More confirmations = higher confidence.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-186",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MULTIPLE INDICATOR STRATEGY (Pring) — Use indicators from DIFFERENT categories: 1) Trend-following (MA, MACD). 2) Momentum (RSI, ROC). 3) Volume (OBV). 4) Breadth (A/D). At least one from each must confirm. Two from same category = less confirmation than one from each.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-187",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LEADING vs LAGGING INDICATORS — Leading: oscillators (RSI, ROC, Stochastic) - signal BEFORE price, prone to false signals. Lagging: trend-following (MA, MACD, SAR) - signal AFTER change, more reliable. Use BOTH: leading for early warning, lagging for confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-188",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE-MOMENTUM SCENARIOS — 1) Price rising + momentum rising = STRONG BUY. 2) Price rising + momentum falling = CAUTION (divergence). 3) Price falling + momentum falling = STRONG SELL. 4) Price falling + momentum rising = EARLY BUY (bullish divergence).",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-189",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ROC ZERO-LINE STRATEGY — BUY: 12-month ROC crosses above zero during uptrend confirmed by 200-day MA. SELL: ROC crosses below zero. Filter: only trade in direction of 200-day MA slope. Simple and robust trend-following strategy.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-190",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "KELTNER + MOMENTUM — Keltner breakout confirmed by RSI >50 and MACD positive = high-probability long. Breakdown with RSI <50 and MACD negative = short. Keltner provides level, momentum provides confirmation. Filters ~60% of false Keltner breakouts.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-191",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM DIVERGENCE TIMING — Divergence can persist weeks/months. DO NOT trade on divergence alone. Wait for: 1) Trendline break. 2) MA crossover. 3) Momentum zero-line break. 4) S/R break. Need 2 of 4 confirmations after divergence. Divergence = WARNING, not trigger.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-192",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SEASONAL MOMENTUM — Filter: momentum buy in Nov-Apr strong period = higher confidence. Buy in May-Oct = lower. Seasonal amplifies momentum during favorable months, dampens unfavorable. SEASON is a filter, not a signal itself.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-193",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME OSCILLATOR — 10-period MA of volume minus 30-period MA. Positive + rising = expanding volume in uptrend. Negative + falling = expanding in downtrend. Divergence: volume oscillator declining while price rising = distribution. Combine with price momentum.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-194",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BREADTH MOMENTUM — 10-week EMA of NYSE A/D line. Above zero = bullish. Below = bearish. New high BEFORE index = bullish (broad participation). Index high + breadth NOT = narrowing = distribution. One of BEST leading indicators for market direction.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-195",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CREDIT SPREADS — Spread = corporate yield - Treasury yield. Widening = risk aversion = bearish for stocks. Narrowing = risk appetite = bullish. Credit spreads LEAD stocks by 1-3 months. BBB-Treasury >3% = elevated risk. <2% = normal. Monitor weekly.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-196",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DOLLAR AND COMMODITIES — Dollar and commodities INVERSELY correlated. Strong dollar = weak commodities. Dollar trend change leads commodity trend change by 1-3 months. Dollar Index (DXY) above 200-day MA = commodity headwind. Below = tailwind.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-197",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM POSITION MANAGEMENT — Increasing position as momentum confirms trend. Reducing as momentum diverges. Closing when momentum reverses. Add on first pullback to MA after momentum confirms. Reduce 50% on first momentum divergence. Close on MA break.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-198",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRING CYCLE INDICATORS — 1) 6-month ROC of S&P = short cycle. 2) 12-month ROC = intermediate cycle. 3) Special K = long cycle. When all three positive = strongest bull alignment. When all negative = strongest bear. Two positive + one negative = late cycle.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-199",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MULTIPLE TIMEFRAME MOMENTUM — Daily RSI for short-term timing. Weekly ROC for intermediate. Monthly KST for primary. Entry: daily RSI oversold + weekly ROC rising + monthly KST bullish = highest probability. All timeframes must agree for maximum confidence.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-200",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "RSI WITH BOLLINGER BANDS — RSI Bollinger Bands (20-period SMA of RSI +/- 2 std dev of RSI). RSI touching upper RSI band = overbought in RSI terms. RSI touching lower = oversold. RSI band squeeze = momentum compression. More nuanced than fixed 70/30 thresholds.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-201",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "HARAMI CROSS - Doji contained within prior large body. More significant than regular harami. At top: bearish. At bottom: bullish. Requires confirmation. Indicates decisive pause in momentum. The doji adds indecision to the contained pattern.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-202",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ABANDONED BABY - Rare 3-candle reversal. Bullish: black candle, doji gapping below, white gapping above doji. Doji abandoned by gaps on both sides. Very rare, very reliable. Bearish mirror at top. Volume adds significance.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-203",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "BELT HOLD - Bullish at bottom: white candle opens near low, closes near high (no lower shadow). Bearish at top: black opens near high, closes near low. Longer body = more significant. Needs confirmation candle.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-204",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "THREE INSIDE UP - 1) Long black. 2) White closes above midpoint of first (harami). 3) White closes above first high. Third candle CONFIRMS harami. More reliable than standalone. Volume increases on third.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-205",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "THREE OUTSIDE UP - 1) Small black. 2) White engulfs first. 3) White closes above second high. CONFIRMS engulfing. Higher probability than standalone. Volume expands on second and third.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-206",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CANDLESTICK WINDOW - Gaps in Japanese analysis. Windows tend to get filled. Upside window = support zone. Downside = resistance. After fill, if price reverses back to original direction, trend resumes strongly.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-207",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "TRAPPED TRADERS - Failed patterns trap wrong-side traders. Hammer that fails traps bottom buyers. Breakout reversal traps breakout traders. Trapped traders provide FUEL for opposite move via forced liquidation. Trade the failure.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-208",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME ON CANDLESTICKS - Bullish reversal patterns (hammer, engulfing, morning star) should show EXPANDED volume on the bullish candle. Bearish reversal patterns need volume on bearish candle. Pattern without volume = lower probability.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-209",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOVING AVERAGE - WMA (Weighted) - Linear weighting: most recent x10, prior x9, etc. Faster than SMA, slower than EMA. Less lag than SMA. More smoothing than EMA. Good compromise.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-210",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DEMA/TEMA - DEMA = 2*EMA - EMA(EMA). Reduces lag ~50%. TEMA = 3*EMA - 3*EMA(EMA) + EMA(EMA(EMA)). Even less lag. More responsive but more noise. Best for fast markets.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-211",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MACD PARAMETERS - Default 12,26,9. Crypto: 8,17,9 or 5,13,1. Long-term: 19,39,9. Shorter = more signals, more whipsaws. Longer = fewer, more reliable. Always backtest changes.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-212",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "RSI PARAMETERS - Default 14. Short-term 9 (more noise). Long-term 21 (more reliable). Crypto: 14-period with 80/20 thresholds better than 70/30 due to momentum nature.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-213",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ELLIOTT WAVE - DIAGONAL TRIANGLES - Ending diagonal in wave 5/C: converging trendlines, 5 overlapping 3-wave structures. Signals exhaustion. Leading diagonal in wave 1: may overlap. Both signal powerful reversal.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-214",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ELLIOTT WAVE PERSONALITY - Wave 1: least obvious. Wave 2: sharp, pessimism. Wave 3: strongest, longest. Wave 4: complex, alternates with 2. Wave 5: divergence, optimism, weak internals. Aids counting.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-215",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ELLIOTT COUNTING RULES - Start from end of prior larger degree wave. Largest to smallest. Larger degree takes precedence. Never force count. Multiple valid = stay out until clarity.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-216",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "POINT AND FIGURE DOUBLE TOP BUY - X column exceeds previous X column top. Basic P&F buy. More reliable when breakout column is tall. Box count determines price target.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-217",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "POINT AND FIGURE TRIPLE TOP - Three X columns at same level. Break above all three = strong buy. Count boxes across all tops x box size x reversal = target.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-218",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME PROFILE - Price spends most time at high-volume levels (value area). Low-volume nodes = quick passage. POC = highest volume price. Value Area = 1 std dev (~70% of volume). POC acts as strong S/R.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-219",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VOLUME AT PRICE - Horizontal volume showing volume at each price level. More useful than time-based volume. High volume at price = strong S/R. Low volume = passes through easily. Reveals institutional levels.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-220",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MARKET INTERNALS - TICK: uptick minus downtick. >+1000 = overbought. <-1000 = oversold. TICK positive all day = strong breadth. ADD (Absolute Breadth Index) high = volatile market.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-221",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "HINDENBURG OMEN - 1) NYSE new highs >2.2% AND new lows >2.2%. 2) NYSE >50-day MA. 3) McClellan negative. 4) New highs not 2x new lows. All 4 = increased decline probability within 40 days.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-222",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DEMARK SETUP/COUNTDOWN - Setup: 9 consecutive closes lower/higher than close 4 bars prior. After Setup, Countdown: 13 bars meeting different criteria. 13-count = stronger exhaustion. Identifies END of trends.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-223",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SUPERTREND - ATR-based. Upper = (H+L)/2 + mult*ATR. Lower = (H+L)/2 - mult*ATR. Default 10-period, 3x. Above lower band = uptrend. Below upper = downtrend. Clear direction with trailing stop.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-224",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "HEIKIN ASHI - Open = (prior open+close)/2. Close = (O+H+L+C)/4. Consecutive green with no lower wick = strong uptrend. Red no upper wick = strong downtrend. Small body + wicks = reversal. Filters noise.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-225",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RENKO BRICKS - New brick only on fixed price move. No time component. Trend change: 2 bricks opposite. Brick size: ATR(14). Renko + trend indicators = clean system. Eliminates most whipsaws.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-226",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MARKET PROFILE - TPO chart. Value Area = 70% of TPOs. POC = most TPOs. Above value area = trending up. Below = trending down. Opening outside + extending = trend day. Inside = range day.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-227",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PVI/NVI - PVI: adjusts on volume INCREASE days (crowd activity). NVI: adjusts on LOW volume days (smart money). NVI above 200-day MA = bullish (smart money in). PVI below = bearish. NVI better predictor.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-228",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PERCENT ABOVE 200-DAY MA - >80% = overbought breadth. <20% = oversold bottom. Divergence: index high + % declining = distribution. Spurt from <20% to >60% = breadth thrust.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-229",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PERCENT ABOVE 50-DAY MA - >80% = short-term overbought. <20% = oversold. Rising from <20% to >60% = momentum thrust. More responsive than 200-day. Divergence = leading warning.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-230",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "OPENING RANGE BREAKOUT - First 15-30 min establishes range. Breakout above high = long. Below low = short. Filter: volume 150%+ of first 30-min avg. Stop: opposite side of opening range.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-231",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BALTIC DRY INDEX - Shipping cost of raw materials. Leading indicator of economic activity. Rising = expansion. Falling = slowdown. Leads stock market 1-3 months. Less manipulated than other indicators.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-232",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TED SPREAD - 3-month LIBOR minus T-bill. Widening = credit stress = bearish. >100 bps = credit crisis. Narrowing = improving = bullish. Leads stocks 1-2 months at turning points.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-233",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COPPER/GOLD RATIO - Rising = risk-on, economic optimism. Falling = risk-off, flight to safety. Correlates with 10-year yield. Divergence from stock market = warning. Leads stocks 1-2 months.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-234",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "HIGH YIELD/TREASURY SPREAD - Widening = risk aversion = stocks declining. Narrowing = risk appetite = stocks rising. >800 bps = credit crisis. Leads stock bottoms 1-3 months. Best risk-on/off indicator.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-235",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VIX TERM STRUCTURE - Contango (longer > shorter) = normal, calm. Backwardation (shorter > longer) = fear, potential bottom. VIX spot > 3-month futures = extreme fear. Steeper contango = more complacency.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-236",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "GOLDEN RATIO - 1.618 and 0.618 in wave relationships, retracements, time cycles, extensions. Multiple golden ratio measurements converging at one price = extremely high-probability S/R zone.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-237",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SWING TRADING ENTRY - 1) HTF trend in favor. 2) Pullback to support (MA, Fib, trendline). 3) Reversal candlestick. 4) Oscillator oversold. 5) Volume declining on pullback. All five = highest probability.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-238",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLATILITY BREAKOUT - ATR(14) at 60-day low = compression. Enter in 20-day MA direction on range breakout. Stop: opposite side. Target: 2x range width. Longer compression = larger expansion.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-239",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "THROWS AND PULLBACKS - 50-65% of breakouts experience throwback/pullback within 1-2 weeks. Throwback holding at broken resistance = confirms breakout. Breaking back through = false breakout. Secondary entry opportunity.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-240",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "FALSE BREAKOUT TRADING - Breakout fails (reverses into range). Opposite move is often powerful. Enter opposite direction. Stop beyond false extreme. Target: opposite range side. Failed patterns trap traders.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-241",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "H&S VARIANTS - Complex H&S: multiple shoulders. Sloping neckline: ascending = bullish bias even if confirms. Descending = more bearish. Volume on neckline break more important than slope.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-242",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BROADENING FORMATIONS - Trendlines DIVERGE. Increasing volatility and indecision. Often at market tops. Volume increases with each swing. Usually bearish. Difficult to trade - better to avoid.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-243",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "DIAMOND PATTERN - Broadening then narrowing. Rare. At tops: broadening = volatility, narrowing = resolution. Break below narrowing = bearish. Measuring: height projected from breakout.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-244",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "HIGH AND TIGHT FLAG - Extremely steep flagpole (>90 degrees), very brief flat consolidation. Most powerful continuation pattern. Flat consolidation traps those waiting for pullback.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-245",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ISLAND REVERSAL - Two gaps sandwiching price cluster. Exhaustion gap + breakaway gap opposite. Most powerful reversal signal. Heavy volume on both gaps. Rare but very reliable.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-246",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PATTERN DIMENSIONS - 1) Height (taller = bigger move). 2) Width (wider = more significant). 3) Volume pattern. 4) Prior trend. Evaluate all four for quality score.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-247",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "WHIPSAW SIGNS - ADX <20 + BB flat/narrow + price around 50-MA + volume below average + MACD near zero. 3+ signs = avoid trend signals, use range strategies.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-248",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "HISTORICAL VOLATILITY PERCENTILE - ATR% ranked over 252 days. <20th = extreme compression (breakout imminent). >80th = extreme expansion (mean reversion). 30-70 = normal. Guides strategy selection.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-249",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PATTERN FAILURE BY MARKET - Stocks: H&S ~10% failure. Futures: higher (gaps). Crypto: highest (24/7, manipulation). Forex: moderate. Crypto needs more volume confirmation than stocks.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-250",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CONSECUTIVE DISTRIBUTION DAYS - 5+ consecutive down days with higher volume than prior down day near top = institutional selling = major top forming. 5+ accumulation days near bottom = buying.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-251",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SUPPORT TEST PARADOX - Each successful test STRENGTHENS support. But 4th+ test = more likely to break (buyers exhausted). Strongest support is also most vulnerable. Reduce position size on repeated tests.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-252",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ZWEIG BREADTH THRUST - 10-day ratio of advances/(advances+declines). >0.615 = thrust. Only 14 times since 1945. 100% of occurrences: market higher 12 months later. Average +25%. Extremely bullish.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-253",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "McCLELLAN SUMMATION - Running total of McClellan Oscillator. Rising = bullish breadth. Falling = bearish. New high before market = confirmed. >+2000 = strong. <-2000 = severe deterioration.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-254",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SECTOR BREADTH - % above 200-day MA per sector. Highest % = leadership. Lowest = laggards. Defensive leading = late cycle. Cyclicals leading = early/mid cycle. Rotation reveals cycle position.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-255",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SMART vs DUMB MONEY - NVI above 200-MA = smart money in. PVI above = crowd in. NVI rising + PVI falling = smart accumulates while retail exits = bullish. NVI historically better predictor.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-256",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLATILITY CONES - Historical vol at 20/60/120-day as percentiles. Current at 5th percentile = extreme compression. At 95th = extreme expansion. Reveals if vol is abnormally high/low relative to history.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-257",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE ACTION - CLOSE POSITION - Close near high = buying pressure into close = bullish. Near low = selling = bearish. Middle = indecision. CLOSE is most important price - final consensus.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-258",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COMPOUND INDICATOR SCORE - RSI signal (+1/0/-1) + MACD signal + Volume trend. >+2 = strong buy. <-2 = strong sell. Reduces false signals from single indicator. Rebalance weekly.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-259",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CHART PATTERN FAILURE RATES - Symmetrical triangle: 25%. Rectangle: 15%. Flag: 12%. H&S: 15%. Cup/handle: 8%. Wedge: 22%. Double top/bottom: 28%. Account for failure in position sizing.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-260",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INTRADAY VWAP STRATEGY - Long: price crosses above VWAP + expanding volume + RSI >50. Short: below + expanding + RSI <50. Stop: 1 ATR. Target: opposite VWAP band. Reversion to VWAP ~70%.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-261",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SQUEEZE + MOMENTUM - BB inside KC = squeeze. Momentum histogram (linear regression) direction. Green rising = long. Red falling = short. Squeeze fires on BB exit. Best breakout-catching tool.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-262",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "KST COMPOSITE MOMENTUM - Short: ROC(10)x1 + ROC(15)x2 + ROC(20)x3 + ROC(30)x4. Signal: 9-period SMA. Long: monthly ROC(9,12,18,24) with 6-month signal. Captures all cycle lengths simultaneously.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-263",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM LEADS PRICE - Momentum peaks/troughs BEFORE price. This is the fundamental principle of all momentum analysis. The lead time varies: shorter indicators lead less, longer lead more. Use this for TIMING.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-264",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ROC ZERO CROSSOVER - ROC(12) crossing above zero = bullish trend. Below = bearish. Filter: only trade in 200-day MA direction. Simple and robust trend-following. Reduced whipsaws with smoothing.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-265",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DIVERGENCE DEPTH RULE - First divergence = warning (reduce size). Second = high probability (prepare entry). Third = almost certain reversal (execute). Wait for trendline break as trigger. Each successive divergence more significant.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-266",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MACD HISTOGRAM (Pring) - Two consecutive declining peaks while price new high = best momentum divergence signal. Histogram is LEADING for MACD crossover. Rising = bullish acceleration. Falling = bearish.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-267",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SMOOTHED ROC - 10-period SMA of 12-period ROC. Crosses zero with less whipsaw. More lag but fewer false signals. 2-period SMA of ROC often sufficient. Best for intermediate signals.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-268",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BOLLINGER BANDS (Pring) - Uptrend: price between middle and upper. Touch middle = buy. Touch upper = NOT sell (trending). Downtrend: middle to lower. Touch middle = sell. Squeeze precedes breakout.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-269",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRING SPECIAL K - Long-term: 6-month ROC x1 + 12-month x2 + 18-month x3 + 24-month x4. Signal: 9-month SMA. Turns BEFORE market. One of best long-term leading indicators. Major cyclical turning points.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-270",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "THREE TIMEFRAME TREND - Primary: 200-MA + monthly momentum. Intermediate: 50-MA + weekly. Short-term: 20-MA + daily. ALL agree = highest confidence. Short against intermediate = correction. Intermediate against primary = reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-271",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "THREE MOMENTUM INDICATOR RULE - RSI + MACD + ROC all confirming = highest probability. Two of three = moderate. One of three = avoid. Different periods: short (RSI 10), intermediate (MACD 12/26), long (ROC 26).",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-272",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE CYCLES - Short: 4-week. Intermediate: 6-month. Long: 4-year (presidential). Troughs = best buying. Cycles stretch/compress 25%. Estimate next trough by averaging prior distances.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-273",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM CONFIRMATION RULE - New price high MUST be confirmed by new momentum high. Price high + momentum NOT = divergence = warning (reduce). Momentum confirming = continue. Absence = reduce exposure.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-274",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MONTHLY MOMENTUM - 12-month ROC or RSI on monthly charts. Above zero = bull market. Below = bear. Monthly divergence = major top/bottom (2-3x per decade). MOST important for position traders.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-275",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "WEEKLY MOMENTUM - 26-week ROC or 13-week RSI. Zero crossover = intermediate change. Weekly divergence = multi-month correction. Filters daily noise. Most useful for swing traders.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-276",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRING HIERARCHY - Monthly KST for primary. Monthly MACD for cycles. Monthly RSI for OB/OS. Weekly for intermediate. Daily for timing. START with monthly, work down. Never daily against monthly.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-277",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM FAILURE SWINGS - Top: peak, pullback, rally fails prior peak, breaks low = SELL. Bottom: trough, rally, fall holds above trough, breaks high = BUY. More reliable than simple OB/OS.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-278",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "STOCHASTICS (Pring) - 21,3,3 for less noise. OB >80, OS <20. Uptrend: only buy OS signals. Downtrend: only sell OB. Divergence at extremes = highest probability. Slow preferred over fast.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-279",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRIPLE CONFIRMATION TOPS - 1) Monthly momentum divergence. 2) Weekly momentum breaking down. 3) Daily price breaking support. All three = highest probability major top. Has marked every significant top.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-280",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRIPLE CONFIRMATION BOTTOMS - 1) Monthly higher low while price lower low. 2) Weekly crossing above zero. 3) Daily breaking resistance. All three = highest probability bottom. Rare but extremely profitable.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-281",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BREADTH MOMENTUM - 10-week EMA of A/D line. Above zero = bullish. Below = bearish. New high before index = broad participation. Index high + breadth NOT = distribution. Best leading indicator.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-282",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME MOMENTUM - 13-week ROC of weekly volume. Expanding in trend direction = confirmed. Declining during advance = distribution. Spiking at bottom = selling climax. Combine with price momentum.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-283",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRING BAROMETER - KST + 12-month ROC + Industrial production + Yield curve + Credit spreads + Stock/bond ratio. Score each +1/0/-1. >+3 = strong bull. <-3 = strong bear. Composite reduces false signals.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-284",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INTERMARKET CONFIRMATION - Top: bonds falling + commodities rising + dollar weakening + spreads widening. Bottom: bonds rising + commodities falling + dollar strengthening + spreads narrowing. More = higher confidence.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-285",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MULTIPLE CATEGORY INDICATORS - Use one from EACH: trend-following (MA), momentum (RSI), volume (OBV), breadth (A/D). Two from same category = less confirmation than one from each. DIVERSIFY indicator types.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-286",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LEADING vs LAGGING - Leading: oscillators (RSI, ROC) - signal before price, more false. Lagging: trend-following (MA, MACD) - signal after, more reliable. Use both: leading for warning, lagging for confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-287",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE-MOMENTUM SCENARIOS - 1) Price up + momentum up = STRONG BUY. 2) Price up + momentum down = CAUTION. 3) Price down + momentum down = STRONG SELL. 4) Price down + momentum up = EARLY BUY.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-288",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SEASONAL MOMENTUM FILTER - Buy signal Nov-April = higher confidence. Buy May-October = lower. Season amplifies favorable, dampens unfavorable. Season is FILTER not signal.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-289",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CREDIT SPREADS - Corporate yield minus Treasury. Widening = risk aversion = bearish. Narrowing = risk appetite = bullish. LEAD stocks 1-3 months. BBB-Treasury >3% = elevated. <2% = normal.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-290",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DOLLAR-COMMODITY INVERSE - Strong dollar = weak commodities. Dollar change leads commodity change 1-3 months. DXY above 200-MA = commodity headwind. Below = tailwind.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-291",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RS BREAKOUT LEADING - RS line new high while price consolidating = LEADING signal. Enter anticipating price follows. 2-4 week lead time. Combine with volume on RS breakout. Best for sector rotation.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-292",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM POSITION MANAGEMENT - Add as momentum confirms. Reduce 50% on first divergence. Close on MA break. Add on first pullback to MA after confirmation. Size proportional to confidence.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-293",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MULTIPLE TIMEFRAME MOMENTUM ENTRY - Daily RSI oversold + weekly ROC rising + monthly KST bullish = highest probability entry. All timeframes must agree for maximum confidence.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-294",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "RSI BOLLINGER BANDS - 20-period SMA of RSI +/- 2 std dev of RSI. Touch upper RSI band = OB in RSI terms. Touch lower = OS. Squeeze on RSI = momentum compression. More nuanced than 70/30.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-295",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COMMODITY-BOND RELATIONSHIP - Rising commodities = inflation = bonds fall. Falling = deflation = bonds rise. CRB vs 10-year yield. Divergence = monetary policy inflection. Commodities LEAD bonds 3-6 months.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-296",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BOND-STOCK ROTATION - Bonds lead stocks at turning points. Bond prices rising + stocks still falling = early recovery. Bond prices falling + stocks rising = warning. Treasury is smarter at inflection.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-297",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "YIELD CURVE STOCKS - Steep curve = early bull. Flat/inverted = late cycle. Leads stocks 6-12 months. Steepening after inversion = buy signal. 10-year minus 2-year standard. Monitor monthly.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-298",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RS ANALYSIS (Pring) - RS = Security/Benchmark. Plot separately. RS breakout = about to outperform. RS breakdown = underperform. RS trendline same as price. Sector RS rotation for allocation.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-299",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INFLATION-ADJUSTED PRICES - Real prices show true trend. Stocks in real terms can differ from nominal. Real commodities: CRB/CPI. Rising = inflationary. Falling = deflationary. Reveals hidden trends.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-300",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "KELTNER + MOMENTUM - Keltner breakout + RSI >50 + MACD positive = high-probability long. Breakdown + RSI <50 + MACD negative = short. Filters ~60% false Keltner breakouts.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-301",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE ACTION CLOSE POSITION - Close near high = buying pressure = bullish. Near low = selling = bearish. Close is most important price - final consensus. Institutional activity concentrates near close.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-302",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FIBONACCI RATIO ORIGINS - 61.8% = Fib sequence convergence. 38.2% = 1-0.618. 23.6% = 1-0.764. 161.8% = 1/0.618. Ratios appear because participants collectively follow Fib-based behavior.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-303",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ELLIOTT FRACTAL NATURE - Each wave subdivides into smaller waves of same structure. Wave 1 contains 5 intermediate waves, each with 5 minor waves. Self-similarity at every degree.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-304",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ADVANCE-DECLINE CUMULATIVE - Running total of daily advances minus declines. New high before market = bullish. Lower high while market higher = BEARISH divergence. Can diverge months before market follows.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-305",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PRICE RELATIVE TO MA - ((Price-MA)/MA)x100. >10% above 200-SMA = extended. >20% = extremely extended. <-10% = oversold. SPX >10% above underperforms next 3 months. Mean reversion zone.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-306",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CHAIKIN OSCILLATOR DIVERGENCE - CMF lower highs while price higher highs = distribution. CMF higher lows while price lower lows = accumulation. CMF divergence more reliable than OBV due to normalization.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-307",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DONCHIAN CHANNEL BREAKOUT - 20-day high/low breakout. Entry on new 20-day high/low. Stop: 10-day opposite. Core Turtle system. Simple and robust. Works all markets/timeframes. Filter false signals with ATR.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-308",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ICHIMOKU FULL SYSTEM - Price above cloud + Tenkan above Kijun + Chikou above price + future cloud bullish = STRONG BUY. Cloud thinnest at edges = potential break. Flat Kijun = strong S/R. Cloud twist = trend change.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-309",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ATR POSITION SIZING - Risk per trade / (ATR x multiplier) = position size. Example: $1000 risk / (2 x $5 ATR) = 100 shares. Ensures equal risk per trade regardless of volatility. ATR adapts position size to market conditions.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-310",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ORDER BLOCKS - Last bearish candle before bullish move = demand zone. Last bullish before bearish = supply zone. Institutional entry points. Price returning = high probability bounce. Stop: beyond order block.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-311",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FAIR VALUE GAPS - Candle 1 high < Candle 3 low (bullish) or Candle 1 low > Candle 3 high (bearish). Gap = imbalance. Price tends to fill FVG before continuing. Higher timeframes = more significant.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-312",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLATILITY REGIME - ATR% of price: <1% = low vol (mean reversion). 1-3% = normal (trend-following). >3% = high vol (wider stops). ATR percentile <20th = compression (breakout imminent). >80th = expansion (exhaustion).",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-313",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE STRUCTURE - Swing high: bar with lower high both sides. Swing low: higher low both sides. Uptrend = higher swing highs + higher swing lows. Break of swing low = potential reversal.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-314",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PATTERN SIZE SIGNIFICANCE - Larger patterns produce larger moves. H&S over 6 months > 3 weeks. Time = cause, price move = effect. Magnitude of move proportional to pattern size.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-315",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SECTOR RS ROTATION - RS = Sector ETF / SPY. RS new high = leadership. Rotate into 2-3 top sectors. Rotation leads index 1-3 months. Use 10-week and 40-week RS MAs for signals.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-316",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FIBONACCI CLUSTER ZONES - Calculate 38.2%, 50%, 61.8% from 3+ DIFFERENT swings. Where they converge = extremely strong S/R. More measurements = higher probability. Use 3+ swing points per asset.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-317",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CORRELATION ANALYSIS - Positive >0.7: limited diversification. Negative <-0.3: hedge potential. Correlations break down during crises (all become +1.0). Use 20-day rolling. Dynamic > static.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-318",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PRICE PSYCHOLOGY - Round numbers ($50, $100, $10K BTC) act as S/R. Institutions place orders at round numbers. Options strikes cluster there. Closer = stronger influence. Break = psychological shift.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-319",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM POSITION SIZING - Momentum confirming (RSI 50-70, MACD+, ADX >25): normal/increased size. Diverging: reduce 50%. Against: close. Size proportional to signal confidence.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-320",
+    "source": "murphy-technical-analysis",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "INDICATOR PERIOD SELECTION - Short (7-10): day trading. Medium (14-21): swing. Long (40-50): position. Match period to horizon. Wrong period for timeframe = #1 misuse.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-321",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME DIVERGENCE PATTERNS - Distribution: price rising on declining volume 2-4 weeks. Each new high lighter. Accumulation: price falling on declining volume. Rate of change matters - rapid decline = stronger signal.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-322",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PATTERN SCANNING - Bullish: 1) Above 200-MA. 2) Pullback to 50-MA or Fib. 3) Volume declining. 4) RSI 30-50. 5) Bullish candlestick. 6) Sector RS rising. All 6 = highest probability.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-323",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FAILURES AS SIGNALS - Failed patterns produce stronger moves than successful. Trapped traders create forced buying/selling. Always identify what constitutes FAILURE of your setup - trade the failure.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-324",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MA CONFLUENCE - 20-EMA, 50-SMA, 200-SMA converging within 2% = MA compression. Precedes major moves. Wider spread = stronger trend. Wait for breakout direction on compression.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-325",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "GAP + VOLUME - Gap >2% on volume >200% average = breakaway gap. Buy pullback to gap edge. Stop below gap low. Runaway gaps provide BEST risk/reward in trending markets.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-326",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INTRADAY PIVOTS - P=(H+L+C)/3. Buy at S1 with bullish candle + volume. Target: P or R1. Open above pivot = bullish bias. Pivot + VWAP convergence = strongest intraday S/R.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-327",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DIVERGENCE FAILURE - When divergence FAILS (price continues despite divergence), move ACCELERATES. Trade the failure: if bearish divergence fails, go long aggressively. Failed divergence = strongest continuation.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-328",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLATILITY BREAKOUT SYSTEM - Price moves >1 ATR from prior close in one session. Direction = trade direction. Stop: 0.5 ATR. Target: 3x ATR. Catches explosive moves from compression.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-329",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MULTI-ASSET CORRELATION - Before entry, check correlation with portfolio. >0.7 = no new trade (concentration). <-0.3 = hedge opportunity. Use 20-day rolling. Improves risk-adjusted returns.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-330",
+    "source": "kirkpatrick-dahlquist-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRICE STRUCTURE BREAK - Uptrend: first swing low break = warning. Prior swing low break = reversal. Downtrend: swing high breaks in sequence. The SEQUENCE of breaks defines trend objectively.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-331",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ROC DIVERGENCE - ROC(26) making lower high while price higher high = momentum divergence. First = warning. Second = high probability. Third = almost certain. Wait for trendline break to trigger.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-332",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "KST SIGNAL - KST crossing above 9-period SMA = buy. Below = sell. Long-term monthly KST cross = primary trend change. Short-term = intermediate. KST designed to capture all cycle lengths.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-333",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MOMENTUM AND TREND FILTER - Only trade momentum signals in direction of 200-MA slope. RSI buy in uptrend (price above rising 200-MA) = high confidence. RSI buy in downtrend = low confidence.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-334",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PRING SPECIAL K SIGNAL - Crosses above 9-month SMA = major bull signal. Below = major bear. Special K turns BEFORE market. One of best long-term leading indicators. Use for PRIMARY trend only.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-335",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CYCLE IDENTIFICATION - Measure distance between last 3 cycle troughs. Average = expected next trough distance. Apply to last trough for timing. Combined with momentum for precise entry.",
+    "priority": 3
+  },
+  {
+    "id": "book-ta-336",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MULTI-TIMEFRAME ALIGNMENT - Daily RSI buy + weekly ROC positive + monthly KST above signal = MAXIMUM probability. Each timeframe adds conviction. Entry only when all align. Partial alignment = partial position.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-337",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VOLUME-PRIce MOMENTUM - Volume ROC + Price ROC both positive = confirmed trend. Volume ROC negative + Price ROC positive = distribution warning. Volume ROC spiking at bottom = selling climax.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-338",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INTERMARKET DIVERGENCE - Bonds rising + stocks still falling = early recovery signal. Dollar falling + commodities still falling = commodity bottom approaching. Watch for LEADING market to diverge from LAGGING.",
+    "priority": 4
+  },
+  {
+    "id": "book-ta-339",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RSI + STOCHASTIC CONFLUENCE - RSI(14) <30 AND Stochastic(21,3,3) <20 simultaneously = extreme oversold = high-probability buy. Both >80/70 = extreme overbought = sell. Dual oversold/overbought more reliable than either alone.",
+    "priority": 5
+  },
+  {
+    "id": "book-ta-340",
+    "source": "pring-technical-analysis-explained",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CREDIT MARKET SIGNALS - Investment grade spreads narrowing = improving risk appetite = bullish. Widening = deteriorating = bearish. High yield spreads lead equity by 1-3 months. Monitor weekly.",
+    "priority": 4
+  }
+]

@@ -1,0 +1,3370 @@
+[
+  {
+    "id": "exec-001",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing",
+      "rule"
+    ],
+    "content": "2% RULE — Never risk more than 2% of total equity on a single trade. Calculate: Equity × 2% = max dollar risk. Divide by (Entry - Stop) = max position size. $10K account → $200 max risk. If stop is $2 away → max 100 units. Professionals risk LESS than 2%. Recalculate equity 1st of each month. This is your shark repellent — NEVER violate.",
+    "priority": 5
+  },
+  {
+    "id": "exec-002",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing",
+      "rule"
+    ],
+    "content": "6% RULE — If monthly equity drops 6% below month's opening, STOP ALL TRADING. Close positions, go to sidelines. Calculates total open risk: 3 trades at 2% each = 6% max exposure. No new trades until one moves stop to breakeven. Forces you to stop losing streaks like an institutional manager. Recalculate on 1st of each month.",
+    "priority": 5
+  },
+  {
+    "id": "exec-003",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context",
+      "rule"
+    ],
+    "content": "POSITION SIZING IS THE #1 FACTOR — Same system, 5 sizing models on Dow stocks over 5.5 years: Fixed 100 shares = 1.75% annual. 1% risk model = 20.92% annual. 0.5% volatility model = 17.52%. Position sizing DRAMATICALLY changes identical system results. Ralph Vince study: 40 PhDs played positive-expectancy game; 95% LOST money due to wrong sizing. Focus on HOW MUCH, not WHEN.",
+    "priority": 5
+  },
+  {
+    "id": "exec-004",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "trigger",
+      "rule"
+    ],
+    "content": "RISK CALCULATION FORMULA — Risk = (Entry - Stop) × Position Size. ALWAYS calculate BEFORE entering. If calculated risk exceeds per-trade limit, reduce position or skip. Crypto adaptation: Position Size = Account$ × Risk% ÷ (Entry - Stop$). Never enter without knowing exact dollar risk. Factor exchange fees (0.52% round-trip taker on Kraken) into EVERY R:R calculation.",
+    "priority": 5
+  },
+  {
+    "id": "exec-005",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "risk_context",
+      "indicator"
+    ],
+    "content": "STOP PLACEMENT — Place stops based on TECHNICAL LEVELS, not arbitrary percentages. Use ATR-based stops: measure average noise, place stop beyond 1× ATR. Minimum: stop must be beyond market noise level. Never move stop AGAINST your position. Accept the stop loss amount BEFORE entering. Wider stops = fewer whipsaws but need smaller position to fit 2% rule.",
+    "priority": 5
+  },
+  {
+    "id": "exec-006",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "timeframe",
+      "setup_type",
+      "rule"
+    ],
+    "content": "MULTIPLE TIMEFRAME CONFIRMATION — Before entry: 1) Highest TF gives direction (4H/Daily for crypto). 2) Mid TF gives timing (1H pullback signal). 3) Lowest TF gives precision (5m/15m entry). Always start at highest TF and work down. If higher TF signal missing, do NOT trade regardless of lower TF signals. Higher TF ALWAYS overrides lower.",
+    "priority": 5
+  },
+  {
+    "id": "exec-007",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "trigger",
+      "setup_type",
+      "regime_subtype"
+    ],
+    "content": "ASIAN SESSION RANGE — Asian session (00:00-08:00 UTC) typically forms tight range. Mark Asian high/low. During European open: price often sweeps one side of Asian range, traps traders, then reverses. The sweep of Asian high/low during EU session is one of the most reliable setups in crypto 24/7. Entry: wait for sweep + reversal candle on 5m. Stop: beyond sweep wick. Target: opposite side of Asian range.",
+    "priority": 5
+  },
+  {
+    "id": "exec-008",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "trigger",
+      "setup_type"
+    ],
+    "content": "SESSION HIGH/LOW LEVELS — Mark previous day high (PDH), previous day low (PDL), Asian session high/low. During EU open: price often sweeps Asian high/low then reverses. During US open: price often sweeps London high/low or PDH/PDL. The sweep + immediate reversal = entry signal. Don't predict the sweep — wait for it to happen and confirm with reversal candle on 5m.",
+    "priority": 5
+  },
+  {
+    "id": "exec-009",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "timeframe",
+      "rule"
+    ],
+    "content": "KILL ZONES (CRYPTO-ADAPTED) — EU Kill Zone: 07:00-10:00 UTC (institutional activity spike). US Kill Zone: 13:30-16:30 UTC (volume peak + US equities open). Overlap: 13:30-16:00 UTC = highest volume window. Asian: 00:00-08:00 UTC = range building. Trade ONLY during kill zones or overlaps. First 15 min of each = analysis. Execute in the MIDDLE when structure is clear.",
+    "priority": 5
+  },
+  {
+    "id": "exec-010",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "risk_context",
+      "rule"
+    ],
+    "content": "NEVER ENTER WITHOUT STOP — Always use stop losses. A mental stop is not enough — place it in the market. Never enter a position without knowing your exit point first. If you can't define your stop before entry, you don't have a trade — you have a gamble. This applies to every single trade, no exceptions.",
+    "priority": 5
+  },
+  {
+    "id": "exec-011",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "trigger",
+      "setup_type",
+      "rule"
+    ],
+    "content": "DON'T CHASE — If you miss an entry, let it go. The system produces signals regularly. Chasing entries at extended prices violates risk/reward and puts you on the wrong side of psychology. Those who chase become the 'pain' that others profit from. Wait for pullback to a key level for next entry opportunity.",
+    "priority": 5
+  },
+  {
+    "id": "exec-012",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "timeframe",
+      "rule"
+    ],
+    "content": "TIME-BASED STOPS — If position doesn't move in your favor within X periods, exit. Rationale: if market hasn't responded to your signal, edge may be gone. Typical: 4-8 candles for scalps, 12-24 candles for swings. Combine with trailing: time stop activates only if position is at/below entry after X periods. Don't use alone — pair with structural stop.",
+    "priority": 5
+  },
+  {
+    "id": "exec-013",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing",
+      "rule"
+    ],
+    "content": "DRAWDOWN RECOVERY TABLE — 10% loss needs 11% gain. 20% needs 25%. 30% needs 43%. 40% needs 67%. 50% needs 100%. Beyond 50% = almost impossible recovery. This is WHY position sizing matters more than entry. Protect equity at all costs — it's your working capital. After 3 consecutive losers: stop for day. After 5: stop for week.",
+    "priority": 5
+  },
+  {
+    "id": "exec-014",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context",
+      "rule"
+    ],
+    "content": "ANTI-MARTINGALE SIZING — Increase bet after WIN, decrease after LOSS. ALL professional position sizing is anti-martingale. You can have a winning system and still lose by betting too much. After 10% drawdown from equity peak, reduce position size 50%. After 20% drawdown, trade minimum size. Only increase after new equity high.",
+    "priority": 5
+  },
+  {
+    "id": "exec-015",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "stop_loss",
+      "rule"
+    ],
+    "content": "DON'T EVER AVERAGE LOSERS — Decrease trading volume when trading poorly; increase when trading well. Never trade situations where you don't have control. If a position doesn't feel right as soon as you put it on, get out immediately. Don't be embarrassed to change your mind within minutes.",
+    "priority": 5
+  },
+  {
+    "id": "exec-016",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "PLAY GREAT DEFENSE — Every day assume every position you have is wrong. Know where your stop risk points are. Define maximum possible drawdown. Spend rest of day enjoying positions going your way. PTJ limits monthly losses: 3% stop on equity for rest of month if down. Never have a double-digit monthly loss.",
+    "priority": 5
+  },
+  {
+    "id": "exec-017",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context",
+      "session"
+    ],
+    "content": "COMPOUND STRATEGY — Build profit for the day. On directional days, risk the profit from 10+ trades. Day closes → profit locked as equity, can't risk it. Next day resets. Accumulate daily profits, then on best days, aggressive shots with no downside. This is how 500%+ return in 12 months was achieved (Fabio).",
+    "priority": 5
+  },
+  {
+    "id": "exec-018",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "trigger"
+    ],
+    "content": "VOLUME IS THE ONLY LEADING INDICATOR — Three levels: 1) LAGGING — indicators (MACD, RSI) — derivatives of price, always follow. 2) REAL-TIME — price action — watching effect. 3) LEADING — volume — watching narrative BEFORE price creates it. CVD moves before price. Aggression appears before breakout. If using lagging indicators, you're always behind.",
+    "priority": 5
+  },
+  {
+    "id": "exec-019",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "trigger",
+      "setup_type",
+      "rule"
+    ],
+    "content": "ENTRY FINESSE — Avoid market orders — opens door to bad habits. Use limit orders at pre-identified support/resistance levels. Place orders BEFORE market reaches your level. Either orders get hit or they don't — no chasing. If you miss an entry, let it go. This enforces professional mindset: pre-planned, anti-impulsive entries only.",
+    "priority": 5
+  },
+  {
+    "id": "exec-020",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing",
+      "rule"
+    ],
+    "content": "DRAWNDOWN RULES — After 3 consecutive losers: stop for day, review. After 5: stop for week. After 10% account drawdown: reduce size 50%. After 20%: minimum size only. After 25%: close all, take 1-2 week break. Return to paper trading until 20+ profitable simulated trades. Then return with half previous size.",
+    "priority": 5
+  },
+  {
+    "id": "exec-021",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "asset_behavior"
+    ],
+    "content": "CALENDAR SPREAD ENTRY — Sell near-term, buy longer-term same strike. Profits from theta decay and/or rising IV. Best in ranging/low-volatility markets. IV rank >50 for selling premium. Manage at 50% profit or 2× credit stop. Gamma risk highest ATM near expiry — close/roll at 21 DTE.",
+    "priority": 5
+  },
+  {
+    "id": "exec-022",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "session",
+      "timeframe"
+    ],
+    "content": "OPENING RANGE BREAKOUT — Define high/low of first 5-15 min. Long on break above range high with volume, short below range low. Stop at opposite side. Best on assets with catalyst/gap. 80% of daily range established in first 90 minutes. Apply to crypto: use first 15 min of EU/US kill zone as range.",
+    "priority": 5
+  },
+  {
+    "id": "exec-023",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "timeframe",
+      "rule"
+    ],
+    "content": "FIRST HOUR RULE — Never trade first 5 min. Highest probability 15-90 min into session. By mid-session volume dies. Avoid midday — low probability chop. For crypto: apply to EU open (07:15-08:30 UTC) and US open (13:45-15:00 UTC). Quality setups exist in first 2 hours only.",
+    "priority": 5
+  },
+  {
+    "id": "exec-024",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "stop_loss",
+      "trigger"
+    ],
+    "content": "SCALING OUT — Enter full position. At first target: close half, move stop to breakeven. At second target: close half of remaining, move stop to entry on final quarter. Let last quarter run with trailing stop or exit signal. Captures guaranteed profit on early targets while allowing runners. Don't trail aggressively on full position — gets stopped on wiggles.",
+    "priority": 5
+  },
+  {
+    "id": "exec-025",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing",
+      "rule"
+    ],
+    "content": "EXPECTANCY FORMULA — Expectancy = (Win% × Avg Win) - (Loss% × Avg Loss). Per dollar risked: E = (PW × AW/PL) - 1. Positive expectancy required. Most important: not how often you win, but how much when right vs wrong. A 40% win rate with 3:1 R:R beats 80% win rate with 1:3. Track over 100+ trades minimum.",
+    "priority": 5
+  },
+  {
+    "id": "exec-026",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "SYSTEM DESIGN IS PERSONAL — Different traders need different systems: risk tolerance, time available, capital, personality. A trend follower who needs action will fail. Design system around WHO YOU ARE, not what looks good on paper. Test for psychological compatibility before live trading. Self-knowledge comes BEFORE system design.",
+    "priority": 5
+  },
+  {
+    "id": "exec-027",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "trigger",
+      "rule"
+    ],
+    "content": "WEBSOCKET ORDER BOOK SYNC — WebSocket connections silently drop during network lag. If a single Level 2 update packet is dropped, local order book state becomes CORRUPTED. Defensive: 1) Detect sequence discontinuities. 2) Sever connection. 3) Query fresh snapshot via REST. 4) Re-initialize WebSocket. NEVER trust order book without sequence verification.",
+    "priority": 5
+  },
+  {
+    "id": "exec-028",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "session",
+      "rule"
+    ],
+    "content": "PREVENT OVERTRADING — #1 account killer. Boredom trading, sizing up after losses. Max 3-5 trades/day. Quality 2-3× in first 2 hours of active session. If you hit daily target, STOP. Don't give it back in afternoon/session chop. Do nothing unless there is something to do.",
+    "priority": 5
+  },
+  {
+    "id": "exec-029",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "stop_loss",
+      "setup_type"
+    ],
+    "content": "95% OF PROFITS FROM 5% OF TRADES — Missing only a few major profit opportunities has dramatic negative impact. Guard against holding rigid opinions that could cause you to miss a major trend. Don't miss the big ones. Let winners run — don't cap them with fixed targets. Use trailing stops instead.",
+    "priority": 5
+  },
+  {
+    "id": "exec-030",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing",
+      "indicator"
+    ],
+    "content": "SQN (System Quality Number) — SQN = (Average R / Std Dev of R) × √(Number of trades). Measures system quality. SQN >1.6 = tradeable. >2.0 = good. >3.0 = excellent. >5.0 = holy grail. Position sizing can be optimized using SQN. Track monthly to monitor system health. Minimum 100 trades for statistical significance.",
+    "priority": 5
+  },
+  {
+    "id": "exec-031",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe",
+      "indicator"
+    ],
+    "content": "FIBONACCI PULLBACK ENTRY — In strong trend, pullbacks typically hold between 38.2% and 61.8% Fib retracement. SETUP: Confirmed trend (price above 200 EMA, higher highs/lows). ENTRY: Wait for price to reach 38.2-61.8% zone + bullish engulfing/pin bar on 1H. STOP: Below 76.4% retracement. TARGET 1: Previous high (1:1 R:R, close 50%). TARGET 2: 1:2 R:R (trail remainder). TIMEFRAME: 4H trend, 1H entry.",
+    "priority": 4
+  },
+  {
+    "id": "exec-032",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "EMA BOUNCE ENTRY — Use 20 EMA on 1H chart. SETUP: Uptrend confirmed (price above 50 EMA, ADX >25). ENTRY: Price pulls back to 20 EMA and prints bullish candle (hammer/engulfing). STOP: Below recent swing low or 1.5× ATR below entry. TARGET 1: Previous high (close 50%). TARGET 2: Trail with 20 EMA. Works best when ADX >25 confirming trend strength.",
+    "priority": 4
+  },
+  {
+    "id": "exec-033",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "SQUEEZE BREAKOUT — Bollinger Bands inside Keltner Channels = squeeze (low volatility, energy building). Red dots = squeeze active. When BB expands outside Keltner = FIRES. SETUP: Squeeze fires in direction of C wave (longest period). ENTRY: First colored dot after red dots. STOP: Below recent swing low/high. TARGET: Next pivot level or trail with trend bars. Use 15m/1H for identification, 5m for entry.",
+    "priority": 4
+  },
+  {
+    "id": "exec-034",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe",
+      "asset_behavior"
+    ],
+    "content": "ORDER BLOCK + FVG CONFLUENCE — When order block aligns with fair value gap at same price level = HIGH-PROBABILITY entry zone. Order block provides institutional support, FVG provides gap price wants to fill. SETUP: Identify OB and FVG on 1H/4H. ENTRY: Price reaches zone + rejection wick or engulfing on 5m. STOP: Below order block. TARGET: POC or next structure level.",
+    "priority": 4
+  },
+  {
+    "id": "exec-035",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "session"
+    ],
+    "content": "VWAP PULLBACK ENTRY — Price above VWAP = bullish bias, below = bearish. SETUP: Strong move away from VWAP with volume. ENTRY: First pullback to VWAP with increasing volume. STOP: Below VWAP or recent swing low. TARGET: Previous high or breakout level. DON'T chase the spike. Only trade FIRST pullback — second/third have lower probability. First pullback is where institutions reload.",
+    "priority": 4
+  },
+  {
+    "id": "exec-036",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "HEIKIN ASHI + 100 EMA SCALP — Use HA candles with 100 EMA on 2-5 minute chart. LONG when: HA candle green, price above 100 EMA, HA has NO lower wick (strong momentum). SHORT when: HA candle red, price below 100 EMA, HA has NO upper wick. EXIT when HA changes color. The ABSENCE of a wick is KEY — shows one-sided momentum.",
+    "priority": 4
+  },
+  {
+    "id": "exec-037",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "HIGH-VOLUME DOJI ENTRY — Doji (open=close) at key S/R with HIGH VOLUME = battle between buyers and sellers. Doji at support + high volume → reversal up. At resistance + high volume → reversal down. Higher volume = more significant. ENTER on NEXT candle after doji in trend direction. STOP: Beyond doji wick. TARGET: Next S/R level.",
+    "priority": 4
+  },
+  {
+    "id": "exec-038",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "rule"
+    ],
+    "content": "SCALPING ENTRY CHECKLIST — 1) Price above/below 100 EMA? (trend). 2) HA candle color aligned? (momentum). 3) No wick on relevant side? (strong momentum). 4) Volume above average? (institutional participation). 5) At a key level? (S/R, VWAP, round number). ALL 5 = enter. Any missing = skip. Quality over quantity — 3 perfect trades beat 10 mediocre ones.",
+    "priority": 4
+  },
+  {
+    "id": "exec-039",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "setup_type",
+      "trigger",
+      "rule"
+    ],
+    "content": "SESSION TRADING RULES — Wait 15 min for session to establish range. Mark session high/low. Trade breakouts from session range during kill zones. If price sweeps session low + reverses with bullish candle → long. If sweeps session high + reverses with bearish candle → short. 5m for entries, 1H for bias. Don't trade lunch hours — low volume, choppy, stop hunting.",
+    "priority": 4
+  },
+  {
+    "id": "exec-040",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "asset_behavior",
+      "indicator"
+    ],
+    "content": "THREE-STEP MODEL (Trend Following) — Step 1 MARKET STATE: only trade when OUT of balance. In balance = stay out. Step 2 LOCATION: swing points + low volume nodes. Set alert BELOW LVN, don't place limit orders. Wait to SEE aggression first. Step 3 EXECUTION: big aggressive orders (bubbles). Seller aggression → short. Stop ABOVE aggression candle. Target: previous balance area / POC.",
+    "priority": 4
+  },
+  {
+    "id": "exec-041",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "trigger",
+      "stop_loss",
+      "asset_behavior"
+    ],
+    "content": "CVD FOR BREAK-EVEN TIMING — CVD (Cumulative Volume Delta) = leading indicator for break-even timing. When CVD pushes up aggressively and leg is building → move to break even BEFORE price action traders. Price action traders wait for price to break a level. CVD shows narrative BEFORE price creates effect. Use CVD to decide when to move stop — don't wait for price confirmation.",
+    "priority": 4
+  },
+  {
+    "id": "exec-042",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "DISPLACEMENT CANDLE ENTRY — Large, full-bodied candles with small/no wicks that move price aggressively through a level. Displacement shows INTENT. When displacement breaks structure (BOS) = strong entry signal. SETUP: Displacement at key level (S/R, order block). ENTRY: On retracement to displacement zone. STOP: Beyond displacement wick. TARGET: Next structure level. Bigger displacement = stronger conviction.",
+    "priority": 4
+  },
+  {
+    "id": "exec-043",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "asset_behavior",
+      "timeframe"
+    ],
+    "content": "BREAKER BLOCK ENTRY — A breaker block is an order block that has been BROKEN — price closed through it. The broken level flips from support to resistance. Trapped traders are underwater. When price returns to breaker, expect strong reaction. ENTRY: Wait for price to reach breaker + rejection candle. STOP: Beyond the breaker. TARGET: Next structure level.",
+    "priority": 4
+  },
+  {
+    "id": "exec-044",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "INSIDE DAY BREAKOUT — Need 2+ inside days on daily chart. BUY 10 pips above or SELL 10 pips below prior inside day range. Stop-and-reverse at opposite side. Higher success in tight range pairs. For crypto: apply to BTC/ETH daily with ATR-adjusted levels. Longest squeeze = biggest breakout. Volume should decrease during inside days, expand on breakout.",
+    "priority": 4
+  },
+  {
+    "id": "exec-045",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "BOLLINGER BAND SQUEEZE — When bands contract sharply, breakout is imminent. Trade in direction of breakout. Combine with ADX confirmation — if ADX rises above 25 during breakout, trend is genuine. The tighter the squeeze, the bigger the move. Wait for close outside bands with volume before entering.",
+    "priority": 4
+  },
+  {
+    "id": "exec-046",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "CHANNEL BREAKOUT ENTRY — Enter on breakout above upper channel line. Stop just below channel. Draw parallel trendlines containing price. Works especially well before EU/US opens and ahead of major events. Channel width projects minimum move after breakout. Redraw channels as trends accelerate.",
+    "priority": 4
+  },
+  {
+    "id": "exec-047",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "asset_behavior"
+    ],
+    "content": "FALSE BREAKOUT TRADE — Professional fishing expeditions to run stops. Upside false: rises above resistance, sucks in buyers, reverses. Downside false: falls below support, attracts shorts, rallies back. BEST TRADES occur after false breakouts — trade back into range with stop at extreme. If stopped on false breakout, re-enter. Professionals attempt multiple entries.",
+    "priority": 4
+  },
+  {
+    "id": "exec-048",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe",
+      "indicator"
+    ],
+    "content": "ABCD PATTERN — Impulse A-B, pullback to C (38-50% Fib), continuation to D. SETUP: Strong impulse move (A-B). ENTRY at C with MA/VWAP support. STOP: Below C. TARGET: AB leg extension (D point). Best during kill zones. Volume should decrease during pullback (B-C), expand on continuation (C-D).",
+    "priority": 4
+  },
+  {
+    "id": "exec-049",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "BULL FLAG — Spike on heavy volume, tight parallel consolidation. ENTRY: Break above flag resistance with volume. STOP: Below flag low. Tighter consolidation = more explosive breakout. Volume pattern: heavy on flagpole, light during flag, heavy on breakout. Target: flagpole height projected from breakout point.",
+    "priority": 4
+  },
+  {
+    "id": "exec-050",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe",
+      "indicator"
+    ],
+    "content": "TRIPLE SCREEN SYSTEM — Screen 1 (highest TF): Use trend-following indicators (MACD-Histogram, EMA) for strategic direction. Only trade in direction of this trend. Screen 2 (mid TF): Use oscillators (Force Index, Stochastic) for countertrend entry — buy dips in uptrend. Screen 3 (lowest TF): Use breakout for precision entry. Factor of Five links timeframes (~5× each level).",
+    "priority": 4
+  },
+  {
+    "id": "exec-051",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "IMPULSE SYSTEM — Color bars: GREEN (EMA rising + MACD-Hist rising) = buy zone. RED (both falling) = sell zone. BLUE (conflicting) = caution. NEVER go long on red bars, never short on green bars. Use for entry timing on lower TF: buy pullbacks to green bars in uptrend, sell rallies to red bars in downtrend.",
+    "priority": 4
+  },
+  {
+    "id": "exec-052",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "risk_context",
+      "rule"
+    ],
+    "content": "SAFE ENTRY RULES — 1) Trade only in direction of highest-TF trend. 2) Wait for oscillator signal on mid-TF confirming pullback. 3) Confirm with Impulse System. 4) Place stop at recent swing extreme beyond entry. 5) Risk ≤2% per trade. 6) Total open risk ≤6%. 7) Use limit orders near S/R, not market orders. 8) Calculate position size BEFORE entering.",
+    "priority": 4
+  },
+  {
+    "id": "exec-053",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "trigger",
+      "position_sizing"
+    ],
+    "content": "EXITING TRADES — Three types: 1) Protective stop (safety net, never widen). 2) Trailing stop (locks profit — use ATR or channel breakouts). 3) Profit target (at channel lines or where average momentum reaches). Take partial profits at upper/lower channel, trail remainder. Move stop to breakeven after first target hit. Exit when trend indicator reverses.",
+    "priority": 4
+  },
+  {
+    "id": "exec-054",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe",
+      "asset_behavior"
+    ],
+    "content": "KANGAROO TAIL ENTRY — Long-wick candle at zone with small body. Wick shows rejection of price level. Longer wick relative to body = stronger signal. SETUP: Tail at key S/R zone. ENTRY: On break of tail body. STOP: At tail tip. For trend trades: 'Trendy Kangaroo' = tail WITH the trend at pullback zone = highest probability.",
+    "priority": 4
+  },
+  {
+    "id": "exec-055",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "BIG SHADOW / ENGULFING — A candle whose range completely engulfs prior candle. Bullish Big Shadow at support zone = buy. Bearish at resistance = sell. ENTER on break of shadow. STOP at opposite end. Stronger at higher timeframes (4H, Daily). Volume should be higher on engulfing candle than prior candle.",
+    "priority": 4
+  },
+  {
+    "id": "exec-056",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "asset_behavior",
+      "timeframe"
+    ],
+    "content": "THE LAST KISS — After price breaks through a zone, wait for it to retest from other side. Enter on the retest (the 'last kiss'). Stop beyond the zone. The retest confirms breakout is real. Works on all timeframes. Best when combined with order flow confirmation (aggression at the retest level).",
+    "priority": 4
+  },
+  {
+    "id": "exec-057",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "EMA AS DYNAMIC SUPPORT — In strong trend, price bounces off 9 EMA or 20 EMA repeatedly. Each bounce is potential entry. First bounce is highest probability. If price breaks 9 EMA but holds 20 EMA = trend intact. If breaks both = trend weakening, tighten stops or exit. 100 EMA is TREND FILTER — price must be above/below for direction.",
+    "priority": 4
+  },
+  {
+    "id": "exec-058",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "timeframe",
+      "setup_type",
+      "trigger",
+      "rule"
+    ],
+    "content": "MULTI-TIMEFRAME SCALPING — Use 15m for trend direction and key levels. Use 5m for setup identification. Use 1m/2m for precise entry. Only scalp in direction of 15m trend. If 15m bullish, only take long scalps on 5m/1m. Never counter-trend scalp — the trend will run you over.",
+    "priority": 4
+  },
+  {
+    "id": "exec-059",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "setup_type",
+      "trigger",
+      "asset_behavior"
+    ],
+    "content": "LONDON OPEN FAKEOUT — Watch for fake breakout in first 1-2 hours of London. Wait for reversal through Frankfurt-London range. Enter 10 pips beyond range, stop 20 pips. UK dealers are notorious stop hunters at open. For crypto: apply to EU session (07:00-09:00 UTC). Wait for the fakeout, then trade the reversal.",
+    "priority": 4
+  },
+  {
+    "id": "exec-060",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "asset_behavior"
+    ],
+    "content": "FADING DOUBLE ZEROS — Enter contra-trend at round numbers (e.g., $100,000, $60,000). Place entry 5-10 pips/points beyond figure, stop 20 away. Take half profit at 2× risk, trail rest. Works best when round number aligns with Fibonacci or MA confluence. Large option/stop orders cluster at round numbers.",
+    "priority": 4
+  },
+  {
+    "id": "exec-061",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "PERFECT ORDER — Sequential MA stack (10>20>50>100>200 SMA for uptrend). Enter 5 candles after formation confirmed. ADX should be >20 and rising. Exit when perfect order breaks (10 SMA crosses below 20). Captures major trend moves. For crypto: use EMA instead of SMA for faster response.",
+    "priority": 4
+  },
+  {
+    "id": "exec-062",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "CHANNEL STRATEGY — Draw parallel trendlines containing price. Enter on breakout above upper channel line. Stop just below channel. Works especially well before EU/US opens and ahead of major economic releases. Redraw channels as trends accelerate — steep channels break easily.",
+    "priority": 4
+  },
+  {
+    "id": "exec-063",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "asset_behavior",
+      "timeframe"
+    ],
+    "content": "FILTERING FALSE BREAKOUTS — Look for 20-day high, then 2-day low within 3 days, then new 20-day high within 3 more days. Enter on the re-break. This flushes weak hands before real trend continuation. Apply to crypto: use 4H equivalent (80-candle high, 8-candle low, re-break).",
+    "priority": 4
+  },
+  {
+    "id": "exec-064",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "setup_type",
+      "trigger",
+      "asset_behavior"
+    ],
+    "content": "NEWS TRADING — Don't trade 30 min before major releases. AFTER the news: wait for initial spike, then retracement, then trade the SECOND move. First move is emotional; second is institutional. If news causes sweep of key level + immediate reversal = highest probability entry. For crypto: apply to CPI, FOMC, NFP impacts on BTC.",
+    "priority": 4
+  },
+  {
+    "id": "exec-065",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe",
+      "session"
+    ],
+    "content": "SQUEEZE STRATEGY (TRIANGLE) — Identify converging trendlines on 15m chart forming triangle. Wait for price to break out with volume confirmation. ENTRY: On breakout candle close above/below trendline. STOP: Opposite side of triangle. TARGET: 2:1 R:R minimum. Best during kill zones. Do NOT anticipate direction — wait for the break.",
+    "priority": 4
+  },
+  {
+    "id": "exec-066",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "trigger",
+      "rule"
+    ],
+    "content": "PRE-MARKET CHECKLIST — 1) Mark biggest delta volume (buy/sell sides). 2) Know which levels get tapped at open. 3) Expected reactions within first 15-20 min. 4) 5m for analysis, 1m for execution. 5) NEVER trade 10-20 min before session opens. 6) Review watchlist. 7) Set alerts at key levels. 8) Prepare order entries.",
+    "priority": 4
+  },
+  {
+    "id": "exec-067",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "position_sizing",
+      "trigger"
+    ],
+    "content": "TRAILING STOP MANAGEMENT — Full-position trailing stops get stopped on wiggles. BETTER: 1) Enter full. 2) First target hit: sell half, stop to breakeven. 3) Second target: sell half of remaining, stop to entry. 4) Last quarter: use exit signal, NOT trailing stop. Reduces risk to breakeven while allowing runners. Typical runner: 2-3× first target.",
+    "priority": 4
+  },
+  {
+    "id": "exec-068",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "setup_type",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "TREND DAY IDENTIFICATION — Trending days: 1) Strong opening gap with volume. 2) Price stays above/below VWAP all day. 3) Pullbacks shallow and brief. 4) Moving averages trending one direction. On trending days: use pivot levels as pullback entry, not fade targets. First target = next pivot. Trail rest for larger move.",
+    "priority": 4
+  },
+  {
+    "id": "exec-069",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "regime_subtype",
+      "setup_type",
+      "indicator",
+      "rule"
+    ],
+    "content": "CHOPPY MARKET IDENTIFICATION — Choppy when: 1) Narrow low-volume range. 2) MAs flat/whipsawing. 3) No follow-through on breakouts. In choppy markets: ONLY fade pivot levels (don't trade breakouts). Use smaller targets. If gap + pivot + choppy = often only safe trades available. Reduce position size 50%.",
+    "priority": 4
+  },
+  {
+    "id": "exec-070",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "risk_context",
+      "rule"
+    ],
+    "content": "TRADE MANAGEMENT HIERARCHY — 1) Never violate 2% per trade. 2) Never violate 6% monthly. 3) Only trade in direction of highest-TF trend. 4) Wait for mid-TF oscillator pullback. 5) Confirm with Impulse System. 6) Enter with limit order at planned level. 7) Set stop BEFORE entry. 8) Take partial at first target. 9) Trail on remainder. 10) Exit if trend reverses.",
+    "priority": 4
+  },
+  {
+    "id": "exec-071",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "risk_context"
+    ],
+    "content": "ENTRY EVALUATION — 95% of traders focus on entries. Yet entry is LEAST important component. Few entries beat random significantly over 20-day hold. Best entries: channel breakout >40 days, volatility breakout 0.8×ATR, large single-bar move. Focus instead on: exits (determine R), position sizing (determines magnitude), and expectancy (complete picture).",
+    "priority": 4
+  },
+  {
+    "id": "exec-072",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "rule",
+      "risk_context"
+    ],
+    "content": "SIMPLE CONCEPTS WORK BEST — Complexity leads to curve fitting. If you can't explain system in one paragraph, too complex. Simple setups, entries, exits, sizing rules. Each component understandable independently. Multiple simple components combined > one complex system. If it breaks under pressure, simplify further.",
+    "priority": 4
+  },
+  {
+    "id": "exec-073",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing",
+      "asset_behavior"
+    ],
+    "content": "CORRELATION RISK — Eight highly correlated positions = one position eight times as large. Track correlation of all trades daily. In crisis, correlations go to 1.0. Avoid correlated exposure >5% of account. A mistake in position correlation is root of serious problems. Check 50-day rolling correlation before adding positions.",
+    "priority": 4
+  },
+  {
+    "id": "exec-074",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context",
+      "rule"
+    ],
+    "content": "UNDERTRADE — Whatever you think position should be, cut it at least in half. Novice traders trade 3-5× too big, taking 5-10% risks when should take 1-2%. Position size determined by stop distance. Build the cushion first — don't increase position until doubled or tripled capital.",
+    "priority": 4
+  },
+  {
+    "id": "exec-075",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "timeframe",
+      "trigger"
+    ],
+    "content": "TIME-BASED EXIT — If position at or below entry after X periods, exit. Reduces opportunity cost of dead money. Typical: 4-8 candles for scalps, 12-24 for swings. Combine: time stop activates only if position at/below entry. Pair with structural stop — don't use alone. If market hasn't responded to signal, edge may be gone.",
+    "priority": 4
+  },
+  {
+    "id": "exec-076",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe",
+      "risk_context"
+    ],
+    "content": "DECISION-MAKING TREE — Branch 1: Determine highest-TF trend (up/down/flat). Branch 2: Identify mid-TF oscillator signals in trend direction. Branch 3: Check Impulse System for confirmation. Branch 4: Calculate position size using 2% rule. Branch 5: Set stop, target, entry. Branch 6: If stopped, check re-entry. All branches connected to trunk: inviolate risk control.",
+    "priority": 4
+  },
+  {
+    "id": "exec-077",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "rule"
+    ],
+    "content": "WEEKLY REVIEW PROCESS — Sunday: 1) Review all trades from past week. 2) Score execution quality. 3) Review chart stack for trend direction. 4) Identify key levels for coming week. 5) Note economic events. 6) Update plan. 7) Set mental scenarios. 8) Rest. Review trades weekly. Keep diary with screenshots. Separate best from worst setups.",
+    "priority": 4
+  },
+  {
+    "id": "exec-078",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "rule"
+    ],
+    "content": "ACTION PLAN — Write before each session: 1) Market conditions assessment. 2) Key levels. 3) Indicator readings on multiple TFs. 4) Potential setups with specific triggers. 5) Position sizes pre-calculated. 6) Stop and target levels defined. 7) Max number of trades. 8) Conditions that would keep you OUT. Follow without deviation.",
+    "priority": 4
+  },
+  {
+    "id": "exec-079",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "session",
+      "asset_behavior"
+    ],
+    "content": "OPENING GAP PLAY — Check premarket volume. Low volume = high-probability gap fill (85%). High volume = moderate (60%). RULES: 1) Trade only Tue-Fri. 2) Gaps within pivot levels. 3) Entry at open. 4) Target = previous close (gap fill). 5) Stop = 1.5:1 R:R small gaps, 1:1 large. For crypto: apply to weekend gaps on CME futures.",
+    "priority": 4
+  },
+  {
+    "id": "exec-080",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "setup_type",
+      "trigger",
+      "asset_behavior"
+    ],
+    "content": "3:52 PLAY (END-OF-SESSION REVERSAL) — At session start, market makes directional move. Chasers enter late. By near-close, chasers are underwater and stopped out, pushing further against them. TRADE: Go OPPOSITE the early-session move near close. Stop: tight. Exit: within 21-min time limit. Exploits mass psychology of late entries. Apply to crypto US session close.",
+    "priority": 4
+  },
+  {
+    "id": "exec-081",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "session"
+    ],
+    "content": "TICK FADE — When $TICK reaches extreme (>+600 or <-600), fade the move. BUY on $TICK <-600 with tight stop. SELL on >+600. Additional: 1) Check trend first — don't fade strong trend days. 2) If extreme + gap filling = stronger signal. 3) Last half-hour less reliable. For crypto: use equivalent volume delta extremes as proxy.",
+    "priority": 4
+  },
+  {
+    "id": "exec-082",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe",
+      "session"
+    ],
+    "content": "SCALPER TRADE RULES — Use tick/1m chart. Enter on signal at pivot levels. First target: 1-2 points on half. Move stop to breakeven. Trail with 4-point stop on remainder. After 2 consecutive losers on pivots, done for the day. Scalps generate monthly income; swing trades create wealth. Don't confuse them.",
+    "priority": 4
+  },
+  {
+    "id": "exec-083",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "session",
+      "timeframe"
+    ],
+    "content": "BOX PLAY (ASIAN RANGE) — Identify overnight range (Asian session). Trade breakouts from box during EU/US overlap. BUY above box high, SELL below box low. STOP: opposite side of box. TARGET: width of box projected from breakout. Most effective on BTC, ETH. Combine with squeeze indicator — squeeze firing in direction of box breakout = highest probability.",
+    "priority": 4
+  },
+  {
+    "id": "exec-084",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "regime_subtype",
+      "risk_context"
+    ],
+    "content": "TREND FOLLOWING CONCEPT — Core: capture large moves in trending markets. Accept many small losses for occasional large wins. Let winners run, cut losers short. Don't predict, react. Enter on breakouts or pullbacks to MAs. Use trailing stops. Never limit profits with fixed targets. Works because markets trend ~30% of time.",
+    "priority": 4
+  },
+  {
+    "id": "exec-085",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "regime_subtype",
+      "indicator"
+    ],
+    "content": "MEAN REVERSION CONCEPT — Core: prices revert to average over time. Buy oversold, sell overbought. Works best in ranging markets. Strategies: Bollinger Band bounces, RSI extremes (<30 or >70), S/R bounces. Risk: catching falling knives in strong trends. Requires strict stops. Identify ranging market first (ADX <20, clear S/R) before applying.",
+    "priority": 4
+  },
+  {
+    "id": "exec-086",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe",
+      "stop_loss"
+    ],
+    "content": "DONCHIAN CHANNEL BREAKOUT — Entry: new 20-candle high = buy, new 20-candle low = sell/short. Exit: 10-candle trailing stop. This is the Turtle system. Simple, robust, works across many markets. Trade many uncorrelated assets simultaneously. Each gets equal position size via volatility model. Expect many small losses, occasional huge winners.",
+    "priority": 4
+  },
+  {
+    "id": "exec-087",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "PROPULSION PLAY — Swing trade using 8/21 EMA crossover. BUY: 8 EMA crosses above 21 EMA, wait for pullback to 8 EMA, enter with limit. TARGET: 8% profit using GTC order. STOP: Below 21 EMA. EXIT: Two consecutive red trend bars. Place orders night before, check at end of day only. Removes emotional interference.",
+    "priority": 4
+  },
+  {
+    "id": "exec-088",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "MACD DIVERGENCE ENTRY — Price makes new high but MACD-Histogram makes lower peak = bearish divergence, strong sell signal. New low in price with higher MACD-Hist low = bullish divergence. Wait for second peak/trough to form before acting. Best on 1H/4H for crypto. Combine with trend direction — only take bullish divergence in uptrend context.",
+    "priority": 4
+  },
+  {
+    "id": "exec-089",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "asset_behavior"
+    ],
+    "content": "CONFLUENCE ZONES — Strongest signals when multiple factors align: 1) S/R level. 2) Channel line. 3) Moving average. 4) Fibonacci retracement. 5) Round number. 6) Prior swing point. More factors converging = more significant level. Trade with maximum position size at high-confluence zones, reduced at isolated levels.",
+    "priority": 4
+  },
+  {
+    "id": "exec-090",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "session"
+    ],
+    "content": "PIVOT POINT TRADING — Pivot = (H+L+C)/3. R1 = 2×Pivot-Low. S1 = 2×Pivot-High. Markets test daily pivot 90% of the time. TRENDING: Fade first touch of pivot. CHOPPY: Target 10-point scalps. R2/S2 usually = dead high/low. NEVER fade R3/S3 — too extreme. Stop trading pivots after 2 consecutive losers.",
+    "priority": 4
+  },
+  {
+    "id": "exec-091",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "RSI DIVERGENCE — Price new high + RSI lower high = bearish divergence. Price new low + RSI higher low = bullish divergence. In strong trends, RSI can stay overbought/oversold for extended periods. Combine with trend direction — only take RSI buy signals in uptrends, sell signals in downtrends. Use 14-period on 1H/4H.",
+    "priority": 4
+  },
+  {
+    "id": "exec-092",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context"
+    ],
+    "content": "POSITION SIZING FOR STOCKS/CRYPTO — Use percent risk model: Equity × Risk% ÷ (Entry - Stop) = position size. With $100K and 1% risk: max $1,000 risk. If stop is $2 away = 500 units. This model auto-adjusts: bigger when winning, smaller when losing. Anti-martingale. Best at 0.5-1% risk for most systems.",
+    "priority": 4
+  },
+  {
+    "id": "exec-093",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context",
+      "indicator"
+    ],
+    "content": "PERCENT VOLATILITY MODEL — Limit exposure to current volatility to X% of equity. Use ATR. Equity × Volatility% ÷ ATR = position size. Equalizes risk across different-volatility instruments. At 0.5% volatility: $100K ÷ $500 ATR = 200 units max. More sophisticated than percent risk. Best: 0.5-1.0% per position.",
+    "priority": 4
+  },
+  {
+    "id": "exec-094",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "indicator",
+      "risk_context"
+    ],
+    "content": "STOP TYPES — 1) Dollar stops: fixed amount, not predictable by others. 2) Percent retracement: sell if retraces X% (often arbitrary). 3) Volatility stops: ATR-based, among the best. 4) Dev-stops: ATR + standard deviation (1σ tight, 2σ wide). 5) Channel breakout: exit on new 10-day low/21-day trailing. 6) Time stops: exit if no profit in X days.",
+    "priority": 4
+  },
+  {
+    "id": "exec-095",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "risk_context",
+      "indicator"
+    ],
+    "content": "TIGHT vs WIDE STOPS — Tight: smaller losses, multiple re-entry attempts, bigger R-multiples. BUT: decrease reliability, increase costs, miss moves. Wide: fewer whipsaws, better reliability, lower costs. BUT: bigger losses. Optimal: use MAE analysis to find minimum effective stop distance. Don't use arbitrary numbers.",
+    "priority": 4
+  },
+  {
+    "id": "exec-096",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "position_sizing",
+      "trigger"
+    ],
+    "content": "MULTIPLE EXIT STRATEGY — Design each exit for purpose: 1) Catastrophic stop (wide, based on volatility, rarely hit). 2) Trailing stop (locks profit, lets runners develop). 3) Time stop (removes dead money). 4) Profit target 1 (partial, small). 5) Profit target 2 (partial, medium). Each simple individually. Multiple simple exits > one complex exit.",
+    "priority": 4
+  },
+  {
+    "id": "exec-097",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "session",
+      "rule"
+    ],
+    "content": "COMEBACK TRADE CHECKLIST — After significant losses: 1) Taken a break? (min 24-48 hrs). 2) Position size reduced 50%? 3) This your BEST setup type? 4) Calculated and accepted risk? 5) Stop in place BEFORE entry? 6) Emotionally calm? 7) Highest-probability scenario? If any NO, do NOT trade. Return to basics.",
+    "priority": 4
+  },
+  {
+    "id": "exec-098",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "TWO-DAY LOW STOP — Place stop 10 pips/points below the two-day low for longs. When profit reaches 2× risk, close half and move stop to breakeven. Trail remaining with parabolic SAR or 2-bar low method. This adapts to market structure rather than using arbitrary levels.",
+    "priority": 4
+  },
+  {
+    "id": "exec-099",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context"
+    ],
+    "content": "RISK BUDGET APPROACH — Allocate max 1-3% of total capital per trade. Calculate position value before entry. Use micro positions when learning. Scale up only after 3+ months of consistent profits. Total portfolio heat: open risk across all positions should not exceed 6-8% of account. This prevents catastrophic drawdown from correlated losers.",
+    "priority": 4
+  },
+  {
+    "id": "exec-100",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "trigger",
+      "stop_loss"
+    ],
+    "content": "MULTIPLE POSITIONS APPROACH — Enter 2-3 positions. Close first at 1:1 R:R (covers risk), close second at 2:1, trail third. This ensures profit on most trades while allowing runners. Reduces emotional pressure of all-or-nothing exits. Apply to crypto: enter with 3 limit orders at same level, scale out independently.",
+    "priority": 4
+  },
+  {
+    "id": "exec-101",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing",
+      "rule"
+    ],
+    "content": "REWARD-TO-RISK MINIMUM 2:1 — With 2:1 R:R, you only need 34% win rate to be profitable. With 3:1, only 25%. Focus on finding high R:R setups, not high win rate. A 40% win rate with 3:1 R:R beats 80% with 1:3. Every trade must have minimum 2:1 before entry.",
+    "priority": 4
+  },
+  {
+    "id": "exec-102",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "trigger",
+      "stop_loss"
+    ],
+    "content": "PYRAMIDING INTO WINNERS — Add to winning positions ONLY. Each new position smaller than previous. Start with half position. Add quarter at 1× risk profit. Add another quarter at 2× risk profit. Stop all at 1× risk below current price. NEVER add to losing positions — hallmark of amateur destruction.",
+    "priority": 4
+  },
+  {
+    "id": "exec-103",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "asset_behavior",
+      "session"
+    ],
+    "content": "ORDER FLOW LIVE TRADE — Market out of balance on 5m. Order flow filter activated. Momentum building before breakout — small orders in balance, then aggressive buying. Entry at LVN: plot profile from swing start to end, find LVN. Retracement near LVN + aggression = trigger. THE MORE YOU WAIT after LVN, riskier. In fast, close fast.",
+    "priority": 4
+  },
+  {
+    "id": "exec-104",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "asset_behavior",
+      "session"
+    ],
+    "content": "SQUEEZE MECHANICS — Aggressive sellers step in → next step is recovery (squeeze) or follow-through. Red orders at top are underwater. When they need to close → market jumps. Each closed sell creates more upward momentum. You can see pain building BEFORE price move. Scale out half when aggressive sellers step in.",
+    "priority": 4
+  },
+  {
+    "id": "exec-105",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "trigger",
+      "asset_behavior"
+    ],
+    "content": "TRAILING STOP PHILOSOPHY — Don't move to break even too fast. First drive → pullback → real move. If risk-free too quickly, market spikes you out then rockets. Wait for FULL BODY CANDLE accepting the high before trailing. When you see candle acceptance → trail aggressively. Scale out half when aggressive counter-orders step in.",
+    "priority": 4
+  },
+  {
+    "id": "exec-106",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "rule"
+    ],
+    "content": "MORNING MOMENTUM vs AFTERNOON DRIFT — First 2 hours of active session = highest volume, best setups. After that = volume drops, lower quality. Afternoon = drift mode, low conviction. Best rule: make money in the morning, protect in the afternoon. If you hit daily target by end of first session, STOP.",
+    "priority": 4
+  },
+  {
+    "id": "exec-107",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "trigger",
+      "asset_behavior"
+    ],
+    "content": "GAP VOLUME FILTER — Check volume on major assets before gap open. Low volume = high probability gap fill (85%). High volume = moderate (60%). Low volume = market not interested in news, gap will fill. High volume = market taking news seriously. If confusing, still take trade — overall probabilities favor fills.",
+    "priority": 4
+  },
+  {
+    "id": "exec-108",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context"
+    ],
+    "content": "PLATEAU MONEY MANAGEMENT — After 10% drawdown from equity peak, reduce position size 50%. After 20%, trade minimum size. Only increase after account returns to new equity high. Prevents catastrophic drawdowns during losing streaks while allowing full participation during winning. Creates natural equity curve trending upward.",
+    "priority": 4
+  },
+  {
+    "id": "exec-109",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "timeframe",
+      "rule"
+    ],
+    "content": "SCALP vs SWING DISTINCTION — Scalps: generate monthly income, small consistent gains, high frequency, tight stops, 1-2 point targets. Swings: create wealth, larger moves, lower frequency, wider stops, 8%+ targets. Both needed: scalps pay bills, swings build accounts. Don't confuse them. Different mindsets. Document which type BEFORE entry.",
+    "priority": 4
+  },
+  {
+    "id": "exec-110",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "setup_type",
+      "trigger"
+    ],
+    "content": "TRADE AROUND CORE — Have a main position you believe in fundamentally, then actively trade portions around it. This allows capturing short-term moves while maintaining long-term exposure. Core position sized at 50%, traded portion 25%×2. Manage core with wider stops, traded portion with tight stops.",
+    "priority": 4
+  },
+  {
+    "id": "exec-111",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "VOLATILITY ADAPTATION — When market volatility increases: 1) Reduce position size (2% rule forces this). 2) Widen stops beyond new noise level. 3) Don't trade markets whose noise exceeds 1% of equity. 4) Consider options for protection. 5) Reduce number of open positions. Let rules adapt behavior to changing conditions.",
+    "priority": 4
+  },
+  {
+    "id": "exec-112",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "PAPER TRADING TRANSITION — If losses exceed 15-20%, switch to paper. Rebuild confidence. Prove system works without real money. Return after 20+ profitable paper trades with: 1) Realistic prices (include slippage). 2) Real position sizes. 3) Emotional engagement. Paper trading without rules is worthless.",
+    "priority": 4
+  },
+  {
+    "id": "exec-113",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "setup_type",
+      "trigger"
+    ],
+    "content": "PRICE HAS MEMORY — Previous highs/lows act as S/R because traders remember entry prices. Longer level was traded = more significant. Round numbers act as psychological barriers. When price returns to old levels, some add while others exit — creating S/R. Emotional memory persists months/years. Use to identify high-probability reaction zones.",
+    "priority": 4
+  },
+  {
+    "id": "exec-114",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "setup_type",
+      "indicator"
+    ],
+    "content": "KEY PRICE LEVELS HIERARCHY — 1) All-time highs/lows (strongest). 2) 52-week H/L. 3) Prior month H/L/C. 4) Prior week H/L/C. 5) Prior day H/L/C. 6) Intraday session H/L. 7) Round numbers. 8) Fib retracement. 9) Moving averages (200, 50, 21, 8). Confluence of multiple levels = strongest S/R. Always know where you are relative to these.",
+    "priority": 4
+  },
+  {
+    "id": "exec-115",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "session"
+    ],
+    "content": "VWAP AS INSTITUTIONAL BENCHMARK — Price above VWAP = bullish intraday bias. Below = bearish. Institutional funds aim to buy below VWAP, sell above. In trending days, price stays on one side all day. In choppy, oscillates around VWAP. VWAP bands (1-2 std dev) act as extended S/R. Pivot levels near VWAP = higher significance confluence.",
+    "priority": 4
+  },
+  {
+    "id": "exec-116",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "trigger",
+      "asset_behavior"
+    ],
+    "content": "LEVEL 2 DATA — Shows bid/ask depth. Large bid orders = support. Large ask = resistance. ORDER ABSORPTION = large orders being filled without price moving = someone absorbing all selling (bullish) or buying (bearish). When large bid is absorbed by sellers but doesn't move = buyer absorbing all pressure = very bullish. Use Level 2 for precise timing.",
+    "priority": 4
+  },
+  {
+    "id": "exec-117",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "8/21 EMA CROSS FOR SWINGS — On daily: 8 EMA crossing above 21 EMA = bullish shift. Wait for pullback to 8 EMA as entry. Stop below 21 EMA. Target: 8% using GTC order. Two consecutive red trend bars = exit early. Best when combined with squeeze (fires after pullback = highest probability). Place orders night before, check at EOD.",
+    "priority": 4
+  },
+  {
+    "id": "exec-118",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "MACD + STOCHASTIC COMBO — On higher TF: MACD gives trend direction, Stochastic gives timing. BUY when weekly MACD in buy AND daily Stochastic oversold turning up. SELL when weekly MACD in sell AND daily Stochastic overbought turning down. Monthly MACD rolling over = major trend change warning. Multi-TF combination filters false signals.",
+    "priority": 4
+  },
+  {
+    "id": "exec-119",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "POWER MOMENTUM STRATEGY — Buy when price closes above 20-period EMA AND RSI >50 AND MACD histogram positive. All three must align. Exit when any one condition fails. Simple three-filter system. Apply to 1H/4H for crypto swing trades. Add volume confirmation for higher probability.",
+    "priority": 4
+  },
+  {
+    "id": "exec-120",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "EMA BOUNCE STRATEGY — Use 20 EMA on 1H chart. In uptrend, buy when price pulls back to 20 EMA and bounces with bullish candle. Stop below recent swing low. Works best when ADX >25 confirming trend strength. First touch = highest probability. Second/third = diminishing. Combine with volume spike at bounce.",
+    "priority": 4
+  },
+  {
+    "id": "exec-121",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "MOVING AVERAGE RIBBON — Use 10, 20, 50 EMA. When all three align (10>20>50 for uptrend), trend is strong. Enter on pullbacks to 20 EMA. When ribbon flattens, trend ending — tighten stops or exit. Wider ribbon = stronger trend. Ribbon contracting = potential reversal or consolidation.",
+    "priority": 4
+  },
+  {
+    "id": "exec-125",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context",
+      "rule"
+    ],
+    "content": "SCALING PLAN — Start minimum size. After 2 consecutive profitable weeks → double. After another 2 → double again. Losing week → back to previous size. NEVER increase after a loss. Psychological benefit: you KNOW you can make money at this size. Going from small to medium is easier with 2 weeks of proof.",
+    "priority": 4
+  },
+  {
+    "id": "exec-130",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "setup_type",
+      "regime_subtype"
+    ],
+    "content": "SESSION-SPECIFIC SCALPING — LONDON (07:00-10:00 UTC): higher volatility, wider ranges, good for breakout scalps. US OPEN (13:30-15:00): highest volume, best for momentum. US MIDDAY (15:00-19:00): lower volume, tighter ranges, good for mean reversion. US CLOSE (20:00-21:00): volume picks up, good for trend continuation. Adjust strategy to session.",
+    "priority": 3
+  },
+  {
+    "id": "exec-131",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "asset_behavior",
+      "rule"
+    ],
+    "content": "FEE OPTIMIZATION FOR HIGH-FREQUENCY — Scalping generates many trades — fees compound. Use limit orders (maker) instead of market orders (taker) when possible. Maker fee typically 50-75% cheaper than taker. Over hundreds of trades, this saves significant capital. Track fee-to-profit ratio. On Kraken: 0.16% maker vs 0.26% taker = 40% savings.",
+    "priority": 3
+  },
+  {
+    "id": "exec-132",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "setup_type",
+      "regime_subtype"
+    ],
+    "content": "LONDON vs NEW YORK — London session = higher probability for REVERSALS (sweeps of Asian range). New York = higher probability for CONTINUATIONS or REVERSALS (if significant news). London/NY OVERLAP (13:30-16:00 UTC) = highest volume window. Best time for breakout trades. After NY open, watch first 15-min candle — often sets direction.",
+    "priority": 3
+  },
+  {
+    "id": "exec-133",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "ASIAN SESSION PROPERTIES — Asian session (00:00-08:00 UTC) = lower volume, more manipulation, tighter ranges. Best for JPY pairs in forex, BTC/ETH range identification. Thin liquidity allows large players to run stops. Risk-averse traders should avoid trading during Asian session for entries — use it for LEVEL IDENTIFICATION only.",
+    "priority": 3
+  },
+  {
+    "id": "exec-134",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "WEEKEND CRYPTO SESSION — Weekend (Fri 21:00 UTC - Sun 21:00 UTC) = thin liquidity, wider spreads, larger wicks. BTC weekend moves often reverse Monday when institutional volume returns. Use weekends for: 1) Level marking. 2) Analysis. 3) Swing position management. Avoid: new scalp entries, tight stops. Weekend wicks hunt stops aggressively.",
+    "priority": 3
+  },
+  {
+    "id": "exec-135",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "regime_subtype",
+      "asset_behavior"
+    ],
+    "content": "CRYPTO 24/7 SESSION MAPPING — Asian: 00:00-08:00 UTC (low vol, range). European: 07:00-16:00 UTC (trend start, volume build). US: 13:30-21:00 UTC (volume spike, volatility). Overlap: 13:30-16:00 UTC (maximum activity). Weekend: thin, wicks. Map traditional session setups to these windows. BTC respects session structure despite 24/7 trading.",
+    "priority": 3
+  },
+  {
+    "id": "exec-136",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "CONTOUR AND INVERSION — Normally nearby futures months are cheaper (contango). When front months become pricier = INVERSION, strongest bull signal — real shortage exists. Monitor premiums between delivery months for narrowing/widening. For crypto: apply to perpetual futures vs spot — funding rate extremes signal similar dynamics.",
+    "priority": 3
+  },
+  {
+    "id": "exec-137",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "CHANNELS — Draw parallel lines: uptrend line along lows, channel line along highs. Prices failing to reach channel line = trend weakening. Prices exceeding = accelerating. Profit targets: sell at upper channel in uptrend, cover at lower channel in downtrend. Channel width projects minimum move after breakout.",
+    "priority": 3
+  },
+  {
+    "id": "exec-138",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "TRIANGLES — Congestion where trend pauses. Upper boundary = sellers overpower buyers. Lower = buyers overpower sellers. Ascending (flat top, rising bottom) usually breaks up. Descending usually breaks down. Symmetrical — give benefit to preceding trend. Breakout more reliable with volume expansion.",
+    "priority": 3
+  },
+  {
+    "id": "exec-139",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "DOUBLE TOPS/BOTTOMS — Double top: two approximately equal peaks with trough between. Confirmed on break below trough with increased volume. At second peak, watch indicators for bearish divergence. Many apparent double tops are consolidation — wait for neckline break. Dead cat bounce often occurs between two bottoms.",
+    "priority": 3
+  },
+  {
+    "id": "exec-140",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "RECTANGLES — Horizontal S/R forming trading range. Price bounces between parallel lines. Volume decreases during formation. Breakout usually continues prior trend. Volume must expand on breakout. Target: rectangle height projected from breakout. False breakouts common — wait for close beyond boundary with volume.",
+    "priority": 3
+  },
+  {
+    "id": "exec-141",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "PENNANTS — Tight weave of prices after sharp move (flagpole). When pennant flies in direction of preceding trend = usually reversal. When against trend = consolidation, trend continues. Entries above/below pennant boundary. Volume should decrease during formation, expand on breakout.",
+    "priority": 3
+  },
+  {
+    "id": "exec-142",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "asset_behavior"
+    ],
+    "content": "DEAD CAT BOUNCE — After crash or sharp decline, prices rally briefly then resume decline. Bounce is not bullishness — reaction to oversold. Volume during bounce is typically low. Don't buy the bounce — wait for second bottom. If second bottom holds with lower volume = potential double bottom. If breaks = continuation lower.",
+    "priority": 3
+  },
+  {
+    "id": "exec-143",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "indicator",
+      "timeframe"
+    ],
+    "content": "TRENDLINE RULES — Draw uptrendlines across higher lows, downtrendlines across lower highs. Minimum 2 points, 3rd confirms. More touches = more valid. Angle reflects emotional temperature: >60° unsustainable. Draw across congestion area edges, not extreme points. Longest-held trendlines produce most significant breaks.",
+    "priority": 3
+  },
+  {
+    "id": "exec-144",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "regime_subtype",
+      "indicator",
+      "asset_behavior"
+    ],
+    "content": "MARKET CYCLES — Four phases: Accumulation (smart money buying, sideways), Markup (uptrend), Distribution (smart money selling, sideways), Markdown (downtrend). Identify phase to select strategy. Volume-price reveals: low volume + tight range = accumulation; rising volume + rising price = markup; high volume + sideways = distribution; rising volume + falling = markdown.",
+    "priority": 3
+  },
+  {
+    "id": "exec-145",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "regime_subtype",
+      "setup_type"
+    ],
+    "content": "ADX (DIRECTIONAL SYSTEM) — Rising ADX = trend strengthening regardless of direction. Falling = weakening, entering range. Above 25 = trending, use trend-following. Below 20 = ranging, use oscillators. Between 20-25 = transition zone. Combine with Elder-ray and Force Index for Triple Screen confirmation.",
+    "priority": 3
+  },
+  {
+    "id": "exec-146",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "trigger"
+    ],
+    "content": "RSI — Based on closing prices. Overbought above 70, oversold below 30. Best used for divergences: price new high + RSI lower high = bearish divergence. In strong trends, RSI can stay overbought/oversold for extended periods. Combine with trend direction — only take RSI buy signals in uptrends, sell signals in downtrends.",
+    "priority": 3
+  },
+  {
+    "id": "exec-147",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "trigger"
+    ],
+    "content": "STOCHASTIC — Measures capacity to close prices near range extremes. Use 5-7 day window. Reference lines at 15 (oversold) and 85 (overbought). BUY when bullish divergence near lower line. SELL on bearish divergence near upper. CRITICAL: Do NOT buy above 85 or short below 15 — 'no-go' zones prevent chasing.",
+    "priority": 3
+  },
+  {
+    "id": "exec-148",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "trigger"
+    ],
+    "content": "WILLIAMS %R — Oscillator 0 to -100. Above -20 = overbought, below -80 = oversold. Best use: in trending markets, use oversold readings as pyramiding signals in trend direction. Confirms Force Index signals for adding to winning positions at pullback points.",
+    "priority": 3
+  },
+  {
+    "id": "exec-149",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "trigger"
+    ],
+    "content": "FORCE INDEX — = Price Change × Volume. Use 2-day EMA for entries, 13-day for trend. BUY: 2-day Force Index dips to new low in uptrend (selling climax — entry). SELL: 2-day rallies to new high in downtrend. 13-day above zero = bulls control. Divergences between price and Force Index give strong reversal signals.",
+    "priority": 3
+  },
+  {
+    "id": "exec-150",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "trigger"
+    ],
+    "content": "ELDER-RAY — Measures Bull Power (High - 13-day EMA) and Bear Power (Low - 13-day EMA). BUY: In uptrend (rising EMA), Bear Power turns negative then ticks up. SELL/SHORT: In downtrend, Bull Power positive then ticks down. Profit target: distance from EMA equal to average Bull/Bear Power.",
+    "priority": 3
+  },
+  {
+    "id": "exec-151",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "trigger"
+    ],
+    "content": "MACD-HISTOGRAM SLOPE — Slope is more important than level. Rising = bulls gaining; falling = bears gaining. BEST SIGNAL: Divergence — price new high but MACD-Hist lower peak = bearish. New low with higher MACD-Hist low = bullish. Wait for second peak/trough. Premature action is main danger.",
+    "priority": 3
+  },
+  {
+    "id": "exec-152",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "timeframe"
+    ],
+    "content": "MOVING AVERAGES — Rising MA = crowd bullish, falling = bearish. Use 22-day EMA for daily. MAs work well in trends, give whipsaws in ranges. Key signals: price crossing MA, two MAs crossing, MA slope change. Day-traders use (O+H+L+C)/4 instead of close. Wider = fewer but more reliable signals.",
+    "priority": 3
+  },
+  {
+    "id": "exec-153",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "regime_subtype"
+    ],
+    "content": "BOLLINGER BANDS — Upper/lower bands = 2 standard deviations from 20 SMA. Price touching upper band = overbought in range, strong in trend. Bands contracting = squeeze building. Bands expanding = volatility releasing. Use with ADX: if ADX <20 + band touch = fade; if ADX >25 + band walk = trend.",
+    "priority": 3
+  },
+  {
+    "id": "exec-154",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "timeframe"
+    ],
+    "content": "KELTNER CHANNELS — ATR-based channels (20 EMA ± 1.5× ATR). When Bollinger inside Keltner = squeeze. Price breaking Keltner = trend move. Use as alternative to Bollinger for volatility-based S/R. Keltner breakouts tend to be more reliable than Bollinger breakouts because ATR adapts to volatility.",
+    "priority": 3
+  },
+  {
+    "id": "exec-155",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "session"
+    ],
+    "content": "PIVOT CALCULATIONS — Pivot = (H+L+C)/3. R1 = 2×Pivot-Low. R2 = Pivot+(H-L). R3 = R1+(H-L). S1 = 2×Pivot-High. S2 = Pivot-(H-L). S3 = S1-(H-L). Use settlement price for close. Calculate daily, weekly, monthly. Midpoints between levels for additional S/R. Markets test daily pivot 90% of the time.",
+    "priority": 3
+  },
+  {
+    "id": "exec-156",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "asset_behavior"
+    ],
+    "content": "FIBONACCI CLUSTERS — Calculate retracement levels from multiple recent swings. Where levels from different swings converge = powerful S/R. Use 38.2%, 50%, 61.8%. Clusters work on all timeframes. Combine with pivot levels — confluence of Fib cluster + pivot = extremely strong level. These act as S/R for entries.",
+    "priority": 3
+  },
+  {
+    "id": "exec-157",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "regime_subtype",
+      "indicator",
+      "asset_behavior"
+    ],
+    "content": "SECTOR ROTATION — Early cycle=XLF,XLY. Mid=XLK,XLI. Late=XLE,XLB. Recession=XLU,XLP,XLV. Monthly relative strength. Leads price 1-3 months. For crypto: DeFi leads in early cycle, L1s in mid, memes/exotics in late, stablecoins/staking in defensive rotation.",
+    "priority": 3
+  },
+  {
+    "id": "exec-158",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "regime_subtype",
+      "indicator",
+      "rule"
+    ],
+    "content": "REGIME DETECTION — SPY>200+50>200=bull long only. <200+50<200=bear short/cash. Mixed=reduce 50%. For crypto: BTC>200-day EMA+50>200=bull. Below=bear. Mixed=reduce exposure. Three regimes: trending with momentum (follow), range-bound mean reversion (fade), transitioning (reduce size).",
+    "priority": 3
+  },
+  {
+    "id": "exec-159",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "INTERMARKET CHAIN — Bonds lead stocks, stocks lead commodities, commodities lead currencies. Monitor all four for confluence. For crypto: BTC leads altcoins (1-5 min). ETH leads DeFi tokens. DXY inversely correlates with BTC (-0.3 to -0.6). VIX >30 = risk-off = BTC selloff.",
+    "priority": 3
+  },
+  {
+    "id": "exec-160",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "GOLD-DOLLAR CORRELATION — Negative -0.6 to -0.8. Gold leads miners 1-3 days. Dollar as gold indicator. Both rally = safe haven crisis. For crypto: BTC-gold correlation varies -0.2 to +0.4. During risk-off, BTC trades more like risk asset than digital gold. Monitor DXY as BTC headwind/tailwind.",
+    "priority": 3
+  },
+  {
+    "id": "exec-161",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "CARRY TRADE — Borrow low-yield (JPY, CHF) buy high-yield (AUD, NZD). Works in stable/trending markets. Unwinds violently during risk aversion. AUD/JPY tracks risk sentiment. For crypto: staking yields vs funding rates create analogous dynamics. High positive funding = crowded long = unwind risk.",
+    "priority": 3
+  },
+  {
+    "id": "exec-162",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "regime_subtype",
+      "asset_behavior"
+    ],
+    "content": "YIELD CURVE — 2Y>10Y=inversion=recession 6-18 months. Steep=expansion. Monitor 2s10s spread. Negative=defensive positioning. For crypto: inversion periods historically preceded BTC bear markets by 6-12 months. Steepening = recovery signal for risk assets including crypto.",
+    "priority": 3
+  },
+  {
+    "id": "exec-163",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "regime_subtype",
+      "asset_behavior"
+    ],
+    "content": "VIX AND CRYPTO — VIX -0.75 correlation with stocks. <15=complacency. >30=fear. Rising VIX = risk-off = BTC/ETH selling. VIX contango=bullish, backwardation=bearish. VIX flip from contango to backwardation = defend positions. For crypto: use BTC implied volatility (DVOL) as equivalent.",
+    "priority": 3
+  },
+  {
+    "id": "exec-164",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "INTERMARKET DIVERGENCE — Gold up + miners not = catch-up coming. S&P up + credit widening = correction ahead. Divergences signal stress. For crypto: BTC up + ETH not = rotation. BTC up + stablecoin outflows = weak hands selling. BTC dominance rising + alts falling = risk-off within crypto.",
+    "priority": 3
+  },
+  {
+    "id": "exec-165",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "CORRELATION INSTABILITY — Correlations are not constant. Use rolling 50/200-day correlation. Strong correlation break = regime change signal. During crisis, all correlations go to 1.0. Monitor BTC-altcoin correlation — rising = risk-off within crypto. Falling = healthy rotation and altcoin season.",
+    "priority": 3
+  },
+  {
+    "id": "exec-166",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "regime_subtype",
+      "indicator"
+    ],
+    "content": "SAFE HAVEN CURRENCIES — JPY and CHF appreciate during global risk aversion. USD benefits from flight to safety. AUD, NZD, EM currencies sold off. Monitor VIX, credit spreads, equity indices for risk signals. For crypto: during extreme risk-off, even BTC sells — move to stables or flat.",
+    "priority": 3
+  },
+  {
+    "id": "exec-167",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "regime_subtype",
+      "indicator"
+    ],
+    "content": "BUBBLE DYNAMICS — 1) Precipitating factor. 2) Amplification feedback. 3) Cultural narrative. 4) Anchoring. 5) Herd behavior. Bursts when narrative crumbles. Natural Ponzi: early profits attract buyers pushing prices higher. Self-reinforcing bubbles persist years. For crypto: identical dynamics. Monitor attention cascade via Google Trends.",
+    "priority": 3
+  },
+  {
+    "id": "exec-168",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "regime_subtype",
+      "indicator"
+    ],
+    "content": "SEASONAL TENDENCIES — Certain markets show consistent patterns. Grains cheapest after harvest. Energy bullish in winter. Use seasonal patterns as SETUP conditions, not standalone signals. Always filter through technical analysis. For crypto: BTC historically strong Q4/Q1, weak Q2/Q3. 'Uptober' pattern. Sell in May effect partially applies.",
+    "priority": 3
+  },
+  {
+    "id": "exec-169",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "COT REPORT — Compare hedger positions to historical norms. Hedgers are smart money. If hedgers normally hold 90% shorts but currently 70% = wildly bullish. Look for extreme divergence between hedgers and small traders — join hedgers. Use to confirm technical signals, not standalone. For crypto: use funding rate + OI as proxy.",
+    "priority": 3
+  },
+  {
+    "id": "exec-170",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "SENTIMENT EXTREMES — When 80%+ bullish, market near top (contrarian bearish). When 80%+ bearish, near bottom (contrarian bullish). Compare to COT data. The crowd is usually wrong at extremes. Use as one input — don't trade solely on sentiment. Combine with technical signals for highest-probability entries.",
+    "priority": 3
+  },
+  {
+    "id": "exec-171",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "GOOGLE TRENDS AS SENTIMENT — Search volume for 'bitcoin crash' peaked at BTC major bottoms. 'bitcoin moon' peaked near tops. News reference volume peaks at turning points. Combine with price action for timing. For crypto: social media sentiment (Twitter, Reddit) provides additional signal layer.",
+    "priority": 3
+  },
+  {
+    "id": "exec-172",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "SSI (SPECULATIVE SENTIMENT INDEX) — When retail traders heavily long, price tends to fall. When heavily short, price tends to rise. SSI is contrarian indicator — trade against crowd. For crypto: use funding rate as proxy. Positive funding = crowded long = short signal. Negative = crowded short = long signal.",
+    "priority": 3
+  },
+  {
+    "id": "exec-173",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "INTERMARKET ANALYSIS FOR CRYPTO — BTC leads alts 1-5 min. ETH leads DeFi. DXY inverse BTC (-0.3 to -0.6). VIX >30 = risk-off = BTC selloff. Gold correlation varies. Bond yields rising = BTC headwind (opportunity cost). Monitor TradFi futures (ES, NQ) as leading indicators for crypto session direction.",
+    "priority": 3
+  },
+  {
+    "id": "exec-174",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "trigger"
+    ],
+    "content": "ORDER BOOK ANALYSIS — Bid wall = support. Ask wall = resistance. Spoofing: large orders placed then removed = manipulation. Iceberg orders: hidden size at a level. Real support: orders that DON'T get pulled. Monitor order book changes during kill zones for institutional activity. Use WebSocket for real-time book data.",
+    "priority": 3
+  },
+  {
+    "id": "exec-175",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "trigger",
+      "setup_type"
+    ],
+    "content": "FUNDING RATE TRADING — Extreme positive funding (>0.1%) = crowded long = short signal. Extreme negative = crowded long = long signal. Funding resets every 8h on most exchanges. Trade against extremes at key technical levels. Funding + S/R confluence = highest probability mean reversion setup.",
+    "priority": 3
+  },
+  {
+    "id": "exec-176",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "OPEN INTEREST ANALYSIS — Rising OI + rising price = trend strengthening (new money entering). Rising OI + falling price = new shorts, trend continuing. Falling OI at extremes = trend exhaustion. OI spike + price reversal = trapped traders unwinding. Combine with volume and price action for confirmation.",
+    "priority": 3
+  },
+  {
+    "id": "exec-177",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "trigger",
+      "setup_type"
+    ],
+    "content": "LIQUIDATION CASCADES — Large liquidation events create cascading price moves. Long liquidations push price down → more longs liquidated → snowball. Monitor liquidation heatmaps for cluster zones. Enter AFTER cascade slows, not during. Stop beyond liquidation cluster. Target: pre-cascade level.",
+    "priority": 3
+  },
+  {
+    "id": "exec-178",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "regime_subtype",
+      "rule"
+    ],
+    "content": "MARKET THERMOMETER — Measures distance between today's high/low compared to exponential average. Identifies trending vs ranging state. Rising = heating up (trending), falling = cooling (consolidating). Use to select appropriate indicator type: trending → trend-following tools; ranging → oscillators. Prevents wrong indicator for current regime.",
+    "priority": 3
+  },
+  {
+    "id": "exec-179",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "regime_subtype",
+      "asset_behavior",
+      "setup_type"
+    ],
+    "content": "SUPPLY-DRIVEN vs DEMAND-DRIVEN — Supply shocks create fast, volatile moves. Demand changes create slow, quiet trends. Trend traders profit most in supply-driven; swing traders in demand-driven. For crypto: protocol events (halving, burns) = supply shock. Adoption news = demand change. Adjust strategy to regime.",
+    "priority": 3
+  },
+  {
+    "id": "exec-180",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "BEGINNER, SEMIPRO, PROGRESSION — Beginner: small account, paper trading, 0.5% risk. Semipro: consistent profits, 1% risk, beginning income. Pro: full-time, multiple strategies, 1-2% risk. Each level requires different sizing, markets, expectations. Don't skip stages — the market punishes premature ambition.",
+    "priority": 3
+  },
+  {
+    "id": "exec-181",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "rule"
+    ],
+    "content": "CHOOSING WHAT TO TRADE — Trade liquid instruments. Don't trade expensive markets with small accounts — random noise can be deadly. Beginners: start with most liquid (BTC, ETH). Create spreadsheet comparing position values. Never trade 24-hour markets from single time zone without session awareness.",
+    "priority": 3
+  },
+  {
+    "id": "exec-182",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "regime_subtype",
+      "timeframe",
+      "position_sizing"
+    ],
+    "content": "MIXED MARKET HANDLING — When higher TF bullish but lower TF bearish: sell signals on lower TF create BUYING opportunities. This is because higher TF is dominant. When mixed: reduce position size, use tighter targets, focus on shorter-duration trades. The conflict will resolve. Trade smaller during conflicts.",
+    "priority": 3
+  },
+  {
+    "id": "exec-183",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "timeframe",
+      "indicator",
+      "setup_type"
+    ],
+    "content": "ANCHOR CHARTS — Use monthly and weekly charts as 'anchor' to determine dominant trend before intraday trading. Monthly MACD direction overrides weekly and daily. If monthly MACD in buy, focus on long side even if daily sells. Weekly MACD in buy = dips become buying opportunities. Mixed = sell signals create buying ops.",
+    "priority": 3
+  },
+  {
+    "id": "exec-184",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "timeframe",
+      "rule"
+    ],
+    "content": "TIMEFRAME RELATIONSHIPS — Factor of Five: 1 week ≈ 5 days, 1 month ≈ 5 weeks, 1 hour ≈ 10-min segments (5), each 10-min ≈ 2-min bars (5). Choose your TF, immediately go up one level for direction. Day traders: 30-min + 5-min. Swing traders: weekly + daily. Never use more than 3 TFs — more clutters decisions.",
+    "priority": 3
+  },
+  {
+    "id": "exec-185",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "timeframe",
+      "setup_type",
+      "trigger"
+    ],
+    "content": "SCALPER ENTRY TIMING — Use 144-tick or 5m chart for pivot level entries. Add 8/21 EMA for trend within TF. Use for: pivot fades on choppy days, pullback entries on trending days. Confirmation should occur within 15-20 min or close position. Scalper buy/sell signals on one chart can confirm entries on another.",
+    "priority": 3
+  },
+  {
+    "id": "exec-186",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe",
+      "session"
+    ],
+    "content": "SQUEEZE PLAY (MIDDAY) — Use on 5-min timeframe during midday doldrums when other setups unavailable. Red dots = squeeze active. First dot after red = fire signal. Enter in direction of wave alignment. Stop: below recent swing. Target: next pivot level or trail with trend bar exit. Don't fight the dominant wave direction.",
+    "priority": 3
+  },
+  {
+    "id": "exec-187",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "timeframe"
+    ],
+    "content": "RSI DIVERGENCE ON 60-MIN — On 60-min chart, look for RSI making higher highs while price hasn't = bullish divergence (RSI leading). Price lower lows but RSI higher lows = bullish divergence. These identify path of least resistance for next session. Combine with daily and weekly MACD direction for highest-probability swing entries.",
+    "priority": 3
+  },
+  {
+    "id": "exec-188",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "trigger"
+    ],
+    "content": "MOMENTUM INDEX OSCILLATOR — Measures rate of change relative to volatility. Above zero = bullish momentum. Below = bearish. Divergences between momentum and price = strong reversal signals. Use with squeeze: momentum rising while squeeze forming = high probability long. Combines well with multi-timeframe waves.",
+    "priority": 3
+  },
+  {
+    "id": "exec-189",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "trigger",
+      "stop_loss"
+    ],
+    "content": "TTM TREND BARS — Paint bars based on average price of prior 6 bars vs current range. BLUE = buying pressure. RED = selling pressure. Best for EXIT management. Two consecutive red bars in long trade = exit signal. Two consecutive blue in short = cover signal. Combine with squeeze for complete system.",
+    "priority": 3
+  },
+  {
+    "id": "exec-190",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "TTM WAVES — Three momentum waves: A (shortest, short-term), B (medium), C (longest, long-term). All oscillate around zero. BUY when: C above zero (bullish), squeeze fires long, A dips below zero then crosses back up. SELL when opposite. Never fight the C wave — it determines dominant trend direction.",
+    "priority": 3
+  },
+  {
+    "id": "exec-191",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "PUT/CALL RATIO — PC >1.0 = more puts = bearish sentiment (contrarian bullish). PC <0.7 = more calls = bullish (contrarian bearish). Best signals at extremes. Rising PC during rally = smart money buying protection = caution. Falling PC during decline = smart money selling puts = bottom forming.",
+    "priority": 3
+  },
+  {
+    "id": "exec-192",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "TRIN (ARMS INDEX) — TRIN = (Advancing/Declining Issues) ÷ (Advancing/Declining Volume). >1.0 = more volume into declining = bearish. <1.0 = bullish. Extreme: >2.0 = panic selling (potential bottom), <0.5 = euphoric buying (potential top). Closing values more valuable than intraday.",
+    "priority": 3
+  },
+  {
+    "id": "exec-193",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "setup_type"
+    ],
+    "content": "OPTION IV CRUSH — After events, implied volatility collapses even if stock moves your direction. Buy options BEFORE events when IV low. Sell options BEFORE events when IV high. Check IV rank (current vs 52-week range) before any option trade. For crypto: apply to BTC options around CPI/FOMC events.",
+    "priority": 3
+  },
+  {
+    "id": "exec-194",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "risk_context"
+    ],
+    "content": "THETA DECAY — Accelerates last 30 days. ~35% lost. Sellers target 30-45 DTE. Buyers target 60-90 DTE. Never hold short options through expiry week. For crypto options: similar dynamics on Deribit. Gamma risk highest ATM near expiry — close or roll at 21 DTE.",
+    "priority": 3
+  },
+  {
+    "id": "exec-195",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "setup_type"
+    ],
+    "content": "IV RANK — >50 = sell premium (options expensive). <30 = buy (cheap). 30-50 = neutral. Mispriced volatility is the #1 options edge. Check before any options trade. For crypto: use DVOL (BTC implied vol index) as equivalent measure.",
+    "priority": 3
+  },
+  {
+    "id": "exec-196",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "rule"
+    ],
+    "content": "TRADING RECORD — Track: date, instrument, long/short, entry date/price, stop, target, exit date/price, % gain/loss, R-multiple. Include: which screens triggered, emotional state, market conditions. Calculate equity curve — if rising left to right, system works. Review trades weekly. Record reasons BEFORE entry, not after.",
+    "priority": 3
+  },
+  {
+    "id": "exec-197",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "rule"
+    ],
+    "content": "END-OF-DAY ROUTINE — 1) Update charts. 2) Recalculate indicators. 3) Mark S/R levels. 4) Update spreadsheet. 5) Write diary entry. 6) Set alerts for next day. 7) Review open positions, adjust stops. 8) Plan tomorrow's potential trades. Prevents impulsive morning decisions. Ensures systematic approach.",
+    "priority": 3
+  },
+  {
+    "id": "exec-198",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "HEALTH AND TRADING — Physical health directly impacts performance. Regular exercise reduces cortisol. Proper sleep prevents emotional decisions. Caffeine creates artificial alertness then crashes. Checklist: sleep 7-8h, exercise daily, eat clean, limit caffeine, manage stress through routine. A healthy body supports disciplined mind.",
+    "priority": 3
+  },
+  {
+    "id": "exec-199",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "risk_context",
+      "asset_behavior"
+    ],
+    "content": "SPREAD TRADING — Buy one delivery month, sell another in same market. Much safer than directional trades with lower margin. Spread traders bet against deviations for return to normalcy. Not a single good how-to book exists — professionals kept amateurs out. Excellent risk management tool for reducing directional exposure.",
+    "priority": 3
+  },
+  {
+    "id": "exec-200",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "regime_subtype"
+    ],
+    "content": "PING PONG PLAY — Trade between established S/R in range-bound markets. BUY at support, stop below. SELL at resistance, stop above. Target: opposite side of range. Use 8/21 EMA for trend within range. If 8 EMA trending up within range, favor longs at support. Exit if range breaks.",
+    "priority": 3
+  },
+  {
+    "id": "exec-201",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "REVERSAL PLAY (HOLP/LOHP) — HOLP = High of Low Period, LOHP = Low of High Period. After extended trend, identify stalling period. BUY: market makes new low within consolidation then reverses above HOLP. SELL: new high then reverses below LOHP. Don't buy 'because cheap' — wait for reversal confirmation.",
+    "priority": 3
+  },
+  {
+    "id": "exec-202",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "asset_behavior"
+    ],
+    "content": "FX POWER PLAY — Identify pairs making new highs/lows while correlated pairs fail to confirm. Divergence between correlated pairs signals potential reversal. Enter when divergence confirmed by price action. For crypto: BTC making new high while ETH fails to confirm = potential BTC reversal.",
+    "priority": 3
+  },
+  {
+    "id": "exec-203",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "session"
+    ],
+    "content": "DAILY DOUBLE TRAP — On ranging days where price reverses twice, enter on second reversal. If pair makes new daily low then reverses above opening, go long. Tight stop below false breakdown level. Second reversal is more significant because it traps traders who entered on first reversal.",
+    "priority": 3
+  },
+  {
+    "id": "exec-204",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "BOOMERANG STRATEGY — After news spike, wait for price to retrace 50-61.8% of spike. Enter in direction of original spike. Stop below 76.4% retracement. News provides direction, pullback provides entry. Apply to crypto: CPI/FOMC spike → wait for 50% retrace → enter.",
+    "priority": 3
+  },
+  {
+    "id": "exec-205",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "session",
+      "timeframe"
+    ],
+    "content": "ASIAN SESSION RANGE BREAK — Monitor range during Asian session (typically 30-50 pips/$500-1000 BTC). Enter on European open breakout of Asian range. Stop at opposite end. Best on days with no major US data. Combine with squeeze — if squeeze fires in direction of break = highest probability.",
+    "priority": 3
+  },
+  {
+    "id": "exec-206",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "TREND LINE BREAKS — Break of trend line alone is insufficient. Wait for candle close beyond trend line, then retest from other side. Enter on successful retest. Stop beyond the break point. Retest confirmation eliminates most false breakouts. Volume should expand on break, decrease on retest.",
+    "priority": 3
+  },
+  {
+    "id": "exec-207",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "HEAD AND SHOULDERS — Most reliable reversal pattern. Neckline break confirms. Measure head-to-neckline for target projection. In crypto, shoulders are often asymmetric — that's normal. Volume should decrease from left shoulder to head to right shoulder. Neckline break on high volume.",
+    "priority": 3
+  },
+  {
+    "id": "exec-208",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "TRIANGLE BREAKOUTS — Ascending = bullish bias (flat top, rising bottom). Descending = bearish. Symmetrical = neutral. Enter on break with stop at last swing point. Volume must expand on breakout. Measure triangle height for target. Wait for close beyond boundary — don't anticipate.",
+    "priority": 3
+  },
+  {
+    "id": "exec-209",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "trigger",
+      "timeframe",
+      "asset_behavior"
+    ],
+    "content": "CANDLESTICK PATTERNS AT KEY LEVELS — Engulfing at S/R = strongest reversal signal. Morning/evening star on daily charts. Pin bars (long wicks) show rejection. In crypto: wicks are larger due to 24/7 trading. Use on 4H/Daily for highest reliability. Always require level confluence — pattern alone is insufficient.",
+    "priority": 3
+  },
+  {
+    "id": "exec-210",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "KELTNER + BOLLINGER SQUEEZE — When Bollinger contracts INSIDE Keltner = volatility contraction. Red dots = squeeze active. When Bollinger expands outside Keltner = squeeze FIRES. Trade in direction of momentum after fire. Red dots building → first colored dot after red = fire signal. Use with wave alignment.",
+    "priority": 3
+  },
+  {
+    "id": "exec-211",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "rule"
+    ],
+    "content": "DON'T TRADE MONDAYS — Mondays have lowest probability of gap fills (55-60%). Most breakaway gaps happen on Mondays. Typically pass on fading Monday gaps. Let markets 'settle in.' First trading day of month and expiration day also low fill probability. Exception: very low premarket volume.",
+    "priority": 3
+  },
+  {
+    "id": "exec-212",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "rule"
+    ],
+    "content": "TRADING DAY STRUCTURE — First 2 hours: highest probability setups. Midday: low probability, choppy. Final 2 hours: trend resumption or reversal play. NEVER initiate new positions in final 30 min. Close open positions at market by session close. For crypto: apply to US session structure.",
+    "priority": 3
+  },
+  {
+    "id": "exec-213",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "session",
+      "rule"
+    ],
+    "content": "TWO TRADING WINDOWS — Professional structure: first 2 hours of main session and last 2 hours. Exceptions: management of existing trades, 5-min squeeze setups. Don't initiate new positions outside these windows. The midday gap is for research, journaling, preparation. NOT for trading. Prevents overtrading.",
+    "priority": 3
+  },
+  {
+    "id": "exec-214",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "rule",
+      "asset_behavior"
+    ],
+    "content": "TRADE MANAGEMENT SOFTWARE — Use platform that auto-calculates stops and targets. Once entry placed, software manages: initial stop, first target, auto-trailing after targets, auto position reduction. Eliminates manual errors and emotional decisions. Click 'Flatten' to close all at once if needed.",
+    "priority": 3
+  },
+  {
+    "id": "exec-215",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "setup_type",
+      "risk_context"
+    ],
+    "content": "OPTION DELTA FOR DIRECTIONAL — When buying options, use delta 0.70+ for directional plays. Higher delta = option moves more like underlying. Buy ITM options with 2+ weeks before expiration. If uncertain, go out to next month. Options limit risk to premium while providing leverage.",
+    "priority": 3
+  },
+  {
+    "id": "exec-216",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context"
+    ],
+    "content": "MONEY MANAGEMENT PLAN — Max position: 6 contracts per $100K account. Scale: $50K=3, $75K=5, $100K=6, $150K=8, $200K=10. In/out all at once for entries, scale out for exits. First half target: 1-2 points. Second: trail or open target. R:R minimum 1:1.5 gap plays, 3:1 trending setups.",
+    "priority": 3
+  },
+  {
+    "id": "exec-217",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context"
+    ],
+    "content": "BEGINNER POSITION SIZING — Start with minimum size. Max account risk: 1% per trade. $25K account = $250 max risk. Calculate: risk per unit = entry - stop. $250 ÷ risk = max units. Goal: make a living, not a killing. Don't trade 60 contracts on $100K — you'll soon trade 6 with what's left.",
+    "priority": 3
+  },
+  {
+    "id": "exec-218",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "risk_context",
+      "setup_type"
+    ],
+    "content": "STOP WIDE ENOUGH TO WIN — Gap plays with tight stops (<30% win rate) destroy accounts. Wider stops on high-probability setups (>80% win rate) produce consistent profits. DON'T trail aggressively — parameters set, walk away. Many traders fail because stops too tight, not too wide.",
+    "priority": 3
+  },
+  {
+    "id": "exec-219",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "rule"
+    ],
+    "content": "TRADING JOURNAL SCORECARD — Score each trade on TWO scales: 1) Profitability (win/loss). 2) Execution quality (did you follow plan?). Track average for both daily. Grade by method used. Track 'impulse plays' separately. Review monthly for patterns: consecutive losers, morning vs afternoon, recovery from early losses.",
+    "priority": 3
+  },
+  {
+    "id": "exec-220",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "regime_subtype",
+      "rule"
+    ],
+    "content": "SETUP SELECTION — Different setups work in different conditions. Gap plays: best first trade. Pivots: best in all conditions. Squeeze: works midday. Propulsion: overnight swings. Find setups that fit YOUR personality. Master ONE before adding others. Focus produces consistency.",
+    "priority": 3
+  },
+  {
+    "id": "exec-221",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "regime_subtype"
+    ],
+    "content": "ADAPTIVE MOVING AVERAGE — AMA adjusts speed based on market efficiency. Efficiency ratio = net change ÷ sum of all changes. High efficiency (trending) = fast MA. Low (noisy) = slow MA. Trade: buy when AMA turns up, sell when turns down. Best for markets alternating between trending and choppy.",
+    "priority": 3
+  },
+  {
+    "id": "exec-222",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "stop_loss",
+      "trigger",
+      "timeframe"
+    ],
+    "content": "CHANNEL BREAKOUT EXIT — Enter on 20-candle channel breakout. Exit on 10-candle breakout (opposite side). This is both stop and profit-taking exit. Gives lots of room, well beyond noise. Disadvantage: gives back profits. Solution: use as catastrophic stop, add separate trailing stop and profit target for partials.",
+    "priority": 3
+  },
+  {
+    "id": "exec-223",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "SYSTEM DETERIORATION — Track expectancy monthly. If drops below zero for 3 consecutive months, investigate. Causes: regime change, overfit, random losing, execution errors. Response: reduce size 50%, analyze trades, paper trade, consider shelving. Professional system traders constantly monitor and adapt.",
+    "priority": 3
+  },
+  {
+    "id": "exec-224",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context",
+      "asset_behavior"
+    ],
+    "content": "GALLACHER'S VOLATILITY SIZING — Calculate each market's volatility in dollar terms. Set base unit at volatility equivalent. If BTC = $500 vol, ETH = $200 vol, then ETH gets 2.5× position of BTC for equal risk. Superior to fixed-amount models because normalizes risk across instruments.",
+    "priority": 3
+  },
+  {
+    "id": "exec-225",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "BENCHMARK COMPARISON — Always compare returns to a benchmark: risk-free rate + equity risk premium. If system returns 15% but benchmark 12%, edge is only 3%. Factor in: time, stress, costs, drawdowns. Calculate risk-adjusted: Sharpe ratio, Sortino ratio, SQN for apples-to-apples.",
+    "priority": 3
+  },
+  {
+    "id": "exec-226",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "asset_behavior"
+    ],
+    "content": "TRANSACTION COST REALITY — Rarely see system producing profits much bigger than its transaction costs. Factor in: commissions, slippage, spread, market impact. Calculate costs as % of total P&L. Target: costs <50% of gross profit. Tight stops destroy profitability through frequent cost generation.",
+    "priority": 3
+  },
+  {
+    "id": "exec-227",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing"
+    ],
+    "content": "KAUFMAN'S DRAWDOWN PROBABILITIES — With optimized sizing: 16% chance of 10% DD. 2.5% chance of 20%. 0.5% chance of 30%. If you'd be in serious trouble at 20%, trade only a portion of allocated capital. Your psychology determines tolerance — design sizing to match pain threshold.",
+    "priority": 3
+  },
+  {
+    "id": "exec-228",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing",
+      "asset_behavior"
+    ],
+    "content": "LEVERAGE TRACKING — Always know total leverage ratio. Track daily. Leverage amplifies gains AND losses. Professionals: 2-4:1 stocks, 5-10:1 futures. If exceeds comfort level, reduce positions. Leverage is the silent account killer — track religiously. For crypto: effective leverage = total exposure ÷ equity.",
+    "priority": 3
+  },
+  {
+    "id": "exec-229",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context"
+    ],
+    "content": "MAXIMUM POSITIONS — At 2% risk per trade and 6% monthly limit, max 3 simultaneous positions with full risk. At 1% risk, can have 6. More = more diversification but more complexity. Don't exceed ability to monitor. Each new position reduces available risk for remaining. Consider correlation.",
+    "priority": 3
+  },
+  {
+    "id": "exec-230",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "DEMO TRADE FIRST — Demo trade minimum 3 months before live. Then start with minimum position size. Treat demo money as real — habits formed carry to live trading. If you can't make money in demo, you definitely won't in live. Build confidence, not profits.",
+    "priority": 3
+  },
+  {
+    "id": "exec-240",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "INTEREST RATE EXPECTATIONS — Drive FX more than actual rates. Market prices in expected moves ahead. Fully priced-in rate hike may cause currency to sell off (buy rumor, sell fact). Monitor OIS and futures curves. For crypto: Fed rate expectations drive BTC via risk-on/risk-off.",
+    "priority": 2
+  },
+  {
+    "id": "exec-241",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator"
+    ],
+    "content": "DXY WEIGHTING — EUR 57.6%, JPY 13.6%, GBP 11.9%, CAD 9.1%, SEK 4.2%, CHF 3.6%. EUR/USD moves dominate DXY. DXY breakout confirms or denies EUR/USD signals. For crypto: DXY strength = BTC headwind. Monitor DXY trend as macro filter.",
+    "priority": 2
+  },
+  {
+    "id": "exec-242",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "DOLLAR SMILE THEORY — USD strengthens in: 1) US economy outperforming (risk-on). 2) Global risk aversion (flight-to-safety). USD weakest when US economy weak but no global crisis. For crypto: scenario 1 = mixed for BTC (strong economy = risk-on but strong dollar). Scenario 2 = BTC bearish.",
+    "priority": 2
+  },
+  {
+    "id": "exec-243",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator"
+    ],
+    "content": "INTEREST RATE PARITY — Forward rate = Spot × (1+domestic)/(1+foreign). If parity violated, arbitrage exists. Widening spreads indicate trend acceleration. For crypto: funding rate on perps serves similar function — rate differential between spot and futures.",
+    "priority": 2
+  },
+  {
+    "id": "exec-244",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "TAYLOR RULE — Optimal rate = neutral + 0.5×(inflation-target) + 0.5×(output gap). When market rates deviate significantly, expect policy shift. For crypto: monitor Fed policy deviation from Taylor Rule as macro positioning signal.",
+    "priority": 2
+  },
+  {
+    "id": "exec-245",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "REAL INTEREST RATES — Nominal rate minus inflation. Country with highest real rates attracts capital. Monitor breakeven inflation from TIPS. For crypto: falling real rates = BTC tailwind (opportunity cost of non-yielding asset decreases). Rising real rates = headwind.",
+    "priority": 2
+  },
+  {
+    "id": "exec-246",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator"
+    ],
+    "content": "TRADE FLOWS — Net exporters have currency appreciation tendency. Net importers see depreciation. For crypto: protocol revenue > emissions = sustainable value accrual (equivalent to trade surplus). Monitor protocol health metrics.",
+    "priority": 2
+  },
+  {
+    "id": "exec-247",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator"
+    ],
+    "content": "CAPITAL FLOWS — Equity rallies attract foreign capital, strengthening currency. Fixed income flows chase highest yields. TIC data measures foreign purchases of US assets. For crypto: monitor exchange inflows/outflows, stablecoin flows as capital flow proxies.",
+    "priority": 2
+  },
+  {
+    "id": "exec-248",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior"
+    ],
+    "content": "PPP (PURCHASING POWER PARITY) — Currencies revert to PPP over long term. Useful for identifying long-term misalignment, not short-term. For crypto: no direct equivalent, but market cap / TVL ratio provides similar over/undervaluation signal for DeFi tokens.",
+    "priority": 2
+  },
+  {
+    "id": "exec-249",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "MONEY SUPPLY — M2 growth exceeding GDP = inflationary, currency bearish. QE expands money supply, diluting value. For crypto: expanding M2 historically correlates with BTC bull markets (liquidity seeking returns). Monitor global M2 as macro positioning signal.",
+    "priority": 2
+  },
+  {
+    "id": "exec-250",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator"
+    ],
+    "content": "BALANCE OF PAYMENTS — Current account deficits must be financed by capital surpluses. If inflows insufficient, currency depreciates. US twin deficits are structural USD headwind. For crypto: monitor stablecoin supply growth as crypto capital account equivalent.",
+    "priority": 2
+  },
+  {
+    "id": "exec-251",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "regime_subtype",
+      "asset_behavior"
+    ],
+    "content": "CENTRAL BANK DIVERGENCE — Strongest FX trend driver. When Fed tightening while ECB easing, EUR/USD trends aggressively. Monitor rate expectations via OIS and futures. For crypto: Fed divergence from other central banks = USD strength = BTC headwind or tailwind depending on direction.",
+    "priority": 2
+  },
+  {
+    "id": "exec-252",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior"
+    ],
+    "content": "ECONOMIC SURPRISE INDICES — When country's data consistently beats expectations, currency strengthens. Bloomberg Surprise Index is key. Reversion to mean after extreme readings. For crypto: crypto-specific surprise indices (on-chain metrics vs expectations) serve similar function.",
+    "priority": 2
+  },
+  {
+    "id": "exec-253",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "setup_type",
+      "timeframe"
+    ],
+    "content": "ELLIOTT WAVE IN FX — Wave 3 is longest and strongest. Wave 4 cannot overlap Wave 1. Wave 5 shows momentum divergence. Corrective waves (A-B-C) retrace 38.2%-61.8% of impulse. Apply to BTC on daily/weekly charts. BTC shows clean Elliott Wave patterns during major trends.",
+    "priority": 2
+  },
+  {
+    "id": "exec-254",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "MAGAZINE COVER INDICATOR — When mainstream media features a trend on cover, trend near exhaustion. Contrarian signal at extremes. For crypto: 'Bitcoin is dead' headlines at bottoms. 'Bitcoin to $1M' headlines at tops. Monitor mainstream media narrative intensity.",
+    "priority": 2
+  },
+  {
+    "id": "exec-255",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "NEWS HEADLINE CONTRARIAN — Extreme language (surge, plummet, plunge) signals short-term reversal. Search volume for 'bitcoin crash' peaks at bottoms. For crypto: monitor Twitter/X sentiment, Reddit activity, Google Trends. Spikes in extreme language = near-term reversal.",
+    "priority": 2
+  },
+  {
+    "id": "exec-256",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "risk_context"
+    ],
+    "content": "CURRENCY CORRELATIONS — EUR/USD and USD/CHF have -0.94 monthly correlation. Taking opposite positions on correlated pairs doubles exposure. For crypto: BTC-ETH correlation varies 0.7-0.95. BTC-altcoin correlations shift by regime. Monitor rolling 30-day correlation. Avoid doubling exposure unknowingly.",
+    "priority": 2
+  },
+  {
+    "id": "exec-257",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "SEASONAL PATTERNS IN FX — USD/JPY tends to rise January and July. USD/CHF and GBP/USD show dollar weakness in September. For crypto: 'Uptober' (October strength), January effect, summer doldrums (June-August weakness). Use as secondary filter, not primary signal.",
+    "priority": 2
+  },
+  {
+    "id": "exec-258",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator"
+    ],
+    "content": "COMMODITY CURRENCIES — AUD tracks gold and base metals. CAD tracks crude oil. NZD tracks dairy. Monitor commodity indices as leading indicators. For crypto: BTC correlation with gold varies -0.2 to +0.4. ETH correlation with tech stocks 0.3-0.6. Monitor shifting correlations.",
+    "priority": 2
+  },
+  {
+    "id": "exec-259",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "EQUITY-FX LINK — Rising US equities + rising USD = US outperformance. Rising equities + falling USD = global risk-on. Falling equities + rising USD = risk-off flight to safety. For crypto: BTC increasingly trades as risk asset. Rising equities + rising BTC = risk-on confirmation.",
+    "priority": 2
+  },
+  {
+    "id": "exec-260",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "OPEN INTEREST IN FUTURES — Rising OI + rising price = trend strengthening. Rising OI + falling price = new shorts entering. Falling OI at extremes = exhaustion. For crypto: BTC futures OI on CME + Binance/Bybit. OI spike + price reversal = trapped traders unwinding.",
+    "priority": 2
+  },
+  {
+    "id": "exec-261",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "rule",
+      "risk_context"
+    ],
+    "content": "SIMPLICITY PRINCIPLE — Simple concepts work best. Complexity = curve fitting. If you can't explain system in one paragraph, too complex. Each component should be independently understandable. Multiple simple components > one complex system. If breaks under pressure, simplify further.",
+    "priority": 2
+  },
+  {
+    "id": "exec-262",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "OVERFITTING DANGER — Optimizing to fit historical data perfectly = curve fitting. System will fail on new data. Prevention: 1) Split into dev/validation sets. 2) Test on multiple markets. 3) Simpler = more robust. 4) Fewer parameters = less fitting. 5) Walk-forward analysis is best validation.",
+    "priority": 2
+  },
+  {
+    "id": "exec-263",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "WALK-FORWARD ANALYSIS — Best validation. Optimize on first 20% of data. Test on next 5%. Re-optimize including that 5%. Test next 5%. Repeat. Tracks performance as if traded live with periodic re-optimization. Reveals true performance, not curve-fit fantasy.",
+    "priority": 2
+  },
+  {
+    "id": "exec-264",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "setup_type"
+    ],
+    "content": "RANDOM ENTRY EXPERIMENT — Tom Basso tested: random coin-flip entry + good exits + position sizing = consistently profitable. Proves entry is LEAST important. Even random entries profitable with: 1) Trailing stop limiting losses. 2) Anti-martingale sizing. Entry only needs to be slightly better than random.",
+    "priority": 2
+  },
+  {
+    "id": "exec-265",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "SAMPLE SIZE REQUIREMENTS — Minimum 100 trades for statistical significance. 30 trades = preliminary assessment only. Track: win rate, avg R-multiple, std dev of R, max consecutive losses, max drawdown, expectancy, SQN. Small samples produce misleading results. Don't optimize on small samples.",
+    "priority": 2
+  },
+  {
+    "id": "exec-266",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "risk_context"
+    ],
+    "content": "NEURAL NETWORKS — Can find complex nonlinear relationships. BUT: extremely prone to curve fitting, require massive data, often fail in live. Most useful as ONE input, not standalone. Use for pattern recognition (classify regime) rather than direct signals. If spectacular backtest results, probably overfit.",
+    "priority": 2
+  },
+  {
+    "id": "exec-267",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "asset_behavior",
+      "risk_context"
+    ],
+    "content": "ARBITRAGE CONCEPTS — Price discrepancies between related instruments. Simultaneous buy/sell reduces directional risk. Low risk per trade but requires speed, low commissions, significant capital. Most profitable when volatile. Not suitable for small accounts. For crypto: spot-futures basis trades, cross-exchange arb.",
+    "priority": 2
+  },
+  {
+    "id": "exec-268",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "setup_type",
+      "asset_behavior",
+      "risk_context"
+    ],
+    "content": "SPREAD TRADING FOR SYSTEMS — Spreads less volatile than outright positions. Lower margin. Bet against deviations for reversion. Use technical analysis on spread itself. Excellent for lower-risk, consistent returns. Can be automated. Often overlooked. For crypto: ETH-BTC ratio trades, DeFi-CEX basis.",
+    "priority": 2
+  },
+  {
+    "id": "exec-269",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "position_sizing",
+      "risk_context"
+    ],
+    "content": "40 PhD STUDY (POSITION SIZING) — Ralph Vince gave 40 PhDs a positive-expectancy game. 95% LOST money. They didn't understand position sizing and bet too much after losses. Proves: 1) Intelligence ≠ success. 2) Sizing is THE most important factor. 3) Positive-expectancy systems fail with wrong sizing.",
+    "priority": 2
+  },
+  {
+    "id": "exec-270",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing"
+    ],
+    "content": "SNOW FIGHT METAPHOR — Each trade = snowball at wall. White = profit, black = loss. Net effect = equity change. THREE variables: 1) Reliability (white vs black probability). 2) Reward-to-risk (size). 3) Opportunity (frequency). Multiply all three = expectancy. Position sizing = how many walls simultaneously.",
+    "priority": 2
+  },
+  {
+    "id": "exec-271",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing"
+    ],
+    "content": "OPPORTUNITY FACTOR — Frequency dramatically affects returns. Same expectancy: 100 trades/day = massive annual. 100 trades/year = modest. BUT: more opportunity = more costs. Optimize: highest (expectancy × opportunity) / transaction costs. Don't confuse activity with profitability.",
+    "priority": 2
+  },
+  {
+    "id": "exec-272",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "indicator",
+      "regime_subtype"
+    ],
+    "content": "FLOOR AND CEILING — Fundamentals put floor (production cost) and ceiling (substitution cost) under commodities. Below floor → supply shrinks → price rises. Above ceiling → demand switches. Same price areas serve as floor year after year. For crypto: mining cost = BTC floor (~$30K-40K depending on energy costs).",
+    "priority": 2
+  },
+  {
+    "id": "exec-273",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "risk_context"
+    ],
+    "content": "MARKET IS A CROWD — Not mechanical or electronic — huge crowd under imperfect mass psychology. Physics and math help, but decisions MUST account for psychology. This is why fully automatic systems fail. Crowd has moods, panics, euphoria. Technical indicators measure crowd behavior quantitatively. Ask: what is the crowd feeling?",
+    "priority": 2
+  },
+  {
+    "id": "exec-274",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "asset_behavior"
+    ],
+    "content": "JUST BECAUSE YOU KNOW — Doesn't mean everyone does. The market will go higher than you think, and lower. Most people don't have foresight to look 6 months out. Don't impose your timeline on the market. Be flexible. The market is always right; you are often wrong.",
+    "priority": 2
+  },
+  {
+    "id": "exec-275",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "DON'T PERSONALIZE — Market is totally impersonal; doesn't care whether you make money. When trader says 'I wish' or 'I hope,' they engage in destructive thinking. Whenever buying, make sure you're not going to lose money first. Value first, then catalyst, then timing.",
+    "priority": 2
+  },
+  {
+    "id": "exec-276",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "MARKETS LOOK BEST AT HIGHS — When setting new highs, that is often the BEST time to sell. To be good trader you must be contrarian. Best money is made at turns, not by catching trends in the middle. But: being contrarian doesn't automatically mean victory. Need RIGHT TIMING and APPROPRIATE SIZE.",
+    "priority": 2
+  },
+  {
+    "id": "exec-277",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "asset_behavior",
+      "regime_subtype",
+      "risk_context"
+    ],
+    "content": "VARIANT PERCEPTION — Develop perceptions at variance with general market view. Play those variant perceptions until no longer variant. Perception must be CONTRARIAN — if everyone agrees, edge is gone. When stocks don't act as fundamentals suggest, investigate what the other side knows.",
+    "priority": 2
+  },
+  {
+    "id": "exec-278",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "asset_behavior"
+    ],
+    "content": "EXPECT THE EXTREME — Don't think in boundaries. Unexpected and impossible happen regularly. Don't draw boundaries from history. 'BTC at $20K couldn't go higher' → $69K. 'BTC at $69K can't go lower' → $15K. Always account for scenarios beyond your imagination.",
+    "priority": 2
+  },
+  {
+    "id": "exec-279",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "DON'T TRADE WHEN YOU CAN'T AFFORD TO — Trading with scared money guarantees failure: miss best opportunities, jump out of good positions, take profits too fast, stay with losers. Exceptional traders need confidence AND desire. They come together only occasionally for most.",
+    "priority": 2
+  },
+  {
+    "id": "exec-280",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "rule"
+    ],
+    "content": "BEST INDICATORS ARE SIMPLE — Moving averages, breakouts. Complexity doesn't equal edge. Simple trend-following works because it captures persistent tendency of markets to trend. Weiss: best indicators are simple ones. If you can't explain it simply, you don't understand it well enough.",
+    "priority": 2
+  },
+  {
+    "id": "exec-281",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing"
+    ],
+    "content": "RISK MANAGEMENT IS THE SYSTEM — Entry signal is secondary. Focus on: how much to risk per trade, when to increase/decrease size, how to handle correlated positions. This is the real edge. Basso: risk management IS the system. The entry is merely the trigger.",
+    "priority": 2
+  },
+  {
+    "id": "exec-282",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "TRADING FOR FREEDOM — Freedom requires discipline, risk tolerance, facility with numbers. Discipline = choosing what you want MOST over what you want NOW. Without discipline, no system works. With discipline, even mediocre system produces profits. Freedom is earned through thousands of disciplined decisions.",
+    "priority": 2
+  },
+  {
+    "id": "exec-290",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "asset_behavior",
+      "regime_subtype"
+    ],
+    "content": "MONEY SUPPLY GROWTH DIFFERENTIALS — M2 growth exceeding GDP growth = inflationary, currency bearish. Monitor M2 velocity changes. Quantitative easing expands money supply, diluting currency value. For crypto: expanding global M2 = BTC tailwind. Contracting = headwind.",
+    "priority": 1
+  },
+  {
+    "id": "exec-291",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "indicator",
+      "risk_context"
+    ],
+    "content": "NEURAL NETWORK CAUTION — Extremely prone to curve fitting. Require massive data sets. Often fail in live trading. Most useful as ONE input in system, not standalone. Use for pattern recognition (classify market regime) rather than direct signal generation. Spectacular backtest results = probably overfit.",
+    "priority": 1
+  },
+  {
+    "id": "exec-292",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "TRADING FOR A LIVING vs KILLING — Beginners want to make a killing. Professionals want to make a living. Goal: consistent monthly income, not lottery wins. Small consistent gains compound. $100K at 3% monthly = $42K annual. That's a living. Those who try to make a killing end up killing their account.",
+    "priority": 1
+  },
+  {
+    "id": "exec-293",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "PERSONAL INTEGRITY — Your word to yourself matters. Each broken rule makes next one easier to break. Each kept rule strengthens discipline. Write rules down. Post where visible. If you violate, write WHY in journal. Pattern recognition of your rule-breaking is first step to eliminating it.",
+    "priority": 1
+  },
+  {
+    "id": "exec-294",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "SELF-SABOTAGE PATTERNS — 1) Not taking valid setups (fear). 2) Moving stops against you (hope). 3) Adding to losers (denial). 4) Taking profits too early (fear of losing gains). 5) Revenge trading (anger). 6) Overtrading (boredom). 7) System hopping (frustration). Write rules BEFORE, follow exactly, review weekly.",
+    "priority": 1
+  },
+  {
+    "id": "exec-295",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "THE HOLY GRAIL IS YOU — Most look for mysterious system. Real Holy Grail: understanding yourself — biases, objectives, risk tolerance, time availability, emotional triggers. Different people need different systems based on personality. A system that works for one may fail for another. Self-knowledge comes BEFORE system design.",
+    "priority": 1
+  },
+  {
+    "id": "exec-296",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "JUDGMENTAL BIASES — 1) Reliability bias: overvaluing win rates. 2) Lotto bias: seeking huge wins with tiny probability. 3) Representation bias: small samples = whole. 4) Randomness bias: patterns in noise. 5) Conservatism bias: slow to update. 6) Small numbers bias. Awareness is first step to overcoming.",
+    "priority": 1
+  },
+  {
+    "id": "exec-297",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "12 STEPS TO SYSTEM DEVELOPMENT — 1) Take inventory. 2) Develop open mind. 3) Determine objectives. 4) Choose timeframe. 5) Study best historical moves. 6) Identify concept. 7) Add stops and costs. 8) Add exits, calculate expectancy. 9) Look for huge reward trades. 10) Optimize with sizing. 11) Determine improvements. 12) Worst-case mental planning.",
+    "priority": 1
+  },
+  {
+    "id": "exec-298",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "position_sizing"
+    ],
+    "content": "SIX KEYS TO SUCCESS — 1) Positive expectancy system. 2) Trade consistently. 3) Position sizing to maximize expectancy. 4) Opportunity factor. 5) Transaction costs. 6) Starting capital adequacy. Most focus only on #1. HOLY GRAIL is understanding that #3 determines MOST of success or failure.",
+    "priority": 1
+  },
+  {
+    "id": "exec-299",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "OBJECTIVES BEFORE SYSTEM — Objectives determine EVERYTHING: timeframe, markets, risk, sizing, system type. Must know: monthly return target, max drawdown, time available, capital, psychological risk tolerance. Without clear objectives, you'll chase random systems. Write objectives first.",
+    "priority": 1
+  },
+  {
+    "id": "exec-300",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "LOSS AVERSION — 30-40% win rate feels like failure even if profitable. Don't look at individual P&L. Monthly only. Most traders quit trend-following during losing streaks, missing the big winners that make the system work. Big trends follow biggest pain. Accept the math.",
+    "priority": 1
+  },
+  {
+    "id": "exec-301",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "AMATEUR vs PROFESSIONAL — Amateurs: chase, one attempt, freeze on losses, average down, predict market. Professionals: multiple entries, cut quickly, never average down, react to market. If stopped on false breakout, pros re-enter; amateurs stay out. Pros risk <2%, amateurs want leverage.",
+    "priority": 1
+  },
+  {
+    "id": "exec-302",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "asset_behavior"
+    ],
+    "content": "FEAR IS STRONGER THAN GREED — Bearish moves are faster and sharper than bullish. Tops form slowly (distribution), bottoms form quickly (capitulation). Position sizing should reflect this asymmetry. Use tighter stops on short positions. Allow more room on longs.",
+    "priority": 1
+  },
+  {
+    "id": "exec-303",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "EMOTIONAL DETACHMENT — Good traders are dedicated but not emotionally married. Accept losses and make decisions intellectually. During losing streaks, take a break — continuing breeds greater losses. Emotions are fine at weddings, NOT in trading. When emotional, you are the signal to STOP.",
+    "priority": 1
+  },
+  {
+    "id": "exec-304",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "LOSING BEGETS LOSING — When you start losing, triggers negative psychology and pessimism. During losing streaks: cut back rapidly, stop completely if bad enough. Take 3-4 weeks off to reset. Don't fight back by trading heavier. Biggest losses ALWAYS follow largest profits. After strong run, play smaller.",
+    "priority": 1
+  },
+  {
+    "id": "exec-305",
+    "source": "knowledge-execution-build",
+    "topic": "Execution",
+    "tags": [
+      "risk_context",
+      "rule"
+    ],
+    "content": "AFTER DEVASTATING LOSS — Play very small — shrink to 1/5 or 1/10 normal position. Get black ink (any profit) to rebuild rhythm and confidence. It's not how much you make, but getting confidence back. Works consistently. Take time between loss and next decision.",
+    "priority": 1
+  }
+]

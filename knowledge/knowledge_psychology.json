@@ -1,0 +1,4816 @@
+[
+  {
+    "id": "psych-001",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking",
+      "intuition",
+      "exit-psychology",
+      "adaptability"
+    ],
+    "content": "If a position doesn't feel right as soon as you put it on, get out immediately. Don't be embarrassed to change your mind within minutes. When in doubt, get out and get a good night's sleep. You can always come back in. While in, you can't think.",
+    "priority": 5
+  },
+  {
+    "id": "psych-002",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "tags": [
+      "swing",
+      "revenge-risk",
+      "drawdown",
+      "revenge-trading"
+    ],
+    "content": "Losing begets losing. When you start losing, it triggers negative psychology and pessimism. During losing streaks: cut back rapidly, stop completely if it gets bad enough. Take 3-4 weeks off to reset. Don't fight back by trading heavier.",
+    "priority": 5
+  },
+  {
+    "id": "psych-003",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "tags": [
+      "revenge-risk"
+    ],
+    "content": "After a destabilizing loss, get out, go home, take a nap. Put time between the loss and your next decision. Don't try to catch up or double up to recoup losses. A certain amount of loss affects judgment — you need recovery time.",
+    "priority": 5
+  },
+  {
+    "id": "psych-004",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "ego-control",
+      "large-cap"
+    ],
+    "content": "Don't be a hero. Don't have an ego. Always question yourself and your ability. Don't ever feel that you are good. The second you do, you are dead. PTJ's biggest hits always came after great periods when he started thinking he knew something.",
+    "priority": 5
+  },
+  {
+    "id": "psych-005",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "tags": [
+      "loss-recovery",
+      "consistency",
+      "confidence-rebuilding"
+    ],
+    "content": "After devastating loss, play small — shrink to 1/5 or 1/10 normal position. Get black ink (any profit) to rebuild rhythm and confidence. It's not how much you make, but getting your confidence back. Works consistently.",
+    "priority": 5
+  },
+  {
+    "id": "psych-006",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "winning-streak"
+    ],
+    "content": "Biggest losses have ALWAYS followed largest profits. After strong profit run, play smaller than larger. Take a day off as reward. Battle fatigue sets in after ~12 profitable days in a row. Complacency from winning leads to sloppy trading.",
+    "priority": 5
+  },
+  {
+    "id": "psych-007",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "ego-control"
+    ],
+    "content": "Because they would lose money than admit they're wrong. 'I'll get out when I'm even' protects the ego. Became a winning trader when able to say: to hell with my ego, making money is more important. Schwartz's key transformation.",
+    "priority": 5
+  },
+  {
+    "id": "psych-008",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "process-focus",
+      "capitulation"
+    ],
+    "content": "Don't trade on someone else's opinion. When you get in on another's analysis, you have no basis for deciding when to get out. You surrender the decision process, eliminating risk control. The market punishes all trading transgressions.",
+    "priority": 5
+  },
+  {
+    "id": "psych-009",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "tags": [
+      "tilt-detection",
+      "reversal"
+    ],
+    "content": "When you're getting beat to death, get your head out of the mixer. Dennis: after compounding a loss with three reversals in one day (losing 1/3 of capital), learned to put time between a destabilizing loss and the next decision.",
+    "priority": 5
+  },
+  {
+    "id": "psych-010",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "A greedy trader always blows out. Kovner knew brilliant traders who knew markets better than he did, but he kept money and they didn't. The difference: position size. For every 1 contract Kovner traded, they traded 10.",
+    "priority": 5
+  },
+  {
+    "id": "psych-011",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "process-focus"
+    ],
+    "content": "Cook: After a devastating loss, shrink positions to 1/5 to 1/10 normal. Focus on getting back to profitability with small wins. Don't try to make it all back at once. The recovery process takes patience and humility.",
+    "priority": 5
+  },
+  {
+    "id": "psych-012",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "tags": [
+      "discipline"
+    ],
+    "content": "Hite's friend lost everything on one gold trade — took sell signal, didn't follow it, went long, refused to exit. Lost the mansion. If you follow the system and take the sell signal, you make a fortune instead. System discipline is survival.",
+    "priority": 5
+  },
+  {
+    "id": "psych-013",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "range-bounce",
+      "reversal",
+      "mid-cap",
+      "range-tight"
+    ],
+    "content": "Eckhardt: Human nature teaches POOR trading. Small profits vanish so market teaches cash in early. Consolidations teach buy dips. Returns to old prices teach hold losers. Opposite of correct.",
+    "priority": 5
+  },
+  {
+    "id": "psych-014",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mindset"
+    ],
+    "content": "Eckhardt: Amateurs go broke taking large losses. Professionals go broke taking small profits. Success rate is LEAST important stat, possibly inversely related to performance.",
+    "priority": 5
+  },
+  {
+    "id": "psych-015",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "winning-streak"
+    ],
+    "content": "Eckhardt: Losses make you strong, profits make you weak. Large profits more insidious than large losses for emotional destabilization. After wins you think you are special and make shoddy decisions.",
+    "priority": 5
+  },
+  {
+    "id": "psych-016",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking",
+      "intuition"
+    ],
+    "content": "Eckhardt: If it feels good, dont do it. When all criteria in balance, do the thing you LEAST want to do. Natural instincts mislead. Reprogram to do correct over comfortable.",
+    "priority": 5
+  },
+  {
+    "id": "psych-017",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "random-outcome",
+      "simplicity"
+    ],
+    "content": "FIVE FUNDAMENTAL TRUTH #1: Anything can happen. The market can do virtually anything at any time because any single trader anywhere in the world can negate your trade's potential. One person selling 2M bushels can drop soybeans 10 cents in 30 seconds. You don't know what's going to happen next.",
+    "priority": 5
+  },
+  {
+    "id": "psych-018",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "probability-thinking"
+    ],
+    "content": "FIVE FUNDAMENTAL TRUTH #2: You don't need to know what is going to happen next in order to make money. Casinos make consistent profits on random outcomes because they have an edge and a large sample size. The same applies to trading—edge + sample size = consistent results.",
+    "priority": 5
+  },
+  {
+    "id": "psych-019",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending",
+      "LowVolatility"
+    ],
+    "tags": [
+      "defi",
+      "probability-thinking",
+      "bull-weak"
+    ],
+    "content": "FIVE FUNDAMENTAL TRUTH #3: There is a random distribution between wins and losses for any given set of variables that define an edge. Each trade outcome is statistically independent of every other trade, creating random distribution in any string of trades.",
+    "priority": 5
+  },
+  {
+    "id": "psych-020",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "probability-thinking"
+    ],
+    "content": "FIVE FUNDAMENTAL TRUTH #4: An edge is nothing more than a higher probability of one thing happening over another. It doesn't guarantee any individual outcome. Each edge is a unique occurrence, independent of all others.",
+    "priority": 5
+  },
+  {
+    "id": "psych-021",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "simplicity",
+      "adaptability",
+      "consistency"
+    ],
+    "content": "FIVE FUNDAMENTAL TRUTH #5: Every moment in the market is unique. For a pattern to be exactly the same now as in the past would require every trader from the past moment to be present and interact in exactly the same way. It takes only one different trader to change the outcome.",
+    "priority": 5
+  },
+  {
+    "id": "psych-022",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "tags": [
+      "fomo"
+    ],
+    "content": "THE FOUR PRIMARY TRADING FEARS: 95% of trading errors stem from attitudes about: (1) being wrong, (2) losing money, (3) missing out, and (4) leaving money on the table. These fears act on perception to cause the thing you fear to happen.",
+    "priority": 5
+  },
+  {
+    "id": "psych-023",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "LowVolatility",
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "fear-management"
+    ],
+    "content": "FEAR PARALYSIS: Fear narrows focus of attention to the object of fear. Physically it causes freeze/flight. Mentally it blocks other possibilities and available market information. You won't think about rational things until the fear event passes, then wonder 'Why didn't I act?'",
+    "priority": 5
+  },
+  {
+    "id": "psych-024",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "gap-fill"
+    ],
+    "content": "RISK ACCEPTANCE GAP: There is a huge psychological difference between assuming you are a risk-taker because you trade vs. fully accepting the risks. Most traders have NO concept of what risk acceptance means. They believe they accept risk but their behavior proves otherwise.",
+    "priority": 5
+  },
+  {
+    "id": "psych-025",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "discipline"
+    ],
+    "content": "PROFESSIONAL RISK ACCEPTANCE: The best traders put on trades without slightest hesitation or conflict, and as freely admit when wrong. They exit with losses without emotional discomfort. Risk does not cause them to lose discipline, focus, or confidence.",
+    "priority": 5
+  },
+  {
+    "id": "psych-026",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "market-neutrality"
+    ],
+    "content": "MARKET NEUTRALITY: The market is neutral. It moves and generates information about itself. Movement and information provide opportunity—that's ALL. Markets have no power over how each individual perceives, interprets, or acts on that information.",
+    "priority": 5
+  },
+  {
+    "id": "psych-027",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "asymmetric-thinking",
+      "belief-system",
+      "exit-psychology",
+      "confidence-rebuilding"
+    ],
+    "content": "FAULTY ATTITUDES: Common trading errors (entering too soon/late, not taking losses, exiting winners too soon, moving stops) are NOT market-generated. They result from 'faulty trading attitudes and perspectives' that foster fear instead of trust and confidence.",
+    "priority": 5
+  },
+  {
+    "id": "psych-028",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "bull-strong"
+    ],
+    "content": "EUPHORIA DANGER: Winning is extremely dangerous if you haven't learned to monitor and control yourself. Euphoria creates supreme confidence where possibility of anything going wrong is virtually inconceivable. This is when you're most susceptible to devastating errors.",
+    "priority": 5
+  },
+  {
+    "id": "psych-029",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "simplicity",
+      "consistency",
+      "time-off"
+    ],
+    "content": "TWO ESSENTIAL CHARACTERISTICS: Successful traders have virtually eliminated effects of fear AND recklessness. These two fundamental characteristics allow consistent results. You need both—eliminating fear is only half the equation; developing restraint is the other.",
+    "priority": 5
+  },
+  {
+    "id": "psych-030",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "ANALYSIS IS NOT THE SOLUTION: Trying to eliminate risk by learning more market variables is the 'black hole of analysis'—a path of ultimate frustration. No matter how brilliant an analyst you become, you will NEVER learn enough to anticipate every way the market can make you wrong.",
+    "priority": 5
+  },
+  {
+    "id": "psych-031",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "CONFIDENCE vs FEAR: Confidence and fear are contradictory states from beliefs and attitudes. To be confident in an environment where you can easily lose more than intended requires absolute trust in yourself. You must train your mind to override natural counterproductive inclinations.",
+    "priority": 5
+  },
+  {
+    "id": "psych-032",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "asymmetric-thinking",
+      "belief-system"
+    ],
+    "content": "THE MARKET AS MIRROR: The market doesn't create your attitude—it reflects what's inside back to you. If you're confident, it's because your beliefs are aligned. If angry/afraid, it's because you believe the market creates your outcomes than you.",
+    "priority": 5
+  },
+  {
+    "id": "psych-033",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "TAKING RESPONSIBILITY: You—not the market—are completely responsible for success or failure. Taking anything less creates two obstacles: (1) adversarial relationship with market cutting you off from opportunities, (2) false belief that more analysis will solve your problems.",
+    "priority": 5
+  },
+  {
+    "id": "psych-034",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "ZERO-SUM REALITY: The market's purpose is to separate you from your money. Every other trader's purpose is the same. The market has no responsibility to give you anything. If you ever blame the market or feel betrayed, you haven't accepted zero-sum reality.",
+    "priority": 5
+  },
+  {
+    "id": "psych-035",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "position"
+    ],
+    "content": "BLAME CYCLE: When you project responsibility onto the market, it becomes an adversary. Losing taps you into childhood pain of denial. You feel compelled to fight the market, but you're fighting the negative consequences of not fully accepting that the market owes you nothing.",
+    "priority": 5
+  },
+  {
+    "id": "psych-036",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "large-cap"
+    ],
+    "content": "CONSISTENCY IS A STATE OF MIND: Consistency is not something you can try to be. The act of trying negates intent by taking you out of the opportunity flow. Your best trades were easy and effortless—you didn't try. Having to try indicates resistance and struggle.",
+    "priority": 5
+  },
+  {
+    "id": "psych-037",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system"
+    ],
+    "content": "OPPORTUNITY FLOW: The best traders stay in the flow because they don't try to get anything from the market. They make themselves available to take advantage of whatever the market offers at any given moment. There's a huge difference between these two perspectives.",
+    "priority": 5
+  },
+  {
+    "id": "psych-038",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi",
+      "fomo"
+    ],
+    "content": "ACCEPTING RISK DEFINED: Accepting risk means accepting consequences without emotional discomfort or fear. You must think about trading so that being wrong, losing, missing out, or leaving money on the table doesn't trigger defense mechanisms that take you out of opportunity flow.",
+    "priority": 5
+  },
+  {
+    "id": "psych-039",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "fear-management"
+    ],
+    "content": "PROFESSIONALS NEED NO COURAGE: When you accept risk the way pros do, nothing is threatening, so no fear exists. If no fear, no courage needed. If no stress, no nerves of steel needed. If no fear of recklessness (proper monitoring in place), no self-control needed.",
+    "priority": 5
+  },
+  {
+    "id": "psych-040",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "PAIN AVOIDANCE MECHANISMS: Our minds automatically block threatening information or obscure it to shield from emotional discomfort. Conscious level: rationalize, justify, gather non-painful info. Subconscious level: alter, distort, or exclude information from awareness entirely.",
+    "priority": 5
+  },
+  {
+    "id": "psych-041",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "ASSOCIATION IS AUTOMATIC: Our minds automatically link similar environmental information to existing memories/distinctions. This unconscious function occurs instantaneously, like a heartbeat. You don't decide to associate—it happens before conscious awareness.",
+    "priority": 5
+  },
+  {
+    "id": "psych-042",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "process-focus"
+    ],
+    "content": "SELF-GENERATED PAIN: A trader can self-generate fear/pain from market information while being thoroughly convinced it's justified by circumstances. The market generates neutral info—positive/negative charges exist only in YOUR mind through the association process.",
+    "priority": 5
+  },
+  {
+    "id": "psych-043",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "winning-streak"
+    ],
+    "content": "LAST 2-3 TRADES EFFECT: A typical trader's perception of risk in any situation is a function of outcomes from their most recent 2-3 trades. After losers, next signal feels overly risky. After winners, same signal feels riskless. Pros are NOT impacted by recent trade outcomes.",
+    "priority": 5
+  },
+  {
+    "id": "psych-044",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "ego-control",
+      "probability-thinking"
+    ],
+    "content": "THE UNCERTAINTY PRINCIPLE: At the core of ability to (1) trade without fear/overconfidence, (2) perceive from market's perspective, (3) stay in 'now moment opportunity flow,' (4) enter 'the zone,' is a strong, virtually unshakeable belief in an UNCERTAIN OUTCOME with an edge.",
+    "priority": 5
+  },
+  {
+    "id": "psych-045",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "random-outcome",
+      "belief-system"
+    ],
+    "content": "ANYTHING CAN HAPPEN BELIEF: The best traders believe without a shred of doubt that 'anything can happen.' Not suspect or give lip service. This belief prevents their minds from associating 'now moment' with outcomes of recent trades.",
+    "priority": 5
+  },
+  {
+    "id": "psych-046",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "THE SOYBEAN LESSON: An analyst projected support as 'absolute low of day.' Chairman sold 2M bushels—market dropped 10 cents in 30 seconds. 'If I can do that, anyone can.' This proves it takes only ONE trader to negate any pattern and make ANYTHING happen.",
+    "priority": 5
+  },
+  {
+    "id": "psych-047",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "probability-thinking"
+    ],
+    "content": "THE 'NOW MOMENT' IS UNIQUE: Each 'now moment' market situation, behavior pattern, and edge is always a unique occurrence with its own outcome, independent of all others. Uniqueness implies anything can happen—what we know (expect) or what we don't know.",
+    "priority": 5
+  },
+  {
+    "id": "psych-048",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "probability-thinking"
+    ],
+    "content": "MICRO vs MACRO PROBABILITY: Thinking in probabilities requires TWO layers that seem contradictory. Micro level: believe in uncertainty/unpredictability of each individual trade. Macro level: believe in predictability over a series of trades. This dual belief is essential.",
+    "priority": 5
+  },
+  {
+    "id": "psych-049",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "probability-thinking"
+    ],
+    "content": "CASINO MENTALITY: Casino owners don't predict individual events. They keep odds in their favor and ensure large enough sample size for edges to work. They don't pick and choose which hands to play. You must trade like a casino, not a gambler.",
+    "priority": 5
+  },
+  {
+    "id": "psych-050",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "THE DEGREE OF 'KNOWING' DESTROYS: The degree by which you think you know, assume you know, or in any way need to know what happens next is equal to the degree you will FAIL as a trader. Traders who think in probabilities don't try to predict outcomes.",
+    "priority": 5
+  },
+  {
+    "id": "psych-051",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "probability-thinking"
+    ],
+    "content": "EVERY EDGE IS UNIQUE: At any given moment the market may look exactly the same on a chart as a previous moment, but the actual consistency of the market itself from one moment to the next is NEVER the same. Even if pattern appears identical, the group creating it differs.",
+    "priority": 5
+  },
+  {
+    "id": "psych-052",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "CONVINCING YOURSELF = FAILURE: When you convince yourself a trade will win, you're saying 'I know who's in this market, what they believe, and how their actions will affect price movement seconds/minutes/hours/days from now.' This is absurd and destructive.",
+    "priority": 5
+  },
+  {
+    "id": "psych-053",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "defi",
+      "probability-thinking"
+    ],
+    "content": "PROBABILITY THINKERS DON'T TRADE RIGHT/WRONG: Probability thinkers have no dilemma about predefining risk because they don't trade from a right/wrong perspective. A wrong call feels like calling heads on a coin flip and getting tails—neutral, no emotional significance.",
+    "priority": 5
+  },
+  {
+    "id": "psych-054",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "defi"
+    ],
+    "content": "UNREALISTIC EXPECTATIONS: Any expectation that is specific, well-defined, or rigid—instead of neutral and open-ended—is unrealistic and potentially damaging. If each moment is unique and anything is possible, expectations not reflecting this are unrealistic.",
+    "priority": 5
+  },
+  {
+    "id": "psych-055",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi",
+      "probability-thinking"
+    ],
+    "content": "TRADING IN SAMPLE SIZES: Expand success/failure definition from trade-by-trade to sample size of 20+ trades. Typical trader lives/dies emotionally on last trade result. Edge variables change over time as market dynamics shift—sample sizes detect this before major losses.",
+    "priority": 5
+  },
+  {
+    "id": "psych-056",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "defi",
+      "probability-thinking"
+    ],
+    "content": "DON'T PICK AND CHOOSE EDGES: Traders who think in probabilities take EVERY trade conforming to their edge definition. They don't pick edges they think will work or avoid those they think won't. Doing so contradicts the belief that each edge has a unique, random outcome.",
+    "priority": 5
+  },
+  {
+    "id": "psych-057",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "CERTAINTY DOESN'T EXIST: If you completely accept that certainty doesn't exist, you create the certainty you crave—you're absolutely certain that certainty doesn't exist. This acceptance ends frustration and eliminates susceptibility to typical trading errors.",
+    "priority": 5
+  },
+  {
+    "id": "psych-058",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system",
+      "consistency"
+    ],
+    "content": "BELIEFS SHAPE PERCEPTION: Beliefs manage perception/interpretation of environmental info consistent with what we believe. They create expectations (beliefs projected into future). All decisions and actions are consistent with beliefs. How we feel about results is shaped by beliefs.",
+    "priority": 5
+  },
+  {
+    "id": "psych-059",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi",
+      "probability-thinking"
+    ],
+    "content": "THE SEVEN PRINCIPLES OF CONSISTENCY: (1) Objectively identify edges. (2) Predefine risk of every trade. (3) Completely accept risk or let go of trade. (4) Act on edges without reservation/hesitation. (5) Pay yourself as market makes money available. (6) Monitor for errors. (7) Never violate these principles.",
+    "priority": 5
+  },
+  {
+    "id": "psych-060",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "probability-thinking"
+    ],
+    "content": "RISK-TO-REWARD RATIO: Ideally 3:1—risking one dollar for every three dollars of profit potential. With 3:1 R:R, winning trade percentage can be less than 50% and you still make money consistently. Only risk what you're comfortable losing on entire sample size of 20 trades.",
+    "priority": 5
+  },
+  {
+    "id": "psych-061",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "trailing-stop",
+      "large-cap"
+    ],
+    "content": "SCALE OUT METHOD: Divide position into thirds (or quarters). Take first third off immediately when market gives small profit (e.g., 4 tics on bonds). This reduces total risk significantly. Take second third at predetermined profit objective, move stop to breakeven. Let final third run.",
+    "priority": 5
+  },
+  {
+    "id": "psych-062",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "new-position"
+    ],
+    "content": "RISK-FREE OPPORTUNITY: After taking second third at profit and moving stop to entry, you have a 'risk-free opportunity.' There's no way to lose (normally). This state produces relaxed, carefree mindset. Experience this state—it's critical for building confidence.",
+    "priority": 5
+  },
+  {
+    "id": "psych-063",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "probability-thinking"
+    ],
+    "content": "MECHANICAL EXERCISE RULES: Trade system exactly as designed. Commit to at least 20 occurrences of your edge—every single one. No deviation, no extraneous factors, no changing variables until full sample size complete. This duplicates how a casino operates.",
+    "priority": 5
+  },
+  {
+    "id": "psych-064",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "STOP-LOSS PLACEMENT: Let market structure determine optimum stop point, not arbitrary dollar amount. There's always an optimum point where possibility of trade not working is diminished, especially relative to profit potential. Must be absolutely exact—no subjective decisions.",
+    "priority": 5
+  },
+  {
+    "id": "psych-065",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "stablecoin",
+      "pullback",
+      "probability-thinking",
+      "intraday"
+    ],
+    "content": "TREND IS YOUR FRIEND: Lowest-risk trade with highest probability occurs when buying dips (support) in up-trending market or selling rallies (resistance) in down-trending market. Daily chart trend takes precedence over shorter timeframes as 'major trend.'",
+    "priority": 5
+  },
+  {
+    "id": "psych-066",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "revenge-risk",
+      "position",
+      "revenge-trading"
+    ],
+    "content": "REVENGE TRADING: After loss, traders feel compelled to 'conquer' the market. Underlying reason for learning about market shifts from winning to preventing pain. This creates vicious cycle: more learning → more expectations → more pain → more compulsion to learn.",
+    "priority": 5
+  },
+  {
+    "id": "psych-067",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "belief-system"
+    ],
+    "content": "PREVENT/AVOID MODE: After first significant loss, trader shifts from carefree to prevent-and-avoid thinking. This negative perspective means the more they have to win and not lose, the less tolerance for conflicting information, and the more they block opportunity.",
+    "priority": 5
+  },
+  {
+    "id": "psych-068",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "tags": [
+      "bull-strong",
+      "position",
+      "winning-streak"
+    ],
+    "content": "BOOM AND BUST CYCLE: 40-50% of active traders are 'boom and busters.' They learn to make money but not how to keep it. Equity curves look like roller coasters. After winning streaks, euphoria or self-sabotage causes huge losses that wipe out gains.",
+    "priority": 5
+  },
+  {
+    "id": "psych-069",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "HighVolatility"
+    ],
+    "tags": [
+      "bull-strong",
+      "overtrading",
+      "crowd-psychology"
+    ],
+    "content": "OVERTRADING FROM EUPHORIA: When euphoric, you perceive no risk—nothing can go wrong. Putting on larger position is compelling. Larger position + belief market will do exactly as expected = one adverse tick can cause 'mind-freeze' and complete immobilization.",
+    "priority": 5
+  },
+  {
+    "id": "psych-070",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "position",
+      "probability-thinking"
+    ],
+    "content": "THE VICIOUS KNOWLEDGE CYCLE: More learning → more expectations → more pain when market doesn't comply → more compulsion to learn. Trader becomes more debilitated the more they learn, until they quit or recognize root cause is perspective, not lack of market knowledge.",
+    "priority": 5
+  },
+  {
+    "id": "psych-071",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi",
+      "ema-bounce",
+      "discipline"
+    ],
+    "content": "TRADING PARADOX: How do we remain disciplined, focused, and confident in face of constant uncertainty? This is THE fundamental paradox of trading. Learning to redefine activities to completely accept risk is the key to thinking like a successful trader.",
+    "priority": 5
+  },
+  {
+    "id": "psych-072",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "reversal",
+      "funding-spike"
+    ],
+    "content": "THE MARKET AS PERFECT MIRROR: Markets offer perpetual motion of opportunities. What trader sees in that movement and can do about it—the markets have no control over. All choices and power to turn them into experience reside in the mind of each trader.",
+    "priority": 5
+  },
+  {
+    "id": "psych-073",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi",
+      "crowd-psychology"
+    ],
+    "content": "RANDOM WINNING/LOSING: Refusing to plan and create structure subjects you to crowd whims and unrestrained impulses. Creates random winning and random losing condition. If you can't define your behavior or market's behavior, you can't repeat wins or prevent losses.",
+    "priority": 5
+  },
+  {
+    "id": "psych-074",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "LowVolatility",
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "range-bounce",
+      "fear-management"
+    ],
+    "content": "FEAR NARROWS PERCEPTION: Fear has profoundly limiting effect on range of information we can pay attention to. It causes narrowing of focus onto object of fear. New drivers focus only on traffic, unable to converse or notice scenery—all other info is blocked or unnoticed.",
+    "priority": 5
+  },
+  {
+    "id": "psych-075",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system",
+      "system-discipline"
+    ],
+    "content": "CLOSED LOOP OF BELIEFS: Beliefs create circular, closed-loop systems that are extremely difficult to open. Belief controls incoming info → perceived info matches belief → action matches perception → experience reinforces belief. Everything seems self-evident, beyond question.",
+    "priority": 5
+  },
+  {
+    "id": "psych-076",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending",
+      "LiquidationCluster"
+    ],
+    "tags": [
+      "revenge-risk",
+      "defi",
+      "discipline",
+      "liquidation",
+      "revenge-trading"
+    ],
+    "content": "TYPICAL TRADING ERRORS (from Disciplined Trader): (1) Refusing to define a loss. (2) Not liquidating losing trade after acknowledging diminished potential. (3) Locked into opinion—'I'm right, market is wrong.' (4) Focusing on price/money instead of market behavior. (5) Revenge trading.",
+    "priority": 5
+  },
+  {
+    "id": "psych-077",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "overtrading",
+      "discipline",
+      "probability-thinking",
+      "new-position"
+    ],
+    "content": "MORE ERRORS (from Disciplined Trader): (6) Trading too large position relative to equity. (7) Overtrading—taking low-quality edges. (8) Holding losers while cutting winners. (9) Inability to act on signals—hesitation, second-guessing. (10) Moving stops closer to entry point.",
+    "priority": 5
+  },
+  {
+    "id": "psych-078",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "tags": [
+      "position",
+      "fear-management"
+    ],
+    "content": "FEAR CYCLE: Painful experience → negatively charged memory → next similar situation triggers fear → fear limits behavior and perception → avoids experience → cuts off learning → reinforces the fear → cycle continues. Only way out is conscious effort to de-activate limiting belief.",
+    "priority": 5
+  },
+  {
+    "id": "psych-079",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking",
+      "simplicity"
+    ],
+    "content": "MARKET MOST FUNDAMENTAL CHARACTERISTIC: It can express itself in an almost infinite combination of ways. This seems obvious but we constantly take it for granted, causing us to make the most fundamental trading errors over and over again.",
+    "priority": 5
+  },
+  {
+    "id": "psych-080",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system"
+    ],
+    "content": "IT TAKES ONLY ONE TRADER: Any single trader can cause virtually anything to happen. It takes only one other trader, anywhere in the world, to negate the positive potential of your trade. One person with a different belief about what is high or low.",
+    "priority": 5
+  },
+  {
+    "id": "psych-081",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "confidence-rebuilding"
+    ],
+    "content": "CONFIDENCE AND FEAR ARE SEPARATED BY DEGREE: Confidence and fear are states of mind similar in nature, only separated by degree. As confidence increases, confusion, anxiety, and fear dissipate proportionately. Confidence develops through learning to trust yourself without hesitation.",
+    "priority": 5
+  },
+  {
+    "id": "psych-082",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "UNDERSTANDING SELF = UNDERSTANDING MARKET: Understanding yourself is synonymous with understanding markets because as a trader you ARE part of the collective force that moves prices. How can you understand group behavior enough to extract money if you don't understand your own inner forces?",
+    "priority": 5
+  },
+  {
+    "id": "psych-083",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "discipline"
+    ],
+    "content": "SELF-TRUST FROM DISCIPLINE: Discipline naturally develops self-trust essential to function effectively in environment with no external constraints. Without discipline, you're at mercy of unrestrained impulses. Without self-trust, you'll fear the market's seemingly unpredictable behavior.",
+    "priority": 5
+  },
+  {
+    "id": "psych-084",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "probability-thinking"
+    ],
+    "content": "NEED TO BE RIGHT = DESTRUCTION: The degree you need to know or be right is the degree to which you will fail. Traders who learned to think in probabilities are confident of overall success because they commit to taking EVERY trade conforming to their edge—no picking and choosing.",
+    "priority": 5
+  },
+  {
+    "id": "psych-085",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "PERCEPTION IN ILLUSION: When deciding/assuming you know what happens next, you automatically expect to be right. Then any inconsistent market info gets blocked by pain-avoidance. What you experience is an 'illusion'—not objective, not connected to 'now moment opportunity flow.'",
+    "priority": 5
+  },
+  {
+    "id": "psych-086",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi"
+    ],
+    "content": "LIST OF TYPICAL TRADING ERRORS: Hesitating, jumping the gun, not predefining risk, refusing losses, getting out of winners too soon, taking no profits, letting winners become losers, moving stops closer, getting stopped out then watching market reverse, trading too large.",
+    "priority": 5
+  },
+  {
+    "id": "psych-087",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap",
+      "new-position"
+    ],
+    "content": "SYSTEM MUST BE PRECISE: Entry variables must be absolutely precise—no subjective decisions. If market aligns with rigid variables, you have a trade; if not, no trade. Same for stop-loss exit. Let market structure determine optimum stop point. All signals in same time frame.",
+    "priority": 5
+  },
+  {
+    "id": "psych-088",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "tags": [
+      "fear-management",
+      "mid-cap",
+      "ema-bounce"
+    ],
+    "content": "FEAR CREATES WHAT IT AVOIDS: In desperate attempts to avoid losses, you create them. Focusing attention on feared info means systematically excluding other information—opportunities pass you by. The only way to perceive missed opportunities was to let go of the fear.",
+    "priority": 5
+  },
+  {
+    "id": "psych-089",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system",
+      "system-discipline"
+    ],
+    "content": "RULES → TRUST → FOCUS → IMPROVEMENT: The more I followed my rules, the more I trusted myself. The more I trusted myself, the more I could focus on subtle market relationships to learn new things. Eventually could gauge positive effects of new attitudes on ability to flow with markets.",
+    "priority": 5
+  },
+  {
+    "id": "psych-090",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "tags": [
+      "consistency",
+      "exit-psychology"
+    ],
+    "content": "LOSING TRADE PAIN EXAMPLE: In losing trade, market makes consistently higher highs/higher lows against your position. You only focus on ticks going in your favor (1 out of 4-5). Each favorable tick convinces you market has reversed. The trend is invisible until you exit or get forced out.",
+    "priority": 5
+  },
+  {
+    "id": "psych-091",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "STRUCTURE MUST BE INTERNAL: Unlike society (which provides external structure), market doesn't provide it. The structure we need to guide behavior has to originate in your mind as a conscious act of free will. This is where many problems begin—requiring internal structure in a boundary-less environment.",
+    "priority": 5
+  },
+  {
+    "id": "psych-092",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "PASSIVE vs ACTIVE LOSING: Gambling forces active losing (must reach into wallet for next bet). Trading allows passive losing—once in losing trade, you don't have to do anything to keep losing. You can ignore the situation and market takes everything. Must be active to stop losses.",
+    "priority": 5
+  },
+  {
+    "id": "psych-093",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi"
+    ],
+    "content": "DEFINING RISK FORCES REALITY: Defining risk in advance forces you to confront that each trade has a probable outcome meaning it could be a loser. Consistent losers avoid this reality. Without external structure forcing this thought, susceptible to justifications and distorted logic.",
+    "priority": 5
+  },
+  {
+    "id": "psych-094",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi",
+      "probability-thinking"
+    ],
+    "content": "COST OF FINDING OUT: Always define what the market has to look/sound/feel like to tell you your edge isn't working. This is the cost of finding out—your risk. Decide BEFORE executing. If you can't do this, you believe you know what will happen, which is the root of all trading errors.",
+    "priority": 5
+  },
+  {
+    "id": "psych-095",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi",
+      "probability-thinking"
+    ],
+    "content": "COMMITTED TO EVERY TRADE: Probability thinkers commit to taking EVERY trade that conforms to their edge definition. They don't try to pick and choose which edges will work. By taking every edge, they increase sample size, giving the edge ample opportunity to play out in their favor.",
+    "priority": 5
+  },
+  {
+    "id": "psych-096",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "THE MARKET IS ALWAYS RIGHT: If you ever find yourself blaming the market or feeling betrayed, you are expecting collective actions of all traders to make market act to give you what you want. You must learn for yourself how to get what you want. First step: take complete responsibility.",
+    "priority": 5
+  },
+  {
+    "id": "psych-097",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "discipline"
+    ],
+    "content": "THE MORE YOU FOLLOW RULES, THE MORE YOU TRUST YOURSELF: Self-trust develops through consistent rule-following. This trust translates directly to the market environment—you no longer fear unpredictable behavior because you trust yourself to respond appropriately under ALL conditions.",
+    "priority": 5
+  },
+  {
+    "id": "psych-098",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "LowVolatility",
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "asymmetric-thinking"
+    ],
+    "content": "THE BRIDGE OVER GRAND CANYON: 1-contract trader = 20-ft wide bridge (tolerance for error). 1000-contract bond trader = thin wire ($31,500/tic). At that level, ONE distracting thought = potential disaster. As position size increases, tolerance for error narrows to zero.",
+    "priority": 5
+  },
+  {
+    "id": "psych-099",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "bull-strong",
+      "mid-cap"
+    ],
+    "content": "CHOOSE CONSISTENCY ABOVE ALL: To even start the transformation, you must want consistency so much you would give up all other reasons/motivations for trading (euphoria, impressing others, being right, addiction to random rewards). Clear, intense desire is absolute prerequisite.",
+    "priority": 5
+  },
+  {
+    "id": "psych-100",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "ema-bounce"
+    ],
+    "content": "RELEASE FROM DEMAND: Learn to release yourself from the demand that expectations be fulfilled exactly as expected. This allows you to shift perspective to perceive whatever opportunities exist NOW, as if you didn't have a trade on at all. This is the key mental flexibility skill.",
+    "priority": 5
+  },
+  {
+    "id": "psych-101",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi",
+      "probability-thinking"
+    ],
+    "content": "ACTING ON EDGES WITHOUT HESITATION: If predefining risk takes special effort, if you consciously remind yourself, if conflicting thoughts arise, or if you find yourself in a trade without predefined risk—then this principle is NOT yet a dominant part of your identity. Keep working.",
+    "priority": 5
+  },
+  {
+    "id": "psych-102",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "tags": [
+      "bull-strong",
+      "ego-control"
+    ],
+    "content": "OVERCONFIDENCE THRESHOLD: Everyone has different threshold for when overconfidence/euphoria takes hold. The moment it does, you're in deep trouble. In euphoria, can't perceive any risk—nothing can go wrong. No need for rules. Larger position = more danger from adverse moves.",
+    "priority": 5
+  },
+  {
+    "id": "psych-103",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap",
+      "crowd-psychology"
+    ],
+    "content": "MIND-FREEZE: Combine larger-than-normal position with resolute belief market will do exactly as expected. One tic in wrong direction can cause complete 'mind-freeze' and immobilization. When you finally pull out of it, you're dazed, disillusioned, betrayed—wondering how it happened.",
+    "priority": 5
+  },
+  {
+    "id": "psych-104",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "reversal"
+    ],
+    "content": "HIDDEN VARIABLES ALWAYS OPERATING: Unknown traders sitting on sidelines about to enter. How many want to buy/sell? How many shares/contracts? Participants already in—how many about to change minds? How long will they stay out? What direction when returning? These NEVER stop operating.",
+    "priority": 5
+  },
+  {
+    "id": "psych-105",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "BEST TRADERS FACTOR IN UNKNOWNS: The best traders don't hide from unknown variables or pretend they don't exist. They don't try to intellectualize them away through analysis. They factor unknowns into EVERY component of their trading regime. Everyone else pretends they don't exist.",
+    "priority": 5
+  },
+  {
+    "id": "psych-106",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "LowVolatility",
+      "Trending",
+      "HighVolatility",
+      "Ranging"
+    ],
+    "tags": [
+      "drawdown",
+      "reversal",
+      "revenge-risk",
+      "new-position",
+      "fomc",
+      "tilt-detection",
+      "intraday",
+      "revenge-trading",
+      "news-event"
+    ],
+    "content": "TILT — Compounding Emotional Triggers: Tilt is NOT a sudden event — it COMPOUNDS as successive emotional triggers overwhelm executive functioning during drawdowns or variance shocks. The mind struggles to recover from rapid consecutive triggers. Tilt carries over SESSION TO SESSION — yesterday's tilt affects today's decisions. Detection: 1) Increasing position size after losses. 2) Breaking rules you normally follow. 3) Entering trades without your setup being present. 4) Feeling anger/frustration before entry. Response: STOP trading immediately. Walk away for minimum 2 hours. Review the trigger. Write down what rule was broken. Only return after emotional state is baseline.",
+    "priority": 5
+  },
+  {
+    "id": "psych-107",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending",
+      "LowVolatility"
+    ],
+    "tags": [
+      "rsi-divergence",
+      "new-position"
+    ],
+    "content": "COGNITIVE DEBIASING FRAMEWORKS: Key biases affecting traders: 1) Recency bias — overweighting recent trades in decision-making. 2) Anchoring — fixating on entry price than current reality. 3) Confirmation bias — seeking data that supports existing position. 4) Loss aversion — feeling losses 2× more than equivalent gains. 5) Disposition effect — holding losers too long, selling winners too early. Debiasing: 1) Write down your thesis BEFORE entry (prevents post-hoc rationalization). 2) Set alerts and walk away (prevents anchoring to price). 3) Actively seek disconfirming evidence. 4) Use mechanical exit rules (eliminates disposition effect).",
+    "priority": 5
+  },
+  {
+    "id": "psych-108",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "discipline",
+      "process-focus",
+      "mid-cap",
+      "probability-thinking",
+      "journaling"
+    ],
+    "content": "SEPARATING SELF-WORTH FROM P&L: When traders equate PnL with self-worth, losses become PSYCHOLOGICAL THREATS triggering fight-or-flight adrenal responses. This hijacks rational decision-making. Solution: Reframe losses as OBJECTIVE DATA POINTS for edge refinement, not personal failures. Implementation: 1) Journal losses with clinical detachment (what happened, not why I'm bad). 2) Track process metrics separately from PnL (did I follow my rules?). 3) Celebrate rule adherence even on losing days. 4) Separate identity from outcome — 'I am a trader who had a losing trade' not 'I am a loser'.",
+    "priority": 5
+  },
+  {
+    "id": "psych-109",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear",
+      "LowVolatility",
+      "Trending",
+      "HighVolatility",
+      "Ranging"
+    ],
+    "tags": [
+      "new-position"
+    ],
+    "content": "EMOTIONS AS SYSTEM FLAW SIGNALS: Don't suppress emotions — ANALYZE them. Fear before entry = your position size may be too large, or your stop is too wide. Frustration after a loss = your R:R expectations may be unrealistic. Greed after a win = you may be about to violate position sizing rules. Each emotion points to a SPECIFIC, FIXABLE flaw in your execution matrix. Exercise: When you feel an emotion, PAUSE and ask: 'What does this emotion tell me about my system?' Then fix the system, not the emotion. Emotions are DIAGNOSTIC TOOLS, not obstacles.",
+    "priority": 5
+  },
+  {
+    "id": "psych-110",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending",
+      "LowVolatility"
+    ],
+    "tags": [
+      "mid-cap",
+      "rsi-divergence",
+      "new-position"
+    ],
+    "content": "LOSS AVERSION AND DISPOSITION EFFECT: Loss aversion = feeling losses 2× more intensely than equivalent gains. This creates the disposition effect: holding losers too long (hoping for recovery) and selling winners too early (locking in the 'good feeling'). Consequences: Average loss > Average win. Win rate needed for profitability increases dramatically. Solution: MECHANICAL exit rules. Set stop-loss and take-profit BEFORE entry. NEVER move stop-loss further away. NEVER close a winner before TP unless your system signals it. Remove human judgment from exit decisions entirely.",
+    "priority": 5
+  },
+  {
+    "id": "psych-111",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear",
+      "MvrvExtreme",
+      "SoprReset"
+    ],
+    "tags": [
+      "large-cap",
+      "position",
+      "bear-strong",
+      "winning-streak"
+    ],
+    "content": "CRYPTO DIP PSYCHOLOGY: Bitcoin periodically dips then recovers to new ATHs. The pattern trains HODLers to buy dips—but each cycle conditions more complacency. Eventually a dip doesn't recover for years (2018, 2022). Track on-chain metrics like MVRV and SOPR to distinguish healthy corrections from bear market onsets. Don't blindly BTFD without data.",
+    "priority": 5
+  },
+  {
+    "id": "psych-112",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear",
+      "AltSeason"
+    ],
+    "tags": [
+      "altcoin",
+      "large-cap"
+    ],
+    "content": "SURVIVORSHIP BIAS IN CRYPTO: You only see the winners. For every BTC millionaire, thousands lost everything on dead altcoins. The visible success stories create false sense of easy profits. In crypto, 95%+ of altcoins go to zero. When evaluating trading strategies, ALWAYS ask: what happened to the people who tried this and failed? Their silence is informative.",
+    "priority": 5
+  },
+  {
+    "id": "psych-113",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "tags": [
+      "process-focus",
+      "probability-thinking",
+      "bull-weak"
+    ],
+    "content": "ALTERNATIVE HISTORY THINKING: Before taking any trade, imagine ALL possible outcomes, not the one you expect. The actual outcome is one sample from a distribution. A trade that worked was not necessarily a good trade—it might have been a 30% probability outcome that happened to hit. Evaluate trades by the quality of the decision process, not the outcome.",
+    "priority": 5
+  },
+  {
+    "id": "psych-114",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "tags": [
+      "reversal",
+      "position",
+      "probability-thinking",
+      "bear-strong"
+    ],
+    "content": "LUCK vs SKILL ATTRIBUTION: In a large market of traders, some will have extraordinary returns by pure chance. In crypto's bull markets, nearly everyone is a 'genius.' The true test of skill is performance across market cycles—bull AND bear. If a trader's edge disappears in bear markets, they had no edge—directional luck. Require 100+ trades minimum to evaluate skill.",
+    "priority": 5
+  },
+  {
+    "id": "psych-115",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "BreakingNews"
+    ],
+    "tags": [
+      "rsi-divergence"
+    ],
+    "content": "EMOTIONAL AVOIDANCE OF LOSS: Humans feel losses 2-2.5x more intensely than equivalent gains (loss aversion). In crypto, this leads to holding losers too long (hoping for recovery) and cutting winners too quickly (locking in gains). Counter: automate exits with predetermined stop-losses and take-profit levels. Remove emotional decision-making from the execution loop entirely.",
+    "priority": 5
+  },
+  {
+    "id": "psych-116",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "tags": [
+      "swing",
+      "scalp",
+      "stablecoin",
+      "mid-cap"
+    ],
+    "content": "NOISE vs SIGNAL IN CRYPTO: Daily price movements are mostly noise. Watching 1-minute charts creates emotional reactions to randomness. The signal-to-noise ratio improves dramatically with longer timeframes—weekly charts contain more signal than 5-minute charts. Check prices less frequently. Set alerts for key levels instead of watching screens. CNBC/Bloomberg explanations of daily moves are post-hoc narrative fitting.",
+    "priority": 5
+  },
+  {
+    "id": "psych-117",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "tags": [
+      "bull-strong",
+      "whale-etf",
+      "position",
+      "fomo"
+    ],
+    "content": "BUBBLE STRUCTURE (SHILLER): 1) Displacement—new technology/idea creates opportunity. 2) Boom—prices rise, media amplifies. 3) Euphoria—'this time is different,' FOMO retail enters. 4) Profit-taking—smart money exits. 5) Panic—retail realizes, mass selling. Crypto follows this EXACT cycle. Identify which phase you're in. When taxi drivers give crypto tips = late stage 3/early stage 4.",
+    "priority": 5
+  },
+  {
+    "id": "psych-118",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Ranging",
+      "MvrvExtreme",
+      "SoprReset"
+    ],
+    "tags": [
+      "meme",
+      "range-bounce",
+      "rsi-divergence",
+      "large-cap"
+    ],
+    "content": "VALUATION ANCHORING IN BUBBLES: In the absence of traditional valuation metrics (earnings, dividends), crypto investors anchor to arbitrary round numbers or previous highs. 'BTC should be $100K because...' This is narrative-driven anchoring, not valuation. MVRV Z-Score, NVT Ratio, and Stock-to-Flow provide pseudo-fundamental anchors. When price deviates >2σ from these, mean-reversion is likely.",
+    "priority": 5
+  },
+  {
+    "id": "psych-119",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear",
+      "Trending"
+    ],
+    "tags": [
+      "bull-strong",
+      "mid-cap",
+      "bear-strong"
+    ],
+    "content": "HINDSIGHT BIAS IN BUBBLE RECOGNITION: After every crash, 'everyone knew it was a bubble.' But during the bubble, few act on that belief because timing the top is nearly impossible. Being early = being wrong (for a while). The solution: scale out gradually during euphoria than trying to call the exact top. Sell 10% per 20% rise above your fair-value estimate.",
+    "priority": 5
+  },
+  {
+    "id": "psych-120",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending",
+      "BreakingNews"
+    ],
+    "tags": [
+      "mid-cap",
+      "crowd-psychology"
+    ],
+    "content": "CROWD PSYCHOLOGY IN CRYPTO: Crowds are more irrational than individuals. During crypto manias, individual analytical ability dissolves into herd behavior. Social media (Twitter/Telegram/Discord) amplifies crowd dynamics 24/7. The crowd is right during trends but ALWAYS wrong at extremes. When the entire CT timeline is bullish = danger. When everyone is terrified = opportunity.",
+    "priority": 5
+  },
+  {
+    "id": "psych-121",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "tags": [
+      "swing",
+      "regulatory",
+      "crowd-psychology",
+      "fomo",
+      "large-cap"
+    ],
+    "content": "THE MADNESS OF CROWDS - DELUSION STAGES: 1) Attention—the new asset captures public imagination. 2) Enthusiasm—early profits create FOMO. 3) Delusion—rational thinking is abandoned. 4) The 'hook'—a compelling story prevents exit ('BTC to $1M'). 5) Panic—reality intrudes, mass exit. In crypto, these stages can compress into weeks. Social media accelerates every stage.",
+    "priority": 5
+  },
+  {
+    "id": "psych-122",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear",
+      "BreakingNews"
+    ],
+    "tags": [
+      "hack"
+    ],
+    "content": "FEAR CONTAGION IN CRYPTO: Fear spreads faster and further than greed. One exchange hack/collapse (Mt. Gox, FTX) creates panic across ALL crypto, even unrelated tokens. This is collective delusion in reverse—guilt by association. Use fear contagion events to buy sound assets at irrational discounts, but only AFTER the initial panic subsides (wait 48-72 hours minimum).",
+    "priority": 5
+  },
+  {
+    "id": "psych-123",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "tags": [
+      "loss-acceptance",
+      "ego-control"
+    ],
+    "content": "CON VICTIMS' PSYCHOLOGY: People who have been conned often defend the con artist because admitting they were fooled is more painful than the financial loss. In crypto, this manifests as HODLing dead tokens, defending scam projects, and refusing to cut losses. Recognize this bias. A token down 95% is not 'on sale'—it's likely dying. Cut losses before ego takes over.",
+    "priority": 5
+  },
+  {
+    "id": "psych-124",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear",
+      "AltSeason",
+      "BreakingNews"
+    ],
+    "tags": [
+      "altcoin",
+      "fear-management",
+      "fomo"
+    ],
+    "content": "MISSING OUT (FOMO) AS A DELUSION: Fear of missing out has caused more crypto losses than any technical indicator failure. FOMO buying at peaks, FOMO into unvetted altcoins, FOMO leverage. The antidote: there is ALWAYS another trade. Missing one pump doesn't end your career. Blowing up your account from FOMO buying DOES. Write 'There will always be another trade' on your monitor.",
+    "priority": 5
+  },
+  {
+    "id": "psych-125",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap",
+      "crowd-psychology"
+    ],
+    "content": "CONTRARIAN CONVICTION: Being right AND early feels identical to being wrong. Burry was mocked for 2+ years before the housing collapse validated his thesis. In crypto, if your analysis shows overvaluation but the market keeps rising, you're not wrong—your timing may be off. The solution: size positions so you can survive being early. Small contrarian bets, add on confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "psych-126",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility",
+      "LiquidationCluster"
+    ],
+    "tags": [
+      "gap-fill"
+    ],
+    "content": "LTCM LEVERAGE LESSON FOR CRYPTO: LTCM used 25:1 leverage on 'market-neutral' strategies. When correlations broke, losses exceeded capital by 10x. In crypto, exchanges offer 100x leverage—far more dangerous. Even 'market-neutral' strategies (basis trades, arb) can gap against you. MAXIMUM leverage for crypto: 3-5x on core positions, 10x on highest-conviction short-term trades only.",
+    "priority": 5
+  },
+  {
+    "id": "psych-127",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "tags": [
+      "ego-control",
+      "large-cap"
+    ],
+    "content": "THE HUMAN FACTOR IN RISK: LTCM traders were so confident in their models that they personally invested their entire net worth alongside fund capital. Overconfidence killed them. In crypto, never let confidence in a thesis override risk management. Even if you're 'certain' BTC will recover, position-size as if it might not. Hubris is the precursor to ruin.",
+    "priority": 5
+  },
+  {
+    "id": "psych-128",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear",
+      "Trending"
+    ],
+    "tags": [
+      "funding-spike"
+    ],
+    "content": "PARTICIPANTS' BIAS SHAPES FUNDAMENTALS: Soros's key insight: bias doesn't affect prices—it affects the underlying fundamentals. In crypto: positive sentiment → VC funding → actual development → real value creation. Negative sentiment → funding winter → developer exodus → actual deterioration. The bias BECOMES the fundamental. Trade WITH the bias until it reaches extreme, then fade it.",
+    "priority": 5
+  },
+  {
+    "id": "psych-129",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "tags": [
+      "new-position"
+    ],
+    "content": "CUTTING LOSSES IS PARAMOUNT: If losses get out of control, you're overwhelmed financially AND emotionally. In crypto's volatility, a 10% loss can become 50% overnight. Set stops BEFORE entry. Never move a stop further from entry. Averaging down on a losing position in crypto is financial suicide. The market doesn't know your cost basis—it doesn't care.",
+    "priority": 5
+  },
+  {
+    "id": "psych-130",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "tags": [
+      "overtrading",
+      "discipline",
+      "probability-thinking"
+    ],
+    "content": "PATIENCE AND DISCIPLINE - THE REAL EDGE: 90% of traders lose money. The 10% who win have internalized patience and discipline. A trading plan with imperfect signals but perfect discipline beats brilliant signals with no discipline. Boring is profitable. Excitement in trading = gambling. If you're not bored, you're overtrading.",
+    "priority": 5
+  },
+  {
+    "id": "psych-131",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "news-event"
+    ],
+    "content": "TRADE THE PLAN, NOT YOUR FEELINGS: 'Mr. Market might even reward you for breaking your own rules. This is even worse!' A rule violation that makes money encourages more violations until one destroys your account. Never rationalize breaking your trading plan. Consistency means seeing the same pattern, recognizing it, and taking the same action every time, regardless of recent results.",
+    "priority": 5
+  },
+  {
+    "id": "psych-132",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "tags": [
+      "revenge-risk",
+      "drawdown",
+      "stablecoin",
+      "revenge-trading",
+      "tilt-detection"
+    ],
+    "content": "THE 6% RULE: If you lose 6% of your account in a calendar month, STOP TRADING for the rest of the month. This prevents emotional revenge trading and drawdown spirals. In crypto, where you can lose 6% in hours, adapt this to a DAILY rule: if daily loss >3%, stop for 24 hours. The market will be there tomorrow. Your capital might not be if you keep trading while tilted.",
+    "priority": 5
+  },
+  {
+    "id": "psych-133",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "defi"
+    ],
+    "content": "EMOTIONAL ROLLER COASTER: Most traders spend all time looking for trades, then squirm from pain or grin from pleasure while in them. They manage nothing—they ride emotions. Winning requires managing your emotions BEFORE managing trades. Pre-define entries, stops, targets, and size BEFORE the trade. Then execute the plan mechanically. Emotion is the enemy of execution.",
+    "priority": 5
+  },
+  {
+    "id": "psych-134",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "reversal",
+      "crowd-psychology"
+    ],
+    "content": "THE MARKET CROWD AND YOU: When you join a crowd, your IQ drops. Crowd behavior is driven by emotion, not logic. Crypto Twitter/Discord are crowd amplification machines. When the crowd is euphoric, they want you to buy at the top. When terrified, they want you to sell at the bottom. Separate yourself. Think independently. Use the crowd as a CONTRARY indicator.",
+    "priority": 5
+  },
+  {
+    "id": "psych-135",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear",
+      "AltSeason"
+    ],
+    "tags": [
+      "overtrading",
+      "altcoin"
+    ],
+    "content": "BULLS, BEARS, AND SELF-DECEPTION: Bulls make money, bears make money, but pigs get slaughtered. The 'pig' is the trader who over-leverages, overtrades, and over-commits. In crypto, pig behavior = going all-in on one altcoin, 100x leverage, no stops. Self-deception: 'I'll sell if it drops 10%.' Reality: you won't. Pre-commit through automated orders.",
+    "priority": 5
+  },
+  {
+    "id": "psych-136",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "AltSeason",
+      "HighVolatility"
+    ],
+    "tags": [
+      "altcoin",
+      "rsi-divergence",
+      "large-cap"
+    ],
+    "content": "ATR-BASED POSITION SIZING (TURTLES): Calculate position size = (Account × Risk%) / (N × Point Value), where N = 20-day ATR. This normalizes risk across assets—$1M in BTC and $1M in altcoins carry equal dollar risk despite different volatilities. In crypto, this prevents oversized positions in high-volatility alts. Always size by volatility, never by dollar conviction.",
+    "priority": 5
+  },
+  {
+    "id": "psych-137",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "swing",
+      "discipline"
+    ],
+    "content": "TRADING IS TEACHABLE: Dennis proved that trading can be taught in two weeks to people with zero experience—and they made 100%+ annually for years. The key: they followed RULES. Your brain is the obstacle, not the market. If you can follow a system with discipline, you can succeed. The system is simple. Following it is hard. This is the central lesson of trading.",
+    "priority": 5
+  },
+  {
+    "id": "psych-138",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "breakout",
+      "reversal",
+      "probability-thinking"
+    ],
+    "content": "DON'T PREDICT, REACT: Dennis's approach: 'If someone was giving me a quarter cent edge to buy, I didn't think he knew anything either. I knew I was getting an edge.' The Turtle system doesn't predict—it reacts to price breakouts. In crypto, stop trying to call tops and bottoms. React to what price does. Set breakout alerts and execute when triggered.",
+    "priority": 5
+  },
+  {
+    "id": "psych-139",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "ego-control"
+    ],
+    "content": "LIVERMORE'S FUNDAMENTAL RULE: 'It is not the bull side or the bear side, but the RIGHT side.' Trade what the market is doing, not what you want it to do. In crypto, this means: don't be permanently bullish or bearish. Be long when the trend is up, short when it's down, flat when it's unclear. Ego-attachment to a direction is account suicide.",
+    "priority": 5
+  },
+  {
+    "id": "psych-140",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "tags": [
+      "random-outcome",
+      "system-discipline",
+      "preparation"
+    ],
+    "content": "TIPS AND INDEPENDENT THINKING: 'Nobody can give me a tip or a series of tips that will make more money for me than my own judgment.' In crypto, following influencer calls, Telegram signals, or Twitter tips makes you dependent. When the tipper is wrong or absent, you have no plan. Develop your own system. Use others' ideas as research starting points, never as execution triggers.",
+    "priority": 5
+  },
+  {
+    "id": "psych-141",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "large-cap"
+    ],
+    "content": "WAIT FOR THE RIGHT MOMENT: 'I must not begin to advance until I am sure I shall not have to retreat. But if I cannot advance I do not move at all.' Patience for the right setup > trading frequently. In crypto's 24/7 market, there's always something happening—but most of it is noise. Wait for A+ setups. Sitting in cash IS a position. The hardest trade is often no trade.",
+    "priority": 5
+  },
+  {
+    "id": "psych-142",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason",
+      "Trending"
+    ],
+    "tags": [
+      "rsi-divergence",
+      "winning-streak",
+      "bull-strong",
+      "altcoin",
+      "ego-control"
+    ],
+    "content": "THE DANGERS OF WINNING TOO MUCH: Livermore made and lost fortunes multiple times. His biggest losses came after his biggest wins—overconfidence after winning streaks led to oversized positions and ignored risk management. In crypto, after a 10x altcoin win, your next trade is your most dangerous. Take a break. Reduce size. The euphoria of winning is more dangerous than the despair of losing.",
+    "priority": 5
+  },
+  {
+    "id": "psych-143",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "tags": [
+      "bull-strong",
+      "bear-strong"
+    ],
+    "content": "LIVERMORE ON PANIC: \"Wild speculation always brought the market to its knees.\" He shorted the 1929 crash and made $100M (billions in today's money). His insight: panics are predictable consequences of preceding speculation. In crypto, every parabolic run ends in a crash. The crash is not a surprise—it's an inevitability. Size your positions to survive AND profit from the panic.",
+    "priority": 5
+  },
+  {
+    "id": "psych-144",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "tags": [
+      "swing",
+      "overtrading",
+      "new-position"
+    ],
+    "content": "DON'T OVERTRADE: The Turtles had specific entry criteria—if no signal existed, they did nothing. Overtrading is the #1 account killer in crypto's 24/7 market. Set a maximum number of trades per week (e.g., 3-5). If you've hit your limit, you MUST wait. This forces selectivity and prevents impulsive entries. Quality setups > quantity of trades.",
+    "priority": 5
+  },
+  {
+    "id": "psych-145",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "breakout",
+      "capitulation",
+      "gap-fill",
+      "mid-cap",
+      "ema-bounce"
+    ],
+    "content": "LIVERMORE'S PIVOTAL POINTS: He identified price levels where the character of price action changed—where supply/demand shifted dramatically. In crypto, these correspond to high-volume nodes on volume profile charts, CME gap levels, and options max pain levels. Trade around these pivotal points. A breakout through a pivotal point is high conviction. A rejection is a fade opportunity.",
+    "priority": 5
+  },
+  {
+    "id": "psych-146",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "SoprReset",
+      "ExtremeFear",
+      "MvrvExtreme",
+      "LiquidationCluster"
+    ],
+    "tags": [
+      "reversal",
+      "bear-strong",
+      "capitulation"
+    ],
+    "content": "BUYING DURING CAPITULATION: The Big Short's heroes bought protection BEFORE the crash. The lesson for crypto: buy during calm (cheap puts, low leverage, build cash position) so you're prepared. During actual capitulation, you need dry powder AND conviction. The best crypto buying opportunities come when on-chain metrics show maximum pain (SOPR <0.85, MVRV <0.5, exchange outflows surging).",
+    "priority": 5
+  },
+  {
+    "id": "psych-147",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "new-position",
+      "revenge-risk",
+      "bear-strong",
+      "fomo"
+    ],
+    "content": "CRYPTO TRADING PSYCHOLOGY: Regret is the most dangerous emotion. Regret of not buying → FOMO entry at top. Regret of not selling → bag-holding through crash. Regret of selling too early → chasing the re-entry. Counter: every trade is independent. Past trades don't matter. Focus on current risk/reward. 'What is the right action NOW?' not 'What should I have done?'.",
+    "priority": 5
+  },
+  {
+    "id": "psych-148",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "tags": [
+      "stablecoin",
+      "journaling"
+    ],
+    "content": "LIVERMORE'S BIGGEST LESSON: 'It took me five years to learn to play the game intelligently enough to make big money when I was right.' Trading mastery requires years of deliberate practice. There are no shortcuts. In crypto, the proliferation of 'get rich quick' gurus sells false hope. Commit to the long game. Study markets daily. Journal every trade. Expect to be unprofitable for 1-2 years minimum.",
+    "priority": 5
+  },
+  {
+    "id": "psych-149",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "discipline",
+      "ego-control"
+    ],
+    "content": "THE 90% vs 10%: Over 90% of traders lose money. The 10% who succeed have: 1) A robust trading plan. 2) Complete risk management. 3) The discipline to follow the plan. Most failed traders are engineers, pilots, and successful professionals—intelligence doesn't protect against emotional trading. Your ego is the enemy. The market doesn't care about your IQ.",
+    "priority": 5
+  },
+  {
+    "id": "psych-150",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking"
+    ],
+    "content": "HINDSIGHT AND NARRATIVE: After every large price move, a convincing narrative emerges explaining why it happened. Humans are pattern-seeking creatures—we find patterns in noise. Most 'explanations' for crypto price moves are post-hoc narratives, not causal relationships. Don't build trading strategies around stories. Build them around quantifiable, testable relationships.",
+    "priority": 5
+  },
+  {
+    "id": "psych-151",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "tags": [
+      "swing",
+      "position",
+      "probability-thinking",
+      "large-cap"
+    ],
+    "content": "BTC OPTIONS EXPIRY EFFECTS: Large options expiries (monthly, quarterly) create pin risk and gamma effects around max-pain price. Market makers delta-hedge their short options positions, creating buying/selling pressure. In the week before large expiries (>$1B notional), expect price to gravitate toward max-pain. Post-expiry, the hedging flow reverses, often causing directional moves.",
+    "priority": 5
+  },
+  {
+    "id": "psych-152",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "tags": [
+      "crowd-psychology"
+    ],
+    "content": "COMFORTABLE WITH DISCOMFORT: The Big Short's heroes were uncomfortable for years while waiting for their thesis to play out. Being contrarian means being wrong in the eyes of the crowd for extended periods. In crypto, if your bearish thesis is correct but the market keeps rallying, accept the discomfort. Size positions to survive being early. The crowd's opinion doesn't change the math.",
+    "priority": 5
+  },
+  {
+    "id": "psych-153",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "journaling"
+    ],
+    "content": "THE GAME TAUGHT ME THE GAME: Livermore learned by doing, not by studying theory. His years of bucket shop trading developed pattern recognition that formal education couldn't. In crypto, paper trading and small-position live trading teach more than any course. Start with tiny positions (0.1% of capital per trade). Graduate to larger sizes only after 100+ trades with documented positive expectancy.",
+    "priority": 5
+  },
+  {
+    "id": "psych-154",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "BreakingNews"
+    ],
+    "tags": [
+      "probability-thinking",
+      "crowd-psychology"
+    ],
+    "content": "CONTRARIAN POSITION MANAGEMENT: The Big Short's heroes were right but had to survive being early. Strategy: 1) Take small contrarian position. 2) If market moves against, add only on NEW evidence. 3) NEVER add because price is 'cheaper.' 4) Set a maximum total allocation. 5) Be prepared for the position to take 6-18 months to play out. Patience is the contrarian's only edge.",
+    "priority": 5
+  },
+  {
+    "id": "psych-155",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "HighVolatility"
+    ],
+    "tags": [
+      "ego-control",
+      "stablecoin",
+      "winning-streak"
+    ],
+    "content": "OVERCONFIDENCE BIAS: LTCM's PhDs were so confident in their models that they used maximum leverage. Their Nobel Prizes made them believe they couldn't be wrong. In crypto, if you've had a winning streak, your confidence is inflated by recent success. The cure: track your confidence level on a 1-10 scale daily. When confidence >8, force yourself to reduce position size by 50%.",
+    "priority": 5
+  },
+  {
+    "id": "psych-156",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "AltSeason",
+      "BreakingNews"
+    ],
+    "tags": [
+      "altcoin",
+      "process-focus",
+      "probability-thinking",
+      "bear-strong"
+    ],
+    "content": "PROBABILITY BLINDNESS: Humans cannot intuitively process probabilities. We overweight rare events (plane crashes, 100x altcoin gains) and underweight common events (slow bleed of portfolio). In crypto, this manifests as: buying lottery-ticket altcoins while ignoring the 95% failure rate. Use explicit probability calculations, not gut feelings, for every trade decision.",
+    "priority": 5
+  },
+  {
+    "id": "psych-157",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "position",
+      "large-cap",
+      "journaling"
+    ],
+    "content": "LIVERMORE'S SCIENTIFIC METHOD: He kept meticulous records of every trade, analyzed patterns in his wins and losses, and constantly refined his approach. He didn't trade on hope—he traded on observed patterns confirmed by real results. In crypto: maintain a detailed trading journal. Tag every trade with setup type, market conditions, emotional state, and outcome. Review monthly for pattern recognition.",
+    "priority": 5
+  },
+  {
+    "id": "psych-158",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "drawdown",
+      "regulatory",
+      "mid-cap",
+      "ema-bounce",
+      "intraday"
+    ],
+    "content": "TRADING STYLE MUST FIT PERSONALITY: If you're naturally patient, trend following suits you. If you need action, day trading may be more sustainable. If you're analytical, systematic approaches. If you're intuitive, discretionary. You CANNOT follow a system that doesn't fit your personality—you'll abandon it during drawdowns. Match your system to your temperament, not the other way around.",
+    "priority": 5
+  },
+  {
+    "id": "psych-159",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "TRADING THE REACTIVE: Soros doesn't predict—he reacts to what the market tells him about the relationship between perception and reality. When they diverge significantly, he positions for convergence. In crypto: if price is far above on-chain fundamentals, be cautious. If price is far below, be greedy. The market eventually reverts to reality—but can stay irrational longer than you can stay solvent.",
+    "priority": 5
+  },
+  {
+    "id": "psych-160",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "ego-control",
+      "journaling"
+    ],
+    "content": "LIVERMORE'S FIRST RULE: 'A man must believe in himself and his judgment if he expects to make a living at this game.' But self-belief must be earned through experience and study, not ego. In crypto, confidence should come from backtested data and documented results, not from social media echo chambers. Earn your confidence through work, not from following others.",
+    "priority": 5
+  },
+  {
+    "id": "psych-161",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "overtrading",
+      "discipline"
+    ],
+    "content": "LIVERMORE'S RULE OF PATIENCE: 'The desire for constant action irrespective of underlying conditions is responsible for many losses in Wall Street.' Crypto's 24/7 market makes this worse—you feel like you should always be in a position. WRONG. The best traders spend 90% of their time waiting. Set alerts. Trade only when your A+ setup appears. Discipline is profitable. Activity is expensive.",
+    "priority": 5
+  },
+  {
+    "id": "psych-162",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "defi",
+      "probability-thinking"
+    ],
+    "content": "THE SYSTEM IS THE EDGE: Individual trade outcomes are random. The system's edge only manifests over hundreds of trades. This means you MUST take every signal—skipping trades breaks the system. In crypto, missing one trade can mean missing the 10x move that makes the year. Define your system. Take EVERY signal. Trust the math over your feelings.",
+    "priority": 5
+  },
+  {
+    "id": "psych-163",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "FundingRateExtreme",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "discipline",
+      "whale-etf",
+      "stablecoin",
+      "funding-spike",
+      "journaling",
+      "ego-control"
+    ],
+    "content": "DAILY HOMEWORK: Every day: 1) Review open positions. 2) Check stops and targets. 3) Scan for new setups. 4) Update trading journal. 5) Review market conditions. This 30-minute ritual is non-negotiable. In crypto, add: check on-chain metrics (exchange flows, whale movements), funding rates, and macro calendar. Homework prevents surprises and maintains discipline.",
+    "priority": 5
+  },
+  {
+    "id": "psych-164",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "loss-acceptance"
+    ],
+    "content": "LOSSES ARE THE COST OF BUSINESS: Every business has costs—rent, salaries, supplies. For traders, losses are the cost of doing business. Would you stop paying rent because you had a slow month? No. Don't stop taking trades because of recent losses. The next trade could be the big winner that pays for all the small losses. If you skip it due to fear, you break the system.",
+    "priority": 5
+  },
+  {
+    "id": "psych-165",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "tags": [
+      "intraday",
+      "scalp",
+      "probability-thinking",
+      "journaling",
+      "hack"
+    ],
+    "content": "POST-CLOSE JOURNALING: After your trading session, document: 1) What you planned vs what you executed. 2) Emotional state during trades. 3) Any plan violations and why. 4) Market observations. 5) Tomorrow's key levels and scenarios. This 15-minute ritual is the most valuable trading activity. The journal becomes your edge—showing you patterns in YOUR behavior that you can exploit or correct.",
+    "priority": 5
+  },
+  {
+    "id": "psych-166",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "process-focus",
+      "intraday"
+    ],
+    "content": "RESULTS-ORIENTED THINKING: Don't evaluate your trading by today's P&L. Evaluate by the quality of your decisions. A day where you followed your plan and lost money is a GOOD day. A day where you broke your plan and made money is a BAD day (it reinforces bad behavior). At session close, grade your PROCESS (A/B/C), not your outcome. Process improvement leads to outcome improvement.",
+    "priority": 5
+  },
+  {
+    "id": "psych-167",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason",
+      "FundingRateExtreme"
+    ],
+    "tags": [
+      "funding-spike",
+      "crowd-psychology"
+    ],
+    "content": "LIVERMORE ON CROWD FOLLOWING: 'The public always wants to be told. The ticker is the great leveler.' He meant that the tape tells the truth even when people lie. In crypto, ignore the narratives on Twitter/Discord. Look at what participants are DOING (order flow, funding rates, on-chain movements), not what they're SAYING. Actions > words. Always.",
+    "priority": 5
+  },
+  {
+    "id": "psych-168",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "HighVolatility"
+    ],
+    "tags": [
+      "whale-etf",
+      "reversal",
+      "ego-control"
+    ],
+    "content": "INSTITUTIONAL ARROGANCE: LTCM's Nobel laureates believed their models were superior because of their credentials. In crypto, similar arrogance comes from early success. 'I turned $1K into $100K—I must be a genius.' No, you were lucky in a bull market. Humility is the antidote. Assume every trade could be your last. Treat each position as if your career depends on it. Because it does.",
+    "priority": 5
+  },
+  {
+    "id": "psych-169",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "tags": [
+      "drawdown",
+      "regulatory",
+      "mid-cap"
+    ],
+    "content": "THE LOSING STREAK MENTALITY: After 5+ consecutive losses, most traders abandon their system. This is exactly when the next trade is most likely to be the big winner—if the system is valid. The solution: 1) Trade small enough that a 10-trade losing streak doesn't emotionally devastate you. 2) Track your system's maximum expected drawdown from backtesting. 3) If current drawdown exceeds historical max, THEN review the system.",
+    "priority": 5
+  },
+  {
+    "id": "psych-170",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "large-cap"
+    ],
+    "content": "Don't personalize the market. The market is totally impersonal; it doesn't care whether you make money. Whenever a trader says 'I wish' or 'I hope,' they engage in destructive thinking that takes attention away from diagnosis.",
+    "priority": 4
+  },
+  {
+    "id": "psych-171",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "news-event",
+      "discipline"
+    ],
+    "content": "You could publish trading rules in the newspaper and no one would follow them. The key is consistency and discipline. Almost anyone can make rules that are 80% as good as what Dennis taught. What they can't do is give confidence to stick to rules when things go bad.",
+    "priority": 4
+  },
+  {
+    "id": "psych-172",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mindset"
+    ],
+    "content": "When losing, you should be thinking about trading the MOST. Times when you least want to think about it are precisely when you need to focus most. Don't stick your head in the sand and hope it gets better.",
+    "priority": 4
+  },
+  {
+    "id": "psych-173",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "large-cap",
+      "new-position"
+    ],
+    "content": "Always think of your entry point as last night's close. Don't be concerned about where you got into a position. The only relevant question is whether you are bullish or bearish on the position TODAY. This prevents anchoring bias.",
+    "priority": 4
+  },
+  {
+    "id": "psych-174",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "tags": [
+      "loss-acceptance"
+    ],
+    "content": "There is no such thing as a paper loss. A paper loss is a real loss. Don't comfort yourself with 'it's a paper loss.' If correct, sit there and let market hysteria wash around you. If wrong, first loss is the best loss.",
+    "priority": 4
+  },
+  {
+    "id": "psych-175",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "large-cap"
+    ],
+    "content": "If you make 50% two years in a row then lose 50% the third year, you are worse off than a money market fund. Wait for something you know is right. Take profit, put it back in money market, wait again. You come out way ahead.",
+    "priority": 4
+  },
+  {
+    "id": "psych-176",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "Trading is competitive and you have to handle getting your butt kicked. There are enormous emotional ups and downs. The emotional burden is substantial — if you personalize losses, you can't trade. Tullis taught PTJ steel-hard emotional control.",
+    "priority": 4
+  },
+  {
+    "id": "psych-177",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "probability-thinking",
+      "crowd-psychology"
+    ],
+    "content": "Variant perception: develop perceptions at variance with the general market view. Play those variant perceptions until they are no longer variant. The key is the perception must be CONTRARIAN — if everyone agrees with you, the edge is gone.",
+    "priority": 4
+  },
+  {
+    "id": "psych-178",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "simplicity"
+    ],
+    "content": "When stocks don't act as fundamentals suggest, investigate what the other side knows. Assume the person on other side of your trade knows at least as much as you do. If stock goes against you, find out what their perception was.",
+    "priority": 4
+  },
+  {
+    "id": "psych-179",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "process-focus",
+      "mid-cap",
+      "crowd-psychology"
+    ],
+    "content": "Being contrarian does NOT automatically mean victory. Many contrarians bought bonds at 8%, 9%, 10% yields and lost. You need RIGHT TIMING and APPROPRIATE SIZE. Process requires courage, commitment, and understanding of your own psychology.",
+    "priority": 4
+  },
+  {
+    "id": "psych-180",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "large-cap"
+    ],
+    "content": "You don't always have to be in the market. Don't trade if you don't feel like it or if it doesn't feel right. You need confidence AND desire to trade. Exceptional traders have both most of the time; for others, they come together only occasionally.",
+    "priority": 4
+  },
+  {
+    "id": "psych-181",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "Seykota: Everybody gets what they want out of the market. Some people seem to want to lose, so they win by losing. Examine what you truly want — your results will reflect your deepest desires, not your stated ones.",
+    "priority": 4
+  },
+  {
+    "id": "psych-182",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system",
+      "preparation"
+    ],
+    "content": "Walton: Don't get so caught up in details that you miss the big picture. Exhaustive stock research means nothing if you miss that the sector is already up 70%. Maintain whole-picture perspective: sector, market, macro.",
+    "priority": 4
+  },
+  {
+    "id": "psych-183",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "time-off"
+    ],
+    "content": "Walton: Anyone can do this job — you don't have to be born to it. But you need 100% energy and enthusiasm. When emotional upheaval (divorce, personal crisis) interferes, step away. Don't trade when you can't give it full focus.",
+    "priority": 4
+  },
+  {
+    "id": "psych-184",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "tags": [
+      "swing",
+      "ego-control"
+    ],
+    "content": "The worst thing for a beginning trader is to have your first trade work. It creates overconfidence and reckless behavior. Walton lost all of $10K borrowed from father within 3 weeks of initial winning trade.",
+    "priority": 4
+  },
+  {
+    "id": "psych-185",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "fear-management"
+    ],
+    "content": "Kiev: The mind of a winner accepts uncertainty. Great traders don't need to be right — they need to make good decisions under uncertainty. Fear of being wrong is the biggest obstacle to trading success.",
+    "priority": 4
+  },
+  {
+    "id": "psych-186",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking"
+    ],
+    "content": "As soon as a formula is right for any length of time, its own success carries the weight of its inevitable failure. No set pattern of successful activity lasts. Anyone who thinks he can formulate success is deluding himself. Steinhardt.",
+    "priority": 4
+  },
+  {
+    "id": "psych-187",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "discipline",
+      "reversal"
+    ],
+    "content": "Walton: If you can't give trading 100% energy and enthusiasm, don't trade. Walk away. He returned all investor money and stopped trading completely during a divorce. The discipline to NOT trade is as important as the discipline to trade.",
+    "priority": 4
+  },
+  {
+    "id": "psych-188",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "reversal",
+      "mid-cap"
+    ],
+    "content": "When your feelings as a trader conflict with your system, do nothing until you resolve that conflict. Don't override your system impulsively, but don't ignore valid intuition either. Stand aside until clarity returns. Dennis.",
+    "priority": 4
+  },
+  {
+    "id": "psych-189",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "reversal"
+    ],
+    "content": "Work, work, and more work. Schwartz's bottom line. Trading requires intense personal involvement. You have to do your own homework. The more effort you put into preparation, the better your execution will be.",
+    "priority": 4
+  },
+  {
+    "id": "psych-190",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "large-cap"
+    ],
+    "content": "Dr. Van Tharp: Trading success is determined more by psychology than methodology. Two traders with the same system will get different results based on their psychological makeup. Work on yourself as much as your system.",
+    "priority": 4
+  },
+  {
+    "id": "psych-191",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "self-awareness",
+      "probability-thinking"
+    ],
+    "content": "Tharp: The quality of your trading is proportional to the quality of your self-knowledge. Know your biases, your triggers, your emotional patterns. Self-awareness is the foundation of consistent trading performance.",
+    "priority": 4
+  },
+  {
+    "id": "psych-192",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking"
+    ],
+    "content": "Eckhardt: The call of the countertrend — people view accustomed prices as normal, prices away as aberrant. This leads to trading counter to emerging trends. Path to disaster.",
+    "priority": 4
+  },
+  {
+    "id": "psych-193",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "Eckhardt: Survivors avoid snowball scenarios where bad trades cause emotional destabilization. If losses dont hurt, financial survival is tenuous. Pain is survival mechanism.",
+    "priority": 4
+  },
+  {
+    "id": "psych-194",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "discipline"
+    ],
+    "content": "Seidler: Have a PLAN. Plan forces discipline and gives benchmark. You can follow rules and still lose — thats not poor performance. Conformance to plan more significant than short-term equity.",
+    "priority": 4
+  },
+  {
+    "id": "psych-195",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mindset"
+    ],
+    "content": "Trading is highly addictive — intermittent reinforcement is most addictive schedule. Addictiveness is why many who make fortunes leave the game broke.",
+    "priority": 4
+  },
+  {
+    "id": "psych-196",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking"
+    ],
+    "content": "Carr (Turtle): Dont worry about what markets will do — worry about what YOU will do in response. Focus on reactions, not predictions. Your response is only controllable.",
+    "priority": 4
+  },
+  {
+    "id": "psych-197",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "discipline",
+      "reversal"
+    ],
+    "content": "Walton: Returned $150M to investors when personal life interfered. Never manage money when you cannot give 100% energy. Discipline to NOT trade is as important as trading.",
+    "priority": 4
+  },
+  {
+    "id": "psych-198",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "reversal",
+      "mid-cap"
+    ],
+    "content": "Walton: 115% avg annual return over 8 years working completely alone. Deliberate isolation prevents bad influences. Independent thinking is essential.",
+    "priority": 4
+  },
+  {
+    "id": "psych-199",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "process-focus",
+      "fear-management"
+    ],
+    "content": "Kiev: Great traders dont need to be right — need good decisions under uncertainty. Fear of being wrong is biggest obstacle. Trust process.",
+    "priority": 4
+  },
+  {
+    "id": "psych-200",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "MENTAL SOFTWARE ANALOGY: Your trading mentality is like software. Several thousand perfectly written lines with ONE flawed character can ruin entire performance. The solution is simple (fix the misplaced character) but FINDING the error takes considerable expertise.",
+    "priority": 4
+  },
+  {
+    "id": "psych-201",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "patience"
+    ],
+    "content": "THREE MARKET FORCES: Only three primary forces exist: (1) traders who believe price is low, (2) traders who believe price is high, (3) traders watching/waiting to decide. Balance between groups = stagnation. Imbalance = movement in direction of stronger conviction.",
+    "priority": 4
+  },
+  {
+    "id": "psych-202",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "NOTHING AT STAKE = OBJECTIVITY: When watching a market you rarely trade with no intention of acting, no up/down tics cause anger, disappointment, or betrayal. There's nothing at stake—no expectation—so information has no potential to become threatening or painful.",
+    "priority": 4
+  },
+  {
+    "id": "psych-203",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "ema-bounce"
+    ],
+    "content": "BELIEFS RESIST CHANGE: Beliefs seem to take on a life of their own, resisting any force that would alter their form. They cannot be destroyed—only de-activated by drawing energy out. The concept remains intact but without energy, it no longer affects perception or behavior.",
+    "priority": 4
+  },
+  {
+    "id": "psych-204",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "ema-bounce"
+    ],
+    "content": "ALL ACTIVE BELIEFS DEMAND EXPRESSION: Active beliefs are energized and act as force on perception and behavior. When tapped into, beliefs demand to be heard—flood of energy released. Even beliefs you consciously try to suppress will find ways to force into awareness.",
+    "priority": 4
+  },
+  {
+    "id": "psych-205",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "BELIEFS WORK SUBCONSCIOUSLY: Beliefs keep working regardless of conscious awareness. You don't need to actively remember a belief for it to affect perception and behavior—like driving skills operating automatically at deeper levels than waking consciousness.",
+    "priority": 4
+  },
+  {
+    "id": "psych-206",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "ema-bounce"
+    ],
+    "content": "DE-ACTIVATION TECHNIQUE: Don't try to destroy or alter beliefs—gently render them inactive by drawing energy out. Original structure remains intact but without energy, it has no potential to act on perception or behavior. Transfer energy to more useful concept.",
+    "priority": 4
+  },
+  {
+    "id": "psych-207",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking",
+      "belief-system"
+    ],
+    "content": "WHAT IS TRUTH? Whatever works. Truth is relative to what we're attempting to accomplish. If beliefs limit perception and environment can express infinite combinations, beliefs can only be true relative to current objectives. Truth = how useful the belief is.",
+    "priority": 4
+  },
+  {
+    "id": "psych-208",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "drawdown",
+      "mid-cap"
+    ],
+    "content": "SELF-VALUATION BARRIERS: Traders hit invisible 'glass ceiling' barriers at certain equity levels. Every time they hit it, significant drawdown occurs regardless of market conditions. This is unresolved self-valuation issues acting on perception and behavior subconsciously.",
+    "priority": 4
+  },
+  {
+    "id": "psych-209",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "probability-thinking"
+    ],
+    "content": "THREE STAGES OF TRADING DEVELOPMENT: (1) Mechanical stage—build self-trust, execute flawlessly, train mind in probabilities. (2) Subjective stage—use all knowledge with discretion, monitor for errors. (3) Intuitive stage—trading equivalent of black belt, spontaneous knowing.",
+    "priority": 4
+  },
+  {
+    "id": "psych-210",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi",
+      "discipline"
+    ],
+    "content": "SELF-DISCIPLINE DEFINED: A mental technique to redirect focus of attention to the object of goal/desire when that goal conflicts with some other belief in mental environment. It is NOT a personality trait—people aren't born with it. It's a technique for personal transformation.",
+    "priority": 4
+  },
+  {
+    "id": "psych-211",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "discipline"
+    ],
+    "content": "WHEN DISCIPLINE ISN'T NEEDED: When beliefs are completely aligned with goals, there's no source of conflicting energy—no distracting thoughts, excuses, rationalizations, or mistakes. What was once struggle becomes effortless. If you have to try, you haven't fully integrated the principles.",
+    "priority": 4
+  },
+  {
+    "id": "psych-212",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "self-awareness"
+    ],
+    "content": "OBSERVE YOURSELF: First step to consistency is noticing what you're thinking, saying, and doing. Everything you think/say/do reinforces some belief. Your first defense against errors is catching yourself thinking about it. Last defense is catching yourself in the act.",
+    "priority": 4
+  },
+  {
+    "id": "psych-213",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi"
+    ],
+    "content": "WINNING ATTITUDE DEFINED: Expecting positive result from efforts, with acceptance that whatever results you get are a perfect reflection of your level of development and what you need to learn to do better. This is an inherently creative perspective.",
+    "priority": 4
+  },
+  {
+    "id": "psych-214",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "scaling-in",
+      "probability-thinking"
+    ],
+    "content": "ACCEPT TOTAL SAMPLE RISK: Set up exercise to accept risk of losing on ALL 20 trades in sample size. Calculate total accumulated risk. If uncomfortable, reduce position size. If still uncomfortable, use simulated brokerage. Never change risk parameters to satisfy comfort levels.",
+    "priority": 4
+  },
+  {
+    "id": "psych-215",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "defi",
+      "stablecoin",
+      "intraday"
+    ],
+    "content": "DEFINE TREND PRECISELY: Up-trending market = series of higher highs and higher lows. Down-trending market = series of lower highs and lower lows. Longer timeframe = more significant trend. Only take trades in direction of major trend on daily chart.",
+    "priority": 4
+  },
+  {
+    "id": "psych-216",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "stablecoin",
+      "new-position"
+    ],
+    "content": "TIME FRAME CONSISTENCY: All entry and exit signals must be in same time frame. If using 30-min support/resistance for entry, risk/profit calculations also in 30-min frame. Can use longer timeframes as filters (e.g., only trade daily trend direction).",
+    "priority": 4
+  },
+  {
+    "id": "psych-217",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "large-cap"
+    ],
+    "content": "SELF-SABOTAGE: Errors from self-sabotage have root in conflicts about deserving money or winning. Making errors like sell-for-buy, indulging distractions at critical times, or finding ways to give money back. Could stem from religious upbringing, work ethic, or childhood trauma.",
+    "priority": 4
+  },
+  {
+    "id": "psych-218",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "consistency"
+    ],
+    "content": "WINNING WITHOUT SKILL: You don't need the slightest bit of skill to put on a winning trade. A novice can have a string of winners. This creates dangerous misunderstanding—it feels like you've mastered trading when you've only been lucky. The real skill is consistency.",
+    "priority": 4
+  },
+  {
+    "id": "psych-219",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "DENIED IMPULSES: By age 18, we've experienced thousands of denials ('No, you can't do that'). These create unresolved negative energy that resists anything denying freedom. This is why traders resist creating rules—even though rules are essential for survival.",
+    "priority": 4
+  },
+  {
+    "id": "psych-220",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "bull-strong",
+      "defi",
+      "mid-cap",
+      "ema-bounce"
+    ],
+    "content": "RANDOM REWARD ADDICTION: Studies show monkeys on random reward schedules continue tasks indefinitely even after rewards stop. Same for traders—random wins create addiction to the euphoria of unexpected pleasant surprises, making it hard to follow systematic approaches.",
+    "priority": 4
+  },
+  {
+    "id": "psych-221",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "EXTERNAL vs INTERNAL CONTROL: Society teaches us to manipulate/control external environment to fulfill needs. Market is a 'psychological wilderness' that doesn't respond to control or manipulation. You can only control your own perception, interpretation, and behavior.",
+    "priority": 4
+  },
+  {
+    "id": "psych-222",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "large-cap"
+    ],
+    "content": "RANDOM TRADING = ESCAPING RESPONSIBILITY: Traders adopt random, unstructured approaches to avoid responsibility. With unlimited variables, they can credit wins to 'method' and blame losses on 'unknown variables.' Randomness is unstructured freedom without responsibility.",
+    "priority": 4
+  },
+  {
+    "id": "psych-223",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "LEAVING MONEY ON TABLE IS MORE PAINFUL: When losing, you can shift blame to market. When leaving money on table, the market gave exactly what you wanted but you couldn't act appropriately. There's no way to rationalize it away—you are not responsible for market but for everything else.",
+    "priority": 4
+  },
+  {
+    "id": "psych-224",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "consistency"
+    ],
+    "content": "THRESHOLD OF CONSISTENCY: Traders who break through can virtually take money at will. Money flows with ease. For everyone else, consistency seems 'at hand' before slipping away. The only consistent thing is emotional pain, fear, anger, frustration, anxiety.",
+    "priority": 4
+  },
+  {
+    "id": "psych-225",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi"
+    ],
+    "content": "INTELLIGENCE ≠ SUCCESS: Largest group of consistent losers is doctors, lawyers, engineers, scientists, CEOs, wealthy retirees. Best analysts are often worst traders. Intelligence and analysis contribute but are NOT the defining factor. The difference is attitude/mindset.",
+    "priority": 4
+  },
+  {
+    "id": "psych-226",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "drawdown",
+      "ego-control"
+    ],
+    "content": "TRADER CATEGORIES: Fewer than 10% = consistent winners (steady equity, minor drawdowns). 30-40% = consistent losers. 40-50% = boom-and-busters (roller coaster equity curves). The difference isn't what they do or when, but HOW they think about what they do.",
+    "priority": 4
+  },
+  {
+    "id": "psych-227",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "discipline",
+      "probability-thinking"
+    ],
+    "content": "FIVE MILE RULE: When self-discipline was hardest, author committed to running one step farther than last time—no less. Never broke this rule. Apply to trading: commit to following your system for one more trade, then one more sample size. Build the belief incrementally.",
+    "priority": 4
+  },
+  {
+    "id": "psych-228",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi"
+    ],
+    "content": "TRADING IS A PATTERN RECOGNITION NUMBERS GAME: At simplest form, use analysis to identify patterns, define risk, determine when to take profits. Trade either works or doesn't. Go on to next trade. That simple, but not easy—hardest because the more you think you know, the less successful.",
+    "priority": 4
+  },
+  {
+    "id": "psych-229",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "simplicity"
+    ],
+    "content": "MONEY AS FREEDOM: At most fundamental level, money represents freedom of expression. All behavior is self-expression, and almost any way to express requires money. This is why trading's unlimited freedom is both deeply attractive and psychologically dangerous.",
+    "priority": 4
+  },
+  {
+    "id": "psych-230",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "tags": [
+      "ema-bounce"
+    ],
+    "content": "FEAR AND GREED IN PRICING: Law of supply and demand is founded in human fear and greed. Greed = belief there will never be enough + belief one always needs more to feel secure. Prices fluctuate with relative degree of security/insecurity experienced by collective masses.",
+    "priority": 4
+  },
+  {
+    "id": "psych-231",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "sample-size"
+    ],
+    "content": "THREE SKILL AREAS: Trading results are function of skills in: (1) PERCEPTION—ability to perceive opportunity, (2) EXECUTION—ability to execute a trade, (3) ACCUMULATION—ability to allow account balance to grow over time/series of trades.",
+    "priority": 4
+  },
+  {
+    "id": "psych-232",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "intraday"
+    ],
+    "content": "FORCED AWARENESS: Most traders must lose everything before learning. Losing all possessions creates forced awareness—strips away illusions about nature of trading. 'It wasn't nearly as bad in reality as I imagined. I was still alive and healthy, able to think and function.'",
+    "priority": 4
+  },
+  {
+    "id": "psych-233",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking"
+    ],
+    "content": "REASONS ARE IRRELEVANT: Most traders don't know why they acted as they did because they don't plan trades. After-the-fact reasons are justifications or excuses. To predict price movement, don't focus on reasons—determine how majority perceives conditions relative to fear.",
+    "priority": 4
+  },
+  {
+    "id": "psych-234",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "fear-management"
+    ],
+    "content": "SELF-ACCEPTANCE MEASURE: Measure self-acceptance by how positively/negatively you think of yourself when you perceive a mistake. More negative = greater tendency to avoid responsibility = more fear of mistakes. More positive = easier to learn because you're not avoiding information.",
+    "priority": 4
+  },
+  {
+    "id": "psych-235",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mindset"
+    ],
+    "content": "PERCEPTION SHAPES EXPERIENCE: What we experience is shaped from the inside, not outside. Our first-time experiences shape meaning and energy connected to it, then that meaning shapes all future experience of similar information. We don't perceive environment directly.",
+    "priority": 4
+  },
+  {
+    "id": "psych-236",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system"
+    ],
+    "content": "ENERGY LOOP PERCEPTION: We recognize in the environment what is already inside us. There must be a mental framework to accept information—otherwise it's rejected, labeled meaningless, or not perceived at all. Learning creates the energy loop between inner and outer environments.",
+    "priority": 4
+  },
+  {
+    "id": "psych-237",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mindset"
+    ],
+    "content": "DISTINCTIONS: Distinctions make separations in environmental information where no separation existed before. Child won't distinguish spoon from pencil until taught. Anything we don't know but exists in environment is a distinction we haven't learned to make yet—invisible to us.",
+    "priority": 4
+  },
+  {
+    "id": "psych-238",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi"
+    ],
+    "content": "BELIEFS CREATE BOUNDARIES: All definitions create boundaries. Beliefs manage information to maintain balance between inner and outer environment. Perceived imbalance results in stress or illusion. Beliefs inhibit information flow to allow staged learning.",
+    "priority": 4
+  },
+  {
+    "id": "psych-239",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system",
+      "self-valuation"
+    ],
+    "content": "MONEY = REPRESENTS FREEDOM: If you grew up believing money must be earned through effort, making windfall profits in seconds creates conflict. This conflict gets reconciled by finding ways to give money back to markets. Examine your beliefs about deserving money.",
+    "priority": 4
+  },
+  {
+    "id": "psych-240",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "probability-thinking"
+    ],
+    "content": "WRITING THE FIVE TRUTHS: Write down five fundamental truths and seven principles of consistency. Keep in front of you at all times when trading. Repeat them frequently with conviction. Every time you notice conflicting thought, acknowledge conflict and refocus on objective.",
+    "priority": 4
+  },
+  {
+    "id": "psych-241",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "reversal"
+    ],
+    "content": "GOAL: THE ZONE: Zone = mind and market in sync. You sense what market is about to do as if no separation between yourself and collective consciousness of all participants. Like a bird in a flock turning at precise moment all others turn. Requires both uncertainty belief AND trust in intuition.",
+    "priority": 4
+  },
+  {
+    "id": "psych-242",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "intuition"
+    ],
+    "content": "LEFT vs RIGHT BRAIN: Left brain = rational thought based on what we know. Right brain = creative thought—intuition, hunches, sense of knowing. Inherent conflict between these modes. Rational mind almost always wins unless specifically trained to trust creative information.",
+    "priority": 4
+  },
+  {
+    "id": "psych-243",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "patience"
+    ],
+    "content": "PEOPLE SEE WHAT THEY'VE LEARNED: 'People see what they've learned to see, and everything else is invisible until they learn how to counteract the energy that blocks their awareness of whatever is unlearned and waiting to be discovered.'",
+    "priority": 4
+  },
+  {
+    "id": "psych-244",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mindset"
+    ],
+    "content": "PERCEPTUAL CLOSED LOOPS: We can't learn what we haven't learned yet unless in a new/unique situation or operating from genuine openness. To learn requires experience. To experience requires perception. But perception is limited by what we already know. Closed loop.",
+    "priority": 4
+  },
+  {
+    "id": "psych-245",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "process-focus"
+    ],
+    "content": "PROJECTION PROCESS: Mind associates current sensory info with painful memory → releases negative energy throughout body → mind then associates that pain with current object (projection). Makes current object identical in character to the one in memory, even if behavior is completely different.",
+    "priority": 4
+  },
+  {
+    "id": "psych-246",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "belief-system"
+    ],
+    "content": "CONTRADICTORY BELIEFS: Holding two or more conflicting beliefs can easily cancel out positive intentions, no matter how motivated. Example: 'I'm a risk-taker' assertion vs. actual behavior doing everything possible to avoid risk. These contradictions represent flawed mental software.",
+    "priority": 4
+  },
+  {
+    "id": "psych-247",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "large-cap"
+    ],
+    "content": "AWARENESS ≠ BELIEF: You can be aware of something and even agree with it, but that doesn't make it a functional part of who you are. Awareness and contradictory behavior can coexist. For beliefs to change behavior, they must drop to functional level through experience.",
+    "priority": 4
+  },
+  {
+    "id": "psych-248",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system",
+      "consistency"
+    ],
+    "content": "POSITIVE WINNING ATTITUDE: Doesn't depend on external conditions. People who are truly happy don't need to do anything to be happy—they are happy people who do things. Traders who are consistently successful are consistent as natural expression of who they are.",
+    "priority": 4
+  },
+  {
+    "id": "psych-249",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "probability-thinking"
+    ],
+    "content": "WHEN YOU ACHIEVE PROBABILITY THINKING: You'll know it's a functioning part of your identity when you can go through one sample size of 20+ trades without difficulty, resistance, or conflicting thoughts distracting you from following your mechanical system exactly.",
+    "priority": 4
+  },
+  {
+    "id": "psych-250",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "mindset"
+    ],
+    "content": "LOSING EVERYTHING LIBERATED: After losing everything, stress dissipated—overcome with great sense of relief. 'I was living through my worst fear and found there wasn't anything I couldn't deal with.' Learning that being wrong and losing doesn't diminish you as a person.",
+    "priority": 4
+  },
+  {
+    "id": "psych-251",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "adaptability"
+    ],
+    "content": "EVOLVE BEYOND GROUP MENTALITY: When you attain some control over yourself, you can see how other traders are not in control—like blades of grass bending to prevailing wind. You won't see this until you're no longer a blade of grass yourself by evolving beyond group mentality.",
+    "priority": 4
+  },
+  {
+    "id": "psych-252",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "loss-acceptance"
+    ],
+    "content": "MARKET IS NOT GAMBLING: In gambling, you must actively participate to lose and do nothing to stop. In markets, you must actively participate to enter AND to end losses. If you do nothing, potential exists to lose everything. The event never ends—constant temptation not to cut losses.",
+    "priority": 4
+  },
+  {
+    "id": "psych-253",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "adaptability"
+    ],
+    "content": "MENTAL FLEXIBILITY REQUIRED: You can't change market behavior—you can only change yourself to perceive what it may do next with increased clarity and objectivity. Wanting to know what happens next while maintaining rigid mental structure that allows only limited possibilities = contradiction.",
+    "priority": 4
+  },
+  {
+    "id": "psych-254",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "adaptability"
+    ],
+    "content": "DR. JEKYLL/MR. HYDE MARKET: This characteristic only represents your own mental inflexibility to flow with changes and your lack of understanding that you give yourself the best you can out of what's available. What you lost, you gave away. Market behavior isn't dualistic—you are.",
+    "priority": 4
+  },
+  {
+    "id": "psych-255",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "PERCEPTION = OPPORTUNITY: Depth of insight into market behavior is equivalent to number and quality of distinctions you can make. Perception of opportunity is synonymous with expectation of what market will do next. Learn to make 'uncommitted assessment of probabilities.'",
+    "priority": 4
+  },
+  {
+    "id": "psych-256",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mindset"
+    ],
+    "content": "THE ZONE IS INHERENTLY CREATIVE: You cannot will yourself into the zone. It's a state of mind you find yourself in that is inherently creative. If you start thinking about actions at rational/conscious level, you pop right out of it. Set up mental conditions conducive to it instead.",
+    "priority": 4
+  },
+  {
+    "id": "psych-257",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "asymmetric-thinking",
+      "confidence-rebuilding"
+    ],
+    "content": "POSITIVE AND NEGATIVE ENERGY: Two kinds of mental energy. Positive = love, confidence, happiness, joy, satisfaction, excitement, enthusiasm. Negative = fear, terror, dissatisfaction, betrayal, regret, anger, confusion, anxiety, stress, frustration. These determine how we experience everything.",
+    "priority": 4
+  },
+  {
+    "id": "psych-258",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "MAKE UP YOUR MIND: Decide exactly what you desire with so much clarity (absolutely no lingering doubts) and conviction that nothing stands in your way. If enough force behind resolve, it's possible to experience major shift in mental structure virtually instantaneously.",
+    "priority": 4
+  },
+  {
+    "id": "psych-259",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "fakeout"
+    ],
+    "content": "BIG-TRADE MENTALITY TRAP: Refusing to take $500-750 profits because market is 'insulting' you with paltry sums compared to what you need or expect. This mentality—waiting for the one big trade—keeps traders from building consistent profits and leads to devastating losses.",
+    "priority": 4
+  },
+  {
+    "id": "psych-260",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "discipline"
+    ],
+    "content": "CONFLICTS RESIST STRUCTURE: Attracted to trading because of unlimited freedom of expression. Same reason we resist creating rules—found a Utopia of complete freedom, then told to create rules and have discipline to follow them. Takes great pain to break down this resistance.",
+    "priority": 4
+  },
+  {
+    "id": "psych-261",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "system-discipline",
+      "consistency",
+      "time-off"
+    ],
+    "content": "GIFT AND CURSE: Trading is gift AND curse simultaneously. Gift: complete control of everything you do. Curse: no external rules or boundaries to guide or structure behavior. Unlimited characteristics require restraint and self-control for consistent success.",
+    "priority": 4
+  },
+  {
+    "id": "psych-262",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "defi"
+    ],
+    "content": "DEFINED RULES PREVENT SUPERSTITION: Without clear definition and rules, you're swept into/out of positions by forces you can't identify. Market behavior seems mysterious because YOUR behavior is mysterious. Constant confusion/anxiety/fear breeds superstition.",
+    "priority": 4
+  },
+  {
+    "id": "psych-263",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system",
+      "system-discipline"
+    ],
+    "content": "TWO DOMINANT THEMES: (1) You create the market you experience in your own mind based on beliefs, perceptions, intents, and rules. (2) Trading results are function of skills in perception (ability to perceive opportunity), execution, and accumulation (ability to let account grow).",
+    "priority": 4
+  },
+  {
+    "id": "psych-264",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "ASSOCIATIONS ARE INVOLUNTARY: We automatically associate extraneous sensory info with primary events. Child getting spanked associates song or smell with pain—even though these were unnoticed at the time. Years later, hearing that song instantly changes experience from happy to painful.",
+    "priority": 4
+  },
+  {
+    "id": "psych-265",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "large-cap"
+    ],
+    "content": "MISTAKES AS NEUTRAL: For consistently great athletes, mistakes point the way where to focus efforts to grow. No negatively charged energy waiting to pounce. For rest of us: 'Mistakes must be avoided at all costs' or 'There must be something wrong with me.' De-activate these beliefs.",
+    "priority": 4
+  },
+  {
+    "id": "psych-266",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking",
+      "belief-system"
+    ],
+    "content": "NO TWO TRADERS ENTER UNLESS OPPOSING BELIEFS: No two traders enter a trade unless they have opposing beliefs about future value. Current price = agreement between buyer and seller NOW, but inherent within transaction is complete disagreement on FUTURE value.",
+    "priority": 4
+  },
+  {
+    "id": "psych-267",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking",
+      "random-outcome"
+    ],
+    "content": "MARKET BEHAVIOR IS IRRATIONAL BUT PREDICTABLE: Academic community believes markets are efficient (rational reasons) AND random—contradictory. In fact, market behavior is mostly irrational. But irrational behavior is predictable—determine how traders perceive conditions relative to fear.",
+    "priority": 4
+  },
+  {
+    "id": "psych-268",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "pullback",
+      "probability-thinking",
+      "new-position"
+    ],
+    "content": "HIGHEST PROBABILITY TRADE: Buying dips to support in uptrend OR selling rallies to resistance in downtrend. Also: expanding time frame perspective is critical—develop 'big picture' vision. Shorter time frames used for entry timing within longer trend context.",
+    "priority": 4
+  },
+  {
+    "id": "psych-269",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "ema-bounce"
+    ],
+    "content": "EVERY THOUGHT REINFORCES A BELIEF: Everything you think, say, or do contributes to and reinforces some belief in your mental system. This is why monitoring your self-talk is critical. Negative self-criticism reinforces negative beliefs that then demand expression in your trading.",
+    "priority": 4
+  },
+  {
+    "id": "psych-270",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking",
+      "belief-system",
+      "intuition",
+      "self-valuation"
+    ],
+    "content": "SELF-SABOTAGING BELIEFS AT SUBCONSCIOUS LEVEL: Beliefs about not deserving success, money being ungodly, guilt about wealth—these operate below conscious awareness. They manifest as lapses in focus/concentration, buy-for-sell errors, or leaving screen at critical moments.",
+    "priority": 4
+  },
+  {
+    "id": "psych-271",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system"
+    ],
+    "content": "THE FREE MONEY EXPERIMENT: Of thousands walking by 'Free Money' sign on Michigan Ave, only one person asked for a quarter (a panhandler). Everyone else walked around the man, assuming he was crazy. Their belief 'free money doesn't exist' made the opportunity literally invisible.",
+    "priority": 4
+  },
+  {
+    "id": "psych-272",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "adaptability",
+      "belief-system"
+    ],
+    "content": "ENERGY DYNAMICS OF CHANGE: To change a belief, don't fight it. Draw energy out and channel into better belief. Each positive experience draws more negative energy from old belief. Eventually new belief becomes dominant. The moment of touch = when desire exceeds old belief energy by one degree.",
+    "priority": 4
+  },
+  {
+    "id": "psych-273",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "ema-bounce"
+    ],
+    "content": "ACTIVE CONTRADICTIONS: Two active beliefs in direct conflict, both demanding expression. Example: minimally charged belief that 'not all trades are dangerous' alongside powerfully charged belief that 'all losses are catastrophic.' Can see opportunities but can't act on them without fear.",
+    "priority": 4
+  },
+  {
+    "id": "psych-274",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "THE SNAKE FEAR ANALOGY: Client deathly afraid of snakes. His 3-year-old daughter was completely enthralled. His fear was so intense he couldn't conceive she wouldn't share it. Similarly, traders assume best traders are also afraid but somehow neutralize with courage. This is FALSE.",
+    "priority": 4
+  },
+  {
+    "id": "psych-275",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "self-awareness"
+    ],
+    "content": "NORMALIZING ERRORS: Make errors not exist in negatively charged context. You must be able to monitor yourself, which is difficult if you experience emotional pain when finding yourself making an error. Two choices: (1) acquire positive beliefs about mistakes, (2) compensate via mechanical trading regime.",
+    "priority": 4
+  },
+  {
+    "id": "psych-276",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending",
+      "LowVolatility"
+    ],
+    "tags": [
+      "intraday"
+    ],
+    "content": "DELIBERATE PRACTICE FOR TRADING: Not 'screen time' — structured practice with specific improvement targets. Framework: 1) Identify ONE specific weakness (e.g., cutting winners too early). 2) Design a practice exercise (e.g., hold all winners for minimum 2R for 20 trades). 3) Execute with full attention. 4) Review every trade against the specific target. 5) Adjust and repeat. Rules: Practice ONE skill at a time. Track progress quantitatively. Separate practice sessions from performance sessions. Practice in paper trading, perform in live. The goal is ITERATIVE REFINEMENT, not accumulating trade count.",
+    "priority": 4
+  },
+  {
+    "id": "psych-277",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending",
+      "LowVolatility"
+    ],
+    "tags": [
+      "self-awareness",
+      "process-focus"
+    ],
+    "content": "METACOGNITIVE AWARENESS IN TRADING: Metacognition = thinking about your thinking. During a trade, monitor your DECISION-MAKING PROCESS, not the outcome. Ask: 1) Am I making this decision based on data or emotion? 2) Would I make this same decision if I had no open position? 3) Am I rationalizing a decision I've already made? 4) What would I advise a friend in this situation? The goal is to OBSERVE your cognitive patterns in real-time and catch biases before they affect execution. This is a SKILL that improves with deliberate practice.",
+    "priority": 4
+  },
+  {
+    "id": "psych-278",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "tags": [
+      "drawdown",
+      "mid-cap",
+      "defi",
+      "intraday"
+    ],
+    "content": "FIGHT-OR-FLIGHT RESPONSE IN DRAWDOWNS: During extended drawdowns, the brain's amygdala hijacks rational thinking. Fight response = doubling down on losers (Martingale). Flight response = closing everything and stopping trading at the WORST time. Both are instinctive, neither is optimal. Prevention: 1) Pre-commit to circuit breaker rules BEFORE the drawdown starts. 2) Reduce position size automatically as drawdown deepens. 3) Have a 'drawdown protocol' written down that you follow mechanically. 4) Never make trading decisions during acute stress — the 2-hour rule. 5) Physical exercise after drawdown sessions to reset cortisol levels.",
+    "priority": 4
+  },
+  {
+    "id": "psych-279",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending",
+      "LowVolatility"
+    ],
+    "tags": [
+      "defi",
+      "discipline",
+      "process-focus",
+      "position",
+      "new-position",
+      "swing",
+      "regulatory",
+      "intraday",
+      "journaling"
+    ],
+    "content": "JOURNAL-BASED PERFORMANCE REVIEW PROTOCOL: After every trading session: 1) Screenshot every trade entry and exit. 2) Write: setup type, entry reason, exit reason, emotional state. 3) Rate rule adherence 1-10 (not profitability). 4) Identify ONE thing to improve tomorrow. Weekly review: 1) Calculate process metrics (rule adherence %, plan compliance %). 2) Identify patterns (e.g., 'I break rules most on Mondays'). 3) Set ONE specific improvement target for next week. Monthly review: 1) Compare process metrics to PnL — they should correlate. 2) If PnL up but process metrics down = lucky, not skilled.",
+    "priority": 4
+  },
+  {
+    "id": "psych-280",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason",
+      "BreakingNews"
+    ],
+    "tags": [
+      "reversal",
+      "large-cap"
+    ],
+    "content": "CRYPTO SCAM AWARENESS: If it sounds too good to be true, it is. Anyone promising free bitcoin or guaranteed returns is scamming. Verify ALL URLs character-by-character—scammers create lookalike domains (blttrex.com vs bittrex.com). Never use Google to navigate to exchanges—type URLs directly or use bookmarks. Phishing is the #1 cause of crypto loss.",
+    "priority": 4
+  },
+  {
+    "id": "psych-281",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap",
+      "rsi-divergence"
+    ],
+    "content": "TREND PSYCHOLOGY: An uptrend is a series of higher highs and higher lows—each dip is bought by optimistic traders. A downtrend is the reverse—each rally is sold by pessimistic traders. Trends persist because of the psychological anchoring of previous prices. When these sequences break (lower high in uptrend, higher low in downtrend), the psychological foundation shifts.",
+    "priority": 4
+  },
+  {
+    "id": "psych-282",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "tags": [
+      "large-cap"
+    ],
+    "content": "SOROS'S BACK PAIN INDICATOR: Soros famously said his back pain told him when his position was wrong—his body detected danger before his mind. Develop your own early warning system: anxiety about a position, checking prices compulsively, inability to sleep. These are signals your subconscious has detected something your conscious mind hasn't. Listen to it. Reduce position size immediately.",
+    "priority": 4
+  },
+  {
+    "id": "psych-283",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "tags": [
+      "stablecoin",
+      "fakeout",
+      "journaling"
+    ],
+    "content": "TRADING AS THE LAST FRONTIER: Trading is the last truly free profession—you can work anywhere, answer to nobody, and earn without limits. But the freedom is the trap: without external structure, your worst impulses have no check. Create artificial structure: trading hours, maximum daily trades, mandatory journaling, regular reviews. Treat it as a business, not a hobby.",
+    "priority": 4
+  },
+  {
+    "id": "psych-284",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "tags": [
+      "stablecoin",
+      "intraday"
+    ],
+    "content": "END-OF-DAY POSITION REVIEW: At session close (4PM EST traditional, 00:00 UTC crypto), review all open positions against your plan. Are stops still appropriate? Has the daily thesis changed? In crypto, the Asian session (00:00-08:00 UTC) often reverses the US session direction. Consider reducing position size before the handoff if you won't be monitoring.",
+    "priority": 4
+  },
+  {
+    "id": "psych-285",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "tags": [
+      "new-position",
+      "defi",
+      "news-event",
+      "intraday"
+    ],
+    "content": "PRE-MARKET PREPARATION: Before market open, review: 1) Overnight price action. 2) Key levels from previous day. 3) Any overnight news/events. 4) Pre-set orders at planned entry/exit levels. In crypto's 24/7 market, define your 'session' (e.g., your waking hours). Before starting your trading session, check what happened while you slept. Set alerts for key levels so you don't miss overnight moves.",
+    "priority": 4
+  },
+  {
+    "id": "psych-286",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "overtrading"
+    ],
+    "content": "All successful traders who lasted got balanced lives with fun outside trading. You can't sustain trading if you don't have other focus. Eventually you wind up overtrading or getting excessively disturbed about temporary failures.",
+    "priority": 3
+  },
+  {
+    "id": "psych-287",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "balance-life"
+    ],
+    "content": "Being a trader is like being a boxer — every now and then the market gives you a good wallop. After twenty years you get a bit punch-drunk. The shock absorbers deteriorate over time. Dennis' honest assessment of long-term trading toll.",
+    "priority": 3
+  },
+  {
+    "id": "psych-288",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "system-discipline",
+      "exit-psychology"
+    ],
+    "content": "Trout: Be mechanical about entries and exits but use discretion about position sizing and which markets to trade. The human element should be in the risk management, not the signal generation.",
+    "priority": 3
+  },
+  {
+    "id": "psych-289",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "process-focus"
+    ],
+    "content": "Faulkner: The mind of an achiever focuses on process, not outcome. Traders who focus on doing the right thing than making money paradoxically make more money. Process orientation beats outcome orientation.",
+    "priority": 3
+  },
+  {
+    "id": "psych-290",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "process-focus"
+    ],
+    "content": "Krausz: The subconscious mind processes market information faster than conscious analysis. Gut feelings in experienced traders are the subconscious recognizing patterns. Trust your trained intuition but verify with rules.",
+    "priority": 3
+  },
+  {
+    "id": "psych-291",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "discipline",
+      "gap-fill"
+    ],
+    "content": "Lauer: Value investing means buying when there's a significant gap between price and intrinsic value with a margin of safety. Never pay up. The discipline to wait for the right price is the hardest part.",
+    "priority": 3
+  },
+  {
+    "id": "psych-292",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "process-focus"
+    ],
+    "content": "Kiev: Performance anxiety creates self-sabotage. Traders who put too much pressure on themselves to perform will choke. Relax, trust your process, and let the results come naturally. Pressure kills performance.",
+    "priority": 3
+  },
+  {
+    "id": "psych-293",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "random-outcome"
+    ],
+    "content": "Trading skills can only be taught to a limited extent. Kovner trained ~30 people, only 4-5 became good traders. The difference was not intelligence — it was being strong, independent, and contrary in the extreme. Willingness to take positions others won't.",
+    "priority": 3
+  },
+  {
+    "id": "psych-294",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "bear-strong",
+      "crowd-psychology"
+    ],
+    "content": "When market has enormous move, most of the time it is right to view it as emotional and extreme. Maintain distance from the emotionalism. Steinhardt bought heavily on Oct 19, 1987 crash day — contrarian trade on extreme move.",
+    "priority": 3
+  },
+  {
+    "id": "psych-295",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "intuition"
+    ],
+    "content": "Gut feel is important. No great professional trader lacks it. Being a successful trader also takes courage: courage to try, courage to fail, courage to succeed, and courage to keep going when the going gets tough. Marcus on intuition.",
+    "priority": 3
+  },
+  {
+    "id": "psych-296",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "process-focus"
+    ],
+    "content": "Seidler: Focus on the process, not the money. When you focus on executing well, the money follows. When you focus on money, you make emotional decisions. Process focus produces consistent execution.",
+    "priority": 3
+  },
+  {
+    "id": "psych-297",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "Trading is emotion. It is mass psychology, greed, and fear. It is all the same in every situation and every market. If you can trade one market, you can trade them all — the principles are universal. Marcus on market universality.",
+    "priority": 3
+  },
+  {
+    "id": "psych-298",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "tags": [
+      "mindset"
+    ],
+    "content": "There are people in this business who enjoy watching others lose money. Weinstein's colleagues were relieved and mocked his soybean loss. Trading environment can be toxic. Choose your social environment carefully.",
+    "priority": 3
+  },
+  {
+    "id": "psych-299",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "process-focus"
+    ],
+    "content": "Baldwin: Fearless pit traders make money by being first to react. Speed of execution and decisiveness matter. When you see the signal, act. Hesitation costs money. But be fearless about the PROCESS, not the money.",
+    "priority": 3
+  },
+  {
+    "id": "psych-300",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "discipline"
+    ],
+    "content": "Lipschutz: Zero tolerance for operational errors. Back-office error budget = ZERO. Enough fail-safes = no errors. Operational discipline as important as trading discipline.",
+    "priority": 3
+  },
+  {
+    "id": "psych-301",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking"
+    ],
+    "content": "Carr: People caught up in excitement of wager amount destabilized by losses. Need detached view of money value to trade successfully.",
+    "priority": 3
+  },
+  {
+    "id": "psych-302",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending"
+    ],
+    "tags": [
+      "discipline",
+      "gap-fill"
+    ],
+    "content": "Lauer: Value investing with margin of safety. Buy when gap between price and intrinsic value is significant. Never pay up. Discipline to wait is hardest part.",
+    "priority": 3
+  },
+  {
+    "id": "psych-303",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "process-focus"
+    ],
+    "content": "Kiev: Performance anxiety creates self-sabotage. Too much pressure to perform causes choking. Relax, trust process, let results come naturally.",
+    "priority": 3
+  },
+  {
+    "id": "psych-304",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "system-discipline"
+    ],
+    "content": "SIMULATED BROKERAGE: Use simulated brokerage service for practice—everything identical to actual brokerage except trades not entered in market. Excellent tool for real-time practice under real market conditions and forward testing a trading system before risking capital.",
+    "priority": 3
+  },
+  {
+    "id": "psych-305",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system"
+    ],
+    "content": "THE 'AH HA' EXPERIENCE: When perspective shifts, you feel different—the world even seems different. 'Why didn't you tell me this before?' 'It was right in front of me the whole time.' Sometimes within moments, the new identity feels like it's always been part of you.",
+    "priority": 3
+  },
+  {
+    "id": "psych-306",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "market-psychology"
+    ],
+    "content": "TRADERS ACT AS GROUPS: Individual traders fall into specific groups perceiving same market conditions as opportunities or disappointments. They act in unison, upsetting market balance. Locals = least patient, most impulsive, smallest objectives. Commercials = different timeframes.",
+    "priority": 3
+  },
+  {
+    "id": "psych-307",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "mid-cap"
+    ],
+    "content": "CREATIVE EXPERIENCES: Exposure to anything new or outside boundaries imposed by beliefs. Can come as surprise or from conscious direction. When experienced, can create desire in direct conflict with existing beliefs. Resolution depends on energy dynamics between conflicting forces.",
+    "priority": 3
+  },
+  {
+    "id": "psych-308",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking",
+      "simplicity"
+    ],
+    "content": "TIME AND EFFORT IRRELEVANT: In society, time+effort=reward (hourly wages, salaries). In trading, effort can be irrelevant and there is virtually no relationship between time and reward. Trader can get windfall profit in seconds for one simple decision with only mental energy expended.",
+    "priority": 3
+  },
+  {
+    "id": "psych-309",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "fear-management",
+      "ema-bounce"
+    ],
+    "content": "FEAR OF SCARCITY DRIVES PRICES: Two or more people with same fears will compete for existing supply. Competition = willingness to pay more. If supply exceeds demand, no scarcity fear—conservation of resources. Prices fluctuate with collective security/insecurity.",
+    "priority": 3
+  },
+  {
+    "id": "psych-310",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system"
+    ],
+    "content": "BELIEFS CHANNEL LIKE TV: Beliefs allow us to tune into one channel of environmental info at a time so we can learn through that one channel. Without this limiting function, our minds would receive ALL broadcast stations simultaneously on the same channel = chaos.",
+    "priority": 3
+  },
+  {
+    "id": "psych-311",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "adaptability"
+    ],
+    "content": "PERCEPTION CHANGES TIME: We experience time differently based on energy charge. Predominantly positively charged energy = time speeds up. Predominantly negatively charged energy = time slows down. This applies to trade management—losing trades feel eternal.",
+    "priority": 3
+  },
+  {
+    "id": "psych-312",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "asymmetric-thinking"
+    ],
+    "content": "IRRELEVANT REASONS EXPOSED: Traders who are confident and know they can impact price go to great lengths to keep plans secret. Unconfident traders share ideas hoping for confirmation. After-the-fact reasons usually serve to ease pain of perceived mistakes—not useful information.",
+    "priority": 3
+  },
+  {
+    "id": "psych-313",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "process-focus",
+      "rsi-divergence"
+    ],
+    "content": "REVERSING BELIEF: Once you learn Santa doesn't exist, belief isn't destroyed—it's de-activated. Energy transferred to 'Santa doesn't exist' belief. Both concepts coexist, but only energized one has functional power. Same process works for trading beliefs.",
+    "priority": 3
+  },
+  {
+    "id": "psych-314",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "consistency"
+    ],
+    "content": "GOLF ANALOGY FOR SKILL: First time playing golf, hit several good shots but scored 120+ for 18 holes. Good shots without technique. Need technique to achieve consistency. Same with trading—can win without skill, but consistency requires proper mental technique that must be learned and practiced.",
+    "priority": 3
+  },
+  {
+    "id": "psych-315",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "self-awareness",
+      "discipline",
+      "journaling"
+    ],
+    "content": "RUNNING DIARY: Author kept running diary with date, distance, time, and how he felt physically. Apply to trading: keep a trading journal documenting not P&L but your mental state, emotional reactions, and quality of rule adherence. This accelerates self-awareness development.",
+    "priority": 3
+  },
+  {
+    "id": "psych-316",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "belief-system"
+    ],
+    "content": "UNLIMITED LEARNING CAPACITY: If memories/distinctions/beliefs exist as energy, and energy doesn't take up space, then we have unlimited capacity for learning. The difference between what we know now and 100 years ago would boggle minds of people from that era.",
+    "priority": 3
+  },
+  {
+    "id": "psych-317",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "swing",
+      "probability-thinking"
+    ],
+    "content": "DON'T PREJUDGE TIMING: Don't prejudge how long it takes to get through one sample size of trades without deviation. It will take as long as it takes. Like a golfer hitting 10,000 balls until swing is ingrained in muscle memory—not playing actual games, but practicing skill acquisition.",
+    "priority": 3
+  },
+  {
+    "id": "psych-318",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "tags": [
+      "crowd-psychology"
+    ],
+    "content": "THE PENNY IN THE URINAL: Floor trader warned against using urinal with penny—bad omen. Illustrates how typical trader refuses to plan/create structure, avoiding responsibility, subjecting self to crowd whims, and ending up in positions not knowing why or what to do next. Superstition fills the void.",
+    "priority": 3
+  },
+  {
+    "id": "psych-319",
+    "source": "books-merged",
+    "topic": "Psychology",
+    "conditions": [
+      "Ranging",
+      "HighVolatility",
+      "Trending",
+      "LowVolatility"
+    ],
+    "tags": [
+      "news-event",
+      "discipline",
+      "defi"
+    ],
+    "content": "CONSEQUENCE-BASED DISCIPLINE SYSTEMS: When willpower alone fails, create external consequences for rule-breaking. Examples from Juvier: Physical discomfort (ice bath, running 3 miles) for breaking trading rules. This works because the brain weighs immediate consequences more heavily than abstract future losses. Implementation: 1) Define your 3 most important rules. 2) Assign a meaningful consequence for each violation. 3) Have an accountability partner enforce it. 4) Scale consequences with severity (minor rule = cold shower, major rule = 5-mile run). The goal is to make rule-breaking PAINFUL enough that your brain defaults to following rules.",
+    "priority": 3
+  }
+]

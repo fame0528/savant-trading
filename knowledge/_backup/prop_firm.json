@@ -1,0 +1,58 @@
+[
+  {
+    "id": "prop-001",
+    "source": "velotrade-drawdown-models",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "PROP FIRM DRAWDOWN MODELS — Static vs Trailing: Static balance-based: Drawdown resets to starting balance each day. Most favorable — you know exactly where you stand. EOD trailing: Drawdown tracks peak equity at SESSION CLOSE. Penalizes large intraday swings that don't close at peak. Tick-by-tick trailing: Tracks absolute highest FLOATING equity peak. If trade floats +4% but you scale out at +1%, the model permanently reduces allowable drawdown by 3%. This PUNISHES you for letting winners retrace. RULE: Always audit the drawdown model BEFORE paying evaluation fees. Prefer static models.",
+    "priority": 5
+  },
+  {
+    "id": "prop-002",
+    "source": "apextrader-consistency-rules",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "CONSISTENCY RULE NAVIGATION: Prop firms cap max single-day profit to 30-40% of total target. If one news-driven trade exceeds threshold, profit is discounted or voided. This forces continued trading (and risk exposure) to meet minimum trading days. Strategy: 1) Target SMALL, CONSISTENT daily gains (1-2% of target). 2) NEVER take a trade that could exceed daily profit cap. 3) Spread profits evenly across trading days. 4) If you accidentally exceed cap, STOP trading that day. 5) Use micro-scalping for steady accumulation, not home-run swing trades.",
+    "priority": 5
+  },
+  {
+    "id": "prop-003",
+    "source": "velotrade-micro-scalping",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "MICRO-SCALPING FOR PROP FIRM PASSING: Optimized prop firm strategies abandon high-risk approaches. Use: 1) High-frequency arbitrage (cross-exchange price differences). 2) Micro-scalping (1-2 tick profits, high volume). 3) Options premium harvesting (theta decay). All enforce rigid 1% max per-trade risk. This ensures daily loss constraints are NEVER breached. Key insight: Prop firms want CONSISTENT traders, not profitable ones. A trader who makes 0.5% daily with no drawdowns passes easily. A trader who makes 5% one day and loses 3% the next fails consistency rules.",
+    "priority": 4
+  },
+  {
+    "id": "prop-004",
+    "source": "fortraders-1pct-risk",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "1% MAX PER-TRADE RISK FOR EVALUATIONS: During prop firm evaluations, NEVER risk more than 1% of the account per trade. This is MORE conservative than personal trading because: 1) Drawdown limits are tighter (typically 5-10%). 2) You're trading unfamiliar platform rules. 3) Emotional pressure is higher. 4) One bad day can end the evaluation. With 1% risk and 5% max drawdown, you can sustain 5 consecutive losses before approaching the limit. With 2% risk, only 2.5 losses. The evaluation is a MARATHON, not a sprint. Size down, trade more, pass consistently.",
+    "priority": 5
+  },
+  {
+    "id": "prop-005",
+    "source": "altfins-crypto-prop-comparison",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "CRYPTO PROP FIRM COMPARISON 2026: Key factors to evaluate: 1) Drawdown model (static vs trailing — prefer static). 2) Profit target (lower = easier to pass). 3) Max drawdown (higher = more room). 4) Minimum trading days (fewer = faster). 5) Payout split (80-90% is standard). 6) Crypto-specific pairs available. 7) Fee structure (some charge monthly, others one-time). 8) Instant funding vs evaluation. Red flags: Unrealistic profit targets (>10% in 30 days), hidden rules, delayed payouts, tick-by-tick trailing with tight limits. Always read the FULL terms before paying.",
+    "priority": 3
+  },
+  {
+    "id": "prop-006",
+    "source": "apextrader-news-trading",
+    "topic": "Execution",
+    "conditions": ["BreakingNews"],
+    "content": "NEWS TRADING PROHIBITION IN EVALUATIONS: Many prop firms explicitly prohibit or penalize trading during high-impact news events (FOMC, CPI, NFP). Reason: News-driven trades produce outsized single-day profits that violate consistency rules. Even if not explicitly prohibited, news trading is HIGH RISK during evaluations because: 1) Slippage is extreme. 2) Spreads widen dramatically. 3) One trade can exceed daily profit cap. 4) Volatility can trigger drawdown limits instantly. RULE: Close all positions 10 minutes before red-folder news. Re-enter 10 minutes after. The evaluation edge is CONSISTENCY, not home runs.",
+    "priority": 4
+  },
+  {
+    "id": "prop-007",
+    "source": "velotrade-payout-rules",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "PAYOUT VALIDATION AND WITHDRAWAL RULES: After passing evaluation: 1) Some firms require a 'verification' phase (second evaluation at reduced targets). 2) Payout splits typically 80-90% of profits. 3) Minimum profit threshold before withdrawal ($100-500). 4) Payout frequency (weekly, bi-weekly, monthly). 5) Some firms take fees from payouts. CRITICAL: Read the payout terms BEFORE paying evaluation fees. Some firms have hidden rules like 'first $X of profit goes to fees' or 'payouts only after Y trading days in funded phase'. Prefer firms with transparent, frequent payouts and no hidden deductions.",
+    "priority": 3
+  }
+]

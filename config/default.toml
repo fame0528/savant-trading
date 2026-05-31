@@ -1,0 +1,68 @@
+[exchange]
+name = "kraken"
+ws_url = "wss://ws.kraken.com/v2"
+rest_url = "https://api.kraken.com"
+
+[trading]
+# Starting pairs — engine can discover more via Kraken API
+pairs = ["BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD", "ADA/USD", "DOGE/USD", "AVAX/USD", "DOT/USD", "LINK/USD", "MATIC/USD", "UNI/USD", "ATOM/USD", "ALGO/USD", "FIL/USD", "NEAR/USD"]
+# Set to true to scan all Kraken USD pairs for opportunity
+scan_all_pairs = false
+timeframe = "5m"
+timeframes = ["5m", "1h", "4h"]
+base_currency = "USD"
+starting_balance = 50.0
+database_url = "sqlite:data/savant.db"
+fee_rate = 0.0026
+slippage_pct = 0.0005
+
+[risk]
+max_risk_per_trade = 0.01
+max_daily_loss = 0.03
+max_drawdown = 0.10
+max_positions = 3
+min_rr_ratio = 1.5
+
+[strategy.momentum]
+ema_period = 100
+volume_spike_multiplier = 2.0
+atr_compression_threshold = 0.7
+
+[strategy.mean_reversion]
+profile_periods = 100
+value_area_pct = 0.70
+volume_spike_multiplier = 1.5
+
+[strategy.regime]
+adx_period = 14
+adx_trending_threshold = 25.0
+adx_ranging_threshold = 20.0
+atr_volatility_multiplier = 1.5
+
+[mode]
+paper_trading = true
+
+[ai]
+provider = "opengateway"
+endpoint = "https://opengateway.gitlawb.com/v1"
+model = "mimo-v2.5-pro"
+api_key_env = "OPENGATEWAY_API_KEY"
+autonomy_level = 3
+max_decisions_per_hour = 20
+context_window_candles = 100
+knowledge_token_budget = 8000
+price_tolerance_pct = 10.0
+max_retries = 3
+temperature = 0.7
+max_tokens = 4096
+
+[insight]
+funding_rate_enabled = true
+liquidation_enabled = true
+fear_greed_enabled = true
+btc_dominance_enabled = true
+exchange_flows_enabled = true
+news_sentiment_enabled = true
+rss_enabled = true
+rss_max_items = 10
+onchain_enabled = true

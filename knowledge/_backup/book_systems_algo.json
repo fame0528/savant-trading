@@ -1,0 +1,2570 @@
+[
+  {
+    "id": "book-algo-001",
+    "source": "trend-following-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trend following core rule: Enter when price makes new highs/lows (breakout), exit when trend reverses. Use price as sole decision input—ignore fundamentals. Systematic mechanical rules eliminate emotional bias. Capture 60-80% of major trends by accepting you won't pick tops or bottoms.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-002",
+    "source": "trend-following-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Drawdown tolerance is the price of admission to trend following. Top traders endure 20-40% drawdowns routinely. Dunn Capital had 60%+ drawdowns but compounded to billions. Predefine max acceptable drawdown, size positions so worst-case DD stays within tolerance. Never abandon system during drawdown—biggest trends follow biggest pain.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-003",
+    "source": "trend-following-covel",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "content": "Crisis alpha: Trend followers profited +5% to +82% during Oct 2008 crash. Systems identified emerging downtrends in stocks, USD, commodities and positioned short. During crisis, trends become more pronounced and volatile. Trend following has long-option profile benefiting from extreme price swings.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-004",
+    "source": "trend-following-covel",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bill Dunn's system: Computerized trend following across 60+ markets. Enter on breakout signals, exit on predefined reversal points. No discretion—100% mechanical. Holds positions weeks to months. Diversified across currencies, bonds, commodities, stocks. Key: 'Trading without a predefined exit strategy is a recipe for disaster.'",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-005",
+    "source": "trend-following-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "John W. Henry principle: Human nature is trend following's edge. Most traders can't handle giving back profits after a trend ends, so they abandon systems during drawdowns. The few who endure reap outsized returns. Discipline > intelligence. 'If you don't feel pain during a drawdown, you're not trading big enough.'",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-006",
+    "source": "trend-following-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Ed Seykota's trend following rules: (1) Trade in direction of long-term trend. (2) Cut losses short. (3) Let winners run. (4) Use mechanical system to eliminate emotion. (5) Diversify across uncorrelated markets. His computerized systems from 1970s generated fortunes. 'Ride winners and cut losers' is the whole game.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-007",
+    "source": "trend-following-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Risk management is everything in trend following. Position size so no single trade risks more than 1-2% of equity. Use ATR-based stops (2-3x ATR). Diversify across 20+ markets. Accept that 60-70% of trades will be small losses. Big winners (10-20R+) more than compensate. 'Losers average losers'—never add to losing positions.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-008",
+    "source": "trend-following-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Richard Donchian's rules: Buy when price exceeds highest high of last N days, sell when it drops below lowest low of N days. The original 5-20 moving average crossover system. Donchian pioneered systematic commodity trading in 1940s. His simple breakout rules remain foundation of modern trend following.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-009",
+    "source": "trend-following-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trend following requires accepting uncertainty. You don't know when trends will start, how long they last, or when they end. You only know your rules. Livermore: 'It was never my thinking that made big money for me. It was always my sitting. Men who can both be right AND sit tight are uncommon.'",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-010",
+    "source": "trend-following-covel",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Salem Abraham: Began researching trend following as teenager, visited Dennis. Trades 50+ markets systematically. Key lesson from 2008: Fund was up while S&P crashed. Diversification across markets and timeframes smooths returns. 'You can't predict, but you can prepare.' Mechanical execution eliminates panic.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-011",
+    "source": "trend-following-covel",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "BreakingNews"
+    ],
+    "content": "Trend followers are market-agnostic. They go long OR short any market: oil, bonds, currencies, stocks, commodities. Direction doesn't matter—only that price trends. In 2008, they shorted stocks AND went long bonds. No opinions needed—price tells all.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-012",
+    "source": "trend-following-covel",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "120 trend following models tested by researcher: reversal-based, breakout, moving average, band-style. ALL profitable over decades. Average holding period 2-6 months. Conclusion: trend following edge hasn't changed. The strategy works because human behavioral biases (loss aversion, herding) persist forever.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-013",
+    "source": "trend-following-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Managed futures allocation: Trend following has near-zero correlation to stocks/bonds over full market cycle. Adding 20% managed futures to traditional portfolio improves risk-adjusted returns. Biggest benefit comes during stock market crashes (crisis alpha). Correlation to S&P is slightly negative during bear markets.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-014",
+    "source": "way-turtle-faith",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Original Turtle System 1: Enter on 20-day Donchian channel breakout (new 20-day high = buy, new 20-day low = sell short). Exit on 10-day breakout in opposite direction. Filter: Skip breakout if last S1 trade was profitable (unless skipped breakout triggers S2 entry). Stop: 2N (2x ATR) from entry.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-015",
+    "source": "way-turtle-faith",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Original Turtle System 2: Enter on 55-day Donchian channel breakout. Exit on 20-day breakout in opposite direction. No filter—take every signal. System 2 captures big trends that S1's filter might skip. Most Turtles used S2 for core positions. Longer lookback = fewer trades, bigger moves, higher win rate.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-016",
+    "source": "way-turtle-faith",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Turtle position sizing: N = 20-day ATR. Position size = (Account x 1%) / (N x Dollar per Point). This normalizes risk across all markets. A $1M account risking 1% per unit means max $10K risk per position. Volatile markets get fewer contracts, calm markets get more.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-017",
+    "source": "way-turtle-faith",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle pyramiding rules: Add to winning positions in 0.5N increments. First unit at breakout, second at +0.5N, third at +1N, fourth at +1.5N. Maximum 4 units per market. Each subsequent unit uses same 2N stop from its entry. Total risk per market = 4 units x 2N = 8N maximum (2% of account).",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-018",
+    "source": "way-turtle-faith",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle portfolio risk limits: Max 4 units per market. Max 12 units per correlated group (e.g., all grains). Max 10 units in one direction for highly correlated markets. Max 20 units total regardless of direction. These limits prevent concentration risk. If all signals hit simultaneously, you can't take them all.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-019",
+    "source": "way-turtle-faith",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ATR channel breakout system: Uses ATR instead of fixed point stops. Entry on highest high/lowest low of N days. Stop at 2xATR below entry (long) or above entry (short). This adapts to volatility—tighter stops in calm markets, wider in volatile. More robust than fixed-percentage stops across instruments.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-020",
+    "source": "way-turtle-faith",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Donchian Trend system with EMA filter: 20-day breakout entry, 10-day breakout exit, 350/25-day EMA trend filter. Only take longs when 25-EMA > 350-EMA, shorts when 25-EMA < 350-EMA. Trend filter dramatically improves edge ratio of breakout signals by filtering counter-trend false breakouts.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-021",
+    "source": "way-turtle-faith",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Dual Moving Average system: Buy when 100-day MA crosses above 350-day MA, sell when it crosses below. Always in market. Simpler than Donchian but similar performance. No stops needed. Tested CAGR 57.8%, MAR 1.82 over 10 years. Simplicity wins.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-022",
+    "source": "way-turtle-faith",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Triple Moving Average system: 150/250/350-day MAs. Buy when 150 crosses above 250 AND both are above 350. Sell when 150 crosses below 250. 350-day acts as trend filter. Not always in market. Tested CAGR 48.1%, max DD 31.3%.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-023",
+    "source": "way-turtle-faith",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Critical backtest lesson: Adding stops to trend systems often DEGRADES performance. Dual MA system tested with stops from 0.5-10 ATR: NO stop configuration beat the no-stop version on CAGR, MAR ratio, Sharpe, drawdown, or drawdown duration. For trend followers, drawdowns come from giving back profits, not from entry risk.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-024",
+    "source": "way-turtle-faith",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Random entry + trend filter test: Entering randomly (coin flip) but only in direction of 350/25 EMA trend generated 32.46% CAGR with 43.74% max DD over 10 years. Best random test: 53.3% return, worst: 17.5%. Proves trend filter alone has massive edge—entry timing is secondary to trading with the trend.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-025",
+    "source": "way-turtle-faith",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trader effects: When too many traders use same breakout system, front-runners exploit known entry levels. Buy orders ahead of known breakout levels move price to trigger others' stops, then front-runner sells for guaranteed profit. This is why simple breakout systems lose edge over time—trader effects erode the signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-026",
+    "source": "way-turtle-faith",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Optimization paradox: Choosing specific parameters (25-day vs 30-day MA) reduces predictive value of the backtest itself. Solution: Use broad parameter ranges that work across many values rather than one 'optimal' value. If system works for 20-40 day breakout, it's more robust than one tuned to exactly 23 days.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-027",
+    "source": "way-turtle-faith",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Four sources of backtest-reality divergence: (1) Trader effects—others exploit your pattern. (2) Random effects—luck inflates results. (3) Optimization paradox—parameter selection reduces validity. (4) Overfitting—complex systems memorize noise. Simple, broadly-parameterized systems with walk-forward testing are most robust.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-028",
+    "source": "way-turtle-faith",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle edge measurement (E-ratio): E-ratio = MFE/MAE (Maximum Favorable Excursion / Maximum Adverse Excursion) normalized by ATR. E70 > 1.0 means entry has positive edge. 20-day Donchian breakout E70 = 1.20 (20% more favorable movement than adverse over 70 days). With trend filter, E-ratio improves to 1.35+.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-029",
+    "source": "way-turtle-faith",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Risk of ruin for trend followers: Random effects dominate short-term results. Out of 100 random traders with slight edge, 17 had better 3.5yr MAR than best real system. Over 10+ years, random luck washes out. Minimum 5-year track record needed to distinguish skill from luck. Invest in people, not past performance.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-030",
+    "source": "complete-turtle-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle System One (S1) exact rules: Entry on 20-day breakout (new 20-day high/low). Exit on 10-day breakout in opposite direction. Filter: Skip if last trade was winner (unless a 2N loss occurred, then take it). If skipped S1 signal and market makes new 55-day extreme, take S2 as failsafe. Never miss a big trend.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-031",
+    "source": "complete-turtle-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle System Two (S2) exact rules: Entry on 55-day breakout. Exit on 20-day breakout in opposite direction. No filter—always take S2 signals. S2 was the core system for most Turtles. Longer lookback = fewer whipsaws. The 55-day captures major trends while 20-day exit is faster than waiting for 55-day reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-032",
+    "source": "complete-turtle-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Turtle ATR sizing example: Corn at $250, ATR = 7 cents ($350/contract), stop = 2N = 14 cents ($700). Account $100K, 1% risk = $1,000. Position = $1,000/$700 = 1 contract. If Google ATR = $20, 2N stop = $40. For $1M account, 1% = $10K gives 250 shares.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-033",
+    "source": "complete-turtle-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle pyramiding: Add units at 0.5N intervals. Corn: Entry at $250, add at $253.50 (0.5N=3.5c), add at $257 (1N), add at $260.50 (1.5N). Max 4 units. Stop for each unit = 2N from ITS entry price. Move stop of earlier units to breakeven after adding second unit. Total max risk = 2% per market.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-034",
+    "source": "complete-turtle-covel",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle entry execution: Turtles entered on breakouts using limit orders, not market orders. If market gapped through breakout level, wait for pullback or use S2 failsafe. Never chase. If you miss entry, wait for next signal. Floor traders tried to front-run Turtle orders—some Turtles used fake orders to create confusion.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-035",
+    "source": "complete-turtle-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Jerry Parker's key insight: 'The most important experience was being with someone who says it's OK to lose money.' Parker reduced leverage from Dennis's aggressive style to target 15-20% annual returns instead of 100%+. This attracted institutional investors and built $770M+ net worth. Match risk to your investors' stomach.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-036",
+    "source": "complete-turtle-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Leverage tradeoff: Original Turtles used extreme leverage—could lose 60% in one day but be up 140% year-end. Parker reduced to target 20% annual with smaller drawdowns, raised $1B+. Tom Shanks kept aggressive style, attracted fewer investors. Paul Tudor Jones: 'Everything is a function of leverage and drawdown tolerance.'",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-037",
+    "source": "complete-turtle-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle entrepreneur traits: (1) Nonconformists—self-reliance. (2) Emotionally aloof—not cold, but can ignore noise. (3) Risk takers—comfortable with uncertainty. (4) Socially persuasive. (5) Autonomous. (6) Change seekers. (7) Energetic. These separated successful from failed Turtles. Trading rules alone are insufficient.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-038",
+    "source": "complete-turtle-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Dennis's teaching was 'beyond my wildest imagination.' Most profitable trades required sitting through massive drawdowns within the trade. Turtles who couldn't handle giving back open profits failed. Key: Separate the P&L from the process. Check results weekly at most—daily P&L watching destroys discipline.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-039",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Mean reversion detection—ADF test: Augmented Dickey-Fuller test checks if price series is stationary (mean-reverting). Null hypothesis: series has unit root (non-stationary). If p-value < 0.05, reject null—series likely mean-reverts. Apply to price spreads or ratios of cointegrated pairs. Critical first step before trading any mean reversion strategy.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-040",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Mean reversion detection—Hurst exponent: H < 0.5 = mean-reverting, H = 0.5 = random walk, H > 0.5 = trending. For pairs trading, compute H of the spread. H = 0.3-0.4 indicates strong mean reversion. More intuitive than ADF test for non-statisticians.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-041",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Half-life of mean reversion: Estimate using Ornstein-Uhlenbeck process. Regress price change on current level: dP = lambda*(P - mu) + e. Half-life = -ln(2)/lambda. Tells expected time for spread to revert halfway to mean. If half-life = 5 days, expect reversion within 2-3 weeks. Crucial for sizing and timing.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-042",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Cointegration test (CADF): Two non-stationary price series can have stationary spread if cointegrated. Test: Regress Y on X, run ADF on residuals. If residuals are stationary, pair is cointegrated. Better than correlation—cointegrated pairs can have low correlation but predictable spread. Use Johansen test for portfolios of 3+ instruments.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-043",
+    "source": "algo-trading-chan",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Bollinger Band mean reversion: When z-score of cointegrated pair exceeds +/-2 standard deviations, enter mean reversion trade. Long spread when z < -2, short spread when z > +2. Exit at z = 0 (mean). Use rolling lookback for mean/std calculation. Simple but effective for pairs with proven cointegration.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-044",
+    "source": "algo-trading-chan",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Kalman filter for pairs trading: Dynamically estimates hedge ratio between two instruments, adapting to changing relationships. Superior to static regression hedge ratio. Filter automatically adjusts position sizes as relationship drifts. Also useful for detecting regime changes in cointegration relationship.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-045",
+    "source": "algo-trading-chan",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "ETF pairs trading: Trade cointegrated ETF pairs (GLD/GDX, EWA/EWC, XLE/OIH). Use z-score of spread for entry/exit. Beware: cointegration can break during fundamental shifts. Always verify cointegration with rolling window test. Position in both legs simultaneously to maintain hedge.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-046",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Momentum detection—Variance Ratio test: If variance of k-period returns is k times variance of 1-period returns, series is random walk. If ratio > k, positive autocorrelation (momentum). If ratio < k, negative autocorrelation (mean reversion). Apply to instruments to determine which strategy type to use.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-047",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Time series momentum: Buy instruments with positive N-month return, sell those with negative N-month return. Hold for 1 month. Works across futures, currencies, commodities. Best lookback: 12 months for equities, shorter for commodities. Return is proportional to magnitude of past return.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-048",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Cross-sectional momentum: Rank all instruments by past N-month return. Buy top decile, sell bottom decile. Rebalance monthly. Long-short portfolio is market neutral. Key driver: forced asset sales/purchases (index rebalancing, margin calls, fund flows) create persistent momentum.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-049",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Roll return momentum in futures: Backwardated markets (near > far) trend up. Contango markets (far > near) trend down. Roll return = (near - far)/near. Buy futures with positive roll return, sell negative. This single factor explains significant portion of commodity momentum profits.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-050",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Leveraged ETF strategy: 2x and 3x leveraged ETFs have structural decay from daily rebalancing. Short both bull and bear versions (e.g., short SPXL + short SPXS) to capture volatility decay. Works best in high-volatility, choppy markets. Requires careful rebalancing and borrow cost analysis.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-051",
+    "source": "algo-trading-chan",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Kelly formula for position sizing: f* = (p*b - q)/b, where p = win probability, b = win/loss ratio, q = 1-p. In practice, use half-Kelly (f*/2) for safety. Kelly optimizes long-term growth but has high short-term volatility. For non-Gaussian returns, estimate Kelly via simulation. Never exceed full Kelly.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-052",
+    "source": "algo-trading-chan",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Monte Carlo simulation for strategy validation: Generate simulated price series with same statistical properties as real data. Run strategy on simulated data 10,000+ times. If strategy profits on >95% of simulations, edge is real. If only 60%, could be luck. Worst 1% simulation = your black swan risk.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-053",
+    "source": "algo-trading-chan",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Walk-forward testing: Divide data into multiple in-sample/out-of-sample periods. Optimize on in-sample, test on out-of-sample. Walk forward through time. If out-of-sample performance degrades significantly vs in-sample, strategy is overfit. Target: live Sharpe > 50% of backtest Sharpe to be viable.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-054",
+    "source": "algo-trading-chan",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Data snooping bias avoidance: (1) Use simple linear strategies. (2) Verify with out-of-sample data. (3) Check survivorship bias. (4) Use primary exchange prices. (5) Account for short-sale constraints. (6) Include transaction costs. (7) Test across multiple market regimes.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-055",
+    "source": "algo-trading-chan",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "Black swan risk management: Kelly formula assumes Gaussian returns—fails during fat-tail events. Use constant proportion portfolio insurance (CPPI): maintain floor value, allocate risk budget as percentage of cushion (equity - floor). During drawdowns, automatically reduces exposure. More robust than fixed-fraction Kelly during crashes.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-056",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Futures calendar spread mean reversion: Trade spread between near and far contracts of same commodity. Use cointegration test on spread. Enter when spread deviates >2sigma from mean. Half-life typically 5-20 days. Use settlement prices, not last trade, for backtesting accuracy.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-057",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "VX futures strategy: VIX futures are almost always in contango, creating predictable roll yield. Short VX front month, roll before expiration. During volatility spikes (contango inverts), go long. Simple but lucrative strategy requiring careful risk management—VX can spike 300%+ in days during crises.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-058",
+    "source": "algo-trading-chan",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Scaling-in debate: Adding to losing positions in mean reversion trades can improve returns IF spread truly mean-reverts. But if regime changed, catastrophic loss. Chan recommends against scaling-in unless half-life is very short (<5 days) and cointegration is robust. Better to size correctly at entry.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-059",
+    "source": "algo-trading-chan",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "News sentiment momentum: NLP-based sentiment scores from financial news predict short-term momentum. Positive sentiment = buy, negative = sell. Combine with traditional momentum for stronger signal. Works best for large-cap stocks with heavy news coverage. Decay is fast—hold period days, not weeks.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-060",
+    "source": "algo-trading-chan",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Regime shift awareness: Backtest predictive power fails when market structure changes. Examples: 2001 decimalization killed stat arb. 2008 crisis halved trading volumes, hurting mean reversion. 2010 flash crash changed HFT landscape. Always ask: 'Has the market structure changed since my backtest period?'",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-061",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Dual time frame momentum strategy: Use two timeframes (daily + weekly). Both must show momentum reversal in same direction for trade signal. Daily alone = too many false signals. Weekly alone = too slow. Combined = high probability. Use rate-of-change or MACD as momentum indicator on both timeframes.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-062",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Momentum-price divergence: When price makes new high but momentum indicator doesn't = bearish divergence (potential reversal). When price makes new low but momentum doesn't = bullish divergence. Strongest when it occurs at Fibonacci price or time targets. Never trade divergence alone—combine with pattern and price targets.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-063",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trend vs correction identification (Elliott Wave): Overlap guideline—if wave 4 overlaps wave 1 territory, it's a correction, not a trend. ABC corrections retrace 38.2-78.6% of prior move. 5-wave moves are trends. Simple rule: No overlap of wave 1 by wave 4 = trend in progress. Overlap = correction forming.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-064",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Fibonacci internal retracements: After trend impulse, correction typically ends at 38.2%, 50%, or 61.8% retracement. Alternate price projections (127.2%, 161.8%, 200%, 261.8%) qualify which retracement level will hold. Multiple Fib levels converging in tight zone = high probability reversal target.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-065",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "External retracements: When correction exceeds 100% of prior move, use external retracements (127.2%, 161.8%) to identify final section of correction. These identify where correction ends and new trend begins. Critical for catching exact reversal points. Combine with time targets for maximum precision.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-066",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Time retracements: Apply Fibonacci ratios to TIME as well as price. Measure duration of prior trend, project correction time at 38.2%, 50%, 61.8%. When price reaches Fib price target AND time target simultaneously = highest probability reversal zone. Time-price confluence is the most powerful setup.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-067",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trailing one-bar entry strategy: After momentum and price/time targets align, enter on break of signal bar high (long) or low (short). Stop placed beyond opposite end of signal bar. Tight stop = favorable risk/reward. If stopped out, re-enter on next signal bar. Works on all timeframes from 5-min to monthly.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-068",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Swing entry strategy: Identify swing high/low (3+ bars with higher/lower close on each side). Enter on pullback to 38.2-61.8% retracement of last swing. Stop beyond swing extreme. Target: 127.2-161.8% extension of pullback. Combines price structure with Fibonacci for objective entry with defined risk.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-069",
+    "source": "high-prob-burns",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Multiple-unit exit strategy: Divide position into 2-3 units. First target: 1:1 risk/reward (move stop to breakeven). Second target: prior swing high/low or 2:1 R/R. Third unit: trail with 2-bar reversal or until momentum reverses on higher timeframe. Captures partial profit while allowing big trend participation.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-070",
+    "source": "high-prob-burns",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Position sizing: Risk fixed percentage per trade (1-2% of account). Calculate position size: (Account x Risk%) / (Entry - Stop in points). If $100K account, 1% risk, entry 50, stop 48 = risk $2/point gives 500 shares. Never increase position size to 'make up' for losses. Consistency is key.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-071",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Four dimensions of market analysis: (1) Multiple time frame momentum—direction and timing. (2) Pattern—trend vs correction structure. (3) Price—Fibonacci retracement/projection targets. (4) Time—Fibonacci time retracements and cycles. All four must align for highest probability trade.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-072",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MACD histogram strategy: MACD histogram crossing zero = momentum shift. For dual timeframe: Weekly MACD histogram must be rising (long) or falling (short) AND daily MACD histogram must cross zero in same direction. Most powerful when combined with price at Fibonacci support/resistance.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-073",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Dynamic price projection for trend targets: After 5-wave trend impulse, project end of wave 5 at 61.8-100% extension of waves 1-3 combined. When wave 5 reaches this zone AND momentum diverges = high probability trend completion. Take profits or tighten stops.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-074",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Correction completion signals: (1) Price reaches 38.2-78.6% retracement of prior trend. (2) Time reaches 38.2-61.8% of prior trend duration. (3) Momentum shows reversal on dual timeframe. (4) Pattern shows ABC or complex correction complete. When all four align = enter in direction of larger trend. Highest probability setup.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-075",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Time bands: Project future time zones where reversals are probable using multiple time measurements. Fibonacci time projections from multiple swing points create 'time bands'—clusters of time targets. When price is at Fibonacci price level within a time band = maximum probability reversal zone.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-076",
+    "source": "high-prob-burns",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trade management rules: (1) Never let winner turn into loser—move stop to breakeven at 1:1 R/R. (2) Trail stop using 2-bar reversal on trading timeframe. (3) Take partial profits at predefined targets. (4) Exit completely when momentum reverses on higher timeframe or price hits major Fib target. (5) Never widen a stop.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-077",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Pattern recognition simplified: Only need to know 3 patterns. (1) Trending move—5 waves with no wave 4 overlap of wave 1. (2) Simple correction—ABC, 3 waves. (3) Complex correction—combination of ABC patterns (WXY, triangles). If you can identify these 3, you know whether to trade with or against the move.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-078",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Fifth wave key: Wave 5 of a trend is where most traders get trapped. When wave 5 reaches 61.8-100% extension AND shows momentum divergence = trend ending. This is the single most important pattern recognition for timing entries and exits. Fifth waves end trends.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-079",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Curve-fitting is the #1 killer of trading systems. Occurs when system has too few trades in development sample. Solution: Develop on multiple instruments simultaneously to generate thousands of trades. A system that works on corn, gold, bonds, and currencies is less likely curve-fit than one tuned to just gold.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-080",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Walk-forward optimization: Split data into development and validation segments. Develop on segment 1, validate on segment 2. Then develop on 1+2, validate on 3. Continue walking forward. If validation degrades >30% vs development, system is overfit. Walk-forward is gold standard for system validation.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-081",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Expectancy calculation: Expectancy = (Win% x Avg Win) - (Loss% x Avg Loss). Must be positive. Also: Expectancy x Opportunity Factor (trades/year) = annual expected return. A system with 30% win rate but 5:1 win/loss ratio can be better than 70% win rate with 1:1 ratio.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-082",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Monte Carlo simulation: Randomize trade order from backtest results. Run 1000+ simulations. Analyze distribution of max drawdowns, returns, and time to recovery. Worst 5% of simulations = your realistic worst case. If worst-case max DD exceeds tolerance, reduce leverage.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-083",
+    "source": "building-systems-fitschen",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bar-scoring technique: Assign each bar a score based on multiple criteria (trend alignment, momentum, volatility, volume). Highest-scoring bars = best trade candidates. Use as filter—only take entries when bar score exceeds threshold. Outperforms single-indicator entries by capturing multi-factor confluence.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-084",
+    "source": "building-systems-fitschen",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Realistic CTA performance (2005-2010): Top 20 CTAs averaged 27.98% annual return with 24.46% max drawdown. Key insight: return = drawdown (1:1 ratio for best managers). 17 of 20 had entire 12-month period with zero gains. Design for reality, not dreams.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-085",
+    "source": "building-systems-fitschen",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Drawdown expectations: If you target 25% annual return, expect 20%+ max drawdown. Few traders survive >20% drawdown psychologically. Solution: Set max drawdown YOU can tolerate first (e.g., 15%), then use leverage to achieve corresponding return. Never start with return target and accept whatever drawdown comes.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-086",
+    "source": "building-systems-fitschen",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Short-term scalping system for stocks: Mean reversion using intraday patterns. Entry on oversold conditions near support, exit at intraday resistance. High win rate (65%+), low profit per trade. Requires tight execution—slippage kills edge. Best for liquid large-cap stocks during regular hours.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-087",
+    "source": "building-systems-fitschen",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Mid-term trend following for commodities: Enter on breakout confirmation with volume. Trail stop using ATR multiple. Hold weeks to months. Lower win rate (35-45%) but high win/loss ratio (3:1+). Diversify across 15+ commodity markets. Key: Don't optimize parameters per market—use same parameters across all.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-088",
+    "source": "building-systems-fitschen",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Money management for small accounts: Always trade minimum position size (1 contract or 100 shares). Risk per trade <= 2% of account. Can't use optimal f or Kelly because risk of ruin is too high. Focus on survival first. Add size only after account grows 50%+. Margin call = game over for small accounts.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-089",
+    "source": "building-systems-fitschen",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Money management for large accounts: Can use optimal f and fractional Kelly sizing. Scale positions based on equity changes. Risk 0.5-1% per trade. Combined stock + commodity strategies reduce drawdown by 40%+ with only 10% less return. Diversification across strategy types is as important as across markets.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-090",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "System combination: Trading stock scalping + commodity trend following together: 23-37% annual return with only 6-13% max drawdown. Low correlation between strategies reduces portfolio risk. Longest flat period much shorter than either system alone. Combine strategy types for all-weather performance.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-091",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Trading maxims tested: (1) 'Cut losses short'—TRUE. (2) 'Let winners run'—TRUE. (3) 'Don't trade against the trend'—TRUE. (4) 'Always use stops'—SURPRISINGLY FALSE for some trend systems. (5) 'Diversify'—TRUE. Back your maxims with data, not tradition.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-092",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Channel breakout entry: Buy when price exceeds N-bar highest high, sell short when below N-bar lowest low. Use limit orders at breakout level to reduce slippage. Best results: 20-55 day lookback for daily bars. Works across all futures markets. Add volatility filter—only trade breakouts when ATR > N-day average ATR.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-093",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Volatility breakout entry: Enter when price moves more than N*ATR from prior close or opening price. If close > open + N*ATR, buy. If close < open - N*ATR, sell. Works because volatility breakouts often signal start of new trend. Filter with ADX > 25 for trend confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-094",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Moving average crossover entries: Simple MA crossover (fast crosses above slow = buy, below = sell). Exponential MA responds faster. Best trend-following: 20/50 EMA crossover. Counter-trend: Buy when price dips below long MA and crosses back above. All produce whipsaws in ranging markets.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-095",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Oscillator overbought/oversold entries: RSI < 30 = oversold (buy), RSI > 70 = overbought (sell). Stochastic: Buy when %K crosses above %D in oversold zone. CCI: Buy below -100, sell above +100. Works in ranging markets only—in trending markets, oscillators stay extended for long periods.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-096",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Oscillator divergence entries: Price makes new high but RSI/Stochastic doesn't = bearish divergence (sell). Price makes new low but oscillator doesn't = bullish divergence (buy). Strongest when divergence occurs at support/resistance or after extended trend. Combine with price action confirmation.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-097",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Seasonality entries: Certain markets show persistent seasonal patterns. Grains rally in spring planting, energies peak in winter. Pure seasonality alone has weak edge, but combined with technical confirmation adds 10-20% to returns. Use as filter, not primary signal.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-098",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Cycle-based entries using MESA: Maximum Entropy Spectral Analysis identifies dominant market cycles. Enter at cycle trough (buy) or peak (sell). Filter banks (Butterworth, wavelet) decompose price into cycle components. Weakness: cycles change frequency over time.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-099",
+    "source": "encyclopedia-katz",
+    "topic": "AiStrategy",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Neural network entries: Feed-forward NN trained on technical indicators predicts direction. Use small networks (3-5 nodes) to avoid overfitting. Out-of-sample testing mandatory. Reverse Slow %K model: NN predicts next period's %K value. If predicted %K < threshold, buy.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-100",
+    "source": "encyclopedia-katz",
+    "topic": "AiStrategy",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Genetic algorithm entries: Evolve rule-based entry templates. Rules like 'If indicator_A > threshold AND indicator_B < threshold THEN buy.' GA searches millions of combinations. Outperforms brute-force optimization. Use large out-of-sample window. Evolved rules must make economic sense, not just fit data.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-101",
+    "source": "encyclopedia-katz",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Standard exit strategy (SES): Fixed money management stop (e.g., 3xATR) + profit target (e.g., 6xATR) + time limit (e.g., 10 bars). This 3-component exit handles all scenarios: small loss on bad trades, reasonable profit on good trades, forced exit on dead trades. Foundation for all exit improvements.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-102",
+    "source": "encyclopedia-katz",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Dynamic ATR-based trailing stop: Exit when price retraces N*ATR from highest high since entry. Start with wider stop (3xATR), tighten as trade matures. Outperforms fixed stops because adapts to volatility. In strong trends, wide stop keeps you in. Best N = 2-4 for daily bars.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-103",
+    "source": "encyclopedia-katz",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Profit target exits: Fixed target (N*ATR or N*risk) captures profits on mean-reverting moves. Testing shows: fixed targets improve win rate but reduce expectancy for trend systems. Best for short-term systems. Trend systems should use trailing stops, not fixed targets.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-104",
+    "source": "encyclopedia-katz",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Time-based exits: Exit after N bars regardless of profit/loss. Surprisingly effective—Donchian trend system with 80-day time exit outperformed breakout exit in tests. Time exit works because it captures trending portion and avoids prolonged consolidation. Best combined with minimum profit threshold.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-105",
+    "source": "encyclopedia-katz",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Random entry test for exits: Use random coin-flip entries to isolate exit strategy performance. An exit that profits from random entries proves the exit itself has edge. SES profited from random entries on S&P 500. This proves exit strategy can be more important than entry.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-106",
+    "source": "trend-following-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Keith Campbell (Campbell & Co): Systematic trend following across 80+ markets since 1972. Uses multiple timeframes and systems. Key principle: 'The system is always right.' When drawdown hits, you don't question the system—you trade through it. Consistency over decades is the edge.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-107",
+    "source": "trend-following-covel",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "David Harding (Winton Capital): $21B+ AUM. Combines trend following with statistical arbitrage. Uses hundreds of systems across multiple timeframes. Key insight: Diversification across systems is as important as across markets. More systems = smoother equity curve. Winton's flagship had Sharpe >1.5 for decades.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-108",
+    "source": "trend-following-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Seykota's Trading Tribe: Process emotions through group sharing. Suppressing trading emotions causes them to sabotage decisions. When you can sit with discomfort of drawdown without flinching, you can follow your system. Emotional mastery > technical mastery.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-109",
+    "source": "trend-following-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Zero-sum nature of markets: For every winner there's a loser. Trend followers profit because most participants are wrong most of the time (they buy tops, sell bottoms). The edge IS human behavioral bias—it's permanent. Trend following extracts money from emotional traders who can't cut losses or ride winners.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-110",
+    "source": "way-turtle-faith",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Game theory for traders: Each trade is independent. Don't think about past wins/losses when sizing next trade. Don't vary position size based on confidence—confidence is unreliable. Use mechanical rules for EVERY decision. Take every signal, manage risk per trade, let edge play out over hundreds of trades.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-111",
+    "source": "way-turtle-faith",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "R-cubed metric (RAR%): Risk-adjusted return = CAGR / (MaxDD x DrawdownDuration). Better than Sharpe for trend followers because accounts for time underwater. A system with 30% return and 30% DD lasting 6 months is better than 40% return with 40% DD lasting 18 months. Optimize for RAR%, not just return.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-112",
+    "source": "way-turtle-faith",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Out-of-sample validation: After developing system on in-sample data, test on unseen data. If in-sample CAGR = 50% but out-of-sample = 15%, system is overfit. Accept if out-of-sample Sharpe > 50% of in-sample. If out-of-sample fails, simplify system—reduce parameters, remove filters, use broader lookback ranges.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-113",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Cross-sectional mean reversion: Short top performers and long bottom performers in same sector. Rebalance weekly/monthly. Works because institutional rebalancing and profit-taking cause relative performance to mean-revert. Market-neutral strategy. Best with 20-50 instruments.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-114",
+    "source": "algo-trading-chan",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Pairs trading execution: When spread widens beyond entry threshold, simultaneously buy underperformer and sell outperformer. Use limit orders near mid-price. If one leg fills but other doesn't, cancel and wait—never hold unhedged position. Monitor cointegration daily—if relationship breaks, exit immediately regardless of P&L.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-115",
+    "source": "algo-trading-chan",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Dark pool and HFT impact on mean reversion: Since 2008, dark pools hide large orders, reducing visible liquidity. HFTs front-run predictable patterns. Mean reversion profits compressed. Adapt by using longer lookbacks and less crowded venues. Consider execution algorithms to minimize market impact.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-116",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Intermarket momentum: Four drivers of stock/futures momentum: (1) Roll returns (contango/backwardation). (2) Forced buying/selling (index rebalancing, margin calls). (3) Herding behavior. (4) Information diffusion. Each driver suggests different strategy timeframes. Combine all four for robust momentum signal.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-117",
+    "source": "algo-trading-chan",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Mean reversion vs momentum regimes: Mean reversion thrives in high, constant volatility (2003-2006). Momentum thrives in trending markets (2007-2012). Combine both in portfolio for all-weather performance. When one underperforms, the other tends to outperform. 50/50 allocation between MR and momentum is robust starting point.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-118",
+    "source": "algo-trading-chan",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Hypothesis testing for backtest significance: (1) Gaussian: SR x sqrt(n) > 2.326 means p < 0.01. (2) Monte Carlo: Generate random price series, run strategy. If <5% produce equal returns, strategy is significant. (3) Randomized trades: Permute entry dates, compare to actual results.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-119",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Degree of curve-fitting: Count parameters (P) and trades (T). If T/P < 20, system is heavily curve-fit. Target T/P > 50 for robust system. System with 5 parameters needs 250+ trades minimum. More trades = more confidence that rules capture real patterns, not noise.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-120",
+    "source": "building-systems-fitschen",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Entry techniques tested: (1) Channel breakout. (2) Moving average crossover. (3) Momentum threshold. (4) Volatility breakout. Testing across 30+ futures showed channel breakouts with ATR filter had best risk-adjusted performance for trend following.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-121",
+    "source": "building-systems-fitschen",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Exit techniques tested: (1) Fixed $ stop. (2) ATR trailing stop. (3) Chandelier exit (highest high - 3xATR). (4) Time-based exit. (5) Profit target. ATR trailing stops (2-3xATR) consistently outperform fixed stops. Chandelier exit excellent for trend following. Profit targets hurt trend system performance.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-122",
+    "source": "building-systems-fitschen",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Filter techniques: (1) ADX filter—only trade when ADX > 25. (2) Volume filter—require above-average volume on entry. (3) Volatility filter—trade when ATR > N-day average. (4) Multi-timeframe filter—daily entry must align with weekly trend direction. All reduce trades but improve quality.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-123",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Highest high/lowest low breakout: Buy when price exceeds highest close of N bars. Sell short when below lowest close of N bars. Close-only variant reduces whipsaws vs high/low variant. 20-bar close-only breakout profitable on 70%+ of markets over 15-year test across 36 futures markets.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-124",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Volatility breakout with ADX filter: Enter when daily range exceeds N*ATR AND ADX > 25. Filters false breakouts in choppy markets. Tested on S&P 500, currencies, bonds: ADX filter improved win rate by 8-12% and reduced max drawdown by 15-20%. Best combination: 1.5xATR breakout + ADX(14) > 25.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-125",
+    "source": "encyclopedia-katz",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Neural network exits: Train NN to predict optimal exit timing based on current trade state (profit, duration, volatility). NN exit outperformed fixed rules on S&P and bonds by 15-25% in risk-adjusted returns. Key: Retrain quarterly. Small network (3-5 hidden nodes) avoids overfitting.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-126",
+    "source": "encyclopedia-katz",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Genetic algorithm exits: Evolve exit rules using same approach as entries. Rules like 'If profit > 2xATR AND RSI > 60 THEN exit.' Evolved exit rules often outperform hand-crafted rules. Key insight: Evolved rules frequently include unusual indicator combinations that capture edge.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-127",
+    "source": "trend-following-covel",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Superfund trading system: Trade 60+ markets with computerized trend following. System identifies emerging trends, enters on breakout, exits when trend exhausts. In volatile periods, system REDUCES position size in non-trending markets. Flexibility to reduce exposure when trends fade while maintaining strong positions.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-128",
+    "source": "trend-following-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "2008 crisis performance: Clarke Capital +82.2% (shorted crude from $140 to $80). John W. Henry +72.4%. TransTrend +71.75%. Drury Capital +56.9%. Mulvaney +45.49% in October alone. Common thread: All trend following, diversified across 40+ markets, mechanical entry/exit. No prediction required.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-129",
+    "source": "trend-following-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Anchoring bias in trading: Investors anchor to purchase price and refuse to sell at loss. Trend followers have no anchor—entry price is irrelevant to exit decision. Exit is determined ONLY by system rules. 'The market doesn't know what price you paid.' Cut losses based on price action, not cost basis.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-130",
+    "source": "way-turtle-faith",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle order execution tricks: Curtis Faith used fake orders to confuse floor traders front-running Turtle positions. Would place fake sell order, causing market to drop, then cancel and buy at lower price. Like bluffing in poker—don't do it often. Occasional deception improved fill quality significantly.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-131",
+    "source": "way-turtle-faith",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Support and resistance explained by behavioral finance: Support exists because traders who missed buying at lows place orders at recent low. Resistance exists because traders who bought at highs want to breakeven. These are psychological levels. Trend breakouts work because overcoming these levels forces capitulation.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-132",
+    "source": "way-turtle-faith",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bollinger breakout system: Buy when price breaks above upper Bollinger Band (20-period, 2 std dev). Sell when price breaks below lower band. Combined with 350/25 EMA trend filter. Tested CAGR 51.8%, MAR 1.52. Higher win rate (54.6%) than pure Donchian breakout (42.2%).",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-133",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Variance Ratio test for mean reversion: VR(k) = Var(k-period returns) / (k x Var(1-period returns)). VR < 1 = mean reverting. VR = 1 = random walk. VR > 1 = trending. Apply to spread of cointegrated pair. If VR(5) = 0.6, spread mean-reverts strongly over 5-day horizon.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-134",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Forced asset flow momentum: Index rebalancing, margin calls, fund redemptions create persistent buying/selling pressure. Stocks added to S&P 500 outperform before inclusion. Leveraged ETF rebalancing creates predictable daily flow. Exploit by front-running known forced flows. Edge: structural, not behavioral.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-135",
+    "source": "algo-trading-chan",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Optimal leverage via Kelly: For futures momentum with SR=0.8, Kelly suggests 2x leverage. In practice, use half-Kelly (1x) because: (1) SR estimate has error. (2) Returns are non-Gaussian (fat tails). (3) Drawdowns at full Kelly are psychologically unbearable. Half-Kelly gives 75% of growth with 50% of drawdown.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-136",
+    "source": "building-systems-fitschen",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Commodity trend system entry: Buy when price exceeds 20-day high AND 5-day MA > 20-day MA AND ATR(14) > ATR(20). Triple filter ensures: breakout (price), trend direction (MA), and volatility expansion (ATR). All three must confirm. Reduces false breakouts by 40% vs simple channel breakout alone.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-137",
+    "source": "building-systems-fitschen",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Leverage calibration: Start with minimum risk per trade (1 contract or 100 shares). After 50+ trades, calculate expectancy. Use Kelly formula: f = W - (1-W)/R. Apply half-Kelly. Adjust position size monthly based on current equity. Never increase size during drawdown—this is ruinous.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-138",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Counter-trend moving average entry: Buy when price crosses below long MA (200-day) and then crosses back above. Catches mean reversion from oversold conditions. Tested: profitable in trending markets, disastrous in bear markets. Requires bear market filter: only take counter-trend buys when 200-day MA is rising.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-139",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Pattern price targets: After 5-wave trend, expect correction to 38.2-61.8% of entire move. After ABC correction, expect new trend to reach 127.2-161.8% extension of correction. Take partial profit at first target, trail rest. Use price targets to set realistic profit expectations.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-140",
+    "source": "high-prob-burns",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "No-excuse trading: Every trade must have: (1) Momentum alignment on dual timeframe. (2) Pattern showing trend or correction. (3) Price at Fibonacci support/resistance. (4) Time target zone reached. (5) Specific entry price and stop. (6) Position size calculated. If any element missing—no trade. Discipline = profits.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-141",
+    "source": "way-turtle-faith",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Donchian Trend with Time Exit: 20-day breakout entry, exit after 80 days (no stops). Tested CAGR 57.2%, MAR 1.31. Higher return than standard Donchian Trend (29.4%). Proves time-based exits can outperform price-based exits for trend systems. Simplest possible system—just entry and time limit.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-142",
+    "source": "algo-trading-chan",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Stop loss debate: Stops are necessary for risk management and leveraged positions. But stops DECREASE returns for mean-reverting strategies because they cut trades before reversion. Use wider stops for mean reversion (3-4 sigma), tighter for momentum (2-3xATR). Match stop width to strategy type.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-143",
+    "source": "complete-turtle-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle entry filtering: S1 filter skips breakout if last S1 trade was profitable. Rationale: Profitable trades suggest range-bound market, so next breakout likely false. But if last trade lost 2N+, take the breakout—market may be trending. If skip triggers S2 (55-day), take S2—never miss a big trend.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-144",
+    "source": "complete-turtle-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle portfolio correlation limits: Max 10 units in highly correlated markets (e.g., all USD pairs). Max 12 units in single sector (e.g., all energies). Max 6 units in single market. Max 20 units total. These limits force diversification—no single event can blow up the portfolio.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-145",
+    "source": "trend-following-covel",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Regime detection via price action: Trend followers don't predict regimes—they react to price. When price makes new 55-day high, trend is UP. When new 55-day low, trend is DOWN. When price oscillates in range, no trend. System automatically adapts: big positions in trending markets, small/no positions in chop.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-146",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Johansen test for cointegration: Tests for cointegrating relationships among N > 2 instruments simultaneously. Unlike CADF (pairs), Johansen finds optimal portfolio weights for mean-reverting basket. Returns eigenvectors showing optimal hedge ratios. Use when trading ETF triplets or sector baskets.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-147",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Momentum crash risk: Momentum strategies have negative skew—work most of the time but crash violently during reversals (March 2009). During crashes, correlations spike and diversification fails. Mitigate by: (1) Cross-sectional momentum. (2) Reduce leverage during high VIX. (3) Add mean-reversion overlay.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-148",
+    "source": "trend-following-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Prospect theory in trading (Kahneman): People feel losses 2.5x more than equivalent gains. This causes: (1) Holding losers too long. (2) Selling winners too early. Trend following exploits both: cuts losses mechanically and rides winners. The system IS the edge over human nature.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-149",
+    "source": "trend-following-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Jesse Livermore's trend following: 'When I see by my records that an upward trend is in progress, I become a buyer as soon as a stock makes a new high on its movement, after having had a normal reaction.' Same for shorts. Livermore used price records (manual Donchian channels) in early 1900s.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-150",
+    "source": "way-turtle-faith",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Random effects quantified: 100 tests of random entry + trend filter: Best test 53.3% CAGR, worst 17.5%. Average 32.5%. A lucky average trader can have 10-year track record indistinguishable from skilled trader. Minimum 15-year track record needed to confidently assess skill vs luck.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-151",
+    "source": "algo-trading-chan",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Integrated Development Environment for traders: Use platforms that seamlessly switch from backtesting to live trading. Deltix, QuantHouse for institutional. MATLAB/R/Python for research + broker API for execution. Key: same code runs in backtest and live. Eliminates implementation gap.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-152",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Well-chosen example fallacy: Any system can find spectacular examples in hindsight. Don't judge by best trades—judge by equity curve over entire test period. Red flag: cherry-picked trades. Green flag: complete trade-by-trade report with all wins AND losses. Equity curve tells the truth.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-153",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trend-following vs counter-trend comparison: Tested across 36 futures markets over 15 years. Trend-following entries profitable on 65% of markets. Counter-trend entries profitable on only 45%. Trend-following has higher win rate AND higher average win. Always trade with the trend.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-154",
+    "source": "encyclopedia-katz",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Chandelier exit: Hang trailing stop N*ATR below highest high since entry. Standard: 3*ATR(22). Testing shows 3xATR optimal for daily trend systems. Adapts to volatility, keeps you in big moves, exits before major reversals. Better than fixed-percentage stops for trend following.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-155",
+    "source": "trend-following-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Process vs outcome thinking: A good trade can lose money. A bad trade can make money. Judge trades by whether you FOLLOWED YOUR SYSTEM, not by P&L. Dennis taught: 'The goal is to make money, but the process is to follow rules.' If you follow rules and lose, it's a good trade.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-156",
+    "source": "algo-trading-chan",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Primary vs consolidated quotes: Stocks trade on 10+ venues. Consolidated close may differ from primary exchange close. For MOO/MOC orders, route to primary exchange. Backtesting with consolidated prices inflates mean-reversion returns. Use primary exchange data for accuracy.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-157",
+    "source": "algo-trading-chan",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Survivorship bias in stock databases: If data excludes delisted stocks, buy-low strategies look amazing because you only buy survivors. Fix: Use survivorship-bias-free data (csidata.com, CRSP). Or limit backtest to recent 3 years. Survivorship bias inflates long-only mean reversion returns by 5-15% annually.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-158",
+    "source": "algo-trading-chan",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Futures continuous contract pitfall: Back-adjusting prices makes P&L correct but returns incorrect, or vice versa. Choose based on strategy: P&L adjustment for spread strategies, return adjustment for ratio strategies. Prices may go negative with P&L adjustment—add constant to prevent.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-159",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Greater in time and price guideline: Each successive wave in a trend should be greater in both time and price than the previous. If wave 5 is shorter than wave 3 in both dimensions, trend is exhausting. When waves start contracting = momentum loss = prepare for reversal. Use for timing exits.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-160",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Dual time frame momentum rules: (1) Identify momentum indicator. (2) Apply to TWO timeframes (daily + 3x daily). (3) Both must show reversal for signal. (4) Trade only in direction of higher timeframe momentum. (5) Execute on lower timeframe signal. (6) Stop beyond signal bar extreme.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-161",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Verification process: After developing system, run on completely out-of-sample data NEVER seen during development. Not walk-forward—completely separate dataset. If performance degrades >50%, system is curve-fit. Simplify and test again. Verification is non-negotiable.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-162",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Signal line oscillator model: Buy when fast line crosses above slow line in oversold zone. Sell when fast crosses below slow in overbought zone. MACD signal line crossover is most popular variant. Tested on 36 futures: profitable but high whipsaw. Add trend filter (200-day MA direction) and volatility filter.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-163",
+    "source": "algo-trading-chan",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Order flow strategies: Monitor real-time order book depth and trade flow. Buy when aggressive buying exceeds selling. Banks' forex order flow is proprietary edge. For retail: use volume-weighted price action as proxy. Order flow leads price by seconds to minutes.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-164",
+    "source": "trend-following-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Compound growth math: $1M at 20% annual for 20 years = $38.3M. At 25% = $86.7M. At 30% = $190M. Small differences compound enormously. This is why Parker's 'boring' 15-20% built $770M+. The goal isn't maximum return—it's maximum sustainable compound growth with tolerable drawdowns.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-165",
+    "source": "complete-turtle-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle allocation methodology: Dennis allocated different account sizes based on performance. Curtis Faith received largest allocation ($31M+). Key lesson: Larger allocation + same system = dramatically different results. Position sizing across portfolio matters as much as the trading system itself.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-166",
+    "source": "way-turtle-faith",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trading is a game of probabilities. Individual trades are meaningless—need 100+ trades for edge to manifest. Like a casino: lose individual hands but win over thousands. Don't evaluate on last 10 trades. Faith made $78K in training while other Turtles made $25K—same system, different execution psychology.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-167",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Futures intermarket spread trading: Trade spread between related futures (crack spread = heating oil + gasoline - crude oil). Use cointegration to verify relationship. Enter when spread deviates >2 sigma from mean. Requires settlement prices from same time. Different closing times between exchanges need intraday data.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-168",
+    "source": "algo-trading-chan",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Short-sale constraints: After Lehman collapse, many stocks became hard or impossible to borrow. SEC banned shorting financial stocks. Your backtest must account for historical shortability. Small caps much harder to borrow. Even SPY was hard to borrow post-Lehman. Use uptick rule simulation in backtests.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-169",
+    "source": "building-systems-fitschen",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Flat time metric: Longest period between new equity highs. Top CTAs: 12-18 months flat time. If backtest shows 24+ months, system may be untradeable psychologically. Solution: Combine with uncorrelated strategy to reduce flat time. Two systems with 12-month flat individually may have 6-month combined.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-170",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Complete mechanical system requirements: (1) Entry rules specifying when, how, and at what price. (2) Exit rules for losses (money management stop). (3) Exit rules for profits (trailing stop, target, time limit). Without ALL THREE, system is incomplete. Exits are more important than entries for profitability.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-171",
+    "source": "trend-following-covel",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "When everyone panics, trend followers profit. 2008: buy-and-hold lost 50%+. Trend followers made 30-80%. 1998 LTCM crisis: trend followers up while Nobel laureates lost billions. The herd is always wrong at extremes. Trend following systematically fades the herd by following price, not opinion.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-172",
+    "source": "way-turtle-faith",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Position sizing IS the strategy. Same entry/exit rules with different position sizing produce wildly different results. Kelly criterion determines optimal growth. 1% risk per trade = survival. 2% = aggressive. 0.5% = conservative. The entry determines direction, position sizing determines whether you survive to profit.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-173",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Mean reversion half-life calculation: Regress dy on y(t-1): dy = lambda*y(t-1) + e. Half-life = -ln(2)/lambda. If half-life = 10 days, expect spread to revert halfway within 10 days. Don't trade if half-life > 60 days (too slow) or < 1 day (too noisy). Sweet spot: 3-20 days.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-174",
+    "source": "high-prob-burns",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trade management sequence: (1) Enter at signal with predefined stop. (2) At 1:1 R/R, move stop to breakeven on half. (3) At next Fib target, take profit on 1/3. (4) Trail remainder with 2-bar reversal. (5) Exit final when momentum reverses on higher timeframe. Never let a winner become a loser.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-175",
+    "source": "building-systems-fitschen",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Stock scalping system: Entry when price drops to support with oversold RSI (<20) and bounces. Stop: Below support by 1 ATR. Target: Next resistance or 2xATR. Time limit: Exit by close if target not reached. Win rate: 65%+. Profit/loss ratio: 1.5:1. High frequency, small profits, tight risk control.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-176",
+    "source": "encyclopedia-katz",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Optimization success formula: (1) Large, representative sample (10+ years, 30+ markets). (2) Few rules and parameters (3-5 max). (3) Verification on out-of-sample data. (4) Walk-forward validation. If 'best' parameter is at extreme of tested range, likely overfit. Robust optimum is in middle of flat performance region.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-177",
+    "source": "trend-following-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bill Dunn's system details: 100% computerized signals. Diversified across 60+ global markets. Average holding period 3-6 months. Historical max drawdown ~50% but recovered every time. Annual compound return ~20% over 30+ years. Survived every crash by following price signals without exception.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-178",
+    "source": "way-turtle-faith",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bollinger Channel Breakout: Uses Bollinger Bands instead of Donchian channels. Entry when price exceeds upper/lower band. Tested CAGR 51.8%, MAR 1.52, win rate 54.6%. Outperformed Donchian CBO (49.5%, 1.24, 42.2%). Bollinger adapts to volatility—tighter in calm, wider in volatile.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-179",
+    "source": "algo-trading-chan",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "Volatility regime detection: Use VIX level or ATR ratio. VIX < 15 = low vol (favor mean reversion). VIX > 25 = high vol (favor momentum, reduce size). VIX > 40 = crisis (reduce all exposure). Dynamically adjust strategy allocation and leverage based on current volatility regime.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-180",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "In-sample vs out-of-sample reality: Expect 30-50% performance degradation from backtest to live trading. Causes: slippage, commissions, market impact, regime changes. If backtest shows 40% CAGR, expect 20-28% live. Build this expectation into risk management plan from the start.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-181",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Order types for entries: (1) Market order—guaranteed fill, uncertain price. (2) Stop order—confirms breakout but may get poor fill. (3) Limit order—better price but may miss trade. For trend entries: use stop orders to confirm breakout. For mean reversion: use limit orders at target. Never use market orders.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-182",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Leading vs lagging indicators: All standard indicators (RSI, MACD, MA) are lagging. Leading indicators (Fibonacci price/time targets, pattern completion) show what's likely to happen. Use lagging for trade direction filter, leading for entry timing. Most traders use only lagging and miss reversal zones entirely.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-183",
+    "source": "algo-trading-chan",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Execution algorithms: VWAP for large orders—splits order to match volume profile. TWAP for even distribution. Implementation shortfall—minimizes difference between decision price and fill price. For retail: use limit orders near mid-price, avoid market open/close when spreads are widest.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-184",
+    "source": "way-turtle-faith",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Cognitive biases that destroy traders: (1) Anchoring—fixating on entry price. (2) Loss aversion—holding losers too long. (3) Recency bias—weighting recent trades too heavily. (4) Confirmation bias. (5) Overconfidence—increasing size after wins. Systematic trading eliminates ALL by replacing judgment with rules.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-185",
+    "source": "trend-following-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Chaos theory application: Markets are nonlinear dynamic systems. Small changes in initial conditions lead to vastly different outcomes. This means: (1) Prediction is impossible beyond short timeframes. (2) Simple rules outperform complex models. (3) Trend following works because it doesn't predict—it reacts to what IS.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-186",
+    "source": "complete-turtle-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Dennis's screening test: 63 true/false questions + 11 short answers. Selected people who could think independently, were comfortable with risk, had intellectual curiosity, and could handle losing. NOT selected: people who needed certainty or were emotionally reactive. Trading success starts with personality.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-187",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Time series vs cross-sectional momentum: Time series: Buy/sell based on own past return. Cross-sectional: Rank all instruments, buy winners, sell losers. Time series has higher Sharpe but bigger drawdowns. Cross-sectional is market-neutral but smaller returns. Combine both for all-weather momentum portfolio.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-188",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ABC correction pattern: Wave A drops, wave B retraces 38.2-78.6% of A, wave C extends to 100-161.8% of A. When C reaches target zone AND momentum diverges = correction complete. Enter in direction of larger trend at C completion. Stop below C extreme. Most common correction pattern across all markets.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-189",
+    "source": "building-systems-fitschen",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Combined stock + commodity portfolio: Stock scalping (short-term, mean reversion) + commodity trend following (medium-term, momentum). Correlation ~0.15. Combined: 23-37% annual, 6-13% max DD. Diversification across strategy types reduces risk more than diversification across markets within same strategy.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-190",
+    "source": "encyclopedia-katz",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Simulator requirements: (1) Accurate fill simulation with realistic slippage. (2) Commission modeling. (3) Portfolio-level testing. (4) Walk-forward optimization. (5) Monte Carlo simulation. (6) Statistical significance testing. (7) Trade-by-trade analysis. Don't trust backtests from simple charting software.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-191",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Currency pair mean reversion: AUD/NZD, EUR/CHF, USD/CAD show strongest mean reversion. Use CADF test to verify cointegration. Half-life typically 5-15 days. Beware: Central bank interventions can break cointegration temporarily. Always monitor for regime changes in monetary policy.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-192",
+    "source": "way-turtle-faith",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MAR ratio = CAGR / Max Drawdown. Best metric for trend followers. Top Turtle systems: MAR 0.8-1.8. Dual MA system: 1.82. Bollinger CBO: 1.52. Target MAR > 1.0 for tradeable system. MAR < 0.5 means too much risk for return. Optimize for MAR, not just return.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-193",
+    "source": "trend-following-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Occam's Razor for trading: Simplest system that works is best. Donchian 20/10 channel breakout captures 60-80% of major trends with just 2 rules. Adding complexity often degrades performance. 'Everything should be made as simple as possible, but not simpler.' Simple systems survive regime changes.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-194",
+    "source": "algo-trading-chan",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Kalman filter implementation for pairs: State = hedge ratio. Observation = price ratio. Filter dynamically updates hedge ratio each period. When z-score exceeds threshold, enter. Exit at z=0. Superior to static hedge because relationship between instruments drifts. Handles structural breaks gracefully.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-195",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bar-scoring methodology: Score each bar 0-100 based on: trend alignment (30%), momentum (25%), volatility (20%), volume (15%), pattern (10%). Only enter when score > 70. Multi-factor approach outperforms single-indicator entries by 15-25% in risk-adjusted returns across tested portfolios.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-196",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Equalization of dollar volatility: Before testing across instruments, normalize positions so equal dollar volatility per market. Use ATR: Position size = $Risk / (ATR x point value). Without normalization, one volatile market dominates portfolio performance. Essential for multi-market systems.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-197",
+    "source": "trend-following-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Never average losers. 'Losers average losers'—Paul Tudor Jones. When trade goes against you, exit per system rules. Adding to losing position doubles risk on a trade already proven wrong. Trend following NEVER adds to losers—only to winners via pyramiding. This single rule prevents account destruction.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-198",
+    "source": "complete-turtle-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Turtle stop loss: 2N (2 x ATR) from entry price. If N (ATR) = $2, stop is $4 from entry. For corn at $250 with ATR $3.50: stop at $243 (2x$3.50=$7). Never move stop further from entry—only closer. After adding second pyramid unit, move first unit's stop to breakeven.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-199",
+    "source": "algo-trading-chan",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Data snooping bias is the silent killer. Every parameter you optimize extracts information from data. With enough parameters, ANY strategy looks profitable in-sample. Rule: Keep parameters <= 5. Use walk-forward test. If you optimize 100 strategies on same data, best one is almost certainly overfit.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-200",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Complex corrections (WXY, triangles): When simple ABC fails to reach target, market forms complex corrections—combinations of ABC patterns. WXY = double three (two ABC connected by X wave). Triangles = 5-wave sideways (ABCDE). Complex corrections retrace same as simple (38.2-78.6%) but take longer.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-201",
+    "source": "building-systems-fitschen",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Know your max drawdown tolerance BEFORE trading. Most traders overestimate tolerance. If you've never experienced 20% drawdown, target 10% max DD. Psychological damage of drawdowns is non-linear—20% DD feels more than twice as bad as 10%. Start conservative, increase risk only after surviving first drawdown cycle.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-202",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Moving average lag reduction: EMA reduces lag vs SMA. Weighted MA further reduces. Adaptive MA (Kaufman) adjusts smoothing based on efficiency ratio. For trend following: EMA(20) for entries, SMA(200) for trend filter. Don't over-optimize MA length—20/50/200 work across most markets and timeframes.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-203",
+    "source": "algo-trading-chan",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Strategy performance mean-reverts: A strategy with great recent returns will likely underperform going forward. Don't increase allocation to recent winners or abandon recent losers. Equal-weight across strategies is robust. If a strategy's Sharpe has been 2.0 for 3 years, expect it to drop to 1.0-1.5.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-204",
+    "source": "way-turtle-faith",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The paradox of stops: Adding stops to trend systems IMPROVES psychology (feels safer) but WORSENS performance (cuts winning trades). For MA-based systems, NO stop configuration beat no-stop on ANY metric. For breakout systems, wide stops (4+ ATR) perform nearly as well as no stops. Use stops for psychology, not optimization.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-205",
+    "source": "trend-following-covel",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trading system development: Don't look for 'the' system. Look for ANY system with positive expectancy that you can follow. The system itself contributes maybe 20% to success. Position sizing contributes 30%. Psychology contributes 50%. A mediocre system traded with discipline beats a great system traded emotionally.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-206",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "ETF triplet arbitrage: Trade cointegrated baskets of 3 ETFs (e.g., EEM vs EWJ + EFA). Use Johansen test for optimal weights. Enter when basket z-score exceeds +/-2. Advantage: more stable cointegrating relationship than pairs. Disadvantage: higher costs, more complex execution. Rebalance weights monthly.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-207",
+    "source": "high-prob-burns",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trade only optimum setups: Rank signals by confluence score (momentum alignment + pattern completion + price target proximity + time target zone). Trade only top 20% of signals. Dramatically improves win rate and R/R ratio. Better to miss trades than take low-quality setups.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-208",
+    "source": "building-systems-fitschen",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Large account commodity trend following: Portfolio of 20-30 commodity markets. Same parameters across all markets. Enter on 20-day breakout with ATR filter. Trail with Chandelier exit (3xATR). Rebalance weekly based on current ATR. Target 20-25% annual with 15-20% max DD.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-209",
+    "source": "encyclopedia-katz",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Volatility-based stops: ATR stop outperforms fixed-point and fixed-percentage stops across all tested markets. ATR adapts to current conditions. In high-volatility, wider stops prevent whipsaw. In low-volatility, tighter stops lock in profits. Use 2-4xATR for daily systems. Below 2x = too tight, above 4x = too loose.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-210",
+    "source": "algo-trading-chan",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "When NOT to backtest: (1) SR=0.3 with 2yr drawdown—not worth pain. (2) Long-only underperforming buy-and-hold. (3) Low-priced stock strategy without survivorship-bias-free data. (4) Neural net with 100+ nodes—guaranteed overfit. (5) HFT strategy—can't realistically backtest order book dynamics.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-211",
+    "source": "trend-following-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The 'always new coming storm': Every crisis is presented as unprecedented. But trend following profited in ALL of them because price trends happen the same way every time—human behavior doesn't change. The system doesn't care about the narrative—only price.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-212",
+    "source": "way-turtle-faith",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ATR calculation: True Range = max(High-Low, |High-PrevClose|, |Low-PrevClose|). ATR = N-period moving average of True Range. Use 20-period ATR for position sizing and stops. ATR measures volatility in absolute terms. Normalizing risk by ATR ensures equal risk per position across all markets.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-213",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Linear mean reversion model: Hedge ratio = slope of regression of Y on X. Spread = Y - beta*X. Trade when spread > entry threshold, exit at mean. Use rolling window (60-252 days) for regression. Kalman filter version automatically adapts window size. Start with 60-day rolling for most pairs.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-214",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Momentum indicator selection: MACD histogram for trend direction. RSI(14) for overbought/oversold. Stochastic(14,3,3) for reversal timing. For dual timeframe: Use same indicator on both timeframes. MACD histogram zero-line cross on daily + weekly MACD rising = high-probability long entry.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-215",
+    "source": "building-systems-fitschen",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Commodity trend system filter: ADX(14) > 25 AND price above/below 50-day MA AND volume > 20-day average. Triple filter reduces false breakouts by 50%. Trade count drops from ~200/yr to ~80/yr, but win rate improves from 38% to 48% and average win increases. Better risk-adjusted returns with fewer trades.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-216",
+    "source": "encyclopedia-katz",
+    "topic": "AiStrategy",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Genetic algorithm rule evolution: Define rule templates (IF indicator_A > threshold_1 AND indicator_B < threshold_2 THEN buy). Evolve population over generations using fitness function. Crossover combines parent rules, mutation varies thresholds. After 100+ generations, profitable rule sets emerge. Validate on out-of-sample.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-217",
+    "source": "trend-following-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Multiple system approach: Use 3-5 different trend following systems simultaneously (20-day breakout, 55-day breakout, dual MA, Bollinger breakout, ATR channel). Equal-weight across systems. Systems are uncorrelated even on same instruments. Combined equity curve is much smoother. Diversification of methods.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-218",
+    "source": "way-turtle-faith",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Overfitting diagnosis: If system has >5-7 parameters, likely overfit. If optimal parameter is at extreme edge of tested range, likely overfit. If adding one rule improves backtest dramatically, likely overfit. If system only works on one instrument, likely overfit. Robust systems work across many instruments with broad parameter ranges.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-219",
+    "source": "complete-turtle-covel",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Dennis's account allocation: Distributed capital based on performance. Best performer got largest allocation (Curtis Faith: $31M+). Average performer got $2M. This compounds differences—good trader with more capital generates exponentially more. Your best strategy should get most capital, not equal-weight.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-220",
+    "source": "algo-trading-chan",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Risk indicators for strategy monitoring: Track daily Sharpe ratio (rolling 6-month). If SR drops below 0.5 for 3+ months, investigate. Track hit rate, average R-multiple. If any metric deviates >2 sigma from expected, reduce position size or halt trading. Don't wait for drawdown to diagnose problems.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-221",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Fibonacci alternate price projections: 127.2%, 161.8%, 200%, 261.8% extensions of prior swing. Used to identify WHERE correction or trend will end. Multiple projections converging in tight zone = high probability target. Entry at confluence zone with momentum reversal confirmation.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-222",
+    "source": "building-systems-fitschen",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Risk/reward goal setting: Based on top 20 CTA data: Average return 27.98%, average max DD 24.46%. Ratio ~1.14:1. Realistic target: Annual return = max DD. If you can't tolerate >15% DD, target 15% return. Set DD limit first, then dial in return with leverage.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-223",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Breakout entry order selection: Use stop orders (buy stop above current price) to enter on breakout. This confirms price is actually moving in breakout direction. Limit orders may get filled in false breakout. Stop order slippage is acceptable cost for confirmation. Place stops at breakout level + slippage buffer.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-224",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Four drivers of stock momentum: (1) Institutional herding. (2) Information diffusion—slow incorporation of news. (3) Forced selling—margin calls create post-crash momentum. (4) Behavioral biases—anchoring, disposition effect. All four are structural—they persist because of how markets are organized.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-225",
+    "source": "way-turtle-faith",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The myth of 'entries don't matter': Faith tested by using time-based exits (80 days) with Donchian breakout entries: 57.2% CAGR. Same system with random entries: 32.5% CAGR. Entries DO matter—they add 25% CAGR above random. But exits also matter: better exits improved returns by another 10-15%.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-226",
+    "source": "trend-following-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Managed futures as portfolio insurance: Allocating 20% to trend following improved traditional 60/40 portfolio returns while REDUCING max drawdown. Near-zero long-term correlation to stocks. During stock crashes (2000-02, 2008), managed futures were positive. The only strategy that's truly crisis-positive.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-227",
+    "source": "algo-trading-chan",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "When NOT to backtest: Strategy with SR=0.3 and 2yr drawdown duration is not worth pursuing. Long-only strategy that underperforms buy-and-hold benchmark is pointless. Low-priced stock strategy without survivorship-bias-free data is dangerous. Neural net with 100+ nodes is guaranteed overfit.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-228",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Fibonacci alternate price projections for targets: 127.2%, 161.8%, 200%, 261.8% extensions of prior swing. Used to identify WHERE correction or trend will end. Multiple projections converging in tight zone = high probability target. Entry at confluence with momentum reversal confirmation. Most powerful combined with time projections.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-229",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "In-sample vs out-of-sample reality: Expect 30-50% degradation from backtest to live. Causes: slippage, commissions, market impact, regime changes. If backtest shows 40% CAGR, expect 20-28% live. Build this expectation into risk plan from start. Under-promise, over-deliver to investors.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-230",
+    "source": "encyclopedia-katz",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Standard exit strategy improvement path: Start with SES (3-part: stop + target + time). Test fixed stop vs ATR stop. Test trailing vs fixed target. Test different time limits. Each improvement should show statistical significance on out-of-sample data. Never add complexity unless it demonstrably improves risk-adjusted returns.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-231",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Momentum strategy regime awareness: Momentum performed poorly 2007-2012 (mean-reverting regime). Before 2007 and after 2012, momentum was strong. Don't abandon a working strategy during temporary drawdown—but do reduce allocation during regime shifts. Monitor rolling Sharpe to detect regime changes early.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-232",
+    "source": "way-turtle-faith",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "R-cubed metric: RAR% = CAGR / (MaxDD x DrawdownMonths). Better than Sharpe for trend followers. A system with 30% return, 30% DD lasting 6 months (RAR=0.17) is better than 40% return, 40% DD lasting 18 months (RAR=0.06). Optimize for RAR% to minimize total pain per unit of gain.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-233",
+    "source": "trend-following-covel",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Salem Abraham's approach: Traded 50+ markets systematically using modified Turtle rules. In 2008, fund was positive while S&P crashed -37%. Diversification across markets and timeframes smooths returns. Key insight: 'You can't predict, but you can prepare.' Mechanical execution eliminates panic during crises.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-234",
+    "source": "complete-turtle-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Dennis's teaching was 'beyond my wildest imagination.' Most profitable trades required sitting through massive drawdowns. Turtles who couldn't handle giving back open profits failed. Key: Separate P&L from process. Check results weekly at most. Daily P&L watching destroys discipline and causes premature exits.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-235",
+    "source": "algo-trading-chan",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Walk-forward testing protocol: Divide data into 10 segments. Optimize on segments 1-7, test on 8. Re-optimize on 1-8, test on 9. Re-optimize on 1-9, test on 10. Average out-of-sample performance = realistic expectation. If OOS degrades >50% vs IS, system is overfit. This is the gold standard for system validation.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-236",
+    "source": "building-systems-fitschen",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Small account survival rules: (1) Trade minimum size always. (2) Risk <=2% per trade. (3) Can't use optimal f—risk of ruin too high. (4) Focus on survival first, growth second. (5) Add size only after 50%+ account growth. (6) Margin call = game over. Small accounts need conservative sizing.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-237",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Breakout model types tested: (1) Close-only channel breakout. (2) Highest high/lowest low breakout. (3) Volatility breakout. (4) Combined channel + volatility. Testing 36 markets over 15 years: All profitable. Close-only had fewest whipsaws. Volatility breakout had best risk-adjusted returns. Combined was most robust across market types.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-238",
+    "source": "high-prob-burns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Wave 5 completion signals: (1) Wave 5 reaches 61.8-100% extension of waves 1-3. (2) Momentum shows divergence (price new high, indicator lower high). (3) Time target zone reached. (4) Volume declining on wave 5 vs wave 3. When all four align = trend ending. Take profits, tighten stops, prepare for reversal.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-239",
+    "source": "algo-trading-chan",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Pairs trading execution detail: When z-score exceeds +2, short spread (short Y, long X in hedge ratio). When z-score drops below -2, long spread. Exit at z=0. If one leg fills but other doesn't, cancel unfilled order and wait. Never hold unhedged. Monitor cointegration rolling—if breaks, exit immediately.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-240",
+    "source": "trend-following-covel",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Seykota's key insight: 'Win or lose, everybody gets what they want out of the market. Some people seem to like to lose, so they win by losing money.' Traders who sabotage their systems are getting psychological needs met (being right, excitement, victimhood). Identify what you REALLY want from trading.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-241",
+    "source": "way-turtle-faith",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "System comparison 1996-2006: ATR CBO 49.5% CAGR, Bollinger CBO 51.8%, Donchian Trend 29.4%, Donchian Time 57.2%, Dual MA 57.8%, Triple MA 48.1%. Bollinger CBO had best MAR (1.52). Dual MA had best Sharpe (1.55). Donchian Trend had most trades (1832) but lowest performance—trader effects eroded breakout edge.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-242",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Trading maxims backed by testing: 'Cut losses short' = TRUE, systems with tighter stops have better risk-adjusted returns. 'Let winners run' = TRUE, trailing stops outperform fixed targets. 'Always use stops' = SURPRISINGLY FALSE for some trend systems—no-stop versions of MA systems outperformed all stop variants.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-243",
+    "source": "encyclopedia-katz",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Neural exit component: Train neural network to predict when to exit based on trade state (current profit, trade duration, current volatility, market regime). NN exit outperformed fixed ATR stop by 15-25% on risk-adjusted basis. Retrain quarterly as market conditions change. Small network (3-5 nodes) prevents overfitting.",
+    "priority": 3
+  },
+  {
+    "id": "book-algo-244",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Momentum is one of the most robust anomalies in finance. Four drivers make it persistent: institutional herding, slow information diffusion, forced selling, behavioral biases. All are structural—not statistical artifacts. Momentum works across stocks, bonds, currencies, commodities, and has for 200+ years.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-245",
+    "source": "high-prob-burns",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trade only the high probability setups: Not every signal is equal. Rank by confluence: momentum alignment + pattern completion + price target proximity + time target zone. Trade only top 20% of signals. This improves win rate, R/R ratio, and psychological sustainability. Quality over quantity.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-246",
+    "source": "building-systems-fitschen",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Curve-fitting prevention: (1) Develop on multiple instruments simultaneously. (2) Target T/P ratio > 50 (trades per parameter). (3) Use walk-forward validation. (4) Verify on completely unseen data. (5) Keep parameters <= 5. (6) If adding one rule dramatically improves results, suspect overfitting. Simplicity = robustness.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-247",
+    "source": "encyclopedia-katz",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Moving average trend-following model comparison: Simple MA crossover profitable but slow. EMA crossover faster but more whipsaws. Adaptive MA (Kaufman) best of all—adjusts smoothing to market efficiency. All MA systems have drawdown during choppy markets. Use trend filter (ADX > 25) to reduce false signals in ranging conditions.",
+    "priority": 4
+  },
+  {
+    "id": "book-algo-248",
+    "source": "algo-trading-chan",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Mean reversion detection toolkit: (1) ADF test for stationarity. (2) Hurst exponent (H < 0.5 = MR). (3) Variance Ratio (VR < 1 = MR). (4) Half-life calculation. (5) CADF test for cointegration. (6) Johansen test for basket cointegration. Use ALL tests—if 4+ confirm mean reversion, edge is robust.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-249",
+    "source": "way-turtle-faith",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Position sizing is the strategy. Same entry/exit rules with different position sizing produce wildly different results. Kelly criterion determines optimal growth rate. 1% risk/trade = survival. 2% = aggressive growth. 0.5% = conservative. Entry determines direction, position sizing determines whether you survive to see profits compound.",
+    "priority": 5
+  },
+  {
+    "id": "book-algo-250",
+    "source": "trend-following-covel",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trend following edge persists because: (1) Human behavioral biases are permanent—loss aversion, herding, anchoring. (2) Markets periodically trend due to fundamental shifts. (3) Most traders can't sit through drawdowns. (4) The strategy is psychologically difficult to execute. Difficulty of execution IS the moat that protects the edge.",
+    "priority": 5
+  }
+]

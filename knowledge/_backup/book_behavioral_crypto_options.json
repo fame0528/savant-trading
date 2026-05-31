@@ -1,0 +1,3061 @@
+[
+  {
+    "id": "book-bco-001",
+    "source": "crypto-trading-101",
+    "topic": "Execution",
+    "conditions": [
+      "AltSeason",
+      "BtcDominant",
+      "HalvingProximity",
+      "FundingRateExtreme"
+    ],
+    "content": "CRYPTO ORDER TYPES: Market orders fill instantly at best available price—use for urgent entries/exits. Limit orders set exact price—use for planned entries at support/resistance. Stop-limit orders trigger a limit order when stop price hits—essential for automated risk management. Always use stop-losses on every position. In high-volatility crypto, slippage on market orders can be 1-3% on low-cap alts.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-002",
+    "source": "crypto-trading-101",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "content": "CRYPTO RISK RULE #1: Only invest what you can afford to lose entirely. Plan on losing any money you invest—consider gains a bonus. Never borrow money or use credit cards/loans to buy crypto. Never invest someone else's money. Crypto can lose 80%+ in weeks. If you lose borrowed money, you lose the relationship AND face debt with interest.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-003",
+    "source": "crypto-trading-101",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason",
+      "BreakingNews"
+    ],
+    "content": "CRYPTO SCAM AWARENESS: If it sounds too good to be true, it is. Anyone promising free bitcoin or guaranteed returns is scamming. Verify ALL URLs character-by-character—scammers create lookalike domains (blttrex.com vs bittrex.com). Never use Google to navigate to exchanges—type URLs directly or use bookmarks. Phishing is the #1 cause of crypto loss.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-004",
+    "source": "crypto-trading-101",
+    "topic": "RiskManagement",
+    "conditions": [
+      "AltSeason",
+      "BtcDominant"
+    ],
+    "content": "BTC-DENOMINATED THINKING: When trading altcoins, your profit in satoshis matters more than USD value. Most alts are traded against BTC pairs—if your alt rises in USD but falls vs BTC, it was a bad trade because those satoshis could have bought more BTC directly. Always measure alt performance in satoshi terms, not just USD.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-005",
+    "source": "crypto-trading-101",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "BtcDominant",
+      "HalvingProximity"
+    ],
+    "content": "BTC CORRELATION CASCADE: Most cryptocurrencies are tied to Bitcoin's value. If BTC plummets, nearly all altcoins follow with amplified downside. When you trade altcoins, you're essentially making a leveraged bet on BTC direction plus idiosyncratic alt risk. Monitor BTC dominance index—if rising, alts underperform; if falling, alt season begins.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-006",
+    "source": "crypto-trading-101",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed",
+      "BreakingNews"
+    ],
+    "content": "CRYPTO BUBBLE vs NETWORK EFFECT: Sharp crypto gains resemble tech bubbles but differ fundamentally—Bitcoin isn't a company that can lose profitability. The network effect means value grows as adoption increases. However, protocol-level failures CAN collapse price. Don't confuse network-effect growth with speculative bubbles, but don't ignore protocol risk either.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-007",
+    "source": "crypto-trading-101",
+    "topic": "Execution",
+    "conditions": [
+      "AltSeason",
+      "BtcDominant"
+    ],
+    "content": "CRYPTO WALLET SECURITY HIERARCHY: Hardware wallets (Ledger/Trezor) = most secure for long-term holds. Paper wallets = secure if generated offline properly. Desktop wallets = good security, full control. Mobile wallets = convenient for small spending amounts. Online/exchange wallets = highest risk, use only for active trading capital. Never store large amounts on exchanges.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-008",
+    "source": "crypto-trading-101",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "CRYPTO DIP PSYCHOLOGY: Bitcoin periodically dips then recovers to new ATHs. The pattern trains HODLers to buy dips—but each cycle conditions more complacency. Eventually a dip doesn't recover for years (2018, 2022). Track on-chain metrics like MVRV and SOPR to distinguish healthy corrections from bear market onsets. Don't blindly BTFD without data.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-009",
+    "source": "crypto-trading-101",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen",
+      "LiquidityExpansion"
+    ],
+    "content": "DOLLAR-COST AVERAGING IN CRYPTO: Allocate fixed USD amounts weekly/monthly regardless of price. This smooths entry volatility inherent in 24/7 crypto markets. Use exchange recurring buy features where available. DCA removes timing risk but doesn't eliminate directional risk—only invest amounts you can hold through 80%+ drawdowns.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-010",
+    "source": "crypto-trading-101",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HalvingProximity",
+      "BtcDominant",
+      "FomcDate"
+    ],
+    "content": "CRYPTO TAX CONSIDERATIONS: In the US, crypto-to-crypto trades are taxable events. Every altcoin trade creates a capital gain/loss record. Use tax software (CoinTracker, Koinly) to track cost basis across hundreds of trades. Short-term gains (held <1 year) taxed as income; long-term gains get preferential rates. Tax-loss harvesting works in crypto.",
+    "priority": 3
+  },
+  {
+    "id": "book-bco-011",
+    "source": "crypto-encyclopedia",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "BtcDominant",
+      "HalvingProximity"
+    ],
+    "content": "51% ATTACK RISK ASSESSMENT: When miners controlling >50% of a blockchain's hashing power can manipulate transactions—double-spend, reverse transactions, prevent confirmations. Smaller PoW chains are vulnerable. Monitor hash rate distribution. For trading: any credible 51% attack report is an immediate sell signal for that chain's token. Post-attack confidence takes months to rebuild.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-012",
+    "source": "crypto-encyclopedia",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HalvingProximity",
+      "BtcDominant"
+    ],
+    "content": "BITCOIN HALVING CYCLE: Block rewards halve approximately every 4 years (210,000 blocks). Historical pattern: 12-18 months pre-halving accumulation, parabolic run 6-12 months post-halving, then bear market correction of 80%+. Each cycle's peak-to-peak return diminishes. The halving reduces new supply issuance—supply shock theory drives narrative and price action.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-013",
+    "source": "crypto-encyclopedia",
+    "topic": "OrderFlow",
+    "conditions": [
+      "LiquidityExpansion",
+      "LiquidityContraction"
+    ],
+    "content": "BUY/SELL WALLS IN CRYPTO: A buy wall = significantly larger buy orders than sell orders at a price level, creating visible support on order books. Sell wall = large sell orders creating resistance. Walls can be spoofed (placed then removed). Track wall persistence and fill rates to distinguish real from fake liquidity. Walls that get pulled are manipulation signals.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-014",
+    "source": "crypto-encyclopedia",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility",
+      "LiquidityContraction"
+    ],
+    "content": "COLD STORAGE vs HOT WALLET TRADING: Cold storage = offline device for long-term holdings, immune to online hacks. Hot wallet = internet-connected for active trading. Split capital: 80%+ in cold storage, only active trading allocation on exchanges. Transfer to exchange when needed for trades, return profits to cold storage immediately. Prevents exchange hack catastrophe.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-015",
+    "source": "crypto-encyclopedia",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "BtcDominant",
+      "AltSeason"
+    ],
+    "content": "ALTCOIN CLASSIFICATION: Altcoins = any cryptocurrency alternative to Bitcoin. Layer-1s (ETH, SOL, AVAX) compete on smart contract platforms. Layer-2s (MATIC, ARB) scale Layer-1s. DeFi tokens (UNI, AAVE) power financial protocols. Memecoins (DOGE, SHIB) trade on narrative alone. Each category has different risk/reward profiles and correlation to BTC. Diversify across categories.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-016",
+    "source": "crypto-encyclopedia",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HalvingProximity",
+      "FomcDate"
+    ],
+    "content": "STABLECOIN DYNAMICS: USDT, USDC, DAI maintain 1:1 USD peg. Stablecoins are crypto's cash equivalent—used for trading pairs, yield farming, and risk-off positioning. Monitor stablecoin dominance (percentage of total crypto market cap in stables)—rising stablecoin dominance = market risk-off; falling = risk-on. Stablecoin depeg events create systemic cascading liquidations.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-017",
+    "source": "crypto-encyclopedia",
+    "topic": "Execution",
+    "conditions": [
+      "LiquidityExpansion"
+    ],
+    "content": "CRYPTO EXCHANGE SELECTION: Centralized exchanges (Binance, Coinbase) offer high liquidity and fiat on/off ramps but carry custodial risk. DEXs (Uniswap, dYdX) offer self-custody but higher slippage and gas costs. CEX liquidity >> DEX liquidity for large orders. Use CEXs for execution, DEXs for permissionless access. Always check exchange proof-of-reserves for solvency risk.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-018",
+    "source": "crypto-encyclopedia",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "BreakingNews",
+      "HighVolatility"
+    ],
+    "content": "FORK EVENTS AS TRADING SIGNALS: Hard forks create new chains/tokens (e.g., BTC→BCH). Accidental forks from coding errors. Hard forks are contentious splits—holders receive free tokens on both chains. Pre-fork: accumulate for airdrop. Post-fork: sell the weaker chain quickly as it typically dumps. Monitor GitHub for fork signals and community sentiment splits.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-019",
+    "source": "goodcrypto-patterns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "DIAMOND REVERSAL PATTERN (CRYPTO): Signals trend reversal at tops or bottoms. NOT confirmed when candles break the diamond line—calculate breakout level as diamond height projected below the break point. Only enter short when price drops below this projected level. Confirm with high volume surge. Works exceptionally well on BTC 4H and daily charts during distribution phases.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-020",
+    "source": "goodcrypto-patterns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "DOUBLE TOP/BOTTOM (CRYPTO): Price tests resistance/support zone twice and fails. Short target = distance from support to resistance projected downward. Triple bottoms work identically to double bottoms—just stronger confirmation. In crypto, double tops at round numbers ($50K, $100K BTC) are particularly significant due to psychological resistance and options strike clustering.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-021",
+    "source": "goodcrypto-patterns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CUP AND HANDLE (CRYPTO): U-shaped rounded bottom + short downward handle = bullish reversal. Enter long above handle breakout. Target = depth of cup projected above breakout. In crypto, cup formations often take weeks to months on daily charts. Handle should form on declining volume (shakeout), then breakout on volume surge. Very reliable on large-cap crypto.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-022",
+    "source": "goodcrypto-patterns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "RISING WEDGE = BEARISH (CRYPTO): Higher highs + higher lows converging into wedge. Extremely bearish—signifies either slow bearish continuation OR bullish trend reversal. Volume decline during wedge formation signals momentum loss. Enter short below wedge breakout zone. Target = opening width of wedge. Rising wedges on BTC daily often precede 20-40% corrections.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-023",
+    "source": "goodcrypto-patterns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "LowVolatility"
+    ],
+    "content": "FALLING WEDGE = BULLISH (CRYPTO): Lower highs + lower lows converging. Regardless of preceding trend, falling wedge breakout signals bull market entry. In crypto, falling wedges at the end of bear markets mark cycle bottoms. Volume should expand on breakout. Enter long above upper trendline. Target = wedge opening width projected upward.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-024",
+    "source": "goodcrypto-patterns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ASCENDING TRIANGLE CONTINUATION: Higher lows + flat horizontal resistance. Bullish continuation pattern from uptrend. Breakout = uptrend resumed with significant price and volume increase. In crypto, ascending triangles before halving events have historically resolved upward with explosive moves. Measure target from triangle height projected above resistance.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-025",
+    "source": "goodcrypto-patterns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "DESCENDING TRIANGLE: Flat horizontal support + lower highs from bearish trend. Lower highs build selling momentum until support breaks. Entry on breakdown with increased volume. Target = triangle height below support. On BTC, descending triangles that form during bear markets after failed rallies are among the most reliable continuation patterns.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-026",
+    "source": "goodcrypto-patterns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "SYMMETRICAL TRIANGLE: Higher lows + lower lows converging. Direction depends on origin trend—bullish trend → long on upper breakout; bearish trend → short on lower breakdown. Momentum builds with narrowing range. Target = triangle opening width projected from breakout. In crypto, symmetrical triangles during consolidation phases often precede massive directional moves.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-027",
+    "source": "option-volatility-pricing",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "FundingRateExtreme"
+    ],
+    "content": "OPTION GREEKS FOR CRYPTO OPTIONS: Delta = directional exposure (0-1). Gamma = rate of delta change (highest ATM near expiry). Theta = time decay (accelerates near expiry). Vega = volatility sensitivity (highest for longer-dated options). In crypto options (Deribit), vega risk is enormous due to implied vol spikes during BTC crashes. Short vega positions can blow up in hours.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-028",
+    "source": "option-volatility-pricing",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "LiquidationCluster"
+    ],
+    "content": "VOLATILITY SMILE IN CRYPTO OPTIONS: Unlike equity options, crypto options show extreme skew—put IV >> call IV (crash fear premium). The smile is asymmetric and steepens during fear events. When selling options, this skew means puts are overpriced relative to calls. However, tail risk in crypto is real—selling puts collects premium but carries catastrophic risk.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-029",
+    "source": "option-volatility-pricing",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "Ranging"
+    ],
+    "content": "STRADDLE/STRANGLE FOR CRYPTO EVENTS: Buy straddle (ATM call + put) before major events (halvings, ETF decisions, FOMC). Crypto's event-driven volatility makes straddles profitable when IV is low pre-event but realized vol spikes. Strangles (OTM call + put) are cheaper but need larger moves. Key: buy when IV rank is <30%, sell when IV rank >70%.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-030",
+    "source": "option-volatility-pricing",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "DELTA-NEUTRAL VOLATILITY TRADING: In crypto, trade volatility directly by delta-hedging options positions. Long straddle + dynamic delta hedging = long gamma/long vol. Profit when realized vol exceeds implied vol at entry. Crypto's 24/7 markets and high realized vol create persistent opportunities for gamma scalping. Requires frequent rebalancing and tight execution.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-031",
+    "source": "option-volatility-pricing",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility",
+      "FundingRateExtreme"
+    ],
+    "content": "COVERED CALL ON CRYPTO HOLDINGS: Sell OTM calls against long BTC/ETH positions to generate yield. Collects premium from high crypto implied volatility. Risk: capped upside if BTC rallies past strike. Best during ranging/consolidation phases when IV is elevated but price isn't moving. On Deribit, weekly/monthly covered calls yield 1-5% monthly in premium during high IV.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-032",
+    "source": "option-volatility-pricing",
+    "topic": "RiskManagement",
+    "conditions": [
+      "ExtremeFear",
+      "LiquidationCluster"
+    ],
+    "content": "PROTECTIVE PUT FOR CRYPTO PORTFOLIO: Buy OTM puts as insurance against crash. In crypto, crash protection is critical—BTC can drop 30% overnight. Cost is the put premium (high due to IV). Best risk/reward: buy puts when IV rank <20% (complacency). Avoid buying puts when IV is already extreme (overpaying). Collar = sell call to finance put purchase, limiting both upside and downside.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-033",
+    "source": "option-volatility-pricing",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "GAMMA RISK NEAR CRYPTO OPTION EXPIRY: Gamma explodes for ATM options in final 48 hours before expiry. Small BTC price moves cause massive delta swings. If short options near expiry, gamma risk can force panic hedging. Crypto options expire 08:00 UTC Friday on Deribit. Position around these expiries carefully—pin risk and gamma squeezes are common.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-034",
+    "source": "option-volatility-pricing",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "IMPLIED VOLATILITY REGIME DETECTION: Track IV rank (current IV vs 52-week range) for BTC options. IV rank <20% = complacency, buy vol (straddles). IV rank >80% = panic, sell vol (iron condors, covered calls). Crypto IV has a floor around 50% annualized and spikes to 150%+ during crashes. Mean-reversion in IV is one of the most reliable patterns in crypto options.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-035",
+    "source": "option-volatility-pricing",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility",
+      "FundingRateExtreme"
+    ],
+    "content": "OPTION SYNTHETICS FOR CAPITAL EFFICIENCY: Long call + short put at same strike = synthetic long spot (cheaper than buying BTC). Useful for leveraged exposure without funding rates. In crypto perps, funding can be 0.1%+ per 8 hours during euphoria. Synthetic positions via options avoid funding bleed. Use when funding is expensive and IV skew is moderate.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-036",
+    "source": "fooled-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "SURVIVORSHIP BIAS IN CRYPTO: You only see the winners. For every BTC millionaire, thousands lost everything on dead altcoins. The visible success stories create false sense of easy profits. In crypto, 95%+ of altcoins go to zero. When evaluating trading strategies, ALWAYS ask: what happened to the people who tried this and failed? Their silence is informative.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-037",
+    "source": "fooled-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "LiquidationCluster"
+    ],
+    "content": "RUSSIAN ROULETTE ANALOGY: A strategy that makes money 99% of the time but has a 1% chance of total ruin is NOT a good strategy—it's a time bomb. Crypto leverage traders often use this model: small consistent gains, then catastrophic liquidation. Never evaluate a strategy by average returns alone. The worst-case outcome must be survivable. Risk of ruin > expected return.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-038",
+    "source": "fooled-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "ALTERNATIVE HISTORY THINKING: Before taking any trade, imagine ALL possible outcomes, not just the one you expect. The actual outcome is just one sample from a distribution. A trade that worked was not necessarily a good trade—it might have been a 30% probability outcome that happened to hit. Evaluate trades by the quality of the decision process, not the outcome.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-039",
+    "source": "fooled-randomness",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "DATA MINING BIAS IN BACKTESTING: Running thousands of strategy variations on historical data guarantees finding 'winners' by pure chance. In crypto with limited history, this is especially dangerous. A backtested strategy MUST be validated on out-of-sample data. If you test 100 strategies at 95% confidence, expect 5 false positives. Use walk-forward analysis and multiple testing corrections.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-040",
+    "source": "fooled-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "SKEWNESS AND ASYMMETRY: Crypto returns are massively negatively skewed—small gains most days, occasional catastrophic losses. The median trade return is lower than the mean. This means most traders experience worse results than 'average' suggests. Design strategies for median outcomes, not mean. Use stops to truncate left tail. Position size for the loss scenario, not the win scenario.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-041",
+    "source": "fooled-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "content": "LUCK vs SKILL ATTRIBUTION: In a large market of traders, some will have extraordinary returns by pure chance. In crypto's bull markets, nearly everyone is a 'genius.' The true test of skill is performance across market cycles—bull AND bear. If a trader's edge disappears in bear markets, they had no edge—just directional luck. Require 100+ trades minimum to evaluate skill.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-042",
+    "source": "fooled-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "content": "NEVER CROSS A RIVER AVERAGING 4 FEET DEEP: A market that averages 4 feet of depth can still have a 12-foot section that drowns you. Averages hide extremes. Crypto's average daily volatility might seem manageable, but it has 10-sigma events regularly. Design risk management for the worst day, not the average day. Tail risk IS the business in crypto.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-043",
+    "source": "fooled-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "BreakingNews",
+      "ExtremeFear"
+    ],
+    "content": "EMOTIONAL AVOIDANCE OF LOSS: Humans feel losses 2-2.5x more intensely than equivalent gains (loss aversion). In crypto, this leads to holding losers too long (hoping for recovery) and cutting winners too quickly (locking in gains). Counter: automate exits with predetermined stop-losses and take-profit levels. Remove emotional decision-making from the execution loop entirely.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-044",
+    "source": "fooled-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "content": "NOISE vs SIGNAL IN CRYPTO: Daily price movements are mostly noise. Watching 1-minute charts creates emotional reactions to randomness. The signal-to-noise ratio improves dramatically with longer timeframes—weekly charts contain more signal than 5-minute charts. Check prices less frequently. Set alerts for key levels instead of watching screens. CNBC/Bloomberg explanations of daily moves are post-hoc narrative fitting.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-045",
+    "source": "fooled-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "ERGODICITY AND RUIN: A strategy's ensemble average (across many traders) can differ from its time average (single trader over time). If one bad sequence of trades leads to ruin, the trader is eliminated from the sample. Even if the strategy 'works on average,' individual ruin means you can't participate in future gains. Always preserve the ability to keep playing. Survival > optimization.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-046",
+    "source": "irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "content": "BUBBLE STRUCTURE (SHILLER): 1) Displacement—new technology/idea creates opportunity. 2) Boom—prices rise, media amplifies. 3) Euphoria—'this time is different,' FOMO retail enters. 4) Profit-taking—smart money exits. 5) Panic—retail realizes, mass selling. Crypto follows this EXACT cycle. Identify which phase you're in. When taxi drivers give crypto tips = late stage 3/early stage 4.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-047",
+    "source": "irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "BreakingNews"
+    ],
+    "content": "NARRATIVE ECONOMICS IN CRYPTO: Prices are driven by stories, not fundamentals. Bitcoin narratives shift: digital gold → inflation hedge → institutional adoption → national reserve. Each narrative attracts different capital. When a narrative exhausts its marginal buyer, price stagnates. Track narrative evolution—if media is recycling old narratives, the cycle is mature.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-048",
+    "source": "irrational-exuberance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "content": "SPECULATIVE BUBBLE INDICATORS: 1) Rapid price increase with no fundamental change. 2) Media coverage explosion. 3) 'New era' thinking ('blockchain changes everything'). 4) Increased trading by inexperienced participants. 5) Derivatives speculation surge (leverage, options). All five present simultaneously in crypto mania phases. Count the indicators. More = closer to the top.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-049",
+    "source": "irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "MvrvExtreme",
+      "SoprReset"
+    ],
+    "content": "VALUATION ANCHORING IN BUBBLES: In the absence of traditional valuation metrics (earnings, dividends), crypto investors anchor to arbitrary round numbers or previous highs. 'BTC should be $100K because...' This is narrative-driven anchoring, not valuation. MVRV Z-Score, NVT Ratio, and Stock-to-Flow provide pseudo-fundamental anchors. When price deviates >2σ from these, mean-reversion is likely.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-050",
+    "source": "irrational-exuberance",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "FomcDate",
+      "BreakingNews"
+    ],
+    "content": "FED POLICY AND CRYPTO BUBBLES: Loose monetary policy (low rates, QE) feeds speculative bubbles by reducing the cost of capital and pushing investors into risk assets. Tightening (rate hikes, QT) punctures them. 2020-2021 crypto bubble directly correlated with zero rates + massive QE. Fed pivot to tightening in 2022 collapsed crypto 75%+. Monitor Fed policy as primary macro driver.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-051",
+    "source": "irrational-exuberance",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "content": "HINDSIGHT BIAS IN BUBBLE RECOGNITION: After every crash, 'everyone knew it was a bubble.' But during the bubble, very few act on that belief because timing the top is nearly impossible. Being early = being wrong (for a while). The solution: scale out gradually during euphoria rather than trying to call the exact top. Sell 10% per 20% rise above your fair-value estimate.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-052",
+    "source": "irrational-exuberance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "MvrvExtreme",
+      "HalvingProximity"
+    ],
+    "content": "CRYPTO BUBBLE CYCLE LENGTH: Historical crypto cycles: 2013 bubble→2015 bottom (2yr), 2017 bubble→2018 bottom (1yr), 2021 bubble→2022 bottom (1yr). Each cycle is faster and involves more institutional money. The post-halving blow-off tops have diminishing returns (each cycle's peak is a smaller multiple of the previous). Plan for 3-4 year round trips.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-053",
+    "source": "extraordinary-delusions",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "content": "TULIP MANIA → CRYPTO PARALLEL: In 1637, tulip bulb prices rose 20x in months, then collapsed to near-zero. The pattern: 1) Novel asset with limited supply. 2) Speculation divorced from utility. 3) Leveraged buying. 4) Sudden liquidity withdrawal. 5) Cascade of forced selling. Every altcoin mania mirrors this. When valuations have no connection to utility, you're in tulip territory.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-054",
+    "source": "extraordinary-delusions",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "BreakingNews"
+    ],
+    "content": "CROWD PSYCHOLOGY IN CRYPTO: Crowds are more irrational than individuals. During crypto manias, individual analytical ability dissolves into herd behavior. Social media (Twitter/Telegram/Discord) amplifies crowd dynamics 24/7. The crowd is right during trends but ALWAYS wrong at extremes. When the entire CT timeline is bullish = danger. When everyone is terrified = opportunity.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-055",
+    "source": "extraordinary-delusions",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "content": "THE MADNESS OF CROWDS - DELUSION STAGES: 1) Attention—the new asset captures public imagination. 2) Enthusiasm—early profits create FOMO. 3) Delusion—rational thinking is abandoned. 4) The 'hook'—a compelling story prevents exit ('BTC to $1M'). 5) Panic—reality intrudes, mass exit. In crypto, these stages can compress into weeks. Social media accelerates every stage.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-056",
+    "source": "extraordinary-delusions",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "content": "PUMP AND DUMP PATTERNS: Historical market manipulation from 1700s South Sea Bubble mirrors modern crypto pump-and-dumps. Signs: 1) Unexplained volume surge in low-cap token. 2) Social media hype campaign. 3) Price rises 500%+ in hours. 4) Insiders sell into retail buying. 5) Price collapses 90%+ in hours. If you didn't get in before the pump, NEVER chase it.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-057",
+    "source": "extraordinary-delusions",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear",
+      "BreakingNews"
+    ],
+    "content": "FEAR CONTAGION IN CRYPTO: Fear spreads faster and further than greed. One exchange hack/collapse (Mt. Gox, FTX) creates panic across ALL crypto, even unrelated tokens. This is collective delusion in reverse—guilt by association. Use fear contagion events to buy fundamentally sound assets at irrational discounts, but only AFTER the initial panic subsides (wait 48-72 hours minimum).",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-058",
+    "source": "extraordinary-delusions",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "CON VICTIMS' PSYCHOLOGY: People who have been conned often defend the con artist because admitting they were fooled is more painful than the financial loss. In crypto, this manifests as HODLing dead tokens, defending scam projects, and refusing to cut losses. Recognize this bias. A token down 95% is not 'on sale'—it's likely dying. Cut losses before ego takes over.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-059",
+    "source": "extraordinary-delusions",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "ExtremeGreed"
+    ],
+    "content": "MISSING OUT (FOMO) AS A DELUSION: Fear of missing out has caused more crypto losses than any technical indicator failure. FOMO buying at peaks, FOMO into unvetted altcoins, FOMO leverage. The antidote: there is ALWAYS another trade. Missing one pump doesn't end your career. Blowing up your account from FOMO buying DOES. Write 'There will always be another trade' on your monitor.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-060",
+    "source": "big-short",
+    "topic": "RiskManagement",
+    "conditions": [
+      "ExtremeGreed",
+      "HighVolatility"
+    ],
+    "content": "CORRELATION CONVERGENCE IN CRISIS: In 2008, 'uncorrelated' assets all collapsed together. In crypto, the same happens—BTC, ETH, DeFi tokens, even 'uncorrelated' algo stables all crash simultaneously during systemic events. Diversification within crypto provides less protection than assumed. True diversification = assets outside crypto (cash, bonds, real assets).",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-061",
+    "source": "big-short",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "BreakingNews"
+    ],
+    "content": "WHEN THE MUSIC STOPS (BIG SHORT LESSON): Chuck Prince (Citi) said 'as long as the music is playing, you've got to get up and dance.' This is the institutional FOMO that inflates bubbles. In crypto, VCs and funds keep deploying into obvious mania because not being invested means losing clients. Recognize when professional money is dancing reluctantly—that's late cycle.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-062",
+    "source": "big-short",
+    "topic": "RiskManagement",
+    "conditions": [
+      "ExtremeFear",
+      "LiquidationCluster"
+    ],
+    "content": "TAIL RISK HEDGING: Michael Burry paid small premiums for years while waiting for the housing collapse. The lesson: tail hedges (deep OTM puts) are cheap during calm periods and pay 10-50x during crashes. In crypto, buy deep OTM BTC puts when IV rank <20%. Accept that most will expire worthless—the few that pay cover all costs and generate massive alpha.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-063",
+    "source": "big-short",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "content": "CONTRARIAN CONVICTION: Being right AND early feels identical to being wrong. Burry was mocked for 2+ years before the housing collapse validated his thesis. In crypto, if your analysis shows overvaluation but the market keeps rising, you're not wrong—your timing may be off. The solution: size positions so you can survive being early. Small contrarian bets, add on confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-064",
+    "source": "big-short",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "ExtremeGreed",
+      "FundingRateExtreme"
+    ],
+    "content": "LEVERAGE AS SYSTEMIC RISK: Excessive leverage was the detonator in 2008 and is in every crypto crash. When aggregate leverage (open interest, funding rates, margin debt) reaches extremes, the system is fragile. One catalyst triggers cascading liquidations. Monitor: BTC futures OI, aggregate funding rates, DeFi utilization rates. Extreme readings = reduce exposure immediately.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-065",
+    "source": "big-short",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "BreakingNews",
+      "FomcDate"
+    ],
+    "content": "EVERYTHING IS CORRELATED (BIG SHORT EPILOGUE): The lesson from 2008: in a crisis, correlations go to 1.0. Crypto is correlated with risk assets (NASDAQ) during selloffs, despite being 'uncorrelated' during bull markets. Macro events (Fed decisions, banking crises) that affect traditional markets now directly impact crypto. Monitor macro correlation regime.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-066",
+    "source": "when-genius-failed",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "LiquidationCluster"
+    ],
+    "content": "LTCM LEVERAGE LESSON FOR CRYPTO: LTCM used 25:1 leverage on 'market-neutral' strategies. When correlations broke, losses exceeded capital by 10x. In crypto, exchanges offer 100x leverage—far more dangerous. Even 'market-neutral' strategies (basis trades, arb) can gap against you. MAXIMUM leverage for crypto: 3-5x on core positions, 10x on highest-conviction short-term trades only.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-067",
+    "source": "when-genius-failed",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "MODEL RISK: LTCM's Nobel laureates used models that assumed normal distributions and stable correlations. Reality: fat tails and correlation shifts. In crypto, models built on 2-3 years of data will fail spectacularly during regime changes. Always stress-test models against: -50% BTC in 24h, -90% altcoin collapse, exchange outages, and stablecoin depegs.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-068",
+    "source": "when-genius-failed",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "LiquidationCluster"
+    ],
+    "content": "LIQUIDATION CASCADES: LTCM couldn't exit positions because everyone was trying to sell the same positions simultaneously. In crypto, this happens weekly—when BTC drops, liquidation engines sell into falling prices, creating a death spiral. DeFi protocols auto-liquidate collateral positions, adding fuel. Reduce leverage BEFORE volatility spikes. Monitor liquidation heatmaps.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-069",
+    "source": "when-genius-failed",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "CONVERGENCE TRADE RISK: LTCM bet that spread differentials would converge to 'fair value.' In crypto, basis trades (long spot + short futures) and DeFi yield farming are convergence trades. They work until they don't. When exchange risk materializes (FTX), the 'risk-free' leg explodes. Never put >20% of capital in any single convergence trade regardless of apparent safety.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-070",
+    "source": "when-genius-failed",
+    "topic": "RiskManagement",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "content": "THE HUMAN FACTOR IN RISK: LTCM traders were so confident in their models that they personally invested their entire net worth alongside fund capital. Overconfidence killed them. In crypto, never let confidence in a thesis override risk management. Even if you're 'certain' BTC will recover, position-size as if it might not. Hubris is the precursor to ruin.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-071",
+    "source": "when-genius-failed",
+    "topic": "RiskManagement",
+    "conditions": [
+      "LiquidationCluster",
+      "HighVolatility"
+    ],
+    "content": "SYSTEMIC RISK FROM INTERCONNECTION: LTCM's collapse threatened the entire financial system because its positions were held across every major bank. In crypto, similar interconnection exists—Terra/Luna collapse cascaded to 3AC, Celsius, Voyager, BlockFi. One protocol's failure can cascade through the entire ecosystem. Track counterparty exposure. Diversify across protocols and exchanges.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-072",
+    "source": "alchemy-finance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "REFLEXIVITY THEORY FOR CRYPTO: Participant perceptions don't just reflect reality—they SHAPE it. In crypto: rising prices attract users → more development → better fundamentals → higher prices (virtuous cycle). Falling prices → user exodus → less development → worse fundamentals → lower prices (vicious cycle). This is reflexivity. Crypto is MORE reflexive than any traditional market.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-073",
+    "source": "alchemy-finance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "NEAR-EQUILIBRIUM vs FAR-FROM-EQUILIBRIUM: In normal conditions, market corrections are mean-reverting (near-equilibrium). In far-from-equilibrium conditions, feedback loops create one-directional trends. Crypto oscillates between these states. IDENTIFY THE REGIME: If corrections are being bought = near-equilibrium (trend intact). If bounces are being sold = far-from-equilibrium (regime change).",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-074",
+    "source": "alchemy-finance",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "PARTICIPANTS' BIAS SHAPES FUNDAMENTALS: Soros's key insight: bias doesn't just affect prices—it affects the underlying fundamentals. In crypto: positive sentiment → VC funding → actual development → real value creation. Negative sentiment → funding winter → developer exodus → actual deterioration. The bias BECOMES the fundamental. Trade WITH the bias until it reaches extreme, then fade it.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-075",
+    "source": "alchemy-finance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "BOOM-BUST SEQUENCE: Soros identifies: 1) Trend not yet recognized. 2) Trend is tested and survives. 3) Increasing conviction in trend. 4) Growing divergence between perception and reality. 5) Recognition of the divergence. 6) The trend reverses. Apply to crypto: identify which phase BTC is in. Phase 1-3 = trend follow. Phase 4 = reduce size. Phase 5-6 = reverse or exit.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-076",
+    "source": "alchemy-finance",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "FomcDate",
+      "BreakingNews"
+    ],
+    "content": "CREDIT AND REGULATORY CYCLE IN CRYPTO: Soros's credit cycle applies directly: easy money → crypto leverage builds → asset inflation → regulators notice → tightening → forced deleveraging → crash. The regulatory response to crypto mania (SEC actions, exchange bans) punctures the bubble just as monetary tightening does. Track both credit AND regulatory cycles.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-077",
+    "source": "alchemy-finance",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SOROS'S TRADING RULE: 'It's not whether you're right or wrong, but how much money you make when you're right and how much you lose when you're wrong.' This is the core of asymmetric betting. In crypto: when your thesis is confirmed, add aggressively (pyramid). When it's negated, exit immediately. Never average down on a losing thesis. Cut losers fast, ride winners hard.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-078",
+    "source": "alchemy-finance",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "HISTORICAL PROCESS ANALYSIS: Soros treats markets as historical processes, not equilibrium systems. Each event changes the system permanently. In crypto, each cycle (2013, 2017, 2021) is structurally different—institutional participation, regulation, and infrastructure evolve. Don't assume previous cycle patterns will repeat exactly. Adapt your framework to the current cycle's structure.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-079",
+    "source": "trend-following-bible",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND FOLLOWING FOUR COMMANDMENTS: 1) Trade with the trend. 2) Cut your losses. 3) Let your profits run. 4) Don't let big profits get away. These rules are 'light years ahead of so many traders.' In crypto, trend following works exceptionally well because crypto trends persist longer than traditional markets due to retail-driven momentum and 24/7 global participation.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-080",
+    "source": "trend-following-bible",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "TREND FOLLOWING IS 50/50 PER TRADE: Any individual trade has roughly 50% chance of working. The edge comes from asymmetric payoff structure—losses are small (stopped out), wins are large (trend riding). You need the rare big winners to offset all the small losses. In crypto, one 10x altcoin trend can pay for 20 stopped-out trades. Size small, let winners run.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-081",
+    "source": "trend-following-bible",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "CUTTING LOSSES IS PARAMOUNT: If losses get out of control, you're overwhelmed financially AND emotionally. In crypto's volatility, a 10% loss can become 50% overnight. Set stops BEFORE entry. Never move a stop further from entry. Averaging down on a losing position in crypto is financial suicide. The market doesn't know your cost basis—it doesn't care.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-082",
+    "source": "trend-following-bible",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "PATIENCE AND DISCIPLINE - THE REAL EDGE: 90% of traders lose money. The 10% who win have internalized patience and discipline. A trading plan with imperfect signals but perfect discipline beats brilliant signals with no discipline. Boring is profitable. Excitement in trading = gambling. If you're not bored, you're probably overtrading.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-083",
+    "source": "trend-following-bible",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "BACKTESTING IS MANDATORY: Never trade a method without backtesting it yourself. Backtesting gives you the confidence to pull the trigger after multiple consecutive losses. Use walk-forward analysis: optimize on in-sample, validate on out-of-sample. Test across multiple market conditions (trending, ranging, high vol, low vol). If you haven't backtested it, it's not a system—it's a hope.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-084",
+    "source": "trend-following-bible",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "POSITION SIZING AND CORRELATION: Don't trade 10 crypto positions that are all 80% correlated to BTC. That's not diversification—it's concentrated directional risk with 10x the transaction costs. Check pairwise correlations. If >0.7, treat as one position for sizing purposes. True diversification = uncorrelated positions across different crypto sectors or crypto + traditional assets.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-085",
+    "source": "trend-following-bible",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRADE THE PLAN, NOT YOUR FEELINGS: 'Mr. Market might even reward you for breaking your own rules. This is even worse!' A rule violation that makes money encourages more violations until one destroys your account. Never rationalize breaking your trading plan. Consistency means seeing the same pattern, recognizing it, and taking the same action every time, regardless of recent results.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-086",
+    "source": "trend-following-bible",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "THE MARATHON METAPHOR: Trend following is not a sprint—it's a marathon. Drawdowns can last weeks or months. You'll feel like 'a punching bag who takes all the hits.' The key: stand up every time you get knocked down. Confidence comes from knowing that standing up again is the right thing to do. Track your equity curve, not individual trades.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-087",
+    "source": "evidence-based-ta",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "DATA MINING BIAS: Testing hundreds of indicators/rules on the same dataset guarantees finding false patterns. Most TA 'rules' (head-and-shoulders, support/resistance) have NO statistical edge when tested rigorously. In crypto, with only 10+ years of data, overfitting is even more dangerous. Require: out-of-sample validation, statistical significance testing, and economic significance (after costs).",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-088",
+    "source": "evidence-based-ta",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "RANDOMIZATION TESTING: To verify a strategy has genuine edge, compare its performance against randomized versions of the same data. If the real strategy doesn't significantly outperform randomized signals, the 'edge' is likely noise. Apply this to any crypto TA signal before trading it. Bootstrap and Monte Carlo methods provide rigorous statistical frameworks.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-089",
+    "source": "evidence-based-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CONFIRMATION BIAS IN TA: Analysts see patterns they expect to see. Classic TA patterns (head-and-shoulders, triangles) are often subjective—two analysts see different patterns in the same chart. To combat this: define patterns with EXACT, quantifiable rules (e.g., 'double top = two highs within 2% of each other, separated by >20 bars, with volume decline on second high').",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-090",
+    "source": "evidence-based-ta",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SURVIVORSHIP BIAS IN BACKTESTING: Testing only on assets that survived produces artificially positive results. In crypto, this is critical—backtesting altcoin strategies only on surviving chains (ETH, SOL) ignores the hundreds that went to zero. Include dead coins in backtests. If you only have data for survivors, your results are biased upward by 30-50%+.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-091",
+    "source": "evidence-based-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "SUPPORT AND RESISTANCE—STATISTICAL REALITY: Academic evidence for S/R levels is mixed. The 'memory' of price at round numbers is real (psychological levels), but traditional S/R drawn from charts often has no statistical edge. In crypto, round-number levels ($50K, $100K BTC) and options strike concentrations DO create meaningful levels. Focus on quantifiable, institutional levels.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-092",
+    "source": "evidence-based-ta",
+    "topic": "AiStrategy",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "OBJECTIVE vs SUBJECTIVE TA: Subjective TA (chart patterns, trend lines) has no rigorous statistical evidence. Objective TA (moving average crossovers, momentum indicators) can be backtested. For algorithmic crypto trading, ONLY use objective, quantifiable signals. If a human can't write exact code for it, it's not a strategy—it's an opinion.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-093",
+    "source": "new-trading-living",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "THE 2% RULE: Never risk more than 2% of your account on a single trade. If account = $100K, max risk per trade = $2,000. This means a string of 10 losses only draws down 20%, not 50%+. In crypto's volatility, use even tighter risk: 1% per trade. The 2% rule ensures you survive long enough to let your edge play out.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-094",
+    "source": "new-trading-living",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "THE 6% RULE: If you lose 6% of your account in a calendar month, STOP TRADING for the rest of the month. This prevents emotional revenge trading and drawdown spirals. In crypto, where you can lose 6% in hours, adapt this to a DAILY rule: if daily loss >3%, stop for 24 hours. The market will be there tomorrow. Your capital might not be if you keep trading while tilted.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-095",
+    "source": "new-trading-living",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "EMOTIONAL ROLLER COASTER: Most traders spend all time looking for trades, then squirm from pain or grin from pleasure while in them. They manage nothing—they ride emotions. Winning requires managing your emotions BEFORE managing trades. Pre-define entries, stops, targets, and size BEFORE the trade. Then execute the plan mechanically. Emotion is the enemy of execution.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-096",
+    "source": "new-trading-living",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "IMPULSE SYSTEM: Color bars based on two indicators: 13-EMA slope (trend) and MACD-Histogram slope (momentum). Green/green = uptrend with rising momentum (only go long). Red/red = downtrend with falling momentum (only go short). Mixed colors = no new positions, manage existing. This simple system prevents trading against the trend-momentum combination.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-097",
+    "source": "new-trading-living",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "A-TRADE FILTER: Before entering ANY trade, ask: 'Is this an A-trade?' An A-trade aligns with the weekly trend, has a clear entry trigger on the daily, and offers at least 2:1 reward-to-risk. If it's not an A-trade, skip it. In crypto, there are hundreds of potential trades—be extremely selective. Quality > quantity. One great trade beats ten mediocre ones.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-098",
+    "source": "new-trading-living",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "STOP PLACEMENT: Place stops at a level that proves your trade thesis wrong, NOT at an arbitrary dollar amount. In crypto, volatility-based stops (ATR multiples) work better than fixed percentages. Use 2-3x ATR(14) for stops. If the ATR stop would risk >2% of account, reduce position size. Never move a stop further from entry—only trail it in the direction of profit.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-099",
+    "source": "new-trading-living",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "KANGAROO TAILS (ELDER): Long wicks/shadows at trend extremes signal reversals. A long lower shadow after a decline = buyers stepped in aggressively. A long upper shadow after a rally = sellers overwhelmed buyers. In crypto, these are especially significant on 4H and daily charts. Confirm with volume spike on the tail bar. These work because they represent failed attempts to push price further.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-100",
+    "source": "new-trading-living",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "FomcDate"
+    ],
+    "content": "NH-NL INDEX FOR MARKET BREADTH: New High-New Low Index shows how many stocks are making new highs vs new lows. Adapted for crypto: track how many altcoins are making new 30-day highs vs new 30-day lows. When NH-NL turns negative while BTC makes new highs = internal weakness, distribution phase. When NH-NL turns positive during BTC lows = accumulation, reversal signal.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-101",
+    "source": "trading-living",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "THE MARKET CROWD AND YOU: When you join a crowd, your IQ drops. Crowd behavior is driven by emotion, not logic. Crypto Twitter/Discord are crowd amplification machines. When the crowd is euphoric, they want you to buy at the top. When terrified, they want you to sell at the bottom. Separate yourself. Think independently. Use the crowd as a CONTRARY indicator.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-102",
+    "source": "trading-living",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND PSYCHOLOGY: An uptrend is a series of higher highs and higher lows—each dip is bought by optimistic traders. A downtrend is the reverse—each rally is sold by pessimistic traders. Trends persist because of the psychological anchoring of previous prices. When these sequences break (lower high in uptrend, higher low in downtrend), the psychological foundation shifts.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-103",
+    "source": "trading-living",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "MONEY MANAGEMENT IS MORE IMPORTANT THAN ANALYSIS: You can be right about the direction but wrong about sizing and still blow up. A trader with mediocre analysis and great money management will outperform a trader with great analysis and no money management. ALWAYS define risk BEFORE entry. Size positions by risk, not by conviction.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-104",
+    "source": "trading-living",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "BULLS, BEARS, AND SELF-DECEPTION: Bulls make money, bears make money, but pigs get slaughtered. The 'pig' is the trader who over-leverages, overtrades, and over-commits. In crypto, pig behavior = going all-in on one altcoin, 100x leverage, no stops. Self-deception: 'I'll sell if it drops 10%.' Reality: you won't. Pre-commit through automated orders.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-105",
+    "source": "complete-turtle-trader",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TURTLE TRADING SYSTEM: Buy 20-day breakout (new 20-day high), add at 0.5 ATR intervals (up to 4 units), stop at 2 ATR from entry. Exit on 10-day breakout (new 10-day low). Adapt for crypto: use shorter periods (10-day breakout, 5-day exit) because crypto trends are faster. Position size in ATR units to normalize volatility across different crypto assets.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-106",
+    "source": "complete-turtle-trader",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "ATR-BASED POSITION SIZING (TURTLES): Calculate position size = (Account × Risk%) / (N × Point Value), where N = 20-day ATR. This normalizes risk across assets—$1M in BTC and $1M in altcoins carry equal dollar risk despite different volatilities. In crypto, this prevents oversized positions in high-volatility alts. Always size by volatility, never by dollar conviction.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-107",
+    "source": "complete-turtle-trader",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "TRADING IS TEACHABLE: Dennis proved that trading can be taught in two weeks to people with zero experience—and they made 100%+ annually for years. The key: they followed RULES. Your brain is the obstacle, not the market. If you can follow a system with discipline, you can succeed. The system is simple. Following it is hard. This is the central lesson of trading.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-108",
+    "source": "complete-turtle-trader",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SYSTEM THINKING > PREDICTION: Dennis was an empiricist—'prove it to me.' He tested everything with data, not opinions. He rejected weather reports, government data, and expert opinions. The market itself is the only truth. In crypto, stop listening to influencers and start backtesting. A backtested system you follow with discipline > any prediction from any 'expert.'",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-109",
+    "source": "complete-turtle-trader",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "ACCEPTING LOSSES: Dennis made $80M in 1986 but was down $10M in a single day. He 'slept like a baby.' The secret: losses are the cost of doing business. Like a casino, you need many small losses to capture the few massive wins. In crypto, expect to be stopped out frequently. Each stop is the cost of being positioned for the next 10x trend. Pay it willingly.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-110",
+    "source": "complete-turtle-trader",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "PYRAMIDING WINNERS: Dennis added to winning positions at calculated intervals (0.5 ATR). This means your average entry price worsens, but your winning position grows. In crypto's extended trends, pyramiding can turn a 2% position into an 8% position that captures the bulk of a 200% move. Only pyramid winning positions. NEVER add to losers.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-111",
+    "source": "complete-turtle-trader",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DON'T PREDICT, REACT: Dennis's approach: 'If someone was giving me a quarter cent edge to buy, I didn't think he knew anything either. I just knew I was getting an edge.' The Turtle system doesn't predict—it reacts to price breakouts. In crypto, stop trying to call tops and bottoms. React to what price actually does. Set breakout alerts and execute when triggered.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-112",
+    "source": "complete-turtle-trader",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "CORRELATION LIMITS: The Turtles had maximum position limits per market and per correlated group. In crypto: don't hold max positions in BTC, ETH, SOL, AVAX simultaneously—they're all Layer-1 smart contract platforms with >0.8 correlation. That's effectively one massive position. Treat correlated cryptos as a single position for risk management purposes.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-113",
+    "source": "reminiscences",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LIVERMORE'S FUNDAMENTAL RULE: 'It is not the bull side or the bear side, but the RIGHT side.' Trade what the market is doing, not what you want it to do. In crypto, this means: don't be permanently bullish or bearish. Be long when the trend is up, short when it's down, flat when it's unclear. Ego-attachment to a direction is account suicide.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-114",
+    "source": "reminiscences",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "TIPS AND INDEPENDENT THINKING: 'Nobody can give me a tip or a series of tips that will make more money for me than my own judgment.' In crypto, following influencer calls, Telegram signals, or Twitter tips makes you dependent. When the tipper is wrong or absent, you have no plan. Develop your own system. Use others' ideas as research starting points, never as execution triggers.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-115",
+    "source": "reminiscences",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TAPE READING PRINCIPLES: Livermore studied price behavior patterns for years before trading. He noticed stocks had 'habits'—certain behaviors that repeated. In crypto, this translates to: study BTC's behavior around key levels, funding rate extremes, and options expiry dates. Build a mental library of patterns. Price action near psychological levels ($50K, $100K) has predictable crowd behavior.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-116",
+    "source": "reminiscences",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "LEARN FROM LOSSES: 'In losing money I have gained experience and accumulated a lot of valuable don'ts.' Livermore went broke multiple times but never made the same mistake twice. Keep a detailed loss journal. After every loss, write: what went wrong, why, and what you'll do differently. Losses are tuition. The uneducated trader pays tuition repeatedly for the same lesson.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-117",
+    "source": "reminiscences",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "WAIT FOR THE RIGHT MOMENT: 'I must not begin to advance until I am sure I shall not have to retreat. But if I cannot advance I do not move at all.' Patience for the right setup > trading frequently. In crypto's 24/7 market, there's always something happening—but most of it is noise. Wait for A+ setups. Sitting in cash IS a position. The hardest trade is often no trade.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-118",
+    "source": "reminiscences",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "THE BIG MOVE: 'Instead of placing piking bets on what the next few quotations were going to be, my game was to anticipate what was going to happen in a big way.' Don't scalp small profits—position for the big move. In crypto, the big moves (50-200% in BTC, 1000%+ in alts) make the year. Most of your profits should come from 1-3 trades per year. Everything else is noise management.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-119",
+    "source": "reminiscences",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "TICKER LAG AND EXECUTION: Livermore was ruined by the ticker lagging the market during the 1901 panic—orders executed 20 points from where the tape showed. In crypto, during high-volatility events, exchange APIs lag, orders fill at unexpected prices, and slippage is massive. Use limit orders in volatile markets. Accept that you can't always get the exact price you want.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-120",
+    "source": "livermore",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LIVERMORE'S TIMING RULE: 'The desire to act constantly without understanding what to do is the main failing of most traders.' Wait for the stock/market to confirm your thesis before committing capital. In crypto: don't buy the rumor of a breakout—buy the CONFIRMATION of the breakout. Wait for the candle to close above resistance, not just wick above it.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-121",
+    "source": "livermore",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "LIVERMORE'S PYRAMIDING: He started with a small position and added as the trade proved correct—NEVER adding to a loser. His biggest winners were positions he kept adding to as they moved in his favor. In crypto: start with 25% of intended position size. Add 25% each time price confirms (breaks above next resistance, holds key support). Maximum 100% only on strongest trends.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-122",
+    "source": "livermore",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "content": "THE DANGERS OF WINNING TOO MUCH: Livermore made and lost fortunes multiple times. His biggest losses came after his biggest wins—overconfidence after winning streaks led to oversized positions and ignored risk management. In crypto, after a 10x altcoin win, your next trade is your most dangerous. Take a break. Reduce size. The euphoria of winning is more dangerous than the despair of losing.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-123",
+    "source": "livermore",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "LIVERMORE'S MARKET KEY: He identified stocks as being in accumulation, markup, distribution, or markdown phases. This is Wyckoff before Wyckoff. Apply to BTC: Accumulation = sideways at lows, smart money buying. Markup = trending up. Distribution = sideways at highs, smart money selling. Markdown = trending down. Identify the phase. Trade with the phase's direction.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-124",
+    "source": "livermore",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "LIVERMORE ON PANIC: \"Wild speculation always brought the market to its knees.\" He shorted the 1929 crash and made $100M (billions in today's money). His insight: panics are predictable consequences of preceding speculation. In crypto, every parabolic run ends in a crash. The crash is not a surprise—it's an inevitability. Size your positions to survive AND profit from the panic.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-125",
+    "source": "livermore",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "LIVERMORE'S 100 BROKER TACTIC: He spread orders across 100+ brokers so nobody could see his full position. In crypto, use multiple exchanges and OTC desks for large orders. Iceberg orders hide true size. Never show your full hand—the market will trade against you. Smart money watches order flow. Use TWAP/VWAP execution for large crypto orders.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-126",
+    "source": "livermore",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "LIVERMORE'S RULE OF CONSERVATION: 'A man must believe in himself and his judgment if he expects to make a living at this game. But he must also conserve his capital.' Self-belief without capital preservation is worthless. Always maintain enough cash to take advantage of the next opportunity. Being fully invested means having no buying power when the real opportunity arrives.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-127",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SUPREMACY OF THE TREND: The trend is the single most important factor in trading success. All other analysis is secondary. Methods for defining trends: higher highs/higher lows, moving average alignment, and price position relative to key moving averages. In crypto, use the 50/200 EMA crossover on daily charts as the primary trend filter. Only trade in the direction of the dominant trend.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-128",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MOMENTUM LEADS PRICE: Momentum indicators (RSI, MACD, Rate of Change) turn before price. A bullish divergence (price makes lower low, momentum makes higher low) signals potential reversal. In crypto, momentum divergences on the daily chart are among the most reliable reversal signals. The strongest signals occur after extended trends and at key support/resistance levels.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-129",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "PRICE ALTERNATION PRINCIPLE: Markets alternate between contraction (low volatility, tight ranges) and expansion (high volatility, trending moves). After contraction, expect expansion. After expansion, expect contraction. In crypto, monitor Bollinger Band width and ATR for contraction signals. Tightening bands = coiled spring. Trade the breakout direction with momentum confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-130",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FIBONACCI RETRACEMENT CONFLUENCE: When multiple Fibonacci levels from different swing points cluster together, they form strong support/resistance zones. In crypto, 0.618 retracement is the most common pullback level during trends. 0.382 = shallow pullback (strong trend). 0.786 = deep pullback (weak trend). Confluence of Fib levels with horizontal S/R and volume profile = high-probability zone.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-131",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "THREE PHASES OF A PRICE MOVE: 1) Accumulation/markup (smart money buys, price grinds up). 2) Public participation (retail FOMO, parabolic advance). 3) Distribution/markdown (smart money sells to retail, price collapses). Apply to crypto cycles: Phase 1 = post-bear-market accumulation. Phase 2 = bull run. Phase 3 = blow-off top distribution. Identify phase before sizing positions.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-132",
+    "source": "complete-trading-course",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "EDGE AND EXPECTANCY: Expectancy = (Win% × Avg Win) - (Loss% × Avg Loss). A strategy is profitable if expectancy > 0. Edge = how much better than random your strategy is. In crypto, many 'edges' evaporate after transaction costs and slippage. Calculate expectancy including ALL costs. If net expectancy < 0, don't trade. Backtest with realistic slippage assumptions (10-50 bps for crypto).",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-133",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "HEAD AND SHOULDERS PATTERN: Left shoulder → head → right shoulder with neckline support. Break below neckline confirms reversal. Target = head-to-neckline distance projected below neckline. In crypto, H&S patterns on daily/weekly charts mark major cycle tops. Volume should decrease on right shoulder vs left shoulder (divergence). Very reliable on BTC and ETH.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-134",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ELLIOTT WAVE THREE RULES: 1) Wave 2 never retraces more than 100% of Wave 1. 2) Wave 3 is never the shortest impulse wave. 3) Wave 4 never overlaps Wave 1's price territory. In crypto, Wave 3 extensions are common (often 1.618× or 2.618× Wave 1). Use these rules to project targets and invalidation levels. Elliott is subjective—use it for context, not precise signals.",
+    "priority": 3
+  },
+  {
+    "id": "book-bco-135",
+    "source": "random-walk",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "RANDOM WALK IMPLICATIONS FOR CRYPTO: If crypto markets are efficient, no technical analysis can consistently outperform. However, crypto markets are LESS efficient than traditional markets due to: fewer institutional participants, 24/7 trading, information asymmetry, and behavioral biases. This creates exploitable inefficiencies—but they're shrinking as institutional adoption grows.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-136",
+    "source": "random-walk",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "DIVERSIFICATION BENEFITS: Malkiel advocates broad diversification. In crypto, this means: don't put everything in BTC. Diversify across BTC, ETH, Layer-1s, DeFi, and stablecoins. But realize that crypto diversification is limited—all crypto correlates >0.6 during crashes. True diversification requires non-crypto assets. Use crypto as a PORTFOLIO allocation (5-20%), not your entire investment.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-137",
+    "source": "random-walk",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HalvingProximity",
+      "BtcDominant"
+    ],
+    "content": "FIRM FOUNDATION THEORY: Assets have intrinsic value based on future earnings/cash flows. Applying to BTC: Stock-to-Flow, NVT Ratio, and Metcalfe's Law provide pseudo-fundamental valuations. When price significantly exceeds these models (>2 standard deviations), the asset is overvalued relative to its network fundamentals. Mean reversion is likely within 6-18 months.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-138",
+    "source": "random-walk",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CASTLES IN THE AIR: Much of crypto valuation is Keynesian 'castle in the air' theory—buying what you think others will buy at higher prices. This is valid in momentum-driven markets. The key is identifying when the 'greater fool' supply is exhausted. Track new wallet addresses and exchange inflows. When onboarding flattens despite price increases, the supply of greater fools is thinning.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-139",
+    "source": "alchemy-finance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "FundingRateExtreme",
+      "OIDivergence"
+    ],
+    "content": "FUNDING RATE AS REFLEXIVITY SIGNAL: Soros's reflexivity applies directly to perpetual futures funding. Positive funding = longs pay shorts → more people go long → funding increases → reflexivity loop. When funding exceeds 0.1% per 8 hours for sustained periods, the reflexive loop is at maximum. The unwinding is violent—funding rate mean-reversion triggers cascading long liquidations.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-140",
+    "source": "trend-following-bible",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "TREND BREAKOUT FILTER: Only take breakouts in the direction of the larger trend. A 20-day breakout to the upside during a weekly uptrend = high probability. A 20-day breakout during a weekly downtrend = likely a bear trap. In crypto, multi-timeframe alignment dramatically improves breakout success rate. Check daily + weekly trend before entering any breakout trade.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-141",
+    "source": "new-trading-living",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "BOLLINGER BAND SQUEEZE: When Bollinger Bands narrow inside Keltner Channels, volatility is extremely low—a big move is coming. Direction unknown. In crypto, BB squeezes on 4H/daily charts precede 15-40% BTC moves. Set alerts for squeeze conditions. Wait for the breakout direction, then enter with momentum. Don't try to predict direction—react to it.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-142",
+    "source": "complete-turtle-trader",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "DON'T OVERTRADE: The Turtles had specific entry criteria—if no signal existed, they did nothing. Overtrading is the #1 account killer in crypto's 24/7 market. Set a maximum number of trades per week (e.g., 3-5). If you've hit your limit, you MUST wait. This forces selectivity and prevents impulsive entries. Quality setups > quantity of trades.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-143",
+    "source": "irrational-exuberance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "MvrvExtreme",
+      "SoprReset"
+    ],
+    "content": "ON-CHAIN VALUATION MODELS: MVRV (Market Value to Realized Value) Z-Score >7 = overvalued (sell zone). <0 = undervalued (buy zone). SOPR (Spent Output Profit Ratio) >1.1 = profit-taking overheated. <0.98 = capitulation. These on-chain metrics provide fundamental anchoring for crypto that doesn't exist in traditional markets. Combine with price action for timing.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-144",
+    "source": "livermore",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LIVERMORE'S PIVOTAL POINTS: He identified price levels where the character of price action changed—where supply/demand shifted dramatically. In crypto, these correspond to high-volume nodes on volume profile charts, CME gap levels, and options max pain levels. Trade around these pivotal points. A breakout through a pivotal point is high conviction. A rejection is a fade opportunity.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-145",
+    "source": "fooled-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "POSITION SIZING FOR SURVIVABILITY: Kelly Criterion optimal sizing often produces positions too large for psychological comfort. Use half-Kelly or quarter-Kelly for actual trading. In crypto, where win rates and payoff ratios are uncertain, conservative sizing is critical. Rule of thumb: if a position's loss would make you lose sleep, it's too large. Reduce until you can psychologically handle the max loss.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-146",
+    "source": "big-short",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear",
+      "LiquidationCluster"
+    ],
+    "content": "BUYING DURING CAPITULATION: The Big Short's heroes bought protection BEFORE the crash. The lesson for crypto: buy during calm (cheap puts, low leverage, build cash position) so you're prepared. During actual capitulation, you need dry powder AND conviction. The best crypto buying opportunities come when on-chain metrics show maximum pain (SOPR <0.85, MVRV <0.5, exchange outflows surging).",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-147",
+    "source": "when-genius-failed",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "CORRELATION ILLUSION: LTCM assumed correlations between their positions were stable. During the crisis, correlations went to 1.0 and their 'hedged' portfolio was massively exposed. In crypto, assume all positions are perfectly correlated during a crisis. Size your total portfolio for the scenario where ALL positions drop 50% simultaneously. If that loss is unacceptable, reduce total exposure.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-148",
+    "source": "extraordinary-delusions",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "ExtremeGreed",
+      "BreakingNews"
+    ],
+    "content": "HERD MENTALITY TIMING: The crowd is right during the middle of trends but wrong at extremes. During crypto bull markets, following the crowd is profitable—until it isn't. The transition point: when the narrative shifts from analysis to ideology ('BTC will replace all money'), when skeptics are mocked, when leveraged products multiply. These are late-stage crowd signals.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-149",
+    "source": "evidence-based-ta",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "OUT-OF-SAMPLE VALIDATION PROTOCOL: Split crypto data into: 1) Training set (70%). 2) Validation set (15%). 3) Test set (15%). Optimize on training, tune on validation, evaluate ONLY on test set. If performance degrades >30% from training to test = overfitting. For crypto with limited data, use rolling window backtesting: optimize on window N, test on N+1, roll forward.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-150",
+    "source": "trading-living",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "FORCE INDEX FOR CRYPTO: Force Index = Price Change × Volume. 2-day EMA for entries (buy when it dips in uptrend), 13-day EMA for trend (bulls control above zero). In crypto, Force Index confirms breakout legitimacy—a breakout on rising Force Index is real; one on falling Force Index is likely a trap. Divergence between Force Index and price is a strong reversal signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-151",
+    "source": "option-volatility-pricing",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "FundingRateExtreme"
+    ],
+    "content": "VOLATILITY SELLING IN CRYPTO: Crypto implied volatility is structurally elevated (50-100% annualized for BTC). This creates persistent premium-selling opportunities. Strategies: cash-secured puts (buy dips at discount), iron condors (range-bound), covered calls (yield on holdings). Risk: black swan events can cause catastrophic losses. Size positions for 3σ moves. Never sell naked options.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-152",
+    "source": "crypto-trading-101",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "CRYPTO TRADING PSYCHOLOGY: Regret is the most dangerous emotion. Regret of not buying → FOMO entry at top. Regret of not selling → bag-holding through crash. Regret of selling too early → chasing the re-entry. Counter: every trade is independent. Past trades don't matter. Focus on current risk/reward. 'What is the right action NOW?' not 'What should I have done?'.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-153",
+    "source": "random-walk",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TECHNICAL ANALYSIS VALIDITY: Academic evidence shows simple momentum strategies (buy recent winners, sell recent losers) generate excess returns in crypto, contradicting the random walk hypothesis. However, these returns are declining as markets mature. Simple moving average systems (200-day SMA crossover) still work on BTC weekly charts. Complex systems generally don't outperform simple ones.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-154",
+    "source": "reminiscences",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "content": "LIVERMORE'S BIGGEST LESSON: 'It took me five years to learn to play the game intelligently enough to make big money when I was right.' Trading mastery requires years of deliberate practice. There are no shortcuts. In crypto, the proliferation of 'get rich quick' gurus sells false hope. Commit to the long game. Study markets daily. Journal every trade. Expect to be unprofitable for 1-2 years minimum.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-155",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VOLUME CONFIRMATION: Every significant price move should be confirmed by volume. Breakouts on low volume are suspect (likely to fail). Reversals on high volume are significant (capitulation/accumulation). In crypto, volume is the most honest indicator—it's harder to fake than price. Monitor exchange-reported volume and on-chain volume separately. Exchange volume can be wash-traded.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-156",
+    "source": "alchemy-finance",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "SOROS'S BACK PAIN INDICATOR: Soros famously said his back pain told him when his position was wrong—his body detected danger before his mind. Develop your own early warning system: anxiety about a position, checking prices compulsively, inability to sleep. These are signals your subconscious has detected something your conscious mind hasn't. Listen to it. Reduce position size immediately.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-157",
+    "source": "goodcrypto-patterns",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "RECTANGLE PATTERN CONTINUATION: Price oscillates between horizontal support and resistance within a trend. Continuation signal—breakout in direction of preceding trend. Less momentum than triangle breakouts. In crypto, rectangles during consolidation phases are common. Trade the range (buy support, sell resistance) until breakout. Then follow the breakout direction with volume confirmation.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-158",
+    "source": "trend-following-bible",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "THE 90% vs 10%: Over 90% of traders lose money. The 10% who succeed have: 1) A robust trading plan. 2) Complete risk management. 3) The discipline to follow the plan. Most failed traders are engineers, pilots, and successful professionals—intelligence doesn't protect against emotional trading. Your ego is the enemy. The market doesn't care about your IQ.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-159",
+    "source": "when-genius-failed",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "LiquidationCluster"
+    ],
+    "content": "RISK OF RUIN CALCULATION: With 50% win rate, 1:1 risk/reward, and 2% risk per trade, probability of 50% drawdown ≈ 13%. With 3% risk per trade ≈ 30%. With 10% risk ≈ 99%. In crypto, where leverage amplifies risk, even a 'safe' 2% risk per trade can become 20% effective risk with 10x leverage. Calculate true risk including leverage. Keep effective risk <2% of total capital.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-160",
+    "source": "fooled-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "content": "HINDSIGHT AND NARRATIVE: After every large price move, a convincing narrative emerges explaining why it happened. Humans are pattern-seeking creatures—we find patterns in noise. Most 'explanations' for crypto price moves are post-hoc narratives, not causal relationships. Don't build trading strategies around stories. Build them around quantifiable, testable relationships.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-161",
+    "source": "livermore",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LIVERMORE'S SECRET: His edge was not in predicting direction—it was in position management. He started small, added to winners, cut losers immediately, and was always ready to reverse if the market told him he was wrong. His system was: small initial risk, maximum reward on right trades, minimum loss on wrong trades. This asymmetry is the only reliable edge in trading.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-162",
+    "source": "new-trading-living",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MOVING AVERAGE SYSTEM FOR CRYPTO: Use dual moving averages: 13-EMA (fast) and 26-EMA (slow). Buy when fast crosses above slow. Sell when fast crosses below slow. Use daily chart for direction, 4H chart for entries. This simple system captures major crypto trends while avoiding the worst bear markets. Not optimal, but robust across market conditions.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-163",
+    "source": "extraordinary-delusions",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "content": "SOUTH SEA BUBBLE LESSONS: The South Sea Company stock rose 800% in months on promises of untold riches from trade monopolies. It collapsed when no actual profits materialized. In crypto, evaluate token promises vs actual deliverables. Most 'Ethereum killers' and 'DeFi protocols' have more whitepaper than usage. Track real users, real revenue, real TVL. Promises without adoption = South Sea.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-164",
+    "source": "crypto-encyclopedia",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "HalvingProximity"
+    ],
+    "content": "CRYPTO INDEX TRACKING: CCI30 tracks top 30 cryptos by market cap. Use as benchmark—if your portfolio underperforms the index, you'd be better off just holding the index. In bull markets, individual altcoin selection adds value. In bear markets, index exposure with reduced size minimizes drawdowns. Rebalance monthly to capture market-cap-weighted momentum.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-165",
+    "source": "option-volatility-pricing",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "BTC OPTIONS EXPIRY EFFECTS: Large options expiries (monthly, quarterly) create pin risk and gamma effects around max-pain price. Market makers delta-hedge their short options positions, creating buying/selling pressure. In the week before large expiries (>$1B notional), expect price to gravitate toward max-pain. Post-expiry, the hedging flow reverses, often causing directional moves.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-166",
+    "source": "complete-turtle-trader",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRADE LIKE A CASINO: Dennis's early method—take edges, no matter how small, with volume. At the end of the day, edges equal profit. In crypto market-making and arbitrage, this philosophy works: collect small edges (bid-ask spread, funding rate arbitrage, basis trades) with high volume. Over many trades, small edges compound into significant returns. Think like the house, not the gambler.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-167",
+    "source": "big-short",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "content": "COMFORTABLE WITH DISCOMFORT: The Big Short's heroes were uncomfortable for years while waiting for their thesis to play out. Being contrarian means being wrong in the eyes of the crowd for extended periods. In crypto, if your bearish thesis is correct but the market keeps rallying, accept the discomfort. Size positions to survive being early. The crowd's opinion doesn't change the math.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-168",
+    "source": "alchemy-finance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "BtcDominant"
+    ],
+    "content": "REFLEXIVE DIVERGENCE SIGNAL: When market price diverges significantly from the fundamental reality that participants' behavior creates, the divergence becomes unsustainable. In crypto: if price rises but developer activity declines, TVL drops, and new address growth slows—the price-fundamentals gap will close. The only question is whether price adjusts down or fundamentals adjust up. Usually price.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-169",
+    "source": "irrational-exuberance",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "FomcDate",
+      "BreakingNews"
+    ],
+    "content": "CRYPTO AS A LEADING INDICATOR: Shiller shows speculative assets lead the real economy. In crypto, BTC has led NASDAQ by 2-3 months in recent cycles. When BTC diverges from risk-on assets, pay attention—either crypto is signaling macro shifts, or it's about to re-correlate. Use BTC/SPX ratio as a macro divergence indicator.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-170",
+    "source": "fooled-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "MONTE CARLO FOR RISK ASSESSMENT: Run Monte Carlo simulations on your trading strategy—randomize the ORDER of your trades thousands of times. Some orderings lead to ruin even with a positive expectancy system. If >5% of Monte Carlo paths result in >50% drawdown, your position sizing is too aggressive. In crypto, use fat-tailed distributions (Student-t) not normal distribution for simulations.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-171",
+    "source": "trend-following-bible",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "LET PROFITS RUN, CUT LOSSES SHORT: The mathematical edge of trend following comes from asymmetric exits. Your stop is 1 ATR away. Your target is 'as far as the trend goes'—potentially 10+ ATR. This asymmetry (small loss, large win) means you can be wrong 60-70% of the time and still be profitable. In crypto, the long tails of returns make this even more powerful. Never cap upside.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-172",
+    "source": "when-genius-failed",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "TAIL RISK IS THE BUSINESS: LTCM assumed extreme events were once-in-10,000-year occurrences. They happened within months. In crypto, 'once-in-a-lifetime' events happen every quarter. 30% daily drops, exchange hacks, protocol failures, stablecoin depegs. Trade as if the next extreme event is always imminent. Because in crypto, it probably is.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-173",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "GAPS AS MOMENTUM SIGNALS: Opening gaps (price opens above/below previous close) reveal overnight sentiment shifts. In crypto's 24/7 market, 'gaps' are less relevant for spot but CRITICAL for CME futures (which close on weekends). BTC CME gaps fill ~70% of the time. Monday morning gaps reveal institutional sentiment. Large gaps in direction of trend = continuation signal.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-174",
+    "source": "new-trading-living",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "STOPS AND PROFIT TARGETS: Say NO to wishful thinking. Set stops at a level that proves your thesis wrong—not at an arbitrary percentage. Set profit targets at 'enough'—the level where the risk/reward no longer justifies holding. In crypto, use OCO orders (One-Cancels-Other): a stop-loss AND a take-profit order simultaneously. This automates your exit plan and removes emotion.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-175",
+    "source": "livermore",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "LIVERMORE'S ACCUMULATION/DISTRIBUTION: Smart money accumulates during bear markets when volume is low and prices are depressed—they buy slowly over weeks/months. They distribute during bull markets when volume is high and prices are elevated—they sell slowly. Track exchange outflows (accumulation) and inflows (distribution). Large BTC moving to exchanges = distribution signal. To cold storage = accumulation.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-176",
+    "source": "reminiscences",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "THE GAME TAUGHT ME THE GAME: Livermore learned by doing, not by studying theory. His years of bucket shop trading developed pattern recognition that formal education couldn't. In crypto, paper trading and small-position live trading teach more than any course. Start with tiny positions (0.1% of capital per trade). Graduate to larger sizes only after 100+ trades with documented positive expectancy.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-177",
+    "source": "random-walk",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "INDEX INVESTING ADAPTATION: Malkiel argues most active managers underperform indices. In crypto, most altcoin pickers underperform simply holding BTC/ETH. The equivalent of index investing: 60% BTC, 30% ETH, 10% top-10 altcoins. Rebalance quarterly. This 'lazy portfolio' outperforms 80%+ of active crypto traders after costs and taxes.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-178",
+    "source": "option-volatility-pricing",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "IMPLIED vs REALIZED VOLATILITY SPREAD: When IV > RV (implied > realized), options are overpriced—sell premium. When IV < RV, options are underpriced—buy premium. In crypto, IV structurally exceeds RV by 10-20 points due to crash risk premium. This means systematically selling crypto options has positive expected value—but with catastrophic left-tail risk. Size for the tail.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-179",
+    "source": "crypto-trading-101",
+    "topic": "Execution",
+    "conditions": [
+      "AltSeason",
+      "BtcDominant"
+    ],
+    "content": "ALTCOIN ROTATION STRATEGY: During alt season, rotate capital from underperforming alts to momentum leaders. Monitor BTC dominance—if falling, alt season is active. Set relative strength filters: only hold alts outperforming BTC on 7-day and 30-day basis. Exit any alt that underperforms BTC for 2+ weeks. Concentrate in 3-5 highest-conviction, highest-momentum positions.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-180",
+    "source": "extraordinary-delusions",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "ExtremeGreed",
+      "BreakingNews"
+    ],
+    "content": "MANIAS ALWAYS END: Every mania in history—from tulips to South Sea to crypto—ends the same way: with prices returning to or below the starting point. The pattern is universal because human psychology is universal. When someone says 'this time is different,' it NEVER is. The only variable is timing. Position for the inevitable end while profiting from the mania's continuation.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-181",
+    "source": "big-short",
+    "topic": "Execution",
+    "conditions": [
+      "ExtremeFear",
+      "BreakingNews"
+    ],
+    "content": "CONTRARIAN POSITION MANAGEMENT: The Big Short's heroes were right but had to survive being early. Strategy: 1) Take small contrarian position. 2) If market moves against, add only on NEW evidence. 3) NEVER add just because price is 'cheaper.' 4) Set a maximum total allocation. 5) Be prepared for the position to take 6-18 months to play out. Patience is the contrarian's only edge.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-182",
+    "source": "alchemy-finance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "OIDivergence",
+      "FundingRateExtreme"
+    ],
+    "content": "OPEN INTEREST DIVERGENCE AS REGIME SIGNAL: When BTC price makes new highs but open interest declines = weakening trend (distribution). When price makes new lows but OI increases = potential bottom (shorts building for squeeze). OI divergence from price is a reflexive signal—it shows whether participant behavior confirms or contradicts price direction.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-183",
+    "source": "trend-following-bible",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "TREND RETRACEMENTS: After a breakout, the ideal entry is on a pullback to the breakout level. In crypto, 38.2% and 50% Fibonacci retracements of the breakout move offer low-risk re-entry points. Volume should decrease on the pullback (healthy). If volume increases on pullback = distribution, not retracement. Enter with stop below the retracement low.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-184",
+    "source": "when-genius-failed",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "OVERCONFIDENCE BIAS: LTCM's PhDs were so confident in their models that they used maximum leverage. Their Nobel Prizes made them believe they couldn't be wrong. In crypto, if you've had a winning streak, your confidence is inflated by recent success. The cure: track your confidence level on a 1-10 scale daily. When confidence >8, force yourself to reduce position size by 50%.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-185",
+    "source": "new-trading-living",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "TRADING AS THE LAST FRONTIER: Trading is the last truly free profession—you can work anywhere, answer to nobody, and earn without limits. But the freedom is the trap: without external structure, your worst impulses have no check. Create artificial structure: trading hours, maximum daily trades, mandatory journaling, regular reviews. Treat it as a business, not a hobby.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-186",
+    "source": "complete-turtle-trader",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "THE 50% DRAWDOWN REALITY: Richard Dennis lost 50% of his fund at one point—and still made his investors wealthy over time. Drawdowns of 30-50% are NORMAL for trend-following systems. If you can't psychologically handle a 50% drawdown, you're trading too large. Reduce size until a 50% drawdown is emotionally manageable. Then increase size slowly as your psychology adapts.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-187",
+    "source": "fooled-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "BreakingNews",
+      "ExtremeFear"
+    ],
+    "content": "PROBABILITY BLINDNESS: Humans cannot intuitively process probabilities. We overweight rare events (plane crashes, 100x altcoin gains) and underweight common events (slow bleed of portfolio). In crypto, this manifests as: buying lottery-ticket altcoins while ignoring the 95% failure rate. Use explicit probability calculations, not gut feelings, for every trade decision.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-188",
+    "source": "livermore",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LIVERMORE'S SCIENTIFIC METHOD: He kept meticulous records of every trade, analyzed patterns in his wins and losses, and constantly refined his approach. He didn't trade on hope—he traded on observed patterns confirmed by real results. In crypto: maintain a detailed trading journal. Tag every trade with setup type, market conditions, emotional state, and outcome. Review monthly for pattern recognition.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-189",
+    "source": "option-volatility-pricing",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "PORTFOLIO GREEKS MANAGEMENT: Don't manage individual option positions—manage your aggregate portfolio Greeks. Net delta = directional exposure. Net gamma = convexity. Net vega = volatility exposure. Net theta = time decay. In crypto, rebalance portfolio Greeks daily. During high-vol events, gamma scalping can replace directional bets. Keep portfolio vega within predefined limits.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-190",
+    "source": "irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "MvrvExtreme"
+    ],
+    "content": "CRYPTO SPECULATION INDEX: Combine: Google Trends for 'bitcoin,' new exchange account registrations, social media mention velocity, and stablecoin inflows to exchanges. When all four are at extreme highs simultaneously = late-stage speculation. When all four are at extreme lows = capitulation complete. This composite sentiment index marks cycle extremes with reasonable accuracy.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-191",
+    "source": "reminiscences",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LIVERMORE'S MARKET MANIPULATION RULE: He observed that pools would mark stocks up, attract public buying, then distribute. The same happens in crypto with market makers and 'whales.' Track large wallet movements. When large holders move BTC to exchanges = potential distribution. When they withdraw to cold storage = accumulation. Follow the smart money, not the crowd.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-192",
+    "source": "evidence-based-ta",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "IN-SAMPLE vs OUT-OF-SAMPLE: A strategy that works perfectly on historical data but fails on new data is curve-fit. Walk-forward optimization: test on rolling 12-month windows, validate on next 3 months. If win rate drops >15% from in-sample to out-of-sample, the strategy is overfit. In crypto's short history, out-of-sample data is scarce—use cross-validation across different coins as an alternative.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-193",
+    "source": "trend-following-bible",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRADING STYLE MUST FIT PERSONALITY: If you're naturally patient, trend following suits you. If you need action, day trading may be more sustainable. If you're analytical, systematic approaches. If you're intuitive, discretionary. You CANNOT follow a system that doesn't fit your personality—you'll abandon it during drawdowns. Match your system to your temperament, not the other way around.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-194",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "TRIANGLE BREAKOUT TRADING: Ascending (bullish), descending (bearish), symmetrical (directional). Enter on breakout with volume. Stop inside the triangle. Target = triangle height projected from breakout. In crypto, triangle breakouts on daily charts have >65% success rate when confirmed by volume. Without volume confirmation, success rate drops below 50%.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-195",
+    "source": "crypto-trading-101",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "BtcDominant",
+      "HalvingProximity"
+    ],
+    "content": "BITCOIN AS DIGITAL GOLD NARRATIVE: BTC's fixed supply (21M) and halving schedule create a deflationary asset unlike any fiat currency. This narrative drives institutional adoption as a store of value. However, narrative ≠ guaranteed outcome. Monitor real institutional flows (Grayscale holdings, ETF inflows, corporate treasury allocations) for validation of the narrative.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-196",
+    "source": "alchemy-finance",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "TRADING THE REACTIVE: Soros doesn't predict—he reacts to what the market tells him about the relationship between perception and reality. When they diverge significantly, he positions for convergence. In crypto: if price is far above on-chain fundamentals, be cautious. If price is far below, be greedy. The market eventually reverts to reality—but can stay irrational longer than you can stay solvent.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-197",
+    "source": "when-genius-failed",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "LEVERAGE MULTIPLIES EVERYTHING: LTCM's 25:1 leverage meant a 4% adverse move wiped out equity. In crypto with 10x leverage, a 10% move wipes out equity. With 100x leverage, a 1% move. Every percentage of leverage multiplies both gains AND losses. For long-term survival, use spot or 2-3x maximum. Use leverage only for short-term trades with tight stops.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-198",
+    "source": "fooled-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "ASYMMETRIC PAYOFF STRUCTURE: The best trading strategies have limited downside and unlimited upside. Long call options, long spot with stop-loss, trend-following systems—all share this property. Avoid strategies with limited upside and unlimited downside (selling naked calls, no-stop leveraged longs). In crypto, the right tail is fat but the left tail is fatter. Always truncate the left tail.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-199",
+    "source": "livermore",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "LIVERMORE'S FIRST RULE: 'A man must believe in himself and his judgment if he expects to make a living at this game.' But self-belief must be earned through experience and study, not ego. In crypto, confidence should come from backtested data and documented results, not from social media echo chambers. Earn your confidence through work, not from following others.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-200",
+    "source": "new-trading-living",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "THE IRON TRIANGLE OF RISK CONTROL: Three requirements for every trade: 1) Trend analysis says go. 2) Oscillator confirms entry timing. 3) Money management allows the trade. If ANY of the three says no, don't trade. In crypto: daily trend is up? MACD/Stochastic confirming? Position within 2% risk limit? Only if all three are satisfied. Skip the trade if one fails.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-201",
+    "source": "option-volatility-pricing",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility",
+      "FundingRateExtreme"
+    ],
+    "content": "CALENDAR SPREADS IN CRYPTO: Buy longer-dated option, sell shorter-dated option at same strike. Profits from term structure (longer-dated IV > shorter-dated). In crypto, the term structure is usually in contango (longer = higher IV). Front-month options decay faster. Calendar spreads are vega-neutral and benefit from time decay. Best during ranging markets with stable IV.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-202",
+    "source": "trend-following-bible",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRADE THE BEST MARKETS: Not all markets trend equally. Rank markets by trend strength (ADX, Aroon) and only trade the top 5-10 trending markets. In crypto, this means focusing capital on the strongest trending coins rather than spreading across 50 positions. Quality over quantity. If nothing is trending strongly, sit in cash/stables. Cash is a valid position.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-203",
+    "source": "complete-turtle-trader",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "MAXIMUM ACCOUNT RISK: Never have more than 12% of account at risk across ALL positions simultaneously (Turtles' rule adapted for crypto). If holding 6 positions at 2% risk each = 12% total. This means even a worst-case scenario (all stops hit) only costs 12%. In crypto's correlated market, reduce to 6-8% total risk. Because when BTC dumps, everything dumps.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-204",
+    "source": "extraordinary-delusions",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "BreakingNews"
+    ],
+    "content": "MASS DELUSION RECOGNITION: In every mass delusion, participants believe they are being rational while collectively behaving irrationally. The key diagnostic: when the justification for an asset's value requires a radical transformation of society (\"BTC will replace all fiat currency,\" \"DeFi will replace all banks\"), you are in a delusion phase. Trade the trend, but plan for the delusion's inevitable end.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-205",
+    "source": "random-walk",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "DOLLAR-COST AVERAGING SUPERIORITY: For most investors, DCA into BTC/ETH outperforms lump-sum timing. The math: DCA reduces variance of outcomes by spreading entry across time. For crypto, weekly DCA over 12 months captures multiple price levels. Combine with value-aware DCA: invest more when MVRV is low, less when MVRV is high. This enhances returns by 15-30% vs blind DCA.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-206",
+    "source": "big-short",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "ExtremeGreed",
+      "OIDivergence"
+    ],
+    "content": "CREDIT CYCLE IN CRYPTO: The crypto credit cycle: 1) Low rates → DeFi yield farming booms. 2) Yield compression → leverage increases. 3) Leverage limits hit → yield sources dry up. 4) Rate hikes/contagion → forced deleveraging. 5) Cascade → credit crisis (Terra, 3AC, Celsius). Monitor DeFi TVL and lending rates. Declining yields + rising leverage = late cycle.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-207",
+    "source": "livermore",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "NEVER AVERAGE DOWN: Livermore's fatal flaw was averaging down on losing positions. He'd double down when prices fell, convinced he was right. This works until it doesn't—and when it doesn't, it destroys you. In crypto, averaging down on a falling altcoin is how accounts go to zero. If your thesis requires a lower entry to be profitable, the thesis was wrong.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-208",
+    "source": "trend-following-bible",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ADX FOR TREND STRENGTH: ADX > 25 = trending market (trade trend strategies). ADX < 20 = ranging market (trade mean-reversion or sit out). ADX rising = trend strengthening (add to position). ADX falling = trend weakening (tighten stops, reduce size). In crypto, ADX on daily timeframe filters out noise. Only trend-follow when ADX confirms a strong trend is in place.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-209",
+    "source": "new-trading-living",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MACD HISTOGRAM DIVERGENCE: When MACD-Histogram makes a lower high while price makes a higher high = bearish divergence (uptrend weakening). Higher low in MACD-H while price makes lower low = bullish divergence (downtrend weakening). On BTC daily, MACD-H divergence signals major trend changes 60-70% of the time. Combine with volume and trend context.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-210",
+    "source": "complete-trading-course",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TRADE EXECUTION TACTICS: 1) Wait for pullback to support in uptrend. 2) Enter on bullish candlestick pattern at support. 3) Stop below support. 4) Target at next resistance or 2:1 R:R. 5) Trail stop after 1:1 R:R reached. This systematic approach removes emotion from execution. In crypto, use limit orders at support levels rather than market orders to avoid slippage.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-211",
+    "source": "crypto-trading-101",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "AltSeason"
+    ],
+    "content": "DIVERSIFICATION IN CRYPTO: Don't put all funds in one coin. Spread across BTC (store of value), ETH (smart contract platform), and 2-3 high-conviction altcoins. BUT remember that crypto diversification is limited—correlations spike during crashes. Use position sizing: BTC 40-50%, ETH 25-30%, altcoins 20-30%, stablecoins 5-10% (dry powder for dips).",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-212",
+    "source": "irrational-exuberance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "MvrvExtreme",
+      "SoprReset",
+      "HalvingProximity"
+    ],
+    "content": "MARKET CYCLE PHASES (CRYPTO): 1) Accumulation (smart money, low volume, MVRV <1). 2) Early bull (rising prices, increasing volume, MVRV 1-2). 3) Euphoria (parabolic, extreme MVRV >3, SOPR >1.1). 4) Distribution (smart money selling, declining volume). 5) Bear market (capitulation, MVRV <1). Identify current phase. Trade accordingly. You cannot change the phase—only position for it.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-213",
+    "source": "alchemy-finance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "REFLEXIVE COLLAPSE CASCADE: In crypto, falling prices → liquidations → more selling → more liquidations → protocol failures → contagion → more selling. This is reflexivity in reverse. The cascade stops when forced selling is exhausted and only strong hands remain. Signs of cascade exhaustion: exchange outflows resume, stablecoin supply increases, MVRV approaches 0.5, capitulation volume spike.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-214",
+    "source": "fooled-randomness",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "BACKTESTING CRYPTO SPECIFIC PITFALLS: 1) Survivorship bias (dead coins excluded). 2) Look-ahead bias (using data not available at trade time). 3) Overfitting (too many parameters for limited data). 4) Ignoring slippage (10-100bps in crypto). 5) Ignoring exchange downtime. 6) Ignoring fork/airdrop effects. 7) Exchange-specific liquidity differences. Address ALL before trusting any backtest.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-215",
+    "source": "livermore",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "LIVERMORE'S RULE OF PATIENCE: 'The desire for constant action irrespective of underlying conditions is responsible for many losses in Wall Street.' Crypto's 24/7 market makes this worse—you feel like you should always be in a position. WRONG. The best traders spend 90% of their time waiting. Set alerts. Trade only when your A+ setup appears. Discipline is profitable. Activity is expensive.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-216",
+    "source": "complete-turtle-trader",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "THE SYSTEM IS THE EDGE: Individual trade outcomes are random. The system's edge only manifests over hundreds of trades. This means you MUST take every signal—skipping trades breaks the system. In crypto, missing one trade can mean missing the 10x move that makes the year. Define your system. Take EVERY signal. Trust the math over your feelings.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-217",
+    "source": "when-genius-failed",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "CONTAGION RISK MAP: LTCM's failure cascaded because counterparty risk was hidden. In crypto, map your counterparty exposure: which exchanges hold your assets? Which DeFi protocols? Which stablecoins? If any single counterparty's failure would be catastrophic, diversify immediately. The 2022 contagion (Terra→3AC→Celsius→Voyager→BlockFi→FTX) proved this lesson at massive scale.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-218",
+    "source": "new-trading-living",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "DAILY HOMEWORK: Every day: 1) Review open positions. 2) Check stops and targets. 3) Scan for new setups. 4) Update trading journal. 5) Review market conditions. This 30-minute ritual is non-negotiable. In crypto, add: check on-chain metrics (exchange flows, whale movements), funding rates, and macro calendar. Homework prevents surprises and maintains discipline.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-219",
+    "source": "trend-following-bible",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "LOSSES ARE THE COST OF BUSINESS: Every business has costs—rent, salaries, supplies. For traders, losses are the cost of doing business. Would you stop paying rent because you had a slow month? No. Don't stop taking trades because of recent losses. The next trade could be the big winner that pays for all the small losses. If you skip it due to fear, you break the system.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-220",
+    "source": "option-volatility-pricing",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "THETA DECAY ACCELERATION: Time decay (theta) accelerates exponentially in the final 30 days before option expiry. If short options, this benefits you—premium evaporates faster. If long options, this hurts you—your position bleeds daily. In crypto, use 30-60 DTE options for long positions (slower decay). Sell weekly/bi-weekly options to collect accelerated theta. Manage gamma risk near expiry.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-221",
+    "source": "extraordinary-delusions",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "GREED IS CONTAGIOUS: \"Everyone has their price\" for corruption—and in manias, the market price of greed is extremely low. When your Uber driver, barber, and grandmother all ask about crypto, the marginal buyer pool is nearly exhausted. New entrants have the least knowledge and highest leverage. Their capitulation drives the crash. Sell when your taxi driver gives you crypto tips.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-222",
+    "source": "livermore",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LIVERMORE'S RECORD-KEEPING: He kept detailed ledgers of every trade, every pattern observed, every lesson learned. He reviewed these records constantly. This made him his own teacher. In crypto, maintain a trade journal with: entry/exit prices, setup type, market conditions, emotional state, and post-trade analysis. Review weekly. The patterns in YOUR behavior are the most profitable patterns to discover.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-223",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "EMA CONFLUENCE ZONES: When multiple EMAs (8, 21, 50, 200) converge tightly, a major move is imminent. Direction is unknown until breakout. In crypto, EMA compression on daily chart preceded every major BTC move of 30%+ in the last 5 years. Trade the breakout with momentum confirmation. Stop below the EMA cluster. Target = previous range projected from breakout.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-224",
+    "source": "new-trading-living",
+    "topic": "Execution",
+    "conditions": [
+      "SessionClose"
+    ],
+    "content": "END-OF-DAY POSITION REVIEW: At session close (4PM EST traditional, 00:00 UTC crypto), review all open positions against your plan. Are stops still appropriate? Has the daily thesis changed? In crypto, the Asian session (00:00-08:00 UTC) often reverses the US session direction. Consider reducing position size before the handoff if you won't be monitoring.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-225",
+    "source": "livermore",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "OPENING HOUR DYNAMICS: Livermore observed that the first hour of trading reveals the day's character—gap direction, opening volume, and initial price action set the tone. In crypto, the 08:00-10:00 UTC window (European open) and 13:30-15:30 UTC (US equity open) are the highest-volume periods. Breakouts during these windows have higher success rates than random-time breakouts.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-226",
+    "source": "new-trading-living",
+    "topic": "OrderFlow",
+    "conditions": [
+      "SessionOpen",
+      "DeltaDivergence"
+    ],
+    "content": "OPENING DRIVE ANALYSIS: First 30 minutes of major session opens show institutional intent. In crypto, watch for large market orders at 08:00 UTC (EU open) and 13:30 UTC (US futures open). If the opening drive is absorbed (price reverses), it's a trap. If it accelerates with increasing volume, the trend is genuine. Use delta (buy vs sell volume) to measure absorption vs continuation.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-227",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "WyckoffSpring",
+      "Ranging"
+    ],
+    "content": "WYCKOFF SPRING PATTERN: Price briefly dips below support (the 'spring') then rapidly reverses upward, trapping shorts below the level. Volume surges on the recovery. In crypto, Wyckoff springs at key weekly support levels (e.g., 200-EMA) are among the highest-probability long entries. Confirm with: 1) Spring below support for <4 hours. 2) Volume spike on recovery. 3) Close back above support.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-228",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "WyckoffSpring",
+      "Trending"
+    ],
+    "content": "WYCKOFF ACCUMULATION SCHEMATIC: Phase A (selling climax → automatic rally → secondary test). Phase B (building cause—range-bound). Phase C (spring—final shakeout below support). Phase D (sign of strength—markup begins). Phase E (markup—trend resumes). In crypto, this multi-week accumulation pattern precedes every major BTC bull run. Identify Phase C (spring) for optimal entry.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-229",
+    "source": "livermore",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "DeltaDivergence",
+      "Trending"
+    ],
+    "content": "DELTA DIVERGENCE SIGNAL: When price makes new highs but delta (buy volume minus sell volume) makes lower highs = sellers are absorbing the rally—distribution is occurring. When price makes new lows but delta makes higher lows = buyers are absorbing the decline—accumulation. In crypto, delta divergence on 4H/daily charts marks major turning points 60-70% of the time.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-230",
+    "source": "complete-turtle-trader",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "WyckoffSpring",
+      "Ranging"
+    ],
+    "content": "WYCKOFF SPRING AS TURTLE FAILURE: The Turtle system's 20-day low breakout entry gets stopped out by Wyckoff springs—the false breakdown that shakes out trend followers before the real move begins. After being stopped on a spring, re-enter if: 1) Price recovers above the breakdown level within 3 bars. 2) Volume increases on recovery. This recaptures the false-break trade.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-231",
+    "source": "new-trading-living",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "DeltaDivergence",
+      "HighVolatility"
+    ],
+    "content": "ORDER FLOW ANALYSIS FOR CRYPTO: Monitor the order book for: 1) Large resting orders (walls) that get pulled (spoofing). 2) Aggressive market orders (taker buy/sell ratio). 3) Delta (net buying vs selling pressure). In crypto, order book data is freely available on most exchanges. Track the bid-ask imbalance—if takers are aggressively buying, price is likely to move up short-term.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-232",
+    "source": "alchemy-finance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "WyckoffSpring",
+      "ExtremeFear"
+    ],
+    "content": "WYCKOFF SPRING AS REFLEXIVE BOTTOM: Soros's reflexivity explains why Wyckoff springs mark bottoms—the panic selling that creates the spring is the final capitulation of weak hands. Once exhausted, the reflexive loop reverses: rising prices attract buyers, which raises prices further. The spring IS the moment where the far-from-equilibrium downward trend exhausts itself.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-233",
+    "source": "evidence-based-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "DeltaDivergence",
+      "Trending"
+    ],
+    "content": "DELTA DIVERGENCE STATISTICAL VALIDATION: Academic studies on order flow show that cumulative delta divergence from price predicts reversals with 55-65% accuracy across multiple markets. In crypto, the signal is stronger due to less sophisticated participants and more behavioral trading. Apply statistical significance testing—require at least 30 instances before trusting the pattern.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-234",
+    "source": "crypto-trading-101",
+    "topic": "OrderFlow",
+    "conditions": [
+      "DeltaDivergence",
+      "HighVolatility"
+    ],
+    "content": "CRYPTO ORDER BOOK READING: On exchanges like Binance, the order book shows all limit orders at each price level. Key signals: 1) Spoofing—large orders placed then removed to manipulate direction. 2) Stacking—multiple orders at the same level for genuine support/resistance. 3) Iceberg orders—hidden large orders that only show small portions. Watch for order book imbalance as short-term direction signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-235",
+    "source": "livermore",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "SessionClose",
+      "Trending"
+    ],
+    "content": "CLOSING PRICE SIGNIFICANCE: Livermore considered the close the most important price of the day—it represents the final verdict of all participants. In crypto, the daily close (00:00 UTC) is the most important candle for technical analysis. Weekly close (Sunday 00:00 UTC) is the most significant for swing trading. A strong close near the high/low of the day signals continuation.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-236",
+    "source": "new-trading-living",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen",
+      "HighVolatility"
+    ],
+    "content": "PRE-MARKET PREPARATION: Before market open, review: 1) Overnight price action. 2) Key levels from previous day. 3) Any overnight news/events. 4) Pre-set orders at planned entry/exit levels. In crypto's 24/7 market, define your 'session' (e.g., your waking hours). Before starting your trading session, check what happened while you slept. Set alerts for key levels so you don't miss overnight moves.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-237",
+    "source": "complete-turtle-trader",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "WyckoffSpring",
+      "ExtremeFear"
+    ],
+    "content": "SHAKEOUT BEFORE BREAKOUT: The Turtles' system often got whipsawed by 'shakeout' moves—false breakdowns that triggered stops before the real trend began. This is exactly the Wyckoff spring. The solution: use a 're-entry' rule—if stopped out and price reclaims the level within 3 bars, re-enter the original position. This recaptures the trend after the shakeout.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-238",
+    "source": "evidence-based-ta",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "DeltaDivergence",
+      "Ranging"
+    ],
+    "content": "VOLUME-PRICE DIVERGENCE SCIENTIFIC BASIS: Aronson's research confirms that volume-price divergences have statistical validity across multiple markets. Rising price + declining volume = distribution. Falling price + declining volume = accumulation. In crypto, these signals are even more pronounced because volume is the primary honest indicator (harder to fake than price). Require statistical significance before trading.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-239",
+    "source": "option-volatility-pricing",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "DeltaDivergence",
+      "HighVolatility"
+    ],
+    "content": "OPTIONS ORDER FLOW AS SIGNAL: Unusual options activity (large block trades, volume spikes in specific strikes) reveals institutional positioning. In crypto (Deribit), track: 1) Put/Call ratio extremes. 2) Large block trades in specific strikes. 3) Implied volatility changes across the surface. Unusual put buying before a crash, or call buying before a rally, is a leading signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-240",
+    "source": "trend-following-bible",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "LiquidityExpansion",
+      "Trending"
+    ],
+    "content": "LIQUIDITY EXPANSION ENTRY: Enter trend-following positions when liquidity expands—volume surges, bid-ask spreads narrow, and volatility increases. In crypto, liquidity expansion often accompanies breakout moves. The opposite—liquidity contraction (declining volume, widening spreads)—signals range-bound conditions. Match strategy to liquidity regime: trend-follow during expansion, mean-revert during contraction.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-241",
+    "source": "livermore",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "LiquidityContraction",
+      "Ranging"
+    ],
+    "content": "LOW VOLUME CONSOLIDATION: Livermore noted that stocks often consolidated on low volume before making big moves. In crypto, when BTC volume drops below 50% of its 20-day average for 5+ days, a volatility expansion is imminent. Direction is unknown. Prepare for the move with breakout orders in both directions. The longer the consolidation, the bigger the eventual move.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-242",
+    "source": "new-trading-living",
+    "topic": "RiskManagement",
+    "conditions": [
+      "SessionClose"
+    ],
+    "content": "END-OF-WEEK POSITION MANAGEMENT: Reduce position sizes by 50% before the weekend. Crypto weekend liquidity is lower, making price more susceptible to manipulation and gap moves. CME futures close Friday and reopen Sunday—BTC can gap significantly. Weekend moves are often reversed Monday. If you hold over weekend, reduce risk and widen stops slightly.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-243",
+    "source": "trading-living",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "DeltaDivergence",
+      "Trending"
+    ],
+    "content": "VOLUME CONFIRMS TREND: In a genuine uptrend, volume should increase on rallies and decrease on pullbacks. In a genuine downtrend, volume increases on declines and decreases on bounces. If volume contradicts price (price rising but volume declining), the trend is losing momentum. In crypto, volume analysis on BTC daily chart is the single most reliable trend confirmation tool.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-244",
+    "source": "random-walk",
+    "topic": "Backtesting",
+    "conditions": [
+      "LiquidityExpansion",
+      "LiquidityContraction"
+    ],
+    "content": "LIQUIDITY AND MARKET EFFICIENCY: The random walk hypothesis holds better in liquid markets where information is quickly priced in. Crypto markets are less liquid than equities, creating more exploitable inefficiencies during low-liquidity periods. However, these inefficiencies come with higher execution costs (slippage). Net edge = gross edge minus execution costs. Trade the most liquid instruments.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-245",
+    "source": "big-short",
+    "topic": "Sentiment",
+    "conditions": [
+      "LiquidityContraction",
+      "ExtremeFear"
+    ],
+    "content": "LIQUIDITY VACUUM EVENTS: When everyone tries to exit simultaneously, liquidity evaporates. In 2008, mortgage-backed securities had zero bids. In crypto, during crashes, order books thin dramatically—spreads widen 10x, slippage exceeds 5%. This is when stop-losses execute 10-20% from trigger price. Mitigate with: limit orders (not market), smaller position sizes, and multiple exchange access.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-246",
+    "source": "fooled-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "LiquidityContraction",
+      "HighVolatility"
+    ],
+    "content": "LIQUIDITY IS NOT GUARANTEED: Most trading models assume you can exit at or near your desired price. In crypto, liquidity can vanish in seconds during crashes. Your 'stop-loss' at $50K might fill at $45K during a flash crash. Account for this in position sizing—assume worst-case slippage of 5-10% on stops during high-vol events. If that makes the trade unprofitable on paper, don't take it.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-247",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "LiquidityExpansion",
+      "Trending"
+    ],
+    "content": "VOLUME BREAKOUT VALIDATION: A breakout on volume 2x+ the 20-day average is likely genuine. A breakout on below-average volume is likely a trap. In crypto, monitor 24h volume relative to market cap—high volume/market-cap ratio during breakouts indicates broad participation. Low ratio = likely manipulation or low-conviction move. Wait for volume confirmation before entering breakout trades.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-248",
+    "source": "irrational-exuberance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "LiquidityContraction",
+      "ExtremeFear"
+    ],
+    "content": "LIQUIDATION-DRIVEN BEAR MARKETS: Shiller's bubble model implies that when the marginal buyer is exhausted, forced selling (liquidations) drives prices far below fundamental value. In crypto, DeFi protocol liquidations, exchange margin calls, and leveraged position liquidations create cascading forced selling. Monitor aggregate liquidation levels—when $1B+ in liquidations cluster at a price, expect violent moves through that level.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-249",
+    "source": "alchemy-finance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "LiquidityExpansion",
+      "Trending"
+    ],
+    "content": "REFLEXIVE LIQUIDITY: In Soros's framework, rising prices attract more capital (liquidity expansion), which drives prices further. Falling prices repel capital (liquidity contraction), which drives prices lower. This reflexive liquidity cycle is especially pronounced in crypto where capital flows between DeFi, CEX, and stablecoins are fast and frictionless. Trade with expanding liquidity, reduce when it contracts.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-250",
+    "source": "extraordinary-delusions",
+    "topic": "Sentiment",
+    "conditions": [
+      "LiquidityContraction",
+      "ExtremeFear"
+    ],
+    "content": "BANK RUN PSYCHOLOGY IN CRYPTO: The same psychology that drives bank runs drives exchange outflows during crypto crises. If depositors believe others are withdrawing, rational behavior is to withdraw too—even if the exchange is solvent. This self-fulfilling prophecy can kill solvent exchanges (FTX). Diversify across exchanges. Keep only active trading capital on any single platform.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-251",
+    "source": "crypto-encyclopedia",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen",
+      "LiquidityExpansion"
+    ],
+    "content": "CRYPTO MARKET HOURS: While crypto trades 24/7, distinct sessions exist. Asian session (00:00-08:00 UTC): historically bearish bias for BTC. European session (08:00-16:00 UTC): higher volatility, more institutional flow. US session (13:30-21:00 UTC): highest volume, most directional moves. Weekend sessions: lower volume, more susceptible to manipulation. Trade during highest-volume sessions for best execution.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-252",
+    "source": "trend-following-bible",
+    "topic": "RiskManagement",
+    "conditions": [
+      "LiquidityContraction",
+      "HighVolatility"
+    ],
+    "content": "LIQUIDITY-BASED POSITION SIZING: Reduce position size when liquidity contracts (declining volume, widening spreads). In crypto, when BTC daily volume drops below 30-day average by >50%, reduce position sizes by 50%. Low liquidity means: 1) Harder to exit. 2) Larger slippage. 3) More susceptibility to manipulation. Liquidity is a risk factor—price it into your position sizing.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-253",
+    "source": "new-trading-living",
+    "topic": "Execution",
+    "conditions": [
+      "SessionClose",
+      "HighVolatility"
+    ],
+    "content": "POST-CLOSE JOURNALING: After your trading session, document: 1) What you planned vs what you executed. 2) Emotional state during trades. 3) Any plan violations and why. 4) Market observations. 5) Tomorrow's key levels and scenarios. This 15-minute ritual is the most valuable trading activity. The journal becomes your edge—showing you patterns in YOUR behavior that you can exploit or correct.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-254",
+    "source": "livermore",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "SessionOpen",
+      "LiquidityExpansion"
+    ],
+    "content": "MORNING GAP ANALYSIS: A gap up at session open with expanding volume = bullish signal (buyers overwhelmed sellers overnight). Gap down with expanding volume = bearish. In crypto, CME futures gaps (weekend gaps) fill ~70% of the time but not immediately. Intraday gaps at session opens (EU/US) with volume are more actionable—trade in direction of gap with stop inside gap range.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-255",
+    "source": "option-volatility-pricing",
+    "topic": "RiskManagement",
+    "conditions": [
+      "SessionClose",
+      "HighVolatility"
+    ],
+    "content": "OPTIONS EXPIRY DAY MANAGEMENT: On Deribit expiry day (Friday 08:00 UTC), close or roll positions by Thursday. Expiry day is chaotic—pin risk, gamma squeezes, and erratic price action as market makers adjust hedges. In crypto, monthly/quarterly expiries (last Friday of month) are especially significant. Post-expiry, the removal of hedging flows often causes directional moves.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-256",
+    "source": "complete-turtle-trader",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "SessionOpen",
+      "Trending"
+    ],
+    "content": "TURTLE SYSTEM ENTRY TIMING: The Turtles entered on new 20-day highs/lows regardless of time of day. However, breakouts during high-volume sessions (US open) were more reliable than breakouts during Asian quiet hours. Adapt for crypto: weight breakouts occurring during 13:30-21:00 UTC (US session) more heavily than overnight breakouts. Volume-confirmed breakouts at session open are strongest.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-257",
+    "source": "evidence-based-ta",
+    "topic": "Backtesting",
+    "conditions": [
+      "SessionOpen",
+      "SessionClose"
+    ],
+    "content": "TIME-OF-DAY EFFECTS IN CRYPTO: Statistical analysis shows BTC returns are not uniform across hours. US session (13:30-21:00 UTC) generates disproportionate returns. Asian session has a slight negative bias. These patterns persist across years and are statistically significant. Incorporate time-of-day as a factor in entry/exit timing—enter during high-return periods, avoid low-return periods.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-258",
+    "source": "big-short",
+    "topic": "RiskManagement",
+    "conditions": [
+      "LiquidityContraction",
+      "ExtremeFear"
+    ],
+    "content": "CONTAGION PLANNING: Before entering any crypto position, answer: 'What happens if the largest exchange collapses? If the largest stablecoin depegs? If BTC drops 50% overnight?' If any scenario leads to account ruin, reduce position size. The 2022 contagion chain (Terra→3AC→Celsius→FTX) destroyed fortunes of traders who assumed 'it can't all happen at once.' It can. It did.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-259",
+    "source": "fooled-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "SessionClose"
+    ],
+    "content": "RESULTS-ORIENTED THINKING: Don't evaluate your trading by today's P&L. Evaluate by the quality of your decisions. A day where you followed your plan and lost money is a GOOD day. A day where you broke your plan and made money is a BAD day (it reinforces bad behavior). At session close, grade your PROCESS (A/B/C), not your outcome. Process improvement leads to outcome improvement.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-260",
+    "source": "trend-following-bible",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "WyckoffSpring",
+      "Ranging"
+    ],
+    "content": "FALSE BREAKOUT RECOVERY ENTRY: When a trend-following breakout fails (false breakdown/spring), the recovery is often explosive. Strategy: 1) Get stopped on initial breakout. 2) Watch for recovery above the breakdown level. 3) Re-enter on recovery with stop below the false breakdown low. 4) The false move was the stop-hunt—the real move follows. This is Wyckoff spring logic applied to trend following.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-261",
+    "source": "crypto-trading-101",
+    "topic": "Execution",
+    "conditions": [
+      "LiquidityExpansion",
+      "HighVolatility"
+    ],
+    "content": "EXCHANGE SELECTION FOR LIQUIDITY: During high volatility, not all exchanges have equal liquidity. Binance > Coinbase > FTX (dead) > smaller exchanges. For large orders, check order book depth across exchanges. Use exchange aggregators (1inch for DEX, or Coinglass for futures) to find best execution. In crisis, some exchanges halt withdrawals—have accounts on multiple exchanges for redundancy.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-262",
+    "source": "livermore",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "LiquidityExpansion",
+      "ExtremeGreed"
+    ],
+    "content": "CLIMAX VOLUME: Livermore recognized that extreme volume at trend extremes signaled exhaustion—buying climax (high volume at top) or selling climax (high volume at bottom). In crypto, daily volume >3x the 20-day average at a price extreme = likely climax. Don't chase climax moves—wait for pullback. Climax volume + bearish candle pattern = high-probability reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-263",
+    "source": "irrational-exuberance",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "SessionClose",
+      "MvrvExtreme"
+    ],
+    "content": "WEEKLY CLOSE SIGNIFICANCE: Shiller emphasizes that market narratives crystallize around weekly timeframes. The weekly candle close is the most significant for crypto cycle analysis. A weekly close above key resistance (e.g., BTC above $50K) shifts narratives. A weekly close below support triggers bearish narrative shifts. Use weekly close for strategic decisions, daily for tactical entries.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-264",
+    "source": "alchemy-finance",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen",
+      "LiquidityExpansion"
+    ],
+    "content": "SOROS'S FIRST-MOVER ADVANTAGE: Soros positioned early, before the crowd recognized the trend. In crypto, first-mover advantage means entering breakouts at session opens before confirmation by the broader market. If BTC breaks above resistance during the Asian session (low participation), the European and US sessions will amplify the move. Enter early, add on confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-265",
+    "source": "complete-trading-course",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "SessionClose",
+      "Trending"
+    ],
+    "content": "DAILY CANDLE ANALYSIS: At session close, analyze the daily candle: 1) Long body with small wicks = strong trend conviction. 2) Doji/small body = indecision, potential reversal. 3) Long upper wick = selling pressure (bearish). 4) Long lower wick = buying pressure (bullish). In crypto, daily candles are the most reliable timeframe for candlestick pattern analysis. Weekly candles for longer-term positioning.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-266",
+    "source": "when-genius-failed",
+    "topic": "RiskManagement",
+    "conditions": [
+      "LiquidityContraction",
+      "ExtremeFear"
+    ],
+    "content": "LIQUIDITY PREMIUM: LTCM's models didn't account for liquidity risk—they assumed they could always exit at fair value. In crypto, liquidity risk is the #1 risk after directional risk. Illiquid positions deserve a 'liquidity discount'—don't pay the same price for an illiquid altcoin as for BTC. If you can't exit in <1 hour without moving the market >2%, the position is too large.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-267",
+    "source": "random-walk",
+    "topic": "RiskManagement",
+    "conditions": [
+      "SessionClose"
+    ],
+    "content": "PORTFOLIO REBALANCING CADENCE: Malkiel advocates regular rebalancing to maintain target allocations. In crypto, rebalance monthly or when any position deviates >20% from target weight. This forces you to sell winners and buy losers—a systematic contrarian strategy. In bull markets, rebalancing reduces returns slightly but in bear markets it dramatically reduces drawdowns.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-268",
+    "source": "new-trading-living",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "LiquidityContraction",
+      "Ranging"
+    ],
+    "content": "RANGE-BOUND TRADING IN LOW LIQUIDITY: When liquidity contracts and Bollinger Bands narrow, switch from trend-following to mean-reversion. Buy at range support, sell at range resistance. In crypto, this is effective during consolidation phases between major trends. Use RSI oversold/overbought for entries. Exit if range breaks (close outside Bollinger Band with volume).",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-269",
+    "source": "extraordinary-delusions",
+    "topic": "Sentiment",
+    "conditions": [
+      "SessionOpen",
+      "BreakingNews"
+    ],
+    "content": "NEWS REACTION ANALYSIS: How a market reacts to news reveals its true condition. Good news + price up = healthy market. Good news + price down = distribution (smart money selling into strength). Bad news + price up = accumulation (smart money buying the dip). Bad news + price down = genuine weakness. In crypto, monitor reaction to halving events, ETF news, and regulatory announcements.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-270",
+    "source": "option-volatility-pricing",
+    "topic": "RiskManagement",
+    "conditions": [
+      "WyckoffSpring",
+      "HighVolatility"
+    ],
+    "content": "GAMMA SQUEEZE AT SPRING BOTTOMS: When Wyckoff spring occurs near options max-pain, market makers who are short puts must delta-hedge by buying the underlying. This gamma squeeze amplifies the recovery move. In crypto (Deribit), track max-pain price. If a spring occurs near max-pain during high open interest, the recovery will be explosive due to forced delta-hedging buying.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-271",
+    "source": "crypto-encyclopedia",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "SessionOpen",
+      "HalvingProximity"
+    ],
+    "content": "HALVING ANTICIPATION CYCLE: The crypto market prices in halving events 6-12 months in advance. Track halving proximity: 12+ months before = accumulation phase. 6-12 months = early markup. 0-6 months = anticipation peak. Post-halving = 'buy the rumor, sell the news' potential. In the weeks before halving, watch for increasing spot demand and declining exchange reserves.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-272",
+    "source": "livermore",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "SessionClose",
+      "Trending"
+    ],
+    "content": "MULTI-TIMEFRAME CONFIRMATION: Livermore used daily, weekly, and monthly data to confirm his positions. In crypto: monthly chart for cycle direction, weekly for trend direction, daily for entry timing, 4H for precision entry. A trade that aligns across all four timeframes is highest conviction. A conflict between timeframes = reduce size or sit out. The daily close is the most important data point.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-273",
+    "source": "evidence-based-ta",
+    "topic": "Backtesting",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "REGIME-DEPENDENT STRATEGY SELECTION: Different strategies work in different regimes. In trending markets, momentum strategies outperform. In ranging markets, mean-reversion strategies outperform. In high-volatility markets, volatility-selling strategies work. The key: IDENTIFY THE REGIME FIRST, then select the appropriate strategy. Use ADX for trending/ranging, VIX-equivalent (BVOL) for vol regime.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-274",
+    "source": "fooled-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "LiquidationCluster"
+    ],
+    "content": "RECOVERY FROM DRAWDOWNS: A 10% loss requires 11% gain to recover. A 50% loss requires 100% gain. A 90% loss requires 900% gain. This asymmetry means large drawdowns are exponentially harder to recover from. In crypto's volatility, a single bad trade with no stop can set you back years. Protect capital above all else. The math of drawdown recovery is unforgiving.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-275",
+    "source": "big-short",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "FomcDate",
+      "LiquidityContraction"
+    ],
+    "content": "FED POLICY AND CRYPTO LIQUIDITY: Fed tightening (rate hikes, QT) reduces global dollar liquidity, which flows out of risk assets including crypto. Fed easing (rate cuts, QE) increases dollar liquidity flowing into crypto. The correlation between Fed balance sheet and BTC price is >0.7 over multi-year periods. Trade crypto with the macro tide—don't fight the Fed.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-276",
+    "source": "trend-following-bible",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "TRAILING STOP METHODS: 1) ATR trailing stop (2-3x ATR below highest close). 2) Moving average trail (close below 20-EMA). 3) Parabolic SAR. 4) Chandelier exit. In crypto, ATR trailing works best during volatile trends. Moving average trails work best during smooth trends. Select method based on current volatility regime. Never use fixed-percentage trails—they're too rigid for crypto's varying volatility.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-277",
+    "source": "complete-turtle-trader",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SYSTEM COMPLETENESS: A complete trading system must define: 1) Market universe. 2) Entry rules. 3) Exit rules. 4) Position sizing. 5) Risk management. 6) Portfolio limits. If any element is missing, it's not a system—it's a collection of ideas. In crypto, many traders have entry rules but no exit rules, or sizing but no risk limits. Build the COMPLETE system before trading real money.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-278",
+    "source": "new-trading-living",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen",
+      "LiquidityExpansion"
+    ],
+    "content": "SCANNING FOR TRADES: Use screeners to find setups rather than manually charting hundreds of coins. Filter by: 1) Trend direction (above 200-EMA). 2) Volume surge (>2x average). 3) RSI between 30-70 (not extreme). 4) Proximity to support/resistance. In crypto, TradingView screener or CoinGecko filters work. Scan during your pre-market routine. Only trade the top 3-5 setups.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-279",
+    "source": "option-volatility-pricing",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "LiquidityContraction",
+      "LowVolatility"
+    ],
+    "content": "LOW VOLATILITY REGIME OPTIONS STRATEGIES: When crypto IV is below 50% annualized (rare but happens during extended consolidation), buy straddles/strangles cheaply. The 'volatility risk premium' is minimal during these periods. If a breakout is imminent (BB squeeze, triangle formation), a long straddle captures the move regardless of direction. Close when IV doubles from entry level.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-280",
+    "source": "random-walk",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "FomcDate",
+      "BreakingNews"
+    ],
+    "content": "INFORMATION INCORPORATION SPEED: The random walk hypothesis says all available information is already in price. In crypto, information is incorporated faster in BTC (seconds) than in altcoins (minutes to hours). This means: 1) BTC leads. 2) Altcoins lag. 3) Trade altcoins based on BTC's reaction to news. If BTC sells off on FOMC news, sell alts immediately—they'll follow with a delay.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-281",
+    "source": "livermore",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "content": "LIVERMORE ON CROWD FOLLOWING: 'The public always wants to be told. The ticker is the great leveler.' He meant that the tape tells the truth even when people lie. In crypto, ignore the narratives on Twitter/Discord. Look at what participants are DOING (order flow, funding rates, on-chain movements), not what they're SAYING. Actions > words. Always.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-282",
+    "source": "irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "HalvingProximity"
+    ],
+    "content": "NARRATIVE SHIFT TIMING: Major narrative shifts in crypto coincide with external catalysts: 1) Halving events (supply shock narrative). 2) ETF approvals (institutional adoption narrative). 3) Macro crises (safe haven narrative). 4) Protocol upgrades (technology narrative). Track when the dominant narrative changes—each new narrative attracts a new wave of marginal buyers and extends the cycle.",
+    "priority": 4
+  },
+  {
+    "id": "book-bco-283",
+    "source": "complete-trading-course",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "SessionOpen"
+    ],
+    "content": "ENTRY CHECKLIST: Before EVERY trade: 1) Weekly trend direction identified? 2) Daily trend aligned? 3) Key level identified? 4) Entry trigger present? 5) Stop level defined? 6) Risk/reward >2:1? 7) Position size within 2% risk? 8) Correlation check with existing positions? If any answer is NO, skip the trade. This 60-second checklist prevents 80% of bad trades.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-284",
+    "source": "when-genius-failed",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeGreed"
+    ],
+    "content": "INSTITUTIONAL ARROGANCE: LTCM's Nobel laureates believed their models were superior because of their credentials. In crypto, similar arrogance comes from early success. 'I turned $1K into $100K—I must be a genius.' No, you were lucky in a bull market. Humility is the antidote. Assume every trade could be your last. Treat each position as if your career depends on it. Because it does.",
+    "priority": 5
+  },
+  {
+    "id": "book-bco-285",
+    "source": "trend-following-bible",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "THE LOSING STREAK MENTALITY: After 5+ consecutive losses, most traders abandon their system. This is exactly when the next trade is most likely to be the big winner—if the system is valid. The solution: 1) Trade small enough that a 10-trade losing streak doesn't emotionally devastate you. 2) Track your system's maximum expected drawdown from backtesting. 3) If current drawdown exceeds historical max, THEN review the system.",
+    "priority": 5
+  }
+]

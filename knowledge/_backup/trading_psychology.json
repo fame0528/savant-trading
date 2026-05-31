@@ -1,0 +1,82 @@
+[
+  {
+    "id": "psych-001",
+    "source": "jared-tencler-tilt",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility", "ExtremeFear"],
+    "content": "TILT — Compounding Emotional Triggers: Tilt is NOT a sudden event — it COMPOUNDS as successive emotional triggers overwhelm executive functioning during drawdowns or variance shocks. The mind struggles to recover from rapid consecutive triggers. Tilt carries over SESSION TO SESSION — yesterday's tilt affects today's decisions. Detection: 1) Increasing position size after losses. 2) Breaking rules you normally follow. 3) Entering trades without your setup being present. 4) Feeling anger/frustration before entry. Response: STOP trading immediately. Walk away for minimum 2 hours. Review the trigger. Write down what rule was broken. Only return after emotional state is baseline.",
+    "priority": 5
+  },
+  {
+    "id": "psych-002",
+    "source": "psychology-today-cbt-debiasing",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "COGNITIVE DEBIASING FRAMEWORKS: Key biases affecting traders: 1) Recency bias — overweighting recent trades in decision-making. 2) Anchoring — fixating on entry price rather than current reality. 3) Confirmation bias — seeking data that supports existing position. 4) Loss aversion — feeling losses 2× more than equivalent gains. 5) Disposition effect — holding losers too long, selling winners too early. Debiasing: 1) Write down your thesis BEFORE entry (prevents post-hoc rationalization). 2) Set alerts and walk away (prevents anchoring to price). 3) Actively seek disconfirming evidence. 4) Use mechanical exit rules (eliminates disposition effect).",
+    "priority": 5
+  },
+  {
+    "id": "psych-003",
+    "source": "bear-bull-traders-deliberate-practice",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "DELIBERATE PRACTICE FOR TRADING: Not just 'screen time' — structured practice with specific improvement targets. Framework: 1) Identify ONE specific weakness (e.g., cutting winners too early). 2) Design a practice exercise (e.g., hold all winners for minimum 2R for 20 trades). 3) Execute with full attention. 4) Review every trade against the specific target. 5) Adjust and repeat. Rules: Practice ONE skill at a time. Track progress quantitatively. Separate practice sessions from performance sessions. Practice in paper trading, perform in live. The goal is ITERATIVE REFINEMENT, not just accumulating trade count.",
+    "priority": 4
+  },
+  {
+    "id": "psych-004",
+    "source": "steenbarger-self-worth",
+    "topic": "Psychology",
+    "conditions": ["ExtremeFear", "ExtremeGreed"],
+    "content": "SEPARATING SELF-WORTH FROM P&L: When traders equate PnL with self-worth, losses become PSYCHOLOGICAL THREATS triggering fight-or-flight adrenal responses. This hijacks rational decision-making. Solution: Reframe losses as OBJECTIVE DATA POINTS for edge refinement, not personal failures. Implementation: 1) Journal losses with clinical detachment (what happened, not why I'm bad). 2) Track process metrics separately from PnL (did I follow my rules?). 3) Celebrate rule adherence even on losing days. 4) Separate identity from outcome — 'I am a trader who had a losing trade' not 'I am a loser'.",
+    "priority": 5
+  },
+  {
+    "id": "psych-005",
+    "source": "jared-tencler-emotions-as-signals",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "EMOTIONS AS SYSTEM FLAW SIGNALS: Don't suppress emotions — ANALYZE them. Fear before entry = your position size may be too large, or your stop is too wide. Frustration after a loss = your R:R expectations may be unrealistic. Greed after a win = you may be about to violate position sizing rules. Each emotion points to a SPECIFIC, FIXABLE flaw in your execution matrix. Exercise: When you feel an emotion, PAUSE and ask: 'What does this emotion tell me about my system?' Then fix the system, not the emotion. Emotions are DIAGNOSTIC TOOLS, not obstacles.",
+    "priority": 5
+  },
+  {
+    "id": "psych-006",
+    "source": "loss-aversion-disposition-effect",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "LOSS AVERSION AND DISPOSITION EFFECT: Loss aversion = feeling losses 2× more intensely than equivalent gains. This creates the disposition effect: holding losers too long (hoping for recovery) and selling winners too early (locking in the 'good feeling'). Consequences: Average loss > Average win. Win rate needed for profitability increases dramatically. Solution: MECHANICAL exit rules. Set stop-loss and take-profit BEFORE entry. NEVER move stop-loss further away. NEVER close a winner before TP unless your system signals it. Remove human judgment from exit decisions entirely.",
+    "priority": 5
+  },
+  {
+    "id": "psych-007",
+    "source": "bear-bull-traders-metacognition",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "METACOGNITIVE AWARENESS IN TRADING: Metacognition = thinking about your thinking. During a trade, monitor your DECISION-MAKING PROCESS, not just the outcome. Ask: 1) Am I making this decision based on data or emotion? 2) Would I make this same decision if I had no open position? 3) Am I rationalizing a decision I've already made? 4) What would I advise a friend in this situation? The goal is to OBSERVE your cognitive patterns in real-time and catch biases before they affect execution. This is a SKILL that improves with deliberate practice.",
+    "priority": 4
+  },
+  {
+    "id": "psych-008",
+    "source": "fight-or-flight-drawdowns",
+    "topic": "Psychology",
+    "conditions": ["ExtremeFear", "HighVolatility"],
+    "content": "FIGHT-OR-FLIGHT RESPONSE IN DRAWDOWNS: During extended drawdowns, the brain's amygdala hijacks rational thinking. Fight response = doubling down on losers (Martingale). Flight response = closing everything and stopping trading at the WORST time. Both are instinctive, neither is optimal. Prevention: 1) Pre-commit to circuit breaker rules BEFORE the drawdown starts. 2) Reduce position size automatically as drawdown deepens. 3) Have a 'drawdown protocol' written down that you follow mechanically. 4) Never make trading decisions during acute stress — the 2-hour rule. 5) Physical exercise after drawdown sessions to reset cortisol levels.",
+    "priority": 4
+  },
+  {
+    "id": "psych-009",
+    "source": "duklascopy-journal-protocol",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "JOURNAL-BASED PERFORMANCE REVIEW PROTOCOL: After every trading session: 1) Screenshot every trade entry and exit. 2) Write: setup type, entry reason, exit reason, emotional state. 3) Rate rule adherence 1-10 (not profitability). 4) Identify ONE thing to improve tomorrow. Weekly review: 1) Calculate process metrics (rule adherence %, plan compliance %). 2) Identify patterns (e.g., 'I break rules most on Mondays'). 3) Set ONE specific improvement target for next week. Monthly review: 1) Compare process metrics to PnL — they should correlate. 2) If PnL up but process metrics down = lucky, not skilled.",
+    "priority": 4
+  },
+  {
+    "id": "psych-010",
+    "source": "juvier-consequence-discipline",
+    "topic": "Psychology",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "CONSEQUENCE-BASED DISCIPLINE SYSTEMS: When willpower alone fails, create external consequences for rule-breaking. Examples from Juvier: Physical discomfort (ice bath, running 3 miles) for breaking trading rules. This works because the brain weighs immediate consequences more heavily than abstract future losses. Implementation: 1) Define your 3 most important rules. 2) Assign a meaningful consequence for each violation. 3) Have an accountability partner enforce it. 4) Scale consequences with severity (minor rule = cold shower, major rule = 5-mile run). The goal is to make rule-breaking PAINFUL enough that your brain defaults to following rules.",
+    "priority": 3
+  }
+]

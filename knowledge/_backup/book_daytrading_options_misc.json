@@ -1,0 +1,2106 @@
+[
+  {
+    "id": "book-dom-001",
+    "source": "aziz-day-trading",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "OPENING RANGE BREAKOUT: Define high/low of first 5-15 min. Long on break above range high with volume, short below range low. Stop at opposite side. Best on stocks gapping >2% pre-market. 80% of daily range established by 10:30 AM EST.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-002",
+    "source": "aziz-day-trading",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen",
+      "HighVolatility"
+    ],
+    "content": "FIRST HOUR RULE: Never trade first 5 min. Highest probability 9:45-10:30 AM EST. By 11:30 AM volume dies. Avoid midday 11:30-2:00 PM - low probability chop.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-003",
+    "source": "aziz-day-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "SessionOpen",
+      "Trending"
+    ],
+    "content": "ABCD PATTERN: Impulse A-B, pullback to C (38-50% Fib), continuation D. Entry at C with MA/VWAP support. Stop below C. Target = AB leg extension.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-004",
+    "source": "aziz-day-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "SessionOpen"
+    ],
+    "content": "BULL FLAG: Spike on heavy volume, tight parallel consolidation. Entry on break above flag resistance with volume. Stop below flag low. Tighter = more explosive.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-005",
+    "source": "aziz-day-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "SessionOpen"
+    ],
+    "content": "VWAP: Price above = bullish, below = bearish. Buy pullbacks to VWAP in uptrend. Acts as magnet and S/R. Institutional execution benchmark.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-006",
+    "source": "aziz-day-trading",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "RED-TO-GREEN: Stock opens red, crosses above prior close with volume. Longer in red = stronger move from trapped shorts. Requires catalyst.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-007",
+    "source": "aziz-day-trading",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "RISK: Max 1% per trade. Size = Account Risk / Trade Risk. Daily loss limit = 3%. Hit = done. Three losing days = day off.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-008",
+    "source": "aziz-day-trading",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "11 RULES: Best setups only. No overtrade. Cut fast. Let winners run. No revenge. Accept wrong. Risk first. Stick plan. Review. Journal. Learn.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-009",
+    "source": "aziz-day-trading",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "GAPPERS: Gap >2% with catalyst. Float <50M. High short interest = squeeze. Entry at ORB not open. Never chase 10%+ moved.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-010",
+    "source": "day-trading-for-dummies",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen",
+      "HighVolatility"
+    ],
+    "content": "GAP TRADING: Earnings gaps 3x+ volume continue. Gaps below support keep falling. Fill in 1hr = fade. No fill = trend with it.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-011",
+    "source": "day-trading-for-dummies",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility",
+      "SessionOpen"
+    ],
+    "content": "SCALPING: Strongest on news volume. 1-min entry breaks 5-min high. Target 0.5-1%. Exit 5-15 min. Level 2 required.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-012",
+    "source": "day-trading-for-dummies",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SIZING: Shares = (Account x Risk%) / (Entry - Stop). Never widen stops. Scale: 50% initial, 25% confirm, 25% breakout.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-013",
+    "source": "day-trading-for-dummies",
+    "topic": "Execution",
+    "conditions": [
+      "SessionClose"
+    ],
+    "content": "END-OF-DAY FADE: New highs last 30 min declining volume = gap down next day. Selloff into close low volume = gap up.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-014",
+    "source": "day-trading-for-dummies",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "RISK OF RUIN: 60% WR 1:1 R:R, risk 10% = >50% ruin. Risk 2% = near-zero. Kelly: (win% x avg win/avg loss) - (1-win%).",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-015",
+    "source": "day-trading-for-dummies",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "OVERTRADING: #1 killer. Boredom trading, sizing up after losses. Max 3-5 trades/day. Quality 2-3x in first 2 hours.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-016",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "LowVolatility"
+    ],
+    "content": "LONG STRADDLE: Buy ATM call+put. Max loss = premium. Profits large move either way. Best IV rank <20 with catalyst.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-017",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "LONG STRANGLE: OTM call+put. Cheaper, needs larger move. Delta-neutral. Best 30-45 DTE.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-018",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "LowVolatility",
+      "Ranging"
+    ],
+    "content": "SHORT STRADDLE: Sell ATM call+put. Max profit = credit. Unlimited risk. IV rank >80. Close at 50% profit.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-019",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "LowVolatility",
+      "Ranging"
+    ],
+    "content": "SHORT STRANGLE: Sell OTM call+put. 16-delta = ~68% PoP. Manage at 50%. Undefined risk - size strictly.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-020",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "IRON CONDOR: Sell OTM put+call spreads. Net credit. Max profit = credit. Max loss = width-credit. Close at 50% or 2x credit stop.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-021",
+    "source": "saliba-option-spreads",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BULL CALL VERTICAL: Buy lower call, sell higher. Limited risk/profit. Better than naked call - reduces cost.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-022",
+    "source": "saliba-option-spreads",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BEAR PUT VERTICAL: Buy higher put, sell lower. Defined risk on decline. Entry when IV low.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-023",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "CALENDAR SPREAD: Sell near-term, buy longer-term same strike. Profits from decay and/or rising IV.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-024",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "LowVolatility"
+    ],
+    "content": "GREEKS: Delta=direction. Gamma=delta change. Theta=decay. Vega=IV sensitivity. Condors negative vega. Straddles positive vega.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-025",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "IV RANK: >50=sell premium. <30=buy. 30-50=neutral. Mispriced vol = #1 options edge.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-026",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "LowVolatility"
+    ],
+    "content": "GAMMA RISK: Highest ATM near expiry. Close/roll at 21 DTE. Never hold short through expiry week.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-027",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "VEGA EARNINGS: IV rises before, crushes after. Buy 21 DTE, sell 1 day before. Avg IV expansion 20-40%.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-028",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "THETA DECAY: Accelerates last 30 days. ~35% lost. Sellers 30-45 DTE. Buyers 60-90 DTE.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-029",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "BUTTERFLY: Buy 1 ITM, sell 2 ATM, buy 1 OTM. Max profit at middle strike. Profits from decay.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-030",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "BACKSPREAD: Sell 1 ATM, buy 2+ OTM. Credit or small debit. Unlimited upside. Free lottery if credit.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-031",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "COLLAR: Long stock + long put + short call. Limits both sides. Call finances put. Best = zero cost.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-032",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "LowVolatility"
+    ],
+    "content": "COVERED WRITE: Long 100 shares + short ATM call. Income. ~2-5% monthly. Best high IV sideways/bullish.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-033",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "CONDOR ADJUST: Tested side near strike = roll untested closer. Or close tested, keep untested free. Max loss = 2x credit.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-034",
+    "source": "wagner-etf-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TOP-DOWN ETF: 1) Broad trend SPY>200MA. 2) Sector RS vs SPY. 3) Best RS in sector. 4) Time with patterns.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-035",
+    "source": "wagner-etf-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ETF RS: Compare sectors 3-6 month RS. Outperformers = leaders. RS new highs with price = buy. RS declining = distribution.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-036",
+    "source": "wagner-etf-trading",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SECTOR ROTATION: Early=XLF,XLY. Mid=XLK,XLI. Late=XLE,XLB. Recession=XLU,XLP,XLV. Monthly RS. Leads price 1-3mo.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-037",
+    "source": "wagner-etf-trading",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "LEVERAGED ETF DECAY: 2x/3x daily rebalancing decay. +10%-10% = -1% underlying, -9% 3x. Never hold >few days.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-038",
+    "source": "wagner-etf-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ETF ENTRY: Pullback to 10/20 EMA bounce. Or flag/pennant breakout. Never chase 5%+ from support.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-039",
+    "source": "wagner-etf-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ETF ROTATION MODEL: Rank sectors by 3mo RS monthly. Long top 3. Rebalance monthly. Outperformed 3-5% annually.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-040",
+    "source": "wagner-etf-trading",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "REGIME: SPY>200+50>200=bull long only. <200+50<200=bear short/cash. Mixed=reduce 50%.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-041",
+    "source": "wagner-etf-trading",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ETF SIZING: Max 10-15% per ETF. Leveraged 3-5%. ATR stops 2x 20-day. Max 30% one sector. Cash 30-50% when unclear.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-042",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "INTERMARKET CHAIN: Bonds lead stocks, stocks lead commodities, commodities lead currencies. Monitor all four for confluence.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-043",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "GOLD-DOLLAR: Negative -0.6 to -0.8. Gold leads miners 1-3 days. Dollar as gold indicator. Both rally = safe haven crisis.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-044",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "S&P CORRELATIONS: DAX 0.85+, Euro Stoxx 0.90+, VIX -0.75. Euro Stoxx leads S&P 3-5 min European hours.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-045",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "OIL-STOCK: Fluctuates -0.5 to +0.5 by regime. Break from norm = regime change signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-046",
+    "source": "katsanos-intermarket",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "REGIME: RISK-ON=stocks/bonds/commodities/USD. RISK-OFF=opposite. STAGFLATION=stocks+down/commodities up. GOLDILOCKS=stocks up/bonds flat.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-047",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CARRY TRADE: Borrow JPY/CHF buy AUD/NZD. AUD/JPY drops 2%+=risk-off. Sell equities.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-048",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BOND-STOCK DIVERGENCE: Falling yields+rising stocks=goldilocks. Rising yields+falling= tightening. 10Y yield leads stocks 1-3mo.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-049",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "COMMODITY-CURRENCY: AUD/gold 0.7+. CAD/oil 0.6+. CHF safe haven. JPY risk-off. Trade currencies by commodity correlations.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-050",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CORRELATION INSTABILITY: Not constant. Rolling 50/200-day. Strong correlation break = regime change signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-051",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "YIELD CURVE: 2Y>10Y=inversion=recession 6-18mo. Steep=expansion. Monitor 2s10s. Negative=defensive.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-052",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "GLOBAL LEADERSHIP: US leads 1-5 days. Europe 1-3. Asia 1-2. DAX up 2%=S&P gaps up. Early warning.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-053",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "DOLLAR-COMMODITY: Strong negative. Dollar up=commodities down. Natural hedge.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-054",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "INTERMARKET DIVERGENCE: Gold up miners not=catch up. S&P up credit widening=correct. Divergences signal stress.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-055",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VIX-STOCK: -0.75. <15=complacency. >30=fear. Contango=bullish. Backwardation=bearish. Flip=defend.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-056",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "BUBBLE: 1)Precipitating factor. 2)Amplification feedback. 3)Cultural narrative. 4)Anchoring. 5)Herd behavior. Bursts when narrative crumbles.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-057",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "content": "NATURAL PONZI: Early profits attract buyers pushing prices higher. Self-reinforcing bubbles persist years.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-058",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "ANCHORING: Recent highs as fair value. Normalizes elevated prices. P/E anchors to bubble norms.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-059",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "HERD: Follow others not analysis. Rational individually, catastrophic collectively. Crypto herding identical to equity.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-060",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "NEW ERA: This time is different. 1920s/1960s/1990s/2020s. Everyone agreeing = top near.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-061",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "MEDIA AMPLIFICATION: Superficial narratives confirming trends. Competition = extreme takes.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-062",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CAPE: >30=near-zero 10yr returns. <10=15%+ annually. Not timing but powerful for allocation.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-063",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "SELF-FULFILLING PROPHECY: Price from similar hunches reinforced by media. Everyone follows everyone.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-064",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "PRICE-SENSITIVE FEEDBACK: Rising prices=wealth effect=spending=earnings=prices. Speed depends on leverage.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-065",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "ATTENTION CASCADE: Rising prices attract attention, buying, media, more buying. Monitor Google Trends.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-066",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "INSURANCE FLOAT: Premiums now, claims later, invest float. $1 equity ~$0.50 float. 3% cost, 13% return = compounding machine.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-067",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "CASH FORTRESS: Cash in bulls, deploy in crisis. Goldman preferred 10% in 2008. Cash = call option on crises.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-068",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MUNGER INVERSION: How to lose not win. Avoid leverage, bad businesses, overpaying, crowd-following.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-069",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MGMT ASSESSMENT: Owner-thinkers, capital allocators, candid, bureaucratic resistance.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-070",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "BRAND POWER: Cash with minimal reinvestment. Pricing power. Crypto: developer loyalty + network effects.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-071",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "COMPOUNDING: 25.9% annual zero down years. 50% loss needs 100% gain. Protect capital above all.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-072",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CIRCLE OF COMPETENCE: Invest only what you understand. Crypto: cant explain tokenomics = skip.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-073",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "TEMPERAMENT: Rationality in euphoria and panic. Emotional discipline > analytical brilliance.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-074",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PUNCH CARD: 20 lifetime trades. Extreme selectivity. 3-5 high conviction. Quality over quantity.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-075",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MOATS: Cost, network, intangible, switching, efficient scale. Wide = decades high returns.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-076",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "OWNER EARNINGS: NI + D&A - CapEx. Crypto: protocol revenue - emissions = sustainable yield.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-077",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "BE FEARFUL WHEN GREEDY: VIX<15+highs=cautious. VIX>40+crashes=aggressive. Deployed billions 2008.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-078",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "CRISIS OPPORTUNITY: Goldman 10% preferred. GE. BNSF. Build cash reserves for crisis deployment.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-079",
+    "source": "faith-way-of-turtle",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TURTLE SIZING: ATR normalized. Unit=(Account x 1%)/(N x $/pt). Max 4/market, 10/direction, 12 total.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-080",
+    "source": "faith-way-of-turtle",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TURTLE ENTRY: Sys1: 20-day breakout exit 10-day. Skip if last won. Sys2: 55-day. Take all. 70% profit from 5-10 trades/yr.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-081",
+    "source": "faith-way-of-turtle",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "TURTLE RISK: Max 2%/trade, 12 total, 6/direction, 4/market. Correlated share limits.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-082",
+    "source": "faith-way-of-turtle",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "TURTLE PARADOX: Works because most cant execute. 30-40% WR. Quit during streaks = miss big winners.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-083",
+    "source": "faith-way-of-turtle",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BACKTEST TRAPS: Curve-fitting, survivorship bias, look-ahead bias, cost neglect. Out-of-sample. Simple > complex.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-084",
+    "source": "faith-way-of-turtle",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "DRAWDOWN: Accept 20-40%. Predefine max DD. Exceeded = reduce size 50% not abandon. Biggest trends follow biggest pain.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-085",
+    "source": "faith-way-of-turtle",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "EXPECTANCY: (Win%xAW)-(Loss%xAL). 40%WR 3:1=0.60/dollar. Low WR not low profitability.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-086",
+    "source": "faith-way-of-turtle",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "R-MULTIPLES: Trade as R. +3R, -1R. Removes size bias. Judge 100+ trades.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-087",
+    "source": "faith-way-of-turtle",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CORRELATION RISK: 12 diversified 0.8+=ONE bet. Crisis correlations 1.0. >0.7 reduce positions.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-088",
+    "source": "faith-way-of-turtle",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ROBUSTNESS: Test multiple markets/timeframes/regimes. One instrument only = curve-fit.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-089",
+    "source": "faith-way-of-turtle",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "LOSS AVERSION: 30-40% WR feels like failure. Dont look at individual P&L. Monthly only.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-090",
+    "source": "faith-way-of-turtle",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "EDGE PER TRADE: 0.5-2%. 200 trades/yr at 0.5%=100%+. Variance hides edge 20-30 trades.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-091",
+    "source": "faith-way-of-turtle",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MECHANICAL VS DISCRETIONARY: Rules for sizing/entry/exit. Discretionary only to REDUCE risk.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-092",
+    "source": "carr-trend-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND ID: Higher highs/lows. 20 EMA filter. ADX>25. 50/200 golden cross = major bull.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-093",
+    "source": "carr-trend-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND ENTRY: Confirmed uptrend, pullback to support, reversal candle, stop below, target 2:1 R:R.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-094",
+    "source": "carr-trend-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MA CONFLUENCE: 10/20/50 convergence = powerful move. Compression after consolidation.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-095",
+    "source": "carr-trend-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RSI TRENDS: Uptrend 40-80 (40=oversold). Downtrend 20-60 (60=overbought). 30/70 only for ranging.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-096",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CAN SLIM: C=Current 25%+. A=Annual. N=New. S=Supply volume. L=Leader RS>80. I=Institutional. M=Market.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-097",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CUP WITH HANDLE: 20-30% decline, rounded bottom, handle. Pivot=10c above handle. 50%+ volume. Stop 7-8%.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-098",
+    "source": "oneil-how-to-make-money",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "8% STOP: Cut losses 8% below purchase. No exceptions. Buy 10, cut 7, need 2-3 at 100-200%+.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-099",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SELLING: 20-25% for most. Exception leaders 8-12wk or 200%+. Below 50-day MA heavy volume = sell.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-100",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MARKET DIRECTION: 3-5 distribution days in 2-3wk = top. Follow-through 1.5%+ heavier volume = confirmed uptrend.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-101",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LEADERSHIP: Earnings 25%+, RS>90, top industry, institutional, new product. Concentrate 5-8 leaders.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-102",
+    "source": "oneil-how-to-make-money",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "NEVER AVERAGE DOWN: Wrong at $50, more wrong at $45. #1 cause of large losses.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-103",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BREAKOUT VOLUME: New high must surge 50%+ above avg. Institutional buying. No volume = fake.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-104",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INDUSTRY GROUP: 50% of stock move. Buy top 10-20 groups. First breakout in new theme = leaders.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-105",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TIGHT PATTERNS: 3-4wk closes within 1-2%. Institutional support. Breakout from tight = explosive.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-106",
+    "source": "oneil-how-to-make-money",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "content": "SELL TO CASH: Downtrend signal = sell 50%+. Cash is optionality. Cant buy bargains fully invested.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-107",
+    "source": "lewis-boomerang",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "content": "SOVEREIGN DEBT: Banking debt/revenue predicts default. Ireland 25x. Pattern: bubble, absorb, explode, default.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-108",
+    "source": "lewis-boomerang",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "CDS WARNING: Greek CDS 11bp to 2300bp. >200bp=risk. Credit warns weeks/months before equities.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-109",
+    "source": "lewis-boomerang",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "IRELAND: Govt guaranteed all bank debt. Sovereign credit becomes banking risk. Monitor bank/GDP.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-110",
+    "source": "lewis-boomerang",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "JAPAN: >200% debt/GDP aging savers. Savings drop, borrow internationally. Workforce shrink = inevitable.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-111",
+    "source": "taleb-fooled-by-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "SURVIVORSHIP BIAS: 1000 flippers, 10 get 10 heads. Those 10 write books. Skill often luck.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-112",
+    "source": "taleb-fooled-by-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "ALTERNATIVE HISTORY: For every winner thousands lost. One path observed. Judge full distribution.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-113",
+    "source": "taleb-fooled-by-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "BLACK SWAN: Models underestimate 10-100x. Size for 3-5x worst. Never leverage that wipes in gap.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-114",
+    "source": "taleb-fooled-by-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "BARBELL: 85-90% safe + 10-15% asymmetric. Avoid middle - tail risk without upside.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-115",
+    "source": "taleb-fooled-by-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "LOSS AVERSION: 2.5x worse. Holding losers, selling winners. Mechanical rules. Remove emotion.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-116",
+    "source": "taleb-fooled-by-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "NARRATIVE FALLACY: Stories for randomness. 5 wins = found edge. Combat: stats, 100+ trades.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-117",
+    "source": "taleb-fooled-by-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "MEDALIST: Roulette survivor not skilled. Selling OTM puts, carry, short vol = disguised roulette.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-118",
+    "source": "taleb-fooled-by-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "SKEWNESS: Negative skew dangerous. Positive skew superior. Seek $1 risk for $3+ reward.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-119",
+    "source": "random-walk-wall-street",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "EMH: Prices reflect info. Not perfectly efficient. Hard to exploit mispricings.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-120",
+    "source": "random-walk-wall-street",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RANDOM PATTERNS: Random data shows all classic patterns. Many signals are data-mined artifacts.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-121",
+    "source": "random-walk-wall-street",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DATA MINING: More hypotheses = more false positives. Bonferroni: 100 tests = 5 false significant.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-122",
+    "source": "fisher-common-stocks",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SCUTTLEBUTT: Talk to customers, suppliers, competitors. Ground-level research. Crypto: GitHub, Discord.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-123",
+    "source": "bogle-common-sense-investing",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "COST HYPOTHESIS: Index 0.03% vs active 1-2%. 30yr = 40-60% lost to fees. Minimize commissions/slippage.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-124",
+    "source": "fundamental-analysis-dummies",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "FUNDAMENTALS: Revenue, earnings, FCF, D/E, ROE, moat, mgmt. Direction bias. Technicals for timing.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-125",
+    "source": "fundamental-analysis-dummies",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "FED POLICY: Tightening = dollar up, stocks correct 6-12mo lag. Easing reverses. Position before trend.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-126",
+    "source": "fundamental-analysis-dummies",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CYCLES: Leading: permits, claims, ISM, stocks. Coincident: production, GDP. Lagging: CPI. Leading turn 3-6mo early.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-127",
+    "source": "cofnas-binary-options",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen",
+      "HighVolatility"
+    ],
+    "content": "BINARY OPTIONS: Yes/no. Correct=$100, wrong=$0. Max risk=premium. Known risk/reward. Direction AND timing.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-128",
+    "source": "cofnas-binary-options",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "BINARY STRATEGIES: ATM 50/50 1:1. ITM higher prob. OTM higher payoff. ATM or slightly ITM for conviction trades.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-129",
+    "source": "cofnas-binary-options",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews"
+    ],
+    "content": "NFP BINARY: Buy OTM Wed-Thu. Close after release. Consensus within 20K. Surprises 50K+ = biggest moves.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-130",
+    "source": "lewis-moneyball",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MONEYBALL: Find undervalued edges. Most use same indicators. Edge in unconventional: unusual options, on-chain, sentiment.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-131",
+    "source": "lewis-liars-poker",
+    "topic": "Psychology",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "INCENTIVE PROBLEM: Traders keep profits, firm bears losses = moral hazard. Evaluate who bears downside.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-132",
+    "source": "millionaire-traders",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SUCCESSFUL TRAITS: Specialize ONE setup. Journals. Risk 0.5-2%. Patient A+ setups. Business mindset.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-133",
+    "source": "millionaire-traders",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "6-MONTH RULE: 6-8mo practice. 3mo sim first. Deliberate practice not passive learning.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-134",
+    "source": "adventures-currency-trader",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "content": "FEAR PARADOX: Scariest trades often best. Panicking crowd = best risk/reward. Fear = crowd on wrong side.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-135",
+    "source": "buffett-making-american-capitalist",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "GRAHAM TO MUNGER: Net-nets to quality at fair price. Adapt as capital grows. $10K vs $1B different strategies.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-136",
+    "source": "buffett-making-american-capitalist",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PERMANENT CAPITAL: Corp structure no redemptions. Trade with money you wont need years.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-137",
+    "source": "buffett-snowball",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "BERKSHIRE ORIGIN: $7-8 (book $19) below net working capital. Bad businesses great at right price.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-138",
+    "source": "buffett-snowball",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "SNOWBALL: Knowledge compounds like money. Buffett reads 500+ pages/day. No shortcut to mastery.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-139",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ONE-DOLLAR TEST: $1 retained creates >$1 value? Yes = capital creating. Invest alongside best allocators.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-140",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SIMPLE MATH: Arithmetic + emotional control. Complex adds precision not accuracy. Simple executed consistently.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-141",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "BUSINESSLIKE: Would you buy entire company? Hold 10yr? No = dont buy one share.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-142",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CASH IS OPTIONALITY: Reserves in bulls. Deploy in crisis when no one else can.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-143",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RS ASSET ROTATION: Rank assets 6mo RS monthly. Top 2-3. Rebalance quarterly.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-144",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "GOLD CRISIS: Rallies in crises. Falling during = liquidity crisis. Both falling = most dangerous deleveraging.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-145",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INTRADAY LEADS: Euro Stoxx leads S&P 3-5min. DAX leads Euro Stoxx. Bonds lead equities 1-2min.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-146",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "MARGIN SPREADS: Portfolio margin reduces requirements. Vertical = max loss. Check broker offers it.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-147",
+    "source": "wagner-etf-trading",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ETF EXECUTION: Limit mid for liquid. Spread >0.1% = skip. Avoid market first/last 15min.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-148",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RS RATING: Compare all stocks 12mo. >80=top 20%. Best >90 before major moves.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-149",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "A/D RATING: Price/volume institutional. A=heavy buying, E=heavy selling. Track weekly.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-150",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BASE-ON-BASE: Second base at higher level. Breakout from second = extremely bullish.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-151",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "BUBBLE CHECKLIST: Rising prices, tech excitement, volume, media, new era, valuations, confidence, new products.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-152",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "NATURAL EXPERIMENTS: Bubbles same pattern worldwide. Crypto identical to equity bubbles.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-153",
+    "source": "taleb-fooled-by-randomness",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "ASYMMETRIC PAYOFF: $1 risk for $3+ even at 40% WR. Positive skew mathematically superior.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-154",
+    "source": "buffett-making-american-capitalist",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INSURANCE VEHICLE: Premiums now claims later. Float grew $100B+. Funds 10-15% investments.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-155",
+    "source": "buffett-snowball",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "GEICO CRISIS: $61 to $2. Buffett knew model sound. Bought heavily. 50x return.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-156",
+    "source": "carr-trend-trading",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "10 HABITS: Trend, cut losses, let winners, risk first, journal, review, plan, disciplined, learn, own money.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-157",
+    "source": "fundamental-analysis-dummies",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "EARNINGS QUALITY: Revenue-driven, recurring, OCF>NI, positive surprises, guidance raised.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-158",
+    "source": "random-walk-wall-street",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FIRM FOUNDATION VS CASTLE: DCF vs momentum. Use foundation for allocation, castle for trading.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-159",
+    "source": "cofnas-binary-options",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews"
+    ],
+    "content": "SENTIMENT: IG Client Sentiment, COT. 75%+ retail long = contrarian short. Institutional extremes = reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-160",
+    "source": "aziz-day-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "SessionOpen"
+    ],
+    "content": "S/R DAY TRADING: Prior day high/low/close, pre-market range. Buy bounces, short resistance. Tested levels STRONGER.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-161",
+    "source": "aziz-day-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "SessionOpen",
+      "Trending"
+    ],
+    "content": "FLOAT FILTER: Low float <20M + low cap <$2B = biggest moves. 50-200% squeeze potential.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-162",
+    "source": "aziz-day-trading",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "JOURNAL: Entry/exit/time, screenshot, setup, emotional state, market conditions, P&L. Review weekly.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-163",
+    "source": "day-trading-for-dummies",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "PRE-MARKET: 6:00 news. 6:30 gappers. 7:00 S/R. 8:00 direction. 8:30 data. 9:15 plan. Prep=80% success.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-164",
+    "source": "day-trading-for-dummies",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "LEVEL 2: Bid/ask prices+sizes. Large bids=support, large asks=resistance. Thick bid/thin ask=buying pressure.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-165",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "RATIO SPREAD: Buy 1 ATM sell 2+ OTM. Can be zero cost. Unlimited risk past short strikes.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-166",
+    "source": "wagner-etf-trading",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ETF SHORT: Below 200MA declining RS bottom sector groups. Cover above 10-day MA. No borrow fees.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-167",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "REPUTATIONAL RISK: 20yr to build, 5min to ruin. Protect psychological capital. Revenge trade cascade.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-168",
+    "source": "faith-way-of-turtle",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "POSITION HEAT: Aggregate unrealized risk. Normal 30-50%, elevated 50-70%, max 80%. All can move against simultaneously.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-169",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "IPO LEADERS: No overhead supply, entrepreneurial. Screen <8yr EPS+RS >80+.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-170",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "COMMODITY-CURRENCY: AUD/gold 0.7+. CAD/oil 0.6+. CHF safe haven. JPY risk-off.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-171",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "DOW 10K: Brokerage celebrating milestones = crowd lost perspective. Warning not buy signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-172",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VALUATION: Price vs value. Intrinsic=DCF. Buy 25-30% below. Most crypto = pure speculation.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-173",
+    "source": "taleb-fooled-by-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "HINDSIGHT BIAS: Everyone knew after. Write predictions BEFORE events. Track hit rate.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-174",
+    "source": "taleb-fooled-by-randomness",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "LUDIC FALLACY: Casino models for markets flawed. Rules change, distribution unknown, Black Swans exist.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-175",
+    "source": "faith-way-of-turtle",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "IN VS OUT SAMPLE: 70/30 split. Good in bad out = curve-fit. 2-3 params robust, 10+ fragile.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-176",
+    "source": "faith-way-of-turtle",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SYSTEM COMMITMENT: Min 100 trades. 30 trade sample hides edge. Switching = experiencing all losses.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-177",
+    "source": "oneil-how-to-make-money",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SELL 20-25%: Most consolidate after. Exception: 20% in 1-3wk massive volume = hold for 100%+.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-178",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "GOLD-DOLLAR: Strong negative. Gold leads miners 1-3 days. Dollar as gold indicator.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-179",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "FREE-RIDER: If millions research, why analyze? Creates complacency. Nobody questions until crash.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-180",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MOAT TYPES: Cost (GEICO), network (Visa), intangible (Coke), switching (enterprise), scale (utilities).",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-181",
+    "source": "day-trading-for-dummies",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "CIRCUIT BREAKERS: 7% halt 15min, 13% 15min, 20% close. LULD halts. Reduce before events.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-182",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "SYNTHETICS: Long call + short put = synthetic long stock. Reduce margin, exploit put-call parity.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-183",
+    "source": "day-trading-for-dummies",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "TICK: Uptick-downtick. >+500=buying. <-500=selling. +/-1000=reversal. Confirm or fade extremes.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-184",
+    "source": "day-trading-for-dummies",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "MARKET VS LIMIT: Market=fill not price. Limit=price not fill. Liquid=limit. Breakouts=market.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-185",
+    "source": "aziz-day-trading",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "PDT RULE: <$25K limited 3 trades/5 days. Cash account, futures, multiple brokers, or $25K+.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-186",
+    "source": "day-trading-for-dummies",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "HOTKEYS: Buy/sell preset size. Auto stop. Flatten all. Scale 50% target. 2sec delay = 0.1-0.3% cost.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-187",
+    "source": "aziz-day-trading",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "BUSINESS: Not get rich. 84% lose. Profession. Tools+education+patience. 6-8 months to success.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-188",
+    "source": "day-trading-for-dummies",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MARGIN: Never >50%. >75% = reduce. Margin calls at worst time. Intraday 4:1 close before end.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-189",
+    "source": "faith-way-of-turtle",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "NO-SYSTEM: Abandoning during DD = all losses, no wins. Commit 100+ trades minimum.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-190",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CORRELATION INSTABILITY: Rolling 50/200-day. Break from strong correlation = regime change.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-191",
+    "source": "buffett-making-american-capitalist",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "GRAHAM-NEWMAN: Bought below net working capital. Adapted to quality at fair price.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-192",
+    "source": "oneil-how-to-make-money",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DAILY GRAPHS: Study leaders weekly. Mark buy points, S/R. Hand-marking builds pattern recognition.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-193",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "NARRATIVE: Every bubble this time is different. 1920s radio, 1960s conglomerates, 1990s internet, 2020s AI.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-194",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PUNCH CARD 20: Forces extreme selectivity. Quality over quantity produces better returns.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-195",
+    "source": "lewis-moneyball",
+    "topic": "Backtesting",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BASE RATE: Always use base rates. What % of breakouts continue? Gut = unquantified bias. Measure.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-196",
+    "source": "fundamental-analysis-dummies",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PORTER: New entrants, supplier power, buyer power, substitutes, rivalry. High barriers+low rivalry=best.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-197",
+    "source": "random-walk-wall-street",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LIFECYCLE: Young aggressive 90% stocks. Middle 60/40. Near retirement 40/60. Reduce 1%/year.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-198",
+    "source": "fisher-common-stocks",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "FISHER 15: Mgmt, R&D, sales, margins, improving margins, labor, exec depth, costs, moat, long-range, self-funding, honest, unique edge.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-199",
+    "source": "saliba-option-spreads",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "DELTA HEDGING: Maintain delta-neutral by adjusting stock as underlying moves. Gamma scalping profits from movement.",
+    "priority": 5
+  },
+  {
+    "id": "book-dom-200",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "GLOBAL CORRELATIONS: DAX 0.85+ Euro Stoxx 0.90+. Japan-specific events Shanghai leads. US futures as early warning.",
+    "priority": 5
+  }
+]

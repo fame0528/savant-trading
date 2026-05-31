@@ -1,0 +1,4020 @@
+﻿[
+  {
+    "id": "fund-001",
+    "source": "graham-intelligent-investor",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility",
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "Mr. Market is your servant not your master. The market offers to buy or sell shares daily at different prices. You are free to accept or ignore. Most of the time doing nothing is wisest. Treat price fluctuations as opportunities not threats.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:swing",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-002",
+    "source": "graham-intelligent-investor",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "ExtremeFear"
+    ],
+    "content": "Margin of safety: never buy a security unless price is 25-30% below conservatively calculated intrinsic value. This buffer protects against analytical errors, bad luck, and market volatility. The central concept of investing.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:leverage_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-003",
+    "source": "graham-intelligent-investor",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "Short run market is a voting machine (popularity), long run it is a weighing machine (fundamental value). Focus on weighing. Do not let short-term price action influence long-term investment decisions.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-004",
+    "source": "graham-intelligent-investor",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed",
+      "HighVolatility"
+    ],
+    "content": "The investor chief problem and worst enemy is likely himself. Emotional discipline trumps analytical ability. Develop sound intellectual framework and keep emotions from corroding it.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-005",
+    "source": "graham-intelligent-investor",
+    "topic": "Sentiment",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "If you own stocks you will see values drop 30-50% multiple times in your investing lifetime. This is normal. Prepare psychologically and financially. Declines are opportunities not existential threats.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-006",
+    "source": "graham-intelligent-investor",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeGreed"
+    ],
+    "content": "Never borrow to buy stocks on margin. Leverage converts safe investment into dangerous speculation. The intelligent investor never needs margin to achieve satisfactory returns.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:leverage_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-007",
+    "source": "graham-intelligent-investor",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "When euphoric increase bonds. When depressed increase stocks. The crowd is usually wrong at extremes. Use sentiment as a contrarian allocation signal, not a timing tool.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:extreme_reading",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-008",
+    "source": "lynch-one-up-wall-street",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Six stock categories: (1) Slow growers 2-4% (2) Stalwarts 10-12% (3) Fast growers 20-25% small aggressive (4) Cyclicals tied to business cycle (5) Turnarounds near-bankruptcy recovery (6) Asset plays hidden valuable assets. Each requires different strategy.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:moving_average"
+    ]
+  },
+  {
+    "id": "fund-009",
+    "source": "lynch-one-up-wall-street",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "PEG ratio: P/E divided by expected earnings growth rate. PEG below 1.0 undervalued, 1.0 fair, above 1.0 overvalued. Single best valuation metric for growth stocks. Never overpay for growth.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-010",
+    "source": "lynch-one-up-wall-street",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Invest in what you know. Average investors find great stocks years before professionals by observing everyday life: restaurants, stores, products used. Your edge is personal experience and ground-level observation.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-011",
+    "source": "buffett-warren-buffett-way",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Circle of competence: only invest in businesses you understand. Know boundaries of what you know and do not. Stay within your circle. Size of circle does not matter, knowing its boundaries does.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-012",
+    "source": "buffett-warren-buffett-way",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Business tenet 1: is the business simple and understandable? You should understand how the company makes money, its competitive position, and industry dynamics in plain terms.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-013",
+    "source": "buffett-warren-buffett-way",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Business tenet 3: favorable long-term prospects. Key is economic moats - durable competitive advantages: brand identity, patent protection, cost advantages, switching costs, network effects.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-014",
+    "source": "buffett-warren-buffett-way",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Four moat types: (1) intangible assets brands patents licenses (2) switching costs (3) network effects (4) cost advantages from process location scale. Evaluate moat durability over 10+ years.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-015",
+    "source": "buffett-warren-buffett-way",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Owner earnings = net income + depreciation - capex. True cash flow available to owners. Ignore reported EPS without adjusting for maintenance capex. This is what the business actually earns.",
+    "priority": 5,
+    "tags": [
+      "setup_type:yield",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-016",
+    "source": "buffett-warren-buffett-way",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "Look for consistently high ROE with low debt. High ROE with little leverage indicates genuine competitive advantage. High ROE with high leverage is a red flag masquerading as quality.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:leverage_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-017",
+    "source": "buffett-warren-buffett-way",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Calculate intrinsic value using discounted cash flow. Use 10-year Treasury rate as discount rate. Higher rate = lower value. DCF is gold standard for business valuation.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:yield_curve"
+    ]
+  },
+  {
+    "id": "fund-018",
+    "source": "buffett-warren-buffett-way",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Buy at significant discount to intrinsic value. Margin of safety is non-negotiable. Wonderful company at fair price beats fair company at wonderful price. Quality + Value = Optimal.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:leverage_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-019",
+    "source": "buffett-warren-buffett-way",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "Be fearful when others greedy and greedy when others fearful. Maximum pessimism = best buying. Maximum optimism = best selling. Requires extreme emotional discipline.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:extreme_reading",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-020",
+    "source": "buffett-warren-buffett-way",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Think of stocks as businesses not ticker symbols. Buying fractional ownership in real business with real assets and earnings. This mindset eliminates most emotional trading mistakes.",
+    "priority": 5,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-021",
+    "source": "buffett-warren-buffett-way",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "Rule 1: Never lose money. Rule 2: Never forget Rule 1. Preserving capital is paramount. A 50% loss requires 100% gain to recover. Asymmetric math demands capital preservation first.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:moving_average"
+    ]
+  },
+  {
+    "id": "fund-022",
+    "source": "buffett-warren-buffett-way",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeGreed"
+    ],
+    "content": "Never use leverage. Borrowed money is how smart people go broke. Even at 99-to-1 odds the 1% event wipes you out if leveraged. Patience replaces leverage as the accelerator.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:leverage_risk",
+      "indicator:moving_average"
+    ]
+  },
+  {
+    "id": "fund-023",
+    "source": "fisher-common-stocks",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Scuttlebutt research: talk to competitors, suppliers, customers, former employees, industry experts to build comprehensive company picture before investing. Go far beyond annual reports and filings.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-024",
+    "source": "fisher-common-stocks",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Buy and hold for decades. Do not sell for market declines, short-term earnings misses, or recessions. Sell only when: analysis was wrong, management deteriorated, or business fundamentally changed.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-025",
+    "source": "dalio-principles",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "5-Step Process: (1) Set clear goals (2) Identify problems preventing goals (3) Diagnose root causes (4) Design solutions (5) Execute. Iterative process applies to trading investing and all of life.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-026",
+    "source": "dalio-principles",
+    "topic": "Sentiment",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "Embrace reality and deal with it. Do not let wishes or fears distort perception. Pain + Reflection = Progress. Every mistake reveals a principle you are missing. Study failures systematically.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:moving_average"
+    ]
+  },
+  {
+    "id": "fund-027",
+    "source": "dalio-principles",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Be radically open-minded. Biggest threat is your own blind spots. Actively seek best opposing arguments. If you cannot articulate the other side better than they can, you are not thinking clearly.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-028",
+    "source": "dalio-principles",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Believability-weighted decisions: weight opinions by track record. Someone who succeeded 3+ times is more believable than a theorist. Give more weight to credible voices in all decisions.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-029",
+    "source": "dalio-principles",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility",
+      "LowVolatility"
+    ],
+    "content": "Systematic decision-making: convert principles into algorithms and rules. Test historically. Follow mechanically. This removes emotion and ensures consistency across all market conditions.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:moving_average"
+    ]
+  },
+  {
+    "id": "fund-030",
+    "source": "dalio-principles",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility",
+      "LowVolatility"
+    ],
+    "content": "Everything cycles. Economies cycle between expansion and contraction. Markets cycle between greed and fear. Credit cycles drive most movements. Know where you are in the cycle to position correctly.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-031",
+    "source": "dalio-principles",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Holy grail of investing: 15-20 uncorrelated return streams. Reduces risk 80% without reducing expected return. Find assets and strategies that zig when others zag. Correlation is the enemy.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-032",
+    "source": "dalio-principles",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility",
+      "LowVolatility"
+    ],
+    "content": "All-Weather concept: 30% stocks 40% long bonds 15% intermediate bonds 7.5% gold 7.5% commodities. Balance performs in all economic environments: growth/inflation up or down.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-033",
+    "source": "dalio-principles",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility",
+      "LowVolatility"
+    ],
+    "content": "Risk parity: allocate by risk not capital. Each asset class contributes equally to portfolio risk. Bonds less volatile so hold more to equalize risk. True diversification requires equal risk contribution.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:RSI"
+    ]
+  },
+  {
+    "id": "fund-034",
+    "source": "dalio-principles",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Economic machine: (1) productivity growth trend (2) long-term debt cycle 50-75 yrs (3) short-term debt cycle 5-8 yrs. Understanding position in each cycle guides optimal asset allocation.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-035",
+    "source": "dalio-principles",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "Never bet the farm. Even at 99% certainty size positions so being wrong does not knock you out. Survival is prerequisite for long-term compounding of returns.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-036",
+    "source": "dalio-principles",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "Leverage transforms manageable risk into existential risk. Survive 1982 by not being over-leveraged. Always maintain enough liquidity to survive being wrong for extended periods. Cash is optionality.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:leverage_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-037",
+    "source": "antonacci-dual-momentum",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Absolute momentum (time-series): asset has positive momentum if current price above price N months ago (typically 12). Only go long assets in uptrends. Shift to cash/bonds in downtrends.",
+    "priority": 4,
+    "tags": [
+      "setup_type:momentum",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-038",
+    "source": "antonacci-dual-momentum",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Relative momentum (cross-sectional): rank assets by trailing returns and buy strongest performers. Winners tend to keep winning over 3-12 month horizons. Exploit continuation of trends.",
+    "priority": 4,
+    "tags": [
+      "setup_type:momentum",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:regulatory_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-039",
+    "source": "antonacci-dual-momentum",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Dual momentum combines both: only buy assets with positive absolute momentum AND strongest relative momentum. Filters false signals from each approach alone. Best of both worlds.",
+    "priority": 4,
+    "tags": [
+      "setup_type:momentum",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-040",
+    "source": "antonacci-dual-momentum",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear",
+      "Ranging"
+    ],
+    "content": "Risk-managed momentum: use absolute momentum as trend filter. When risk assets in downtrend shift to safe-haven assets. Cuts maximum drawdowns dramatically while capturing most upside.",
+    "priority": 4,
+    "tags": [
+      "setup_type:momentum",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-041",
+    "source": "oneil-how-to-make-money",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "C = Current quarterly earnings: look for 25%+ increase in current quarter EPS vs same quarter prior year. The bigger the acceleration the better. This is the single most important earnings signal.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-042",
+    "source": "oneil-how-to-make-money",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "A = Annual earnings growth: look for 25%+ annual EPS growth over past 3-5 years. ROE should be 17%+ annually. Consistency matters. Avoid companies with erratic or declining annual earnings.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-043",
+    "source": "oneil-how-to-make-money",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "N = New: newer companies, new products, new management, new price highs. Innovation drives stock performance. Buy stocks making new highs off properly formed bases not new lows.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-044",
+    "source": "oneil-how-to-make-money",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "S = Supply and demand: daily trading volume should increase significantly on up days and decrease on down days. Big volume demand at key price points signals institutional accumulation.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:swing",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:moving_average"
+    ]
+  },
+  {
+    "id": "fund-045",
+    "source": "oneil-how-to-make-money",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "L = Leader or laggard: use Relative Strength (RS) rating to identify leaders. Buy stocks with RS 80 or above (top 20% of performers). Avoid laggards with low RS. Industry group strength matters too.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-046",
+    "source": "oneil-how-to-make-money",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "I = Institutional sponsorship: look for stocks with increasing institutional ownership by top-performing funds. At least 3-5 institutional sponsors needed. Avoid stocks with declining institutional interest.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-047",
+    "source": "oneil-how-to-make-money",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility",
+      "LowVolatility"
+    ],
+    "content": "M = Market direction: determine the general market trend before making any purchases. 3 out of 4 stocks follow the market direction. Do not fight the trend. Buy in confirmed uptrends sell in downtrends.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-048",
+    "source": "oneil-how-to-make-money",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Cup with handle pattern: stock forms U-shaped cup (7-65 weeks) then a slight downward drift (handle). Buy on breakout above handle with volume 50%+ above average. Most reliable chart pattern.",
+    "priority": 4,
+    "tags": [
+      "setup_type:breakout",
+      "timeframe:swing",
+      "trigger:breakout",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:volume"
+    ]
+  },
+  {
+    "id": "fund-049",
+    "source": "oneil-how-to-make-money",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Buy point: purchase at pivot point (10 cents above handle high) on breakout day with heavy volume. Volume should be at least 50% above average daily volume. If volume is weak the breakout will likely fail.",
+    "priority": 4,
+    "tags": [
+      "setup_type:breakout",
+      "timeframe:swing",
+      "trigger:volume_spike",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:volume"
+    ]
+  },
+  {
+    "id": "fund-050",
+    "source": "oneil-how-to-make-money",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "Cut every loss at 7-8% without exception. This is the most important rule. No hoping, no praying, no averaging down. The 7-8% stop protects you from catastrophic losses that destroy portfolios.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-051",
+    "source": "oneil-how-to-make-money",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "Never average down on a losing position. If a stock drops 7-8% from your buy point sell immediately. Averaging down doubles your risk on a position that has already proven you wrong.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-052",
+    "source": "oneil-how-to-make-money",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Follow the market averages daily. When market is in confirmed uptrend build positions. When distribution days accumulate (market down on above-average volume) get defensive. Market direction trumps all.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:volume"
+    ]
+  },
+  {
+    "id": "fund-053",
+    "source": "bogle-common-sense-investing",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Investment returns come from two sources: dividends and earnings growth. Speculative returns (P/E changes) are a net zero over time. Own businesses for their earnings power not for price appreciation.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-054",
+    "source": "bogle-common-sense-investing",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "Costs matter enormously. Every dollar paid in fees is a dollar less in returns. Over 30 years a 1% fee difference can reduce terminal wealth by 25-30%. Minimize all investment costs relentlessly.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-055",
+    "source": "bogle-common-sense-investing",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Index funds guarantee your fair share of market returns. Active management is a zero-sum game before costs and a negative-sum game after costs. Most active managers underperform their index.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-056",
+    "source": "bogle-common-sense-investing",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "ExtremeGreed"
+    ],
+    "content": "Reversion to the mean: today star performers are tomorrow laggards. Hot funds cool off. Hot sectors revert. The market is brutally efficient at eliminating excess returns over time.",
+    "priority": 4,
+    "tags": [
+      "setup_type:mean_reversion",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:regulatory_risk",
+      "indicator:RSI"
+    ]
+  },
+  {
+    "id": "fund-057",
+    "source": "bogle-common-sense-investing",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Do not just do something, stand there. The best portfolio strategy is to buy and hold a diversified low-cost index fund. Activity is the enemy of investment returns.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:RSI"
+    ]
+  },
+  {
+    "id": "fund-058",
+    "source": "greenblatt-little-book",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Magic Formula: rank stocks by (1) Return on Capital (quality) and (2) Earnings Yield (cheapness). Buy 20-30 top-ranked stocks. Hold 1 year. Rebalance. Simple mechanical and effective over long periods.",
+    "priority": 4,
+    "tags": [
+      "setup_type:yield",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-059",
+    "source": "greenblatt-little-book",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "Return on Capital = EBIT / (Net Working Capital + Net Fixed Assets). Measures how efficiently a business generates profits from its capital. Higher is better. Look for 25%+ ROC.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-060",
+    "source": "greenblatt-little-book",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Earnings Yield = EBIT / Enterprise Value. Measures how cheap a stock is relative to its earnings power. Higher yield means cheaper. This is better than P/E because it accounts for debt and cash.",
+    "priority": 4,
+    "tags": [
+      "setup_type:yield",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-061",
+    "source": "greenblatt-little-book",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "ExtremeFear"
+    ],
+    "content": "Good companies at bargain prices: the magic formula combines quality (ROC) with cheapness (EY). Buying cheap bad companies or expensive good companies both underperform. You need both.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-062",
+    "source": "greenblatt-little-book",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "The formula will underperform for 1-3 year periods. Most people cannot tolerate this and quit before the long-term edge materializes. Patience is the most important ingredient in formula investing.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-063",
+    "source": "morningstar-five-rules",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Rule 1: Do your homework. Never buy a stock without understanding the business model, competitive landscape, financial health, and valuation. Lazy research leads to painful losses.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-064",
+    "source": "morningstar-five-rules",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Economic moats: sustainable competitive advantages that protect returns on capital. Wide moat = 10+ years of protected profitability. Narrow moat = 5-10 years. No moat = commodity business to avoid.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-065",
+    "source": "morningstar-five-rules",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Five moat sources: (1) intangible assets (2) switching costs (3) network effects (4) cost advantages (5) efficient scale. Each creates barriers that prevent competitors from eroding profits.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-066",
+    "source": "morningstar-five-rules",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Rule 2: Find economic moat. Companies without moats are commodities competing on price alone. Only moat companies can sustain above-average returns on capital over long periods.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-067",
+    "source": "morningstar-five-rules",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear",
+      "Ranging"
+    ],
+    "content": "Rule 3: Have a margin of safety. Even the best company is a bad investment at the wrong price. Valuation matters. Buy when price is below your estimate of fair value by at least 20-30%.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:leverage_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-068",
+    "source": "cryptoassets-burniske-tatar",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "AltSeason",
+      "BtcDominant"
+    ],
+    "content": "Three cryptoasset categories: (1) Currencies (Bitcoin Litecoin) store of value and medium of exchange (2) Platforms (Ethereum) for building decentralized applications (3) Utility tokens for specific network services.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:alt_season",
+      "asset_behavior:btc_driven",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-069",
+    "source": "cryptoassets-burniske-tatar",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HalvingProximity"
+    ],
+    "content": "Bitcoin valuation framework: Metcalfe Law states network value proportional to square of active users. As Bitcoin adoption grows its value increases exponentially not linearly. Track active addresses as key metric.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:halving_cycle",
+      "asset_behavior:btc_driven",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-070",
+    "source": "cryptoassets-burniske-tatar",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HalvingProximity",
+      "BtcDominant"
+    ],
+    "content": "Bitcoin is digital gold: fixed supply cap of 21 million coins, predictable issuance schedule, decentralized network, censorship-resistant. Store of value thesis strengthened by halving events reducing supply inflation.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:btc_dominant",
+      "asset_behavior:btc_driven",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-071",
+    "source": "cryptoassets-burniske-tatar",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HalvingProximity",
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Halving cycle: Bitcoin halving every ~4 years reduces block reward by 50%. Historically followed by major bull runs 12-18 months post-halving as reduced supply meets growing demand.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:halving_cycle",
+      "asset_behavior:btc_driven",
+      "risk_context:standard",
+      "indicator:moving_average"
+    ]
+  },
+  {
+    "id": "fund-072",
+    "source": "cryptoassets-burniske-tatar",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "Never invest more in crypto than you can afford to lose completely. Crypto is a high-risk high-reward asset class. Assume any individual position could go to zero and size accordingly.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-073",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "The 2% rule: never risk more than 2% of total capital on a single trade. This preserves capital during losing streaks and allows 50+ consecutive losses before ruin. Professional standard.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:regulatory_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-074",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Position sizing formula: Position Size = (Account x Risk%) / (Entry - Stop). This mathematical approach ensures consistent risk regardless of asset price or volatility. Apply before every trade.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:tail_risk",
+      "indicator:moving_average"
+    ]
+  },
+  {
+    "id": "fund-075",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Risk-reward minimum 1:2. Risk $1 to make $2. With 1:3 R:R you only need 33% win rate to be profitable. Calculate before entering. If R:R does not meet minimum skip the trade.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-076",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "Sentiment",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "Trading success is 80% psychology 20% methodology. The best strategy fails if you cannot execute consistently. Master your emotions before optimizing your system. Mindset is the edge.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-077",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Five fundamental truths: (1) Anything can happen (2) You do not need to know what happens next to make money (3) Wins and losses are randomly distributed (4) An edge is just higher probability (5) Every moment is unique.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-078",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "Loss recovery protocol: after 3 consecutive losses reduce size by 50%, after 10% drawdown stop trading for 48 hours, after 20% drawdown switch to paper trading until system confidence restored.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:defi_specific",
+      "risk_context:regulatory_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-079",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "Never average down. If a position moves against you your original thesis is being challenged. Adding to losers doubles risk on a losing idea. Only add to winners who have proven the thesis correct.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-080",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Process over outcomes. A good trade can lose money and a bad trade can make money. Judge yourself on the quality of your decision-making process not on individual trade outcomes.",
+    "priority": 4,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-081",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "Sentiment",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "Revenge trading is the account killer. After a loss the urge to make it back immediately is overwhelming. Resist it completely. Take a break, review the loss, and wait for the next valid setup.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-082",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility",
+      "LowVolatility"
+    ],
+    "content": "Identify market regime before applying strategy. Trend-following works in trending markets. Mean-reversion works in ranging markets. Applying wrong strategy to wrong regime is the most common systematic error.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:RSI"
+    ]
+  },
+  {
+    "id": "fund-083",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Amateurs think about how much they can make. Professionals think about how much they can lose. Shift your mindset from upside fantasy to downside protection. Survival comes before profits.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-084",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending",
+      "SessionOpen"
+    ],
+    "content": "Fear of missing out (FOMO) leads to chasing trades at bad prices. Missing one trade costs nothing. Chasing it can cost everything. The market will offer another opportunity. Patience is free alpha.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-085",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "The law of survival: (1) Preserve capital (2) Consistent returns (3) Exceptional returns. Cannot achieve #3 without #1 and #2. Survival is the first and most important objective of every trader.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-086",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "Sentiment",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "Develop complete confidence in your ability to take losses. If you cannot accept a small loss you will eventually take a catastrophic one. Small losses are the cost of doing business in markets.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:moving_average"
+    ]
+  },
+  {
+    "id": "fund-087",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility",
+      "LiquidationCluster"
+    ],
+    "content": "Correlation breakdown: during black swan events all correlations go to 1.0. Your diversification fails when you need it most. Have a plan for total portfolio correlation spike. Cash is the only true hedge.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:tail_risk",
+      "indicator:RSI"
+    ]
+  },
+  {
+    "id": "fund-088",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "Maximum drawdown tolerance: define your maximum acceptable drawdown before starting. If hit, stop trading and reassess. A 50% loss requires 100% gain. A 20% loss requires 25%. Prevention is easier than recovery.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:defi_specific",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-089",
+    "source": "cross-cutting-multiple-authors",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Accept uncertainty. The market is not a puzzle to be solved but a probability distribution to be navigated. No amount of analysis gives certainty. The best traders are comfortable with not knowing.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-090",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "INSURANCE FLOAT: Premiums now, claims later, invest float. $1 equity ~$0.50 float. 3% cost, 13% return = compounding machine.",
+    "priority": 3,
+    "tags": [
+      "setup_type:yield",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-091",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "CASH FORTRESS: Cash in bulls, deploy in crisis. Goldman preferred 10% in 2008. Cash = call option on crises.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-092",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MUNGER INVERSION: How to lose not win. Avoid leverage, bad businesses, overpaying, crowd-following.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:leverage_risk",
+      "indicator:RSI"
+    ]
+  },
+  {
+    "id": "fund-093",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MGMT ASSESSMENT: Owner-thinkers, capital allocators, candid, bureaucratic resistance.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-094",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "BRAND POWER: Cash with minimal reinvestment. Pricing power. Crypto: developer loyalty + network effects.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-095",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "COMPOUNDING: 25.9% annual zero down years. 50% loss needs 100% gain. Protect capital above all.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-096",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CIRCLE OF COMPETENCE: Invest only what you understand. Crypto: cant explain tokenomics = skip.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-097",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "TEMPERAMENT: Rationality in euphoria and panic. Emotional discipline > analytical brilliance.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-098",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PUNCH CARD: 20 lifetime trades. Extreme selectivity. 3-5 high conviction. Quality over quantity.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:extreme_reading",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-099",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MOATS: Cost, network, intangible, switching, efficient scale. Wide = decades high returns.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-100",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "OWNER EARNINGS: NI + D&A - CapEx. Crypto: protocol revenue - emissions = sustainable yield.",
+    "priority": 3,
+    "tags": [
+      "setup_type:yield",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:defi_specific",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-101",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "BE FEARFUL WHEN GREEDY: VIX<15+highs=cautious. VIX>40+crashes=aggressive. Deployed billions 2008.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-102",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "CRISIS OPPORTUNITY: Goldman 10% preferred. GE. BNSF. Build cash reserves for crisis deployment.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-103",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ONE-DOLLAR TEST: $1 retained creates >$1 value? Yes = capital creating. Invest alongside best allocators.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-104",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SIMPLE MATH: Arithmetic + emotional control. Complex adds precision not accuracy. Simple executed consistently.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-105",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "BUSINESSLIKE: Would you buy entire company? Hold 10yr? No = dont buy one share.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-106",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CASH IS OPTIONALITY: Reserves in bulls. Deploy in crisis when no one else can.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-107",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "REPUTATIONAL RISK: 20yr to build, 5min to ruin. Protect psychological capital. Revenge trade cascade.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-108",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "VALUATION: Price vs value. Intrinsic=DCF. Buy 25-30% below. Most crypto = pure speculation.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-109",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MOAT TYPES: Cost (GEICO), network (Visa), intangible (Coke), switching (enterprise), scale (utilities).",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-110",
+    "source": "buffett-berkshire-hathaway",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PUNCH CARD 20: Forces extreme selectivity. Quality over quantity produces better returns.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:extreme_reading",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-111",
+    "source": "buffett-making-american-capitalist",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "GRAHAM TO MUNGER: Net-nets to quality at fair price. Adapt as capital grows. $10K vs $1B different strategies.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-112",
+    "source": "buffett-making-american-capitalist",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PERMANENT CAPITAL: Corp structure no redemptions. Trade with money you wont need years.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-113",
+    "source": "buffett-making-american-capitalist",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INSURANCE VEHICLE: Premiums now claims later. Float grew $100B+. Funds 10-15% investments.",
+    "priority": 3,
+    "tags": [
+      "setup_type:yield",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-114",
+    "source": "buffett-making-american-capitalist",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "GRAHAM-NEWMAN: Bought below net working capital. Adapted to quality at fair price.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-115",
+    "source": "buffett-snowball",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "BERKSHIRE ORIGIN: $7-8 (book $19) below net working capital. Bad businesses great at right price.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-116",
+    "source": "buffett-snowball",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "SNOWBALL: Knowledge compounds like money. Buffett reads 500+ pages/day. No shortcut to mastery.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-117",
+    "source": "buffett-snowball",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "GEICO CRISIS: $61 to $2. Buffett knew model sound. Bought heavily. 50x return.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-118",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "BUBBLE: 1)Precipitating factor. 2)Amplification feedback. 3)Cultural narrative. 4)Anchoring. 5)Herd behavior. Bursts when narrative crumbles.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-119",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "content": "NATURAL PONZI: Early profits attract buyers pushing prices higher. Self-reinforcing bubbles persist years.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:RSI"
+    ]
+  },
+  {
+    "id": "fund-120",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "ANCHORING: Recent highs as fair value. Normalizes elevated prices. P/E anchors to bubble norms.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-121",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "HERD: Follow others not analysis. Rational individually, catastrophic collectively. Crypto herding identical to equity.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-122",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "NEW ERA: This time is different. 1920s/1960s/1990s/2020s. Everyone agreeing = top near.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-123",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "MEDIA AMPLIFICATION: Superficial narratives confirming trends. Competition = extreme takes.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:extreme_reading",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-124",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CAPE: >30=near-zero 10yr returns. <10=15%+ annually. Not timing but powerful for allocation.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-125",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "SELF-FULFILLING PROPHECY: Price from similar hunches reinforced by media. Everyone follows everyone.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-126",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "PRICE-SENSITIVE FEEDBACK: Rising prices=wealth effect=spending=earnings=prices. Speed depends on leverage.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:leverage_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-127",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "ATTENTION CASCADE: Rising prices attract attention, buying, media, more buying. Monitor Google Trends.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-128",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "BUBBLE CHECKLIST: Rising prices, tech excitement, volume, media, new era, valuations, confidence, new products.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:volume"
+    ]
+  },
+  {
+    "id": "fund-129",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "NATURAL EXPERIMENTS: Bubbles same pattern worldwide. Crypto identical to equity bubbles.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-130",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "DOW 10K: Brokerage celebrating milestones = crowd lost perspective. Warning not buy signal.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-131",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "FREE-RIDER: If millions research, why analyze? Creates complacency. Nobody questions until crash.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-132",
+    "source": "shiller-irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "NARRATIVE: Every bubble this time is different. 1920s radio, 1960s conglomerates, 1990s internet, 2020s AI.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-133",
+    "source": "fundamental-analysis-dummies",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "FUNDAMENTALS: Revenue, earnings, FCF, D/E, ROE, moat, mgmt. Direction bias. Technicals for timing.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-134",
+    "source": "fundamental-analysis-dummies",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "FED POLICY: Tightening = dollar up, stocks correct 6-12mo lag. Easing reverses. Position before trend.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-135",
+    "source": "fundamental-analysis-dummies",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "CYCLES: Leading: permits, claims, ISM, stocks. Coincident: production, GDP. Lagging: CPI. Leading turn 3-6mo early.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-136",
+    "source": "fundamental-analysis-dummies",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "EARNINGS QUALITY: Revenue-driven, recurring, OCF>NI, positive surprises, guidance raised.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-137",
+    "source": "fundamental-analysis-dummies",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "PORTER: New entrants, supplier power, buyer power, substitutes, rivalry. High barriers+low rivalry=best.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-138",
+    "source": "random-walk-wall-street",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "EMH: Prices reflect info. Not perfectly efficient. Hard to exploit mispricings.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-139",
+    "source": "random-walk-wall-street",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RANDOM PATTERNS: Random data shows all classic patterns. Many signals are data-mined artifacts.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-140",
+    "source": "random-walk-wall-street",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DATA MINING: More hypotheses = more false positives. Bonferroni: 100 tests = 5 false significant.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-141",
+    "source": "random-walk-wall-street",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FIRM FOUNDATION VS CASTLE: DCF vs momentum. Use foundation for allocation, castle for trading.",
+    "priority": 3,
+    "tags": [
+      "setup_type:momentum",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-142",
+    "source": "random-walk-wall-street",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LIFECYCLE: Young aggressive 90% stocks. Middle 60/40. Near retirement 40/60. Reduce 1%/year.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-143",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "INTERMARKET CHAIN: Bonds lead stocks, stocks lead commodities, commodities lead currencies. Monitor all four for confluence.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-144",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "GOLD-DOLLAR: Negative -0.6 to -0.8. Gold leads miners 1-3 days. Dollar as gold indicator. Both rally = safe haven crisis.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-145",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "S&P CORRELATIONS: DAX 0.85+, Euro Stoxx 0.90+, VIX -0.75. Euro Stoxx leads S&P 3-5 min European hours.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-146",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "OIL-STOCK: Fluctuates -0.5 to +0.5 by regime. Break from norm = regime change signal.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-147",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "REGIME: RISK-ON=stocks/bonds/commodities/USD. RISK-OFF=opposite. STAGFLATION=stocks+down/commodities up. GOLDILOCKS=stocks up/bonds flat.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-148",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CARRY TRADE: Borrow JPY/CHF buy AUD/NZD. AUD/JPY drops 2%+=risk-off. Sell equities.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-149",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BOND-STOCK DIVERGENCE: Falling yields+rising stocks=goldilocks. Rising yields+falling= tightening. 10Y yield leads stocks 1-3mo.",
+    "priority": 3,
+    "tags": [
+      "setup_type:yield",
+      "timeframe:flexible",
+      "trigger:divergence",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-150",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "COMMODITY-CURRENCY: AUD/gold 0.7+. CAD/oil 0.6+. CHF safe haven. JPY risk-off. Trade currencies by commodity correlations.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-151",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CORRELATION INSTABILITY: Not constant. Rolling 50/200-day. Strong correlation break = regime change signal.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-152",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "YIELD CURVE: 2Y>10Y=inversion=recession 6-18mo. Steep=expansion. Monitor 2s10s. Negative=defensive.",
+    "priority": 3,
+    "tags": [
+      "setup_type:yield",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:RSI"
+    ]
+  },
+  {
+    "id": "fund-153",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "GLOBAL LEADERSHIP: US leads 1-5 days. Europe 1-3. Asia 1-2. DAX up 2%=S&P gaps up. Early warning.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-154",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "DOLLAR-COMMODITY: Strong negative. Dollar up=commodities down. Natural hedge.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-155",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "INTERMARKET DIVERGENCE: Gold up miners not=catch up. S&P up credit widening=correct. Divergences signal stress.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:divergence",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-156",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "VIX-STOCK: -0.75. <15=complacency. >30=fear. Contango=bullish. Backwardation=bearish. Flip=defend.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-157",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "RS ASSET ROTATION: Rank assets 6mo RS monthly. Top 2-3. Rebalance quarterly.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:alt_rotation",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-158",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "GOLD CRISIS: Rallies in crises. Falling during = liquidity crisis. Both falling = most dangerous deleveraging.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-159",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "INTRADAY LEADS: Euro Stoxx leads S&P 3-5min. DAX leads Euro Stoxx. Bonds lead equities 1-2min.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:intraday",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-160",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "COMMODITY-CURRENCY: AUD/gold 0.7+. CAD/oil 0.6+. CHF safe haven. JPY risk-off.",
+    "priority": 3,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-161",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "GOLD-DOLLAR: Strong negative. Gold leads miners 1-3 days. Dollar as gold indicator.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-162",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CORRELATION INSTABILITY: Rolling 50/200-day. Break from strong correlation = regime change.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-163",
+    "source": "katsanos-intermarket",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "GLOBAL CORRELATIONS: DAX 0.85+ Euro Stoxx 0.90+. Japan-specific events Shanghai leads. US futures as early warning.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-164",
+    "source": "lewis-boomerang",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "content": "SOVEREIGN DEBT: Banking debt/revenue predicts default. Ireland 25x. Pattern: bubble, absorb, explode, default.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-165",
+    "source": "lewis-boomerang",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "CDS WARNING: Greek CDS 11bp to 2300bp. >200bp=risk. Credit warns weeks/months before equities.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-166",
+    "source": "lewis-boomerang",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "IRELAND: Govt guaranteed all bank debt. Sovereign credit becomes banking risk. Monitor bank/GDP.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-167",
+    "source": "lewis-boomerang",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "JAPAN: >200% debt/GDP aging savers. Savings drop, borrow internationally. Workforce shrink = inevitable.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-168",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TURTLE SIZING: ATR normalized. Unit=(Account x 1%)/(N x $/pt). Max 4/market, 10/direction, 12 total.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-169",
+    "source": "faith-way-of-turtle",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TURTLE ENTRY: Sys1: 20-day breakout exit 10-day. Skip if last won. Sys2: 55-day. Take all. 70% profit from 5-10 trades/yr.",
+    "priority": 2,
+    "tags": [
+      "setup_type:breakout",
+      "timeframe:flexible",
+      "trigger:breakout",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-170",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "TURTLE RISK: Max 2%/trade, 12 total, 6/direction, 4/market. Correlated share limits.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-171",
+    "source": "faith-way-of-turtle",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "TURTLE PARADOX: Works because most cant execute. 30-40% WR. Quit during streaks = miss big winners.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-172",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BACKTEST TRAPS: Curve-fitting, survivorship bias, look-ahead bias, cost neglect. Out-of-sample. Simple > complex.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-173",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "DRAWDOWN: Accept 20-40%. Predefine max DD. Exceeded = reduce size 50% not abandon. Biggest trends follow biggest pain.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:defi_specific",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-174",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "EXPECTANCY: (Win%xAW)-(Loss%xAL). 40%WR 3:1=0.60/dollar. Low WR not low profitability.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-175",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "R-MULTIPLES: Trade as R. +3R, -1R. Removes size bias. Judge 100+ trades.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-176",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "CORRELATION RISK: 12 diversified 0.8+=ONE bet. Crisis correlations 1.0. >0.7 reduce positions.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:RSI"
+    ]
+  },
+  {
+    "id": "fund-177",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ROBUSTNESS: Test multiple markets/timeframes/regimes. One instrument only = curve-fit.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-178",
+    "source": "faith-way-of-turtle",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "LOSS AVERSION: 30-40% WR feels like failure. Dont look at individual P&L. Monthly only.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:RSI"
+    ]
+  },
+  {
+    "id": "fund-179",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "EDGE PER TRADE: 0.5-2%. 200 trades/yr at 0.5%=100%+. Variance hides edge 20-30 trades.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-180",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "MECHANICAL VS DISCRETIONARY: Rules for sizing/entry/exit. Discretionary only to REDUCE risk.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-181",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "POSITION HEAT: Aggregate unrealized risk. Normal 30-50%, elevated 50-70%, max 80%. All can move against simultaneously.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-182",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "IN VS OUT SAMPLE: 70/30 split. Good in bad out = curve-fit. 2-3 params robust, 10+ fragile.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-183",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SYSTEM COMMITMENT: Min 100 trades. 30 trade sample hides edge. Switching = experiencing all losses.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-184",
+    "source": "faith-way-of-turtle",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "NO-SYSTEM: Abandoning during DD = all losses, no wins. Commit 100+ trades minimum.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:trending",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-185",
+    "source": "crypto-trading-101",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "AltSeason",
+      "BtcDominant"
+    ],
+    "content": "BTC-DENOMINATED THINKING: When trading altcoins, your profit in satoshis matters more than USD value. Most alts are traded against BTC pairs—if your alt rises in USD but falls vs BTC, it was a bad trade because those satoshis could have bought more BTC directly. Always measure alt performance in satoshi terms, not just USD.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:alt_season",
+      "asset_behavior:btc_driven",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-186",
+    "source": "crypto-trading-101",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "BtcDominant",
+      "HalvingProximity"
+    ],
+    "content": "BTC CORRELATION CASCADE: Most cryptocurrencies are tied to Bitcoin's value. If BTC plummets, nearly all altcoins follow with amplified downside. When you trade altcoins, you're essentially making a leveraged bet on BTC direction plus idiosyncratic alt risk. Monitor BTC dominance index—if rising, alts underperform; if falling, alt season begins.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:btc_dominant",
+      "asset_behavior:btc_driven",
+      "risk_context:leverage_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-187",
+    "source": "crypto-encyclopedia",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HalvingProximity",
+      "BtcDominant"
+    ],
+    "content": "BITCOIN HALVING CYCLE: Block rewards halve approximately every 4 years (210,000 blocks). Historical pattern: 12-18 months pre-halving accumulation, parabolic run 6-12 months post-halving, then bear market correction of 80%+. Each cycle's peak-to-peak return diminishes. The halving reduces new supply issuance—supply shock theory drives narrative and price action.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:btc_dominant",
+      "asset_behavior:btc_driven",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-188",
+    "source": "crypto-encyclopedia",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HalvingProximity",
+      "FomcDate"
+    ],
+    "content": "STABLECOIN DYNAMICS: USDT, USDC, DAI maintain 1:1 USD peg. Stablecoins are crypto's cash equivalent—used for trading pairs, yield farming, and risk-off positioning. Monitor stablecoin dominance (percentage of total crypto market cap in stables)—rising stablecoin dominance = market risk-off; falling = risk-on. Stablecoin depeg events create systemic cascading liquidations.",
+    "priority": 2,
+    "tags": [
+      "setup_type:yield",
+      "timeframe:position",
+      "trigger:confirmation",
+      "regime_subtype:halving_cycle",
+      "asset_behavior:stablecoin",
+      "risk_context:leverage_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-189",
+    "source": "irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "content": "BUBBLE STRUCTURE (SHILLER): 1) Displacement—new technology/idea creates opportunity. 2) Boom—prices rise, media amplifies. 3) Euphoria—'this time is different,' FOMO retail enters. 4) Profit-taking—smart money exits. 5) Panic—retail realizes, mass selling. Crypto follows this EXACT cycle. Identify which phase you're in. When taxi drivers give crypto tips = late stage 3/early stage 4.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:alt_season",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:moving_average"
+    ]
+  },
+  {
+    "id": "fund-190",
+    "source": "irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "BreakingNews"
+    ],
+    "content": "NARRATIVE ECONOMICS IN CRYPTO: Prices are driven by stories, not fundamentals. Bitcoin narratives shift: digital gold → inflation hedge → institutional adoption → national reserve. Each narrative attracts different capital. When a narrative exhausts its marginal buyer, price stagnates. Track narrative evolution—if media is recycling old narratives, the cycle is mature.",
+    "priority": 2,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:btc_driven",
+      "risk_context:leverage_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-191",
+    "source": "irrational-exuberance",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "ExtremeGreed",
+      "AltSeason"
+    ],
+    "content": "SPECULATIVE BUBBLE INDICATORS: 1) Rapid price increase with no fundamental change. 2) Media coverage explosion. 3) 'New era' thinking ('blockchain changes everything'). 4) Increased trading by inexperienced participants. 5) Derivatives speculation surge (leverage, options). All five present simultaneously in crypto mania phases. Count the indicators. More = closer to the top.",
+    "priority": 1,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:alt_season",
+      "asset_behavior:market_wide",
+      "risk_context:leverage_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-192",
+    "source": "irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "MvrvExtreme",
+      "SoprReset"
+    ],
+    "content": "VALUATION ANCHORING IN BUBBLES: In the absence of traditional valuation metrics (earnings, dividends), crypto investors anchor to arbitrary round numbers or previous highs. 'BTC should be $100K because...' This is narrative-driven anchoring, not valuation. MVRV Z-Score, NVT Ratio, and Stock-to-Flow provide pseudo-fundamental anchors. When price deviates >2σ from these, mean-reversion is likely.",
+    "priority": 1,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:extreme_reading",
+      "regime_subtype:cycle_extreme",
+      "asset_behavior:btc_driven",
+      "risk_context:standard",
+      "indicator:MVRV_zscore"
+    ]
+  },
+  {
+    "id": "fund-193",
+    "source": "irrational-exuberance",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "FomcDate",
+      "BreakingNews"
+    ],
+    "content": "FED POLICY AND CRYPTO BUBBLES: Loose monetary policy (low rates, QE) feeds speculative bubbles by reducing the cost of capital and pushing investors into risk assets. Tightening (rate hikes, QT) punctures them. 2020-2021 crypto bubble directly correlated with zero rates + massive QE. Fed pivot to tightening in 2022 collapsed crypto 75%+. Monitor Fed policy as primary macro driver.",
+    "priority": 1,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:neutral",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-194",
+    "source": "alchemy-finance",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed",
+      "ExtremeFear"
+    ],
+    "content": "REFLEXIVITY THEORY FOR CRYPTO: Participant perceptions don't just reflect reality—they SHAPE it. In crypto: rising prices attract users → more development → better fundamentals → higher prices (virtuous cycle). Falling prices → user exodus → less development → worse fundamentals → lower prices (vicious cycle). This is reflexivity. Crypto is MORE reflexive than any traditional market.",
+    "priority": 1,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:capitulation",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-195",
+    "source": "alchemy-finance",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "NEAR-EQUILIBRIUM vs FAR-FROM-EQUILIBRIUM: In normal conditions, market corrections are mean-reverting (near-equilibrium). In far-from-equilibrium conditions, feedback loops create one-directional trends. Crypto oscillates between these states. IDENTIFY THE REGIME: If corrections are being bought = near-equilibrium (trend intact). If bounces are being sold = far-from-equilibrium (regime change).",
+    "priority": 1,
+    "tags": [
+      "setup_type:pullback",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:euphoria",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-196",
+    "source": "alchemy-finance",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "BOOM-BUST SEQUENCE: Soros identifies: 1) Trend not yet recognized. 2) Trend is tested and survives. 3) Increasing conviction in trend. 4) Growing divergence between perception and reality. 5) Recognition of the divergence. 6) The trend reverses. Apply to crypto: identify which phase BTC is in. Phase 1-3 = trend follow. Phase 4 = reduce size. Phase 5-6 = reverse or exit.",
+    "priority": 1,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:divergence",
+      "regime_subtype:euphoria",
+      "asset_behavior:btc_driven",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-197",
+    "source": "alchemy-finance",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "FomcDate",
+      "BreakingNews"
+    ],
+    "content": "CREDIT AND REGULATORY CYCLE IN CRYPTO: Soros's credit cycle applies directly: easy money → crypto leverage builds → asset inflation → regulators notice → tightening → forced deleveraging → crash. The regulatory response to crypto mania (SEC actions, exchange bans) punctures the bubble just as monetary tightening does. Track both credit AND regulatory cycles.",
+    "priority": 1,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:confirmation",
+      "regime_subtype:neutral",
+      "asset_behavior:market_wide",
+      "risk_context:leverage_risk",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-198",
+    "source": "irrational-exuberance",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "MvrvExtreme",
+      "SoprReset"
+    ],
+    "content": "ON-CHAIN VALUATION MODELS: MVRV (Market Value to Realized Value) Z-Score >7 = overvalued (sell zone). <0 = undervalued (buy zone). SOPR (Spent Output Profit Ratio) >1.1 = profit-taking overheated. <0.98 = capitulation. These on-chain metrics provide fundamental anchoring for crypto that doesn't exist in traditional markets. Combine with price action for timing.",
+    "priority": 1,
+    "tags": [
+      "setup_type:reversal",
+      "timeframe:flexible",
+      "trigger:extreme_reading",
+      "regime_subtype:cycle_extreme",
+      "asset_behavior:market_wide",
+      "risk_context:standard",
+      "indicator:MVRV_zscore"
+    ]
+  },
+  {
+    "id": "fund-199",
+    "source": "alchemy-finance",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "BtcDominant"
+    ],
+    "content": "REFLEXIVE DIVERGENCE SIGNAL: When market price diverges significantly from the fundamental reality that participants' behavior creates, the divergence becomes unsustainable. In crypto: if price rises but developer activity declines, TVL drops, and new address growth slows—the price-fundamentals gap will close. The only question is whether price adjusts down or fundamentals adjust up. Usually price.",
+    "priority": 1,
+    "tags": [
+      "setup_type:general",
+      "timeframe:flexible",
+      "trigger:divergence",
+      "regime_subtype:btc_dominant",
+      "asset_behavior:defi_specific",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  },
+  {
+    "id": "fund-200",
+    "source": "irrational-exuberance",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeGreed",
+      "MvrvExtreme"
+    ],
+    "content": "CRYPTO SPECULATION INDEX: Combine: Google Trends for 'bitcoin,' new exchange account registrations, social media mention velocity, and stablecoin inflows to exchanges. When all four are at extreme highs simultaneously = late-stage speculation. When all four are at extreme lows = capitulation complete. This composite sentiment index marks cycle extremes with reasonable accuracy.",
+    "priority": 1,
+    "tags": [
+      "setup_type:reversal",
+      "timeframe:flexible",
+      "trigger:extreme_reading",
+      "regime_subtype:euphoria",
+      "asset_behavior:btc_driven",
+      "risk_context:standard",
+      "indicator:none"
+    ]
+  }
+]

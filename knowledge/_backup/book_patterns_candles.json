@@ -1,0 +1,2679 @@
+[
+  {
+    "id": "book-pat-001",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Broadening Bottoms: Price swings widen with lower lows and higher highs forming megaphone shape. Up breakout avg rise 33%, failure rate 13% in bull market. Down breakout avg decline 18%, failure rate 9%. Throwback/pullback 64%. Volume decreases 67% of time. Trade the breakout direction with stop inside pattern.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-002",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Broadening Tops: Bearish megaphone at highs. Down breakout avg decline 20%, failure rate 3% bull market. Up breakout avg rise 24%. Throwback 62%. Volume decreases 75% on down breakout. Sell short below lower trendline with stop above most recent peak. One of the best-performing bear patterns.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-003",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Right-Angled Broadening Ascending: Flat bottom with rising top trendline. Down breakout avg decline 22%, failure rate 8%. Up breakout avg rise 15%. Throwback 52%. Volume decreases. Wait for confirmed break below flat support line.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-004",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Right-Angled Broadening Descending: Flat top with declining bottom. Down breakout avg decline 23%, failure rate 4%. Up breakout avg rise 23%. Pullback 57%. Strong bear pattern ranked #4 overall bear market. Short on break below pattern.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-005",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Broadening Wedges Ascending: Both trendlines slope up with widening price swings. Down breakout avg decline 21%, failure rate 14%. Up breakout avg rise 18%. Pullback 52%. Sell short on break below lower trendline in rising wedge.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-006",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Broadening Wedges Descending: Both trendlines slope down with widening swings. Down breakout avg decline 25%, failure rate 2% bear market. Up breakout avg rise 24%. Pullback 66%. Strong bearish pattern - short below lower trendline.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-007",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bump-and-Run Reversal Bottoms: Price declines steeply then forms a bump with lead-in, bump, and run phases. Up breakout avg rise 31% bear, 39% bull. Failure rate 2% bear, 5% bull. Buy after break above top of bump. Pullback 73% bear. Ranked #8 overall bull pattern.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-008",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bump-and-Run Reversal Tops: Mirror of bottom. Price rises steeply in bump phase then reverses. Down breakout avg decline 27% bear, 33% bull. Failure rate 1% bear, 3% bull. Throwback 65% bear, 68% bull. Short after break below bump neckline. Best bear pattern #3 overall.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-009",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Cup with Handle: U-shaped consolidation with shallow handle near cup rim. Breakout avg rise 34% bear, 47% bull. Failure rate 5% bull, 7% bear. Throwback 42%. Handle should retrace no more than 1/3 to 1/2 of cup depth. Volume surges on breakout. Buy above handle high.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-010",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Inverted Cup with Handle: Upside-down U with handle at bottom. Down breakout avg decline 26% bear, 31% bull. Failure rate 2% bear, 6% bull. Throwback 48%. Short below handle low. One of the best bear market patterns ranked #1 overall.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-011",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Diamond Bottoms: Price forms broadening then narrowing pattern like diamond. Up breakout avg rise 36% bear, 44% bull. Failure rate 3% bear. Down breakout avg decline 44% bear (small sample). Pullback 64% bull. Buy above right neckline break. Ranked #2 overall bear (up breakout).",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-012",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Diamond Tops: Broadening then narrowing at highs. Down breakout avg decline 24% bear, 32% bull. Failure rate 4% bear, 3% bull. Throwback 57% bear. Up breakout avg rise 33% bear. Short below right neckline. Volume decreases on breakout 72% of time.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-013",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Double Bottom Adam & Adam: Two narrow V-shaped lows at same price. Up breakout avg rise 37% bull, 24% bear. Failure rate 4% bull, 7% bear. Pullback 64% bull. Buy above confirmation (prior high). Strongest double bottom variant.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-014",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Double Bottom Adam & Eve: Narrow V first low, wide rounded second low. Up breakout avg rise 36% bull, 33% bear. Failure rate 5% bull, 4% bear. Pullback 54% bear. Buy above confirmation high.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-015",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Double Bottom Eve & Adam: Wide rounded first low, narrow V second low. Up breakout avg rise 35% bull, 23% bear. Failure rate 4% bull, 8% bear. Pullback 56% bear. Buy above confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-016",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Double Bottom Eve & Eve: Two wide rounded lows. Up breakout avg rise 36% bull, 24% bear. Failure rate 4% bull, 7% bear. Pullback 46% bear. Reliable pattern - ranked #6 overall bull. Buy above confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-017",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Double Top Adam & Adam: Two narrow spikes at same price. Down breakout avg decline 19% bear, 31% bull. Failure rate 11% bear, 6% bull. Throwback 48% bear, 58% bull. Short below confirmation low. V-shaped peaks.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-018",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Double Top Adam & Eve: Narrow spike then wide rounded top. Down breakout avg decline 22% bear, 37% bull. Failure rate 7% bear, 6% bull. Throwback 58% bear. Short below confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-019",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Double Top Eve & Adam: Wide rounded then narrow spike top. Down breakout avg decline 24% bear, 34% bull. Failure rate 5% bear, 9% bull. Throwback 54% bear. Short below confirmation low.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-020",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Double Top Eve & Eve: Two wide rounded peaks. Down breakout avg decline 25% bear, 34% bull. Failure rate 2% bear, 9% bull. Throwback 51% bear. Ranked #2 overall bull bear pattern. Very reliable.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-021",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Flags: Small rectangular consolidation against prevailing trend, sloping opposite. Down breakout performance measures to trend low. Failure rate 0% bear, 1% bull. Throwback 40% bear. Brief consolidation of 1-3 weeks. Trade in direction of prior trend.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-022",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "High and Tight Flags: Steep flag after sharp 90%+ advance. Up breakout avg rise 42% bear, 69% bull. Failure rate 0% bear, 1% bull. Pullback 65% bear. Ranked #1 overall in both bull and bear markets. Best-performing pattern in entire book.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-023",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Area/ Common Gaps: Gaps that fill quickly, usually within days. Found in trading ranges or congestion. Not useful for trading. Fill rate very high. Avoid trading these gaps.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-024",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Breakaway Gaps: Gap away from price pattern or congestion. Strong continuation signal. Does not fill quickly. Volume surges. Trade in gap direction. Use as support/resistance zone.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-025",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Continuation/Runaway Gaps: Gap mid-trend, confirming strong momentum. Does not fill quickly. Can act as midpoint for measured move. Trade with trend. Volume should be above average.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-026",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Exhaustion Gaps: Gap near end of trend, quickly filled. Signals trend reversal. Heavy volume with no follow-through. Fade the gap direction. Tight stop required.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-027",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Head-and-Shoulders Bottoms (Inverse H&S): Three lows with middle lowest. Up breakout avg rise 30% bear, 41% bull. Failure rate 4% bear, 5% bull. Pullback 51% bear, 62% bull. Volume increases on breakout. Buy above neckline. Most reliable reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-028",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Head-and-Shoulders Bottoms Complex: Multiple shoulders on one or both sides. Up breakout avg rise 31% bear, 39% bull. Failure rate 3% bear, 5% bull. Pullback 66% bear. Same rules as standard H&S bottom.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-029",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Head-and-Shoulders Tops: Three peaks with middle highest. Down breakout avg decline 29% bear, 34% bull. Failure rate 1% bear, 4% bull. Throwback 64% bear, 67% bull. Volume increases on breakdown. Short below neckline. Ranked #6 overall bear.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-030",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Head-and-Shoulders Tops Complex: Multiple shoulders on one/both sides. Down breakout avg decline 27% bear, 34% bull. Failure rate 1% bear, 2% bull. Throwback 60% bear. Same rules as standard H&S top.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-031",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Horn Bottoms: Two spikes below price level with pause between. Up breakout avg rise 27% bear, 38% bull. Failure rate 7% bear, 9% bull. Pullback 58% bear. Buy above confirmation. Similar to pipe bottoms.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-032",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Horn Tops: Two spikes above with pause. Down breakout avg decline 22% bear, 30% bull. Failure rate 2% bear, 5% bull. Throwback 44% bear. Short below confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-033",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Island Reversals: Price gaps away, trades isolated, then gaps back. Down breakout avg decline 23% bear, 32% bull. Failure rate 5% bear, 7% bull. Throwback 59% bear. Strong reversal signal. Trade in direction of second gap.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-034",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Long Islands: Extended island pattern with wider isolation. Down breakout avg decline 26% bear, 32% bull. Failure rate 2% bear, 3% bull. Throwback 54% bear. Up breakout ranked #15 bull overall.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-035",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Measured Move Down: ABC correction with two legs down separated by correction. Second leg equals first leg length 60-65% of time. Use first leg height to project second leg target. Retracement 49% bear.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-036",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Measured Move Up: Two rally legs separated by correction. Second leg equals first leg ~60% of time. Use first leg to project target. Retracement 27% bear. Classic swing trading pattern.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-037",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Pennants: Small symmetrical triangle consolidation against trend. Down breakout failure rate 0% bear, 2% bull. Throwback 50% bear. Like flags but converging trendlines. Brief 1-3 week duration. Trade with prior trend.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-038",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Pipe Bottoms: Two parallel spikes below price like twin tails. Up breakout avg rise 32% bear, 39% bull. Failure rate 4% bear, 5% bull. Pullback 52% bear. Ranked #2 overall bull market. Buy above pipes high.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-039",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Pipe Tops: Two parallel spikes above price. Down breakout avg decline 27% bear, 30% bull. Failure rate 2% bear, 5% bull. Throwback 37% bear. Ranked #3 overall bear market. Short below pipes low.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-040",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Rectangle Bottoms: Horizontal price range with multiple touches of support/resistance. Down breakout avg decline 25% bear, 24% bull. Up breakout avg rise 24% bear, 33% bull. Throwback 48% bear. Trade breakout direction.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-041",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Rectangle Tops: Horizontal range at high price levels. Down breakout avg decline 21% bear, 30% bull. Failure rate 9% bear. Throwback 65% bear. Up breakout avg rise 20% bear. Trade breakout direction.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-042",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Rounding Bottoms: Gradual U-shaped reversal. Up breakout avg rise 31% bear, 41% bull. Failure rate 5% bear. Pullback 43% bear. Long-term formation. Buy on breakout above rim. Volume pattern should be U-shaped (high on both sides).",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-043",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Rounding Tops: Gradual inverted U. Down breakout avg decline 23% bear, 34% bull. Failure rate 9% bear, 10% bull. Throwback 57% bear. Short on break below rim. Slow formation often 6+ months.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-044",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Ascending Scallops: J-shaped pattern with upward bias. Down breakout avg decline 19% bear. Up breakout avg rise 19% bear, 29% bull. Failure rate 14% bear. Pullback 42% bear. Each scallop trends higher.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-045",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Ascending Inverted Scallops: Inverted J trending up. Up breakout avg rise 26% bear, 43% bull. Failure rate 7% bear, 4% bull. Pullback 65% bear. Buy on breakout.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-046",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Descending Scallops: J-shaped trending down. Down breakout avg decline 23% bear, 17% bull. Failure rate 8% bear. Throwback 52% bear. Each scallop trends lower. Short trades preferred.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-047",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Descending Inverted Scallops: Inverted J trending down. Down breakout avg decline 23% bear, 18% bull. Failure rate 5% bear, 10% bull. Throwback 50% bear. Strong bearish pattern.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-048",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Three Falling Peaks: Three peaks with each lower than prior. Down breakout avg decline 24% bear, 17% bull. Failure rate 4% bear, 12% bull. Throwback 62% bear. Bearish pattern. Short below valley between peaks.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-049",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Three Rising Valleys: Three troughs each higher. Up breakout avg rise 22% bear, 41% bull. Failure rate 9% bear, 5% bull. Pullback 65% bear. Bullish pattern. Buy above peak between valleys.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-050",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Ascending Triangles: Flat top with rising bottom trendline. Up breakout avg rise 30% bear, 35% bull. Failure rate 12% bear, 13% bull. Down breakout avg decline 24% bear. Pullback 54% bear. Bullish bias. Buy above flat resistance.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-051",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Descending Triangles: Flat bottom with declining top trendline. Down breakout avg decline 25% bear, 16% bull. Failure rate 11% bear, 16% bull. Throwback 59% bear. Up breakout avg rise 27% bear. Bearish bias. Short below flat support.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-052",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Symmetrical Triangles: Converging trendlines with similar slopes. Up breakout avg rise 26% bear, 31% bull. Down breakout avg decline 19% bear, 17% bull. Failure rate 9% bear, 13% bull. Throwback 62% bear. Wait for breakout direction.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-053",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Triple Bottoms: Three equal lows with peaks between. Up breakout avg rise 23% bear, 37% bull. Failure rate 8% bear, 4% bull. Pullback 61% bear, 64% bull. Buy above resistance of peaks. Volume should decrease on each test.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-054",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Triple Tops: Three equal peaks with valleys between. Down breakout avg decline 24% bear, 19% bull. Failure rate 5% bear, 10% bull. Throwback 64% bear, 61% bull. Short below support of valleys.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-055",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Falling Wedges: Both trendlines slope down and converge. Down breakout avg decline 24% bear, 15% bull. Up breakout avg rise 26% bear, 32% bull. Failure rate 6% bear, 15% bull. Pullback 72% bear. Usually bullish - buy on upward breakout.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-056",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Rising Wedges: Both trendlines slope up and converge. Down breakout avg decline 20% bear, 14% bull. Failure rate 15% bear, 24% bull. Throwback 63% bear, 73% bull. Usually bearish - short on downward breakout.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-057",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "BreakingNews"
+    ],
+    "content": "Dead-Cat Bounce: Stock drops 20%+ then bounces ~15-20% before resuming decline. Bounce typically lasts 4-8 days. Sell into the bounce. Average decline continues 30%+ after bounce. High volume on initial drop.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-058",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "BreakingNews"
+    ],
+    "content": "Dead-Cat Bounce Inverted: Stock rises sharply then pulls back before resuming rally. Buy the dip. Average rise continues after pullback. Volume surges on initial spike.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-059",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "BreakingNews"
+    ],
+    "content": "Earnings Surprise Bad: Stock gaps down on bad earnings. Down breakout avg decline 17% bear, 13% bull. Failure rate 26% bear, 31% bull. Throwback 45% bear, 41% bull. Wait for throwback to short. 41% throwback in bull.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-060",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "BreakingNews"
+    ],
+    "content": "Earnings Surprise Good: Stock gaps up on good earnings. Up breakout avg rise 14% bear, 24% bull. Failure rate 28% bear, 29% bull. Pullback 44% bear, 41% bull. Buy on pullback to breakout level.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-061",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "BreakingNews"
+    ],
+    "content": "FDA Drug Approvals: Stock moves on FDA approval. Up breakout avg rise 20% bull. Down breakout avg decline 13% bull. Failure rate 34% up, 39% down. Throwback 61% up, 66% down. Trade with breakout direction.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-062",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "BreakingNews"
+    ],
+    "content": "Earnings Flags: Consolidation after earnings gap in direction of gap. Up breakout avg rise 34% bull. Failure rate 10% bull. Pullback 63% bull. Ranked #1 event pattern. Buy breakout from flag.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-063",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "BreakingNews"
+    ],
+    "content": "Stock Downgrades: Down breakout avg decline 19% bear, 14% bull. Failure rate 17% bear, 26% bull. Throwback 45% bear, 48% bull. Up breakout avg rise 14% bear, 27% bull. Wait for direction confirmation.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-064",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "BreakingNews"
+    ],
+    "content": "Stock Upgrades: Up breakout avg rise 16% bear, 24% bull. Failure rate 21% bear, 18% bull. Pullback 59% bear, 63% bull. Down breakout avg decline 18% bear. Trade with confirmed breakout.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-065",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski For Best Performance Rules: Patterns with lowest failure rates perform best. Look for heavy breakout volume (above 50-day avg). Throwbacks/pullbacks hurt performance by 6-8%. Tall patterns perform better than short. Wider price swings within pattern = stronger move.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-066",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Throwback/Pullback Stats: Throwbacks occur in 62% of bull breakouts. Pullbacks occur in 54% of bear breakouts. Average throwback retraces 48% of breakout move. Takes 10-15 days. After throwback, price resumes breakout direction 67% of time.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-067",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Volume Pattern: Volume should be higher on breakout day than prior 50-day average. 59% of breakouts have above-avg volume. Declining volume during pattern formation is bullish for breakouts. Volume spike on breakout confirms.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-068",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Hammer: Small real body at top with long lower shadow (2-3x body) after downtrend. Color irrelevant but white more bullish. No or tiny upper shadow. Requires bullish confirmation next session (close above hammer high). Strong reversal at support.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-069",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Hanging Man: Same shape as hammer but after uptrend. Long lower shadow shows bulls defended but bears pushed back. Requires bearish confirmation: close below hanging man body next day. More bearish at all-time highs. Wait for confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-070",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Inverted Hammer: Small real body at bottom with long upper shadow after downtrend. Needs bullish confirmation next session (white candle closing above inverted hammer high). Without confirmation, treat as bearish. Less reliable than hammer.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-071",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Shooting Star: Small real body at bottom with long upper shadow after uptrend. Shows rejection of higher prices. Bearish without confirmation needed but stronger with it. More significant at resistance. Tiny lower shadow acceptable.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-072",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Doji: Open and close are virtually equal. Shows market indecision. Alone it is neutral. After extended move, doji warns of reversal. Long-legged doji has very long shadows. Dragonfly doji has long lower shadow (bullish). Gravestone doji has long upper shadow (bearish).",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-073",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Marubozu: Long real body with no or very tiny shadows. White marubozu (bullish): opens at low, closes at high. Black marubozu (bearish): opens at high, closes at low. Shows total domination by one side. Strong continuation or reversal depending on context.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-074",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Spinning Tops: Small real bodies with shadows on both sides. Shows indecision. Neither bulls nor bears won. After extended trend, warns of potential reversal. More significant when multiple spinning tops cluster together.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-075",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Belt-Hold Lines: White belt-hold bullish: long white candle opening at its low in downtrend. Black belt-hold bearish: long black candle opening at its high in uptrend. Strong single-bar reversal signals. More reliable on daily/weekly charts.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-076",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bullish Engulfing: White real body completely engulfs prior black body after downtrend. Three criteria: (1) definable downtrend (2) white body wraps around black body (3) opposite colors. Stronger if first body is small and second is large. Heavy volume on engulfing day increases significance.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-077",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bearish Engulfing: Black real body completely engulfs prior white body after uptrend. Same three criteria as bullish but reversed. Stronger with small first body and large second body. Use high of pattern as resistance. More powerful than Western outside reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-078",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Dark Cloud Cover: After uptrend, opens above prior high then closes deeply into prior white body. Requires >50% penetration for significance. Greater penetration = more bearish. Bearish engulfing is stronger version. Use high as resistance. Heavy volume on open = blow-off.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-079",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Piercing Pattern: After downtrend, opens below prior low then closes well into prior black body. Must penetrate >50% of black body. Less flexible than dark-cloud cover. Strong bullish reversal. Opposite of dark-cloud cover. Use low as support.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-080",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Harami: Large candle followed by small candle contained within prior body. Bull harami: black then small white. Bear harami: white then small black. Small body shows momentum shift. More significant if second candle is doji (harami cross). Requires confirmation.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-081",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Harami Cross: Harami where second candle is a doji. Stronger signal than regular harami. After uptrend, very bearish (like harami but more decisive). After downtrend, very bullish. Major reversal signal. Requires confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-082",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Tweezers Top/Bottom: Two or more candles with equal highs (top) or lows (bottom). Minor reversal signal. More significant with other candle patterns (hammer, engulfing, etc). Works as support/resistance. Equal highs/lows = strong level.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-083",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Counterattack Lines: After strong trend, opposite color candle opens sharply with gap but closes at prior candle close. Bullish: gaps down then recovers. Bearish: gaps up then fades. Shows losing side mounting comeback. Moderate reversal signal.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-084",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Morning Star: Three-candle bottom reversal. Long black, small body gap down (star), long white gap up closing into first body. Star shows indecision. Third candle confirms reversal. More bullish if star is doji. Volume increases on third candle.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-085",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Evening Star: Three-candle top reversal. Long white, small body gap up (star), long black gap down into first body. Mirror of morning star. Star shows indecision at highs. More bearish if star is doji. Strong at resistance.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-086",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Morning Doji Star: Morning star where middle candle is doji. Even stronger reversal than regular morning star. The doji adds uncertainty to bearish trend. Gap between doji and adjacent bodies increases significance.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-087",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Evening Doji Star: Evening star with doji middle. Very bearish reversal. Strongest when at resistance or after extended uptrend. The doji adds uncertainty. Immediate reversal more likely than regular evening star.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-088",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Three White Soldiers: Three consecutive long white candles, each closing higher. Opens within prior body. Strong bullish continuation. Each candle should open within prior body and close near its high. Rare but powerful.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-089",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Three Black Crows: Three consecutive long black candles, each closing lower. Opens within prior body. Strong bearish continuation. Each should open within prior body and close near its low. Signals sustained selling.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-090",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Tri-Star: Three dojis in a row. Extremely rare. Bull tri-star at bottom, bear tri-star at top. Shows three sessions of indecision. Very strong reversal when it occurs. Requires confirmation.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-091",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Abandoned Baby: Rare reversal where star gaps away from prior candle and next candle gaps back. Bullish: downtrend, doji gaps below, then white gaps above. Bearish: uptrend, doji gaps above, then black gaps below. Very rare and reliable.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-092",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Rising Windows (Bullish Gap): Gap between prior high and current low. Continuation signal - go with window direction. Entire window becomes support. Stop: close below window bottom. Multiple windows: trend intact until last window closed.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-093",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Falling Windows (Bearish Gap): Gap between prior low and current high. Continuation signal - go with direction. Entire window becomes resistance. Stop: close above window top. If closed, downtrend voided.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-094",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Three Windows: After three rising/falling windows, trend likely exhausted. However, trend stays valid until last window closes. Don't count windows to exit - use window close as stop. This is more guideline than rule.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-095",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Gapping Side-by-Side White Lines: After rising window, two similar white candles. Bullish continuation. In rare case in downtrend, these can be bearish continuation. The key is the window direction.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-096",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "High-Price Gapping Play: Small real bodies near highs after strong move, then gap up. Bullish continuation. The consolidation relieved overbought. Buy above the window. Voided if market closes below window.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-097",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Low-Price Gapping Play: Small real bodies near lows after decline, then gap down. Bearish continuation. Consolidation relieved oversold. Short below window. Voided if market closes above window.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-098",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Tasuki Gap: Rising/falling window followed by opposite color candle that doesn't fill window. Bullish tasuki: white gap up, black opens in white body but doesn't close window. Bearish tasuki: black gap down, white opens in black but doesn't close window. Continue with window direction.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-099",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Rising Three Methods: Long white, three small declining candles within white body range, then another long white. Bullish continuation. The three small candles are a brief pause. Fifth candle confirms continuation.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-100",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Falling Three Methods: Long black, three small rising candles within black body range, then another long black. Bearish continuation. Opposite of rising three methods. Fifth candle confirms.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-101",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Separating Lines: Two opposite-color candles with same opening price. After downtrend: white opens at black open = bullish. After uptrend: black opens at white open = bearish. Strong continuation signal in trend direction.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-102",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Dumpling Top: Rounding top with gap down to confirm. Small real bodies form convex shape. Gap down = falling window confirms. Same as Western rounded top but with gap requirement. Use gap as resistance.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-103",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Frypan Bottom: Rounding bottom with gap up to confirm. Concave shape of small bodies. Rising window confirms. Same as Western rounded bottom but with gap. More bullish than regular rounding bottom due to gap.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-104",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Tower Top: Long white candles, pause with small bodies, then long black candles. V-shaped reversal at highs. Like Western spike reversal. No gap needed unlike dumpling top. Signals abrupt trend change.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-105",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Tower Bottom: Long black candles, pause with small bodies, then long white candles. V-shaped reversal at lows. Like frypan bottom but no gap needed. Abrupt reversal from selling to buying pressure.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-106",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Three-Line Break Charts: Constructed by comparing current close to prior three lines. New white if close exceeds highest of three prior whites. New black if close falls below lowest of three prior blacks. Trade on color change. More reliable with trend.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-107",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Renko Charts: Brick size fixed. New brick only when price moves one full brick size. No time element. Filters noise. Buy when white brick appears after black. Sell when black after white. Stop: opposite color brick.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-108",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Kagi Charts: Line changes direction when price reverses by set amount. Buy on yang (thick line = bullish). Sell on yin (thin line = bearish). Shoulder/waist patterns for entries. Multi-level breaks for stronger signals.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-109",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Candle Patterns as Support/Resistance: Use highs of bearish engulfing/dark-cloud cover as resistance. Use lows of bullish engulfing/piercing pattern as support. Cluster of candle signals at same level = very strong S/R. Wait for bounce off these levels.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-110",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Shadow Analysis: Long upper shadows = resistance/rejection. Long lower shadows = support/defense. Series of shadows at same level creates strong S/R. Shadow extends from body to high/low. More shadows = stronger level.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-111",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Confirmation Rule: Always wait for candle pattern confirmation before trading. Bullish: close above pattern high. Bearish: close below pattern low. Without confirmation, pattern can fail. This is the #1 rule for candlestick trading.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-112",
+    "source": "nison-beyond-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Three-Line Break Construction: Compare current close to prior three lines. New white line if close > highest of 3 prior whites. New black if close < lowest of 3 prior blacks. Opposite color line required for reversal. Three-line break is most popular break chart in Japan.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-113",
+    "source": "nison-beyond-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Three-Line Break Trading: White line = buy signal. Black line = sell signal. More reliable when combined with candle charts for confirmation. Use trend with 3-line break. Extra confirmation with black shoe/white suit patterns.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-114",
+    "source": "nison-beyond-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Renko Construction: Fixed brick size. New brick only when price exceeds prior brick by full brick amount. Same direction brick if continuation. Opposite direction brick if reversal by 2x brick size. No time component. Pure price filter.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-115",
+    "source": "nison-beyond-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Renko Trading: Buy when white brick forms after sequence of black bricks. Sell when black brick after whites. Use brick size to set stop. Larger brick = fewer signals but more reliable. Smaller brick = more signals but more noise.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-116",
+    "source": "nison-beyond-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Kagi Construction: Line drawn vertically. Reversal when price exceeds reversal amount. Yin (thin) line = bearish. Yang (thick) line = bullish. Changes from yin to yang when price exceeds prior shoulder (top). Changes from yang to yin below prior waist (bottom).",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-117",
+    "source": "nison-beyond-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Kagi Trading: Buy on yang (thick line). Sell on yin (thin line). Shoulder pattern = buy point. Waist pattern = sell point. Multi-level breaks add confidence. Double windows in kagi = continuation signal. Tweezers in kagi = support/resistance.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-118",
+    "source": "nison-beyond-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Disparity Index: Measures distance between current price and moving average as percentage. Above 0 = price above MA. Below 0 = price below MA. Extreme readings warn of reversal. Use with candle signals for timing.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-119",
+    "source": "nison-beyond-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Golden Cross / Death Cross: Golden: short MA crosses above long MA = bullish. Death: short MA crosses below long MA = bearish. Japanese use 25-day and 75-day MAs (not 50/200). More reliable on weekly charts. Lagging but confirmed signals.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-120",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bull Reversal Bar: Bar with close above open or above midpoint. Best: open near/below prior close, close above open and prior close. Lower tail 1/3-1/2 bar height. Not much overlap with prior bars. Followed by strong entry bar (bull trend bar). Strongest at support.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-121",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bear Reversal Bar: Bar with close below open or midpoint. Best: open near/above prior close, close well below. Upper tail 1/3-1/2 bar height. Minimal overlap with prior bars. Followed by strong bear entry bar. Strongest at resistance.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-122",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Two-Bar Reversal: Two bars that together form reversal. Bull: bear bar followed by bull bar that closes above both opens. Bear: bull bar followed by bear bar closing below both opens. Shows rapid shift in control. Entry on break of second bar.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-123",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Three-Bar Reversal: Three bars showing climax then reversal. Like two-bar but with small pause bar in middle. Entry on break of third bar. Moderate reliability. Better at major S/R levels.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-124",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Inside Bar: Bar whose high and low are within prior bar range. Shows contraction/indecision. Can be setup for breakout in either direction. Often pause in trend. ii pattern (two inside bars) = tighter squeeze, stronger breakout.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-125",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ii Pattern (Inside-Inside): Two consecutive inside bars. Very tight range contraction. High probability breakout setup. Place stop orders above and below pattern. Enter in direction of breakout. Strong signal when at trend extremes.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-126",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "iii Pattern (Inside-Inside-Inside): Three inside bars. Even tighter contraction than ii. Highest probability breakout setup. Breakout usually strong. Place orders both sides. Enter in breakout direction.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-127",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Outside Bar: Bar whose range engulfs prior bar. Shows expansion/volatility. Can be reversal or continuation. If closes near extreme, likely continuation. If closes near middle, more neutral. oo pattern = two outside bars = very volatile.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-128",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "ioi Pattern: Inside bar, outside bar, inside bar. Setup for breakout. After expansion (outside bar), market contracts again (inside bar). Enter on break of last inside bar. Direction depends on context.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-129",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Shaved Bar: Bar with no tail at top (bull) or bottom (bear). Strong trend bar closing at extreme. Shows decisive momentum. Bull shaved bar closes at high = very bullish. Bear shaved bar closes at low = very bearish.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-130",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Trend Bar: Bar with body > 60% of range. Bull trend bar: close near high. Bear trend bar: close near low. Shows one side in control. Stronger signal when closes beyond prior bar extremes. Body size measures conviction.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-131",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Doji Bar: Bar with body < 10% of range. Shows equilibrium/indecision. Significant after trend when it signals potential reversal. More significant at S/R. Variations: doji star, dragonfly doji, gravestone doji.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-132",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Climax Bars: Extreme trend bars at end of extended move. Bull climax: huge bull bar after long rally. Bear climax: huge bear bar after long decline. Often followed by reversal or trading range. Don't chase climax bars. Wait for pullback.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-133",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "High 1 (H1): First pullback bar in bull trend after new high. Buy above its high. Most common pullback setup. The pullback bar's high becomes the signal bar. Simple and effective. Works in any timeframe.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-134",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "High 2 (H2): Second pullback in bull trend. Two-legged pullback to moving average. More reliable than H1. Buy above second pullback bar's high. Often at trendline or MA support. Two legs = trapped bears from first pullback.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-135",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Low 1 (L1): First pullback bar in bear trend after new low. Short below its low. Most common bear pullback setup. Mirror of H1. Works in any timeframe.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-136",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Low 2 (L2): Second pullback in bear trend. Two-legged pullback to moving average. More reliable than L1. Short below second pullback bar's low. Two legs = trapped bulls from first pullback.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-137",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Second Entry: Trade on second attempt at a move. First attempt often fails. Second attempt has higher probability. Example: first test of resistance fails, second test more likely to break. Or first reversal fails, second succeeds.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-138",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Failed Signal Bar / Trap: When entry bar reverses, trapping traders. Bull trap: buy above signal bar, then price reverses down. Bear trap: short below signal bar, price reverses up. Trade the trap in opposite direction. Failed moves often lead to strong moves in opposite direction.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-139",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trendline: Connect two or more swing lows in uptrend (support) or swing highs in downtrend (resistance). Break of trendline signals potential trend change. Adjust as trend develops. Steeper trendline = stronger trend but less sustainable.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-140",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trend Channel Lines: Parallel to trendline on opposite side. Connect swing highs in uptrend, swing lows in downtrend. Price reaching channel line = potential reversal. Overshoot of channel line = climax. Touch of channel line = profit target.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-141",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Micro Channels: Very tight channels with 5-10 bars. Strong trend with no pullback. Extremely strong trend. Usually near end of move. Don't buy breakout of bull micro channel (likely climax). Wait for pullback.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-142",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Spike and Channel Trend: Strong breakout bar(s) followed by shallow channel. Spike = initial momentum. Channel = orderly trend continuation. Buy pullback to bottom of channel. If spike retraces 50%+, trend may be ending.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-143",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trending Trading Range Day: Day with bias up or down but within trading range. Each leg reverses significantly. Buy at bottom of range, sell at top. Scalping environment. Bias determined by first hour.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-144",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trend from the Open: Strong directional move from open with minimal pullbacks. Rare but powerful. Enter on first small pullback. Don't fight it. Typically 3-5 bars before first pullback. Small pullback trend days are strongest.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-145",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Broad Channel / Stairs: Stepped trend with significant pullbacks. Higher highs/lows but with 2-3 bar counter-trend moves. Buy at bottom of channel. Trade with patience. Each step = new support/resistance.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-146",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Two Legs: Most corrections and trends have two legs. After first leg, expect correction then second leg. Two-legged pullbacks are most reliable entries. Count legs by measuring moves away from MA. Each leg often equals measured move.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-147",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Measured Moves: Price often moves equal distances. First leg height = second leg target. Breakout gap or initial impulse = measured move target. Used for profit targets. Works for both pullbacks and trend continuations.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-148",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Magnet Levels: Price tends to gravitate to key levels. Prior swing highs/lows, round numbers, opening price, prior day high/low. Price moves toward magnets. Once reached, price may reverse. Use for profit targets.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-149",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Breakout Test: After breakout, price often pulls back to test breakout level. Successful test (holds) = continuation. Failed test (breaks back) = reversal. Buy/sell the test. Stop beyond breakout level.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-150",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Support Becomes Resistance: When support breaks, it becomes resistance. When resistance breaks, it becomes support. Classic principle. Use prior swing levels as S/R. The more touches, the stronger the level.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-151",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Trading Range as Magnet: Price in trading range is attracted to opposite side. If at top of range, expect move to bottom and vice versa. Breakout from range in trend direction. Failed breakout = strong reversal to opposite side.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-152",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Barb Wire: Tight trading range of 3+ bars with significant overlap. Choppy indecisive action. Avoid trading in barb wire. Wait for breakout. Often occurs after strong move (consolidation). Trade breakout direction.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-153",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Reversal Day: Day that reverses prior trend. Bull: opens near low, closes near high after downtrend. Bear: opens near high, closes near low after uptrend. More significant on daily/weekly. Volume should be above average.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-154",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Trend Resumption Day: After one-day counter-trend, trend resumes strongly. Shows trend is still in force. Buy/sell in trend direction. Counter-trend day was just a pullback.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-155",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Double Pressure: When higher timeframe and lower timeframe align in same direction. E.g., 60min bullish + 5min bullish = strongest signal. Wait for alignment before entry. Reduces false signals significantly. Key concept for scalpers.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-156",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Support and Resistance Zones: Not exact price but zone where price reacts. Use prior swing highs/lows, round numbers, moving averages. Zone width depends on timeframe. More touches = stronger zone. Look for reaction candles at zones.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-157",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "False Break: Price breaks level but fails to follow through. Traps breakout traders. Strong reversal signal. The more convincing the false break, the stronger the reversal. Enter against the failed breakout with stop beyond the false break extreme.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-158",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Tease Break: Brief break of level that lacks conviction. Price barely pokes through then returns. Like false break but less dramatic. Still triggers stops. Trade against the tease break. Tighter stop than false break.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-159",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Proper Break: Convincing break with strong candle body closing beyond level. Body > 75% of candle range. Follow-through on next candle. Volume confirmation. Trade with the break. Wait for pullback to broken level for entry.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-160",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Candle Body Reading: Large body = strong directional conviction. Small body = indecision. Body position within range matters: close near high = bullish, near low = bearish. Body size relative to prior bodies shows momentum shift.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-161",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bullish Body Characteristics: Opens near low, closes near high. Body > 60% of total range. Little/no upper shadow. Growing body size vs prior candles. All show buying pressure dominance.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-162",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bearish Body Characteristics: Opens near high, closes near low. Body > 60% of total range. Little/no lower shadow. Growing body size vs prior. All show selling pressure dominance.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-163",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Indecision Bodies: Small body relative to range. Shadows on both sides. Doji or near-doi. After trend = warning. After consolidation = pre-breakout. Multiple indecision bodies = volatility contraction before expansion.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-164",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Intraday Bias: Determine from first 30-60 min price action. Higher highs and lows = bullish bias. Lower highs and lows = bearish bias. Flat = neutral/scalp both sides. Adjust bias as day develops.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-165",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Candle Sequence Bias: 3+ consecutive bull bodies = bullish. 3+ consecutive bear bodies = bearish. Alternating colors = ranging. Growing bodies = strengthening trend. Shrinking bodies = trend weakening.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-166",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Close Position Bias: Where price closes relative to range determines bias. Close in upper third = bullish. Close in lower third = bearish. Close in middle third = neutral. Series of closes in upper third confirms uptrend.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-167",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Pullback Entry: Wait for trend establishment, then enter on pullback. Pullback should be 1-3 candles. Pullback should not exceed 50% of impulse. Enter on first reversal candle in trend direction. Stop below/above pullback extreme.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-168",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Breakout Entry: Enter when price breaks key level with strong body. Volume should increase. Stop just beyond broken level. Expectation: immediate follow-through. If no follow-through in 2-3 bars, exit.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-169",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Two-Bar Entry: Wait for counter-trend bar, then enter when next bar confirms trend resumption. Bull: bear bar then bull bar closing above bear bar high. Bear: bull bar then bear bar closing below bull bar low. Stop beyond confirmation bar.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-170",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Drill-Down Approach: Use higher timeframe for bias, lower for entry. 60min for direction, 5min for timing. Only trade when both align. Higher TF support + 5min reversal = high probability entry. This is Volman's core methodology.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-171",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Reaction Candle at Support: Strong bullish candle at support zone after bearish move. Body should close in upper half. Entry: above candle high. Stop: below support zone. Target: nearest resistance. High probability when aligned with higher TF bias.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-172",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Reaction Candle at Resistance: Strong bearish candle at resistance zone after bullish move. Body closes in lower half. Entry: below candle low. Stop: above resistance. Target: nearest support. Fade the move.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-173",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Breakeven Stop: Move stop to entry after price moves 1x risk in your favor. Protects capital. Allows free trade. Don't move too early (gets stopped out). 1:1 risk-reward minimum before adjusting.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-174",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Trailing Stop Method: Trail stop below/above each new swing low/high in trend. Use 20-period MA as dynamic trailing stop. Or use prior 2-3 bar low as trailing stop. Locks in profits during trends.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-175",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Partial Profit Taking: Take 50% off at 1:1 risk-reward. Let remainder run with trailing stop. Reduces emotional pressure. Ensures winner even if reversal. Standard for scalpers.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-176",
+    "source": "volman-price-action",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Time-Based Exit: If trade not working in expected timeframe, exit. Scalp: 5-15 bars. Swing: 20-50 bars. Don't hold losers hoping. If price stalls near entry for extended period, the setup is failing. Exit.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-177",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Volume Confirmation: Breakout should have above-average volume. Pullback should have below-average volume. Volume spike at reversal = potential climax. Declining volume in trend = trend weakening. Volume leads price.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-178",
+    "source": "bulkowski-encyclopedia",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Stop Placement: Place stop at opposite side of pattern. For bottoms: below pattern low. For tops: above pattern high. Wider stops for larger patterns. Never risk more than 2% of capital per trade. Adjust position size for stop distance.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-179",
+    "source": "nison-candlesticks",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Nison Stop Placement: Use candle pattern extremes as stops. Bullish engulfing: stop below pattern low. Bearish engulfing: stop above pattern high. Hammer: stop below hammer low. Hanging man: stop above high. Move to breakeven on confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-180",
+    "source": "brooks-price-action",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Brooks Risk Management: Risk 1% per trade max. Stop beyond signal bar. If signal bar too wide, pass on trade. Scalp: target 1:1 risk-reward. Swing: target 2:1+. Always use protective stop. Don't average losers.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-181",
+    "source": "volman-price-action",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Volman Risk Management: Risk per trade should allow 10+ trades before account depleted. Stop beyond setup extreme. Move to breakeven at 1:1. Take partial profits. Don't hold losers past time stop. Maximum 3 concurrent positions.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-182",
+    "source": "nison-candlesticks",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Nison on Confirmation: Never act on candle signal alone. Always wait for confirmation. Patience prevents losses. A non-confirmed pattern is just potential. The market is always right. Hope is not a strategy.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-183",
+    "source": "brooks-price-action",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Brooks on Failed Moves: Failed moves lead to fast moves in opposite direction. When trapped traders exit en masse, momentum accelerates. Trade the failure, not the breakout. Most breakout attempts fail.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-184",
+    "source": "volman-price-action",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Volman on Discipline: Only trade when setup meets all criteria. No setup = no trade. Don't force entries. Quality over quantity. One good trade beats five mediocre ones. Patience is the edge.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-185",
+    "source": "bulkowski-encyclopedia",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski on Pattern Failures: Patterns fail - accept it. Failure rate ranges from 1-39%. Use failures as trading opportunities. Failed head-and-shoulders = strong continuation in trend direction. Know failure rates before trading.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-186",
+    "source": "bulkowski-encyclopedia",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Volume Rules: 59% of breakouts have above-average volume. Volume should increase on breakout day. Declining volume during pattern formation is healthy. Heavy volume breakout more reliable. Volume confirms price movement.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-187",
+    "source": "nison-candlesticks",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Nison Volume Confirmation: Heavy volume on engulfing pattern increases significance. Volume surge on third candle of morning/evening star confirms. Blow-off volume at top (high volume with no price progress). Declining volume with price rise = bearish divergence.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-188",
+    "source": "brooks-price-action",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Brooks Volume Analysis: Volume spike = climax. First bar of reversal often has highest volume. Volume decreases in trading ranges. Volume increases at breakouts. Low-volume pullbacks in trend = healthy. High-volume pullbacks = potential reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-189",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Bull Market Rank #1: Flags High and Tight rank #1 overall bull pattern (both up/down). Avg rise 69% bull. Failure rate 1% bull. After sharp 90%+ advance, flag forms. Best pattern to trade in strong bull market.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-190",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Bear Market Rank #1: Cup with Handle Inverted rank #1 bear pattern. Avg decline 26% bear. Failure rate 2% bear. Short below handle. The inverted cup provides excellent risk-reward in bear markets.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-191",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Performance by Breakout Direction: In bull markets, upward breakouts outperform downward. In bear markets, downward breakouts outperform. Always trade with market direction. Counter-trend breakouts have higher failure rates.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-192",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Throwback Strategy: After bullish breakout, 62% chance of throwback. If throwback occurs, price averages 6% lower but resumes. Buy the throwback at breakout level. Better entry than chasing breakout. Stop below throwback low.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-193",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Pullback Strategy: After bearish breakdown, 54% chance of pullback. Pullback averages 6% higher. Short the pullback at breakdown level. Better entry than chasing breakdown. Stop above pullback high.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-194",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Tall vs Short Patterns: Tall patterns outperform short ones. Measure pattern height from highest high to lowest low. Divide by breakout price. Tall (>median) moves further than short. Tall patterns have lower failure rates.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-195",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Volume on Breakout: Patterns with above-average breakout volume outperform those without. Volume should be >50-day moving average. No volume = suspect breakout. Heavy volume confirms institutional participation.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-196",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Narrow Breakouts: Price that barely breaks above/below pattern boundary is weak. Wide breakouts (>5% beyond boundary) perform better. Narrow breakouts often fail and reverse. Wait for decisive break.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-197",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Partial Declines/Rises: Partial decline in bottom pattern = bullish. Price comes down but stays above pattern low then breaks out up. Partial rise in top pattern = bearish. Price rises but stays below pattern high then breaks down.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-198",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Dead-Cat Bounce Mechanics: Stock drops 20%+ in one session. Bounces 20-40% of decline over 4-8 days. Then resumes decline. Short into bounce strength. Cover when bounce fades. Don't bottom fish.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-199",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "On-Neck Pattern: After downtrend, white candle closes at or near prior black candle's low. Weak bullish signal. Does not penetrate black body significantly. Continuation of downtrend more likely. Only minor reversal potential.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-200",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "In-Neck Pattern: After downtrend, white candle closes slightly into prior black body. Weak bullish, slightly stronger than on-neck. Still likely downtrend continuation. Requires significant penetration for real reversal.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-201",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Thrusting Pattern: After downtrend, long white candle pushes into but not above midpoint of prior black body. Stronger than in-neck but still weak. Below midpoint penetration. Continuation likely. Wait for full piercing pattern.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-202",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bearish Belt-Hold: Long black candle opening at its high after uptrend. No upper shadow. Opens at high, closes at or near low. Shows total selling control. Strong single-candle bearish reversal. More reliable on longer timeframes.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-203",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bullish Belt-Hold: Long white candle opening at its low after downtrend. No lower shadow. Opens at low, closes at or near high. Shows total buying control. Strong single-candle bullish reversal. Support at belt-hold low.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-204",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Unique Three River Bottom: Large black candle, small body candle inside prior range (harami), then white candle opening above second candle's range. Very rare bullish reversal. Three-candle pattern. Requires confirmation.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-205",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Advance Block: Three white candles with progressively smaller bodies and growing upper shadows. Bullish but weakening. Bears gaining ground. Take profits or tighten stops. Often found near resistance.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-206",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Deliberation Pattern: Two long white candles followed by small white candle (spinning top). Like three white soldiers but third candle lacks conviction. Bullish but caution warranted. Potential reversal or pause.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-207",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Stick Sandwich: Black candle, white candle, black candle where first and third closes are equal. Rare bottom reversal. Two black closes at same level = support. Wait for bullish confirmation. Equal closes key.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-208",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Identical Three Crows: Three black candles of similar size, each opening at prior close (no gap). Like three black crows but more precise. Strong bearish continuation. Each candle opens at prior close = relentless selling.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-209",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Concealing Baby Swallow: Four consecutive black candles with upper shadows. Third candle gaps down. Fourth engulfs third but still black. Very rare. Bullish reversal signal at bottom. Wait for confirmation.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-210",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Ladder Bottom: Three black candles with growing lower shadows, then a white candle with upper shadow, then white opening above. Rare bullish reversal. Five-candle pattern. Confirmation needed.",
+    "priority": 3
+  },
+  {
+    "id": "book-pat-211",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Window Support/Resistance: Entire window zone acts as support (rising) or resistance (falling). Key level is bottom of rising window and top of falling window. If closed, prior trend voided. Window can be any size.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-212",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Gap Fill Analysis: Not all gaps fill immediately. Breakaway gaps rarely fill. Exhaustion gaps fill quickly. Common gaps fill within days. Trade direction of unfilled gap. Fade filled gap. Timeframe matters.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-213",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Nison Moving Average Integration: Use 25-day and 75-day MA (Japanese standard). Golden cross (25 > 75) bullish. Death cross (25 < 75) bearish. Candle signals at MA crossover more powerful. Use MAs with candle patterns.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-214",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Spike and Channel Bear: Strong down bar(s) followed by bear channel. Short rallies to top of channel. Don't buy the spike low (premature). Wait for channel to form, then sell rallies. Breakout above channel = trend change.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-215",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Final Flag: Last consolidation pattern before reversal. After strong trend, flag forms but breaks opposite direction. Trapped trend traders create momentum for reversal. Enter counter-trend on flag breakout failure.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-216",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Wedge Pattern (Brooks): Three pushes to trend extreme in broadening or converging pattern. Bear flag wedge: three pushes up. Bull flag wedge: three pushes down. Enter counter-trend on break of third push. Stop beyond wedge extreme.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-217",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Opening Reversal: Strong move in first 15-30 min that reverses. After gap up: if price can't make new high, potential opening reversal down. After gap down: if can't make new low, opening reversal up. Fade the opening move.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-218",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Midday Fade: After strong morning trend, midday (11am-1pm) often ranges or reverses. The morning trend exhausts itself. Take profits before midday. Don't enter new positions during midday lull.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-219",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trend Line Break: Break of major trendline signals potential trend end. Wait for pullback after break. If pullback holds, enter new direction. If price returns above/below trendline, the break failed. Use trendline break + pullback entry.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-220",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Magnet of the Open: Price tends to return to opening price during the day. Especially in first 2 hours. After early move, expect reversion to open. Once open is tested, then trend can resume. Opening price = equilibrium.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-221",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Magnet of Prior Day Close: Price gravitates to prior day's close, especially on gap opens. Gap fills happen because prior close is a magnet. Trade the fill then reassess. If gap doesn't fill in 3 bars, the gap direction is strong.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-222",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Higher Timeframe Alignment: When 5min and 60min charts agree, probability increases. Trade pullbacks on 5min that align with 60min trend. Counter-trend 5min trades only when 60min shows reversal. Multi-timeframe confirmation.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-223",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Barb Wire Avoidance: When 3+ bars overlap significantly, don't trade. Barb wire = chop. Enter only on breakout from barb wire. Usually resolves in direction of prior trend. Place stop orders beyond range extremes.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-224",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Leg 1 = Leg 2 Measured Move: After impulse move and correction, second leg often equals first leg. Use first leg height for target. Works on all timeframes. Adjust target if strong S/R in the way. Most common target method.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-225",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Gap Open Trading: Gap in trend direction = continuation. Fade gap against trend. Gap creates vacuum. Fill happens ~70% of time for common gaps. Breakaway gaps fill ~30%. Trade gap fill then reassess.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-226",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Breakout Pullback Entry: After strong breakout bar, wait for pullback. Pullback should be 1-3 bars and not exceed 50% of breakout. Enter on first trend-direction bar. Stop beyond breakout bar extreme. High probability setup.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-227",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Failed High/Low 2: When H2 or L2 setup fails (breaks beyond signal bar), it becomes strong signal in opposite direction. Failed bear setup = strong bull signal. Trade the failure with tight stop beyond the failed signal.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-228",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Climax Reversal: After extended trend with 5+ trend bars, a huge bar followed by immediate reversal bar. Exhaustion move. Don't chase climax. Wait for pullback. Climax often followed by trading range, not immediate reversal.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-229",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Price Action Principle: Price is the ultimate indicator. Everything you need is in the bars. No lagging indicators needed. The market speaks through price. Learn to listen by studying bar-by-bar action.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-230",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Range Determination: Identify if market is trending or ranging. In range: fade extremes. In trend: trade pullbacks. Mixed signals = stay out. Reclassify constantly as market evolves. Don't apply trend rules in ranges.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-231",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Candle Body vs Shadow Analysis: Body shows committed buying/selling. Shadow shows rejected price. Long shadow + small body = rejection. Long body + small shadow = commitment. Use relative proportions for bias.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-232",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "5-Minute Entry Technique: Identify S/R zone on higher TF. Wait for 5min candle to reach zone. Look for rejection candle (long shadow, small body). Enter on next candle in rejection direction. Stop beyond zone.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-233",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Volman Bias Reset: Reset bias at start of each session. Don't carry yesterday's bias. Let first 30-60 minutes establish new bias. Watch for higher highs/lows or lower highs/lows. Neutral until proven otherwise.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-234",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Drill-Down Entry Checklist: (1) Higher TF direction established. (2) 5min pulls back to S/R zone. (3) Rejection candle forms at zone. (4) Entry on break of rejection candle. (5) Stop beyond zone. (6) Target next S/R.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-235",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Volman on Indicators: Indicators lag price. They derive from price. Why use derivative when you can read source? Indicators can confirm but never lead. Price action traders see what indicator users see later.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-236",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "False Breakout Trade: Price breaks level then immediately reverses. Enter counter-breakout. Stop beyond false break extreme. Target: opposite side of range. False breaks are more profitable than real breakouts for scalpers.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-237",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Session Analysis: London open (3am ET) often sets direction. NY open (9:30am ET) confirms or reverses. Overlap period (9:30-11am) highest volatility. Afternoon often ranges. Trade sessions, not random times.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-238",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Volman on Confluence: Multiple factors at one price level. Prior S/R + round number + moving average + trendline. More confluence = stronger level. Trade reaction at confluence zone. Single-factor levels are weaker.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-239",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Candle Pattern at Moving Average: When price pulls back to MA and forms rejection candle, high probability entry. MA acts as dynamic S/R. Combined with candle pattern and higher TF bias = strongest setup.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-240",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Price Stall Pattern: Price moves to level then pauses with 2-3 small-bodied candles. Shows equilibrium at that level. Breakout direction from stall likely to continue. Enter on breakout bar. Stop on opposite side of stall.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-241",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Volman Trade Review: Review every trade for quality of setup, entry, management. Categorize as A, B, or C setup. Only take A setups when starting. Track win rate by setup quality. Improvement comes from review.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-242",
+    "source": "bulkowski-encyclopedia",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Pattern Trading Execution: (1) Identify pattern forming. (2) Wait for breakout. (3) Confirm with volume. (4) Enter on breakout close. (5) Stop inside pattern. (6) Target: pattern height projected from breakout.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-243",
+    "source": "nison-candlesticks",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Candle Signal Execution: (1) Identify candle pattern. (2) Wait for confirmation candle. (3) Enter on confirmation close or next open. (4) Stop at pattern extreme. (5) Target from Western TA (S/R, measured move).",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-244",
+    "source": "brooks-price-action",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Price Action Entry Rules: (1) Signal bar forms. (2) Place stop order 1 tick beyond signal bar. (3) If filled, you're in. (4) If not filled, cancel and reassess. (5) Stop: beyond signal bar. (6) Target: 1:1 for scalp, swing for more.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-245",
+    "source": "volman-price-action",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Volman Execution Protocol: (1) Establish higher TF bias. (2) Wait for pullback to S/R on 5min. (3) Look for rejection candle. (4) Enter on break. (5) Stop beyond S/R zone. (6) Move to BE at 1:1. (7) Trail remainder.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-246",
+    "source": "brooks-price-action",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Brooks Trending vs Ranging: If consecutive bars overlap significantly = range. If bars make new highs with little overlap = trend. In trend: buy pullbacks. In range: fade extremes. Most important question in trading.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-247",
+    "source": "bulkowski-encyclopedia",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Bull vs Bear Identification: Compare pattern failure rates. Bull market patterns: lower failure rates on up breakouts. Bear market: lower failure rates on down breakouts. Match trade direction to market regime.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-248",
+    "source": "volman-price-action",
+    "topic": "RegimeDetection",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Volman Market Phase: Trending (trade pullbacks), Ranging (fade extremes), Transitional (uncertain - reduce size). Identify phase from recent swing structure. Reclassify every 30 min. Each phase requires different strategy.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-249",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Nison Cluster of Signals: Multiple candle patterns converging at same price level = very strong S/R. Example: shooting star + bearish engulfing + dark cloud all at $50 = powerful resistance. Convergence increases signal reliability dramatically.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-250",
+    "source": "brooks-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Brooks Always in Long/Short: After strong bull breakout, traders are 'always in long'. After strong bear breakdown, 'always in short'. Stay with position until opposite signal. Don't exit winners prematurely. Let the market tell you when to exit.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-251",
+    "source": "bulkowski-encyclopedia",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Bulkowski Composite Performance Score: Best patterns combine low failure rate, high avg rise/decline, low throwback/pullback occurrence. Flags High and Tight score highest. Use composite ranking to filter which patterns to trade.",
+    "priority": 5
+  },
+  {
+    "id": "book-pat-252",
+    "source": "nison-candlesticks",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bullish Doji Star: Doji after long white candle in uptrend. Shows indecision at highs. Needs bearish confirmation next session. Without confirmation, bullish trend may resume. Stronger if at resistance. Weaker version of evening doji star.",
+    "priority": 4
+  },
+  {
+    "id": "book-pat-253",
+    "source": "volman-price-action",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Volman on Momentum: Strong momentum candle = don't fade it. Wait for momentum to exhaust (small bodies, shadows). Enter fade only after momentum dies. Momentum candles with body > 75% range = wait. Don't catch falling knives.",
+    "priority": 5
+  }
+]

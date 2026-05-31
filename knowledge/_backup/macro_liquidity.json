@@ -1,0 +1,82 @@
+[
+  {
+    "id": "macro-001",
+    "source": "michael-howell-global-liquidity",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "65-MONTH GLOBAL LIQUIDITY CYCLE: Global liquidity operates on a ~65-month debt refinancing cycle that serves as the fundamental pacemaker for all risk asset valuations. This cycle supersedes the Bitcoin halving cycle as the primary driver. When liquidity is expanding → risk assets inflate. When liquidity contracts → risk assets deflate. The cycle is driven by central bank balance sheets, repo markets, and shadow banking — NOT just M2 money supply. Track the total flow of money through global financial markets, not just headline money supply metrics.",
+    "priority": 5
+  },
+  {
+    "id": "macro-002",
+    "source": "tradingview-debt-liquidity-ratio",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging", "ExtremeFear", "ExtremeGreed"],
+    "content": "DEBT-TO-LIQUIDITY RATIO — Cycle Indicator: Ratio = total public+private debt stock / available refinancing liquidity. Averages ~2× with strong mean-reverting properties. Below average = abundant liquidity → risk assets inflate rapidly. Above average = liquidity constraints → market contractions. This ratio predicts asset bubbles, inflationary run-ups, and corrections. When the ratio drops significantly below 2×, expect crypto bull markets. When it stretches above 2×, expect bear markets. The ratio is the single best macro indicator for crypto cycle positioning.",
+    "priority": 5
+  },
+  {
+    "id": "macro-003",
+    "source": "youtube-halving-cycle-degradation",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "HALVING CYCLE DEGRADATION — Macro > Supply: The traditional 4-year Bitcoin halving cycle is being superseded by global macro forces. ETF capital inflows, CBDCs, and institutional adoption mean that supply-shock dynamics from halvings are increasingly diluted. The post-halving bull run is evolving into a more stabilized regime with increased resilience to localized volatility but heightened sensitivity to geopolitical events, sovereign debt yields, and DXY. Contemporary cycle analysis must weight global debt maturity walls and central bank balance sheet fluctuations HIGHER than internal blockchain issuance schedules.",
+    "priority": 4
+  },
+  {
+    "id": "macro-004",
+    "source": "dxy-btc-correlation",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "DXY (DOLLAR INDEX) INVERSE CORRELATION WITH BTC: Strong inverse correlation: DXY up = BTC down, DXY down = BTC up. The correlation is not perfect but is statistically significant over 30+ day periods. DXY strengthening = tighter global liquidity, risk-off sentiment, capital flowing to USD safety. DXY weakening = loosening liquidity, risk-on, capital flowing to risk assets including crypto. Trading rule: When DXY breaks below key support, increase crypto exposure. When DXY breaks above key resistance, reduce crypto exposure. DXY is a LEADING indicator — it typically moves before crypto.",
+    "priority": 4
+  },
+  {
+    "id": "macro-005",
+    "source": "treasury-qe-analysis",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "TREASURY QE / CENTRAL BANK BALANCE SHEETS: Central bank balance sheet expansion = liquidity injection = bullish for crypto. 'Treasury QE' = when governments issue debt that is effectively monetized by the central bank system. Track: 1) Fed balance sheet (weekly). 2) ECB balance sheet. 3) BOJ balance sheet. 4) PBOC balance sheet. Combined expansion = global liquidity pump. Combined contraction = global liquidity drain. The 2020-2021 crypto bull was driven by $10T+ in combined central bank expansion. The 2022 bear was driven by quantitative tightening.",
+    "priority": 4
+  },
+  {
+    "id": "macro-006",
+    "source": "cbdc-impact-analysis",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "CBDC IMPACT ON CRYPTO MARKET STRUCTURE: Central Bank Digital Currencies represent a structural shift in how money moves. Impact on crypto: 1) CBDCs may reduce demand for stablecoins (USDT/USDC) as payment rails. 2) CBDCs enable programmable money — could be used for regulatory enforcement. 3) CBDCs may increase overall digital asset adoption, benefiting crypto. 4) CBDCs create competition for Bitcoin as a 'digital money' narrative. Net assessment: Short-term neutral to slightly bearish for stablecoins. Long-term neutral — CBDCs and crypto serve different purposes (surveillance money vs freedom money).",
+    "priority": 3
+  },
+  {
+    "id": "macro-007",
+    "source": "etf-flows-analysis",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "ETF CAPITAL FLOWS AS PRICE DRIVER: Bitcoin ETFs (BlackRock IBIT, Fidelity FBTC, etc.) have become a primary demand driver. Track: 1) Daily ETF inflows/outflows (available from ETF providers). 2) Cumulative ETF holdings vs total supply. 3) ETF flow momentum (accelerating vs decelerating). Rules: Sustained ETF inflows >$200M/day = strong bullish signal. ETF outflows >$100M/day = bearish signal. ETF flows are the institutional equivalent of exchange inflow/outflow — they represent 'smart money' directional conviction. ETF data is delayed 1 day — use as confirmation, not real-time signal.",
+    "priority": 4
+  },
+  {
+    "id": "macro-008",
+    "source": "debt-refinancing-cycle",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "DEBT REFINANCING CYCLE AND RISK ASSETS: 70-80% of global capital market transactions are debt refinancing, not new investment. This means liquidity is SELF-PERPETUATING: old debt finances new liquidity. When debt maturity walls hit (large volumes of debt coming due simultaneously), liquidity can tighten rapidly as refinancing demand exceeds supply. Track: 1) Corporate debt maturity schedules. 2) Sovereign debt maturity walls. 3) High-yield credit spreads. When maturity walls are small = smooth refinancing = liquidity abundant. When maturity walls are large = refinancing stress = liquidity contraction.",
+    "priority": 3
+  },
+  {
+    "id": "macro-009",
+    "source": "sovereign-yield-crypto-correlation",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "SOVEREIGN DEBT YIELDS VS CRYPTO CORRELATION: Rising US Treasury yields = higher opportunity cost of holding non-yielding assets like BTC. Falling yields = lower opportunity cost, capital flows to risk assets. 10-year Treasury yield is the benchmark. When real yields (inflation-adjusted) rise, crypto underperforms. When real yields fall, crypto outperforms. The correlation strengthens during macro-driven regimes and weakens during crypto-native events (halvings, ETF launches). Track the 10-year real yield as a macro headwind/tailwind for crypto.",
+    "priority": 3
+  },
+  {
+    "id": "macro-010",
+    "source": "repo-shadow-banking-liquidity",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "REPO MARKET AND SHADOW BANKING LIQUIDITY: Global liquidity is NOT just M2 money supply — it includes repo markets and shadow banking sectors. Total global liquidity pool has doubled over 15 years to ~$200T. Repo market stress (like Sept 2019 repo crisis) = early warning of liquidity contraction. Shadow banking leverage = hidden risk that amplifies both up and down moves. Track: 1) SOFR (Secured Overnight Financing Rate) spread. 2) Commercial paper spreads. 3) Cross-currency basis swaps. When these stress indicators spike, liquidity is tightening even if M2 looks fine.",
+    "priority": 3
+  }
+]
