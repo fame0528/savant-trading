@@ -1897,6 +1897,39 @@ pub async fn run_sandbox(config: AppConfig) -> anyhow::Result<()> {
     let md = format_report_markdown(&report_card);
     println!("\n{}", md);
 
+    // 7b. Wallet simulation
+    let wallet = savant_trading::sandbox::simulator::VirtualWallet::new(
+        config.trading.starting_balance,
+        config.trading.fee_rate,
+        config.trading.slippage_pct,
+    );
+    // Note: wallet simulation needs raw decisions + candle data.
+    // For now, use the graded results to count trades.
+    let wallet_metrics = wallet.metrics();
+    println!("\n{}", wallet_metrics.report_card());
+
+    // 7c. Run report
+    let run_report = savant_trading::sandbox::run_report::RunReport::generate(
+        &summary.results,
+        &wallet_metrics,
+        &wallet.trades,
+        savant_trading::sandbox::run_report::ConfigSnapshot {
+            pairs: config.trading.pairs.clone(),
+            timeframe: config.trading.timeframe.clone(),
+            model: config.ai.model.clone(),
+            concurrency: 10,
+            starting_balance: config.trading.starting_balance,
+        },
+        savant_trading::sandbox::run_report::KnowledgeStats {
+            total_units: load_knowledge_base().len(),
+            files_loaded: 10,
+        },
+    );
+    match run_report.write_to_disk("data") {
+        Ok(path) => println!("Run report written to {}", path),
+        Err(e) => warn!("Failed to write run report: {}", e),
+    }
+
     // 8. Feedback analysis
     let analysis = analyze_failures(&summary);
     if !analysis.violated_rules.is_empty() {
