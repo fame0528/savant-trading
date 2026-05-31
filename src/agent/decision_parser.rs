@@ -34,6 +34,39 @@ pub struct TradeDecision {
     pub risk_reward: f64,
 }
 
+impl TradeDecision {
+    /// Calculate Expected Value: EV = (p × reward) - ((1-p) × risk)
+    /// Where p = confidence, reward = distance to TP1, risk = distance to stop.
+    /// Returns Some(ev) for Buy/Sell, None for Hold.
+    pub fn expected_value(&self) -> Option<f64> {
+        if self.action == TradeAction::Hold {
+            return None;
+        }
+
+        let p = self.confidence;
+        let risk = match self.side {
+            Side::Long => (self.entry_price - self.stop_loss).abs(),
+            Side::Short => (self.stop_loss - self.entry_price).abs(),
+        };
+        let reward = match self.side {
+            Side::Long => (self.take_profit_1 - self.entry_price).abs(),
+            Side::Short => (self.entry_price - self.take_profit_1).abs(),
+        };
+
+        if risk <= 0.0 || reward <= 0.0 {
+            return None;
+        }
+
+        let ev = (p * reward) - ((1.0 - p) * risk);
+        Some(ev)
+    }
+
+    /// Returns true if the trade has positive expected value.
+    pub fn is_positive_ev(&self) -> bool {
+        self.expected_value().map(|ev| ev > 0.0).unwrap_or(false)
+    }
+}
+
 /// Errors from decision parsing.
 #[derive(Debug, thiserror::Error)]
 pub enum ParseError {
