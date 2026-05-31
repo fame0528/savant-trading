@@ -13,3 +13,4 @@ pub mod knowledge;
 pub mod orchestrator;
 pub mod prompts;
 pub mod provider;
+pub mod tags;
