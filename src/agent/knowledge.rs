@@ -100,18 +100,24 @@ impl KnowledgeBase {
         self.select_with_tags(conditions, &[], token_budget)
     }
 
-    /// Select with both conditions and context tags for precise matching.
+    /// Select with both conditions and context tags using MMR (Maximal Marginal Relevance).
+    ///
+    /// MMR balances relevance vs diversity: high-scoring units that are similar to
+    /// already-selected units get penalized, preventing echo chambers.
+    /// λ=0.5 balances relevance and diversity equally.
     pub fn select_with_tags(
         &self,
         conditions: &[MarketCondition],
         context_tags: &[String],
         token_budget: usize,
     ) -> Vec<&KnowledgeUnit> {
-        let mut scored: Vec<(f64, &KnowledgeUnit)> = self
+        // Score all candidates
+        let mut candidates: Vec<(f64, usize)> = self
             .units
             .iter()
-            .filter(|unit| unit.conditions.iter().any(|c| conditions.contains(c)))
-            .map(|unit| {
+            .enumerate()
+            .filter(|(_, unit)| unit.conditions.iter().any(|c| conditions.contains(c)))
+            .map(|(idx, unit)| {
                 let condition_score = unit
                     .conditions
                     .iter()
@@ -127,20 +133,53 @@ impl KnowledgeBase {
                         .filter(|t| context_tags.contains(t))
                         .count() as f64
                 };
-                let total = condition_score + priority_score + tag_score;
-                (total, unit)
+                (condition_score + priority_score + tag_score, idx)
             })
             .collect();
 
-        scored.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal));
+        // Sort by initial score descending
+        candidates.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal));
 
-        let mut selected = Vec::new();
+        let lambda = 0.5f64;
+        let mut selected_indices: Vec<usize> = Vec::new();
+        let mut selected: Vec<&KnowledgeUnit> = Vec::new();
         let mut used_tokens = 0;
-        for (_score, unit) in scored {
+
+        while !candidates.is_empty() {
+            // Find the candidate with highest MMR score
+            let mut best_mmr = f64::NEG_INFINITY;
+            let mut best_pos = 0;
+
+            for (pos, &(rel_score, idx)) in candidates.iter().enumerate() {
+                // Diversity penalty: max similarity to any already-selected unit
+                let max_sim = if selected_indices.is_empty() {
+                    0.0
+                } else {
+                    selected_indices
+                        .iter()
+                        .map(|&sel_idx| {
+                            topic_tag_similarity(&self.units[idx], &self.units[sel_idx])
+                        })
+                        .fold(0.0f64, f64::max)
+                };
+
+                let mmr = lambda * rel_score - (1.0 - lambda) * max_sim;
+                if mmr > best_mmr {
+                    best_mmr = mmr;
+                    best_pos = pos;
+                }
+            }
+
+            let (_, idx) = candidates.remove(best_pos);
+            let unit = &self.units[idx];
             let unit_tokens = unit.content.len().div_ceil(4);
+
             if used_tokens + unit_tokens <= token_budget {
                 used_tokens += unit_tokens;
+                selected_indices.push(idx);
                 selected.push(unit);
+            } else {
+                break;
             }
         }
 
@@ -184,6 +223,23 @@ impl KnowledgeBase {
     pub fn is_empty(&self) -> bool {
         self.units.is_empty()
     }
+}
+
+/// Similarity between two knowledge units based on topic and tag overlap.
+/// Returns 0.0 (completely different) to 1.0 (identical).
+fn topic_tag_similarity(a: &KnowledgeUnit, b: &KnowledgeUnit) -> f64 {
+    let topic_match = if a.topic == b.topic { 1.0 } else { 0.0 };
+
+    let tag_overlap = if a.tags.is_empty() && b.tags.is_empty() {
+        0.0
+    } else {
+        let common = a.tags.iter().filter(|t| b.tags.contains(t)).count();
+        let total = (a.tags.len() + b.tags.len()).max(1);
+        (common * 2) as f64 / total as f64
+    };
+
+    // Weighted: topic match is strong signal, tag overlap refines
+    0.6 * topic_match + 0.4 * tag_overlap
 }
 
 #[cfg(test)]
