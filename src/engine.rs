@@ -413,28 +413,39 @@ pub async fn run(
 
     let interval_seconds = parse_timeframe(&config.trading.timeframe);
 
-    info!("Fetching initial data for {} pairs...", active_pairs.len());
+    info!(
+        "Fetching initial data for {} pairs (parallel)...",
+        active_pairs.len()
+    );
 
+    // Parallel candle fetch — all pairs simultaneously
+    let mut candle_futures = tokio::task::JoinSet::new();
     for pair in &active_pairs {
-        match kraken
-            .get_ohlc(
-                pair,
-                parse_timeframe_minutes(&config.trading.timeframe),
-                None,
-            )
-            .await
-        {
-            Ok(mut candles) => {
+        let kraken_clone = KrakenClient::new(&config.exchange.rest_url);
+        let pair_clone = pair.clone();
+        let tf = config.trading.timeframe.clone();
+        candle_futures.spawn(async move {
+            let result = kraken_clone
+                .get_ohlc(&pair_clone, parse_timeframe_minutes(&tf), None)
+                .await;
+            (pair_clone, result)
+        });
+    }
+
+    while let Some(result) = candle_futures.join_next().await {
+        match result {
+            Ok((pair, Ok(mut candles))) => {
                 if candles.len() > 1 {
                     candles.pop();
                 }
-                if let Some(store) = market_stores.get_mut(pair) {
+                if let Some(store) = market_stores.get_mut(&pair) {
                     let count = candles.len();
                     store.add_candles(candles);
                     info!("Loaded {} historical candles for {}", count, pair);
                 }
             }
-            Err(e) => error!("Failed to fetch initial data for {}: {}", pair, e),
+            Ok((pair, Err(e))) => error!("Failed to fetch initial data for {}: {}", pair, e),
+            Err(e) => error!("Candle fetch task panicked: {}", e),
         }
     }
 
@@ -618,6 +629,14 @@ pub async fn run(
                         ),
                     )
                     .await;
+
+                // Pre-filter: skip pairs with no actionable signal
+                // Only send to LLM if indicators show a potential setup
+                let has_signal = has_actionable_signal(&indicators, regime, ob_imbalance);
+                if !has_signal && positions.iter().all(|p| p.pair != *pair) {
+                    debug!("Skipping {} — no actionable signal", pair);
+                    continue;
+                }
 
                 shared
                     .log_activity(
@@ -1958,4 +1977,57 @@ pub async fn run_sandbox(config: AppConfig) -> anyhow::Result<()> {
 
     println!("\n=== SANDBOX COMPLETE ===");
     Ok(())
+}
+
+/// Pre-filter: does this pair have an actionable signal worth sending to LLM?
+/// Returns true if any indicator suggests a potential setup.
+fn has_actionable_signal(
+    indicators: &savant_trading::core::types::IndicatorValues,
+    regime: savant_trading::core::types::MarketRegime,
+    ob_imbalance: Option<f64>,
+) -> bool {
+    // RSI extreme — oversold or overbought
+    if let Some(rsi) = indicators.rsi {
+        if !(30.0..=70.0).contains(&rsi) {
+            return true;
+        }
+    }
+
+    // ADX strong trend
+    if let Some(adx) = indicators.adx {
+        if adx > 25.0 {
+            return true;
+        }
+    }
+
+    // EMA crossover (fast vs slow)
+    if let (Some(fast), Some(slow)) = (indicators.ema_fast, indicators.ema_slow) {
+        let spread_pct = ((fast - slow) / slow).abs() * 100.0f64;
+        if spread_pct > 0.1 {
+            return true;
+        }
+    }
+
+    // Order book imbalance
+    if let Some(obi) = ob_imbalance {
+        if obi.abs() > 0.3 {
+            return true;
+        }
+    }
+
+    // VWAP deviation
+    if let Some(vwap) = indicators.vwap {
+        if let Some(atr) = indicators.atr {
+            // If price is more than 1 ATR from VWAP
+            // We don't have current_price here, so skip this check
+            let _ = (vwap, atr);
+        }
+    }
+
+    // Strong trend regime (ADX > 25 is checked above, but also check regime)
+    if regime == savant_trading::core::types::MarketRegime::Trending {
+        return true;
+    }
+
+    false
 }
