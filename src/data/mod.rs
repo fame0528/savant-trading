@@ -7,6 +7,7 @@
 //! - `websocket` — Kraken WebSocket v2 client for real-time data
 
 pub mod cache;
+pub mod historical;
 pub mod indicators;
 pub mod kraken;
 pub mod market_data;

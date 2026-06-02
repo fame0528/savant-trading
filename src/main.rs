@@ -18,6 +18,7 @@ struct TestArgs {
     count: Option<usize>,
     sandbox: bool,
     full: bool,
+    historical: bool,
 }
 
 fn parse_test_args(args: &[String]) -> TestArgs {
@@ -41,6 +42,9 @@ fn parse_test_args(args: &[String]) -> TestArgs {
             }
             "--full" => {
                 ta.full = true;
+            }
+            "--historical" => {
+                ta.historical = true;
             }
             _ => {}
         }
@@ -221,6 +225,7 @@ fn print_help() {
     println!("  savant --test --train                 Training mode (5 runs by default)");
     println!("  savant --test --train --full           Full training mode (20 runs)");
     println!("  savant --test --train -a -n 20        Training with filters");
+    println!("  savant --test --train --historical     Train on real Kraken historical data");
     println!("  savant --test --sandbox               Legacy sandbox with grading");
     println!();
     println!("API: http://localhost:8080/api/");
