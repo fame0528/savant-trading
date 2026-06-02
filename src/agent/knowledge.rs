@@ -86,6 +86,7 @@ pub enum MarketCondition {
     TrendAlignment,
     Crypto24h,
     TradingSystems,
+    VolumeProfile,
 }
 
 /// The knowledge base — holds all loaded knowledge units and provides
