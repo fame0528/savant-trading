@@ -1062,6 +1062,31 @@ pub async fn run(
                                             paper.account_mut().trades_today += 1;
                                             info!("AI position opened: {}", decision.pair);
 
+                                            // Write trade alert to file for external monitoring
+                                            let alert = serde_json::json!({
+                                                "type": "TRADE_OPENED",
+                                                "timestamp": chrono::Utc::now().to_rfc3339(),
+                                                "pair": decision.pair,
+                                                "side": format!("{:?}", decision.side),
+                                                "action": format!("{:?}", decision.action),
+                                                "entry_price": decision.entry_price,
+                                                "stop_loss": decision.stop_loss,
+                                                "take_profit_1": decision.take_profit_1,
+                                                "quantity": ps.quantity,
+                                                "risk_amount": ps.risk_amount,
+                                                "confidence": decision.confidence,
+                                                "risk_reward": decision.risk_reward,
+                                            });
+                                            let alert_line = format!("{}\n", alert);
+                                            let _ = std::fs::OpenOptions::new()
+                                                .create(true)
+                                                .append(true)
+                                                .open("data/alerts.jsonl")
+                                                .and_then(|mut f| {
+                                                    use std::io::Write;
+                                                    f.write_all(alert_line.as_bytes())
+                                                });
+
                                             shared.log_activity(
                                                 savant_trading::core::shared::ActivityLevel::Trade,
                                                 &decision.pair,
@@ -1101,6 +1126,28 @@ pub async fn run(
                 "CLOSED: {} {} | PnL: ${:.2} ({:.2}%) | {}",
                 trade.pair, trade.side, trade.pnl, trade.pnl_pct, trade.notes,
             );
+
+            // Write close alert to file for external monitoring
+            let close_alert = serde_json::json!({
+                "type": "TRADE_CLOSED",
+                "timestamp": chrono::Utc::now().to_rfc3339(),
+                "pair": trade.pair,
+                "side": format!("{:?}", trade.side),
+                "entry_price": trade.entry_price,
+                "exit_price": trade.exit_price,
+                "pnl": trade.pnl,
+                "pnl_pct": trade.pnl_pct,
+                "notes": trade.notes,
+            });
+            let close_line = format!("{}\n", close_alert);
+            let _ = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open("data/alerts.jsonl")
+                .and_then(|mut f| {
+                    use std::io::Write;
+                    f.write_all(close_line.as_bytes())
+                });
 
             shared
                 .log_activity(
