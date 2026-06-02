@@ -504,6 +504,56 @@ pub fn format_mutations_report(mutations: &[SoulMutation]) -> String {
     report
 }
 
+/// Four-Factor Causal Attribution (Fabio Valentina / Pradeep Bondi).
+///
+/// When a trade loses, classify the failure into one of four categories:
+/// - Setup: Wrong setup selection (bad entry criteria)
+/// - Process: Execution error (wrong size, wrong entry, missed stop)
+/// - Market: Market not in our favor (correlation, regime shift)
+/// - Trader: Emotional/revenge trading (FOMO, tilt)
+///
+/// This attribution is injected into the memory context for the next 5 episodes,
+/// allowing the agent to self-correct based on WHY it failed, not just THAT it failed.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CausalAttribution {
+    pub episode_id: String,
+    pub factor: LossFactor,
+    pub explanation: String,
+    pub timestamp: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum LossFactor {
+    /// Wrong setup selection — the entry criteria themselves were flawed
+    Setup,
+    /// Execution error — right setup, wrong execution (size, timing, stop)
+    Process,
+    /// Market factor — regime shift, correlation spike, black swan
+    Market,
+    /// Emotional — revenge trading, FOMO, tilt
+    Trader,
+}
+
+impl std::fmt::Display for LossFactor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LossFactor::Setup => write!(f, "Setup"),
+            LossFactor::Process => write!(f, "Process"),
+            LossFactor::Market => write!(f, "Market"),
+            LossFactor::Trader => write!(f, "Trader"),
+        }
+    }
+}
+
+impl CausalAttribution {
+    pub fn format_for_memory(&self) -> String {
+        format!(
+            "[{}] {}: {}",
+            self.factor, self.episode_id, self.explanation
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
