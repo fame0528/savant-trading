@@ -1,7 +1,17 @@
 [exchange]
 name = "kraken"
+# Execution backend: "kraken" (CEX, KYC), "0x" (DEX, no KYC), "1inch" (DEX, no KYC)
+backend = "kraken"
 ws_url = "wss://ws.kraken.com/v2"
 rest_url = "https://api.kraken.com"
+
+[exchange.dex]
+# DEX-specific settings (only used when backend != "kraken")
+chain_id = 42161
+rpc_url = "https://arb1.arbitrum.io/rpc"
+wallet_key_env = "WALLET_PRIVATE_KEY"
+api_key_env = "ZEROEX_API_KEY"
+slippage_pct = 0.005
 
 [trading]
 # Core pairs — always tracked, highest liquidity
@@ -74,10 +84,10 @@ atr_volatility_multiplier = 1.5
 paper_trading = true
 
 [ai]
-provider = "opengateway"
-endpoint = "https://opengateway.gitlawb.com/v1"
-model = "mimo-v2.5-pro"
-api_key_env = "OPENGATEWAY_API_KEY"
+provider = "openrouter"
+endpoint = "https://openrouter.ai/api/v1"
+model = "openrouter/owl-alpha"
+api_key_env = "OPENROUTER_API_KEY"
 autonomy_level = 3
 max_decisions_per_hour = 20
 # Expanded to use more of the 1M context window (FID-015)
@@ -92,6 +102,22 @@ top_p = 0.95
 max_tokens = 131072
 # Reasoning model needs room for chain-of-thought (FID-015)
 timeout_secs = 300
+
+# OpenRouter-specific configuration (only used when provider = "openrouter")
+[ai.openrouter]
+endpoint = "https://openrouter.ai/api/v1"
+model = "openai/gpt-4o"
+api_key_env = "OPENROUTER_API_KEY"
+# Your site URL — OpenRouter uses this for ranking
+referer = "https://github.com/spencer-thompson/savant-trading"
+# Your app name — shown in OpenRouter dashboard attribution
+title = "Savant Trading Engine"
+
+[ai.openrouter.management]
+# Management API key (created on OpenRouter dashboard, used for admin operations only)
+# Cannot be used for LLM completion calls
+management_key_env = "OPENROUTER_MANAGEMENT_KEY"
+endpoint = "https://openrouter.ai/api/v1/keys"
 
 [insight]
 funding_rate_enabled = true

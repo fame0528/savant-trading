@@ -94,6 +94,74 @@ fn default_timeout_secs() -> u64 {
     300
 }
 
+fn default_openrouter_endpoint() -> String {
+    "https://openrouter.ai/api/v1".into()
+}
+fn default_openrouter_api_key_env() -> String {
+    "OPENROUTER_API_KEY".into()
+}
+fn default_openrouter_model() -> String {
+    "openai/gpt-4o".into()
+}
+fn default_openrouter_referer() -> String {
+    "https://github.com/spencer-thompson/savant-trading".into()
+}
+fn default_openrouter_title() -> String {
+    "Savant Trading Engine".into()
+}
+fn default_management_key_env() -> String {
+    "OPENROUTER_MANAGEMENT_KEY".into()
+}
+fn default_management_endpoint() -> String {
+    "https://openrouter.ai/api/v1/keys".into()
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct OpenRouterManagementConfig {
+    #[serde(default = "default_management_key_env")]
+    pub management_key_env: String,
+    #[serde(default = "default_management_endpoint")]
+    pub endpoint: String,
+}
+
+impl Default for OpenRouterManagementConfig {
+    fn default() -> Self {
+        Self {
+            management_key_env: default_management_key_env(),
+            endpoint: default_management_endpoint(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct OpenRouterConfig {
+    #[serde(default = "default_openrouter_endpoint")]
+    pub endpoint: String,
+    #[serde(default = "default_openrouter_api_key_env")]
+    pub api_key_env: String,
+    #[serde(default = "default_openrouter_model")]
+    pub model: String,
+    #[serde(default = "default_openrouter_referer")]
+    pub referer: String,
+    #[serde(default = "default_openrouter_title")]
+    pub title: String,
+    #[serde(default)]
+    pub management: OpenRouterManagementConfig,
+}
+
+impl Default for OpenRouterConfig {
+    fn default() -> Self {
+        Self {
+            endpoint: default_openrouter_endpoint(),
+            api_key_env: default_openrouter_api_key_env(),
+            model: default_openrouter_model(),
+            referer: default_openrouter_referer(),
+            title: default_openrouter_title(),
+            management: OpenRouterManagementConfig::default(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct AiConfig {
     pub provider: String,
@@ -112,6 +180,8 @@ pub struct AiConfig {
     pub top_p: f64,
     #[serde(default = "default_timeout_secs")]
     pub timeout_secs: u64,
+    #[serde(default)]
+    pub openrouter: OpenRouterConfig,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -130,8 +200,48 @@ pub struct InsightConfig {
 #[derive(Debug, Clone, Deserialize)]
 pub struct ExchangeConfig {
     pub name: String,
+    #[serde(default = "default_backend")]
+    pub backend: String,
     pub ws_url: String,
     pub rest_url: String,
+    #[serde(default)]
+    pub dex: DexConfig,
+}
+
+fn default_backend() -> String {
+    "kraken".to_string()
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct DexConfig {
+    #[serde(default = "default_chain_id")]
+    pub chain_id: u64,
+    #[serde(default = "default_rpc_url")]
+    pub rpc_url: String,
+    #[serde(default = "default_wallet_key_env")]
+    pub wallet_key_env: String,
+    #[serde(default = "default_dex_api_key_env")]
+    pub api_key_env: String,
+    #[serde(default = "default_dex_slippage")]
+    pub slippage_pct: f64,
+}
+
+fn default_chain_id() -> u64 { 42161 }
+fn default_rpc_url() -> String { "https://arb1.arbitrum.io/rpc".into() }
+fn default_wallet_key_env() -> String { "WALLET_PRIVATE_KEY".into() }
+fn default_dex_api_key_env() -> String { "ZEROEX_API_KEY".into() }
+fn default_dex_slippage() -> f64 { 0.005 }
+
+impl Default for DexConfig {
+    fn default() -> Self {
+        Self {
+            chain_id: default_chain_id(),
+            rpc_url: default_rpc_url(),
+            wallet_key_env: default_wallet_key_env(),
+            api_key_env: default_dex_api_key_env(),
+            slippage_pct: default_dex_slippage(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -229,6 +339,26 @@ impl AppConfig {
                 "starting_balance must be positive".into(),
             ));
         }
+        // Validate exchange backend
+        match self.exchange.backend.as_str() {
+            "kraken" | "0x" | "1inch" => {}
+            other => {
+                return Err(ConfigError::ValidationError(format!(
+                    "Invalid exchange.backend '{}': must be 'kraken', '0x', or '1inch'",
+                    other
+                )));
+            }
+        }
+        // Validate AI provider
+        match self.ai.provider.as_str() {
+            "opengateway" | "openrouter" => {}
+            other => {
+                return Err(ConfigError::ValidationError(format!(
+                    "Invalid ai.provider '{}': must be 'opengateway' or 'openrouter'",
+                    other
+                )));
+            }
+        }
         Ok(())
     }
 }
@@ -238,8 +368,10 @@ impl Default for AppConfig {
         Self {
             exchange: ExchangeConfig {
                 name: "kraken".into(),
+                backend: default_backend(),
                 ws_url: "wss://ws.kraken.com/v2".into(),
                 rest_url: "https://api.kraken.com".into(),
+                dex: DexConfig::default(),
             },
             trading: TradingConfig {
                 pairs: vec!["BTC/USD".into(), "ETH/USD".into()],
@@ -299,10 +431,10 @@ impl Default for AppConfig {
                 paper_trading: true,
             },
             ai: AiConfig {
-                provider: "opengateway".into(),
-                endpoint: "https://opengateway.gitlawb.com/v1".into(),
-                model: "mimo-v2.5-pro".into(),
-                api_key_env: "OPENGATEWAY_API_KEY".into(),
+                provider: "openrouter".into(),
+                endpoint: "https://openrouter.ai/api/v1".into(),
+                model: "openrouter/owl-alpha".into(),
+                api_key_env: "OPENROUTER_API_KEY".into(),
                 autonomy_level: 3,
                 max_decisions_per_hour: 5,
                 context_window_candles: 500,
@@ -313,6 +445,7 @@ impl Default for AppConfig {
                 top_p: 0.95,
                 max_tokens: 131072,
                 timeout_secs: 300,
+                openrouter: OpenRouterConfig::default(),
             },
             insight: InsightConfig {
                 funding_rate_enabled: true,

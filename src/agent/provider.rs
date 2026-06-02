@@ -4,6 +4,7 @@
 //! Streaming keeps the connection alive during long reasoning (mimo v2.5 pro)
 //! and provides real-time visibility into the model's thinking.
 
+use crate::core::config::AiConfig;
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
 
@@ -16,18 +17,20 @@ pub struct LlmConfig {
     pub temperature: f64,
     pub top_p: f64,
     pub timeout_secs: u64,
+    pub extra_headers: Vec<(String, String)>,
 }
 
 impl Default for LlmConfig {
     fn default() -> Self {
         Self {
-            endpoint: "https://opengateway.gitlawb.com/v1".to_string(),
-            model: "mimo-v2.5-pro".to_string(),
-            api_key: std::env::var("OPENGATEWAY_API_KEY").unwrap_or_default(),
+            endpoint: "https://openrouter.ai/api/v1".to_string(),
+            model: "openrouter/owl-alpha".to_string(),
+            api_key: std::env::var("OPENROUTER_API_KEY").unwrap_or_default(),
             max_tokens: 131072,
             temperature: 0.6,
             top_p: 0.95,
             timeout_secs: 300,
+            extra_headers: vec![],
         }
     }
 }
@@ -51,6 +54,64 @@ pub enum LlmError {
     InvalidResponse(String),
     #[error("Rate limited, retry after {0}s")]
     RateLimited(u64),
+}
+
+/// Create an [`LlmProvider`] based on the configured AI provider.
+///
+/// Reads `config.ai.provider` to select the correct defaults:
+/// - `"opengateway"` → uses `endpoint`, `model`, `api_key_env` directly from `AiConfig`
+/// - `"openrouter"` → uses `AiConfig.openrouter` sub-config with provider-specific headers
+/// - any other value → falls back to the top-level AiConfig fields (graceful)
+pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
+    let (mut base, extra_headers) = match ai_cfg.provider.as_str() {
+        "openrouter" => {
+            let or = &ai_cfg.openrouter;
+            (
+                LlmConfig {
+                    endpoint: or.endpoint.clone(),
+                    model: or.model.clone(),
+                    api_key: std::env::var(&or.api_key_env).unwrap_or_default(),
+                    max_tokens: ai_cfg.max_tokens,
+                    temperature: ai_cfg.temperature,
+                    top_p: ai_cfg.top_p,
+                    timeout_secs: ai_cfg.timeout_secs,
+                    extra_headers: vec![],
+                },
+                vec![
+                    ("HTTP-Referer".to_string(), or.referer.clone()),
+                    ("X-OpenRouter-Title".to_string(), or.title.clone()),
+                ],
+            )
+        }
+        _ => {
+            (
+                LlmConfig {
+                    endpoint: ai_cfg.endpoint.clone(),
+                    model: ai_cfg.model.clone(),
+                    api_key: std::env::var(&ai_cfg.api_key_env).unwrap_or_default(),
+                    max_tokens: ai_cfg.max_tokens,
+                    temperature: ai_cfg.temperature,
+                    top_p: ai_cfg.top_p,
+                    timeout_secs: ai_cfg.timeout_secs,
+                    extra_headers: vec![],
+                },
+                vec![],
+            )
+        }
+    };
+    base.extra_headers = extra_headers;
+
+    // OPENROUTER_MODEL env var overrides config file for quick model switching
+    // without editing config/default.toml. Only applies to the OpenRouter provider.
+    if ai_cfg.provider.as_str() == "openrouter" {
+        if let Ok(env_model) = std::env::var("OPENROUTER_MODEL") {
+            if !env_model.is_empty() {
+                base.model = env_model;
+            }
+        }
+    }
+
+    LlmProvider::new(base)
 }
 
 impl LlmProvider {
@@ -181,10 +242,15 @@ impl LlmProvider {
 
     async fn send_request(&self, body: &serde_json::Value) -> Result<reqwest::Response, LlmError> {
         let url = format!("{}/chat/completions", self.config.endpoint);
-        self.client
+        let mut req_builder = self
+            .client
             .post(&url)
             .header("Content-Type", "application/json")
-            .header("Authorization", format!("Bearer {}", self.config.api_key))
+            .header("Authorization", format!("Bearer {}", self.config.api_key));
+        for (name, value) in &self.config.extra_headers {
+            req_builder = req_builder.header(name.as_str(), value.as_str());
+        }
+        req_builder
             .json(body)
             .send()
             .await

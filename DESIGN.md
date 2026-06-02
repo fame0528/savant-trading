@@ -15,7 +15,7 @@ savant-trading/
 ├── Cargo.toml
 ├── config/
 │   └── default.toml              # Runtime configuration
-├── knowledge/                    # 22 JSON knowledge files (254 units)
+├── knowledge/                    # 10 JSON knowledge files (2,959 units)
 ├── src/
 │   ├── main.rs                   # CLI entry point
 │   ├── lib.rs                    # Library root
@@ -61,7 +61,12 @@ savant-trading/
 │   ├── execution/                # Order execution
 │   │   ├── mod.rs
 │   │   ├── engine.rs             # Execution engine trait
-│   │   └── paper.rs              # Paper trading simulator (with state persistence)
+│   │   ├── paper.rs              # Paper trading simulator (with state persistence)
+│   │   └── dex/                  # DEX backends (0x, 1inch on Arbitrum)
+│   │       ├── mod.rs            # Token resolution, DexTrader
+│   │       ├── trader.rs         # DexTrader execution logic
+│   │       ├── zero_x.rs         # 0x API backend
+│   │       └── inch.rs           # 1inch API backend
 │   ├── insight/                  # Live market insight
 │   │   ├── mod.rs
 │   │   ├── sentiment.rs          # Fear & Greed, BTC Dominance
@@ -72,6 +77,24 @@ savant-trading/
 │   │   ├── news.rs               # News and social sentiment
 │   │   ├── rss.rs                # RSS feed fetcher (15 sources)
 │   │   └── aggregator.rs         # Unified MarketContext
+│   ├── memory/                   # Episodic memory + calibration
+│   │   ├── mod.rs
+│   │   ├── episodic.rs           # SQLite WAL decision ledger
+│   │   ├── context.rs            # 6th prompt layer (memory injection)
+│   │   ├── calibration.rs        # Brier score confidence calibration
+│   │   ├── cusum.rs              # CUSUM edge decay detection
+│   │   ├── replay.rs             # Experience replay
+│   │   ├── semantic.rs           # Semantic consolidation
+│   │   └── anti_pattern.rs       # Anti-pattern detection
+│   ├── sandbox/                  # Synthetic scenario testing
+│   │   ├── mod.rs
+│   │   ├── generator.rs          # GARCH(1,1) OHLCV generator
+│   │   ├── scenarios.rs          # 50 curated scenarios (11 categories)
+│   │   ├── grader.rs             # 3-tier grading rubric
+│   │   ├── harness.rs            # Scenario runner
+│   │   ├── feedback.rs           # GEPA-style SOUL.md mutation
+│   │   ├── mock.rs               # Mock API presets
+│   │   └── report.rs             # Report card generation
 │   ├── monitor/                  # Monitoring & journaling
 │   │   ├── mod.rs
 │   │   ├── journal.rs            # SQLite trade journal
@@ -94,7 +117,8 @@ savant-trading/
 ├── docs/                         # Research documents
 ├── dev/
 │   ├── LEARNINGS.md
-│   ├── findings/                 # FID tracking
+│   ├── fids/                     # Active FIDs / closed archive
+│   │   └── archive/
 │   └── session-summaries/
 ├── .env.example
 ├── .gitignore
@@ -105,61 +129,61 @@ savant-trading/
 
 ## Strategies
 
-### 1. Momentum Breakout (Ross Cameron + TJR)
+The system does not use hardcoded rule-based strategies. The **AI agent** (mimo v2.5 pro via OpenGateway) receives full market context and makes trading decisions using knowledge extracted from 11 curated transcripts. The strategy module contains optional rule-based fallbacks that activate only if the LLM fails 3 consecutive ticks.
 
-**Setup:**
-- 100 EMA as trend filter (price above = long bias, below = short bias)
-- Identify consolidation range (ATR compression < 0.7x average)
-- Volume spike > 2x 20-period average
+## AI Brain Architecture
 
-**Entry:**
-- Long: Price breaks above range high with volume confirmation
-- Short: Price breaks below range low with volume confirmation
-- Confirmation: Break of structure (higher high for long, lower low for short)
+### Decision Pipeline
 
-**Exit:**
-- Stop: Below/Above range midpoint (50% of range)
-- TP1: 1:1 R:R (take 50%)
-- TP2: 1:2 R:R (take 30%)
-- TP3: 1:3 R:R (take 20%)
-- Move stop to break-even after TP1 hit
+```
+Market Data (candles, indicators, order book)
+    ↓
+Insight Data (funding rates, sentiment, on-chain, RSS)
+    ↓
+Account State + Positions + Trade History
+    ↓
+6-Layer Prompt Composition:
+  1. SOUL.md identity (loaded via include_str!)
+  2. Risk constraints
+  3. Strategy knowledge (transcript-derived)
+  4. ECHO trading rules
+  5. Output format (strict JSON schema)
+  6. Memory context (Brier, CUSUM, anti-patterns)
+    ↓
+Knowledge Selection (MMR + utility scoring, 2,959 units, capped at 20)
+    ↓
+LLM (mimo v2.5 pro via SSE streaming) → JSON decision
+    ↓
+Decision Parser → TradeDecision validation
+    ↓
+Execution Engine (Paper / Kraken CEX / 0x DEX / 1inch DEX)
+```
 
-### 2. Volume Profile Mean Reversion (Fabio Valentina)
+### Key Components
 
-**Setup:**
-- Calculate volume profile over N periods (default: 100)
-- Identify Value Area (70% of volume) and Point of Control (POC)
-- Price extends beyond Value Area Low (VAL) or Value Area High (VAH)
-
-**Entry:**
-- Long: Price dips below VAL, then first green candle back inside value area
-- Short: Price extends above VAH, then first red candle back inside value area
-- Confirmation: Large order absorption (volume spike without price continuation)
-
-**Exit:**
-- Stop: Beyond the extreme (below VAL for long, above VAH for short)
-- TP: Point of Control (POC)
-- R:R typically 1:2 to 1:4
-
-### 3. Regime-Based Strategy Selector
-
-**Detection (ADX + ATR):**
-- ADX > 25 and rising → Trending → Use Momentum Breakout
-- ADX < 20 → Ranging → Use Mean Reversion
-- ATR > 1.5x 20-period average → Volatile → Reduce size by 50%
-- BTC correlation > 0.8 → Correlated → Trade BTC only
+| Component | File | Role |
+|-----------|------|------|
+| SOUL.md identity | `src/agent/prompts/base_identity.md` | Identity, 5-step thinking framework |
+| Risk constraints | `src/agent/prompts/risk_constraints.md` | Hard limits AI cannot override |
+| Strategy knowledge | `src/agent/prompts/strategy_knowledge.md` | Scale-out, trailing, session awareness |
+| Trading rules | `src/agent/prompts/echo_rules.md` | ECHO-derived rules (sell into strength, 3-loss stop) |
+| Output format | `src/agent/prompts/output_format.md` | Strict JSON schema enforcement |
+| Knowledge selection | `src/agent/knowledge.rs` | MMR + utility scoring from 2,959 units |
+| Context builder | `src/agent/context_builder.rs` | Assembles all data into LLM prompt |
+| Decision parser | `src/agent/decision_parser.rs` | Extracts + validates JSON decisions |
+| Orchestrator | `src/agent/orchestrator.rs` | Main decision loop, 3 autonomy levels |
 
 ## Risk Management
 
 | Rule | Value | Source |
 |------|-------|--------|
-| Max risk per trade | 1% of account | TJR, Fabio |
-| Max daily loss | 3% of account | All sources |
-| Max drawdown | 10% of account | Fabio |
-| Max concurrent positions | 3 | Portfolio diversification |
+| Max risk per trade | 20% of account ($10 at $50) | FID-015: full deployment at small balance |
+| Max daily loss | 10% of account | All transcript sources |
+| Max drawdown | 20% of account | Fabio, TJR |
+| Max concurrent positions | 5 | Portfolio diversification + small balance |
 | Scale-out | 50% @ 1:1, 30% @ 1:2, 20% @ 1:3 | Pradeep, Fabio |
 | Break-even trigger | After 1R profit | Fabio |
-| Min R:R | 1:1.5 | Ross Cameron |
+| Min R:R | 2.0:1 | FID-015: compensates for full deployment risk |
 
 ## Position Sizing
 
@@ -167,76 +191,29 @@ savant-trading/
 position_size = (account_balance * risk_per_trade) / (entry_price - stop_loss_price)
 
 Example:
-  Account: $100
-  Risk: 1% = $1
+  Account: $50
+  Risk: 20% = $10
   Entry: $50,000 (BTC)
   Stop: $49,500 (0.5% below)
-  Position size: $1 / $500 = 0.00002 BTC ($1 worth of risk)
+  Position size: $10 / $500 = 0.0002 BTC ($10 worth of risk)
+
+Dynamic risk tiers (configurable):
+  $50 → 20% risk (fully deployed, safety from stops + circuit breakers)
+  $500 → 10% risk (50% deployed)
+  $5,000 → 5% risk (25% deployed)
+  $50,000+ → 2% risk (10% deployed)
 ```
 
 ## Tech Stack
 
 - **Language:** Rust (tokio async runtime)
-- **Exchange:** Kraken (REST API v0 + WebSocket v2)
+- **Exchange:** Kraken (REST API v0 + WebSocket v2) / 0x DEX / 1inch DEX
 - **HTTP:** reqwest
 - **WebSocket:** tokio-tungstenite
 - **Serialization:** serde + serde_json
 - **Config:** toml
-- **Database:** sqlx + SQLite (trade journal)
+- **Database:** sqlx + SQLite (trade journal, episodic memory)
 - **Logging:** tracing + tracing-subscriber
 - **Indicators:** Custom implementation (no external TA library)
-
-## Phased Implementation
-
-| Phase | Description | Status |
-|-------|-------------|--------|
-| 1 | Foundation: project setup, config, types, error handling | Pending |
-| 2 | Data Engine: Kraken client, OHLCV, indicators | Pending |
-| 3 | Strategy Engine: momentum, mean reversion, regime | Pending |
-| 4 | Risk Management: position sizing, stops, circuit breaker | Pending |
-| 5 | Execution: paper trader, then live Kraken | Pending |
-| 6 | Monitoring: SQLite journal, metrics, alerts | Pending |
-| 7 | Integration: wire together, backtest, live paper trading | Pending |
-
-## Configuration
-
-```toml
-[exchange]
-name = "kraken"
-api_key = ""          # Set via environment variable
-api_secret = ""       # Set via environment variable
-ws_url = "wss://ws.kraken.com/v2"
-rest_url = "https://api.kraken.com"
-
-[trading]
-pairs = ["BTC/USD", "ETH/USD"]
-timeframe = "5m"
-base_currency = "USD"
-starting_balance = 100.0
-
-[risk]
-max_risk_per_trade = 0.01      # 1%
-max_daily_loss = 0.03          # 3%
-max_drawdown = 0.10            # 10%
-max_positions = 3
-min_rr_ratio = 1.5             # Minimum 1:1.5 R:R
-
-[strategy.momentum]
-ema_period = 100
-volume_spike_multiplier = 2.0
-atr_compression_threshold = 0.7
-
-[strategy.mean_reversion]
-profile_periods = 100
-value_area_pct = 0.70
-volume_spike_multiplier = 1.5
-
-[strategy.regime]
-adx_period = 14
-adx_trending_threshold = 25
-adx_ranging_threshold = 20
-atr_volatility_multiplier = 1.5
-
-[mode]
-paper_trading = true           # Start in paper mode
-```
+- **Cache:** TTL cache with LRU eviction
+- **Confidence Calibration:** PAVA isotonic regression (Brier score)

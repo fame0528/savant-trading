@@ -591,8 +591,8 @@ async fn print_knowledge_utility() -> anyhow::Result<()> {
 
     let mut boosted: Vec<(&String, &f64)> = scores.iter().filter(|(_, v)| **v > 1.01).collect();
     let mut suppressed: Vec<(&String, &f64)> = scores.iter().filter(|(_, v)| **v < 0.99).collect();
-    boosted.sort_by(|a, b| b.1.partial_cmp(a.1).unwrap());
-    suppressed.sort_by(|a, b| a.1.partial_cmp(b.1).unwrap());
+    boosted.sort_by(|a, b| b.1.partial_cmp(a.1).unwrap_or(std::cmp::Ordering::Equal));
+    suppressed.sort_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal));
 
     println!("\n--- KNOWLEDGE UTILITY ---");
     println!("  Total tracked: {}", scores.len());

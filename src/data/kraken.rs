@@ -59,17 +59,15 @@ impl KrakenClient {
     /// 1. SHA256(nonce + POST data) → sha256_digest
     /// 2. HMAC-SHA512(url_path, sha256_digest) using base64-decoded secret
     /// 3. Base64 encode the result
-    fn sign(&self, url_path: &str, post_data: &str) -> Result<String, DataError> {
+    fn sign(&self, url_path: &str, post_data_with_nonce: &str) -> Result<String, DataError> {
         let secret = self
             .api_secret
             .as_ref()
             .ok_or_else(|| DataError::HttpError("No API secret configured".into()))?;
 
-        let nonce_str = self.nonce.fetch_add(1, Ordering::SeqCst).to_string();
-
         // Step 1: SHA256(nonce + post_data)
         let mut sha256 = Sha256::new();
-        sha256.update(format!("{}{}", nonce_str, post_data).as_bytes());
+        sha256.update(post_data_with_nonce.as_bytes());
         let sha256_digest = sha256.finalize();
 
         // Step 2: HMAC-SHA512(url_path, sha256_digest)
@@ -99,7 +97,9 @@ impl KrakenClient {
             .as_ref()
             .ok_or_else(|| DataError::HttpError("No API key configured".into()))?;
 
-        let nonce = self.nonce.load(Ordering::SeqCst).to_string();
+        // Atomically increment and capture nonce — must be the same value
+        // in both the POST body and the HMAC signature
+        let nonce = self.nonce.fetch_add(1, Ordering::SeqCst).to_string();
         params.insert("nonce".to_string(), nonce.clone());
 
         let url_path = format!("/0/private/{}", endpoint);

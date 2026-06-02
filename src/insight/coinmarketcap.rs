@@ -257,7 +257,11 @@ pub async fn discover_pairs(
         .collect();
 
     // Sort by volatility score descending
-    pairs.sort_by(|a, b| b.volatility_score.partial_cmp(&a.volatility_score).unwrap());
+    pairs.sort_by(|a, b| {
+        b.volatility_score
+            .partial_cmp(&a.volatility_score)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
 
     info!(
         "Discovered {} tradeable pairs from {} CMC coins",

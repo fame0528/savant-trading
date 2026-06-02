@@ -63,6 +63,18 @@ rand = "0.8"
 # Async traits
 async-trait = "0.1"
 
+# Ethereum/DEX — core types (Address, U256, Bytes, hex)
+alloy-core = { version = "1.6", features = ["std"] }
+# ECDSA secp256k1 — wallet transaction signing
+k256 = { version = "0.13", features = ["ecdsa", "std"] }
+# Keccak-256 — Ethereum signing hash
+sha3 = "0.10"
+# RLP — Ethereum transaction encoding
+rlp = "0.5"
+
+[dev-dependencies]
+wiremock = "0.6"
+
 [[bin]]
 name = "savant"
 path = "src/main.rs"

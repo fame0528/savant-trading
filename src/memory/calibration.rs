@@ -192,8 +192,10 @@ impl IsotonicCalibrator {
         }
 
         // Above last threshold: use last calibrated probability
-        if raw_confidence >= self.thresholds.last().unwrap().0 {
-            return self.thresholds.last().unwrap().1;
+        if let Some(last) = self.thresholds.last() {
+            if raw_confidence >= last.0 {
+                return last.1;
+            }
         }
 
         // Linear interpolation between adjacent thresholds

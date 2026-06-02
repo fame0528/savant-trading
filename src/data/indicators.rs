@@ -237,7 +237,7 @@ impl IndicatorEngine {
             .enumerate()
             .map(|(i, &v)| (i, v))
             .collect();
-        sorted_bins.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        sorted_bins.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
 
         let mut va_volume = 0.0;
         let mut va_bins = Vec::new();
@@ -333,6 +333,9 @@ impl IndicatorEngine {
                 .sum();
             // Annualize: multiply by sqrt(periods_per_day * 365)
             // For 5m candles: 288 periods/day, sqrt(288*365) ≈ 324
+            // NOTE: This assumes 5m candles. For other intervals, calculate:
+            //   periods_per_day = 1440 / interval_minutes
+            //   annualize_factor = sqrt(periods_per_day * 365)
             let avg = sum / period as f64;
             let annualized = avg.sqrt() * 324.0;
             result.push(annualized);

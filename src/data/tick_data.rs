@@ -89,7 +89,7 @@ pub fn aggregate_ticks_to_candles(ticks: &[Tick], interval_minutes: i64) -> Vec<
         }
 
         let open = bucket_ticks[0].price;
-        let close = bucket_ticks.last().unwrap().price;
+        let close = bucket_ticks.last().map(|t| t.price).unwrap_or(open);
         let high = bucket_ticks
             .iter()
             .map(|t| t.price)
@@ -323,8 +323,8 @@ pub fn process_tick_data(
         return Err(format!("No ticks found in {} for {}", data_dir, pair));
     }
 
-    let start_ts = ticks.first().unwrap().timestamp.timestamp();
-    let end_ts = ticks.last().unwrap().timestamp.timestamp();
+    let start_ts = ticks.first().map(|t| t.timestamp.timestamp()).unwrap_or(0);
+    let end_ts = ticks.last().map(|t| t.timestamp.timestamp()).unwrap_or(0);
     let tick_count = ticks.len();
 
     let mut candles = aggregate_ticks_to_candles(&ticks, interval_minutes as i64);

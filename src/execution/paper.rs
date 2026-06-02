@@ -399,8 +399,9 @@ impl PaperTrader {
         if let Some(parent) = std::path::Path::new(path).parent() {
             std::fs::create_dir_all(parent).map_err(|e| format!("Create dir: {}", e))?;
         }
-        std::fs::write(path, serde_json::to_string_pretty(&state).unwrap())
-            .map_err(|e| format!("Write state: {}", e))?;
+        let state_json =
+            serde_json::to_string_pretty(&state).map_err(|e| format!("Serialize state: {}", e))?;
+        std::fs::write(path, state_json).map_err(|e| format!("Write state: {}", e))?;
         Ok(())
     }
 
@@ -537,10 +538,16 @@ impl ExecutionEngine for PaperTrader {
             .remove(position_id)
             .ok_or_else(|| ExecutionError::PositionNotFound(position_id.to_string()))?;
 
-        let pnl = match pos.side {
+        let gross_pnl = match pos.side {
             Side::Long => (pos.current_price - pos.entry_price) * pos.quantity,
             Side::Short => (pos.entry_price - pos.current_price) * pos.quantity,
         };
+
+        // Deduct entry + exit fees (H2 fix)
+        let entry_fee = pos.entry_price * pos.quantity * self.fee_rate;
+        let exit_fee = pos.current_price * pos.quantity * self.fee_rate;
+        let total_fee = entry_fee + exit_fee;
+        let pnl = gross_pnl - total_fee;
 
         if self.account.balance + pnl < 0.0 {
             warn!(

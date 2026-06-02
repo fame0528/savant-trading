@@ -320,12 +320,20 @@ impl VirtualWallet {
         let best = self
             .trades
             .iter()
-            .max_by(|a, b| a.pnl.partial_cmp(&b.pnl).unwrap())
+            .max_by(|a, b| {
+                a.pnl
+                    .partial_cmp(&b.pnl)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
             .cloned();
         let worst = self
             .trades
             .iter()
-            .min_by(|a, b| a.pnl.partial_cmp(&b.pnl).unwrap())
+            .min_by(|a, b| {
+                a.pnl
+                    .partial_cmp(&b.pnl)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
             .cloned();
 
         WalletMetrics {

@@ -62,14 +62,14 @@ pub struct ScenarioParams {
     pub event: Option<MarketEvent>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum TrendDirection {
     Bull(f64), // strength 0.0-1.0
     Bear(f64),
     Sideways,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum VolatilityRegime {
     Low,
     Normal,
@@ -302,9 +302,11 @@ mod tests {
 
     #[test]
     fn generate_bull_trend() {
-        let mut config = GeneratorConfig::default();
-        config.num_candles = 100;
-        config.trend_bias = 0.5;
+        let config = GeneratorConfig {
+            num_candles: 100,
+            trend_bias: 0.5,
+            ..Default::default()
+        };
         let candles = generate_candles(&config);
         assert_eq!(candles.len(), 100);
         // Price should be positive
@@ -313,8 +315,10 @@ mod tests {
 
     #[test]
     fn generate_with_flash_crash() {
-        let mut config = GeneratorConfig::default();
-        config.num_candles = 100;
+        let config = GeneratorConfig {
+            num_candles: 100,
+            ..Default::default()
+        };
         let candles_before = generate_candles(&config);
         let pre_crash_close = candles_before[50].close;
         let mut candles = candles_before;
@@ -336,10 +340,12 @@ mod tests {
 
     #[test]
     fn volatility_clustering() {
-        let mut config = GeneratorConfig::default();
-        config.num_candles = 500;
-        config.garch_alpha = 0.12;
-        config.garch_beta = 0.85;
+        let config = GeneratorConfig {
+            num_candles: 500,
+            garch_alpha: 0.12,
+            garch_beta: 0.85,
+            ..Default::default()
+        };
         let candles = generate_candles(&config);
 
         // Calculate returns

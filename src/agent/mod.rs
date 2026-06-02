@@ -10,6 +10,7 @@
 pub mod context_builder;
 pub mod decision_parser;
 pub mod knowledge;
+pub mod openrouter_management;
 pub mod orchestrator;
 pub mod prompts;
 pub mod provider;

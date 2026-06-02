@@ -302,7 +302,7 @@ pub fn generate_scenarios_from_history(
             candles[i + scenario_len..std::cmp::min(i + scenario_len + 10, candles.len())].to_vec();
 
         // Determine what happened: did price go up or down after the decision point?
-        let decision_price = context_candles.last().unwrap().close;
+        let decision_price = context_candles.last().map(|c| c.close).unwrap_or(0.0);
         let future_close = future_candles
             .last()
             .map(|c| c.close)

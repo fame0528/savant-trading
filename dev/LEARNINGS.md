@@ -108,4 +108,41 @@
 
 ---
 
+---
+
+## Session 2026-0602-1800: Historical Data Training, ECHO Law 6 Audit, FID-016 Bug Fixes
+
+**Key Learnings:**
+
+- **Law 1 (Read 0-EOF) is non-negotiable.** Attempting to read only specific line ranges (via sed/grep) instead of full functions was flagged as a violation. The correct approach is to read the entire function or file before any edit.
+- **Python scripts for bulk replacements** are effective for patterns like adding fields to 60+ struct literals or removing 19 unwrap() calls across 12 files. Use `encoding='utf-8', errors='replace'` to handle UnicodeDecodeErrors on non-UTF-8 files.
+- **`sem.acquire().await?` only works in closures returning `Result`.** When closures return struct types (PairResult, ScenarioResponse), use `let-else` pattern with sentinel returns instead.
+- **`count_filter` ordering matters.** `extend()` appends to the end, and `truncate()` removes from the end. Apply truncation BEFORE extend to preserve the appended items.
+- **`unwrap_or_else(|| vec![])` → `unwrap_or_default()`** is the most idiomatic form for empty Vec fallbacks that also satisfies clippy.
+- **`PartialEq` on enums** is needed for `assert_eq!` in tests — can't assume it's derived.
+- **Helper functions in test modules** should be inside `#[cfg(test)]` to avoid dead-code warnings.
+- **ECHO.md session lifecycle** requires updating 3 files: session summary (in `dev/session-summaries/`), LEARNINGS.md (in `dev/`), and FID files (in `dev/fids/`).
+
+**Technical Insights:**
+
+- Historical scenario mixing requires converting `HistoricalScenario` → `Scenario` with `candles_override` set to context candles, and skipping `apply_scenario()` (since historical data has real market structure baked in).
+- Trend/volatility derivation from historical candles: compute average price change across windows for trend direction, compute average (high-low)/close for volatility regime.
+- All 19 non-test `.unwrap()` calls were eliminated without changing program behavior. The `partial_cmp` → `unwrap_or(Ordering::Equal)` pattern was the most common (8 occurrences).
+
+---
+
+## Session 2026-0602-2030: All 5 Open FIDs Implemented + Archived, Full ECHO Compliance
+
+**Key Learnings:**
+
+- **Python replacement scripts are effective but can introduce UTF-8 issues.** Em-dash `—` gets encoded as `\x97` in some Python configurations. Always run `cargo check` after any bulk replacement.
+- **Field names must be verified against struct definitions.** Assumed `volume_ratio` existed on `IndicatorValues` but the actual field is `volume_sma`. Always grep the struct definition, never guess field names.
+- **Five FIDs in one session is feasible** when each is targeted. Coordination overhead is real but manageable with clear write_todos planning.
+- **str_replace on large Rust files with Windows CRLF** can fail silently due to whitespace byte differences. Use `sed -n 'N,Np' | od -c` to debug exact bytes when str_replace fails.
+- **ECHO compliance check** as a dedicated maintenance task catches config drift (VERSION file was `0.1.0` protocol version instead of `0.4.4` project version). Should run at least once per session.
+- **VERSION file must contain project version** (matching `Cargo.toml`'s `version`), NOT the ECHO protocol version (`protocol.config.yaml`'s `protocol.version`). These are different values.
+- **All 7 FIDs closed and archived** means a clean slate — FID-001 through FID-024 are complete. 50 total archived FIDs.
+
+---
+
 <!-- Add new entries above this line -->

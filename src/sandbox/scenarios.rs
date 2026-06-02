@@ -2,8 +2,28 @@
 
 use serde::{Deserialize, Serialize};
 
+use crate::core::types::Candle;
+use crate::data::historical::HistoricalScenario;
 use crate::sandbox::generator::{MarketEvent, ScenarioParams, TrendDirection, VolatilityRegime};
-use crate::sandbox::mock::MockData;
+use crate::sandbox::mock::{MockData, MockPresets};
+
+/// Minimum net price change (as fraction) to classify a trend as non-sideways.
+/// Below this threshold the market is considered flat / ranging.
+const HISTORICAL_TREND_THRESHOLD: f64 = 0.005;
+
+/// Scaling factor applied to the average per-candle return to normalize
+/// trend strength into the [0.0, 1.0] range.
+const STRENGTH_SCALE_FACTOR: f64 = 10.0;
+
+/// Volatility thresholds (average (high-low)/close ratio):
+///   > EXTREME → Extreme, > HIGH → High, > NORMAL → Normal, else Low.
+const VOLATILITY_EXTREME_THRESHOLD: f64 = 0.10;
+const VOLATILITY_HIGH_THRESHOLD: f64 = 0.03;
+const VOLATILITY_NORMAL_THRESHOLD: f64 = 0.01;
+
+/// Minimum net price change (as fraction) to derive bullish/bearish mock sentiment.
+/// Moves smaller than this produce neutral mock data.
+const MOCK_SENTIMENT_THRESHOLD: f64 = 0.02;
 
 /// A single test scenario.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -17,6 +37,10 @@ pub struct Scenario {
     pub target_rule: String,
     pub params: ScenarioParams,
     pub mock_data: MockData,
+    /// When set, these candles replace the default synthetic candles.
+    /// Used for training on real historical market data.
+    #[serde(default)]
+    pub candles_override: Option<Vec<Candle>>,
 }
 
 /// Load all 50 scenarios.
@@ -49,6 +73,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -77,6 +102,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -103,6 +129,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -131,6 +158,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -157,6 +185,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     // ── Trend Bear (5) ──────────────────────────────────────
@@ -185,6 +214,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -216,6 +246,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -241,6 +272,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -269,6 +301,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -294,6 +327,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     // ── Range Bound (5) ─────────────────────────────────────
@@ -320,6 +354,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -345,6 +380,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -370,6 +406,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -395,6 +432,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -424,6 +462,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     // ── Volatility (5) ──────────────────────────────────────
@@ -456,6 +495,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -485,6 +525,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -510,6 +551,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -541,6 +583,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -560,6 +603,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             }),
         },
         mock_data: MockPresets::etf_approval(),
+        candles_override: None,
     });
 
     // ── Catalyst (5) ────────────────────────────────────────
@@ -577,6 +621,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             event: None,
         },
         mock_data: MockPresets::fomc_rate_hike(),
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -593,6 +638,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             event: None,
         },
         mock_data: MockPresets::etf_approval(),
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -612,6 +658,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             }),
         },
         mock_data: MockPresets::exchange_hack(),
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -637,6 +684,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -664,6 +712,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     // ── Microstructure (5) ──────────────────────────────────
@@ -691,6 +740,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -716,6 +766,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -742,6 +793,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -767,6 +819,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -793,6 +846,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     // ── Session (5) ─────────────────────────────────────────
@@ -817,6 +871,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -840,6 +895,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -866,6 +922,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -891,6 +948,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -919,6 +977,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     // ── Correlation (5) ─────────────────────────────────────
@@ -936,6 +995,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             event: None,
         },
         mock_data: MockPresets::etf_approval(),
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -961,6 +1021,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -992,6 +1053,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1017,6 +1079,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1045,6 +1108,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     // ── Sentiment/On-chain (5) ──────────────────────────────
@@ -1074,6 +1138,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1102,6 +1167,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1127,6 +1193,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1154,6 +1221,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1181,6 +1249,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     // ── Edge Cases (5) ──────────────────────────────────────
@@ -1204,6 +1273,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1226,6 +1296,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1248,6 +1319,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1270,6 +1342,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1298,6 +1371,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     // ── Extended: On-Chain Stress (3) ──────────────────────────
@@ -1330,6 +1404,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1359,6 +1434,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1388,6 +1464,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     // ── Extended: Trend Bull Stress (3) ────────────────────────
@@ -1418,6 +1495,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1448,6 +1526,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1477,6 +1556,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     // ── Extended: Correlation Stress (2) ───────────────────────
@@ -1507,6 +1587,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1541,6 +1622,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             session_override: Some("US".into()),
             ..Default::default()
         },
+        candles_override: None,
     });
 
     // ── Extended: Edge Case Stress (2) ─────────────────────────
@@ -1574,6 +1656,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             session_override: Some("Asian".into()),
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios.push(Scenario {
@@ -1606,50 +1689,10 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             ],
             ..Default::default()
         },
+        candles_override: None,
     });
 
     scenarios
-}
-
-// Need to import MockPresets
-use crate::sandbox::mock::MockPresets;
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn loads_at_least_50_scenarios() {
-        let scenarios = load_all_scenarios();
-        assert!(scenarios.len() >= 50);
-    }
-
-    #[test]
-    fn all_scenarios_have_ids() {
-        let scenarios = load_all_scenarios();
-        for s in &scenarios {
-            assert!(!s.id.is_empty());
-            assert!(!s.category.is_empty());
-            assert!(!s.name.is_empty());
-        }
-    }
-
-    #[test]
-    fn scenarios_cover_all_categories() {
-        let scenarios = load_all_scenarios();
-        let categories: Vec<&str> = scenarios.iter().map(|s| s.category.as_str()).collect();
-        assert!(categories.contains(&"Trend Bull"));
-        assert!(categories.contains(&"Trend Bear"));
-        assert!(categories.contains(&"Range Bound"));
-        assert!(categories.contains(&"Volatility"));
-        assert!(categories.contains(&"Catalyst"));
-        assert!(categories.contains(&"Microstructure"));
-        assert!(categories.contains(&"Session"));
-        assert!(categories.contains(&"Correlation"));
-        assert!(categories.contains(&"Sentiment"));
-        assert!(categories.contains(&"On-Chain"));
-        assert!(categories.contains(&"Edge Case"));
-    }
 }
 
 /// Load only training scenarios (first 40).
@@ -1836,6 +1879,7 @@ pub fn generate_random_scenarios(n: usize) -> Vec<Scenario> {
                 news_headlines: headlines,
                 session_override: session,
             },
+            candles_override: None,
         });
     }
 
@@ -1968,4 +2012,377 @@ fn generate_random_headlines(fear_greed: i32, mvrv: f64, funding: f64) -> Vec<St
     }
 
     headlines
+}
+
+/// Convert a HistoricalScenario into a Scenario with candles_override set.
+///
+/// Derives trend direction, volatility regime, and mock sentiment from the
+/// historical candle data. The original candles are preserved in
+/// `candles_override` so the engine can bypass `apply_scenario()` and use
+/// real market structure for context building.
+pub fn historical_to_scenario(hs: &HistoricalScenario) -> Scenario {
+    let ctx = &hs.context_candles;
+    let (trend, _strength) = derive_historical_trend(ctx);
+    let volatility_regime = derive_historical_volatility(ctx);
+    let mock_data = derive_historical_mock_data(ctx);
+
+    let trigger_condition = if ctx.len() < 2 {
+        format!("Historical context window ({} candles)", ctx.len())
+    } else {
+        let first = ctx.first().map(|c| c.close).unwrap_or(0.0);
+        let last = ctx.last().map(|c| c.close).unwrap_or(0.0);
+        let pct = if first > 0.0 {
+            (last - first) / first * 100.0
+        } else {
+            0.0
+        };
+        format!(
+            "Historical context: {:.2}% move over {} candles",
+            pct,
+            ctx.len()
+        )
+    };
+
+    let target_rule = match hs.expected_action.as_str() {
+        "Buy" => "Long entry aligned with real market structure".to_string(),
+        "Sell" => "Short entry aligned with real market structure".to_string(),
+        _ => "HOLD — historical setup ambiguous".to_string(),
+    };
+
+    Scenario {
+        id: hs.id.clone(),
+        category: "Historical".to_string(),
+        name: format!("Historical — {}", hs.id),
+        difficulty: "Hard".to_string(),
+        trigger_condition,
+        expected_action: hs.expected_action.clone(),
+        target_rule,
+        params: ScenarioParams {
+            trend,
+            volatility_regime,
+            event: None,
+        },
+        mock_data,
+        candles_override: Some(ctx.clone()),
+    }
+}
+
+/// Derive trend direction + strength from a candle window.
+///
+/// Returns `(TrendDirection, strength_normalized_to_0_1)`.
+/// Fewer than 2 candles or < 0.5% net change → Sideways.
+fn derive_historical_trend(candles: &[Candle]) -> (TrendDirection, f64) {
+    if candles.len() < 2 {
+        return (TrendDirection::Sideways, 0.0);
+    }
+
+    let first = candles.first().map(|c| c.close).unwrap_or(0.0);
+    let last = candles.last().map(|c| c.close).unwrap_or(0.0);
+    if first <= 0.0 {
+        return (TrendDirection::Sideways, 0.0);
+    }
+
+    let net_pct = (last - first) / first;
+    if net_pct.abs() < HISTORICAL_TREND_THRESHOLD {
+        return (TrendDirection::Sideways, 0.0);
+    }
+
+    let total_return: f64 = candles
+        .windows(2)
+        .filter_map(|w| {
+            let prev = w[0].close;
+            if prev > 0.0 {
+                Some((w[1].close - prev) / prev)
+            } else {
+                None
+            }
+        })
+        .sum();
+    let avg_return = total_return / (candles.len() - 1) as f64;
+    let strength = (avg_return.abs() * STRENGTH_SCALE_FACTOR).clamp(0.0, 1.0);
+
+    if net_pct > 0.0 {
+        (TrendDirection::Bull(strength), strength)
+    } else {
+        (TrendDirection::Bear(strength), strength)
+    }
+}
+
+/// Classify volatility regime from the average candle range as % of close.
+///
+///   - 0% (empty)     → Low
+///   - < 1%           → Low
+///   - 1-3%           → Normal
+///   - 3-10%          → High
+///   - > 10%          → Extreme
+fn derive_historical_volatility(candles: &[Candle]) -> VolatilityRegime {
+    if candles.is_empty() {
+        return VolatilityRegime::Low;
+    }
+
+    let avg_range: f64 = candles
+        .iter()
+        .filter_map(|c| if c.close > 0.0 { Some((c.high - c.low) / c.close) } else { None })
+        .sum::<f64>()
+        / candles.len() as f64;
+
+    if avg_range > VOLATILITY_EXTREME_THRESHOLD {
+        VolatilityRegime::Extreme
+    } else if avg_range > VOLATILITY_HIGH_THRESHOLD {
+        VolatilityRegime::High
+    } else if avg_range > VOLATILITY_NORMAL_THRESHOLD {
+        VolatilityRegime::Normal
+    } else {
+        VolatilityRegime::Low
+    }
+}
+
+/// Derive mock sentiment/on-chain data from the candle action's direction.
+///
+/// Used to populate `MockData` for the prompt so the agent sees internally
+/// consistent context (bullish candles → Greed, bearish → Fear).
+fn derive_historical_mock_data(candles: &[Candle]) -> MockData {
+    if candles.len() < 2 {
+        return MockData::default();
+    }
+
+    let first = candles.first().map(|c| c.close).unwrap_or(0.0);
+    let last = candles.last().map(|c| c.close).unwrap_or(0.0);
+    if first <= 0.0 {
+        return MockData::default();
+    }
+
+    let net_pct = (last - first) / first;
+    if net_pct > MOCK_SENTIMENT_THRESHOLD {
+        MockData {
+            fear_greed_index: 72,
+            fear_greed_label: "Greed".to_string(),
+            funding_rate: 0.0008,
+            mvrv: 2.1,
+            sopr: 1.02,
+            news_headlines: vec![
+                "Historical window shows bullish momentum building".to_string(),
+                "Real market structure confirms uptrend continuation".to_string(),
+            ],
+            ..Default::default()
+        }
+    } else if net_pct < -MOCK_SENTIMENT_THRESHOLD {
+        MockData {
+            fear_greed_index: 28,
+            fear_greed_label: "Fear".to_string(),
+            funding_rate: -0.0006,
+            mvrv: 0.85,
+            sopr: 0.96,
+            news_headlines: vec![
+                "Historical window shows sustained selling pressure".to_string(),
+                "Real market structure confirms downtrend continuation".to_string(),
+            ],
+            ..Default::default()
+        }
+    } else {
+        MockData::default()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn loads_at_least_50_scenarios() {
+        let scenarios = load_all_scenarios();
+        assert!(scenarios.len() >= 50);
+    }
+
+    #[test]
+    fn all_scenarios_have_ids() {
+        let scenarios = load_all_scenarios();
+        for s in &scenarios {
+            assert!(!s.id.is_empty());
+            assert!(!s.category.is_empty());
+            assert!(!s.name.is_empty());
+        }
+    }
+
+    #[test]
+    fn scenarios_cover_all_categories() {
+        let scenarios = load_all_scenarios();
+        let categories: Vec<&str> = scenarios.iter().map(|s| s.category.as_str()).collect();
+        assert!(categories.contains(&"Trend Bull"));
+        assert!(categories.contains(&"Trend Bear"));
+        assert!(categories.contains(&"Range Bound"));
+        assert!(categories.contains(&"Volatility"));
+        assert!(categories.contains(&"Catalyst"));
+        assert!(categories.contains(&"Microstructure"));
+        assert!(categories.contains(&"Session"));
+        assert!(categories.contains(&"Correlation"));
+        assert!(categories.contains(&"Sentiment"));
+        assert!(categories.contains(&"On-Chain"));
+        assert!(categories.contains(&"Edge Case"));
+    }
+}
+
+#[cfg(test)]
+mod historical_tests {
+    use super::*;
+
+    fn make_candle(open: f64, high: f64, low: f64, close: f64) -> Candle {
+        use chrono::Utc;
+        Candle {
+            timestamp: Utc::now(),
+            open,
+            high,
+            low,
+            close,
+            volume: 1000.0,
+            pair: "BTC/USD".to_string(),
+        }
+    }
+
+    fn make_hs(candles: Vec<Candle>, action: &str) -> HistoricalScenario {
+        HistoricalScenario {
+            id: "test-hist-001".to_string(),
+            context_candles: candles,
+            future_candles: vec![],
+            expected_action: action.to_string(),
+            pct_change: 0.0,
+            decision_price: 0.0,
+        }
+    }
+
+    #[test]
+    fn historical_to_scenario_sets_candles_override() {
+        let candles = vec![
+            make_candle(100.0, 102.0, 99.0, 101.0),
+            make_candle(101.0, 103.0, 100.0, 102.0),
+            make_candle(102.0, 105.0, 101.0, 104.0),
+        ];
+        let hs = make_hs(candles.clone(), "Buy");
+        let scenario = historical_to_scenario(&hs);
+        assert!(scenario.candles_override.is_some());
+        assert_eq!(scenario.candles_override.unwrap().len(), 3);
+    }
+
+    #[test]
+    fn historical_to_scenario_sets_historical_category() {
+        let candles = vec![
+            make_candle(100.0, 101.0, 99.0, 100.5),
+            make_candle(100.5, 102.0, 100.0, 101.0),
+        ];
+        let hs = make_hs(candles, "Buy");
+        let scenario = historical_to_scenario(&hs);
+        assert_eq!(scenario.category, "Historical");
+        assert_eq!(scenario.difficulty, "Hard");
+    }
+
+    #[test]
+    fn historical_to_scenario_preserves_expected_action() {
+        let candles = vec![
+            make_candle(100.0, 101.0, 99.0, 100.5),
+            make_candle(100.5, 102.0, 100.0, 101.0),
+        ];
+        let hs = make_hs(candles, "Sell");
+        let scenario = historical_to_scenario(&hs);
+        assert_eq!(scenario.expected_action, "Sell");
+    }
+
+    #[test]
+    fn derive_historical_trend_bull() {
+        let candles = vec![
+            make_candle(100.0, 101.0, 99.0, 100.5),
+            make_candle(100.5, 102.0, 100.0, 101.5),
+            make_candle(101.5, 104.0, 101.0, 103.0),
+            make_candle(103.0, 106.0, 102.0, 105.0),
+        ];
+        let (trend, strength) = derive_historical_trend(&candles);
+        assert!(matches!(trend, TrendDirection::Bull(_)));
+        assert!(strength > 0.0);
+        assert!(strength <= 1.0);
+    }
+
+    #[test]
+    fn derive_historical_trend_bear() {
+        let candles = vec![
+            make_candle(105.0, 106.0, 104.0, 104.5),
+            make_candle(104.5, 105.0, 103.0, 103.5),
+            make_candle(103.5, 104.0, 101.0, 102.0),
+            make_candle(102.0, 103.0, 100.0, 100.5),
+        ];
+        let (trend, strength) = derive_historical_trend(&candles);
+        assert!(matches!(trend, TrendDirection::Bear(_)));
+        assert!(strength > 0.0);
+    }
+
+    #[test]
+    fn derive_historical_trend_sideways() {
+        let candles = vec![
+            make_candle(100.0, 101.0, 99.0, 100.2),
+            make_candle(100.2, 101.0, 99.5, 100.3),
+            make_candle(100.3, 101.0, 99.5, 100.1),
+        ];
+        let (trend, _strength) = derive_historical_trend(&candles);
+        assert!(matches!(trend, TrendDirection::Sideways));
+    }
+
+    #[test]
+    fn derive_historical_volatility_extreme() {
+        let candles = vec![
+            make_candle(100.0, 120.0, 80.0, 105.0),
+            make_candle(105.0, 130.0, 85.0, 110.0),
+        ];
+        let vol = derive_historical_volatility(&candles);
+        assert!(matches!(vol, VolatilityRegime::Extreme));
+    }
+
+    #[test]
+    fn derive_historical_volatility_high() {
+        let candles = vec![
+            make_candle(100.0, 106.0, 97.0, 103.0),
+            make_candle(103.0, 108.0, 100.0, 105.0),
+        ];
+        let vol = derive_historical_volatility(&candles);
+        assert!(matches!(vol, VolatilityRegime::High));
+    }
+
+    #[test]
+    fn derive_historical_volatility_low() {
+        let candles = vec![
+            make_candle(100.0, 100.5, 99.5, 100.2),
+            make_candle(100.2, 100.6, 99.6, 100.3),
+        ];
+        let vol = derive_historical_volatility(&candles);
+        assert!(matches!(vol, VolatilityRegime::Low));
+    }
+
+    #[test]
+    fn derive_historical_mock_data_bullish() {
+        let candles = vec![
+            make_candle(100.0, 101.0, 99.0, 100.0),
+            make_candle(100.5, 103.0, 100.0, 103.0),
+        ];
+        let mock = derive_historical_mock_data(&candles);
+        assert_eq!(mock.fear_greed_label, "Greed");
+        assert_eq!(mock.fear_greed_index, 72);
+    }
+
+    #[test]
+    fn derive_historical_mock_data_bearish() {
+        let candles = vec![
+            make_candle(105.0, 106.0, 104.0, 105.0),
+            make_candle(104.5, 105.0, 102.0, 102.0),
+        ];
+        let mock = derive_historical_mock_data(&candles);
+        assert_eq!(mock.fear_greed_label, "Fear");
+        assert_eq!(mock.fear_greed_index, 28);
+    }
+
+    #[test]
+    fn derive_historical_mock_data_neutral() {
+        let candles = vec![
+            make_candle(100.0, 101.0, 99.0, 100.2),
+            make_candle(100.2, 101.0, 99.5, 100.3),
+        ];
+        let mock = derive_historical_mock_data(&candles);
+        assert!(mock.fear_greed_label == "Neutral" || mock.fear_greed_index == 50);
+    }
 }

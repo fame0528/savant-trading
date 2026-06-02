@@ -361,11 +361,31 @@ impl ExecutionEngine for KrakenTrader {
 
         let txid = txids.first().cloned().unwrap_or_default();
 
-        // Calculate fill price (assume market fill at requested price for now)
-        let fill_price = price.unwrap_or(0.0);
+        // For market orders, fetch ticker price as fill price (C4 fix)
+        let fill_price = match price {
+            Some(p) => p,
+            None => {
+                // Fetch current market price from Kraken ticker
+                match self.client.get_ticker(pair).await {
+                    Ok(ticker) => match side {
+                        Side::Long => ticker.ask,  // Buy at ask
+                        Side::Short => ticker.bid, // Sell at bid
+                    },
+                    Err(_) => {
+                        return Err(ExecutionError::Other(
+                            "Market order placed but cannot determine fill price".into(),
+                        ));
+                    }
+                }
+            }
+        };
+
         let fee = fill_price * quantity * self.config.fee_rate;
+        let order_value = fill_price * quantity;
 
         self.order_counter += 1;
+        let position_id = format!("{}-{}", txid, self.order_counter);
+
         let order = Order {
             id: txid.clone(),
             pair: pair.to_string(),
@@ -382,6 +402,26 @@ impl ExecutionEngine for KrakenTrader {
             filled_at: Some(Utc::now()),
             filled_price: Some(fill_price),
         };
+
+        // Create position and track it (C1 fix)
+        let position = Position {
+            id: position_id.clone(),
+            pair: pair.to_string(),
+            side,
+            entry_price: fill_price,
+            current_price: fill_price,
+            stop_loss: 0.0, // Will be set by caller
+            take_profit_1: 0.0,
+            take_profit_2: 0.0,
+            take_profit_3: 0.0,
+            quantity,
+            unrealized_pnl: 0.0,
+            risk_amount: 0.0,
+            strategy_name: "kraken_live".to_string(),
+            opened_at: Utc::now(),
+            scale_level: crate::core::types::ScaleLevel::Full,
+        };
+        self.positions.insert(position_id, position);
 
         // Deduct from balance
         self.balance -= order_value + fee;
@@ -431,11 +471,20 @@ impl ExecutionEngine for KrakenTrader {
 
         let txid = txids.first().cloned().unwrap_or_default();
 
-        let pnl = match pos.side {
-            Side::Long => (pos.current_price - pos.entry_price) * pos.quantity,
-            Side::Short => (pos.entry_price - pos.current_price) * pos.quantity,
+        // Fetch current market price for accurate P&L (C5 fix)
+        let exit_price = match self.client.get_ticker(&pos.pair).await {
+            Ok(ticker) => match pos.side {
+                Side::Long => ticker.bid,  // Sell at bid
+                Side::Short => ticker.ask, // Buy at ask
+            },
+            Err(_) => pos.current_price, // Fallback to last known price
         };
-        let fee = pos.current_price * pos.quantity * self.config.fee_rate;
+
+        let pnl = match pos.side {
+            Side::Long => (exit_price - pos.entry_price) * pos.quantity,
+            Side::Short => (pos.entry_price - exit_price) * pos.quantity,
+        };
+        let fee = exit_price * pos.quantity * self.config.fee_rate;
         let net_pnl = pnl - fee;
 
         self.balance += net_pnl;
@@ -446,7 +495,7 @@ impl ExecutionEngine for KrakenTrader {
             pair: pos.pair.clone(),
             side: pos.side,
             entry_price: pos.entry_price,
-            exit_price: pos.current_price,
+            exit_price,
             quantity: pos.quantity,
             pnl: net_pnl,
             pnl_pct: net_pnl / (pos.entry_price * pos.quantity) * 100.0,

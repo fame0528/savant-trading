@@ -177,7 +177,7 @@ pub fn aggregate_multi_run(
         return vec![];
     }
     if all_results.len() == 1 {
-        return all_results.into_iter().next().unwrap();
+        return all_results.into_iter().next().unwrap_or_default();
     }
 
     let scenario_count = all_results[0].len();
@@ -291,7 +291,7 @@ impl SandboxSummary {
                 let avg = scores.iter().sum::<f64>() / scores.len() as f64;
                 (cat.clone(), avg)
             })
-            .min_by(|a, b| a.1.partial_cmp(&b.1).unwrap())
+            .min_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal))
             .map(|(cat, _)| cat)
             .unwrap_or_else(|| "N/A".into());
 
@@ -301,7 +301,7 @@ impl SandboxSummary {
                 let avg = scores.iter().sum::<f64>() / scores.len() as f64;
                 (cat.clone(), avg)
             })
-            .max_by(|a, b| a.1.partial_cmp(&b.1).unwrap())
+            .max_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal))
             .map(|(cat, _)| cat)
             .unwrap_or_else(|| "N/A".into());
 

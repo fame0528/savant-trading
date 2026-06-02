@@ -8,15 +8,20 @@ use savant_trading::agent::context_builder::FullContext;
 use savant_trading::agent::knowledge::KnowledgeBase;
 use savant_trading::agent::orchestrator::{AgentConfig, AgentOrchestrator, AutonomyLevel};
 use savant_trading::agent::prompts::{self, PromptComposer};
-use savant_trading::agent::provider::LlmConfig;
+use savant_trading::agent::openrouter_management::OpenRouterManagementClient;
+use savant_trading::agent::provider::create_provider;
 use savant_trading::core::config::AppConfig;
 use savant_trading::core::events::EventBus;
-use savant_trading::core::types::{Candle, Position, ScaleLevel, TradingEvent};
+use savant_trading::core::types::{Candle, Position, ScaleLevel, Side, TradingEvent};
 use savant_trading::data::indicators::IndicatorEngine;
 use savant_trading::data::kraken::KrakenClient;
 use savant_trading::data::market_data::MarketDataStore;
 use savant_trading::data::orderbook::OrderBookManager;
+use savant_trading::execution::dex::DexTrader;
+use savant_trading::execution::dex::zero_x::ZeroXBackend;
+use savant_trading::execution::dex::inch::InchBackend;
 use savant_trading::execution::engine::ExecutionEngine;
+use savant_trading::execution::kraken::{KrakenTrader, KrakenTraderConfig};
 use savant_trading::execution::paper::PaperTrader;
 use savant_trading::insight::aggregator::{InsightAggregator, InsightConfig};
 use savant_trading::monitor::journal::TradeJournal;
@@ -54,10 +59,94 @@ pub fn parse_timeframe_minutes(tf: &str) -> u32 {
     }
 }
 
-/// Load knowledge base from JSON files.
+/// Create a live execution engine based on config mode + backend.
 ///
-/// Searches knowledge/ at project root first (22 files, 254 units).
-/// Falls back to src/agent/knowledge/ for development builds.
+/// Returns `None` for paper trading (`paper_trading: true`).
+/// Otherwise creates the appropriate backend:
+///   - `"kraken"` → [`KrakenTrader`] (requires KRAKEN_API_KEY/Secret env vars)
+///   - `"0x"`     → [`DexTrader<ZeroXBackend>`] (requires WALLET_PRIVATE_KEY + ZEROEX_API_KEY)
+///   - `"1inch"`  → [`DexTrader<InchBackend>`] (requires WALLET_PRIVATE_KEY + 1INCH_API_KEY)
+async fn create_executor(config: &AppConfig) -> Result<Option<Box<dyn ExecutionEngine>>, anyhow::Error> {
+    if config.mode.paper_trading {
+        info!("Paper trading mode: using PaperTrader");
+        return Ok(None);
+    }
+
+    match config.exchange.backend.as_str() {
+        "kraken" => {
+            let api_key = std::env::var("KRAKEN_API_KEY")
+                .map_err(|_| anyhow::anyhow!("KRAKEN_API_KEY not set — required for Kraken live trading"))?;
+            let api_secret = std::env::var("KRAKEN_API_SECRET")
+                .map_err(|_| anyhow::anyhow!("KRAKEN_API_SECRET not set — required for Kraken live trading"))?;
+
+            let kraken_config = KrakenTraderConfig {
+                starting_balance: config.trading.starting_balance,
+                fee_rate: config.trading.fee_rate,
+                maker_fee_rate: (config.trading.fee_rate - 0.0015).max(0.001),
+                max_order_pct: config.risk.max_risk_per_trade,
+                max_daily_loss_pct: config.risk.max_daily_loss,
+                slippage_alert_pct: config.trading.slippage_pct * 10.0,
+                webhook_url: None,
+            };
+
+            let trader = KrakenTrader::new(
+                &config.exchange.rest_url,
+                &api_key,
+                &api_secret,
+                kraken_config,
+            )
+            .await
+            .map_err(|e| anyhow::anyhow!("Failed to create KrakenTrader: {}", e))?;
+
+            info!("LIVE trading mode: KrakenTrader initialized");
+            Ok(Some(Box::new(trader)))
+        }
+        "0x" => {
+            let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)
+                .map_err(|_| anyhow::anyhow!("{} not set — required for 0x DEX trading", config.exchange.dex.wallet_key_env))?;
+            let api_key = std::env::var(&config.exchange.dex.api_key_env)
+                .map_err(|_| anyhow::anyhow!("{} not set — required for 0x API", config.exchange.dex.api_key_env))?;
+
+            let backend = ZeroXBackend::new(api_key);
+            let trader = DexTrader::new(
+                backend,
+                &wallet_key,
+                &config.exchange.dex.rpc_url,
+                config.exchange.dex.chain_id,
+                config.exchange.dex.slippage_pct,
+                config.trading.starting_balance,
+            )
+            .await
+            .map_err(|e| anyhow::anyhow!("Failed to create DexTrader (0x): {}", e))?;
+
+            info!("LIVE trading mode: DexTrader (0x) initialized on chain {}", config.exchange.dex.chain_id);
+            Ok(Some(Box::new(trader)))
+        }
+        "1inch" => {
+            let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)
+                .map_err(|_| anyhow::anyhow!("{} not set — required for 1inch DEX trading", config.exchange.dex.wallet_key_env))?;
+            let api_key = std::env::var(&config.exchange.dex.api_key_env)
+                .map_err(|_| anyhow::anyhow!("{} not set — required for 1inch API", config.exchange.dex.api_key_env))?;
+
+            let backend = InchBackend::new(api_key);
+            let trader = DexTrader::new(
+                backend,
+                &wallet_key,
+                &config.exchange.dex.rpc_url,
+                config.exchange.dex.chain_id,
+                config.exchange.dex.slippage_pct,
+                config.trading.starting_balance,
+            )
+            .await
+            .map_err(|e| anyhow::anyhow!("Failed to create DexTrader (1inch): {}", e))?;
+
+            info!("LIVE trading mode: DexTrader (1inch) initialized on chain {}", config.exchange.dex.chain_id);
+            Ok(Some(Box::new(trader)))
+        }
+        other => Err(anyhow::anyhow!("Unknown exchange backend '{}'", other)),
+    }
+}
+
 fn load_knowledge_base() -> KnowledgeBase {
     let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
     let knowledge_root = manifest_dir.join("knowledge");
@@ -178,6 +267,29 @@ pub async fn run(
         }
     }
 
+    // Create execution engine based on backend config
+    // engine.rs uses the ExecutionEngine trait, which now includes default no-op
+    // implementations for kill(), sync_balance(), and place_stop_loss() — so
+    // KrakenTrader, DexTrader, and future engines all work through the same
+    // Box<dyn ExecutionEngine> handle.
+    let mut executor: Option<Box<dyn ExecutionEngine>> = None;
+    if !config.mode.paper_trading {
+        match create_executor(&config).await {
+            Ok(Some(trader)) => {
+                info!(
+                    "Live execution engine ready: backend={}",
+                    config.exchange.backend
+                );
+                executor = Some(trader);
+            }
+            Ok(None) => {}
+            Err(e) => {
+                error!("Failed to initialize live executor: {}", e);
+                warn!("Falling back to PaperTrader for safety");
+            }
+        }
+    }
+
     let journal = match TradeJournal::new(&config.trading.database_url).await {
         Ok(j) => {
             info!("Trade journal connected: {}", config.trading.database_url);
@@ -245,15 +357,7 @@ pub async fn run(
         _ => AutonomyLevel::Autonomous,
     };
 
-    let llm_config = LlmConfig {
-        endpoint: config.ai.endpoint.clone(),
-        model: config.ai.model.clone(),
-        api_key: std::env::var(&config.ai.api_key_env).unwrap_or_default(),
-        max_tokens: config.ai.max_tokens,
-        temperature: config.ai.temperature,
-        top_p: config.ai.top_p,
-        timeout_secs: config.ai.timeout_secs,
-    };
+    let provider = create_provider(&config.ai);
 
     let agent_config = AgentConfig {
         autonomy_level: autonomy,
@@ -263,8 +367,43 @@ pub async fn run(
         max_retries: config.ai.max_retries,
     };
 
-    let agent = AgentOrchestrator::new(llm_config, agent_config, knowledge_base, composer);
-    info!("AI agent initialized: {:?} mode, mimo v2.5 pro", autonomy);
+    let agent = AgentOrchestrator::new(provider, agent_config, knowledge_base, composer);
+    info!("AI agent initialized: {:?} mode with provider '{}'", autonomy, config.ai.provider);
+
+    // === OPENROUTER MANAGEMENT (optional, only if management key is set) ===
+    if config.ai.provider == "openrouter" {
+        let mgmt_key_env = &config.ai.openrouter.management.management_key_env;
+        if let Ok(mgmt_key) = std::env::var(mgmt_key_env) {
+            if !mgmt_key.is_empty() {
+                let mgmt = OpenRouterManagementClient::with_endpoint(
+                    mgmt_key,
+                    &config.ai.openrouter.management.endpoint,
+                );
+                match mgmt.list_keys(None).await {
+                    Ok(keys) => {
+                        info!(
+                            "OpenRouter Management: {} API keys (logged at startup)",
+                            keys.len()
+                        );
+                        for key in &keys {
+                            if key.limit > 0.0 && key.limit_remaining < key.limit * 0.1 {
+                                warn!(
+                                    "OpenRouter key '{}' is approaching limit: {:.0}/{:.0} credits remaining",
+                                    key.name, key.limit_remaining, key.limit
+                                );
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        warn!(
+                            "OpenRouter Management unavailable ({}). Key monitoring disabled.",
+                            e
+                        );
+                    }
+                }
+            }
+        }
+    }
 
     // === INSIGHT SETUP ===
     let insight_config = InsightConfig {
@@ -483,6 +622,10 @@ pub async fn run(
     // Track latest WS ticker prices
     let mut ws_ticker_prices: HashMap<String, f64> = HashMap::new();
 
+    // Track PaperTrader position ID → KrakenTrader position ID mapping
+    // Used for stop-loss placement and position close routing across the two systems
+    let mut kraken_position_map: HashMap<String, String> = HashMap::new();
+
     let mut tick = 0u64;
 
     loop {
@@ -506,17 +649,31 @@ pub async fn run(
                 }
                 savant_trading::data::websocket::WsMessage::CancelAllOrders { reason } => {
                     warn!("WS CANCEL-ALL TRIGGERED: {}", reason);
-                    // In paper mode, close all positions as a safety measure.
-                    // In live mode, this would call Kraken's CancelAll endpoint.
-                    let pairs: Vec<String> = paper.positions().keys().cloned().collect();
-                    for pair in &pairs {
-                        if let Some(pos) = paper.positions().get(pair) {
-                            warn!(
-                                "Emergency close: {} {} {} @ {:.2}",
-                                pos.side, pos.quantity, pair, pos.current_price
-                            );
-                        }
+                    // Log emergency close warnings BEFORE clearing so output is not lost
+                    let emergency_pairs: Vec<(Side, f64, String, f64)> = paper
+                        .positions()
+                        .values()
+                        .map(|pos| (pos.side, pos.quantity, pos.pair.clone(), pos.current_price))
+                        .collect();
+                    for (side, qty, pair, price) in &emergency_pairs {
+                        warn!("Emergency close: {} {} {} @ {:.2}", side, qty, pair, price);
                     }
+                    // In live mode, cancel all orders and clear position tracking
+                    if let Some(ref mut ex) = executor {
+                        if let Err(e) = ex.kill().await {
+                            error!("Kraken kill failed: {}", e);
+                        }
+                        // Clear position mapping since Kraken cancelled everything
+                        kraken_position_map.clear();
+                    }
+                    // Clear PaperTrader positions to match Kraken state (AFTER logging)
+                    let cleared_count = paper.positions().len();
+                    paper.positions_mut().clear();
+                    paper.account_mut().open_positions = 0;
+                    info!(
+                        "Cleared {} local positions to match Kraken cancel-all",
+                        cleared_count
+                    );
                     shared
                         .log_activity(
                             savant_trading::core::shared::ActivityLevel::Warning,
@@ -688,7 +845,7 @@ pub async fn run(
 
                 // Pre-filter: skip pairs with no actionable signal
                 // Only send to LLM if indicators show a potential setup
-                let has_signal = has_actionable_signal(&indicators, regime, ob_imbalance);
+                let has_signal = has_actionable_signal(&indicators, regime, ob_imbalance, current_price, candles.last().map(|c| c.volume));
                 let has_position = positions.iter().any(|p| p.pair == *pair);
                 debug!(
                     "Phase 1: {} signal={} position={} → {}",
@@ -812,7 +969,17 @@ pub async fn run(
             let atr = pd.indicators.atr;
             let sem = eval_semaphore.clone();
             join_set.spawn(async move {
-                let _permit = sem.acquire().await.unwrap();
+                let Ok(_permit) = sem.acquire().await else {
+                    tracing::warn!("Semaphore closed, skipping LLM query for {}", pd.pair);
+                    return PairResult {
+                        pair: pd.pair,
+                        response: Err(savant_trading::agent::provider::LlmError::InvalidResponse(
+                            "Semaphore closed".into(),
+                        )),
+                        current_price: pd.current_price,
+                        _atr: atr,
+                    };
+                };
                 let messages = vec![savant_trading::agent::provider::Message {
                     role: "user".to_string(),
                     content: usr,
@@ -1041,14 +1208,24 @@ pub async fn run(
                                         ps.risk_amount *= session_mult;
                                     }
 
-                                    let order = paper
-                                        .place_order(
+                                    let order = if let Some(ref mut ex) = executor {
+                                        ex.place_order(
                                             &decision.pair,
                                             decision.side,
                                             ps.quantity,
                                             Some(decision.entry_price),
                                         )
-                                        .await;
+                                        .await
+                                    } else {
+                                        paper
+                                            .place_order(
+                                                &decision.pair,
+                                                decision.side,
+                                                ps.quantity,
+                                                Some(decision.entry_price),
+                                            )
+                                            .await
+                                    };
 
                                     match order {
                                         Ok(_) => {
@@ -1069,6 +1246,7 @@ pub async fn run(
                                                 opened_at: chrono::Utc::now(),
                                                 scale_level: ScaleLevel::Full,
                                             };
+                                            // Track position in PaperTrader for state/reporting
                                             paper
                                                 .positions_mut()
                                                 .insert(pos.id.clone(), pos.clone());
@@ -1076,6 +1254,31 @@ pub async fn run(
                                                 paper.positions().len();
                                             paper.account_mut().trades_today += 1;
                                             info!("AI position opened: {}", decision.pair);
+
+                                            // Place stop-loss on Kraken for live mode
+                                            // Must use the KrakenTrader's internal position ID, not PaperTrader's ID
+                                            if let Some(ref mut ex) = executor {
+                                                // Find the Kraken position that was just created by matching pair + side
+                                                // (KrakenTrader assigns its own ID format: "{txid}-{counter}")
+                                                if let Some(kraken_pos) =
+                                                    ex.open_positions().iter().find(|p| {
+                                                        p.pair == pos.pair && p.side == pos.side
+                                                    })
+                                                {
+                                                    let kraken_id = kraken_pos.id.clone();
+                                                    kraken_position_map
+                                                        .insert(pos.id.clone(), kraken_id.clone());
+                                                    if let Err(e) =
+                                                        ex.place_stop_loss(&kraken_id).await
+                                                    {
+                                                        warn!("Failed to place stop-loss for Kraken position {}: {}", kraken_id, e);
+                                                    } else {
+                                                        info!("Stop-loss placed on Kraken for position {} @ {:.4}", kraken_id, pos.stop_loss);
+                                                    }
+                                                } else {
+                                                    warn!("Kraken position not found for stop-loss after placing order for {}", pos.pair);
+                                                }
+                                            }
 
                                             // Write trade alert to file for external monitoring
                                             let alert = serde_json::json!({
@@ -1135,7 +1338,60 @@ pub async fn run(
         for (pair, price) in &ws_ticker_prices {
             all_prices.insert(pair.clone(), *price);
         }
+        // Capture paper position IDs and details BEFORE check_stops removes them from the map
+        let paper_positions_before: Vec<(String, String, Side, f64)> = paper
+            .positions()
+            .iter()
+            .map(|(id, pos)| (id.clone(), pos.pair.clone(), pos.side, pos.entry_price))
+            .collect();
+
         let closed = paper.check_stops(&all_prices);
+
+        // In live mode, close positions on Kraken that PaperTrader closed via stops
+        for trade in &closed {
+            if let Some(ref mut ex) = executor {
+                // Match closed trade to paper position by pair + side + entry_price
+                let paper_id = paper_positions_before
+                    .iter()
+                    .find(|(_, pair, side, entry)| {
+                        *pair == trade.pair
+                            && *side == trade.side
+                            && (*entry - trade.entry_price).abs() < 0.0001
+                    })
+                    .map(|(id, _, _, _)| id.clone());
+
+                // Look up the Kraken position ID from the stored mapping
+                let kraken_id = paper_id
+                    .as_ref()
+                    .and_then(|pid| kraken_position_map.get(pid))
+                    .cloned();
+
+                if let Some(ref kid) = kraken_id {
+                    if let Err(e) = ex.close_position(kid).await {
+                        warn!("Failed to close Kraken position {}: {}", kid, e);
+                    } else {
+                        // Clean up the mapping entry after successful close
+                        if let Some(ref pid) = paper_id {
+                            kraken_position_map.remove(pid);
+                        }
+                    }
+                } else {
+                    // Fallback: search by pair + side if mapping not found
+                    // This handles edge cases where the mapping wasn't established
+                    let fallback_id = ex
+                        .open_positions()
+                        .iter()
+                        .find(|p| p.pair == trade.pair && p.side == trade.side)
+                        .map(|p| p.id.clone());
+                    if let Some(fid) = fallback_id {
+                        if let Err(e) = ex.close_position(&fid).await {
+                            warn!("Failed to close fallback Kraken position {}: {}", fid, e);
+                        }
+                    }
+                }
+            }
+        }
+
         for trade in closed {
             info!(
                 "CLOSED: {} {} | PnL: ${:.2} ({:.2}%) | {}",
@@ -1244,6 +1500,23 @@ pub async fn run(
             all_prices.insert(pair.clone(), *price);
         }
         paper.update_prices(&all_prices);
+
+        // Sync balance from Kraken for live mode and propagate to PaperTrader
+        // PaperTrader's balance is used for circuit breaker checks, position sizing, and display
+        if let Some(ref mut ex) = executor {
+            if tick.is_multiple_of(10) && ex.sync_balance().await.is_ok() {
+                let kraken_balance = ex.balance();
+                // Only update balance and equity, not peak_equity (preserves drawdown tracking)
+                paper.account_mut().balance = kraken_balance;
+                paper.account_mut().equity = kraken_balance
+                    + paper
+                        .positions()
+                        .values()
+                        .map(|p| p.unrealized_pnl)
+                        .sum::<f64>();
+                debug!("Balance synced from Kraken: ${:.2}", kraken_balance);
+            }
+        }
 
         if tick.is_multiple_of(10) {
             let account = paper.account();
@@ -1525,16 +1798,7 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
 
     // Call LLM
     println!("\n--- LLM CALL ---");
-    let llm_config = LlmConfig {
-        endpoint: config.ai.endpoint.clone(),
-        model: config.ai.model.clone(),
-        api_key: std::env::var(&config.ai.api_key_env).unwrap_or_default(),
-        max_tokens: config.ai.max_tokens,
-        temperature: config.ai.temperature,
-        top_p: config.ai.top_p,
-        timeout_secs: config.ai.timeout_secs,
-    };
-    let provider = savant_trading::agent::provider::LlmProvider::new(llm_config);
+    let provider = savant_trading::agent::provider::create_provider(&config.ai);
     let messages = vec![savant_trading::agent::provider::Message {
         role: "user".to_string(),
         content: user_message,
@@ -1827,8 +2091,14 @@ async fn run_training_batch(
 
     let mut prepared: Vec<Prepared> = Vec::with_capacity(scenarios.len());
     for scenario in scenarios {
-        let mut candles = real_candles.clone();
-        generator::apply_scenario(&mut candles, &scenario.params);
+        let candles = match &scenario.candles_override {
+            Some(override_candles) => override_candles.clone(),
+            None => {
+                let mut c = real_candles.clone();
+                generator::apply_scenario(&mut c, &scenario.params);
+                c
+            }
+        };
 
         let indicators = savant_trading::data::indicators::IndicatorEngine::calculate_all(
             &candles,
@@ -1894,7 +2164,7 @@ async fn run_training_batch(
                     .map(|c| c.high)
                     .fold(f64::NEG_INFINITY, f64::max),
                 low: chunk.iter().map(|c| c.low).fold(f64::INFINITY, f64::min),
-                close: chunk.last().unwrap().close,
+                close: chunk.last().map(|c| c.close).unwrap_or(0.0),
                 volume: chunk.iter().map(|c| c.volume).sum(),
                 pair: "BTC/USD".into(),
             });
@@ -1980,7 +2250,22 @@ async fn run_training_batch(
         let usr = ps.user_message;
         let sem = semaphore.clone();
         join_set.spawn(async move {
-            let _permit = sem.acquire().await.unwrap();
+            let Ok(_permit) = sem.acquire().await else {
+                tracing::warn!("Semaphore closed, skipping scenario");
+                return ScenarioResponse {
+                    scenario_id: ps.scenario_id,
+                    scenario_name: ps.scenario_name,
+                    category: ps.category,
+                    expected_action: ps.expected_action,
+                    regime: ps.regime,
+                    indicators_snapshot: ps.indicators_snapshot,
+                    response: Err(savant_trading::agent::provider::LlmError::InvalidResponse(
+                        "Semaphore closed".into(),
+                    )),
+                    current_price: ps.current_price,
+                    latency_ms: 0,
+                };
+            };
             let provider = savant_trading::agent::provider::LlmProvider::new(
                 savant_trading::agent::provider::LlmConfig {
                     endpoint,
@@ -1990,6 +2275,7 @@ async fn run_training_batch(
                     temperature: 0.6,
                     top_p: 0.95,
                     timeout_secs: 300,
+                    extra_headers: vec![],
                 },
             );
             let messages = vec![savant_trading::agent::provider::Message {
@@ -2595,15 +2881,27 @@ pub async fn run_training(
         let mut scenarios =
             savant_trading::sandbox::scenarios::generate_random_scenarios(scenarios_per_run);
 
+        // Apply count_filter BEFORE historical extend, so it always runs regardless
+        // of whether historical data is available.
+        if let Some(n) = count_filter {
+            scenarios.truncate(n);
+        }
+
         // If historical data is available, inject real market context into scenarios
         if let Some(ref dataset) = historical_dataset {
-            let hist_scenarios =
+            let raw_hist =
                 savant_trading::data::historical::generate_scenarios_from_history(dataset, 100, 50);
-            if !hist_scenarios.is_empty() {
+            if !raw_hist.is_empty() {
+                let hist_scenarios: Vec<savant_trading::sandbox::scenarios::Scenario> = raw_hist
+                    .iter()
+                    .map(savant_trading::sandbox::scenarios::historical_to_scenario)
+                    .collect();
                 info!(
-                    "Historical: {} real market scenarios available (using synthetic + historical mix)",
-                    hist_scenarios.len()
+                    "Historical: {} real market scenarios mixed with {} synthetic",
+                    hist_scenarios.len(),
+                    scenarios.len()
                 );
+                scenarios.extend(hist_scenarios);
             }
         }
 
@@ -2616,9 +2914,8 @@ pub async fn run_training(
                 a.contains("buy") || a.contains("sell")
             });
         }
-        if let Some(n) = count_filter {
-            scenarios.truncate(n);
-        }
+        // Note: count_filter already applied before historical extend above.
+        // This line is intentionally removed to avoid truncating historical scenarios.
 
         println!("\n{}", "=".repeat(80));
         println!(
@@ -2768,6 +3065,7 @@ pub async fn run_sandbox(config: AppConfig) -> anyhow::Result<()> {
                     temperature: config.ai.temperature,
                     top_p: config.ai.top_p,
                     timeout_secs: config.ai.timeout_secs,
+                    extra_headers: vec![],
                 },
             )
         })
@@ -2912,7 +3210,7 @@ pub async fn run_sandbox(config: AppConfig) -> anyhow::Result<()> {
                     .map(|c| c.high)
                     .fold(f64::NEG_INFINITY, f64::max),
                 low: chunk.iter().map(|c| c.low).fold(f64::INFINITY, f64::min),
-                close: chunk.last().unwrap().close,
+                close: chunk.last().map(|c| c.close).unwrap_or(0.0),
                 volume: chunk.iter().map(|c| c.volume).sum(),
                 pair: "BTC/USD".into(),
             });
@@ -3001,7 +3299,20 @@ pub async fn run_sandbox(config: AppConfig) -> anyhow::Result<()> {
         let usr = ps.user_message;
         let sem = semaphore.clone();
         join_set.spawn(async move {
-            let _permit = sem.acquire().await.unwrap();
+            let Ok(_permit) = sem.acquire().await else {
+                tracing::warn!("Semaphore closed, skipping sandbox scenario");
+                return ScenarioResponse {
+                    scenario_id: String::new(),
+                    scenario_name: String::new(),
+                    category: String::new(),
+                    difficulty: String::new(),
+                    expected_action: String::new(),
+                    response: Err(savant_trading::agent::provider::LlmError::InvalidResponse(
+                        "Semaphore closed".into(),
+                    )),
+                    current_price: 0.0,
+                };
+            };
             let local_provider = savant_trading::agent::provider::LlmProvider::new(provider_config);
             let messages = vec![savant_trading::agent::provider::Message {
                 role: "user".to_string(),
@@ -3226,8 +3537,10 @@ pub async fn run_sandbox(config: AppConfig) -> anyhow::Result<()> {
 /// Returns true if any indicator suggests a potential setup.
 fn has_actionable_signal(
     indicators: &savant_trading::core::types::IndicatorValues,
-    regime: savant_trading::core::types::MarketRegime,
+    _regime: savant_trading::core::types::MarketRegime,
     ob_imbalance: Option<f64>,
+    current_price: f64,  // NEW: needed for VWAP deviation check
+    current_volume: Option<f64>,  // NEW: needed for volume spike check
 ) -> bool {
     // RSI extreme — oversold or overbought
     if let Some(rsi) = indicators.rsi {
@@ -3246,7 +3559,7 @@ fn has_actionable_signal(
     // EMA crossover (fast vs slow)
     if let (Some(fast), Some(slow)) = (indicators.ema_fast, indicators.ema_slow) {
         let spread_pct = ((fast - slow) / slow).abs() * 100.0f64;
-        if spread_pct > 0.1 {
+        if spread_pct > 0.5 {
             return true;
         }
     }
@@ -3258,18 +3571,20 @@ fn has_actionable_signal(
         }
     }
 
-    // VWAP deviation
-    if let Some(vwap) = indicators.vwap {
-        if let Some(atr) = indicators.atr {
-            // If price is more than 1 ATR from VWAP
-            // We don't have current_price here, so skip this check
-            let _ = (vwap, atr);
+    // VWAP deviation (WIRED - FID-021: was dead code)
+    if let (Some(vwap), Some(atr)) = (indicators.vwap, indicators.atr) {
+        if atr > 0.0 && ((current_price - vwap) / atr).abs() > 1.0 {
+            return true;
         }
     }
 
-    // Strong trend regime (ADX > 25 is checked above, but also check regime)
-    if regime == savant_trading::core::types::MarketRegime::Trending {
-        return true;
+    // NOTE: Trending regime gate removed (FID-021: redundant with ADX > 25)
+
+    // Volume spike (NEW - FID-021)
+    if let (Some(vol), Some(vsma)) = (current_volume, indicators.volume_sma) {
+        if vsma > 0.0 && vol / vsma > 1.5 {
+            return true;
+        }
     }
 
     false

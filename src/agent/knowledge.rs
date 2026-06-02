@@ -310,6 +310,66 @@ fn topic_tag_similarity(a: &KnowledgeUnit, b: &KnowledgeUnit) -> f64 {
     0.6 * topic_match + 0.4 * tag_overlap
 }
 
+/// Adjust utility_score for knowledge units based on episode outcomes.
+///
+/// For each episode: if the agent won, boost utility of units that were in the
+/// prompt. If it lost, suppress them. Learning rate controls the magnitude.
+pub fn update_utility_scores(
+    knowledge: &mut KnowledgeBase,
+    episodes: &[(Vec<String>, bool)], // (knowledge_unit_ids, is_win)
+    learning_rate: f64,
+) -> u32 {
+    let mut updates = 0u32;
+    for (unit_ids, is_win) in episodes {
+        for unit_id in unit_ids {
+            if let Some(unit) = knowledge.units.iter_mut().find(|u| u.id == *unit_id) {
+                let delta = if *is_win {
+                    learning_rate
+                } else {
+                    -learning_rate * 0.5 // Penalize losses less than reward wins
+                };
+                unit.utility_score = (unit.utility_score + delta).clamp(0.1, 5.0);
+                updates += 1;
+            }
+        }
+    }
+    updates
+}
+
+/// Load all knowledge JSON files from a directory and return a KnowledgeBase.
+pub fn load_knowledge_from_dir(dir: &std::path::Path) -> KnowledgeBase {
+    use std::fs;
+    let mut all_units = Vec::new();
+
+    if let Ok(entries) = fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) == Some("json")
+                && !path.to_string_lossy().contains("_backup")
+                && path.file_name().and_then(|n| n.to_str()) != Some("package.json")
+            {
+                if let Ok(content) = fs::read_to_string(&path) {
+                    match KnowledgeBase::from_json(&content) {
+                        Ok(base) => {
+                            all_units.extend(base.units);
+                        }
+                        Err(e) => {
+                            tracing::warn!("Failed to parse {}: {}", path.display(), e);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    tracing::info!(
+        "Loaded {} knowledge units from {}",
+        all_units.len(),
+        dir.display()
+    );
+    KnowledgeBase::new(all_units)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -429,7 +489,7 @@ mod tests {
 
     #[test]
     fn utility_score_affects_ranking() {
-        let mut base = KnowledgeBase::new(vec![
+        let base = KnowledgeBase::new(vec![
             KnowledgeUnit {
                 id: "a".into(),
                 source: "test".into(),
@@ -452,66 +512,6 @@ mod tests {
             },
         ]);
         let selected = base.select(&[MarketCondition::Trending], 10000);
-        assert_eq!(selected[0].id, "a"); // higher utility wins
+    assert_eq!(selected[0].id, "a"); // higher utility wins
     }
-}
-
-/// Adjust utility_score for knowledge units based on episode outcomes.
-///
-/// For each episode: if the agent won, boost utility of units that were in the
-/// prompt. If it lost, suppress them. Learning rate controls the magnitude.
-pub fn update_utility_scores(
-    knowledge: &mut KnowledgeBase,
-    episodes: &[(Vec<String>, bool)], // (knowledge_unit_ids, is_win)
-    learning_rate: f64,
-) -> u32 {
-    let mut updates = 0u32;
-    for (unit_ids, is_win) in episodes {
-        for unit_id in unit_ids {
-            if let Some(unit) = knowledge.units.iter_mut().find(|u| u.id == *unit_id) {
-                let delta = if *is_win {
-                    learning_rate
-                } else {
-                    -learning_rate * 0.5 // Penalize losses less than reward wins
-                };
-                unit.utility_score = (unit.utility_score + delta).clamp(0.1, 5.0);
-                updates += 1;
-            }
-        }
-    }
-    updates
-}
-
-/// Load all knowledge JSON files from a directory and return a KnowledgeBase.
-pub fn load_knowledge_from_dir(dir: &std::path::Path) -> KnowledgeBase {
-    use std::fs;
-    let mut all_units = Vec::new();
-
-    if let Ok(entries) = fs::read_dir(dir) {
-        for entry in entries.flatten() {
-            let path = entry.path();
-            if path.extension().and_then(|e| e.to_str()) == Some("json")
-                && !path.to_string_lossy().contains("_backup")
-                && path.file_name().and_then(|n| n.to_str()) != Some("package.json")
-            {
-                if let Ok(content) = fs::read_to_string(&path) {
-                    match KnowledgeBase::from_json(&content) {
-                        Ok(base) => {
-                            all_units.extend(base.units);
-                        }
-                        Err(e) => {
-                            tracing::warn!("Failed to parse {}: {}", path.display(), e);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    tracing::info!(
-        "Loaded {} knowledge units from {}",
-        all_units.len(),
-        dir.display()
-    );
-    KnowledgeBase::new(all_units)
 }

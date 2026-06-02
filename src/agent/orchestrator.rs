@@ -9,7 +9,7 @@ use crate::agent::context_builder::{self, FullContext};
 use crate::agent::decision_parser::{self, TradeAction, TradeDecision};
 use crate::agent::knowledge::KnowledgeBase;
 use crate::agent::prompts::PromptComposer;
-use crate::agent::provider::{LlmConfig, LlmProvider, Message};
+use crate::agent::provider::{LlmProvider, Message};
 
 /// Autonomy level for the AI agent.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,15 +57,18 @@ pub enum AgentResult {
 }
 
 impl AgentOrchestrator {
-    /// Create a new agent orchestrator.
+    /// Create a new agent orchestrator with a pre-configured provider.
+    ///
+    /// Use [`crate::agent::provider::create_provider`] to build the provider
+    /// from config — this handles OpenGateway, OpenRouter, and future providers.
     pub fn new(
-        llm_config: LlmConfig,
+        provider: LlmProvider,
         agent_config: AgentConfig,
         knowledge_base: KnowledgeBase,
         composer: PromptComposer,
     ) -> Self {
         Self {
-            provider: LlmProvider::new(llm_config),
+            provider,
             knowledge_base,
             composer,
             config: agent_config,

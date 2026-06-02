@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.4.4] — 2026-06-02
 
+### Closed (FID-016, FID-017, FID-018, FID-019, FID-020, FID-021, FID-022, FID-023, FID-024 — archived 2026-06-02)
+
+- **FID-016: Kraken Live Trading Execution Engine** (critical) — KrakenTrader implemented with 14/16 proposed fixes. Private API client with HMAC-SHA512 signing, order placement (market/limit/stop), balance sync, daily loss halt, kill switch, slippage alerts, Discord webhook notifications. See commit `d2ab69a`. Minor gaps: partial fill tracking, sandbox mode. Status: closed → archived.
+
+- **FID-017: Multi-Exchange DEX Integration (0x + 1inch)** (critical) — DexTrader with ZeroXBackend and InchBackend. Enterprise token resolution (symbol fallback for non-EVM tokens). EIP-1559 signing with ECHO Law 6 compliance. Docs audit fixed 4 0x API issues + 2 1inch API issues + 2 EIP-1559 critical bugs. 176 tests, clippy clean. Status: verified → closed → archived.
+
+- **FID-023: OpenRouter LLM Provider** (high) — Added OpenRouter as first-class AI provider alongside OpenGateway. Provider factory (`create_provider()`), `extra_headers` support, `OpenRouterConfig` struct with endpoint/model/api_key_env/referer/title, config validation, engine wiring in `run()` and `dry_run()`. Zero protocol changes — same OpenAI-compatible wire format. Status: verified → closed → archived.
+
+- **FID-024: OpenRouter Model Env Var + Management Key System** (medium) — Added `OPENROUTER_MODEL` env var override for model switching without config edits. Created `OpenRouterManagementClient` with full CRUD (list/create/get/update/delete keys) via `/api/v1/keys`. `OpenRouterManagementConfig` struct, optional engine startup wiring for key usage monitoring. Status: verified → closed → archived.
+
+- **FID-018: DEX Production Safety** (critical) — Stop-loss persistence + re-establishment, balance reconciliation via RPC (`eth_getBalance` + USDC `balanceOf`), crash recovery via JSON state persistence (`data/dex_state.json`). ETH gas halt at <0.002 ETH. State saved on every position mutation. Status: analyzed → closed → archived.
+
+- **FID-019: DEX Test Infrastructure** (medium) — `ZeroXBackend::with_client()` and `InchBackend::with_client()` constructor injection. `with_client_and_url()` for wiremock routing. 12 hermetic tests covering happy path, 429, 500, malformed JSON, and missing fields for both backends. All pass without API keys or network. Status: analyzed → closed → archived.
+
+- **FID-020: TUI Code Quality** (low) — Dynamic footer reads backend, mode, budget, model from `TuiSnapshot`. Version uses `env!("CARGO_PKG_VERSION")`. Drawdown thresholds derived from config values. Status: analyzed → closed → archived.
+
+- **FID-021: has_actionable_signal Pre-Filter Review** (medium) — EMA spread threshold 0.1% → 0.5%. VWAP deviation check wired (was dead code). Volume spike gate added (`vol / volume_sma > 1.5`). Trending regime gate removed (redundant with ADX > 25). `current_price` and `current_volume` parameters passed to function. Status: analyzed → closed → archived.
+
+- **FID-022: CLI TUI Overhaul** (high) — Multi-tab Ratatui terminal with 5-file modular architecture (`mod.rs`, `state.rs`, `tabs.rs`, `widgets.rs`, `keyboard.rs`). 10 tabs with keyboard navigation (0-9, Tab, arrows, PgUp/PgDn), search (`/`), help overlay (`?`/`F1`). Snapshot-based rendering from `SharedEngineData`. Status: analyzed → closed → archived.
+
+---
+
+**All 7 FIDs closed this session:** FID-018 (DEX Safety), FID-019 (DEX Tests), FID-020 (TUI Quality), FID-021 (Pre-filter), FID-022 (TUI Overhaul), FID-023 (OpenRouter Provider), FID-024 (OpenRouter Management).
+
 ### Added (FID-015 — Gemini Deep Research Optimization Overhaul)
 
 - **Config Overhaul** — Corrected fee rate (0.26% → 0.40% taker), tightened risk (daily loss 20% → 10%, drawdown 40% → 20%), raised R:R (1.5 → 2.0), temperature 0.6 + top_p 0.95, knowledge budget 8K → 20K chars, candles 100 → 500, timeout 180s → 300s, max_tokens 131072 (128K), added 1d timeframe.

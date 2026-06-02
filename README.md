@@ -65,9 +65,9 @@ Rule-Based Strategies ──→ Optional parallel signals (comparison only)
 - **Multi-Asset Correlation** — Pearson correlation matrix, effective position counting for correlated pairs
 - **Portfolio Heat** — Total risk exposure tracking, blocks trades when heat exceeds 40% of equity
 - **Dynamic Slippage** — Slippage scales with ATR volatility and order book depth
-- **Pair Discovery** — `scan_all_pairs = true` discovers all USD pairs on Kraken automatically
+- **Pair Discovery** — `scan_all_pairs` can discover 455+ Kraken USD pairs (off by default — 15+ min/cycle)
 - **Kraken Integration** — REST + WebSocket (exponential backoff reconnection) for candle data, order execution, and account management
-- **Paper Trading** — Full simulation with realistic fees (0.26% Kraken taker) and dynamic slippage modeling
+- **Paper Trading** — Full simulation with realistic fees (0.40% Kraken taker) and dynamic slippage modeling
 - **Scale-Out Execution** — TP1 → 50% close + break-even stop, TP2 → 60% of remainder, TP3 → full close
 - **Circuit Breakers** — Independent risk layer the AI cannot override: daily loss limit, drawdown kill switch, max positions, portfolio heat
 - **Backtesting Engine** — Historical strategy validation with walk-forward optimization and Sharpe ratio
@@ -149,46 +149,73 @@ All non-secret settings are in `config/default.toml`:
 ```toml
 [exchange]
 name = "kraken"
+backend = "kraken"               # "kraken" (CEX), "0x" (DEX), "1inch" (DEX)
 ws_url = "wss://ws.kraken.com/v2"
 rest_url = "https://api.kraken.com"
 
+[exchange.dex]
+chain_id = 42161                 # Arbitrum
+rpc_url = "https://arb1.arbitrum.io/rpc"
+slippage_pct = 0.005
+
 [trading]
-pairs = ["BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD", "ADA/USD", "DOGE/USD",
-         "AVAX/USD", "DOT/USD", "LINK/USD", "MATIC/USD", "UNI/USD",
-         "ATOM/USD", "ALGO/USD", "FIL/USD", "NEAR/USD"]
-scan_all_pairs = false           # Set true to discover all Kraken USD pairs
+pairs = [
+    "BTC/USD", "ETH/USD",          # Core
+    "SOL/USD", "XRP/USD", "ADA/USD", "AVAX/USD", "DOT/USD", "LINK/USD",
+    "DOGE/USD", "SHIB/USD", "PEPE/USD", "WIF/USD", "BONK/USD",            # Momentum
+    "UNI/USD", "AAVE/USD", "ARB/USD", "OP/USD", "LDO/USD", "PENDLE/USD", # DeFi/L2
+    "RENDER/USD", "FET/USD", "GRT/USD",                                   # AI/narrative
+    "LTC/USD", "ATOM/USD", "NEAR/USD", "INJ/USD", "TIA/USD", "SUI/USD",  # Other
+]
+scan_all_pairs = false           # 455+ pairs, 15+ min/cycle — only if needed
 timeframe = "5m"
-timeframes = ["5m", "1h", "4h"]  # Multi-timeframe analysis
+timeframes = ["5m", "1h", "4h", "1d"]
 base_currency = "USD"
-starting_balance = 100.0
-fee_rate = 0.0026        # Kraken taker fee
-slippage_pct = 0.0005    # 0.05% slippage
+starting_balance = 50.0
+fee_rate = 0.0040                # Kraken Pro base tier taker
+slippage_pct = 0.0005
 
 [risk]
-max_risk_per_trade = 0.01   # 1% per trade
-max_daily_loss = 0.03        # 3% daily limit
-max_drawdown = 0.10          # 10% drawdown kill switch
-max_positions = 3
-min_rr_ratio = 1.5
+max_risk_per_trade = 0.20        # 20% per trade ($10 at $50 — fully deployed)
+max_daily_loss = 0.10            # 10% daily halt
+max_drawdown = 0.20              # 20% drawdown kill switch
+max_positions = 5
+min_rr_ratio = 2.0
 
 [ai]
 provider = "opengateway"
+endpoint = "https://opengateway.gitlawb.com/v1"
 model = "mimo-v2.5-pro"
-autonomy_level = 3              # 1=suggest, 2=confirm, 3=autonomous
-max_decisions_per_hour = 5
-knowledge_token_budget = 8000
-temperature = 0.7
+autonomy_level = 3
+max_decisions_per_hour = 20
+knowledge_token_budget = 20000
+temperature = 0.6
+top_p = 0.95
+max_tokens = 131072              # Matches MiMo v2.5 Pro output capacity
+timeout_secs = 300
 
 [insight]
 fear_greed_enabled = true
-btc_dominance_enabled = true
 funding_rate_enabled = true
 liquidation_enabled = true
+btc_dominance_enabled = true
 exchange_flows_enabled = true
 news_sentiment_enabled = true
 rss_enabled = true
 rss_max_items = 10
 onchain_enabled = true
+
+[training]
+min_sample_size = 5
+failure_win_rate = 0.30
+max_portfolio_heat = 0.40
+backup_interval_hours = 6
+max_backups = 7
+utility_learning_rate = 0.05
+utility_archive_threshold = 0.30
+max_active_lessons = 50
+brier_cap_threshold = 0.25
+memory_context_min_trades = 5
 ```
 
 ---
@@ -224,17 +251,38 @@ savant-trading/
 │   │   ├── orderbook.rs          # Order book
 │   │   └── websocket.rs          # Kraken WebSocket v2 client
 │   ├── execution/                # Trade execution
+│   │   ├── engine.rs             # Execution engine trait
 │   │   ├── paper.rs              # Paper trading simulator
-│   │   └── engine.rs             # Execution engine trait
+│   │   └── dex/                  # DEX backends (0x, 1inch on Arbitrum)
+│   │       ├── mod.rs            # Token resolution, DexTrader
+│   │       ├── trader.rs         # DexTrader execution logic
+│   │       ├── zero_x.rs         # 0x API backend
+│   │       └── inch.rs           # 1inch API backend
 │   ├── insight/                  # Live market insight
+│   │   ├── aggregator.rs         # Unified MarketContext
 │   │   ├── sentiment.rs          # Fear & Greed, BTC Dominance
 │   │   ├── funding_rates.rs      # Derivatives data
 │   │   ├── liquidation.rs        # Liquidation clusters
 │   │   ├── flows.rs              # Exchange inflow/outflow
-│   │   ├── onchain.rs            # MVRV, SOPR, NVT (CoinMetrics)
+│   │   ├── onchain.rs            # MVRV, SOPR, NVT
 │   │   ├── news.rs               # News and social sentiment
-│   │   ├── rss.rs                # RSS feed fetcher (15 sources)
-│   │   └── aggregator.rs         # Unified MarketContext
+│   │   └── rss.rs                # RSS feed fetcher (15 sources)
+│   ├── memory/                   # Episodic memory + calibration
+│   │   ├── episodic.rs           # SQLite WAL decision ledger
+│   │   ├── context.rs            # 6th prompt layer (memory injection)
+│   │   ├── calibration.rs        # Brier score confidence calibration
+│   │   ├── cusum.rs              # CUSUM edge decay detection
+│   │   ├── replay.rs             # Experience replay (lessons from history)
+│   │   ├── semantic.rs           # Semantic consolidation (SQL → patterns)
+│   │   └── anti_pattern.rs       # Anti-pattern detection
+│   ├── sandbox/                  # Synthetic scenario testing
+│   │   ├── generator.rs          # GARCH(1,1) OHLCV generator
+│   │   ├── scenarios.rs          # 50 curated scenarios (11 categories)
+│   │   ├── grader.rs             # 3-tier grading rubric
+│   │   ├── harness.rs            # Scenario runner + report cards
+│   │   ├── feedback.rs           # GEPA-style SOUL.md mutation
+│   │   ├── mock.rs               # Mock API presets
+│   │   └── report.rs             # Report card generation
 │   ├── monitor/                  # Journaling and reporting
 │   │   ├── journal.rs            # SQLite trade journal
 │   │   ├── metrics.rs            # Performance metrics
@@ -252,30 +300,14 @@ savant-trading/
 │   │   ├── writer.rs
 │   │   ├── watcher.rs
 │   │   └── config.rs
-│   ├── memory/                   # Episodic memory + calibration
-│   │   ├── episodic.rs           # SQLite WAL decision ledger
-│   │   ├── context.rs            # 6th prompt layer (memory injection)
-│   │   ├── calibration.rs        # Brier score confidence calibration
-│   │   ├── cusum.rs              # CUSUM edge decay detection
-│   │   ├── replay.rs             # Experience replay (lessons from history)
-│   │   ├── semantic.rs           # Semantic consolidation (SQL → patterns)
-│   │   └── anti_pattern.rs       # Anti-pattern detection (failure conditions)
-│   ├── sandbox/                  # Synthetic scenario testing
-│   │   ├── generator.rs          # GARCH(1,1) OHLCV generator
-│   │   ├── scenarios.rs          # 50 curated scenarios (11 categories)
-│   │   ├── grader.rs             # 3-tier grading rubric
-│   │   ├── harness.rs            # Scenario runner + report cards
-│   │   ├── feedback.rs           # GEPA-style SOUL.md mutation
-│   │   ├── mock.rs               # Mock API presets
-│   │   └── report.rs             # Report card generation
 │   ├── tui/                      # Real-time TUI dashboard (ratatui)
-│   ├── api/                    # REST API server (axum)
+│   ├── api/                      # REST API server (axum)
 │   ├── engine.rs                 # Main trading loop
 │   ├── main.rs                   # CLI entry point
 │   └── lib.rs                    # Module declarations
 ├── config/
 │   └── default.toml              # All non-secret configuration
-├── knowledge/                    # 22 JSON knowledge files (254 units)
+├── knowledge/                    # 10 JSON knowledge files (2,959 units)
 ├── templates/
 │   ├── FID-TEMPLATE.md           # Finding ID template
 │   └── SESSION-SUMMARY.md        # Session summary template
@@ -286,7 +318,8 @@ savant-trading/
 │   └── KNOWLEDGE-EXPANSION-EXECUTION.md
 ├── dev/
 │   ├── LEARNINGS.md              # Cross-session knowledge
-│   ├── findings/                 # FID tracking
+│   ├── fids/                     # Active FIDs (0 active)
+│   │   └── archive/              # 50 archived FIDs
 │   └── session-summaries/        # Session history
 ├── .env.example                  # Environment template
 ├── .gitignore
@@ -328,8 +361,8 @@ cargo run -- --test -c "Crash" -a -n 10      # Combine filters
 cargo run -- --test --train
 cargo run -- --test --train -a -n 20
 
-# Legacy sandbox with grading
-cargo run -- --test --sandbox
+# Historical data training (30 days of 5m candles)
+cargo run -- --historical
 
 # Help
 cargo run -- --help
@@ -346,9 +379,9 @@ The risk layer is **independent of the AI brain** — the agent cannot override 
 
 | Circuit Breaker | Threshold | Action |
 |----------------|-----------|--------|
-| Single trade risk | 1% of portfolio | Max position size calculated automatically |
-| Daily loss limit | 3% | All trading halted for the day |
-| Drawdown kill switch | 10% | All positions closed, bot stops, manual restart required |
+| Single trade risk | 20% of portfolio ($10 at $50) | Max position size calculated automatically |
+| Daily loss limit | 10% | All trading halted for the day |
+| Drawdown kill switch | 20% | All positions closed, bot stops, manual restart required |
 | Consecutive failures | 3 LLM failures | Fallback to rule-based strategies temporarily |
 
 ---
@@ -365,19 +398,26 @@ cargo fmt --check
 
 ### Finding IDs (FIDs)
 
-All bugs and improvements are tracked as Finding IDs in `dev/findings/`:
+All bugs and improvements are tracked as Finding IDs in `dev/fids/`:
 
 ```bash
-ls dev/findings/
-# Active FIDs (all closed):
-# FID-2026-0531-007.md  [CLOSED] Knowledge Base Reorganization
-# FID-2026-0531-008.md  [CLOSED] Sandbox Architecture Overhaul
-# FID-2026-0531-009.md  [CLOSED] Knowledge Selection Fix
-# FID-2026-0531-010.md  [CLOSED] Persistent Training Pipeline
-# FID-2026-0531-011.md  [CLOSED] Closed-Loop Training Pipeline
+ls dev/fids/
+# (empty — all FIDs closed and archived)
 
-ls dev/findings/archived/
-# 32 archived FIDs from initial build (FID-2026-0530-001 through 026, 0531-001 through 006)
+ls dev/fids/archive/
+# 50 archived FIDs from development history (FID-001 through 024)
+```
+
+### Current FID Status (end of session)
+
+All FIDs (FID-001 through FID-024) are closed and archived — clean slate.
+
+| FIDs | Count | Location |
+|------|-------|----------|
+| Active (numbered) | 0 | `dev/fids/` |
+| Archived (files) | 50 | `dev/fids/archive/` |
+
+```
 ```
 
 ### ECHO Protocol

@@ -294,7 +294,7 @@ mod tests {
 
     #[test]
     fn range_validation_mvrv() {
-        assert!(MVRV_MIN <= 0.1 && MVRV_MAX >= 10.0);
+        const _: () = assert!(MVRV_MIN <= 0.1 && MVRV_MAX >= 10.0);
         // Valid
         assert!((0.5..=9.0).contains(&1.375));
         // Invalid (garbage)

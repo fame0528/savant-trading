@@ -23,6 +23,7 @@ impl TradeJournal {
                 quantity REAL NOT NULL,
                 pnl REAL NOT NULL,
                 pnl_pct REAL NOT NULL,
+                fees REAL NOT NULL DEFAULT 0.0,
                 strategy_name TEXT NOT NULL,
                 opened_at TEXT NOT NULL,
                 closed_at TEXT NOT NULL,
@@ -55,8 +56,8 @@ impl TradeJournal {
     pub async fn record_trade(&self, trade: &TradeRecord) -> Result<(), sqlx::Error> {
         sqlx::query(
             r#"
-            INSERT INTO trades (id, pair, side, entry_price, exit_price, quantity, pnl, pnl_pct, strategy_name, opened_at, closed_at, notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO trades (id, pair, side, entry_price, exit_price, quantity, pnl, pnl_pct, fees, strategy_name, opened_at, closed_at, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "#,
         )
         .bind(&trade.id)
@@ -67,6 +68,7 @@ impl TradeJournal {
         .bind(trade.quantity)
         .bind(trade.pnl)
         .bind(trade.pnl_pct)
+        .bind(trade.fees)
         .bind(&trade.strategy_name)
         .bind(trade.opened_at.to_rfc3339())
         .bind(trade.closed_at.to_rfc3339())
@@ -103,7 +105,7 @@ impl TradeJournal {
 
     pub async fn get_trades(&self, limit: i64) -> Result<Vec<TradeRecord>, sqlx::Error> {
         let rows = sqlx::query(
-            "SELECT id, pair, side, entry_price, exit_price, quantity, pnl, pnl_pct, strategy_name, opened_at, closed_at, notes FROM trades ORDER BY closed_at DESC LIMIT ?"
+            "SELECT id, pair, side, entry_price, exit_price, quantity, pnl, pnl_pct, fees, strategy_name, opened_at, closed_at, notes FROM trades ORDER BY closed_at DESC LIMIT ?"
         )
         .bind(limit)
         .fetch_all(&self.pool)
@@ -136,7 +138,7 @@ impl TradeJournal {
                 quantity: row.get("quantity"),
                 pnl: row.get("pnl"),
                 pnl_pct: row.get("pnl_pct"),
-                fees: 0.0,
+                fees: row.get::<f64, _>("fees"),
                 strategy_name: row.get("strategy_name"),
                 opened_at,
                 closed_at,

@@ -7,6 +7,7 @@ use savant_trading::backtest::engine::{run_backtest, BacktestConfig};
 use savant_trading::core::config::AppConfig;
 use savant_trading::core::shared::SharedEngineData;
 use savant_trading::data::kraken::KrakenClient;
+use savant_trading::tui::TuiApp;
 
 mod api;
 mod engine;
@@ -161,6 +162,43 @@ async fn main() -> anyhow::Result<()> {
             info!("=== SAVANT ACTION TEST ===");
             return engine::run_action_test(config, ta.category, ta.action_only, ta.count).await;
         }
+        Some("--tui") => {
+            info!("=== SAVANT TRADING ENGINE (TUI MODE) ===");
+
+            let shared = SharedEngineData::new();
+            let shared_for_tui = shared.clone();
+            let engine_running = Arc::new(AtomicBool::new(true));
+            let engine_running_clone = engine_running.clone();
+
+            // Start API server in background
+            let api_config = config.clone();
+            let api_handle = tokio::spawn(async move {
+                if let Err(e) = api::start_server(api_config, shared, engine_running_clone).await {
+                    warn!("API server error: {}", e);
+                }
+            });
+
+            // Run engine in background — store handle for clean shutdown
+            let engine_config = config.clone();
+            let engine_shared = shared_for_tui.clone();
+            let engine_handle = tokio::spawn(async move {
+                if let Err(e) = engine::run(engine_config, engine_shared, engine_running).await {
+                    warn!("Engine error: {}", e);
+                }
+            });
+
+            // Run TUI in foreground
+            let mut tui = TuiApp::new(shared_for_tui, &config);
+            if let Err(e) = tui.run().await {
+                warn!("TUI error: {}", e);
+            }
+
+            // Shut down engine + API server when TUI exits
+            engine_handle.abort();
+            api_handle.abort();
+            info!("SAVANT TUI closed — engine + API stopped.");
+            return Ok(());
+        }
         Some("--help") | Some("-h") => {
             print_help();
             return Ok(());
@@ -255,6 +293,7 @@ fn print_help() {
     println!();
     println!("USAGE:");
     println!("  savant                    Start trading engine + API server");
+    println!("  savant --tui              Start with full-screen multi-tab TUI");
     println!("  savant --dry-run          One AI decision cycle, full pipeline");
     println!("  savant --api-only         REST API server only");
     println!("  savant backtest           Backtest on historical data");

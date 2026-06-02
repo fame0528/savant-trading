@@ -7,15 +7,21 @@ credentials.json
 
 # === Agent runtime state ===
 dev/session-summaries/
-dev/findings/
+dev/fids/archive/
+dev/fids/
 dev/plans/
 dev/baselines/
 
-# Keep LEARNINGS.md tracked — cross-session knowledge
+# Keep FIDs and LEARNINGS.md tracked
+!dev/fids/*.md
 !dev/LEARNINGS.md
+
+# === Session logs (huge, do not track) ===
+session-ses_*.md
 
 # === Build artifacts ===
 /target
+/dist
 *.o
 *.d
 
@@ -28,9 +34,13 @@ dev/baselines/
 /logs/
 tick_candles_*.json
 
-# === Knowledge source books (1.8GB, too large for git) ===
+# === Knowledge source books and extracted (large, not code) ===
 knowledge/books/
 knowledge/_backup/
+knowledge/extracted/
+
+# === Raw trade data (100+ CSV files, not code) ===
+trade-data/
 
 # === Firebase ===
 firebase-debug.log
