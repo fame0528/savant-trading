@@ -254,45 +254,78 @@ fn parse_kraken_futures(response: &KrakenFuturesResponse, symbol: &str) -> Fundi
     FundingData::default()
 }
 
-/// Fetch funding data for multiple symbols at once (single API call).
+/// Fetch funding data for multiple symbols at once.
+///
+/// Tries OKX first (per-symbol), falls back to Kraken (single API call for all).
+/// Applies range validation to all results.
 pub async fn fetch_funding_multi(
     client: &reqwest::Client,
     symbols: &[String],
 ) -> Vec<(String, FundingData)> {
-    match client
-        .get("https://futures.kraken.com/derivatives/api/v3/tickers")
-        .send()
-        .await
-    {
-        Ok(resp) => {
-            if !resp.status().is_success() {
-                warn!("Kraken Futures API returned HTTP {}", resp.status());
-                return symbols
-                    .iter()
-                    .map(|s| (s.clone(), FundingData::default()))
-                    .collect();
-            }
+    // Try OKX for each symbol first
+    let mut results: Vec<(String, FundingData)> = Vec::new();
+    let mut okx_misses: Vec<String> = Vec::new();
 
-            match resp.json::<KrakenFuturesResponse>().await {
-                Ok(data) => symbols
-                    .iter()
-                    .map(|s| (s.clone(), parse_kraken_futures(&data, s)))
-                    .collect(),
-                Err(e) => {
-                    warn!("Kraken Futures parse error: {}", e);
-                    symbols
-                        .iter()
-                        .map(|s| (s.clone(), FundingData::default()))
-                        .collect()
+    for symbol in symbols {
+        if let Some(data) = fetch_okx_funding(client, symbol).await {
+            results.push((symbol.clone(), data));
+        } else {
+            okx_misses.push(symbol.clone());
+        }
+    }
+
+    // Fetch Kraken for any that missed OKX
+    if !okx_misses.is_empty() {
+        match client
+            .get("https://futures.kraken.com/derivatives/api/v3/tickers")
+            .send()
+            .await
+        {
+            Ok(resp) => {
+                if !resp.status().is_success() {
+                    warn!("Kraken Futures API returned HTTP {}", resp.status());
+                    for s in &okx_misses {
+                        results.push((s.clone(), FundingData::default()));
+                    }
+                } else {
+                    match resp.json::<KrakenFuturesResponse>().await {
+                        Ok(data) => {
+                            for s in &okx_misses {
+                                let parsed = parse_kraken_futures(&data, s);
+                                // Range validation — reject garbage values
+                                if let Some(fr) = parsed.funding_rate {
+                                    if !(FUNDING_RATE_MIN..=FUNDING_RATE_MAX).contains(&fr) {
+                                        warn!(
+                                            "Kraken funding {:.4}% outside [{}, {}] — rejecting {}",
+                                            fr * 100.0,
+                                            FUNDING_RATE_MIN * 100.0,
+                                            FUNDING_RATE_MAX * 100.0,
+                                            s
+                                        );
+                                        results.push((s.clone(), FundingData::default()));
+                                        continue;
+                                    }
+                                }
+                                results.push((s.clone(), parsed));
+                            }
+                        }
+                        Err(e) => {
+                            warn!("Kraken Futures parse error: {}", e);
+                            for s in &okx_misses {
+                                results.push((s.clone(), FundingData::default()));
+                            }
+                        }
+                    }
+                }
+            }
+            Err(e) => {
+                warn!("Kraken Futures request failed: {}", e);
+                for s in &okx_misses {
+                    results.push((s.clone(), FundingData::default()));
                 }
             }
         }
-        Err(e) => {
-            warn!("Kraken Futures request failed: {}", e);
-            symbols
-                .iter()
-                .map(|s| (s.clone(), FundingData::default()))
-                .collect()
-        }
     }
+
+    results
 }

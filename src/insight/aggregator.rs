@@ -337,15 +337,22 @@ impl InsightAggregator {
             self.cached.news = news_data;
         }
 
-        // RSS feeds (circuit breaker: disable if zero items returned)
+        // RSS feeds — capped with source diversity
         if self.config.rss_enabled && !self.rss_disabled {
-            let mut items = rss::fetch_all_feeds(&self.client).await;
+            let pair_strings: Vec<String> = symbols.to_vec();
+            let items =
+                rss::fetch_all_feeds_capped(&self.client, self.config.rss_max_items, &pair_strings)
+                    .await;
             if items.is_empty() {
                 self.rss_disabled = true;
                 info!("RSS feeds disabled (no items)");
             } else {
-                let pair_strings: Vec<String> = symbols.to_vec();
-                rss::score_relevance(&mut items, &pair_strings);
+                // Relevance already scored in fetch_all_feeds_capped
+                info!(
+                    "RSS: {} items (capped at {})",
+                    items.len(),
+                    self.config.rss_max_items
+                );
             }
             self.cached.rss_items = items;
         }
