@@ -96,6 +96,49 @@ async fn main() -> anyhow::Result<()> {
             info!("=== SAVANT BACKTEST ===");
             return run_backtest_cmd(&config).await;
         }
+        Some("tick-data") => {
+            let data_dir = args
+                .get(2)
+                .cloned()
+                .unwrap_or_else(|| "data/kraken_ticks".to_string());
+            let pair = args
+                .get(3)
+                .cloned()
+                .unwrap_or_else(|| "BTC/USD".to_string());
+            info!(
+                "=== PROCESSING TICK DATA ===\nDir: {}\nPair: {}",
+                data_dir, pair
+            );
+            match savant_trading::data::tick_data::process_tick_data(&data_dir, &pair, 5) {
+                Ok(dataset) => {
+                    println!("Tick data processed successfully:");
+                    println!("  Pair: {}", dataset.pair);
+                    println!("  Ticks: {}", dataset.tick_count);
+                    println!(
+                        "  Candles: {} ({}m)",
+                        dataset.candle_count, dataset.interval_minutes
+                    );
+                    println!(
+                        "  Date range: {} to {}",
+                        chrono::DateTime::from_timestamp(dataset.start_ts, 0)
+                            .map(|d| d.format("%Y-%m-%d").to_string())
+                            .unwrap_or_else(|| "unknown".to_string()),
+                        chrono::DateTime::from_timestamp(dataset.end_ts, 0)
+                            .map(|d| d.format("%Y-%m-%d").to_string())
+                            .unwrap_or_else(|| "unknown".to_string()),
+                    );
+                    println!(
+                        "  Cached to: data/tick_candles_{}_5m.json",
+                        pair.replace('/', "_")
+                    );
+                }
+                Err(e) => {
+                    eprintln!("Tick data processing failed: {}", e);
+                    std::process::exit(1);
+                }
+            }
+            return Ok(());
+        }
         Some("--test") => {
             let ta = parse_test_args(&args);
             if ta.sandbox {

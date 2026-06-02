@@ -12,4 +12,5 @@ pub mod indicators;
 pub mod kraken;
 pub mod market_data;
 pub mod orderbook;
+pub mod tick_data;
 pub mod websocket;
