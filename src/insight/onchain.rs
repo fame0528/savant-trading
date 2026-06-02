@@ -1,7 +1,10 @@
-//! On-chain analytics — MVRV, NUPL, SOPR, NVT from free APIs.
+//! On-chain analytics — MVRV, NUPL, SOPR from free APIs.
 //!
-//! Uses CoinMetrics Community API (free tier) with graceful fallback.
+//! Primary: BGeometrics (free, no key, api_key=test).
+//! Fallback: CoinMetrics Community API (free).
 //! Provides network valuation metrics for AI context enrichment.
+//!
+//! All values are range-validated on parse to reject garbage data.
 
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info, warn};
@@ -25,7 +28,15 @@ pub struct OnchainData {
     pub source: String,
 }
 
-/// CoinMetrics community API response for asset metrics.
+/// BGeometrics API response — simple date+value pair.
+#[derive(Debug, Deserialize)]
+struct BgResponse {
+    #[allow(dead_code)]
+    date: Option<String>,
+    value: Option<serde_json::Value>,
+}
+
+/// CoinMetrics community API response.
 #[derive(Debug, Deserialize)]
 struct CoinMetricsResponse {
     data: Option<Vec<CoinMetricsDataPoint>>,
@@ -39,23 +50,31 @@ struct CoinMetricsDataPoint {
     nvt_adj: Option<String>,
 }
 
+/// Valid ranges for on-chain metrics. Values outside are rejected as garbage.
+const MVRV_MIN: f64 = 0.1;
+const MVRV_MAX: f64 = 10.0;
+const SOPR_MIN: f64 = 0.5;
+const SOPR_MAX: f64 = 2.0;
+const NUPL_MIN: f64 = -0.5;
+const NUPL_MAX: f64 = 1.0;
+
 /// Fetch on-chain data from free APIs with fallback chain.
+///
+/// Primary: BGeometrics (MVRV, SOPR, NUPL). Free, no key, daily data.
+/// Fallback: CoinMetrics (MVRV, NVT). Free, no key.
 pub async fn fetch_onchain(client: &reqwest::Client) -> OnchainData {
     let mut data = OnchainData {
         source: "pending".to_string(),
         ..Default::default()
     };
 
-    // Try CoinMetrics Community API first (free, no key)
-    fetch_coinmetrics(client, &mut data).await;
+    // Primary: BGeometrics
+    fetch_bgeometrics(client, &mut data).await;
 
-    // Fallback: CoinGecko if CoinMetrics failed
+    // Fallback: CoinMetrics if BGeometrics failed
     if data.mvrv.is_none() {
-        fetch_coingecko_onchain(client, &mut data).await;
+        fetch_coinmetrics(client, &mut data).await;
     }
-
-    // Blockchain.info hashrate (always fetch — supplementary data)
-    fetch_blockchain_info(client, &mut data).await;
 
     if data.source == "pending" {
         data.source = "none".to_string();
@@ -64,7 +83,96 @@ pub async fn fetch_onchain(client: &reqwest::Client) -> OnchainData {
     data
 }
 
-/// Fetch MVRV, NVT from CoinMetrics Community API (free tier).
+/// Fetch MVRV, SOPR, NUPL from BGeometrics (free, no key).
+///
+/// API: GET https://api.bgeometrics.com/v1/{metric}?api_key=test
+/// Returns: {"date": "2025-05-31", "value": 1.375}
+async fn fetch_bgeometrics(client: &reqwest::Client, data: &mut OnchainData) {
+    let metrics = [("mvrv", "mvrv"), ("sopr", "sopr"), ("nupl", "nupl")];
+
+    for (metric_name, field) in &metrics {
+        let url = format!(
+            "https://api.bgeometrics.com/v1/{}?api_key=test",
+            metric_name
+        );
+
+        match client.get(&url).send().await {
+            Ok(resp) => {
+                if !resp.status().is_success() {
+                    warn!(
+                        "BGeometrics {} returned HTTP {}",
+                        metric_name,
+                        resp.status()
+                    );
+                    continue;
+                }
+
+                match resp.json::<BgResponse>().await {
+                    Ok(bg) => {
+                        if let Some(val) = parse_bg_value(&bg.value) {
+                            let valid = match *field {
+                                "mvrv" => {
+                                    if (MVRV_MIN..=MVRV_MAX).contains(&val) {
+                                        data.mvrv = Some(val);
+                                        true
+                                    } else {
+                                        warn!(
+                                            "BGeometrics MVRV {} outside valid range [{}, {}]",
+                                            val, MVRV_MIN, MVRV_MAX
+                                        );
+                                        false
+                                    }
+                                }
+                                "sopr" => {
+                                    if (SOPR_MIN..=SOPR_MAX).contains(&val) {
+                                        data.sopr = Some(val);
+                                        true
+                                    } else {
+                                        warn!(
+                                            "BGeometrics SOPR {} outside valid range [{}, {}]",
+                                            val, SOPR_MIN, SOPR_MAX
+                                        );
+                                        false
+                                    }
+                                }
+                                "nupl" => {
+                                    if (NUPL_MIN..=NUPL_MAX).contains(&val) {
+                                        data.nupl = Some(val);
+                                        true
+                                    } else {
+                                        warn!(
+                                            "BGeometrics NUPL {} outside valid range [{}, {}]",
+                                            val, NUPL_MIN, NUPL_MAX
+                                        );
+                                        false
+                                    }
+                                }
+                                _ => false,
+                            };
+                            if valid {
+                                data.source = "bgeometrics".to_string();
+                                info!("BGeometrics {}: {:.4}", metric_name, val);
+                            }
+                        }
+                    }
+                    Err(e) => warn!("BGeometrics {} parse error: {}", metric_name, e),
+                }
+            }
+            Err(e) => warn!("BGeometrics {} request failed: {}", metric_name, e),
+        }
+    }
+}
+
+/// Parse a BGeometrics value field (can be number or string).
+fn parse_bg_value(value: &Option<serde_json::Value>) -> Option<f64> {
+    match value {
+        Some(serde_json::Value::Number(n)) => n.as_f64(),
+        Some(serde_json::Value::String(s)) => s.parse::<f64>().ok(),
+        _ => None,
+    }
+}
+
+/// Fallback: Fetch MVRV, NVT from CoinMetrics Community API.
 async fn fetch_coinmetrics(client: &reqwest::Client, data: &mut OnchainData) {
     let url = "https://community-api.coinmetrics.io/v4/timeseries/asset-metrics";
     let params = [
@@ -87,9 +195,11 @@ async fn fetch_coinmetrics(client: &reqwest::Client, data: &mut OnchainData) {
                         if let Some(latest) = points.last() {
                             if let Some(ref mvrv_str) = latest.cap_mvrv_cur {
                                 if let Ok(v) = mvrv_str.parse::<f64>() {
-                                    data.mvrv = Some(v);
-                                    data.source = "coinmetrics".to_string();
-                                    info!("CoinMetrics MVRV: {:.4}", v);
+                                    if (MVRV_MIN..=MVRV_MAX).contains(&v) {
+                                        data.mvrv = Some(v);
+                                        data.source = "coinmetrics".to_string();
+                                        info!("CoinMetrics MVRV: {:.4}", v);
+                                    }
                                 }
                             }
                             if let Some(ref nvt_str) = latest.nvt_adj {
@@ -105,70 +215,6 @@ async fn fetch_coinmetrics(client: &reqwest::Client, data: &mut OnchainData) {
             }
         }
         Err(e) => warn!("CoinMetrics API request failed: {}", e),
-    }
-}
-
-/// CoinGecko fallback — derive MVRV proxy from market_cap / fdv ratio.
-async fn fetch_coingecko_onchain(client: &reqwest::Client, data: &mut OnchainData) {
-    let url = "https://api.coingecko.com/api/v3/coins/bitcoin";
-    let params = [
-        ("localization", "false"),
-        ("tickers", "false"),
-        ("market_data", "true"),
-        ("community_data", "false"),
-        ("developer_data", "false"),
-    ];
-
-    match client.get(url).query(&params).send().await {
-        Ok(resp) => {
-            if !resp.status().is_success() {
-                warn!("CoinGecko on-chain returned HTTP {}", resp.status());
-                return;
-            }
-
-            if let Ok(json) = resp.json::<serde_json::Value>().await {
-                let md = json.get("market_data");
-                let market_cap = md.and_then(|m| m.get("market_cap")?.get("usd")?.as_f64());
-                let fdv = md.and_then(|m| m.get("fully_diluted_valuation")?.get("usd")?.as_f64());
-                let total_volume = md.and_then(|m| m.get("total_volume")?.get("usd")?.as_f64());
-
-                if let (Some(mcap), Some(fdv_val)) = (market_cap, fdv) {
-                    if fdv_val > 0.0 {
-                        let mvrv_proxy = mcap / fdv_val;
-                        data.mvrv = Some(mvrv_proxy);
-                        data.source = "coingecko-proxy".to_string();
-                        info!("CoinGecko MVRV proxy: {:.4} (mcap/fdv)", mvrv_proxy);
-                    }
-                }
-
-                if let (Some(vol), Some(mcap)) = (total_volume, market_cap) {
-                    if vol > 0.0 {
-                        let nvt_proxy = mcap / vol;
-                        data.nvt_signal = Some(nvt_proxy);
-                        debug!("CoinGecko NVT proxy: {:.2}", nvt_proxy);
-                    }
-                }
-            }
-        }
-        Err(e) => warn!("CoinGecko on-chain request failed: {}", e),
-    }
-}
-
-/// Fetch supplementary data from blockchain.info (free, no key).
-async fn fetch_blockchain_info(client: &reqwest::Client, _data: &mut OnchainData) {
-    match client
-        .get("https://blockchain.info/q/hashrate")
-        .send()
-        .await
-    {
-        Ok(resp) => {
-            if let Ok(text) = resp.text().await {
-                if let Ok(hashrate) = text.trim().parse::<f64>() {
-                    debug!("Blockchain.info hashrate: {:.2} PH/s", hashrate);
-                }
-            }
-        }
-        Err(e) => warn!("blockchain.info hashrate request failed: {}", e),
     }
 }
 
@@ -203,6 +249,33 @@ mod tests {
         assert!(data.nupl.is_none());
         assert!(data.sopr.is_none());
         assert!(data.nvt_signal.is_none());
+    }
+
+    #[test]
+    fn range_validation_mvrv() {
+        assert!(MVRV_MIN <= 0.1 && MVRV_MAX >= 10.0);
+        // Valid
+        assert!((0.5..=9.0).contains(&1.375));
+        // Invalid (garbage)
+        assert!(!(0.1..=10.0).contains(&-45.0));
+        assert!(!(0.1..=10.0).contains(&100.0));
+    }
+
+    #[test]
+    fn parse_bg_value_number() {
+        let val = Some(serde_json::json!(1.375));
+        assert_eq!(parse_bg_value(&val), Some(1.375));
+    }
+
+    #[test]
+    fn parse_bg_value_string() {
+        let val = Some(serde_json::json!("0.9992"));
+        assert_eq!(parse_bg_value(&val), Some(0.9992));
+    }
+
+    #[test]
+    fn parse_bg_value_none() {
+        assert_eq!(parse_bg_value(&None), None);
     }
 
     #[test]

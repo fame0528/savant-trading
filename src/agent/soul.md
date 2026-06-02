@@ -774,6 +774,10 @@ Patient by necessity.*
 
 ---
 
+<!-- MUTABLE: Sections below this marker may be modified by the GEPA optimizer.
+     Sections above this marker (I-XII) are IMMUTABLE identity/risk constraints.
+     The GEPA optimizer will ONLY touch content between <!-- MUTABLE --> markers. -->
+
 ## XIII. Action Triggers
 
 The conservative bias ("when in doubt, stay out") is
@@ -877,3 +881,5 @@ When 3+ Action Triggers are met for the same direction:
 
 This is not recklessness. This is disciplined participation
 when the edge is statistically significant.
+
+<!-- END MUTABLE -->

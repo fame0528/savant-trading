@@ -6,6 +6,7 @@
 //! - `indicators` — Technical indicators (EMA, SMA, RSI, ATR, ADX, VWAP, Volume Profile)
 //! - `websocket` — Kraken WebSocket v2 client for real-time data
 
+pub mod cache;
 pub mod indicators;
 pub mod kraken;
 pub mod market_data;

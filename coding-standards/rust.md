@@ -1,5 +1,6 @@
 # Rust Coding Standards
-# Load this when protocol.config.yaml has language: "rust"
+
+<!-- Load this when protocol.config.yaml has language: "rust" -->
 
 ## Naming Conventions
 
@@ -21,18 +22,22 @@
 ## Patterns
 
 ### Error Handling
+
 - Use `Result<T, E>` for all fallible operations
-- Never use `unwrap()` in library code — use `?` operator or `.expect("reason")`
+- Never use `unwrap()` or `expect()` in non-test code — use `?` operator, `match`, or explicit error types
+- `.expect("reason")` is acceptable only in tests, examples, and `main.rs` where panicking is the intended behavior
 - Define project-specific error types using `thiserror`
 - Use `anyhow` for application-level error propagation
 
 ### Ownership
+
 - Prefer borrowing (`&T`) over cloning
 - Use `Arc<Mutex<T>>` for shared mutable state
 - Use `Rc<T>` for single-threaded shared ownership
 - Document lifetime elision decisions in complex cases
 
 ### Imports
+
 - Group: std → external crates → local modules
 - One blank line between groups
 - Prefer explicit imports over glob (`use module::*`)
@@ -40,7 +45,7 @@
 
 ## File Structure
 
-```
+```text
 src/
 ├── main.rs          # Entry point only
 ├── lib.rs           # Public API surface
@@ -61,3 +66,13 @@ src/
 - [ ] `Box<dyn Error>` instead of typed errors
 - [ ] Dead code (unused functions/imports)
 - [ ] `todo!()` or `unimplemented!()` without FID reference
+
+## Quality Overrides
+
+These override the defaults in `protocol.config.yaml` when Rust is the configured language.
+
+| Setting | Default | Rust Override | Reason |
+|---------|---------|---------------|--------|
+| `max_file_lines` | 300 | 300 | — |
+| `max_function_lines` | 50 | 50 | — |
+| `max_line_length` | 100 | 100 | — |

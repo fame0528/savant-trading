@@ -1,6 +1,6 @@
 # Session Summary: YYYY-MM-DD HH:MM
 
-**Session ID:** YYYY-MMDD-HHMM-[short-description]
+**Session ID:** YYYY-MM-DD-HHMM-[short-description]
 **Duration:** [Start time] — [End time]
 **Status:** active | completed | interrupted
 
@@ -9,16 +9,19 @@
 ## Initial State
 
 ### Environment
+
 - **OS:** [OS and version]
 - **Language/Runtime:** [Language and version]
 - **Branch:** [Git branch]
 - **Last Commit:** [SHA and message]
 
 ### Known Issues
+
 - [Issue 1 from previous session]
 - [Issue 2 from previous session]
 
 ### Dependencies
+
 - [External dependency status]
 
 ---
@@ -34,6 +37,7 @@
 ## Work Completed
 
 ### Task 1: [Description]
+
 - **Status:** completed | in-progress | blocked
 - **FIDs Created:** [FID references]
 - **Changes Made:**
@@ -41,6 +45,7 @@
 - **Verification:** [How it was verified]
 
 ### Task 2: [Description]
+
 - **Status:** completed | in-progress | blocked
 - **FIDs Created:** [FID references]
 - **Changes Made:**
@@ -52,11 +57,13 @@
 ## Issues Discovered
 
 ### Issue 1: [Description]
+
 - **Severity:** critical | high | medium | low
 - **FID:** [FID reference]
 - **Status:** open | investigating | resolved
 
 ### Issue 2: [Description]
+
 - **Severity:** critical | high | medium | low
 - **FID:** [FID reference]
 - **Status:** open | investigating | resolved
@@ -84,12 +91,14 @@
 ## Final State
 
 ### Code Changes
+
 - **Files Modified:** [count]
 - **Lines Added:** [count]
 - **Lines Removed:** [count]
 - **Net Change:** [+/- count]
 
 ### Git Status
+
 - **Branch:** [branch]
 - **Uncommitted Changes:** [yes/no]
 - **New Commits:** [list SHAs]
@@ -113,11 +122,14 @@
 ## Next Session
 
 ### Priority Tasks
+
 1. [ ] [Next task 1]
 2. [ ] [Next task 2]
 
 ### Blockers
+
 - [Blocker 1]
 
 ### Notes for Next Agent
+
 - [Important context]

@@ -1,4 +1,4 @@
-﻿[
+[
   {
     "id": "fund-001",
     "source": "graham-intelligent-investor",
@@ -11,7 +11,7 @@
       "ExtremeGreed"
     ],
     "content": "Mr. Market is your servant not your master. The market offers to buy or sell shares daily at different prices. You are free to accept or ignore. Most of the time doing nothing is wisest. Treat price fluctuations as opportunities not threats.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:swing",
@@ -32,7 +32,7 @@
       "ExtremeFear"
     ],
     "content": "Margin of safety: never buy a security unless price is 25-30% below conservatively calculated intrinsic value. This buffer protects against analytical errors, bad luck, and market volatility. The central concept of investing.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -54,7 +54,7 @@
       "ExtremeFear"
     ],
     "content": "Short run market is a voting machine (popularity), long run it is a weighing machine (fundamental value). Focus on weighing. Do not let short-term price action influence long-term investment decisions.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -75,7 +75,7 @@
       "HighVolatility"
     ],
     "content": "The investor chief problem and worst enemy is likely himself. Emotional discipline trumps analytical ability. Develop sound intellectual framework and keep emotions from corroding it.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -95,7 +95,7 @@
       "ExtremeFear"
     ],
     "content": "If you own stocks you will see values drop 30-50% multiple times in your investing lifetime. This is normal. Prepare psychologically and financially. Declines are opportunities not existential threats.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -115,7 +115,7 @@
       "ExtremeGreed"
     ],
     "content": "Never borrow to buy stocks on margin. Leverage converts safe investment into dangerous speculation. The intelligent investor never needs margin to achieve satisfactory returns.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -135,7 +135,7 @@
       "ExtremeGreed"
     ],
     "content": "When euphoric increase bonds. When depressed increase stocks. The crowd is usually wrong at extremes. Use sentiment as a contrarian allocation signal, not a timing tool.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -155,7 +155,7 @@
       "Ranging"
     ],
     "content": "Six stock categories: (1) Slow growers 2-4% (2) Stalwarts 10-12% (3) Fast growers 20-25% small aggressive (4) Cyclicals tied to business cycle (5) Turnarounds near-bankruptcy recovery (6) Asset plays hidden valuable assets. Each requires different strategy.",
-    "priority": 5,
+    "priority": 4,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -176,7 +176,7 @@
       "LowVolatility"
     ],
     "content": "PEG ratio: P/E divided by expected earnings growth rate. PEG below 1.0 undervalued, 1.0 fair, above 1.0 overvalued. Single best valuation metric for growth stocks. Never overpay for growth.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -196,7 +196,7 @@
       "Ranging"
     ],
     "content": "Invest in what you know. Average investors find great stocks years before professionals by observing everyday life: restaurants, stores, products used. Your edge is personal experience and ground-level observation.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -216,7 +216,7 @@
       "Ranging"
     ],
     "content": "Circle of competence: only invest in businesses you understand. Know boundaries of what you know and do not. Stay within your circle. Size of circle does not matter, knowing its boundaries does.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -236,7 +236,7 @@
       "Ranging"
     ],
     "content": "Business tenet 1: is the business simple and understandable? You should understand how the company makes money, its competitive position, and industry dynamics in plain terms.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -256,7 +256,7 @@
       "Ranging"
     ],
     "content": "Business tenet 3: favorable long-term prospects. Key is economic moats - durable competitive advantages: brand identity, patent protection, cost advantages, switching costs, network effects.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -276,7 +276,7 @@
       "Ranging"
     ],
     "content": "Four moat types: (1) intangible assets brands patents licenses (2) switching costs (3) network effects (4) cost advantages from process location scale. Evaluate moat durability over 10+ years.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -296,7 +296,7 @@
       "Ranging"
     ],
     "content": "Owner earnings = net income + depreciation - capex. True cash flow available to owners. Ignore reported EPS without adjusting for maintenance capex. This is what the business actually earns.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:yield",
       "timeframe:flexible",
@@ -317,7 +317,7 @@
       "LowVolatility"
     ],
     "content": "Look for consistently high ROE with low debt. High ROE with little leverage indicates genuine competitive advantage. High ROE with high leverage is a red flag masquerading as quality.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -337,7 +337,7 @@
       "Ranging"
     ],
     "content": "Calculate intrinsic value using discounted cash flow. Use 10-year Treasury rate as discount rate. Higher rate = lower value. DCF is gold standard for business valuation.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -358,7 +358,7 @@
       "HighVolatility"
     ],
     "content": "Buy at significant discount to intrinsic value. Margin of safety is non-negotiable. Wonderful company at fair price beats fair company at wonderful price. Quality + Value = Optimal.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -378,7 +378,7 @@
       "ExtremeGreed"
     ],
     "content": "Be fearful when others greedy and greedy when others fearful. Maximum pessimism = best buying. Maximum optimism = best selling. Requires extreme emotional discipline.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -399,7 +399,7 @@
       "HighVolatility"
     ],
     "content": "Think of stocks as businesses not ticker symbols. Buying fractional ownership in real business with real assets and earnings. This mindset eliminates most emotional trading mistakes.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -419,7 +419,7 @@
       "ExtremeFear"
     ],
     "content": "Rule 1: Never lose money. Rule 2: Never forget Rule 1. Preserving capital is paramount. A 50% loss requires 100% gain to recover. Asymmetric math demands capital preservation first.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -439,7 +439,7 @@
       "ExtremeGreed"
     ],
     "content": "Never use leverage. Borrowed money is how smart people go broke. Even at 99-to-1 odds the 1% event wipes you out if leveraged. Patience replaces leverage as the accelerator.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -459,7 +459,7 @@
       "Ranging"
     ],
     "content": "Scuttlebutt research: talk to competitors, suppliers, customers, former employees, industry experts to build comprehensive company picture before investing. Go far beyond annual reports and filings.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -480,7 +480,7 @@
       "HighVolatility"
     ],
     "content": "Buy and hold for decades. Do not sell for market declines, short-term earnings misses, or recessions. Sell only when: analysis was wrong, management deteriorated, or business fundamentally changed.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -501,7 +501,7 @@
       "HighVolatility"
     ],
     "content": "5-Step Process: (1) Set clear goals (2) Identify problems preventing goals (3) Diagnose root causes (4) Design solutions (5) Execute. Iterative process applies to trading investing and all of life.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -522,7 +522,7 @@
       "ExtremeGreed"
     ],
     "content": "Embrace reality and deal with it. Do not let wishes or fears distort perception. Pain + Reflection = Progress. Every mistake reveals a principle you are missing. Study failures systematically.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -543,7 +543,7 @@
       "HighVolatility"
     ],
     "content": "Be radically open-minded. Biggest threat is your own blind spots. Actively seek best opposing arguments. If you cannot articulate the other side better than they can, you are not thinking clearly.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -563,7 +563,7 @@
       "Ranging"
     ],
     "content": "Believability-weighted decisions: weight opinions by track record. Someone who succeeded 3+ times is more believable than a theorist. Give more weight to credible voices in all decisions.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -585,7 +585,7 @@
       "LowVolatility"
     ],
     "content": "Systematic decision-making: convert principles into algorithms and rules. Test historically. Follow mechanically. This removes emotion and ensures consistency across all market conditions.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -607,7 +607,7 @@
       "LowVolatility"
     ],
     "content": "Everything cycles. Economies cycle between expansion and contraction. Markets cycle between greed and fear. Credit cycles drive most movements. Know where you are in the cycle to position correctly.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -628,7 +628,7 @@
       "HighVolatility"
     ],
     "content": "Holy grail of investing: 15-20 uncorrelated return streams. Reduces risk 80% without reducing expected return. Find assets and strategies that zig when others zag. Correlation is the enemy.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -650,7 +650,7 @@
       "LowVolatility"
     ],
     "content": "All-Weather concept: 30% stocks 40% long bonds 15% intermediate bonds 7.5% gold 7.5% commodities. Balance performs in all economic environments: growth/inflation up or down.",
-    "priority": 4,
+    "priority": 5,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -672,7 +672,7 @@
       "LowVolatility"
     ],
     "content": "Risk parity: allocate by risk not capital. Each asset class contributes equally to portfolio risk. Bonds less volatile so hold more to equalize risk. True diversification requires equal risk contribution.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -693,7 +693,7 @@
       "HighVolatility"
     ],
     "content": "Economic machine: (1) productivity growth trend (2) long-term debt cycle 50-75 yrs (3) short-term debt cycle 5-8 yrs. Understanding position in each cycle guides optimal asset allocation.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -714,7 +714,7 @@
       "ExtremeGreed"
     ],
     "content": "Never bet the farm. Even at 99% certainty size positions so being wrong does not knock you out. Survival is prerequisite for long-term compounding of returns.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -734,7 +734,7 @@
       "ExtremeFear"
     ],
     "content": "Leverage transforms manageable risk into existential risk. Survive 1982 by not being over-leveraged. Always maintain enough liquidity to survive being wrong for extended periods. Cash is optionality.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -755,7 +755,7 @@
       "HighVolatility"
     ],
     "content": "Absolute momentum (time-series): asset has positive momentum if current price above price N months ago (typically 12). Only go long assets in uptrends. Shift to cash/bonds in downtrends.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:momentum",
       "timeframe:position",
@@ -775,7 +775,7 @@
       "Ranging"
     ],
     "content": "Relative momentum (cross-sectional): rank assets by trailing returns and buy strongest performers. Winners tend to keep winning over 3-12 month horizons. Exploit continuation of trends.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:momentum",
       "timeframe:flexible",
@@ -795,7 +795,7 @@
       "Ranging"
     ],
     "content": "Dual momentum combines both: only buy assets with positive absolute momentum AND strongest relative momentum. Filters false signals from each approach alone. Best of both worlds.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:momentum",
       "timeframe:flexible",
@@ -816,7 +816,7 @@
       "Ranging"
     ],
     "content": "Risk-managed momentum: use absolute momentum as trend filter. When risk assets in downtrend shift to safe-haven assets. Cuts maximum drawdowns dramatically while capturing most upside.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:momentum",
       "timeframe:flexible",
@@ -837,7 +837,7 @@
       "LowVolatility"
     ],
     "content": "C = Current quarterly earnings: look for 25%+ increase in current quarter EPS vs same quarter prior year. The bigger the acceleration the better. This is the single most important earnings signal.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -858,7 +858,7 @@
       "LowVolatility"
     ],
     "content": "A = Annual earnings growth: look for 25%+ annual EPS growth over past 3-5 years. ROE should be 17%+ annually. Consistency matters. Avoid companies with erratic or declining annual earnings.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -878,7 +878,7 @@
       "Ranging"
     ],
     "content": "N = New: newer companies, new products, new management, new price highs. Innovation drives stock performance. Buy stocks making new highs off properly formed bases not new lows.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -899,7 +899,7 @@
       "HighVolatility"
     ],
     "content": "S = Supply and demand: daily trading volume should increase significantly on up days and decrease on down days. Big volume demand at key price points signals institutional accumulation.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:swing",
@@ -919,7 +919,7 @@
       "Ranging"
     ],
     "content": "L = Leader or laggard: use Relative Strength (RS) rating to identify leaders. Buy stocks with RS 80 or above (top 20% of performers). Avoid laggards with low RS. Industry group strength matters too.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -940,7 +940,7 @@
       "LowVolatility"
     ],
     "content": "I = Institutional sponsorship: look for stocks with increasing institutional ownership by top-performing funds. At least 3-5 institutional sponsors needed. Avoid stocks with declining institutional interest.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -962,7 +962,7 @@
       "LowVolatility"
     ],
     "content": "M = Market direction: determine the general market trend before making any purchases. 3 out of 4 stocks follow the market direction. Do not fight the trend. Buy in confirmed uptrends sell in downtrends.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -982,7 +982,7 @@
       "Ranging"
     ],
     "content": "Cup with handle pattern: stock forms U-shaped cup (7-65 weeks) then a slight downward drift (handle). Buy on breakout above handle with volume 50%+ above average. Most reliable chart pattern.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:breakout",
       "timeframe:swing",
@@ -1003,7 +1003,7 @@
       "HighVolatility"
     ],
     "content": "Buy point: purchase at pivot point (10 cents above handle high) on breakout day with heavy volume. Volume should be at least 50% above average daily volume. If volume is weak the breakout will likely fail.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:breakout",
       "timeframe:swing",
@@ -1023,7 +1023,7 @@
       "ExtremeFear"
     ],
     "content": "Cut every loss at 7-8% without exception. This is the most important rule. No hoping, no praying, no averaging down. The 7-8% stop protects you from catastrophic losses that destroy portfolios.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1043,7 +1043,7 @@
       "ExtremeFear"
     ],
     "content": "Never average down on a losing position. If a stock drops 7-8% from your buy point sell immediately. Averaging down doubles your risk on a position that has already proven you wrong.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -1064,7 +1064,7 @@
       "HighVolatility"
     ],
     "content": "Follow the market averages daily. When market is in confirmed uptrend build positions. When distribution days accumulate (market down on above-average volume) get defensive. Market direction trumps all.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -1084,7 +1084,7 @@
       "Ranging"
     ],
     "content": "Investment returns come from two sources: dividends and earnings growth. Speculative returns (P/E changes) are a net zero over time. Own businesses for their earnings power not for price appreciation.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1105,7 +1105,7 @@
       "LowVolatility"
     ],
     "content": "Costs matter enormously. Every dollar paid in fees is a dollar less in returns. Over 30 years a 1% fee difference can reduce terminal wealth by 25-30%. Minimize all investment costs relentlessly.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -1125,7 +1125,7 @@
       "Ranging"
     ],
     "content": "Index funds guarantee your fair share of market returns. Active management is a zero-sum game before costs and a negative-sum game after costs. Most active managers underperform their index.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1146,7 +1146,7 @@
       "ExtremeGreed"
     ],
     "content": "Reversion to the mean: today star performers are tomorrow laggards. Hot funds cool off. Hot sectors revert. The market is brutally efficient at eliminating excess returns over time.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:mean_reversion",
       "timeframe:flexible",
@@ -1167,7 +1167,7 @@
       "HighVolatility"
     ],
     "content": "Do not just do something, stand there. The best portfolio strategy is to buy and hold a diversified low-cost index fund. Activity is the enemy of investment returns.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1187,7 +1187,7 @@
       "Ranging"
     ],
     "content": "Magic Formula: rank stocks by (1) Return on Capital (quality) and (2) Earnings Yield (cheapness). Buy 20-30 top-ranked stocks. Hold 1 year. Rebalance. Simple mechanical and effective over long periods.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:yield",
       "timeframe:flexible",
@@ -1208,7 +1208,7 @@
       "LowVolatility"
     ],
     "content": "Return on Capital = EBIT / (Net Working Capital + Net Fixed Assets). Measures how efficiently a business generates profits from its capital. Higher is better. Look for 25%+ ROC.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1228,7 +1228,7 @@
       "Ranging"
     ],
     "content": "Earnings Yield = EBIT / Enterprise Value. Measures how cheap a stock is relative to its earnings power. Higher yield means cheaper. This is better than P/E because it accounts for debt and cash.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:yield",
       "timeframe:flexible",
@@ -1249,7 +1249,7 @@
       "ExtremeFear"
     ],
     "content": "Good companies at bargain prices: the magic formula combines quality (ROC) with cheapness (EY). Buying cheap bad companies or expensive good companies both underperform. You need both.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1270,7 +1270,7 @@
       "HighVolatility"
     ],
     "content": "The formula will underperform for 1-3 year periods. Most people cannot tolerate this and quit before the long-term edge materializes. Patience is the most important ingredient in formula investing.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -1290,7 +1290,7 @@
       "Ranging"
     ],
     "content": "Rule 1: Do your homework. Never buy a stock without understanding the business model, competitive landscape, financial health, and valuation. Lazy research leads to painful losses.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1310,7 +1310,7 @@
       "Ranging"
     ],
     "content": "Economic moats: sustainable competitive advantages that protect returns on capital. Wide moat = 10+ years of protected profitability. Narrow moat = 5-10 years. No moat = commodity business to avoid.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -1330,7 +1330,7 @@
       "Ranging"
     ],
     "content": "Five moat sources: (1) intangible assets (2) switching costs (3) network effects (4) cost advantages (5) efficient scale. Each creates barriers that prevent competitors from eroding profits.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1350,7 +1350,7 @@
       "Ranging"
     ],
     "content": "Rule 2: Find economic moat. Companies without moats are commodities competing on price alone. Only moat companies can sustain above-average returns on capital over long periods.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1370,7 +1370,7 @@
       "Ranging"
     ],
     "content": "Rule 3: Have a margin of safety. Even the best company is a bad investment at the wrong price. Valuation matters. Buy when price is below your estimate of fair value by at least 20-30%.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1392,7 +1392,7 @@
       "BtcDominant"
     ],
     "content": "Three cryptoasset categories: (1) Currencies (Bitcoin Litecoin) store of value and medium of exchange (2) Platforms (Ethereum) for building decentralized applications (3) Utility tokens for specific network services.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1413,7 +1413,7 @@
       "HalvingProximity"
     ],
     "content": "Bitcoin valuation framework: Metcalfe Law states network value proportional to square of active users. As Bitcoin adoption grows its value increases exponentially not linearly. Track active addresses as key metric.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1435,7 +1435,7 @@
       "BtcDominant"
     ],
     "content": "Bitcoin is digital gold: fixed supply cap of 21 million coins, predictable issuance schedule, decentralized network, censorship-resistant. Store of value thesis strengthened by halving events reducing supply inflation.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1456,7 +1456,7 @@
       "Ranging"
     ],
     "content": "Halving cycle: Bitcoin halving every ~4 years reduces block reward by 50%. Historically followed by major bull runs 12-18 months post-halving as reduced supply meets growing demand.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -1476,7 +1476,7 @@
       "ExtremeFear"
     ],
     "content": "Never invest more in crypto than you can afford to lose completely. Crypto is a high-risk high-reward asset class. Assume any individual position could go to zero and size accordingly.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -1497,7 +1497,7 @@
       "HighVolatility"
     ],
     "content": "The 2% rule: never risk more than 2% of total capital on a single trade. This preserves capital during losing streaks and allows 50+ consecutive losses before ruin. Professional standard.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1518,7 +1518,7 @@
       "HighVolatility"
     ],
     "content": "Position sizing formula: Position Size = (Account x Risk%) / (Entry - Stop). This mathematical approach ensures consistent risk regardless of asset price or volatility. Apply before every trade.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -1559,7 +1559,7 @@
       "ExtremeGreed"
     ],
     "content": "Trading success is 80% psychology 20% methodology. The best strategy fails if you cannot execute consistently. Master your emotions before optimizing your system. Mindset is the edge.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1580,7 +1580,7 @@
       "HighVolatility"
     ],
     "content": "Five fundamental truths: (1) Anything can happen (2) You do not need to know what happens next to make money (3) Wins and losses are randomly distributed (4) An edge is just higher probability (5) Every moment is unique.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1620,7 +1620,7 @@
       "ExtremeFear"
     ],
     "content": "Never average down. If a position moves against you your original thesis is being challenged. Adding to losers doubles risk on a losing idea. Only add to winners who have proven the thesis correct.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -1641,7 +1641,7 @@
       "HighVolatility"
     ],
     "content": "Process over outcomes. A good trade can lose money and a bad trade can make money. Judge yourself on the quality of your decision-making process not on individual trade outcomes.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1807,7 +1807,7 @@
       "ExtremeFear"
     ],
     "content": "Maximum drawdown tolerance: define your maximum acceptable drawdown before starting. If hit, stop trading and reassess. A 50% loss requires 100% gain. A 20% loss requires 25%. Prevention is easier than recovery.",
-    "priority": 3,
+    "priority": 4,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -1848,7 +1848,7 @@
       "Ranging"
     ],
     "content": "INSURANCE FLOAT: Premiums now, claims later, invest float. $1 equity ~$0.50 float. 3% cost, 13% return = compounding machine.",
-    "priority": 3,
+    "priority": 4,
     "tags": [
       "setup_type:yield",
       "timeframe:flexible",
@@ -1948,7 +1948,7 @@
       "Ranging"
     ],
     "content": "COMPOUNDING: 25.9% annual zero down years. 50% loss needs 100% gain. Protect capital above all.",
-    "priority": 3,
+    "priority": 4,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -2384,7 +2384,7 @@
       "ExtremeFear"
     ],
     "content": "GEICO CRISIS: $61 to $2. Buffett knew model sound. Bought heavily. 50x return.",
-    "priority": 3,
+    "priority": 4,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -2521,7 +2521,7 @@
       "Ranging"
     ],
     "content": "CAPE: >30=near-zero 10yr returns. <10=15%+ annually. Not timing but powerful for allocation.",
-    "priority": 3,
+    "priority": 4,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3242,7 +3242,7 @@
       "HighVolatility"
     ],
     "content": "GOLD-DOLLAR: Strong negative. Gold leads miners 1-3 days. Dollar as gold indicator.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3261,7 +3261,7 @@
       "Trending"
     ],
     "content": "CORRELATION INSTABILITY: Rolling 50/200-day. Break from strong correlation = regime change.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3281,7 +3281,7 @@
       "HighVolatility"
     ],
     "content": "GLOBAL CORRELATIONS: DAX 0.85+ Euro Stoxx 0.90+. Japan-specific events Shanghai leads. US futures as early warning.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3301,7 +3301,7 @@
       "HighVolatility"
     ],
     "content": "SOVEREIGN DEBT: Banking debt/revenue predicts default. Ireland 25x. Pattern: bubble, absorb, explode, default.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3320,7 +3320,7 @@
       "ExtremeFear"
     ],
     "content": "CDS WARNING: Greek CDS 11bp to 2300bp. >200bp=risk. Credit warns weeks/months before equities.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -3339,7 +3339,7 @@
       "ExtremeFear"
     ],
     "content": "IRELAND: Govt guaranteed all bank debt. Sovereign credit becomes banking risk. Monitor bank/GDP.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3358,7 +3358,7 @@
       "ExtremeFear"
     ],
     "content": "JAPAN: >200% debt/GDP aging savers. Savings drop, borrow internationally. Workforce shrink = inevitable.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3377,7 +3377,7 @@
       "Trending"
     ],
     "content": "TURTLE SIZING: ATR normalized. Unit=(Account x 1%)/(N x $/pt). Max 4/market, 10/direction, 12 total.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3396,7 +3396,7 @@
       "Trending"
     ],
     "content": "TURTLE ENTRY: Sys1: 20-day breakout exit 10-day. Skip if last won. Sys2: 55-day. Take all. 70% profit from 5-10 trades/yr.",
-    "priority": 2,
+    "priority": 4,
     "tags": [
       "setup_type:breakout",
       "timeframe:flexible",
@@ -3416,7 +3416,7 @@
       "HighVolatility"
     ],
     "content": "TURTLE RISK: Max 2%/trade, 12 total, 6/direction, 4/market. Correlated share limits.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3436,7 +3436,7 @@
       "HighVolatility"
     ],
     "content": "TURTLE PARADOX: Works because most cant execute. 30-40% WR. Quit during streaks = miss big winners.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3455,7 +3455,7 @@
       "Trending"
     ],
     "content": "BACKTEST TRAPS: Curve-fitting, survivorship bias, look-ahead bias, cost neglect. Out-of-sample. Simple > complex.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3475,7 +3475,7 @@
       "HighVolatility"
     ],
     "content": "DRAWDOWN: Accept 20-40%. Predefine max DD. Exceeded = reduce size 50% not abandon. Biggest trends follow biggest pain.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3494,7 +3494,7 @@
       "Trending"
     ],
     "content": "EXPECTANCY: (Win%xAW)-(Loss%xAL). 40%WR 3:1=0.60/dollar. Low WR not low profitability.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3513,7 +3513,7 @@
       "Trending"
     ],
     "content": "R-MULTIPLES: Trade as R. +3R, -1R. Removes size bias. Judge 100+ trades.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3532,7 +3532,7 @@
       "Trending"
     ],
     "content": "CORRELATION RISK: 12 diversified 0.8+=ONE bet. Crisis correlations 1.0. >0.7 reduce positions.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -3551,7 +3551,7 @@
       "Trending"
     ],
     "content": "ROBUSTNESS: Test multiple markets/timeframes/regimes. One instrument only = curve-fit.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3571,7 +3571,7 @@
       "HighVolatility"
     ],
     "content": "LOSS AVERSION: 30-40% WR feels like failure. Dont look at individual P&L. Monthly only.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3590,7 +3590,7 @@
       "Trending"
     ],
     "content": "EDGE PER TRADE: 0.5-2%. 200 trades/yr at 0.5%=100%+. Variance hides edge 20-30 trades.",
-    "priority": 2,
+    "priority": 4,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3609,7 +3609,7 @@
       "Trending"
     ],
     "content": "MECHANICAL VS DISCRETIONARY: Rules for sizing/entry/exit. Discretionary only to REDUCE risk.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3628,7 +3628,7 @@
       "Trending"
     ],
     "content": "POSITION HEAT: Aggregate unrealized risk. Normal 30-50%, elevated 50-70%, max 80%. All can move against simultaneously.",
-    "priority": 2,
+    "priority": 4,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -3647,7 +3647,7 @@
       "Trending"
     ],
     "content": "IN VS OUT SAMPLE: 70/30 split. Good in bad out = curve-fit. 2-3 params robust, 10+ fragile.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3666,7 +3666,7 @@
       "Trending"
     ],
     "content": "SYSTEM COMMITMENT: Min 100 trades. 30 trade sample hides edge. Switching = experiencing all losses.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3685,7 +3685,7 @@
       "Trending"
     ],
     "content": "NO-SYSTEM: Abandoning during DD = all losses, no wins. Commit 100+ trades minimum.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3705,7 +3705,7 @@
       "BtcDominant"
     ],
     "content": "BTC-DENOMINATED THINKING: When trading altcoins, your profit in satoshis matters more than USD value. Most alts are traded against BTC pairs—if your alt rises in USD but falls vs BTC, it was a bad trade because those satoshis could have bought more BTC directly. Always measure alt performance in satoshi terms, not just USD.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3725,7 +3725,7 @@
       "HalvingProximity"
     ],
     "content": "BTC CORRELATION CASCADE: Most cryptocurrencies are tied to Bitcoin's value. If BTC plummets, nearly all altcoins follow with amplified downside. When you trade altcoins, you're essentially making a leveraged bet on BTC direction plus idiosyncratic alt risk. Monitor BTC dominance index—if rising, alts underperform; if falling, alt season begins.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3745,7 +3745,7 @@
       "BtcDominant"
     ],
     "content": "BITCOIN HALVING CYCLE: Block rewards halve approximately every 4 years (210,000 blocks). Historical pattern: 12-18 months pre-halving accumulation, parabolic run 6-12 months post-halving, then bear market correction of 80%+. Each cycle's peak-to-peak return diminishes. The halving reduces new supply issuance—supply shock theory drives narrative and price action.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:position",
@@ -3765,7 +3765,7 @@
       "FomcDate"
     ],
     "content": "STABLECOIN DYNAMICS: USDT, USDC, DAI maintain 1:1 USD peg. Stablecoins are crypto's cash equivalent—used for trading pairs, yield farming, and risk-off positioning. Monitor stablecoin dominance (percentage of total crypto market cap in stables)—rising stablecoin dominance = market risk-off; falling = risk-on. Stablecoin depeg events create systemic cascading liquidations.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:yield",
       "timeframe:position",
@@ -3785,7 +3785,7 @@
       "AltSeason"
     ],
     "content": "BUBBLE STRUCTURE (SHILLER): 1) Displacement—new technology/idea creates opportunity. 2) Boom—prices rise, media amplifies. 3) Euphoria—'this time is different,' FOMO retail enters. 4) Profit-taking—smart money exits. 5) Panic—retail realizes, mass selling. Crypto follows this EXACT cycle. Identify which phase you're in. When taxi drivers give crypto tips = late stage 3/early stage 4.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3805,7 +3805,7 @@
       "BreakingNews"
     ],
     "content": "NARRATIVE ECONOMICS IN CRYPTO: Prices are driven by stories, not fundamentals. Bitcoin narratives shift: digital gold → inflation hedge → institutional adoption → national reserve. Each narrative attracts different capital. When a narrative exhausts its marginal buyer, price stagnates. Track narrative evolution—if media is recycling old narratives, the cycle is mature.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3825,7 +3825,7 @@
       "AltSeason"
     ],
     "content": "SPECULATIVE BUBBLE INDICATORS: 1) Rapid price increase with no fundamental change. 2) Media coverage explosion. 3) 'New era' thinking ('blockchain changes everything'). 4) Increased trading by inexperienced participants. 5) Derivatives speculation surge (leverage, options). All five present simultaneously in crypto mania phases. Count the indicators. More = closer to the top.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3845,7 +3845,7 @@
       "SoprReset"
     ],
     "content": "VALUATION ANCHORING IN BUBBLES: In the absence of traditional valuation metrics (earnings, dividends), crypto investors anchor to arbitrary round numbers or previous highs. 'BTC should be $100K because...' This is narrative-driven anchoring, not valuation. MVRV Z-Score, NVT Ratio, and Stock-to-Flow provide pseudo-fundamental anchors. When price deviates >2σ from these, mean-reversion is likely.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3865,7 +3865,7 @@
       "BreakingNews"
     ],
     "content": "FED POLICY AND CRYPTO BUBBLES: Loose monetary policy (low rates, QE) feeds speculative bubbles by reducing the cost of capital and pushing investors into risk assets. Tightening (rate hikes, QT) punctures them. 2020-2021 crypto bubble directly correlated with zero rates + massive QE. Fed pivot to tightening in 2022 collapsed crypto 75%+. Monitor Fed policy as primary macro driver.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3886,7 +3886,7 @@
       "ExtremeFear"
     ],
     "content": "REFLEXIVITY THEORY FOR CRYPTO: Participant perceptions don't just reflect reality—they SHAPE it. In crypto: rising prices attract users → more development → better fundamentals → higher prices (virtuous cycle). Falling prices → user exodus → less development → worse fundamentals → lower prices (vicious cycle). This is reflexivity. Crypto is MORE reflexive than any traditional market.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3906,7 +3906,7 @@
       "ExtremeGreed"
     ],
     "content": "NEAR-EQUILIBRIUM vs FAR-FROM-EQUILIBRIUM: In normal conditions, market corrections are mean-reverting (near-equilibrium). In far-from-equilibrium conditions, feedback loops create one-directional trends. Crypto oscillates between these states. IDENTIFY THE REGIME: If corrections are being bought = near-equilibrium (trend intact). If bounces are being sold = far-from-equilibrium (regime change).",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:pullback",
       "timeframe:flexible",
@@ -3926,7 +3926,7 @@
       "ExtremeGreed"
     ],
     "content": "BOOM-BUST SEQUENCE: Soros identifies: 1) Trend not yet recognized. 2) Trend is tested and survives. 3) Increasing conviction in trend. 4) Growing divergence between perception and reality. 5) Recognition of the divergence. 6) The trend reverses. Apply to crypto: identify which phase BTC is in. Phase 1-3 = trend follow. Phase 4 = reduce size. Phase 5-6 = reverse or exit.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3946,7 +3946,7 @@
       "BreakingNews"
     ],
     "content": "CREDIT AND REGULATORY CYCLE IN CRYPTO: Soros's credit cycle applies directly: easy money → crypto leverage builds → asset inflation → regulators notice → tightening → forced deleveraging → crash. The regulatory response to crypto mania (SEC actions, exchange bans) punctures the bubble just as monetary tightening does. Track both credit AND regulatory cycles.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -3966,7 +3966,7 @@
       "SoprReset"
     ],
     "content": "ON-CHAIN VALUATION MODELS: MVRV (Market Value to Realized Value) Z-Score >7 = overvalued (sell zone). <0 = undervalued (buy zone). SOPR (Spent Output Profit Ratio) >1.1 = profit-taking overheated. <0.98 = capitulation. These on-chain metrics provide fundamental anchoring for crypto that doesn't exist in traditional markets. Combine with price action for timing.",
-    "priority": 1,
+    "priority": 4,
     "tags": [
       "setup_type:reversal",
       "timeframe:flexible",
@@ -3986,7 +3986,7 @@
       "BtcDominant"
     ],
     "content": "REFLEXIVE DIVERGENCE SIGNAL: When market price diverges significantly from the fundamental reality that participants' behavior creates, the divergence becomes unsustainable. In crypto: if price rises but developer activity declines, TVL drops, and new address growth slows—the price-fundamentals gap will close. The only question is whether price adjusts down or fundamentals adjust up. Usually price.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:flexible",
@@ -4006,7 +4006,7 @@
       "MvrvExtreme"
     ],
     "content": "CRYPTO SPECULATION INDEX: Combine: Google Trends for 'bitcoin,' new exchange account registrations, social media mention velocity, and stablecoin inflows to exchanges. When all four are at extreme highs simultaneously = late-stage speculation. When all four are at extreme lows = capitulation complete. This composite sentiment index marks cycle extremes with reasonable accuracy.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:reversal",
       "timeframe:flexible",

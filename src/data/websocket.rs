@@ -33,6 +33,11 @@ pub enum WsMessage {
     },
     Ticker(TickerData),
     StateChange(WsState),
+    /// WS sequence gap detected + REST retry exhausted.
+    /// Engine should cancel all open orders to prevent getting run over.
+    CancelAllOrders {
+        reason: String,
+    },
 }
 
 /// Create a channel pair for WebSocket communication.
@@ -190,10 +195,14 @@ fn parse_trades(json: &serde_json::Value) -> Option<WsMessage> {
 
 /// Connect to Kraken WebSocket v2 and stream messages.
 ///
-/// Runs indefinitely with auto-reconnection. Sends parsed messages
-/// through the channel. Spawn as a tokio task.
+/// Runs indefinitely with exponential backoff reconnection (1s → 30s cap).
+/// Sends parsed messages through the channel. Spawn as a tokio task.
 pub async fn connect(url: &str, pairs: Vec<String>, tx: mpsc::UnboundedSender<WsMessage>) {
     let subscribe_msgs = build_subscribe_messages(&pairs, 10);
+    let mut backoff_secs = 1u64;
+    let max_backoff = 30u64;
+    let mut consecutive_failures = 0u32;
+    let max_failures_before_cancel = 3;
 
     loop {
         info!("Kraken WS connecting to {}", url);
@@ -203,6 +212,8 @@ pub async fn connect(url: &str, pairs: Vec<String>, tx: mpsc::UnboundedSender<Ws
             Ok((ws_stream, _)) => {
                 info!("Kraken WS connected");
                 let _ = tx.send(WsMessage::StateChange(WsState::Connected));
+                backoff_secs = 1; // Reset backoff on successful connection
+                consecutive_failures = 0; // Reset failure counter
 
                 let (mut write, mut read) = ws_stream.split();
 
@@ -246,12 +257,34 @@ pub async fn connect(url: &str, pairs: Vec<String>, tx: mpsc::UnboundedSender<Ws
             }
             Err(e) => {
                 error!("Kraken WS connection failed: {}", e);
+                consecutive_failures += 1;
+
+                // If WS has failed N consecutive times, emit CancelAllOrders
+                // to prevent getting run over while we can't see the market
+                if consecutive_failures >= max_failures_before_cancel {
+                    error!(
+                        "WS failed {} times consecutively — emitting CancelAllOrders",
+                        consecutive_failures
+                    );
+                    let _ = tx.send(WsMessage::CancelAllOrders {
+                        reason: format!(
+                            "WebSocket failed {} times: {}. Cancelling all orders to prevent adverse execution.",
+                            consecutive_failures, e
+                        ),
+                    });
+                }
             }
         }
 
         let _ = tx.send(WsMessage::StateChange(WsState::Reconnecting));
-        warn!("Kraken WS reconnecting in 5 seconds...");
-        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+        // Exponential backoff with ±20% jitter
+        let jitter = backoff_secs as f64 * (0.8 + rand::random::<f64>() * 0.4);
+        warn!(
+            "Kraken WS reconnecting in {:.1}s (backoff: {}s)...",
+            jitter, backoff_secs
+        );
+        tokio::time::sleep(std::time::Duration::from_millis((jitter * 1000.0) as u64)).await;
+        backoff_secs = (backoff_secs * 2).min(max_backoff);
     }
 }
 

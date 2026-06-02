@@ -122,7 +122,88 @@ const FEEDS: &[RssFeed] = &[
     },
 ];
 
-/// Fetch all RSS feeds concurrently and return parsed items.
+/// Fetch all RSS feeds concurrently with per-feed timeout, source diversity,
+/// and max items cap.
+///
+/// - Per-feed timeout: 5s (prevents slow feeds blocking)
+/// - Source diversity: top 2 per source, then sort all by relevance, take top N
+/// - Cap: max_items from config (default 10)
+pub async fn fetch_all_feeds_capped(
+    client: &reqwest::Client,
+    max_items: usize,
+    pairs: &[String],
+) -> Vec<RssItem> {
+    let mut handles = Vec::new();
+
+    for feed in FEEDS {
+        let url = feed.url;
+        let name = feed.name;
+        let client = client.clone();
+        handles.push(tokio::spawn(async move {
+            // Per-feed timeout: 5 seconds
+            match tokio::time::timeout(
+                std::time::Duration::from_secs(5),
+                fetch_single_feed(&client, url, name),
+            )
+            .await
+            {
+                Ok(result) => result,
+                Err(_) => Err(format!("{}: timed out after 5s", name)),
+            }
+        }));
+    }
+
+    let mut all_items = Vec::new();
+    for handle in handles {
+        match handle.await {
+            Ok(Ok(items)) => all_items.extend(items),
+            Ok(Err(e)) => warn!("RSS feed task error: {}", e),
+            Err(e) => warn!("RSS feed task panicked: {}", e),
+        }
+    }
+
+    // Deduplicate by link
+    all_items.sort_by(|a, b| a.link.cmp(&b.link));
+    all_items.dedup_by(|a, b| a.link == b.link);
+
+    // Score relevance
+    score_relevance(&mut all_items, pairs);
+
+    // Source diversity: group by source, take top 2 per source
+    let mut by_source: std::collections::HashMap<String, Vec<RssItem>> =
+        std::collections::HashMap::new();
+    for item in all_items {
+        by_source.entry(item.source.clone()).or_default().push(item);
+    }
+    let mut diverse_items: Vec<RssItem> = Vec::new();
+    for (_source, mut items) in by_source {
+        items.sort_by(|a, b| {
+            b.relevance_score
+                .partial_cmp(&a.relevance_score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+        diverse_items.extend(items.into_iter().take(2));
+    }
+
+    // Sort all by relevance, take top max_items
+    diverse_items.sort_by(|a, b| {
+        b.relevance_score
+            .partial_cmp(&a.relevance_score)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+    diverse_items.truncate(max_items);
+
+    info!(
+        "RSS: {} items from {} feeds (capped at {}, source-diverse)",
+        diverse_items.len(),
+        FEEDS.len(),
+        max_items
+    );
+
+    diverse_items
+}
+
+/// Fetch all RSS feeds concurrently and return parsed items (legacy, uncapped).
 pub async fn fetch_all_feeds(client: &reqwest::Client) -> Vec<RssItem> {
     let mut handles = Vec::new();
 

@@ -12,6 +12,80 @@ pub struct AppConfig {
     pub mode: ModeConfig,
     pub ai: AiConfig,
     pub insight: InsightConfig,
+    #[serde(default)]
+    pub training: TrainingConfig,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct TrainingConfig {
+    #[serde(default = "default_min_sample_size")]
+    pub min_sample_size: i64,
+    #[serde(default = "default_failure_win_rate")]
+    pub failure_win_rate: f64,
+    #[serde(default = "default_max_portfolio_heat")]
+    pub max_portfolio_heat: f64,
+    #[serde(default = "default_backup_interval_hours")]
+    pub backup_interval_hours: u64,
+    #[serde(default = "default_max_backups")]
+    pub max_backups: u32,
+    #[serde(default = "default_utility_learning_rate")]
+    pub utility_learning_rate: f64,
+    #[serde(default = "default_utility_archive_threshold")]
+    pub utility_archive_threshold: f64,
+    #[serde(default = "default_max_active_lessons")]
+    pub max_active_lessons: i64,
+    #[serde(default = "default_brier_cap_threshold")]
+    pub brier_cap_threshold: f64,
+    #[serde(default = "default_memory_context_min_trades")]
+    pub memory_context_min_trades: i64,
+}
+
+impl Default for TrainingConfig {
+    fn default() -> Self {
+        Self {
+            min_sample_size: default_min_sample_size(),
+            failure_win_rate: default_failure_win_rate(),
+            max_portfolio_heat: default_max_portfolio_heat(),
+            backup_interval_hours: default_backup_interval_hours(),
+            max_backups: default_max_backups(),
+            utility_learning_rate: default_utility_learning_rate(),
+            utility_archive_threshold: default_utility_archive_threshold(),
+            max_active_lessons: default_max_active_lessons(),
+            brier_cap_threshold: default_brier_cap_threshold(),
+            memory_context_min_trades: default_memory_context_min_trades(),
+        }
+    }
+}
+
+fn default_min_sample_size() -> i64 {
+    5
+}
+fn default_failure_win_rate() -> f64 {
+    0.30
+}
+fn default_max_portfolio_heat() -> f64 {
+    0.40
+}
+fn default_backup_interval_hours() -> u64 {
+    6
+}
+fn default_max_backups() -> u32 {
+    7
+}
+fn default_utility_learning_rate() -> f64 {
+    0.05
+}
+fn default_utility_archive_threshold() -> f64 {
+    0.30
+}
+fn default_max_active_lessons() -> i64 {
+    50
+}
+fn default_brier_cap_threshold() -> f64 {
+    0.25
+}
+fn default_memory_context_min_trades() -> i64 {
+    5
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -239,6 +313,7 @@ impl Default for AppConfig {
                 rss_max_items: 10,
                 onchain_enabled: true,
             },
+            training: TrainingConfig::default(),
         }
     }
 }

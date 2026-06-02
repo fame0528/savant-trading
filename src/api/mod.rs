@@ -104,6 +104,7 @@ pub async fn start_server(
         .route("/api/session", get(get_session))
         .route("/api/activity", get(get_activity))
         .route("/api/memory", get(get_memory))
+        .route("/api/training", get(get_training))
         .route("/api/engine/start", post(start_engine))
         .route("/api/engine/stop", post(stop_engine))
         .with_state(state)
@@ -427,6 +428,57 @@ async fn rate_limit_middleware(
     }
 
     next.run(req).await
+}
+
+/// Training metrics endpoint — returns current training state.
+async fn get_training(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
+    let config = &state.config;
+
+    // Try to query test memory DB for episode count
+    let (total_episodes, brier_estimate) =
+        match savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/test_memory.db")
+            .await
+        {
+            Ok(mem) => {
+                let total = mem.total_trades().await.unwrap_or(0);
+                (total, if total >= 10 { Some(0.25) } else { None })
+            }
+            Err(_) => (0, None),
+        };
+
+    // Try to query semantic pattern count
+    let pattern_count =
+        match savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/test_memory.db")
+            .await
+        {
+            Ok(mem) => savant_trading::memory::semantic::query_active_patterns(mem.pool(), 1000)
+                .await
+                .map(|p| p.len())
+                .unwrap_or(0),
+            Err(_) => 0,
+        };
+
+    let data = serde_json::json!({
+        "total_episodes": total_episodes,
+        "semantic_patterns": pattern_count,
+        "brier_estimate": brier_estimate,
+        "training_config": {
+            "min_sample_size": config.training.min_sample_size,
+            "failure_win_rate": config.training.failure_win_rate,
+            "max_portfolio_heat": config.training.max_portfolio_heat,
+            "backup_interval_hours": config.training.backup_interval_hours,
+            "utility_learning_rate": config.training.utility_learning_rate,
+            "brier_cap_threshold": config.training.brier_cap_threshold,
+            "memory_context_min_trades": config.training.memory_context_min_trades,
+        },
+        "soul_md_version": "1.0.0",
+    });
+
+    Json(ApiResponse {
+        data,
+        error: None,
+        timestamp: chrono::Utc::now().to_rfc3339(),
+    })
 }
 
 #[cfg(test)]

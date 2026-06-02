@@ -1651,3 +1651,317 @@ mod tests {
         assert!(categories.contains(&"Edge Case"));
     }
 }
+
+/// Load only training scenarios (first 40).
+///
+/// Used by GEPA optimizer for mutation feedback. The remaining 20 scenarios
+/// are held out as a validation set to prevent overfitting.
+pub fn load_train_scenarios() -> Vec<Scenario> {
+    let all = load_all_scenarios();
+    all.into_iter().take(40).collect()
+}
+
+/// Load only validation scenarios (last 20).
+///
+/// The Pareto gatekeeper evaluates mutations against this set.
+/// A mutation is only accepted if it maintains or improves validation scores.
+pub fn load_val_scenarios() -> Vec<Scenario> {
+    let all = load_all_scenarios();
+    all.into_iter().skip(40).collect()
+}
+
+/// Load scenarios filtered by difficulty level.
+pub fn load_scenarios_by_difficulty(difficulties: &[&str]) -> Vec<Scenario> {
+    load_all_scenarios()
+        .into_iter()
+        .filter(|s| difficulties.contains(&s.difficulty.as_str()))
+        .collect()
+}
+
+/// Get the worst-performing category from a set of scenario results.
+pub fn worst_category(results: &[(String, f64)]) -> Option<String> {
+    results
+        .iter()
+        .min_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal))
+        .map(|(cat, _)| cat.clone())
+}
+
+/// Generate N random scenarios with massive variation.
+///
+/// Every run produces unique scenarios by randomizing:
+/// - Mock data (fear/greed, funding, MVRV, SOPR, NVT across full ranges)
+/// - Trend direction and volatility regime
+/// - Market events (flash crash, liquidity void, etc.)
+/// - Expected action derived from the mock data (not hardcoded)
+///
+/// This ensures the agent sees wildly different conditions every training cycle
+/// instead of memorizing the same 60 static scenarios.
+pub fn generate_random_scenarios(n: usize) -> Vec<Scenario> {
+    use rand::Rng;
+    let mut rng = rand::thread_rng();
+    let mut scenarios = Vec::with_capacity(n);
+
+    // Weighted categories — weak categories get 2x representation
+    // to force the agent to learn patterns it struggles with.
+    let categories = [
+        ("Trend Bull", 3), // Weak: 29.8% win rate — needs most training
+        ("Trend Bear", 2), // Weak: 43.8% win rate
+        ("Range Bound", 1),
+        ("Volatility", 1),
+        ("Catalyst", 1),
+        ("Microstructure", 1),
+        ("Session", 1),
+        ("Correlation", 3), // Weak: 28.6% win rate — needs most training
+        ("Sentiment", 3),   // Weak: 29.1% win rate — needs most training
+        ("On-Chain", 1),
+        ("Edge Case", 1),
+    ];
+    let total_weight: u32 = categories.iter().map(|(_, w)| w).sum();
+    let difficulties = ["Easy", "Medium", "Hard", "Extreme"];
+    let sessions = [
+        None,
+        Some("Asian"),
+        Some("European"),
+        Some("US"),
+        Some("Weekend"),
+    ];
+
+    for i in 0..n {
+        // Weighted category selection — weak categories get more representation
+        let mut cat_roll = rng.gen_range(0..total_weight);
+        let mut cat = categories[0].0;
+        for (name, weight) in &categories {
+            if cat_roll < *weight {
+                cat = name;
+                break;
+            }
+            cat_roll -= weight;
+        }
+
+        let diff = difficulties[rng.gen_range(0..difficulties.len())];
+        let session = sessions[rng.gen_range(0..sessions.len())].map(String::from);
+
+        // Randomize mock data across FULL realistic ranges
+        let fear_greed: i32 = rng.gen_range(0..=100);
+        let funding_rate: f64 = rng.gen_range(-0.005..0.015); // -0.5% to +1.5% per 8hr
+        let mvrv: f64 = rng.gen_range(0.3..5.0);
+        let sopr: f64 = rng.gen_range(0.7..1.3);
+        let nvt: f64 = rng.gen_range(10.0..200.0);
+        let btc_dom: f64 = rng.gen_range(30.0..80.0);
+        let open_interest: f64 = rng.gen_range(500.0..5000.0);
+
+        let fear_label = match fear_greed {
+            0..=20 => "Extreme Fear",
+            21..=40 => "Fear",
+            41..=60 => "Neutral",
+            61..=80 => "Greed",
+            _ => "Extreme Greed",
+        };
+
+        // Derive expected action from mock data — the agent should learn these mappings
+        let expected_action = derive_expected_action(mvrv, sopr, funding_rate, fear_greed);
+
+        // Randomize trend direction
+        let trend = match rng.gen_range(0..3) {
+            0 => TrendDirection::Bull(rng.gen_range(0.3..1.0)),
+            1 => TrendDirection::Bear(rng.gen_range(0.3..1.0)),
+            _ => TrendDirection::Sideways,
+        };
+
+        // Randomize volatility
+        let vol = match rng.gen_range(0..4) {
+            0 => VolatilityRegime::Low,
+            1 => VolatilityRegime::Normal,
+            2 => VolatilityRegime::High,
+            _ => VolatilityRegime::Extreme,
+        };
+
+        // Randomize market events (30% chance of an event)
+        let event = if rng.gen_bool(0.3) {
+            Some(match rng.gen_range(0..4) {
+                0 => MarketEvent::FlashCrash {
+                    candle_index: rng.gen_range(50..150),
+                    magnitude_pct: rng.gen_range(5.0..25.0),
+                },
+                1 => MarketEvent::ShortSqueeze {
+                    candle_index: rng.gen_range(50..150),
+                    magnitude_pct: rng.gen_range(5.0..20.0),
+                },
+                2 => MarketEvent::GapUp {
+                    candle_index: rng.gen_range(50..150),
+                    gap_pct: rng.gen_range(1.0..8.0),
+                },
+                _ => MarketEvent::GapDown {
+                    candle_index: rng.gen_range(50..150),
+                    gap_pct: rng.gen_range(1.0..10.0),
+                },
+            })
+        } else {
+            None
+        };
+
+        // Random news headlines based on mock data
+        let headlines = generate_random_headlines(fear_greed, mvrv, funding_rate);
+
+        scenarios.push(Scenario {
+            id: format!("RND-{:04}", i),
+            category: cat.to_string(),
+            name: format!("Random {} #{}", cat, i),
+            difficulty: diff.to_string(),
+            trigger_condition: format!(
+                "MVRV={:.2} SOPR={:.3} FG={} Funding={:.4}%",
+                mvrv,
+                sopr,
+                fear_greed,
+                funding_rate * 100.0
+            ),
+            expected_action,
+            target_rule: "Target set (R/R >= 1.5:1)".into(),
+            params: ScenarioParams {
+                trend,
+                volatility_regime: vol,
+                event,
+            },
+            mock_data: MockData {
+                fear_greed_index: fear_greed,
+                fear_greed_label: fear_label.to_string(),
+                btc_dominance: btc_dom,
+                funding_rate,
+                open_interest,
+                mvrv,
+                sopr,
+                nvt_signal: nvt,
+                block_height: 900000 + rng.gen_range(0..10000),
+                hashrate: rng.gen_range(300.0..800.0),
+                news_headlines: headlines,
+                session_override: session,
+            },
+        });
+    }
+
+    scenarios
+}
+
+/// Derive expected action from market data — this is what the agent should learn.
+///
+/// The mappings are based on SOUL.md Action Triggers:
+/// - MVRV < 1.0 + SOPR < 1.0 = capitulation buy
+/// - MVRV > 3.5 = euphoria sell
+/// - Extreme funding = overleveraged (short if positive, squeeze if negative)
+/// - Extreme fear = contrarian buy
+/// - Extreme greed = contrarian sell
+fn derive_expected_action(mvrv: f64, sopr: f64, funding: f64, fear_greed: i32) -> String {
+    let mut buy_signals = 0u8;
+    let mut sell_signals = 0u8;
+
+    // On-chain capitulation
+    if mvrv < 1.0 && sopr < 1.0 {
+        buy_signals += 2;
+    } else if mvrv < 0.8 {
+        buy_signals += 1;
+    }
+
+    // Euphoria
+    if mvrv > 3.5 {
+        sell_signals += 2;
+    } else if mvrv > 2.5 {
+        sell_signals += 1;
+    }
+
+    // Funding rate
+    if funding > 0.001 {
+        sell_signals += 1; // Overleveraged longs
+    }
+    if funding < -0.0005 {
+        buy_signals += 1; // Overleveraged shorts (squeeze)
+    }
+    if funding > 0.005 {
+        sell_signals += 2; // Extreme overleveraged
+    }
+
+    // Sentiment
+    if fear_greed <= 15 {
+        buy_signals += 2; // Extreme fear = contrarian buy
+    } else if fear_greed <= 30 {
+        buy_signals += 1;
+    }
+    if fear_greed >= 85 {
+        sell_signals += 2; // Extreme greed = contrarian sell
+    } else if fear_greed >= 70 {
+        sell_signals += 1;
+    }
+
+    // Determine action
+    if buy_signals >= 3 && buy_signals > sell_signals {
+        "Buy (High Conviction)".to_string()
+    } else if buy_signals >= 2 {
+        "Buy".to_string()
+    } else if sell_signals >= 3 && sell_signals > buy_signals {
+        "Sell (High Conviction)".to_string()
+    } else if sell_signals >= 2 {
+        "Sell".to_string()
+    } else {
+        "Hold / No Trade".to_string()
+    }
+}
+
+/// Generate random news headlines that match the market conditions.
+fn generate_random_headlines(fear_greed: i32, mvrv: f64, funding: f64) -> Vec<String> {
+    use rand::Rng;
+    let mut rng = rand::thread_rng();
+    let mut headlines = Vec::new();
+
+    // Sentiment-driven headlines
+    if fear_greed <= 20 {
+        let options = [
+            "Crypto market crashes 15% in 24 hours as panic selling intensifies",
+            "Major exchange hack reported — users advised to withdraw funds",
+            "Regulatory crackdown: SEC announces new crypto enforcement actions",
+            "Stablecoin depeg fears spread as USDC drops below $0.97",
+            "Bitcoin miners capitulating — hash rate drops 20%",
+        ];
+        headlines.push(options[rng.gen_range(0..options.len())].to_string());
+    } else if fear_greed >= 80 {
+        let options = [
+            "Bitcoin hits new all-time high as retail FOMO intensifies",
+            "Leveraged long positions reach record levels — analysts warn of correction",
+            "Meme coins surge 500% in 24 hours as speculation peaks",
+            "Institutional investors warn of crypto bubble forming",
+        ];
+        headlines.push(options[rng.gen_range(0..options.len())].to_string());
+    }
+
+    // MVRV-driven headlines
+    if mvrv < 0.8 {
+        headlines.push(
+            "On-chain data shows Bitcoin trading below realized price — rare buy signal"
+                .to_string(),
+        );
+    } else if mvrv > 3.5 {
+        headlines.push(
+            "Bitcoin MVRV ratio hits extreme levels — historically precedes major corrections"
+                .to_string(),
+        );
+    }
+
+    // Funding-driven headlines
+    if funding > 0.005 {
+        headlines.push(
+            "Perpetual funding rate hits 500% annualized — massive long squeeze risk".to_string(),
+        );
+    } else if funding < -0.001 {
+        headlines.push(
+            "Short interest reaches record levels — short squeeze setup developing".to_string(),
+        );
+    }
+
+    // Pad to 2-3 headlines
+    if headlines.is_empty() {
+        headlines.push("Markets trading sideways with low volatility".to_string());
+    }
+    if headlines.len() == 1 {
+        headlines.push("No major catalysts expected in the near term".to_string());
+    }
+
+    headlines
+}

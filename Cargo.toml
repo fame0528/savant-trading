@@ -1,6 +1,6 @@
 [package]
 name = "savant-trading"
-version = "0.4.2"
+version = "0.4.3"
 edition = "2021"
 rust-version = "1.91"
 description = "Automated crypto trading engine — Kraken exchange"
@@ -10,7 +10,7 @@ description = "Automated crypto trading engine — Kraken exchange"
 tokio = { version = "1", features = ["full"] }
 
 # HTTP client (Kraken REST API)
-reqwest = { version = "0.12", features = ["json", "native-tls"] }
+reqwest = { version = "0.12", features = ["json", "native-tls", "stream"] }
 
 # WebSocket (Kraken WebSocket v2)
 tokio-tungstenite = { version = "0.24", features = ["native-tls"] }

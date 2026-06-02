@@ -13,7 +13,7 @@
       "btc-core"
     ],
     "content": "WYCKOFF ACCUMULATION — Phases A-E: SC extreme vol → AR sets range high. Phase B: SM accumulates in range. Phase C: THE SPRING — false drop below support LOW volume. HIGHEST PROBABILITY entry. Phase D: SOS break above AR high expanding vol. Phase E: Markup. KEY: Spring must be LOW vol — high vol = real breakdown.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-002",
@@ -29,7 +29,7 @@
       "btc-core"
     ],
     "content": "WYCKOFF DISTRIBUTION — Mirror at tops. BC extreme vol → AR sets range low. Phase B: SM distributes. Phase C: THE UTAD — spike above resistance LOW volume, traps late buyers. Phase D: SOW break below AR low. Phase E: Markdown. UTAD must be LOW vol.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-003",
@@ -46,7 +46,7 @@
       "btc-core"
     ],
     "content": "SPRING ENTRY — 1) Price below support. 2) Volume LOW. 3) Rapid recovery above support. 4) SOS expanding vol. Entry: After recovery + confirmation candle. Stop: Below Spring low. Target: Range high. Spring = institutional stop-hunt to fill orders.",
-    "priority": 5
+    "priority": 4
   },
   {
     "id": "pa-004",
@@ -62,7 +62,7 @@
       "fundamental-rule"
     ],
     "content": "EFFORT vs RESULT — Volume = effort. Spread = result. Agree = genuine trend. Diverge = absorbing. High vol + narrow spread = absorption. Most powerful VPA signal.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-005",
@@ -78,7 +78,7 @@
       "institutional"
     ],
     "content": "HIGH VOL + NARROW SPREAD = ABSORPTION — SM buying while capping price. At tops: distributing without letting fall. Tighter spread on high vol = larger institutional order. The #1 signal for detecting smart money activity.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-006",
@@ -93,7 +93,7 @@
       "distribution"
     ],
     "content": "BUYING CLIMAX — 1) Massive vol spike (highest in weeks). 2) Wide spread up. 3) Often gaps. 4) Followed by narrow spread or reversal. SM DISTRIBUTING. Crypto: highest hourly vol in 30+ days at cycle high + extreme positive funding.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-007",
@@ -108,7 +108,7 @@
       "accumulation"
     ],
     "content": "SELLING CLIMAX — 1) Extreme vol spike. 2) Wide spread down. 3) Panic/capitulation. 4) Followed by narrow spread or reversal. SM ACCUMULATING. Crypto: highest daily vol in 90+ days + massive liquidation cascade.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-008",
@@ -124,7 +124,7 @@
       "confirmation"
     ],
     "content": "TESTING — After high-vol event, price returns on MUCH LOWER vol. Low vol test of climax = exhausted (reversal). Low vol test of breakout = valid (continuation). HIGH vol on test = FAILURE. Most important volume confirmation.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-009",
@@ -139,7 +139,7 @@
       "confirmation"
     ],
     "content": "BREAKOUT VOLUME — Genuine: 2-3x average expanding. Fake: low/declining. After breakout: elevated on continuation, contracts on pullbacks. Vol surge on pullback = FAILING. Compare to 20-period avg on spot volume.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-010",
@@ -153,7 +153,7 @@
       "leading-indicator"
     ],
     "content": "VOLUME PRECEDES PRICE — Volume trends change BEFORE price. Declining vol in uptrend = waning buying. Declining vol in downtrend = sellers drying up. Rising vol before breakout = accumulation ending.",
-    "priority": 5
+    "priority": 2
   },
   {
     "id": "pa-011",
@@ -169,7 +169,7 @@
       "framework"
     ],
     "content": "VSA THREE DIMENSIONS — 1) Volume (effort). 2) Spread (result). 3) Close position. Close HIGH + high vol = demand. Close LOW + high vol = supply. Close MIDDLE + high vol = ABSORPTION. Evaluate all three.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-012",
@@ -184,7 +184,7 @@
       "breakout-prediction"
     ],
     "content": "VOLUME AT S/R — Declining vol approaching support = HOLDS. Expanding vol approaching = BREAKS. Same for resistance. Highest vol level = most significant S/R.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-013",
@@ -200,7 +200,7 @@
       "reversal"
     ],
     "content": "HEAD AND SHOULDERS — Most reliable reversal. Left shoulder high vol, head LOWER, right shoulder LOWEST. Neckline break HIGH vol. Volume DECREASES left-to-right = KEY. Target: head-to-neckline projected. Right shoulder exceeding head = FAILS.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-014",
@@ -215,7 +215,7 @@
       "continuation"
     ],
     "content": "FLAGS & PENNANTS — Highest probability continuation. Declining vol, SURGE on breakout. Target: flagpole length. High & Tight Flags ranked #1 overall (69% avg rise, 1% failure).",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-015",
@@ -231,7 +231,7 @@
       "fundamental"
     ],
     "content": "CONFIRMATION RULE — Always wait for confirmation. Bullish: close above pattern high. Bearish: close below pattern low. Without = potential only. #1 rule for candlestick trading. Patience prevents losses.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-016",
@@ -246,7 +246,7 @@
       "crypto-adapted"
     ],
     "content": "LIQUIDATION CASCADES — 1) Price hits liquidation level. 2) Forced selling. 3) More liquidations. 4) Liquidity vacuum. 5) MM stabilizes. Entry: Buy V-recovery when OI dropped 20%+. Crypto's Wyckoff Springs.",
-    "priority": 5
+    "priority": 2
   },
   {
     "id": "pa-017",
@@ -262,7 +262,7 @@
       "lvnodes"
     ],
     "content": "VOLUME PROFILE S/R — HVN = acceptance, consolidates. LVN = rejection, moves quickly. Pullbacks TO HVN. Breakouts THROUGH LVN. POC = fair value. Value Area H/L = boundaries.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-018",
@@ -278,7 +278,7 @@
       "trend-definition"
     ],
     "content": "SWING STRUCTURE — Uptrend = HH + HL in swing points. Downtrend = LH + LL. Trend REQUIRES 2+ swings. Foundation of all analysis.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-019",
@@ -293,7 +293,7 @@
       "context-over-signal"
     ],
     "content": "CONTEXT OVER SIGNAL — Perfect signal in WRONG context = loser. Context: market state, S/R location, MTF alignment, volume, session. Assess CONTEXT first, then signals.",
-    "priority": 5
+    "priority": 2
   },
   {
     "id": "pa-020",
@@ -307,7 +307,7 @@
       "high1-high2"
     ],
     "content": "H1/H2 ENTRIES — H1: First pullback in bull trend, buy above its high. H2: Second pullback (two-legged), more reliable. Often at trendline/MA. L1/L2 for downtrend. Bread-and-butter trend entries.",
-    "priority": 5
+    "priority": 2
   },
   {
     "id": "pa-021",
@@ -322,7 +322,7 @@
       "two-legged-pullback"
     ],
     "content": "TWO-LEGGED PULLBACK — Highest probability entry. Leg 1, bounce, leg 2. Entry after 2nd leg exhaustion (narrow bars, lower vol). Stop below pullback low. Most corrections have two legs.",
-    "priority": 5
+    "priority": 2
   },
   {
     "id": "pa-022",
@@ -337,7 +337,7 @@
       "failed-signal"
     ],
     "content": "FAILED SIGNAL / TRAP — Entry bar reverses, trapping traders. Trade trap in opposite direction. Failed moves = FAST opposite moves. Trapped traders exiting = momentum. Most breakouts fail.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-023",
@@ -352,7 +352,7 @@
       "percent-risk"
     ],
     "content": "PERCENT RISK SIZING — Equity × Risk% ÷ (Entry-Stop) = position. Standard 0.5-1%. Auto-adjusts: bigger winning, smaller losing. Anti-martingale. Position sizing THE most important factor.",
-    "priority": 5
+    "priority": 2
   },
   {
     "id": "pa-024",
@@ -367,7 +367,7 @@
       "max-risk"
     ],
     "content": "2% RULE — Never risk >2% per trade. $100K = $2,000 max. Calculate before entry. Professionals risk LESS. If stop would risk >2%, reduce size or skip.",
-    "priority": 5
+    "priority": 4
   },
   {
     "id": "pa-025",
@@ -382,7 +382,7 @@
       "survival"
     ],
     "content": "DRAWDOWN RULES — 3 losers: stop day. 5: stop week. 10% DD: reduce 50%. 20%: minimum size. 25%: close all, break. Capital preservation > profit.",
-    "priority": 5
+    "priority": 3
   },
   {
     "id": "pa-026",
@@ -397,7 +397,7 @@
       "role-reversal"
     ],
     "content": "ROLE REVERSAL — Broken support = resistance. Broken resistance = support. All timeframes. Break with volume. Retest = entry with stop beyond. Most reliable when tested multiple times before breaking.",
-    "priority": 5
+    "priority": 2
   },
   {
     "id": "pa-027",
@@ -411,7 +411,7 @@
       "entry-rules"
     ],
     "content": "UTAD SHORT — Spike above resistance LOW vol, reverses. Entry: Short after falls below resistance + vol confirm. Stop: Above UTAD high. Target: Range low. HIGH vol breakout = genuine, do NOT short.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-028",
@@ -426,7 +426,7 @@
       "crypto-adapted"
     ],
     "content": "CRYPTO SPRING — BTC: 1) Drop below key support. 2) Liquidation cascades. 3) Vol spikes then dries up. 4) Recovery within 1-3 candles. 5) OI decreases. Entry: Buy recovery. Stop: Below spring 1-2 ATR. Expect 5-15% below support.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-029",
@@ -441,7 +441,7 @@
       "crypto-adapted"
     ],
     "content": "CRYPTO DISTRIBUTION — BTC tops: 1) Parabolic on declining vol. 2) BC on highest vol months. 3) Drop then weak rally. 4) Lower highs. 5) UTAD (low vol). 6) Break below. Whale wallets to exchanges + extreme funding = distribution.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-030",
@@ -456,7 +456,7 @@
       "crypto-adapted"
     ],
     "content": "COMPOSITE OPERATOR CRYPTO — ETF custodians, MicroStrategy, whales accumulate/distribute over weeks-months. 1) Accumulate during fear. 2) Distribute during euphoria. 3) Create ranges. 4) Use springs/UTADs. Whale wallet balance reveals.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-031",
@@ -470,7 +470,7 @@
       "confirmation"
     ],
     "content": "SIGN OF STRENGTH — After Spring: 1) Breaks AR high. 2) Expanding vol. 3) Pullbacks low vol. 4) Higher highs. Entry: First pullback after SOS. Stop: Below last higher low. Validates Spring was trap.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-032",
@@ -485,7 +485,7 @@
       "stacked-imbalances"
     ],
     "content": "STACKED IMBALANCES — Buy:sell ratio >3:1 across 3+ price levels. Become reliable S/R. Aggressive buyers defend zone. Use as pullback entry zones.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-033",
@@ -500,7 +500,7 @@
       "crypto-adapted"
     ],
     "content": "OI + PRICE — Rising OI + rising price = healthy. Rising OI + falling = new shorts. Falling OI + rising = covering (weak). Falling + falling = liquidation (near bottom). New trend requires RISING OI.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-034",
@@ -515,7 +515,7 @@
       "divergence"
     ],
     "content": "OI DIVERGENCE — Rising price + falling OI = weakening (only covering). Falling price + falling OI = weakening (only liquidation). New ATH with declining OI = spot-driven without leverage conviction.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-035",
@@ -529,7 +529,7 @@
       "trend-health"
     ],
     "content": "HEALTHY TREND VOL — Uptrend: vol EXPANDS rallies, CONTRACTS pullbacks. Downtrend: opposite. Unhealthy = contracts on rallies or expands on pullbacks = distribution/accumulation.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-036",
@@ -543,7 +543,7 @@
       "divergence"
     ],
     "content": "VOLUME DIVERGENCE — Bearish: price HH but vol LOWER. Bullish: price LL but vol LOWER. Confirm by price action. Divergence = WARNING not signal. 3+ consecutive = stronger.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-037",
@@ -557,7 +557,7 @@
       "climax-spike"
     ],
     "content": "CLIMAX VOLUME — 3x+ 20-period avg at extreme, then reversal/narrow range. MAJOR turning point. Crypto: highest vol bar in 50+ periods at cycle extreme = climactic reversal.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-038",
@@ -572,7 +572,7 @@
       "no-supply"
     ],
     "content": "NO SUPPLY — Bearish candle, VERY LOW vol, NARROW spread in downtrend. Sellers EXHAUSTED. Bullish at support after decline. Entry: Buy confirmation above bar high. Stop: Below bar low.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-039",
@@ -587,7 +587,7 @@
       "no-demand"
     ],
     "content": "NO DEMAND — Bullish candle, VERY LOW vol, NARROW spread in uptrend. Buyers EXHAUSTED. Bearish at resistance after advance. Entry: Short confirmation below bar low. Stop: Above bar high.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-040",
@@ -602,7 +602,7 @@
       "upthrust"
     ],
     "content": "UPTHRUST — Wide spread UP high vol, CLOSES near LOW. Spike up then slammed. TRAP for buyers. Short confirmation below upthrust low. Stop: Above high.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-041",
@@ -617,7 +617,7 @@
       "spring"
     ],
     "content": "SHAKEOUT/SPRING — Wide spread DOWN piercing below support then reversing. Low vol = spring (trap). High vol = real breakdown. Must RECOVER above support quickly. Buy recovery.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-042",
@@ -632,7 +632,7 @@
       "dry-up-breakout"
     ],
     "content": "VOL DRY-UP BEFORE BREAKOUT — Most powerful breakouts preceded by lowest vol in 20+ periods. A/D complete. Breakout on SURGE. Declining exchange vol + BB squeeze + flat OI in crypto.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-043",
@@ -646,7 +646,7 @@
       "rising-falling-vol"
     ],
     "content": "RISING MKT + FALLING VOL — HH on progressively lower vol = distribution. SM selling each rally. Volume trend reversed. Do NOT add to longs. Tighten stops.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-044",
@@ -660,7 +660,7 @@
       "falling-falling-vol"
     ],
     "content": "FALLING MKT + FALLING VOL — LL on progressively lower vol = accumulation. Sellers drying up. SM buying. Watch for bottom. Crypto: declining exchange reserves + declining spot vol at lows.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-045",
@@ -674,7 +674,7 @@
       "h-s-performance"
     ],
     "content": "H&S TOPS — Avg decline 29% bear, 34% bull. Failure 1% bear. Throwback 64%. Vol increases on breakdown. Complex (multiple shoulders) similar. Ranked #6 bear.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-046",
@@ -688,7 +688,7 @@
       "inverse-h-s"
     ],
     "content": "INVERSE H&S — Avg rise 30% bear, 41% bull. Failure 4%. Pullback 51%. Vol increases on breakout. Buy above neckline. Most reliable bottom reversal.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-047",
@@ -702,7 +702,7 @@
       "double-bottom"
     ],
     "content": "DOUBLE BOTTOM — A&A (two narrow V): 37% bull, strongest. E&E (two rounded): 36%, ranked #6. Confirmed on break above confirmation high. Vol lower on second test = KEY.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-048",
@@ -716,7 +716,7 @@
       "double-top"
     ],
     "content": "DOUBLE TOP — E&E (two rounded): 25% bear decline, failure 2%, very reliable. Second peak vol LOWER. Confirmed on break below confirmation low.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-049",
@@ -730,7 +730,7 @@
       "triangles"
     ],
     "content": "TRIANGLE BREAKOUT — Symmetrical: neutral. Ascending: bullish. Descending: bearish. Vol CONTRACTS. Breakout 1/2-3/4 of triangle. Vol 2x+ avg. Target: widest part projected.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-050",
@@ -745,7 +745,7 @@
       "throwback-pullback"
     ],
     "content": "THROWBACK/PULLBACK — 62% bull breakouts throwback. 54% bear pullback. Avg retrace 48%, 10-15 days. Resumes 67% of time. Buy throwback at breakout level. HIGH vol throwback = failure.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-051",
@@ -760,7 +760,7 @@
       "failure-signal"
     ],
     "content": "PATTERN FAILURE — Pattern failing its measuring implication signals OPPOSITE direction. H&S failing neckline = strong bullish. Triangle breakout reversing = trade opposite. Failure is information.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-052",
@@ -774,7 +774,7 @@
       "engulfing"
     ],
     "content": "BULLISH/BEARISH ENGULFING — White engulfs black after downtrend (bullish). Black engulfs white (bearish). Three criteria: trend, wraps, opposite colors. Stronger if first small, second large. Heavy vol increases significance.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-053",
@@ -788,7 +788,7 @@
       "hammer"
     ],
     "content": "HAMMER — Small body at top, long lower shadow (2-3x body) after downtrend. Requires bullish confirmation (close above hammer high). Strong at support. Crypto: wick >3x body = reversal.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-054",
@@ -802,7 +802,7 @@
       "morning-evening-star"
     ],
     "content": "MORNING/EVENING STAR — Three-candle reversal. Star = indecision. More powerful if doji. Vol increases on third candle. Key reversal at S/R.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-055",
@@ -817,7 +817,7 @@
       "candle-sr"
     ],
     "content": "CANDLE S/R — Bearish engulfing/dark cloud highs = resistance. Bullish engulfing/piercing lows = support. Cluster at same level = very strong zone. Long upper shadows = resistance. Long lower = support.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-056",
@@ -831,7 +831,7 @@
       "gap-windows"
     ],
     "content": "GAP/WINDOW — Rising window: continuation, gap = support. Falling window: gap = resistance. Three windows = exhausted but valid until last closed. Fill on high vol = failure. CME BTC gaps fill ~90%.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-057",
@@ -846,7 +846,7 @@
       "reversal-bar"
     ],
     "content": "REVERSAL BAR — Bull: close above open/midpoint, lower tail 1/3-1/2 bar. Bear: mirror. Followed by strong entry bar. Strongest at S/R. Entry above/below. Stop beyond extreme.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-058",
@@ -861,7 +861,7 @@
       "two-bar-reversal"
     ],
     "content": "TWO-BAR REVERSAL — Bull: bear + bull closing above both opens. Bear: mirror. Entry on break of 2nd bar. Stop beyond pattern. Most common reversal all timeframes.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-059",
@@ -876,7 +876,7 @@
       "inside-bar"
     ],
     "content": "INSIDE BAR — Range within prior. Contraction. Breakout setup either direction. ii = tighter. iii = tightest, highest prob. Stop orders both sides.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-060",
@@ -891,7 +891,7 @@
       "measured-move"
     ],
     "content": "MEASURED MOVE — Leg 2 = Leg 1 distance. All timeframes. Exact = reversal likely. Exceeding = acceleration. Short = deceleration. Most common target method.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-061",
@@ -906,7 +906,7 @@
       "s-r-flip"
     ],
     "content": "S/R FLIP — Broken support = resistance. Broken resistance = support. Retest = 'last kiss' entry. Stop beyond level. More touches before break = stronger flip.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-062",
@@ -920,7 +920,7 @@
       "breakout-pullback-entry"
     ],
     "content": "BREAKOUT PULLBACK — After strong breakout bar, wait 1-3 bars pullback (<50% of breakout). Enter on first trend-direction bar. Stop beyond breakout bar. High probability.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-063",
@@ -935,7 +935,7 @@
       "climax-reversal"
     ],
     "content": "CLIMAX REVERSAL — Extended trend + 5+ trend bars, huge bar + immediate reversal. Don't chase. Wait for 2-legged correction. Often followed by range, not immediate reversal.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-064",
@@ -950,7 +950,7 @@
       "breakout-test"
     ],
     "content": "BREAKOUT TEST — After breakout, pullback to test level. Holds = continuation. Breaks back = reversal. Buy/sell test. Stop beyond. Higher probability than chasing.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-065",
@@ -965,7 +965,7 @@
       "failed-h2-l2"
     ],
     "content": "FAILED H2/L2 — When H2/L2 fails, becomes strong OPPOSITE signal. Failed bear setup = strong bull. Trade failure with tight stop beyond failed signal.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-066",
@@ -979,7 +979,7 @@
       "impulse-correction"
     ],
     "content": "IMPULSE vs CORRECTIVE — Impulse: <30% overlap, closes near extremes, vol expands. Corrective: >60% overlap, closes middle, vol contracts. 30-60% = uncertain.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-067",
@@ -994,7 +994,7 @@
       "failed-breakout"
     ],
     "content": "FAILED BREAKOUT SETUP — Breakout reverses immediately. Trade OPPOSITE. Entry on re-entry to range. Stop beyond failed extreme. Target: opposite side. Often larger than original.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-068",
@@ -1009,7 +1009,7 @@
       "multi-timeframe"
     ],
     "content": "MTF STRUCTURE — Higher TF: context. Trade TF: setups. Lower TF: precision. Disagreement = reduce size or skip. Higher ALWAYS overrides lower.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-069",
@@ -1023,7 +1023,7 @@
       "tight-range-breakout"
     ],
     "content": "TIGHT RANGE BREAKOUT — 5-20 bars, narrow range. Breakout closes beyond on volume. Enter above/below. Stop inside range. Failed = trade opposite. Powerful reversal.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-070",
@@ -1038,7 +1038,7 @@
       "body-analysis"
     ],
     "content": "CANDLE BODY READING — Large body = conviction. Small = indecision. Close near high = bullish, near low = bearish. Growing = strengthening. Shrinking = weakening.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-071",
@@ -1053,7 +1053,7 @@
       "drill-down-entry"
     ],
     "content": "DRILL-DOWN — HTF for bias, LTF for entry. 60min + 5min. Only when aligned. Checklist: 1) HTF direction. 2) Pullback to S/R. 3) Rejection candle. 4) Enter on break. 5) Stop beyond zone.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-072",
@@ -1068,7 +1068,7 @@
       "pullback-entry"
     ],
     "content": "PULLBACK ENTRY — Wait for trend, enter on pullback. 1-3 candles, <50% of impulse. First reversal candle in trend direction. Stop beyond extreme. BE at 1:1.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-073",
@@ -1083,7 +1083,7 @@
       "false-break"
     ],
     "content": "FALSE BREAK — Price breaks then reverses. Enter counter-breakout. Stop beyond false extreme. Target: opposite side. More convincing = stronger reversal. More profitable than real breakouts.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-074",
@@ -1098,7 +1098,7 @@
       "confluence"
     ],
     "content": "CONFLUENCE ZONES — Prior S/R + round number + MA + trendline + Fibonacci at same level. More = stronger. Single-factor weaker. 3+ = highest probability.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-075",
@@ -1112,7 +1112,7 @@
       "trendlines"
     ],
     "content": "TRENDLINES — Uptrend along LOWS. Downtrend along HIGHS. 2 points min, 3 confirms. More touches = valid. Longer = more significant break. Heavy vol break = reversal.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-076",
@@ -1126,7 +1126,7 @@
       "channels"
     ],
     "content": "TREND CHANNELS — Parallel to trendline. Failing to reach = weakening. Exceeding = accelerating. Break = potential change. Sell at upper in uptrend. Redraw as accelerates.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-077",
@@ -1141,7 +1141,7 @@
       "classification"
     ],
     "content": "GAP TYPES — 1) Common: fills, avoid. 2) Breakaway: high vol, new trend. 3) Runaway: mid-trend. 4) Exhaustion: extreme vol, end. 5) Island: gap+gap = reversal. Low vol gap = meaningless.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-078",
@@ -1156,7 +1156,7 @@
       "trend-detection"
     ],
     "content": "ALLIGATOR — Jaw (13 SMMA offset 8). Teeth (8 offset 5). Lips (5 offset 3). TWISTED = sleeping (no trades). DIVERGE = eating (trend). Lips cross above Teeth+Jaw = BUY. Below = SELL.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-079",
@@ -1171,7 +1171,7 @@
       "atr-based"
     ],
     "content": "ATR-BASED STOPS — 1.5-2x ATR(14). Adapts to volatility. High vol = wider, smaller position. Low vol = tighter, larger. Place beyond technical barriers. NEVER widen. If >2%, skip.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-080",
@@ -1186,7 +1186,7 @@
       "profit-taking"
     ],
     "content": "SCALE-OUT — Full entry. First target: sell half, stop to BE. Second: half remainder, stop to entry. Trail last quarter. Guaranteed profit + runners.",
-    "priority": 4
+    "priority": 3
   },
   {
     "id": "pa-081",
@@ -1201,7 +1201,7 @@
       "monthly-limit"
     ],
     "content": "6% RULE — Monthly equity drops 6% below last month's close → STOP ALL TRADING. Close positions. Prevents many small losses destroying account.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-082",
@@ -1216,7 +1216,7 @@
       "color-bars"
     ],
     "content": "IMPULSE SYSTEM — GREEN (MA up + MACD-Hist up) = buy only. RED = sell only. BLUE = caution. Never long on red, short on green. Buy pullbacks to green bars.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-083",
@@ -1231,7 +1231,7 @@
       "multi-timeframe"
     ],
     "content": "TRIPLE SCREEN — Weekly: trend direction. Daily: oscillator pullback. Intraday: precision breakout. Factor of Five (~5x). Higher ALWAYS overrides lower.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-084",
@@ -1245,7 +1245,7 @@
       "volatility-contraction"
     ],
     "content": "SQUEEZE PLAY — BB inside KC = squeeze (energy building). BB expands outside = FIRES. Use momentum wave for direction. Only dominant wave direction. Tighter = bigger move.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-085",
@@ -1260,7 +1260,7 @@
       "entry-filter"
     ],
     "content": "CONFLUENCE IS KING — Single signals fail. Highest probability: 1) S/R zone. 2) Trend. 3) Candle pattern. 4) Indicator. 5) Session. 3+ = take. <3 = skip.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-086",
@@ -1274,7 +1274,7 @@
       "price-action-hierarchy"
     ],
     "content": "PA HIERARCHY — 1) Structure (trend/range). 2) Levels (S/R). 3) Patterns (signals). Always this order. Never skip to patterns without context.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-087",
@@ -1288,7 +1288,7 @@
       "second-entry"
     ],
     "content": "SECOND ENTRY — Second attempt higher probability. First resistance test fails = second more likely to break. Failed H2 = strong bull. Failed L2 = strong bear.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-088",
@@ -1303,7 +1303,7 @@
       "sentiment"
     ],
     "content": "FUNDING RATE — Positive = longs paying (crowded). Negative = shorts. Extreme positive (>0.1%) = correction probability (squeeze). Extreme negative = short squeeze. Funding + OI divergence = strongest.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-089",
@@ -1318,7 +1318,7 @@
       "warning"
     ],
     "content": "DIVERGENCE — Price HH + RSI/MACD LH = bearish warning. Price LL + oscillator HL = bullish. Strongest at S/R. WARNING not signal. Wait for price confirmation.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-090",
@@ -1333,7 +1333,7 @@
       "tight-consolidation"
     ],
     "content": "UNEXPLAINED BREAKOUTS — Nobody understands reason = good risk/reward. LESS explanation = MORE significant. Everyone observing = higher false signal odds. Unexplained from tight ranges = institutional.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-091",
@@ -1347,7 +1347,7 @@
       "failed-moves"
     ],
     "content": "FAILED MOVES = FAST OPPOSITE — Market not responding to bullish news = strong bearish. Not responding to bearish = strong bullish. Failure is the signal. Trade opposite aggressively.",
-    "priority": 4
+    "priority": 2
   },
   {
     "id": "pa-092",
@@ -1361,7 +1361,7 @@
       "ar-range"
     ],
     "content": "AUTOMATIC RALLY — After SC, first rally on moderate vol sets range high. AR = resistance during Phase B. SC low = support. Trade within SC-AR until Phase C/D.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-093",
@@ -1377,7 +1377,7 @@
       "smart-money"
     ],
     "content": "VSA CORE — No Supply: low vol + narrow spread + close near high at support = buy. No Demand: mirror at resistance = sell. Stopping Volume: high vol at support, narrow spread. Effort vs Result: high vol narrow spread = reversal.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-094",
@@ -1391,7 +1391,7 @@
       "liquidity"
     ],
     "content": "BID-ASK SPREAD — Narrowing = liquidity, trending. Widening = uncertainty. Trade breakouts when narrow. Fade when wide. Crypto: thin book = rapid moves through zone.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-095",
@@ -1406,7 +1406,7 @@
       "vsa-integration"
     ],
     "content": "VP + VSA — VP for S/R zones (HVN/LVN). VSA within zones for SM intent. VP = LOCATION. VSA = INTENT. Together = WHERE and WHEN.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-096",
@@ -1420,7 +1420,7 @@
       "trend-confirmation"
     ],
     "content": "HIGH VOL + WIDE SPREAD UP — Genuine buying. SM driving + retail following. At breakouts and impulse legs. Do NOT fade. Continuation confirmed.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-097",
@@ -1434,7 +1434,7 @@
       "trap"
     ],
     "content": "LOW VOL + WIDE SPREAD = TRAP — Looks impressive but nobody participated. Low vol breakout = fake. Widening spread on declining vol = exhaustion.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-098",
@@ -1449,7 +1449,7 @@
       "squeeze"
     ],
     "content": "LOW VOL + NARROW SPREAD — No interest, QUIET BEFORE STORM. After prolonged = explosive move. Direction by which stops trigger first.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-099",
@@ -1464,7 +1464,7 @@
       "utad"
     ],
     "content": "UTAD — Spike above resistance after prolonged distribution to trap late buyers, reverses. FINAL TRAP before markdown. Short on reversal candle closing back inside range.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-100",
@@ -1478,7 +1478,7 @@
       "healthy-trend"
     ],
     "content": "HEALTHY TREND — Vol expands on rallies, contracts on pullbacks. Opposite = unhealthy. Any deviation = weakening.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-101",
@@ -1492,7 +1492,7 @@
       "reversal-spike"
     ],
     "content": "CLIMAX VOLUME — 3x+ 20-period avg at extreme + reversal/narrow range. MAJOR turning point. Highest vol in 50+ bars at extreme.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-102",
@@ -1507,7 +1507,7 @@
       "position-sizing"
     ],
     "content": "VPA SIZING — Larger when vol confirms (high vol breakout). Smaller when contradicts. Base 1% + 0.5% per confirmation factor.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-103",
@@ -1522,7 +1522,7 @@
       "springboard"
     ],
     "content": "SPRINGBOARD — Declining vol + narrowing range = SM completed A/D. Breakout EXPLOSIVE. Tighter + lower vol = bigger move. Enter aggressively on breakout.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-104",
@@ -1537,7 +1537,7 @@
       "comparison"
     ],
     "content": "VOL COMPARISON — Compare to: 1) Prior bar. 2) 20-period avg. 3) Same level historically. 4) Similar conditions. Only meaningful RELATIVELY.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-105",
@@ -1551,7 +1551,7 @@
       "gaps"
     ],
     "content": "GAP VOLUME — High vol gap = institutional, holds as S/R. Low vol = retail, fills. Fill on high vol = failure. Hold on pullback = continuation.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-106",
@@ -1565,7 +1565,7 @@
       "two-bar-reversal-vol"
     ],
     "content": "TWO-BAR REVERSAL VOL — Wide spread bar + equal/wider opposite on equal/higher vol at extreme = powerful reversal. Second bar MUST close beyond midpoint of first.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-107",
@@ -1580,7 +1580,7 @@
       "hidden-buying"
     ],
     "content": "HIDDEN BUYING — Price drops then recovers to close near HIGH on above-average vol. Selling ABSORBED intrabar. High vol hammer at support = high prob long.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-108",
@@ -1595,7 +1595,7 @@
       "hidden-selling"
     ],
     "content": "HIDDEN SELLING — Price rallies then reverses to close near LOW on above-average vol. Buying ABSORBED intrabar. High vol shooting star at resistance = high prob short.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-109",
@@ -1609,7 +1609,7 @@
       "gaps-volume"
     ],
     "content": "GAPS AND VOLUME — Breakaway: high vol at pattern break. Runaway: mid-trend moderate. Exhaustion: extreme vol at end. Island: gap+gap = reversal. Low vol gap = meaningless.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-110",
@@ -1623,7 +1623,7 @@
       "triangles"
     ],
     "content": "VOL IN TRIANGLES — CONTRACTS during formation. Breakout MUST expand. Low vol breakout = false, returns inside. Vol at apex = lowest.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-111",
@@ -1637,7 +1637,7 @@
       "flags-pennants-vol"
     ],
     "content": "VOL IN FLAGS — Flagpole highest vol. Consolidation declining. Breakout renewed expansion. Vol increase during flag = distribution, fails.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-112",
@@ -1652,7 +1652,7 @@
       "volume-trendline"
     ],
     "content": "VOLUME TRENDLINES — Draw on volume like price. Vol trendline break PRECEDES price break. Rising vol break in uptrend = selling pressure.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-113",
@@ -1666,7 +1666,7 @@
       "cup-handle"
     ],
     "content": "CUP AND HANDLE — U-shaped + shallow handle. Cup depth 1/3-1/2. Handle declining vol, max 1/3 cup retrace. Breakout SURGE. Target: cup depth. 47% avg rise bull.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-114",
@@ -1680,7 +1680,7 @@
       "wedges"
     ],
     "content": "WEDGES — Rising = bearish. Falling = bullish. Vol DRYS UP. Unlike triangles, both lines same direction. Target: widest part.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-115",
@@ -1709,7 +1709,7 @@
       "performance-rules"
     ],
     "content": "PERFORMANCE RULES — 1) Lowest failure = best. 2) Heavy breakout vol. 3) Throwbacks hurt 6-8%. 4) Tall > short. 5) Wider swings = stronger. 6) Narrow breakouts fail.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-117",
@@ -1737,7 +1737,7 @@
       "island-reversal"
     ],
     "content": "ISLAND REVERSAL — Gap in trend direction, isolated, gap BACK. Vol heavy on both gaps. Powerful reversal at major turns.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-119",
@@ -1766,7 +1766,7 @@
       "broadening"
     ],
     "content": "BROADENING — Expanding range (megaphone). Often at TOPS. Vol heavy, erratic. Each swing wider. Wait for resolution. Breakout = significant trend start.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-121",
@@ -1780,7 +1780,7 @@
       "triple-bottom-top"
     ],
     "content": "TRIPLE BOTTOMS/TOPS — Three equal lows/highs. Vol decreases on each test. Buy above resistance / Short below support. 37% avg rise (bottoms), 24% decline (tops).",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-122",
@@ -1795,7 +1795,7 @@
       "pipe-horn"
     ],
     "content": "PIPE/HORN PATTERNS — Two parallel spikes. Pipe bottom ranked #2 overall bull (39% rise). Pipe top #3 bear (27% decline). Buy above / Short below.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-123",
@@ -1810,7 +1810,7 @@
       "doji"
     ],
     "content": "DOJI — Open = close. After extended move = reversal warning. Dragonfly = bullish. Gravestone = bearish. At S/R after trend = actionable.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-124",
@@ -1824,7 +1824,7 @@
       "dark-cloud-piercing"
     ],
     "content": "DARK CLOUD / PIERCING — Dark cloud: opens above prior high, closes >50% into body. Piercing: mirror. More penetration = stronger. Bearish engulfing is stronger version.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-125",
@@ -1838,7 +1838,7 @@
       "three-soldiers-crows"
     ],
     "content": "THREE SOLDIERS/CROWS — Three consecutive long candles same direction. Opens within prior body. Strong continuation. Rare but powerful.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-126",
@@ -1852,7 +1852,7 @@
       "harami"
     ],
     "content": "HARAMI — Large + small within prior body. Momentum shift. Harami cross (doji second) = stronger. Always requires confirmation.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-127",
@@ -1866,7 +1866,7 @@
       "marubozu"
     ],
     "content": "MARUBOZU — Long body, no shadows. White: total bull control. Black: total bear control. Strong continuation or reversal by context. Don't fade.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-128",
@@ -1880,7 +1880,7 @@
       "shooting-star-hanging-man"
     ],
     "content": "SHOOTING STAR / HANGING MAN — Small body, long upper shadow after uptrend. Rejection of higher prices. Hanging man needs bearish confirmation next day.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-129",
@@ -1894,7 +1894,7 @@
       "trend-bar"
     ],
     "content": "TREND BAR — Body >60% of range. Close near extreme. One side in control. Stronger beyond prior extremes. Series = strong trend, don't fade.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-130",
@@ -1908,7 +1908,7 @@
       "micro-channel"
     ],
     "content": "MICRO-CHANNEL — Every bar low above prior (5-10 bars). EXTREME strength. Don't short. Don't buy breakout (climax). Wait for correction.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-131",
@@ -1923,7 +1923,7 @@
       "magnet-levels"
     ],
     "content": "MAGNET LEVELS — Price gravitates to: prior swing H/L, round numbers, open, prior day H/L. Use for targets. Opening price = intraday magnet.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-132",
@@ -1937,7 +1937,7 @@
       "spike-channel"
     ],
     "content": "SPIKE AND CHANNEL — Strong breakout + shallow channel. Buy pullback to channel bottom. Spike retrace 50%+ = ending. Channel break against = trend change.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-133",
@@ -1952,7 +1952,7 @@
       "barb-wire"
     ],
     "content": "BARB WIRE — 3+ bars with significant overlap. Choppy. AVOID. Wait for breakout. Often after strong move. Place stops beyond range.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-134",
@@ -1966,7 +1966,7 @@
       "trend-from-open"
     ],
     "content": "TREND FROM OPEN — Strong directional from open, minimal pullbacks. Enter on first small pullback. Don't fight. First 2-3 trend bars = confirmed.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-135",
@@ -1981,7 +1981,7 @@
       "gap-open"
     ],
     "content": "GAP OPEN — Gap with trend = continuation. Fade against. Fill ~70% common. Breakaway ~30%. Doesn't fill in 3 bars = strong direction.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-136",
@@ -2009,7 +2009,7 @@
       "first-pullback"
     ],
     "content": "FIRST PULLBACK — After breakout/impulse, wait for first pullback. Entry at S/R within pullback or when closes in trend direction. Highest probability.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-138",
@@ -2023,7 +2023,7 @@
       "trend-exhaustion"
     ],
     "content": "TREND EXHAUSTION — 1) Impulses shrinking. 2) Corrections deepening. 3) Vol declining on impulse. 4) Failed channel line. 5) Divergences. 3+ = reduce.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-139",
@@ -2038,7 +2038,7 @@
       "trade-quality-filter"
     ],
     "content": "TRADE QUALITY — A = all aligned (full size). B = most (normal). C = some conflicting (reduced). D = skip. Prevents overtrading.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-140",
@@ -2051,7 +2051,7 @@
       "range-trading"
     ],
     "content": "RANGE STRATEGY — Buy support, sell resistance with limits. Stop beyond boundary. Target opposite. Reduce size. Low vol at boundary = holds. High vol = breakout.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-141",
@@ -2064,7 +2064,7 @@
       "trend-strength"
     ],
     "content": "TREND STRENGTH — Strong: large impulses, <38.2% retrace. Moderate: 38.2-61.8%. Weak: >61.8%, shrinking. Strong = aggressive, weak = defensive.",
-    "priority": 3
+    "priority": 4
   },
   {
     "id": "pa-142",
@@ -2093,7 +2093,7 @@
       "reaction-candle"
     ],
     "content": "REACTION CANDLE AT S/R — Strong bullish candle at support, body closes upper half. Entry above candle. Stop below zone. Mirror at resistance. HTF alignment increases probability.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-144",
@@ -2108,7 +2108,7 @@
       "session-analysis"
     ],
     "content": "SESSION ANALYSIS — London open: direction. NY open: confirm/reverse. Overlap: highest vol. Afternoon: ranging. Crypto: US drives BTC. London = breakout catalyst.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-145",
@@ -2123,7 +2123,7 @@
       "candle-sequence"
     ],
     "content": "CANDLE SEQUENCE — 3+ consecutive same color = that direction. Alternating = ranging. Growing bodies = strengthening. Shrinking = weakening.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-146",
@@ -2137,7 +2137,7 @@
       "fan-lines"
     ],
     "content": "FAN LINES — Three successively less steep from same point. First = watch. Second = higher probability. Third = REVERSAL CONFIRMED.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-147",
@@ -2152,7 +2152,7 @@
       "round-numbers"
     ],
     "content": "ROUND NUMBER S/R — Psychological levels attract vol. High vol + rejection = strong. High vol + acceptance = A/D. Breakout requires exceptional vol.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-148",
@@ -2166,7 +2166,7 @@
       "breakout"
     ],
     "content": "FRACTAL — UP: bar high > 2 bars each side. DOWN: mirror. Broken = continuation. BUY on break above. SELL below. Fractal + AO positive = strongest.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-149",
@@ -2180,7 +2180,7 @@
       "zero-cross"
     ],
     "content": "AO ZERO CROSS — Neg to pos = buy. Pos to neg = sell. Never trade against. Wait for candle close. Increasing = accelerating.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-150",
@@ -2194,7 +2194,7 @@
       "first-wise-man"
     ],
     "content": "DIVERGENCE BAR — Bull: lower low, close in upper quarter. Bear: higher high, close in lower quarter. Entry above/below bar. Strongest at S/R.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-151",
@@ -2209,7 +2209,7 @@
       "four-states"
     ],
     "content": "MFI STATES — GREEN (MFI+ Vol+): continuation. FADE (MFI- Vol-): pausing. FAKE (MFI+ Vol-): false, reverses. SQUAT (MFI- Vol+): breakout imminent.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-152",
@@ -2223,7 +2223,7 @@
       "profitunity-system"
     ],
     "content": "CONVERGENCE — 1) Alligator eating. 2) AO correct. 3) Divergence bar. 4) MFI green. 5) Fractal breakout. 3+ = elevated prob. 5 = max size.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-153",
@@ -2238,7 +2238,7 @@
       "zones"
     ],
     "content": "S/R ZONES — Areas of repeated reversal. Line charts to find. Old > new (memory). Market scars. Width = timeframe. More touches = stronger.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-154",
@@ -2252,7 +2252,7 @@
       "last-kiss"
     ],
     "content": "LAST KISS — After break through zone, wait for retest. Enter on retest. Stop beyond. Confirms breakout. 60-70% occurrence. Better than chasing.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-155",
@@ -2266,7 +2266,7 @@
       "big-shadow"
     ],
     "content": "BIG SHADOW — Range engulfs prior at zone. Bullish at support = buy. Bearish at resistance = sell. Enter on break. Stop at opposite end.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-156",
@@ -2280,7 +2280,7 @@
       "kangaroo-tail"
     ],
     "content": "KANGAROO TAIL — Long-wick at zone, small body. Longer wick = stronger. Enter on body break. Stop at tail tip. Trendy (with-trend) > counter-trend.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-157",
@@ -2294,7 +2294,7 @@
       "zone-mtf"
     ],
     "content": "ZONE MTF — Weekly/daily for zones. 4H/1H for entries. Line chart for zones, candlestick for entries. Multi-TF confluence increases probability.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-158",
@@ -2308,7 +2308,7 @@
       "wave-3"
     ],
     "content": "WAVE 3 — 1.618x wave 1. BIGGEST money. AO strongest. Entry after wave 2 (50-61.8% retrace), AO turning. Best risk/reward. Cannot be shortest impulse.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-159",
@@ -2322,7 +2322,7 @@
       "wave-5-truncation"
     ],
     "content": "WAVE 5 TRUNCATION — Fails to exceed wave 3. AO divergence + lower high. Powerful reversal. Short with stop above wave 3.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-160",
@@ -2351,7 +2351,7 @@
       "pivot-points"
     ],
     "content": "PIVOT POINTS — Pivot = (H+L+C)/3. R1 = 2P-L. S1 = 2P-H. Test daily pivot 90%. R2/S2 = dead H/L. Pivot + round number + MA = strongest confluence.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-162",
@@ -2378,7 +2378,7 @@
       "moving-averages"
     ],
     "content": "TREND ID — 200 SMA: above = uptrend, below = downtrend. 50 SMA intermediate. Golden cross = major bullish. Death cross = major bearish.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-164",
@@ -2392,7 +2392,7 @@
       "ema-bounce"
     ],
     "content": "EMA PULLBACK — 20 EMA = dynamic support in uptrend. Pullback + bounce. Entry on bullish candle at EMA. Stop below swing. ADX>25 for confirmation.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-165",
@@ -2406,7 +2406,7 @@
       "price-is-primary"
     ],
     "content": "PRICE IS PRIMARY — All indicators lag price. Price action at zones = faster info. Use indicators for confirmation only. Market speaks through bars.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-166",
@@ -2421,7 +2421,7 @@
       "crypto-adapted"
     ],
     "content": "SESSION-BASED PA — Asian: quiet. London: trend initiation. NY overlap: highest vol. Afternoon: ranging. Crypto: US drives BTC. London = breakout.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-167",
@@ -2434,7 +2434,7 @@
       "trend-resumption"
     ],
     "content": "TREND RESUMPTION — After pause: continuation = tight range, declining vol. Reversal = wide range, heavy vol. Trade breakout direction.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-168",
@@ -2448,7 +2448,7 @@
       "reversal-day"
     ],
     "content": "REVERSAL DAY — Opens near extreme, closes opposite after trend. Daily/weekly significant. High vol = MAJOR turn. Low vol = minor pause.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-169",
@@ -2461,7 +2461,7 @@
       "channel-break"
     ],
     "content": "CHANNEL BREAK — Break with trend = acceleration (hold). Break against = trend ending (exit). Narrow = strong trend. Wide = weak.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-170",
@@ -2475,7 +2475,7 @@
       "inside-day-breakout"
     ],
     "content": "INSIDE DAY BREAKOUT — 2+ inside days. Buy above / sell below range. Stop-and-reverse opposite. Compression before expansion.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-171",
@@ -2488,7 +2488,7 @@
       "adx-filter"
     ],
     "content": "ADX FILTER — >25 = trending (trend tools). <20 = ranging (oscillators). 20-25 = transition, reduce size. Rising = strengthening. Falling = weakening.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-172",
@@ -2502,7 +2502,7 @@
       "time-stops"
     ],
     "content": "TIME STOPS — No profit in expected timeframe = exit. Loss after 1-2 weeks = wrong. Even breakeven after time = probably wrong. Complements price stops.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-173",
@@ -2516,7 +2516,7 @@
       "process-over-outcome"
     ],
     "content": "PROCESS OVER OUTCOME — Execute plan not P&L. Good process + bad outcome = correct trade. Track execution quality separately from profitability.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-174",
@@ -2530,7 +2530,7 @@
       "no-setup-no-trade"
     ],
     "content": "NO SETUP = NO TRADE — Only when all criteria met. Quality > quantity. Patience is edge. No clear setup = best trade is no trade.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-175",
@@ -2544,7 +2544,7 @@
       "failed-moves-sentiment"
     ],
     "content": "FAILED MOVES — Market 'should' do something but doesn't = trade opposite. Not responding to news = opposite direction signal. Failure is information.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-176",
@@ -2557,7 +2557,7 @@
       "trend-following"
     ],
     "content": "TREND FOLLOWING — Go with trend. Whatever method, get in when major trend exists. Consistency > particular characteristics. 15-30% of time = profits.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-177",
@@ -2571,7 +2571,7 @@
       "contrarian"
     ],
     "content": "CONTRARIAN AT EXTREMES — Best at new highs (sell). Worst at new lows (buy). Best money at turns. Need technical confirmation.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-178",
@@ -2585,7 +2585,7 @@
       "patience"
     ],
     "content": "DO NOTHING — Most people always playing. Wait until money lying in corner, pick it up. Trade as little as possible.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-179",
@@ -2599,7 +2599,7 @@
       "exchange-flows"
     ],
     "content": "EXCHANGE FLOW — Inflows = selling pressure. Outflows = accumulation. Sustained outflows during decline = SM accumulating. Inflows during rally = distribution.",
-    "priority": 3
+    "priority": 2
   },
   {
     "id": "pa-180",
@@ -2992,7 +2992,7 @@
       "background"
     ],
     "content": "TREND THEORY — Primary: months-years. Secondary: weeks-months (1/3-2/3 retrace). Minor: days-weeks. Bull = HH+HL. Reversal = LH+LL. Foundation of Western TA.",
-    "priority": 1
+    "priority": 2
   },
   {
     "id": "pa-208",
@@ -3007,7 +3007,7 @@
       "background"
     ],
     "content": "SCHABACKER FOUNDATION — Chart patterns repeat due to human psychology. All subsequent pattern work builds on this. Patterns = psychology made visible.",
-    "priority": 1
+    "priority": 2
   },
   {
     "id": "pa-209",
@@ -3022,7 +3022,7 @@
       "philosophy"
     ],
     "content": "VOLUME AS TRUTH — Price can be manipulated short-term. Volume reveals truth. Every source emphasizes volume confirmation. Volume = one indicator that cannot be faked.",
-    "priority": 1
+    "priority": 2
   },
   {
     "id": "pa-210",
@@ -3037,7 +3037,7 @@
       "background"
     ],
     "content": "FRACTAL THEORY — Markets fundamentally fractal. Same patterns at every timeframe. 5-min looks like daily looks like weekly. Use MTF analysis. High fractal dim = choppy. Low = trending.",
-    "priority": 1
+    "priority": 2
   },
   {
     "id": "pa-211",
@@ -3052,7 +3052,7 @@
       "background"
     ],
     "content": "DOW THEORY — 1) Discount everything. 2) Three trends. 3) Three phases. 4) Indices confirm. 5) Volume confirms. 6) Until definitive reversal. Patterns = specific tools.",
-    "priority": 1
+    "priority": 2
   },
   {
     "id": "pa-212",
@@ -3067,7 +3067,7 @@
       "background"
     ],
     "content": "PATTERN RELIABILITY — Larger > smaller. Longer formation > shorter. At major S/R > random locations. Edwards/Magee rank: 1) H&S. 2) Rectangles. 3) Symmetrical triangles. 4) Double/triple. 5) Flags/pennants. 6) Wedges. 7) Broadening.",
-    "priority": 1
+    "priority": 2
   },
   {
     "id": "pa-213",
@@ -3082,7 +3082,7 @@
       "background"
     ],
     "content": "WHY PATTERNS WORK — Human nature is repetitive. Greed and fear create recognizable footprints. Institutional behavior forced by size creates predictable patterns. Self-fulfilling prophecy (everyone watching same levels).",
-    "priority": 1
+    "priority": 2
   },
   {
     "id": "pa-214",
@@ -3097,7 +3097,7 @@
       "background"
     ],
     "content": "PATTERN TYPES — Reversal: H&S, double/triple tops/bottoms, rounding. Continuation: triangles, rectangles, flags, pennants, wedges. Too long continuation = becoming reversal.",
-    "priority": 1
+    "priority": 2
   },
   {
     "id": "pa-215",
@@ -3112,7 +3112,7 @@
       "background"
     ],
     "content": "SM DETECTION FRAMEWORK — Coulling VPA (volume-price divergence) + COT (hedger positioning) + Wyckoff (A/D) = three independent methods for institutional activity detection.",
-    "priority": 1
+    "priority": 2
   },
   {
     "id": "pa-216",
@@ -3127,6 +3127,6 @@
       "philosophy"
     ],
     "content": "PA PRINCIPLE — Price is the ultimate indicator. Everything needed is in the bars. No lagging indicators needed. Market speaks through price. Learn by studying bar-by-bar action.",
-    "priority": 1
+    "priority": 2
   }
 ]

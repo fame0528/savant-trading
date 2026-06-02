@@ -123,6 +123,145 @@ impl MarketContext {
             parts.join(" | ")
         }
     }
+
+    /// Actionable market conditions summary using SOUL.md thresholds.
+    ///
+    /// Translates raw data into human-readable assessments the AI can
+    /// directly use for decision-making. Uses the same thresholds as
+    /// SOUL.md Action Triggers (Section XIII).
+    pub fn conditions_summary(&self) -> String {
+        let mut lines = Vec::new();
+
+        // Sentiment
+        if let Some(fg) = self.sentiment.fear_greed_index {
+            let assessment = match fg {
+                0..=15 => "Extreme Fear — capitulation buy zone per SOUL.md §XIII",
+                16..=30 => "Fear — contrarian opportunity, cautious entry",
+                31..=60 => "Neutral — no sentiment edge",
+                61..=80 => "Greed — caution, tighten stops, take partial profits",
+                81..=100 => "Extreme Greed — euphoria, prepare to sell, do NOT long",
+                _ => "Unknown",
+            };
+            lines.push(format!("- Sentiment: {}/100 — {}", fg, assessment));
+        }
+
+        // On-chain
+        if let Some(mvrv) = self.onchain.mvrv {
+            let assessment = if mvrv < 0.8 {
+                "deep capitulation — rare buy signal"
+            } else if mvrv < 1.0 {
+                "below realized value — strong buy zone"
+            } else if mvrv < 2.0 {
+                "fair value — no edge"
+            } else if mvrv < 3.5 {
+                "elevated — take profits on strength"
+            } else {
+                "extreme euphoria — historically precedes major corrections"
+            };
+            lines.push(format!("- On-chain MVRV: {:.2} — {}", mvrv, assessment));
+        }
+
+        if let Some(sopr) = self.onchain.sopr {
+            let assessment = if sopr < 0.95 {
+                "heavy loss realization — capitulation"
+            } else if sopr < 1.0 {
+                "mild loss realization — weak hands selling"
+            } else if sopr < 1.05 {
+                "profit realization — normal"
+            } else {
+                "heavy profit realization — potential distribution"
+            };
+            lines.push(format!("- SOPR: {:.4} — {}", sopr, assessment));
+        }
+
+        // Funding
+        if let Some(fr) = self.funding.funding_rate {
+            let pct = fr * 100.0;
+            let assessment = if pct > 0.05 {
+                "extremely overleveraged longs — squeeze risk, avoid longs"
+            } else if pct > 0.01 {
+                "longs paying shorts — mild bullish crowding"
+            } else if pct > -0.01 {
+                "neutral — no funding edge"
+            } else if pct > -0.05 {
+                "shorts paying longs — mild bearish crowding"
+            } else {
+                "extremely overleveraged shorts — squeeze setup, watch for long entries"
+            };
+            lines.push(format!("- Funding: {:.4}% — {}", pct, assessment));
+        }
+
+        // Liquidation risk
+        lines.push(format!(
+            "- Liquidation risk: {:?}",
+            self.liquidation.risk_level
+        ));
+
+        // Top news with sentiment
+        if !self.rss_items.is_empty() {
+            let top: Vec<&str> = self
+                .rss_items
+                .iter()
+                .take(3)
+                .map(|item| item.title.as_str())
+                .collect();
+            let sentiments: Vec<&str> = self
+                .rss_items
+                .iter()
+                .take(3)
+                .map(|item| classify_headline_sentiment(&item.title))
+                .collect();
+            lines.push("- Top news:".to_string());
+            for (i, title) in top.iter().enumerate() {
+                lines.push(format!("  {}. [{}] {}", i + 1, sentiments[i], title));
+            }
+        }
+
+        if lines.is_empty() {
+            "No market data available".to_string()
+        } else {
+            lines.join("\n")
+        }
+    }
+}
+
+/// Classify a news headline as bullish/bearish/neutral via keyword matching.
+fn classify_headline_sentiment(title: &str) -> &'static str {
+    let lower = title.to_lowercase();
+
+    // Check for negation patterns first
+    let has_positive = lower.contains("approves")
+        || lower.contains("approved")
+        || lower.contains("adoption")
+        || lower.contains("partnership")
+        || lower.contains("launch")
+        || lower.contains("rally")
+        || lower.contains("surge")
+        || lower.contains("etf");
+
+    let has_negative = lower.contains("crash")
+        || lower.contains("hack")
+        || lower.contains("ban")
+        || lower.contains("enforcement")
+        || lower.contains("crackdown")
+        || lower.contains("collapse")
+        || lower.contains("fraud")
+        || lower.contains("scam");
+
+    // SEC + approve = bullish (negation handling)
+    if lower.contains("sec") && has_positive {
+        return "BULLISH";
+    }
+
+    if has_negative && !has_positive {
+        "BEARISH"
+    } else if has_positive && !has_negative {
+        "BULLISH"
+    } else if has_positive || has_negative {
+        "MIXED"
+    } else {
+        "NEUTRAL"
+    }
 }
 
 /// Aggregates all insight sources with caching and graceful failure handling.

@@ -1,4 +1,4 @@
-# SAVANT TRADING v0.4.2
+# SAVANT TRADING v0.4.3
 
 <!-- markdownlint-disable MD033 -->
 <div align="center">
@@ -7,11 +7,11 @@
 
 **AI-Native Autonomous Crypto Trading Engine**
 
-A production-grade, Rust-native trading engine where an AI agent IS the brain — powered by 22 curated transcripts and research-derived knowledge files (254 total units) via mimo v2.5 pro through OpenGateway.
+A production-grade, Rust-native trading engine where an AI agent IS the brain — powered by 2,959 knowledge units across 10 enterprise-grade JSON files via mimo v2.5 pro through OpenGateway.
 
 **Free, Unlimited AI — MIMO v2.5 Pro:** Ships with [OpenGateway](https://gitlawb.com/opengateway) as the inference provider — an open gateway sponsored by Xiaomi MiMo. 1M context window, 131K max output.
 
-[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![Kraken](https://img.shields.io/badge/Kraken-Exchange-%23000000?style=flat-square&logo=bitcoin&logoColor=%2300fbff)](https://www.kraken.com/)[![OpenGateway](https://img.shields.io/badge/OpenGateway-MIMO%20v2.5%20Pro-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://gitlawb.com/opengateway)[![Version](https://img.shields.io/badge/Version-0.4.2-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![Kraken](https://img.shields.io/badge/Kraken-Exchange-%23000000?style=flat-square&logo=bitcoin&logoColor=%2300fbff)](https://www.kraken.com/)[![OpenGateway](https://img.shields.io/badge/OpenGateway-MIMO%20v2.5%20Pro-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://gitlawb.com/opengateway)[![Version](https://img.shields.io/badge/Version-0.4.3-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
 
 </div>
 
@@ -55,22 +55,29 @@ Rule-Based Strategies ──→ Optional parallel signals (comparison only)
 ## Features
 
 - **AI Agent Brain** — mimo v2.5 pro via OpenGateway makes all trading decisions using full market context
+- **SSE Streaming** — Real-time LLM response streaming, no timeout risk during long reasoning
 - **Multi-Timeframe Analysis** — Fetches 5m + 1H + 4H candles per pair; higher timeframe context injected into AI prompt
-- **Knowledge Injection System** — 22 transcripts processed into 254 discrete knowledge units, dynamically selected by market condition
+- **Knowledge Base** — 2,959 units across 10 enterprise-grade JSON files, MMR selection with utility scoring, indicator-driven context tags
+- **Closed-Loop Training** — Semantic consolidation, anti-pattern detection, GEPA mutation, Teacher LLM, version control, auto-rollback
+- **Persistent Memory** — SQLite WAL episodic memory, Brier score calibration, CUSUM edge decay, experience replay
+- **Training Pipeline** — Progressive difficulty, convergence detection, confidence distribution, category edge tracking, auto-lesson generation
 - **Live Market Insight** — Fear & Greed Index, BTC Dominance, funding rates, liquidation clusters, exchange flows, on-chain analytics (MVRV, SOPR, NVT), news sentiment
+- **Multi-Asset Correlation** — Pearson correlation matrix, effective position counting for correlated pairs
+- **Portfolio Heat** — Total risk exposure tracking, blocks trades when heat exceeds 40% of equity
+- **Dynamic Slippage** — Slippage scales with ATR volatility and order book depth
 - **Pair Discovery** — `scan_all_pairs = true` discovers all USD pairs on Kraken automatically
-- **Kraken Integration** — REST + WebSocket for candle data, order execution, and account management
-- **WebSocket Real-Time** — Kraken WS v2 streams ticker, order book, and trade data directly into the engine
-- **Paper Trading** — Full simulation with realistic fees (0.26% Kraken taker) and slippage modeling
+- **Kraken Integration** — REST + WebSocket (exponential backoff reconnection) for candle data, order execution, and account management
+- **Paper Trading** — Full simulation with realistic fees (0.26% Kraken taker) and dynamic slippage modeling
 - **Scale-Out Execution** — TP1 → 50% close + break-even stop, TP2 → 60% of remainder, TP3 → full close
-- **Circuit Breakers** — Independent risk layer the AI cannot override: 3% daily limit, 10% drawdown kill switch
+- **Circuit Breakers** — Independent risk layer the AI cannot override: daily loss limit, drawdown kill switch, max positions, portfolio heat
 - **Backtesting Engine** — Historical strategy validation with walk-forward optimization and Sharpe ratio
-- **REST API with CORS** — 15 endpoints for dashboard integration: portfolio, positions, decisions, insight, memory, activity
-- **Episodic Memory** — SQLite WAL decision ledger with Brier score calibration, CUSUM edge decay detection, experience replay
-- **Sandbox Testing** — GARCH(1,1) synthetic OHLCV generation, 50 curated scenarios, 3-tier grading rubric, GEPA feedback
+- **REST API with CORS** — 16 endpoints including /api/training for training metrics
+- **SQLite Backup** — Automatic rolling backup rotation (last 7 copies, 6-hour interval)
+- **Sandbox Testing** — GARCH(1,1) synthetic OHLCV, 60 scenarios (11 categories), 3-tier grading, train/val split
+- **SOUL.md Evolution** — Immutable/mutable zones, GEPA textual optimization, pareto gatekeeper, version control
 - **Trade Journal** — SQLite persistence for every trade, equity curve, and daily performance summaries
-- **Glass House** — Obsidian vault integration for transparent trading state (trades, decisions, portfolio, lessons)
-- **Modular Prompts** — System prompt composed from 5 independent layers, knowledge units injected per-condition
+- **Glass House** — Obsidian vault integration for transparent trading state
+- **Modular Prompts** — System prompt composed from 5 independent layers + 6th memory context layer
 - **Structured Decisions** — AI outputs JSON with entry, stop, 3 take-profit levels, confidence score, and reasoning
 - **Fallback Mode** — Rule-based strategies activate automatically if LLM is unavailable
 
@@ -78,50 +85,22 @@ Rule-Based Strategies ──→ Optional parallel signals (comparison only)
 
 ## Knowledge Base
 
-The AI agent's trading knowledge comes from 22 curated transcripts and research:
+The AI agent's trading knowledge comes from 150+ books and transcripts, organized into 10 enterprise-grade JSON files with 2,959 tagged knowledge units:
 
-### Original Transcripts (11 files, 141 units)
+| File | Units | Domain |
+|------|-------|--------|
+| `knowledge_technical_analysis.json` | 506 | RSI, EMA, ADX, MACD, Bollinger, Fibonacci, divergences |
+| `knowledge_psychology.json` | 319 | Cognitive biases, tilt, deliberate practice, emotional regulation |
+| `knowledge_crypto_native.json` | 319 | On-chain analytics, DeFi, funding rates, liquidation cascades |
+| `knowledge_risk_management.json` | 350 | Kelly Criterion, drawdown recovery, position sizing, anti-martingale |
+| `knowledge_sentiment.json` | 291 | Fear & Greed, social sentiment, news analysis, crowd psychology |
+| `knowledge_execution.json` | 282 | Order types, slippage, fill optimization, rate limits |
+| `knowledge_market_regimes.json` | 250 | Trending, ranging, volatile, capitulation detection |
+| `knowledge_trading_systems.json` | 226 | Backtesting, walk-forward, Monte Carlo, strategy design |
+| `knowledge_price_action.json` | 216 | Wyckoff, candle patterns, support/resistance, liquidity |
+| `knowledge_fundamentals.json` | 200 | Macro analysis, halving cycles, ETF flows, regulatory |
 
-| Transcript | Knowledge Domain | Key Concepts |
-|------------|-----------------|--------------|
-| `scalping-fabio-valentina-amt` | Order Flow, Volume Profile | 3-step model, aggression detection, CVD, mean reversion vs trend |
-| `strategy-pradeep-bondi-episodic-pivot` | Execution, Catalysts | Sell-into-strength, four-factor model, self-leadership |
-| `daytrading-tjr-complete-guide` | Technical Analysis | FVG, order blocks, liquidity sweeps, break of structure, multi-TF |
-| `crypto-full-course-beginners` | Sentiment, Macro | Fear & Greed, BTC dominance, exchange flows, alt season |
-| `crypto-brian-jung-2026-strategy` | Macro Analysis | Halving cycle, FOMC catalysts, DCA, narrative rotation |
-| `daytrading-juvier-full-course` | Session Trading | Kill zones, session highs/lows, squeeze breakouts |
-| `daytrading-warrior-trading-9-steps` | Stock Selection | 5 Pillars, pullback entry, Level 2, metrics |
-| `daytrading-hybrid-super-scalping` | Scalping | Heikin Ashi + EMA, doji entries, prop firm scaling |
-| `macro-cathie-wood-ark-invest` | Macro Thesis | Innovation platforms, Wright's Law, convergence |
-| `ai-bot-claude-code-trading-bot` | Regime Detection | HMM regimes, walk-forward backtesting, circuit breakers |
-| `ai-bot-trading-competition` | Strategy Design | Natural selection, multi-agent, strategy inputs |
-
-### Research-Derived Knowledge (11 files, 113 units)
-
-| File | Domain | Key Concepts |
-|------|--------|-------------|
-| `onchain_analytics.json` | On-Chain | MVRV, NUPL, SOPR, NVT, exchange flows, whale tracking |
-| `risk_management.json` | Risk Math | Kelly Criterion, drawdown recovery, ATR trailing, anti-martingale |
-| `crypto_derivatives.json` | Derivatives | Funding rate arb, liquidation cascades, OI divergence |
-| `wyckoff_orderflow.json` | Price Action | Wyckoff accumulation/distribution, footprint charts, BTC.D rotation |
-| `macro_liquidity.json` | Macro | 65-month liquidity cycle, DXY, ETF flows, debt ratio |
-| `defi_execution.json` | DeFi | Hyperliquid, Uniswap V3 LP, options Greeks/DDH |
-| `backtesting_deployment.json` | Backtesting | Walk-Forward Optimization, concept drift, Monte Carlo |
-| `execution_engineering.json` | Execution | REST vs WebSocket, rate limits, Kraken fees |
-| `prop_firm.json` | Prop Firms | Drawdown models, consistency rules, evaluation strategy |
-| `trading_psychology.json` | Psychology | Tilt, cognitive debiasing, deliberate practice |
-| `compliance.json` | Compliance | 1099-DA, wash sale rules, entity structuring |
-
-Knowledge units are dynamically injected based on market conditions:
-
-| Market Condition | Knowledge Injected |
-|-----------------|-------------------|
-| High volatility / trending | Fabio's order flow model, aggression detection |
-| Ranging / consolidation | Fabio's mean reversion model, volume profile |
-| Fear & Greed extreme | Contrarian playbook from crypto full course |
-| Breaking news catalyst | Pradeep's episodic pivot rules |
-| Session opening | Juvier's kill zone strategy |
-| BTC dominance shifting | Alt season rotation playbook |
+Knowledge units are tagged with `setup_type`, `regime_subtype`, `trigger`, `indicator`, and `risk_context` for precise MMR selection. A `utility_score` field tracks empirical correlation with successful trades — units that help the agent win get promoted, units that correlate with losses get suppressed.
 
 ---
 
@@ -263,7 +242,8 @@ savant-trading/
 │   ├── risk/                     # Risk management
 │   │   ├── position.rs           # Position sizing
 │   │   ├── stop_loss.rs          # Stop loss and break-even
-│   │   └── circuit_breaker.rs    # Drawdown protection
+│   │   ├── circuit_breaker.rs    # Drawdown protection + portfolio heat
+│   │   └── correlation.rs        # Multi-asset Pearson correlation matrix
 │   ├── strategy/                 # Rule-based strategies (optional)
 │   │   ├── momentum.rs
 │   │   ├── mean_reversion.rs
@@ -277,7 +257,9 @@ savant-trading/
 │   │   ├── context.rs            # 6th prompt layer (memory injection)
 │   │   ├── calibration.rs        # Brier score confidence calibration
 │   │   ├── cusum.rs              # CUSUM edge decay detection
-│   │   └── replay.rs             # Experience replay (lessons from history)
+│   │   ├── replay.rs             # Experience replay (lessons from history)
+│   │   ├── semantic.rs           # Semantic consolidation (SQL → patterns)
+│   │   └── anti_pattern.rs       # Anti-pattern detection (failure conditions)
 │   ├── sandbox/                  # Synthetic scenario testing
 │   │   ├── generator.rs          # GARCH(1,1) OHLCV generator
 │   │   ├── scenarios.rs          # 50 curated scenarios (11 categories)
@@ -333,12 +315,28 @@ cargo run -- backtest
 # View performance report
 cargo run -- report
 
+# Action test (all scenarios with memory capture)
+cargo run -- --test
+
+# Action test with filters
+cargo run -- --test -c "Trend Bull"         # Filter by category
+cargo run -- --test -a                       # Only Buy/Sell scenarios
+cargo run -- --test -n 20                    # First N scenarios
+cargo run -- --test -c "Crash" -a -n 10      # Combine filters
+
+# Training mode (loop until Brier converges)
+cargo run -- --test --train
+cargo run -- --test --train -a -n 20
+
+# Legacy sandbox with grading
+cargo run -- --test --sandbox
+
 # Help
 cargo run -- --help
 ```
 
 **API endpoints** (available at `http://localhost:8080/api/`):
-`/status` `/config` `/portfolio` `/positions` `/trades` `/decisions` `/insight` `/knowledge` `/risk` `/session` `/activity` `/memory`
+`/status` `/config` `/portfolio` `/positions` `/trades` `/decisions` `/insight` `/knowledge` `/risk` `/session` `/activity` `/memory` `/training`
 
 ---
 
@@ -370,17 +368,17 @@ cargo fmt --check
 All bugs and improvements are tracked as Finding IDs in `dev/findings/`:
 
 ```bash
-ls dev/findings/archived/
-# All 31 FIDs closed and archived:
-# FID-2026-0530-001.md  [CLOSED] ECHO Protocol Violations
-# FID-2026-0530-002.md  [CLOSED] Paper Trading Persistence
-# FID-2026-0530-003.md  [CLOSED] Fee & Slippage
-# FID-2026-0530-004.md  [CLOSED] Trailing Stops
-# ...
-# FID-2026-0531-004.md  [CLOSED] Production Sprint (7 items)
-```
+ls dev/findings/
+# Active FIDs (all closed):
+# FID-2026-0531-007.md  [CLOSED] Knowledge Base Reorganization
+# FID-2026-0531-008.md  [CLOSED] Sandbox Architecture Overhaul
+# FID-2026-0531-009.md  [CLOSED] Knowledge Selection Fix
+# FID-2026-0531-010.md  [CLOSED] Persistent Training Pipeline
+# FID-2026-0531-011.md  [CLOSED] Closed-Loop Training Pipeline
 
-See `dev/findings/archived/` for full history. Active FIDs (if any) are in `dev/findings/`.
+ls dev/findings/archived/
+# 32 archived FIDs from initial build (FID-2026-0530-001 through 026, 0531-001 through 006)
+```
 
 ### ECHO Protocol
 

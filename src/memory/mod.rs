@@ -6,8 +6,10 @@
 //! 3. Episodic Memory — SQLite WAL ledger of every decision + market snapshot
 //! 4. Semantic Memory — extracted patterns, edge decay alerts, replay lessons
 
+pub mod anti_pattern;
 pub mod calibration;
 pub mod context;
 pub mod cusum;
 pub mod episodic;
 pub mod replay;
+pub mod semantic;

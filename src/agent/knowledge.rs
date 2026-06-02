@@ -6,6 +6,10 @@
 
 use serde::{Deserialize, Serialize};
 
+/// Maximum number of knowledge units selected per prompt.
+/// Prevents token bloat while keeping MMR diversity.
+const MAX_SELECTED_UNITS: usize = 20;
+
 /// A discrete unit of trading knowledge.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KnowledgeUnit {
@@ -18,6 +22,15 @@ pub struct KnowledgeUnit {
     /// Granular tags for precise matching (setup_type, timeframe, trigger, etc.)
     #[serde(default)]
     pub tags: Vec<String>,
+    /// Empirical utility score — tracks how well this unit correlates with
+    /// successful trades. Adjusted by knowledge lifecycle batch job.
+    /// 1.0 = neutral, > 1.0 = correlates with wins, < 1.0 = correlates with losses.
+    #[serde(default = "default_utility_score")]
+    pub utility_score: f64,
+}
+
+fn default_utility_score() -> f64 {
+    1.0
 }
 
 /// Topic categories for knowledge units — one per trading function.
@@ -64,6 +77,12 @@ pub enum MarketCondition {
     OIDivergence,
     WyckoffSpring,
     DeltaDivergence,
+    Oversold,
+    Overbought,
+    StrongTrend,
+    WeakTrend,
+    VolumeExpansion,
+    TrendAlignment,
 }
 
 /// The knowledge base — holds all loaded knowledge units and provides
@@ -123,8 +142,8 @@ impl KnowledgeBase {
                     .iter()
                     .filter(|c| conditions.contains(c))
                     .count() as f64
-                    * 3.0;
-                let priority_score = unit.priority as f64 * 2.0;
+                    * 2.0;
+                let priority_score = unit.priority as f64;
                 let tag_score = if context_tags.is_empty() {
                     0.0
                 } else {
@@ -132,8 +151,15 @@ impl KnowledgeBase {
                         .iter()
                         .filter(|t| context_tags.contains(t))
                         .count() as f64
+                        * 3.0
                 };
                 (condition_score + priority_score + tag_score, idx)
+            })
+            .map(|(base_score, idx)| {
+                // Apply utility_score: units that correlate with wins get promoted,
+                // units that correlate with losses get suppressed.
+                let utility_mult = 1.0 + self.units[idx].utility_score.max(0.01).log2();
+                (base_score * utility_mult, idx)
             })
             .collect();
 
@@ -174,7 +200,7 @@ impl KnowledgeBase {
             let unit = &self.units[idx];
             let unit_tokens = unit.content.len().div_ceil(4);
 
-            if used_tokens + unit_tokens <= token_budget {
+            if used_tokens + unit_tokens <= token_budget && selected.len() < MAX_SELECTED_UNITS {
                 used_tokens += unit_tokens;
                 selected_indices.push(idx);
                 selected.push(unit);
@@ -223,6 +249,44 @@ impl KnowledgeBase {
     pub fn is_empty(&self) -> bool {
         self.units.is_empty()
     }
+
+    /// Get a mutable reference to all units (for utility score updates).
+    pub fn units_mut(&mut self) -> &mut Vec<KnowledgeUnit> {
+        &mut self.units
+    }
+
+    /// Get a unit by ID.
+    pub fn get_by_id(&self, id: &str) -> Option<&KnowledgeUnit> {
+        self.units.iter().find(|u| u.id == id)
+    }
+
+    /// Save utility scores to a JSON sidecar file.
+    /// Only saves id → utility_score mapping, not full content.
+    pub fn save_utility_scores(&self, path: &std::path::Path) -> std::io::Result<()> {
+        let scores: std::collections::HashMap<&str, f64> = self
+            .units
+            .iter()
+            .map(|u| (u.id.as_str(), u.utility_score))
+            .collect();
+        let json = serde_json::to_string_pretty(&scores)?;
+        std::fs::write(path, json)
+    }
+
+    /// Load utility scores from a JSON sidecar file and apply to units.
+    pub fn load_utility_scores(&mut self, path: &std::path::Path) -> std::io::Result<()> {
+        if !path.exists() {
+            return Ok(());
+        }
+        let json = std::fs::read_to_string(path)?;
+        let scores: std::collections::HashMap<String, f64> = serde_json::from_str(&json)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+        for unit in &mut self.units {
+            if let Some(&score) = scores.get(&unit.id) {
+                unit.utility_score = score;
+            }
+        }
+        Ok(())
+    }
 }
 
 /// Similarity between two knowledge units based on topic and tag overlap.
@@ -255,6 +319,7 @@ mod tests {
             content: format!("Knowledge from {}", id),
             priority,
             tags: vec![],
+            utility_score: 1.0,
         }
     }
 
@@ -272,6 +337,7 @@ mod tests {
             content: format!("Knowledge from {}", id),
             priority,
             tags: tags.into_iter().map(String::from).collect(),
+            utility_score: 1.0,
         }
     }
 
@@ -356,4 +422,92 @@ mod tests {
         assert_eq!(base.len(), 1);
         assert!(base.all()[0].tags.is_empty());
     }
+
+    #[test]
+    fn utility_score_affects_ranking() {
+        let mut base = KnowledgeBase::new(vec![
+            KnowledgeUnit {
+                id: "a".into(),
+                source: "test".into(),
+                topic: KnowledgeTopic::TechnicalAnalysis,
+                conditions: vec![MarketCondition::Trending],
+                content: "Unit A".into(),
+                priority: 3,
+                tags: vec![],
+                utility_score: 2.0, // high utility
+            },
+            KnowledgeUnit {
+                id: "b".into(),
+                source: "test".into(),
+                topic: KnowledgeTopic::TechnicalAnalysis,
+                conditions: vec![MarketCondition::Trending],
+                content: "Unit B".into(),
+                priority: 3,
+                tags: vec![],
+                utility_score: 0.5, // low utility
+            },
+        ]);
+        let selected = base.select(&[MarketCondition::Trending], 10000);
+        assert_eq!(selected[0].id, "a"); // higher utility wins
+    }
+}
+
+/// Adjust utility_score for knowledge units based on episode outcomes.
+///
+/// For each episode: if the agent won, boost utility of units that were in the
+/// prompt. If it lost, suppress them. Learning rate controls the magnitude.
+pub fn update_utility_scores(
+    knowledge: &mut KnowledgeBase,
+    episodes: &[(Vec<String>, bool)], // (knowledge_unit_ids, is_win)
+    learning_rate: f64,
+) -> u32 {
+    let mut updates = 0u32;
+    for (unit_ids, is_win) in episodes {
+        for unit_id in unit_ids {
+            if let Some(unit) = knowledge.units.iter_mut().find(|u| u.id == *unit_id) {
+                let delta = if *is_win {
+                    learning_rate
+                } else {
+                    -learning_rate * 0.5 // Penalize losses less than reward wins
+                };
+                unit.utility_score = (unit.utility_score + delta).clamp(0.1, 5.0);
+                updates += 1;
+            }
+        }
+    }
+    updates
+}
+
+/// Load all knowledge JSON files from a directory and return a KnowledgeBase.
+pub fn load_knowledge_from_dir(dir: &std::path::Path) -> KnowledgeBase {
+    use std::fs;
+    let mut all_units = Vec::new();
+
+    if let Ok(entries) = fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) == Some("json")
+                && !path.to_string_lossy().contains("_backup")
+                && path.file_name().and_then(|n| n.to_str()) != Some("package.json")
+            {
+                if let Ok(content) = fs::read_to_string(&path) {
+                    match KnowledgeBase::from_json(&content) {
+                        Ok(base) => {
+                            all_units.extend(base.units);
+                        }
+                        Err(e) => {
+                            tracing::warn!("Failed to parse {}: {}", path.display(), e);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    tracing::info!(
+        "Loaded {} knowledge units from {}",
+        all_units.len(),
+        dir.display()
+    );
+    KnowledgeBase::new(all_units)
 }

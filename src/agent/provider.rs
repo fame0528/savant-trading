@@ -1,13 +1,12 @@
 //! OpenAI-compatible LLM HTTP client.
 //!
-//! Uses curl for HTTP requests (reqwest has TLS issues on some Windows configs).
+//! Supports both non-streaming and SSE streaming modes.
+//! Streaming keeps the connection alive during long reasoning (mimo v2.5 pro)
+//! and provides real-time visibility into the model's thinking.
 
+use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
-use std::sync::atomic::{AtomicU64, Ordering};
 
-static REQUEST_COUNTER: AtomicU64 = AtomicU64::new(0);
-
-/// Configuration for the LLM provider.
 #[derive(Debug, Clone)]
 pub struct LlmConfig {
     pub endpoint: String,
@@ -31,19 +30,17 @@ impl Default for LlmConfig {
     }
 }
 
-/// A message in the chat completion format.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Message {
     pub role: String,
     pub content: String,
 }
 
-/// The LLM provider — sends requests via curl subprocess.
 pub struct LlmProvider {
+    client: reqwest::Client,
     config: LlmConfig,
 }
 
-/// Errors from the LLM provider.
 #[derive(Debug, thiserror::Error)]
 pub enum LlmError {
     #[error("HTTP request failed: {0}")]
@@ -56,7 +53,11 @@ pub enum LlmError {
 
 impl LlmProvider {
     pub fn new(config: LlmConfig) -> Self {
-        Self { config }
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(config.timeout_secs))
+            .build()
+            .unwrap_or_else(|_| reqwest::Client::new());
+        Self { client, config }
     }
 
     pub fn config_clone(&self) -> LlmConfig {
@@ -64,115 +65,222 @@ impl LlmProvider {
     }
 
     pub async fn chat(&self, system: &str, messages: &[Message]) -> Result<String, LlmError> {
-        let config = self.config.clone();
-        let system = system.to_string();
-        let messages = messages.to_vec();
-
-        tokio::task::spawn_blocking(move || chat_blocking(&config, &system, &messages))
-            .await
-            .map_err(|e| LlmError::Http(format!("Task join error: {}", e)))?
-    }
-}
-
-fn chat_blocking(
-    config: &LlmConfig,
-    system: &str,
-    messages: &[Message],
-) -> Result<String, LlmError> {
-    let mut all_messages = vec![Message {
-        role: "system".to_string(),
-        content: system.to_string(),
-    }];
-    all_messages.extend_from_slice(messages);
-
-    let body = serde_json::json!({
-        "model": config.model,
-        "messages": all_messages,
-        "max_tokens": config.max_tokens,
-        "temperature": config.temperature,
-    });
-
-    let url = format!("{}/chat/completions", config.endpoint);
-    let body_str = serde_json::to_string(&body)
-        .map_err(|e| LlmError::Http(format!("JSON serialize error: {}", e)))?;
-
-    // Write body to temp file (unique per request to avoid race conditions)
-    let req_id = REQUEST_COUNTER.fetch_add(1, Ordering::Relaxed);
-    let tmp_path =
-        std::env::temp_dir().join(format!("savant_llm_{}_{}.json", std::process::id(), req_id));
-    std::fs::write(&tmp_path, &body_str)
-        .map_err(|e| LlmError::Http(format!("Failed to write temp file: {}", e)))?;
-
-    let output = std::process::Command::new("curl")
-        .args([
-            "-s",
-            "-X",
-            "POST",
-            &url,
-            "-H",
-            "Content-Type: application/json",
-            "-H",
-            &format!("Authorization: Bearer {}", config.api_key),
-            "-d",
-            &format!("@{}", tmp_path.display()),
-            "--connect-timeout",
-            "15",
-            "--max-time",
-            &config.timeout_secs.to_string(),
-        ])
-        .output()
-        .map_err(|e| LlmError::Http(format!("curl exec error: {}", e)))?;
-
-    let _ = std::fs::remove_file(&tmp_path);
-
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(LlmError::Http(format!(
-            "curl exit code {}: {}",
-            output.status.code().unwrap_or(-1),
-            stderr
-        )));
-    }
-
-    let response_text = String::from_utf8_lossy(&output.stdout);
-
-    let json: serde_json::Value = serde_json::from_str(&response_text).map_err(|e| {
-        LlmError::InvalidResponse(format!(
-            "JSON parse error: {} — body: {}",
-            e,
-            &response_text[..response_text.len().min(200)]
-        ))
-    })?;
-
-    // Check for API error
-    if let Some(error) = json.get("error") {
-        let msg = error
-            .get("message")
-            .and_then(|m| m.as_str())
-            .unwrap_or("unknown");
-        if msg.contains("rate") || msg.contains("limit") {
+        let body = self.build_body(system, messages, false);
+        let resp = self.send_request(&body).await?;
+        let status = resp.status();
+        if status == 429 {
             return Err(LlmError::RateLimited(60));
         }
-        return Err(LlmError::InvalidResponse(format!("API error: {}", msg)));
+        if !status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(LlmError::Http(format!("HTTP {}: {}", status, text)));
+        }
+        Self::parse_non_streaming(resp).await
     }
 
-    let content = json
-        .get("choices")
-        .and_then(|c| c.get(0))
-        .and_then(|c| c.get("message"))
-        .and_then(|m| {
-            // mimo v2.5 pro returns reasoning in "reasoning" field, content may be null
-            m.get("content")
-                .and_then(|c| c.as_str())
-                .filter(|s| !s.is_empty())
-                .or_else(|| m.get("reasoning").and_then(|r| r.as_str()))
-        })
-        .ok_or_else(|| {
-            LlmError::InvalidResponse(format!(
-                "Missing choices[0].message.content/reasoning — body: {}",
-                &response_text[..response_text.len().min(300)]
-            ))
-        })?;
+    pub async fn chat_stream(
+        &self,
+        system: &str,
+        messages: &[Message],
+    ) -> Result<String, LlmError> {
+        let max_retries = 2;
+        let mut last_err = String::new();
 
-    Ok(content.to_string())
+        for attempt in 0..max_retries {
+            let body = self.build_body(system, messages, true);
+            let resp = match self.send_request(&body).await {
+                Ok(r) => r,
+                Err(e) => {
+                    last_err = format!("{}", e);
+                    if attempt < max_retries - 1 {
+                        let wait = 2u64.pow(attempt as u32 + 1);
+                        tracing::warn!(
+                            "Stream request failed (attempt {}/{}): {}. Retrying in {}s...",
+                            attempt + 1,
+                            max_retries,
+                            last_err,
+                            wait
+                        );
+                        tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
+                        continue;
+                    }
+                    break;
+                }
+            };
+
+            let status = resp.status();
+            if status == 429 {
+                return Err(LlmError::RateLimited(60));
+            }
+            if !status.is_success() {
+                let text = resp.text().await.unwrap_or_default();
+                return Err(LlmError::Http(format!("HTTP {}: {}", status, text)));
+            }
+
+            match Self::parse_streaming(resp).await {
+                Ok(content) => return Ok(content),
+                Err(e) => {
+                    last_err = format!("{}", e);
+                    if attempt < max_retries - 1 {
+                        let wait = 2u64.pow(attempt as u32 + 1);
+                        tracing::warn!(
+                            "Stream parse failed (attempt {}/{}): {}. Retrying in {}s...",
+                            attempt + 1,
+                            max_retries,
+                            last_err,
+                            wait
+                        );
+                        tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
+                        continue;
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Streaming failed all retries — fall back to non-streaming.
+        // Non-streaming reads the full response body at once, avoiding
+        // chunked transfer encoding issues that cause "error decoding
+        // response body" on large prompts.
+        tracing::warn!(
+            "All {} streaming attempts failed ({}). Falling back to non-streaming.",
+            max_retries,
+            last_err
+        );
+        let body = self.build_body(system, messages, false);
+        let resp = self.send_request(&body).await?;
+        let status = resp.status();
+        if status == 429 {
+            return Err(LlmError::RateLimited(60));
+        }
+        if !status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(LlmError::Http(format!("HTTP {}: {}", status, text)));
+        }
+        Self::parse_non_streaming(resp).await
+    }
+
+    fn build_body(&self, system: &str, messages: &[Message], stream: bool) -> serde_json::Value {
+        let mut all_messages = vec![Message {
+            role: "system".to_string(),
+            content: system.to_string(),
+        }];
+        all_messages.extend_from_slice(messages);
+
+        serde_json::json!({
+            "model": self.config.model,
+            "messages": all_messages,
+            "max_tokens": self.config.max_tokens,
+            "temperature": self.config.temperature,
+            "stream": stream,
+        })
+    }
+
+    async fn send_request(&self, body: &serde_json::Value) -> Result<reqwest::Response, LlmError> {
+        let url = format!("{}/chat/completions", self.config.endpoint);
+        self.client
+            .post(&url)
+            .header("Content-Type", "application/json")
+            .header("Authorization", format!("Bearer {}", self.config.api_key))
+            .json(body)
+            .send()
+            .await
+            .map_err(|e| LlmError::Http(format!("{}", e)))
+    }
+
+    async fn parse_non_streaming(resp: reqwest::Response) -> Result<String, LlmError> {
+        let json: serde_json::Value = resp
+            .json()
+            .await
+            .map_err(|e| LlmError::InvalidResponse(format!("JSON parse error: {}", e)))?;
+
+        if let Some(error) = json.get("error") {
+            let msg = error
+                .get("message")
+                .and_then(|m| m.as_str())
+                .unwrap_or("unknown");
+            if msg.contains("rate") || msg.contains("limit") {
+                return Err(LlmError::RateLimited(60));
+            }
+            return Err(LlmError::InvalidResponse(format!("API error: {}", msg)));
+        }
+
+        let content = json
+            .get("choices")
+            .and_then(|c| c.get(0))
+            .and_then(|c| c.get("message"))
+            .and_then(|m| {
+                m.get("content")
+                    .and_then(|c| c.as_str())
+                    .filter(|s| !s.is_empty())
+                    .or_else(|| m.get("reasoning").and_then(|r| r.as_str()))
+            })
+            .ok_or_else(|| {
+                let body_str = serde_json::to_string(&json).unwrap_or_default();
+                let truncated = &body_str[..300.min(body_str.len())];
+                LlmError::InvalidResponse(format!(
+                    "Missing choices[0].message.content/reasoning — body: {}",
+                    truncated
+                ))
+            })?;
+
+        Ok(content.to_string())
+    }
+
+    async fn parse_streaming(resp: reqwest::Response) -> Result<String, LlmError> {
+        let mut stream = resp.bytes_stream();
+        let mut buffer = String::new();
+        let mut full_content = String::new();
+        let mut full_reasoning = String::new();
+
+        while let Some(chunk_result) = stream.next().await {
+            let chunk = chunk_result.map_err(|e| LlmError::Http(format!("Stream error: {}", e)))?;
+            buffer.push_str(&String::from_utf8_lossy(&chunk));
+
+            while let Some(newline_pos) = buffer.find('\n') {
+                let line = buffer[..newline_pos].trim().to_string();
+                buffer = buffer[newline_pos + 1..].to_string();
+
+                if line.is_empty() || !line.starts_with("data: ") {
+                    continue;
+                }
+
+                let data = &line[6..];
+                if data == "[DONE]" {
+                    break;
+                }
+
+                if let Ok(json) = serde_json::from_str::<serde_json::Value>(data) {
+                    if let Some(choices) = json.get("choices").and_then(|c| c.as_array()) {
+                        for choice in choices {
+                            if let Some(delta) = choice.get("delta") {
+                                if let Some(c) = delta.get("content").and_then(|v| v.as_str()) {
+                                    full_content.push_str(c);
+                                }
+                                if let Some(r) = delta.get("reasoning").and_then(|v| v.as_str()) {
+                                    full_reasoning.push_str(r);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        tracing::debug!(
+            "Stream complete: reasoning={} chars, content={} chars",
+            full_reasoning.len(),
+            full_content.len()
+        );
+
+        if !full_content.is_empty() {
+            Ok(full_content)
+        } else if !full_reasoning.is_empty() {
+            Ok(full_reasoning)
+        } else {
+            Err(LlmError::InvalidResponse(
+                "Empty stream response".to_string(),
+            ))
+        }
+    }
 }

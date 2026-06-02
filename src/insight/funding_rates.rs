@@ -56,12 +56,22 @@ struct KrakenFuturesTicker {
     suspended: Option<bool>,
 }
 
-/// Fetch funding data for a symbol from Kraken Futures.
+/// Valid funding rate range per 8hr. Outside this = garbage data.
+/// Normal range: -0.5% to +0.5%. Extreme: -2% to +2%.
+const FUNDING_RATE_MIN: f64 = -0.02;
+const FUNDING_RATE_MAX: f64 = 0.02;
+
+/// Fetch funding data — OKX primary, Kraken fallback with validation.
 ///
-/// Free, no key, no geo-block. Maps trading pair (e.g., "BTC/USD") to
-/// Kraken Futures perpetual symbol (e.g., "PF_XBTUSD").
+/// OKX: Free, no key, no geo-block. Returns decimal rate (0.0001 = 0.01%).
+/// Kraken: Free, no key. Returns percentage rate but can return garbage.
 pub async fn fetch_funding(client: &reqwest::Client, symbol: &str) -> FundingData {
-    // Fetch all tickers from Kraken Futures
+    // Primary: OKX
+    if let Some(data) = fetch_okx_funding(client, symbol).await {
+        return data;
+    }
+
+    // Fallback: Kraken Futures with range validation
     match client
         .get("https://futures.kraken.com/derivatives/api/v3/tickers")
         .send()
@@ -74,7 +84,22 @@ pub async fn fetch_funding(client: &reqwest::Client, symbol: &str) -> FundingDat
             }
 
             match resp.json::<KrakenFuturesResponse>().await {
-                Ok(data) => parse_kraken_futures(&data, symbol),
+                Ok(data) => {
+                    let result = parse_kraken_futures(&data, symbol);
+                    // Range validation — reject garbage values
+                    if let Some(fr) = result.funding_rate {
+                        if !(FUNDING_RATE_MIN..=FUNDING_RATE_MAX).contains(&fr) {
+                            warn!(
+                                "Kraken funding rate {:.4}% outside valid range [{}, {}] — rejecting",
+                                fr * 100.0,
+                                FUNDING_RATE_MIN * 100.0,
+                                FUNDING_RATE_MAX * 100.0
+                            );
+                            return FundingData::default();
+                        }
+                    }
+                    result
+                }
                 Err(e) => {
                     warn!("Kraken Futures response parse error: {}", e);
                     FundingData::default()
@@ -86,6 +111,61 @@ pub async fn fetch_funding(client: &reqwest::Client, symbol: &str) -> FundingDat
             FundingData::default()
         }
     }
+}
+
+/// Fetch funding rate from OKX (primary source).
+///
+/// OKX returns decimal rate: 0.0001 = 0.01% per 8hr.
+/// Pair mapping: "BTC/USD" → "BTC-USDT-SWAP"
+async fn fetch_okx_funding(client: &reqwest::Client, symbol: &str) -> Option<FundingData> {
+    let base = symbol.split('/').next().unwrap_or(symbol).to_uppercase();
+    let inst_id = format!("{}-USDT-SWAP", base);
+
+    let url = format!(
+        "https://www.okx.com/api/v5/public/funding-rate?instId={}",
+        inst_id
+    );
+
+    let resp = client.get(&url).send().await.ok()?;
+    if !resp.status().is_success() {
+        warn!("OKX funding returned HTTP {}", resp.status());
+        return None;
+    }
+
+    let json: serde_json::Value = resp.json().await.ok()?;
+    let data = json.get("data")?.as_array()?.first()?;
+
+    let rate_str = data.get("fundingRate")?.as_str()?;
+    let rate: f64 = rate_str.parse().ok()?;
+
+    // Range validation
+    if !(FUNDING_RATE_MIN..=FUNDING_RATE_MAX).contains(&rate) {
+        warn!(
+            "OKX funding rate {:.4}% outside valid range — rejecting",
+            rate * 100.0
+        );
+        return None;
+    }
+
+    let annualized = rate * 3.0 * 365.0;
+
+    info!(
+        "OKX {}: rate={:.6}%, annualized={:.2}%",
+        symbol,
+        rate * 100.0,
+        annualized * 100.0
+    );
+
+    Some(FundingData {
+        funding_rate: Some(rate),
+        funding_rate_prediction: None,
+        open_interest: None,
+        mark_price: None,
+        volume_24h: None,
+        change_24h: None,
+        index_price: None,
+        funding_rate_annualized: Some(annualized),
+    })
 }
 
 /// Parse Kraken Futures response and find the matching perpetual ticker.

@@ -11,6 +11,40 @@ use savant_trading::data::kraken::KrakenClient;
 mod api;
 mod engine;
 
+#[derive(Debug, Default)]
+struct TestArgs {
+    category: Option<String>,
+    action_only: bool,
+    count: Option<usize>,
+    sandbox: bool,
+}
+
+fn parse_test_args(args: &[String]) -> TestArgs {
+    let mut ta = TestArgs::default();
+    let mut i = 2; // skip "savant" and "--test"
+    while i < args.len() {
+        match args[i].as_str() {
+            "--category" | "-c" => {
+                i += 1;
+                ta.category = args.get(i).cloned();
+            }
+            "--action-only" | "-a" => {
+                ta.action_only = true;
+            }
+            "--count" | "-n" => {
+                i += 1;
+                ta.count = args.get(i).and_then(|s| s.parse().ok());
+            }
+            "--sandbox" | "-s" => {
+                ta.sandbox = true;
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+    ta
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
@@ -31,6 +65,12 @@ async fn main() -> anyhow::Result<()> {
 
     match args.get(1).map(|s| s.as_str()) {
         Some("report") => {
+            if args.get(2).map(|s| s.as_str()) == Some("--test") {
+                return savant_trading::monitor::training_report::run_training_report(
+                    "sqlite:data/test_memory.db",
+                )
+                .await;
+            }
             return savant_trading::monitor::report::print_report(&config.trading.database_url)
                 .await;
         }
@@ -48,9 +88,19 @@ async fn main() -> anyhow::Result<()> {
             info!("=== SAVANT BACKTEST ===");
             return run_backtest_cmd(&config).await;
         }
-        Some("sandbox") => {
-            info!("=== SAVANT SANDBOX ===");
-            return engine::run_sandbox(config).await;
+        Some("--test") => {
+            let ta = parse_test_args(&args);
+            if ta.sandbox {
+                info!("=== SAVANT SANDBOX ===");
+                return engine::run_sandbox(config).await;
+            }
+            // Check for --train flag
+            if args.iter().any(|a| a == "--train") {
+                info!("=== SAVANT TRAINING ===");
+                return engine::run_training(config, ta.category, ta.action_only, ta.count).await;
+            }
+            info!("=== SAVANT ACTION TEST ===");
+            return engine::run_action_test(config, ta.category, ta.action_only, ta.count).await;
         }
         Some("--help") | Some("-h") => {
             print_help();
@@ -59,7 +109,7 @@ async fn main() -> anyhow::Result<()> {
         _ => {}
     }
 
-    info!("=== SAVANT TRADING ENGINE v0.4.2 ===");
+    info!("=== SAVANT TRADING ENGINE v0.4.3 ===");
     info!(
         "Mode: {}",
         if config.mode.paper_trading {
@@ -71,21 +121,18 @@ async fn main() -> anyhow::Result<()> {
     info!("Pairs: {:?}", config.trading.pairs);
     info!("Starting balance: ${:.2}", config.trading.starting_balance);
 
-    // Shared state between engine and API
     let shared = SharedEngineData::new();
     let shared_clone = shared.clone();
     let api_config = config.clone();
     let engine_running = Arc::new(AtomicBool::new(true));
     let engine_running_clone = engine_running.clone();
 
-    // Spawn API server as background task
     tokio::spawn(async move {
         if let Err(e) = api::start_server(api_config, shared_clone, engine_running_clone).await {
             warn!("API server error: {}", e);
         }
     });
 
-    // Run engine as primary task (engine populates SharedEngineData)
     engine::run(config, shared, engine_running).await
 }
 
@@ -112,7 +159,6 @@ async fn run_backtest_cmd(config: &AppConfig) -> anyhow::Result<()> {
         ..Default::default()
     };
 
-    // Use momentum strategy as default for backtesting
     let strategy = savant_trading::strategy::momentum::MomentumStrategy::new(
         config.strategy.momentum.ema_period,
         config.strategy.momentum.volume_spike_multiplier,
@@ -146,25 +192,26 @@ async fn run_backtest_cmd(config: &AppConfig) -> anyhow::Result<()> {
 }
 
 fn print_help() {
-    println!("SAVANT TRADING ENGINE v0.4.2");
+    println!("SAVANT TRADING ENGINE v0.4.3");
     println!();
     println!("USAGE:");
-    println!("  savant                 Start trading engine + API server");
-    println!("  savant --dry-run       Run one AI decision cycle and print full pipeline");
-    println!("  savant --api-only      Start REST API server only (no engine)");
-    println!("  savant backtest        Run backtest on historical data");
-    println!("  savant sandbox         Run 50 scenarios through AI brain and grade");
-    println!("  savant report          Print performance report");
-    println!("  savant --help          Show this help");
+    println!("  savant                    Start trading engine + API server");
+    println!("  savant --dry-run          One AI decision cycle, full pipeline");
+    println!("  savant --api-only         REST API server only");
+    println!("  savant backtest           Backtest on historical data");
+    println!("  savant report             Performance report");
+    println!();
+    println!("TESTING:");
+    println!("  savant --test                         Run all scenarios (action test)");
+    println!("  savant --test -c \"Trend Bull\"        Filter by category");
+    println!("  savant --test -a                      Only scenarios expecting Buy/Sell");
+    println!("  savant --test -n 20                   Run first N scenarios");
+    println!("  savant --test -c \"Crash\" -a -n 10    Combine filters");
+    println!("  savant --test --train                 Training mode (loop until convergence)");
+    println!("  savant --test --train -a -n 20        Training with filters");
+    println!("  savant --test --sandbox               Legacy sandbox with grading");
     println!();
     println!("API: http://localhost:8080/api/");
-    println!("  /api/status           Engine status");
-    println!("  /api/portfolio        Account balance and equity");
-    println!("  /api/positions        Open positions");
-    println!("  /api/trades           Closed trade history");
-    println!("  /api/decisions        AI decision log");
-    println!("  /api/insight          Market insight data");
-    println!("  /api/knowledge        Knowledge base units");
-    println!("  /api/risk             Risk metrics");
-    println!("  /api/session          Session statistics");
+    println!("  /status /portfolio /positions /trades /decisions");
+    println!("  /insight /knowledge /risk /session /activity /memory");
 }

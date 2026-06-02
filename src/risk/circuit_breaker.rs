@@ -1,11 +1,17 @@
 use tracing::warn;
 
 use crate::core::types::AccountState;
+use crate::risk::correlation::CorrelationMatrix;
 
 pub struct CircuitBreaker {
     max_daily_loss_pct: f64,
     max_drawdown_pct: f64,
     max_positions: usize,
+    max_portfolio_heat: f64,
+    /// Maximum bid-ask spread in basis points before halting.
+    /// Market makers pull liquidity during volatility — executing in
+    /// an illiquidity void causes 5%+ slippage.
+    max_spread_bps: f64,
 }
 
 impl CircuitBreaker {
@@ -14,10 +20,36 @@ impl CircuitBreaker {
             max_daily_loss_pct,
             max_drawdown_pct,
             max_positions,
+            max_portfolio_heat: 0.40,
+            max_spread_bps: 50.0, // 50bps = 0.5% — halt if spread exceeds this
         }
     }
 
     pub fn check(&self, account: &AccountState) -> CircuitBreakerResult {
+        self.check_full(account, 0.0, None, 0.0)
+    }
+
+    pub fn check_with_heat(
+        &self,
+        account: &AccountState,
+        total_risk_amount: f64,
+        correlation: Option<&CorrelationMatrix>,
+    ) -> CircuitBreakerResult {
+        self.check_full(account, total_risk_amount, correlation, 0.0)
+    }
+
+    /// Full circuit breaker check including spread width.
+    ///
+    /// `spread_bps` is the current bid-ask spread in basis points.
+    /// If 0.0, spread check is skipped (no book data available).
+    pub fn check_full(
+        &self,
+        account: &AccountState,
+        total_risk_amount: f64,
+        correlation: Option<&CorrelationMatrix>,
+        spread_bps: f64,
+    ) -> CircuitBreakerResult {
+        let _ = correlation; // Used for effective position counting (future)
         let daily_loss_pct = if account.equity > 0.0 {
             -account.daily_pnl / account.equity
         } else {
@@ -52,6 +84,35 @@ impl CircuitBreaker {
             return CircuitBreakerResult::Triggered(format!(
                 "Max positions reached: {}",
                 self.max_positions
+            ));
+        }
+
+        // Portfolio heat check — total risk exposure relative to equity
+        if account.equity > 0.0 {
+            let heat = total_risk_amount / account.equity;
+            if heat >= self.max_portfolio_heat {
+                warn!(
+                    "Circuit breaker: portfolio heat {:.1}% exceeds limit {:.1}%",
+                    heat * 100.0,
+                    self.max_portfolio_heat * 100.0
+                );
+                return CircuitBreakerResult::Triggered(format!(
+                    "Portfolio heat limit reached: {:.1}% (max {:.1}%)",
+                    heat * 100.0,
+                    self.max_portfolio_heat * 100.0
+                ));
+            }
+        }
+
+        // Spread width check — halt if market makers have pulled liquidity
+        if spread_bps > 0.0 && spread_bps >= self.max_spread_bps {
+            warn!(
+                "Circuit breaker: spread {:.0}bps exceeds limit {:.0}bps — illiquidity void detected",
+                spread_bps, self.max_spread_bps
+            );
+            return CircuitBreakerResult::Triggered(format!(
+                "Spread too wide: {:.0}bps (max {:.0}bps) — market illiquid, halting execution",
+                spread_bps, self.max_spread_bps
             ));
         }
 
@@ -126,5 +187,29 @@ mod tests {
         let cb = CircuitBreaker::new(0.20, 0.40, 5);
         let account = make_account(100.0, 100.0, -20.0, 0.0, 2);
         assert!(cb.check(&account).is_triggered());
+    }
+
+    #[test]
+    fn circuit_breaker_spread_too_wide() {
+        let cb = CircuitBreaker::new(0.20, 0.40, 5);
+        let account = make_account(100.0, 100.0, 0.0, 0.0, 1);
+        // Spread 60bps > 50bps limit → trigger
+        assert!(cb.check_full(&account, 0.0, None, 60.0).is_triggered());
+    }
+
+    #[test]
+    fn circuit_breaker_spread_ok() {
+        let cb = CircuitBreaker::new(0.20, 0.40, 5);
+        let account = make_account(100.0, 100.0, 0.0, 0.0, 1);
+        // Spread 30bps < 50bps limit → ok
+        assert!(!cb.check_full(&account, 0.0, None, 30.0).is_triggered());
+    }
+
+    #[test]
+    fn circuit_breaker_spread_zero_skips() {
+        let cb = CircuitBreaker::new(0.20, 0.40, 5);
+        let account = make_account(100.0, 100.0, 0.0, 0.0, 1);
+        // Spread 0.0 = no book data → skip check
+        assert!(!cb.check_full(&account, 0.0, None, 0.0).is_triggered());
     }
 }

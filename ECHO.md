@@ -1,8 +1,8 @@
-# ECHO PROTOCOL v4.0.0 — Universal Agent Bootstrap
+# ECHO PROTOCOL v0.1.0 — Universal Agent Bootstrap
 
 > **This is the SINGLE bootstrap file for any AI agent session.**
 > Language-agnostic. Project-specific details live in `protocol.config.yaml`.
-> **Version:** 4.0.0 | **Status:** ACTIVE | **Non-Negotiable: YES**
+> **Version:** 0.1.0 | **Status:** ACTIVE | **Non-Negotiable: YES**
 
 ---
 
@@ -26,13 +26,14 @@ conventions, and file extensions are defined in `protocol.config.yaml` and the
 
 | Term | Definition |
 |------|-----------|
-| **FID** | Fix Implementation Document — tracks bugs, architectural issues, and improvements through resolution |
+| **FID** | Feature Implementation Document — tracks bugs, architectural issues, and improvements through resolution |
 | **Perfection Loop** | The iterative fix/verify cycle for code quality (5 steps) |
 | **Levenshtein Metric** | 10% character-change cap per pass to prevent oscillation |
 | **Baseline** | Reference code state showing intended patterns |
-| **Honest Assessment** | Verifiable output-based evaluation vs. self-reporting |
+| **Honest Assessment** | Verifiable output-based evaluation vs. self-reporting (see Honest Assessment section below) |
 | **Five Questions** | Evaluation framework for any approach |
 | **Anti-Pattern** | Forbidden behavior that violates the protocol |
+| **Double Audit** | Every change verified by two independent methods (static analysis + runtime tests). Self-reporting is prohibited. |
 | **`protocol.config.yaml`** | Project-specific configuration (language, commands, paths) |
 | **`coding-standards/`** | Language-specific naming and style conventions |
 
@@ -40,7 +41,38 @@ conventions, and file extensions are defined in `protocol.config.yaml` and the
 
 ## The 15 Laws
 
-Laws 1-4 are the Immutable Process Laws governing workflow. Laws 5-15 are the Extended Code Laws governing quality. All are non-negotiable.
+Laws 1-4 are the Immutable Process Laws governing workflow. Laws 5-15 are the Extended Code Laws governing quality.
+
+### Activation Tiers
+
+| Tier | Laws | When Active | Config Flag |
+|------|------|-------------|-------------|
+| **Core** | 1-4 (Immutable Process) | ALWAYS — no exceptions | — |
+| **Extended** | 5-15 (Code Quality) | When `strict_mode: true` (default) | `protocol.strict_mode` |
+
+- **Core laws** are non-negotiable and always enforced regardless of config.
+- **Extended laws** are enforced when `strict_mode: true`. Set to `false` for quick exploration or debugging sessions where full rigor is unnecessary.
+- The boot sequence always confirms Core laws. Extended laws are confirmed only when `strict_mode` is active.
+
+#### strict_mode: false Behavior
+
+When `strict_mode` is `false`:
+
+- Laws 1-4 (Core) remain fully enforced — no exceptions
+- Laws 5-15 (Extended) are advisory, not enforced
+- Anti-patterns remain flagged but do not block progress
+- Perfection Loop still runs but AUDIT phase is relaxed (no double-audit)
+- FID creation is optional (recommended but not required)
+- Circuit breaker rules still apply (prevents runaway loops regardless)
+
+#### Quality Override Precedence
+
+When a quality setting exists in both `protocol.config.yaml` and the language
+coding standard's `## Quality Overrides` section:
+
+1. **Language override wins** — coding-standards values take precedence
+2. **Config is the fallback** — used when no language override exists
+3. **Rationale** — language-specific conventions should reflect idiomatic patterns for that language
 
 ### Laws 1-4: The Immutable Process Laws
 
@@ -60,13 +92,13 @@ Laws 1-4 are the Immutable Process Laws governing workflow. Laws 5-15 are the Ex
 | **5** | No pseudo-code, TODOs, or placeholders | Technical debt compounds |
 | **6** | No type safety shortcuts — use language-appropriate safe patterns (see coding-standards) | Runtime errors in production |
 | **7** | Search for existing code BEFORE creating new | Duplication kills maintainability |
-| **8** | Log intent before coding | Untracked drift |
+| **8** | Log intent before coding | Document the intended change in the session summary before implementation |
 | **9** | Generate production-grade documentation | Unmaintainable code |
 | **10** | Update tracking after every feature | Lost progress |
 | **11** | Follow discovered patterns EXACTLY | Inconsistency |
 | **12** | Never expose sensitive data in logs/errors | Security breach |
 | **13** | Utility-first, universal logic | Duplication is debugging debt |
-| **14** | All error paths handled | Every `Result` propagated with `?` or handled explicitly |
+| **14** | All error paths handled | Every fallible operation must have its error propagated or explicitly handled (see language-specific patterns) |
 | **15** | Build stays clean | Zero errors, zero warnings after every edit |
 
 #### Law 13: Utility-First, Universal Logic
@@ -107,7 +139,7 @@ When evaluating any approach, ask:
 
 The Perfection Loop is a Finite State Machine with mandatory transitions:
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────┐
 │                    PERFECTION LOOP                           │
 │                    Finite State Machine                      │
@@ -115,14 +147,17 @@ The Perfection Loop is a Finite State Machine with mandatory transitions:
 │  ┌─────────┐    ┌──────────┐    ┌─────────┐    ┌─────────┐ │
 │  │   RED   │───>│  GREEN   │───>│  AUDIT  │───>│  SELF   │ │
 │  │  PHASE  │    │  PHASE   │    │  PHASE  │    │ CORRECT │ │
-│  └─────────┘    └──────────┘    └─────────┘    └────┬────┘ │
-│       ^                                              │      │
-│       │                │                                     │
-│       │           ┌──────────┐                               │
-│       │           │ COMPLETE │<──────────────────────────────┘
-│       │           └──────────┘    (if audit passes)
+│  └─────────┘    └─────┬────┘    └─────────┘    └────┬────┘ │
+│       ^                │                             │      │
+│       │                │           ┌──────────┐      │      │
+│       │                │           │ COMPLETE │<─────┘      │
+│       │                │           └──────────┘  (if audit  │
+│       │                │                         passes)    │
+│       │                │                                    │
+│       │                └────────────────────────────────────┘
+│       │                   (corrections applied → re-verify)
 │       │
-│       └─────────────────────── (if issues found)
+│       └─────────────────── (if new issues found)
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -132,14 +167,14 @@ The Perfection Loop is a Finite State Machine with mandatory transitions:
 |-------|----------------|---------|----------------|
 | **RED** | Start of loop | Identify ALL failures and issues | All issues cataloged |
 | **GREEN** | RED complete | Fix issues with MINIMAL changes | All fixes applied |
-| **AUDIT** | GREEN complete | Double-audit with honest assessment | Audit passes/fails |
+| **AUDIT** | GREEN complete | Double-audit: verify change with two independent methods (e.g. static analysis + runtime tests). Self-reporting is prohibited — evidence must come from tool output. | Audit passes/fails |
 | **SELF-CORRECT** | AUDIT failed | Address audit findings | Corrections applied |
 | **COMPLETE** | AUDIT passed | Document results | Loop ends |
 
 ### Circuit Breaker Rules
 
 1. **Max Changes Per Pass** — 10% of total character count
-2. **Verification** — 500-char random sample comparison after each change
+2. **Verification** — After each change, select a 500-character random sample from the modified file(s). Compare before/after using exact character match. If the sample outside your intended change area was modified, revert and re-apply with narrower scope. This catches unintended side effects.
 3. **Convergence Detection** — Stop if change delta < 2% for 2 consecutive passes
 4. **Oscillation Detection** — If same issue reappears 3 times, escalate
 5. **Hard Stop** — 10 maximum iterations per loop
@@ -148,8 +183,8 @@ The Perfection Loop is a Finite State Machine with mandatory transitions:
 
 | Condition | Action |
 |-----------|--------|
-| Deep Audit yields ZERO actionable improvements | → Proceed to Final Certification |
-| User explicitly requests to ship | → Proceed to Final Certification |
+| Deep Audit yields ZERO actionable improvements | → Proceed to COMPLETE state (Final Certification) |
+| User explicitly requests to ship | → Proceed to COMPLETE state (Final Certification) |
 | 5 iterations reached without convergence | → Flag for review (possible architecture smell) |
 | Diminishing returns detected | → Recommend ship |
 
@@ -171,38 +206,39 @@ The Perfection Loop is a Finite State Machine with mandatory transitions:
 
 1. Read this ECHO.md first
 2. Load `protocol.config.yaml` to get project-specific commands
-3. Load `coding-standards/{language}.md` for naming conventions
-4. Review `dev/LEARNINGS.md` for known issues
-5. Create `dev/session-summaries/YYYY-MM-DD-HHMM.md` with:
+3. **BOOT CHECK:** If `language` is set to `"CHANGE_ME"`, HALT. Do not proceed. Require the user to configure the language before continuing.
+4. Load `coding-standards/{language}.md` for naming conventions and quality overrides
+5. Review `dev/LEARNINGS.md` for known issues
+6. Review all FIDs in `dev/fids/` — flag any non-`Closed` as open items for the session
+7. Create `dev/session-summaries/YYYY-MM-DD-HHMM.md` with:
    - Initial state assessment
    - Planned work
    - Dependencies identified
 
 ### During Session
 
-6. Work through one task at a time
-7. Follow the Perfection Loop for each change
-8. Document findings in `dev/findings/` as you discover issues
-9. Create FIDs (Findings documents) when appropriate
-10. Update session summary with progress
+8. Work through one task at a time
+9. Follow the Perfection Loop for each change
+10. Document issues as FIDs in `dev/fids/`
+11. Update session summary with progress
 
 ### End of Session
 
-11. Run all validation commands from config
-12. Update session summary with final state
-13. Note any blockers or open questions
-14. Update `dev/LEARNINGS.md` with new lessons learned
+12. Run all validation commands from config
+13. Update session summary with final state
+14. Note any blockers or open questions
+15. Update `dev/LEARNINGS.md` with new lessons learned
 
 ---
 
 ## FID Lifecycle
 
-FIDs (Findings documents) track discovered issues through resolution:
+FIDs (Feature Implementation Documents) track discovered issues through resolution:
 
-```
-Created → Analyzed → Fixed → Verified → Closed
-   │         │         │         │          │
-   └─────────┴─────────┴─────────┴──────────┘
+```text
+Created → Analyzed → Fixed → Verified → Closed → Archived
+   │         │         │         │          │         │
+   └─────────┴─────────┴─────────┴──────────┴─────────┘
         All stages require evidence
 ```
 
@@ -217,6 +253,15 @@ Created → Analyzed → Fixed → Verified → Closed
 ### FID Format
 
 See `templates/FID-TEMPLATE.md` for the standard format.
+
+### FID Auto-Archive
+
+When a FID status is updated to **Closed**, the agent MUST:
+
+1. Move the FID file from `dev/fids/` to `dev/fids/archive/`
+2. Append an entry to `CHANGELOG.md` with the FID ID, severity, description, and resolution summary
+3. Log the archival in the session summary
+4. Closed FIDs must not remain in the active `dev/fids/` directory
 
 ---
 
@@ -233,8 +278,32 @@ See `templates/FID-TEMPLATE.md` for the standard format.
 | "Good enough" | Good enough is never good enough | — |
 | Deferring approved work without presenting | Scope reduction is a silent decision | 2 |
 | Writing pseudo-code or placeholders | Every line must be production-ready | 5 |
-| `unwrap()` or `expect()` in non-test code | Use `?`, `match`, or explicit error types | 6 |
-| Swallowed errors | `let _ = foo()` only where failure is acceptable | 14 |
+| Swallowed errors | Silently discarding errors where failure is not acceptable (see language-specific error handling patterns in coding-standards) | 14 |
+
+### Language-Specific Type Safety Shortcuts (Law 6)
+
+| Language | Forbidden Pattern | Use Instead |
+|----------|------------------|-------------|
+| Rust | `unwrap()`, `expect()` in non-test code | `?` operator, `match`, explicit error types |
+| TypeScript | `any` type, `@ts-ignore` | `unknown` + type guards, proper typing |
+| Python | Bare `except:`, no type hints | Specific exceptions, type hints on public functions |
+| Go | Ignoring errors with `_` | Check all returned errors |
+| Java | Bare `catch (Exception e)`, null returns | Specific exceptions, `Optional<T>` |
+| C# | `async void`, `.Result`, `.Wait()` | `async Task`, `await`, `CancellationToken` |
+
+---
+
+## Honest Assessment
+
+The protocol requires verifiable claims, but this does not mean agents cannot reason about design decisions. The distinction:
+
+| Claim Type | Requirement | Example |
+|-----------|-------------|---------|
+| **Verification claims** ("code compiles", "tests pass") | MUST be backed by tool output | Paste build/test output as evidence |
+| **Design decisions** ("I chose X because Y") | MUST include documented reasoning | Explain tradeoffs, alternatives considered, why this approach wins |
+| **Status claims** ("this is complete", "this is fixed") | MUST be verifiable through independent check | Run audit commands, grep for call-graph reachability |
+
+**Never** claim code works without running verification commands. **Always** explain architectural reasoning when presenting design choices.
 
 ---
 
@@ -250,12 +319,17 @@ See `templates/FID-TEMPLATE.md` for the standard format.
 
 ## Emergency Procedures
 
+These procedures are escape hatches for stuck states. They do NOT override
+Law 3 (Verify Before Proceed) — you must exhaust all reasonable fix attempts
+before invoking an emergency procedure. Marking a feature `PENDING` requires
+documenting why you are stuck and creating a FID for follow-up.
+
 ### If Tests Won't Pass
 
 1. Run failing test with verbose output to see details
 2. Check if test is stale (references old API)
 3. Fix test or fix code (whichever is correct)
-4. If truly stuck, mark feature as `PENDING` and move on
+4. If truly stuck after all attempts, create a FID, mark feature as `PENDING`, and move on
 
 ### If Compilation Won't Fix
 
@@ -273,11 +347,15 @@ If you've read the same file 2+ times or made the same edit 2+ times:
 3. Move to next feature
 4. Come back later with fresh context
 
+> **See also:** Circuit Breaker Rule #4 (Oscillation Detection) for automated
+> detection of this pattern across iterations.
+
 ---
 
 ## Audit Checklist
 
-For each module or feature, verify (substitute commands from `protocol.config.yaml`):
+For each module or feature, verify during the AUDIT phase of the Perfection Loop
+(substitute commands from `protocol.config.yaml`):
 
 - [ ] Code compiles and runs (`commands.build`)
 - [ ] All tests pass (`commands.test`)
@@ -313,12 +391,15 @@ Document these in `dev/LEARNINGS.md` to improve future sessions.
 |------|-------|
 | Project config | `protocol.config.yaml` |
 | Language standards | `coding-standards/{language}.md` |
+| Migration guide | `MIGRATION.md` |
 | FID template | `templates/FID-TEMPLATE.md` |
 | Session template | `templates/SESSION-SUMMARY.md` |
-| Findings | `dev/findings/` |
+| FIDs | `dev/fids/` |
+| FID archive | `dev/fids/archive/` |
 | Session summaries | `dev/session-summaries/` |
-| Plans | `dev/plans/` |
 | Lessons learned | `dev/LEARNINGS.md` |
+| Version | `VERSION` |
+| Changelog | `CHANGELOG.md` |
 
 ---
 

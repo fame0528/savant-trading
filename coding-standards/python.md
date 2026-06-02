@@ -1,5 +1,6 @@
 # Python Coding Standards
-# Load this when protocol.config.yaml has language: "python"
+
+<!-- Load this when protocol.config.yaml has language: "python" -->
 
 ## Naming Conventions
 
@@ -19,6 +20,7 @@
 ## Patterns
 
 ### Type Hints
+
 - Use type hints on all public functions
 - Use `from __future__ import annotations` for forward refs
 - Prefer `list[int]` over `List[int]` (3.9+)
@@ -26,12 +28,14 @@
 - Use Protocol for structural typing
 
 ### Error Handling
+
 - Define custom exception hierarchy
 - Use specific exceptions, never bare `except:`
 - Use context managers for resource cleanup
 - Log exceptions with traceback at catch points
 
 ### Imports
+
 - Group: stdlib → third-party → local
 - One blank line between groups
 - Prefer absolute imports
@@ -39,7 +43,7 @@
 
 ## File Structure
 
-```
+```text
 src/
 ├── __init__.py
 ├── __main__.py           # Entry point
@@ -66,3 +70,13 @@ src/
 - [ ] Magic numbers (extract to constants)
 - [ ] God classes (>300 lines)
 - [ ] Circular imports
+
+## Quality Overrides
+
+These override the defaults in `protocol.config.yaml` when Python is the configured language.
+
+| Setting | Default | Python Override | Reason |
+|---------|---------|-----------------|--------|
+| `max_file_lines` | 300 | 400 | Python modules with dataclasses and type hints tend to be longer |
+| `max_function_lines` | 50 | 50 | — |
+| `max_line_length` | 100 | 120 | PEP 8 allows 120 for pragmatic readability |

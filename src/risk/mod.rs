@@ -5,5 +5,6 @@
 //! - `circuit_breaker` — Daily loss limit, max drawdown, and max position guards
 
 pub mod circuit_breaker;
+pub mod correlation;
 pub mod position;
 pub mod stop_loss;

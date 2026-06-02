@@ -8,7 +8,11 @@
 project:
   name: "savant-trading"
   description: "Automated crypto trading engine — Kraken exchange"
-  version: "0.4.2"
+  version: "0.4.3"
+
+protocol:
+  version: "0.1.0"
+  strict_mode: true  # true = all 15 laws active (default), false = core 4 laws only
 
 language: "rust"
 
@@ -25,11 +29,10 @@ paths:
   tests: "tests/"
   docs: "docs/"
   dev: "dev/"
-  findings: "dev/findings/"
+  fids: "dev/fids/"
+  fids_archive: "dev/fids/archive/"
   session_summaries: "dev/session-summaries/"
-  plans: "dev/plans/"
   learnings: "dev/LEARNINGS.md"
-  baselines: "dev/baselines/"
 
 quality:
   max_file_lines: 300

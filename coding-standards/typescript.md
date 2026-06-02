@@ -1,5 +1,6 @@
 # TypeScript Coding Standards
-# Load this when protocol.config.yaml has language: "typescript"
+
+<!-- Load this when protocol.config.yaml has language: "typescript" -->
 
 ## Naming Conventions
 
@@ -22,6 +23,7 @@
 ## Patterns
 
 ### Type Safety
+
 - Enable `strict: true` in tsconfig.json
 - Prefer `interface` over `type` for object shapes
 - Use `type` for unions, intersections, and computed types
@@ -29,12 +31,14 @@
 - Use branded types for IDs: `type PlayerId = string & { __brand: 'PlayerId' }`
 
 ### Error Handling
+
 - Use Result pattern or typed error objects
 - Never throw strings — throw Error instances
 - Handle all promise rejections
 - Use try/catch at boundaries only
 
 ### Imports
+
 - Group: react → external → internal → relative
 - One blank line between groups
 - Prefer named exports over default exports
@@ -42,7 +46,7 @@
 
 ## File Structure
 
-```
+```text
 src/
 ├── index.ts              # Entry point
 ├── types/                # Shared types
@@ -69,3 +73,13 @@ src/
 - [ ] Magic numbers or strings (extract to constants)
 - [ ] Component files over 200 lines
 - [ ] Inline styles (use CSS modules or Tailwind)
+
+## Quality Overrides
+
+These override the defaults in `protocol.config.yaml` when TypeScript is the configured language.
+
+| Setting | Default | TS Override | Reason |
+|---------|---------|-------------|--------|
+| `max_file_lines` | 300 | 400 | React components and service files tend to be longer |
+| `max_function_lines` | 50 | 60 | Component render logic can be slightly longer |
+| `max_line_length` | 100 | 100 | — |

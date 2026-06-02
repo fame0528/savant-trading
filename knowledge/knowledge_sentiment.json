@@ -1,4 +1,4 @@
-﻿[
+[
   {
     "id": "sent-012",
     "source": "stock-market-wizards-schwager",
@@ -7,7 +7,7 @@
       "Trending"
     ],
     "content": "Minervini: Buy stocks in Stage 2 uptrends — price above 200-day MA, 200-day MA rising, 150-day MA above 200-day MA, 50-day MA above both. Volume should increase on up days. This filters for institutional accumulation.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "timeframe:daily",
@@ -26,7 +26,7 @@
       "Trending"
     ],
     "content": "Minervini: Buy Stage 2 uptrends — price above 200-day MA, 200-day rising, 150 above 200, 50 above both. Volume increases on up days. Filters institutional accumulation.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "timeframe:daily",
@@ -46,7 +46,7 @@
       "ExtremeGreed"
     ],
     "content": "CRYPTO DIP PSYCHOLOGY: Bitcoin periodically dips then recovers to new ATHs. The pattern trains HODLers to buy dips—but each cycle conditions more complacency. Eventually a dip doesn't recover for years (2018, 2022). Track on-chain metrics like MVRV and SOPR to distinguish healthy corrections from bear market onsets. Don't blindly BTFD without data.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "timeframe:monthly",
@@ -67,7 +67,7 @@
       "BtcDominant"
     ],
     "content": "BITCOIN HALVING CYCLE: Block rewards halve approximately every 4 years (210,000 blocks). Historical pattern: 12-18 months pre-halving accumulation, parabolic run 6-12 months post-halving, then bear market correction of 80%+. Each cycle's peak-to-peak return diminishes. The halving reduces new supply issuance—supply shock theory drives narrative and price action.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "setup_type:rotation",
@@ -88,7 +88,7 @@
       "FundingRateExtreme"
     ],
     "content": "OPTION SYNTHETICS FOR CAPITAL EFFICIENCY: Long call + short put at same strike = synthetic long spot (cheaper than buying BTC). Useful for leveraged exposure without funding rates. In crypto perps, funding can be 0.1%+ per 8 hours during euphoria. Synthetic positions via options avoid funding bleed. Use when funding is expensive and IV skew is moderate.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -108,7 +108,7 @@
       "AltSeason"
     ],
     "content": "BUBBLE STRUCTURE (SHILLER): 1) Displacement—new technology/idea creates opportunity. 2) Boom—prices rise, media amplifies. 3) Euphoria—'this time is different,' FOMO retail enters. 4) Profit-taking—smart money exits. 5) Panic—retail realizes, mass selling. Crypto follows this EXACT cycle. Identify which phase you're in. When taxi drivers give crypto tips = late stage 3/early stage 4.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:bubble_detection",
       "timeframe:monthly",
@@ -130,7 +130,7 @@
       "SoprReset"
     ],
     "content": "VALUATION ANCHORING IN BUBBLES: In the absence of traditional valuation metrics (earnings, dividends), crypto investors anchor to arbitrary round numbers or previous highs. 'BTC should be $100K because...' This is narrative-driven anchoring, not valuation. MVRV Z-Score, NVT Ratio, and Stock-to-Flow provide pseudo-fundamental anchors. When price deviates >2σ from these, mean-reversion is likely.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:bubble_detection",
       "setup_type:rotation",
@@ -152,7 +152,7 @@
       "HalvingProximity"
     ],
     "content": "CRYPTO BUBBLE CYCLE LENGTH: Historical crypto cycles: 2013 bubble→2015 bottom (2yr), 2017 bubble→2018 bottom (1yr), 2021 bubble→2022 bottom (1yr). Each cycle is faster and involves more institutional money. The post-halving blow-off tops have diminishing returns (each cycle's peak is a smaller multiple of the previous). Plan for 3-4 year round trips.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:bubble_detection",
       "timeframe:monthly",
@@ -172,7 +172,7 @@
       "ExtremeGreed"
     ],
     "content": "BOOM-BUST SEQUENCE: Soros identifies: 1) Trend not yet recognized. 2) Trend is tested and survives. 3) Increasing conviction in trend. 4) Growing divergence between perception and reality. 5) Recognition of the divergence. 6) The trend reverses. Apply to crypto: identify which phase BTC is in. Phase 1-3 = trend follow. Phase 4 = reduce size. Phase 5-6 = reverse or exit.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:divergence",
       "timeframe:daily",
@@ -193,7 +193,7 @@
       "OIDivergence"
     ],
     "content": "FUNDING RATE AS REFLEXIVITY SIGNAL: Soros's reflexivity applies directly to perpetual futures funding. Positive funding = longs pay shorts → more people go long → funding increases → reflexivity loop. When funding exceeds 0.1% per 8 hours for sustained periods, the reflexive loop is at maximum. The unwinding is violent—funding rate mean-reversion triggers cascading long liquidations.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:reflexivity",
       "timeframe:daily",
@@ -213,7 +213,7 @@
       "BreakingNews"
     ],
     "content": "CONTRARIAN POSITION MANAGEMENT: The Big Short's heroes were right but had to survive being early. Strategy: 1) Take small contrarian position. 2) If market moves against, add only on NEW evidence. 3) NEVER add just because price is 'cheaper.' 4) Set a maximum total allocation. 5) Be prepared for the position to take 6-18 months to play out. Patience is the contrarian's only edge.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:daily",
@@ -234,7 +234,7 @@
       "HalvingProximity"
     ],
     "content": "MARKET CYCLE PHASES (CRYPTO): 1) Accumulation (smart money, low volume, MVRV <1). 2) Early bull (rising prices, increasing volume, MVRV 1-2). 3) Euphoria (parabolic, extreme MVRV >3, SOPR >1.1). 4) Distribution (smart money selling, declining volume). 5) Bear market (capitulation, MVRV <1). Identify current phase. Trade accordingly. You cannot change the phase—only position for it.",
-    "priority": 5,
+    "priority": 4,
     "tags": [
       "setup_type:dca_entry",
       "setup_type:crisis_entry",
@@ -256,7 +256,7 @@
       "ExtremeFear"
     ],
     "content": "REFLEXIVE COLLAPSE CASCADE: In crypto, falling prices → liquidations → more selling → more liquidations → protocol failures → contagion → more selling. This is reflexivity in reverse. The cascade stops when forced selling is exhausted and only strong hands remain. Signs of cascade exhaustion: exchange outflows resume, stablecoin supply increases, MVRV approaches 0.5, capitulation volume spike.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:reflexivity",
       "setup_type:crisis_entry",
@@ -278,7 +278,7 @@
       "Ranging"
     ],
     "content": "DAILY HOMEWORK: Every day: 1) Review open positions. 2) Check stops and targets. 3) Scan for new setups. 4) Update trading journal. 5) Review market conditions. This 30-minute ritual is non-negotiable. In crypto, add: check on-chain metrics (exchange flows, whale movements), funding rates, and macro calendar. Homework prevents surprises and maintains discipline.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "setup_type:risk_management",
@@ -299,7 +299,7 @@
       "ExtremeGreed"
     ],
     "content": "Contrarian sentiment signals: Magazine covers, extreme COT positioning, retail SSI >80% one-sided, news headlines with extreme language (surge/plummet), Google Trends peaks. All signal trend exhaustion.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:daily",
@@ -321,7 +321,7 @@
       "ExtremeGreed"
     ],
     "content": "Sentiment extreme checklist: 1) Magazine cover featuring trend 2) COT extreme 3) RSI divergence 4) News headline extreme language 5) Google Trends peak. 3+ signals simultaneously = very high conviction reversal.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:divergence",
       "timeframe:daily",
@@ -364,7 +364,7 @@
       "BreakingNews"
     ],
     "content": "SENTIMENT: IG Client Sentiment, COT. 75%+ retail long = contrarian short. Institutional extremes = reversal.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:daily",
@@ -384,7 +384,7 @@
       "Ranging"
     ],
     "content": "COT INDEX EXTREME ZONES: Index above 90 = extreme bullish consensus (very bearish contrarian). Below 10 = extreme bearish consensus (very bullish contrarian). The more extreme, the stronger the reversal signal.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:daily",
@@ -405,7 +405,7 @@
       "ExtremeFear"
     ],
     "content": "MVRV RATIO — Cycle Top/Bottom Detection: MVRV = Market Value / Realized Value. Market Value = current market cap (spot price × supply). Realized Value = each UTXO valued at the price it last moved on-chain. MVRV > 3.5 = euphoric unrealized profits, historically signals cycle TOP. MVRV < 1.0 = realized value exceeds market value = deep capitulation, asymmetric accumulation opportunity. MVRV between 1.0-2.0 = neutral/undervalued zone. MVRV 2.0-3.0 = warming up. The ratio quantifies aggregate unrealized profit/loss of the entire network — it maps the psychological state of all holders simultaneously.",
-    "priority": 5,
+    "priority": 4,
     "tags": [
       "setup_type:dca_entry",
       "setup_type:crisis_entry",
@@ -429,7 +429,7 @@
       "ExtremeFear"
     ],
     "content": "NUPL (Net Unrealized Profit/Loss) — Supply Distribution Tracking: NUPL = (Market Cap - Realized Cap) / Market Cap. Maps proportion of circulating supply in profit vs loss. A UTXO is 'in profit' if current price > acquisition price. Track NUPL VELOCITY (rate of change) for advanced warning: rapid NUPL increase during markup = LTH distributing to new buyers. Rapid NUPL decrease during markdown = smart money accumulating from capitulating sellers. NUPL zones: >0.75 = Euphoria (sell signal), 0.5-0.75 = Belief/Greed, 0.25-0.5 = Hope/Optimism, 0-0.25 = Anxiety/Fear, <0 = Capitulation (strong buy signal).",
-    "priority": 5,
+    "priority": 4,
     "tags": [
       "setup_type:crisis_entry",
       "timeframe:daily",
@@ -450,7 +450,7 @@
       "ExtremeGreed"
     ],
     "content": "SOPR (Spent Output Profit Ratio) — Realized Profit/Loss on Active Spends: SOPR = value of outputs at spend time / value of outputs at creation time. SOPR > 1.0 = coins being spent at profit (market realizing gains). SOPR < 1.0 = coins being spent at loss (capitulation). KEY SIGNAL: SOPR reset to 1.0 after capitulation (SOPR < 1.0) = high-probability re-entry. When SOPR resets from below 1.0 back to 1.0, it means loss-selling exhaustion is complete. This is one of the most reliable on-chain buy signals. During euphoria, SOPR consistently > 1.0 with diminishing magnitude = distribution phase.",
-    "priority": 5,
+    "priority": 4,
     "tags": [
       "setup_type:crisis_entry",
       "timeframe:daily",
@@ -471,7 +471,7 @@
       "Ranging"
     ],
     "content": "NVT RATIO AND NVT SIGNAL — Network Valuation vs Utility: NVT Ratio = Market Cap / Daily On-Chain Transaction Volume. Functions like a P/E ratio for blockchain. High NVT = market cap growing faster than transaction volume = overvalued/speculation-driven. Low NVT = undervalued/settlement-driven. NVT SIGNAL replaces raw daily volume with 90-day MA to smooth volatility. Descending NVT Signal = on-chain volume outpacing market cap = fundamentally undervalued. Ascending NVT Signal = speculation outpacing utility = overvalued. Use NVT Signal, not raw NVT, for trading decisions.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:valuation",
       "timeframe:daily",
@@ -491,7 +491,7 @@
       "ExtremeGreed"
     ],
     "content": "REALIZED CAP VS MARKET CAP DIVERGENCE: Realized Cap values each coin at its last on-chain movement price — represents the aggregate cost basis of all holders. When Market Cap >> Realized Cap = massive unrealized profits, euphoria. When Market Cap approaches Realized Cap = near cost basis, high risk of capitulation. When Market Cap < Realized Cap = aggregate loss, deep value zone. The GAP between Market Cap and Realized Cap is the most reliable measure of market overheating or undervaluation. Track the ratio (MVRV) rather than absolute values.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:divergence",
       "setup_type:crisis_entry",
@@ -514,7 +514,7 @@
       "ExtremeGreed"
     ],
     "content": "MVRV Z-SCORE — Quantitative Thresholds: Z-Score = (Market Value - Realized Value) / StdDev(Market Value). Historical thresholds: Z > 7 = extreme euphoria, cycle top imminent (sell). Z > 5 = very overheated. Z 2-5 = bull market territory. Z 0-2 = neutral. Z < 0 = undervalued, accumulation zone. Z < -0.5 = deep capitulation, strongest buy signal. The Z-Score normalizes MVRV across different market cap eras, making it comparable across cycles. Bitcoin has NEVER sustained a bull market with Z-Score declining — divergence between price and Z-Score is a warning.",
-    "priority": 5,
+    "priority": 4,
     "tags": [
       "setup_type:dca_entry",
       "setup_type:divergence",
@@ -537,7 +537,7 @@
       "ExtremeFear"
     ],
     "content": "SOPR RESET AS RE-ENTRY SIGNAL: The SOPR reset is one of the highest-conviction on-chain buy signals. Mechanism: During capitulation, SOPR < 1.0 (coins moving at loss). As loss-selling exhaustion completes, SOPR resets back to 1.0. This reset = the marginal seller has been absorbed. Entry: Buy when SOPR crosses back above 1.0 after sustained period below 1.0. Confirmation: Combine with exchange outflow spike (smart money absorbing sell pressure). Historical accuracy: Every major Bitcoin bottom since 2011 has been preceded by a SOPR reset. False signals are rare but occur during prolonged bear markets.",
-    "priority": 5,
+    "priority": 4,
     "tags": [
       "setup_type:crisis_entry",
       "timeframe:daily",
@@ -556,7 +556,7 @@
       "Ranging"
     ],
     "content": "NVT DIVERGENCE — Price vs Network Activity: When price makes higher highs but NVT Signal is ALSO making higher highs = bearish divergence (price rising on speculation, not utility). When price makes lower lows but NVT Signal is declining = bullish divergence (network usage holding up despite price decline). NVT divergence is most useful during ranging markets to determine which direction the next breakout will go. Combine with volume profile: if NVT shows undervaluation AND price is at a high-volume node = strong support.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:divergence",
       "setup_type:valuation",
@@ -579,7 +579,7 @@
       "ExtremeGreed"
     ],
     "content": "UTXO AGE DISTRIBUTION FOR CYCLE POSITIONING: UTXO age bands show what percentage of supply last moved in various timeframes (1d, 1w, 1m, 3m, 6m, 1y, 2y, 5y+). Young UTXOs (1d-1w) dominating = high speculation, active trading. Old UTXOs (1y+) declining = long-term holders selling (distribution). Old UTXOs (1y+) increasing = long-term holders accumulating (accumulation). The shift from old UTXO dominance to young UTXO dominance marks the transition from accumulation to markup. When 1y+ UTXOs reach 60%+ of supply = deep accumulation, cycle bottom likely near.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "timeframe:monthly",
@@ -600,7 +600,7 @@
       "ExtremeGreed"
     ],
     "content": "FEAR & GREED INDEX (0-100): 0-25 = Extreme Fear (historically best buying opportunities — when everyone is terrified, that's when you buy). 26-45 = Fear. 46-55 = Neutral. 56-75 = Greed. 76-100 = Extreme Greed (market overheated, reduce exposure, take profits). When index hits single digits, it's almost ALWAYS a buying opportunity. When above 90, be very cautious — smart money is distributing to retail. Don't use in isolation — combine with technicals and volume. Updates daily from alternative.me.",
-    "priority": 5,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -621,7 +621,7 @@
       "ExtremeFear"
     ],
     "content": "When news is wonderful and a market can't go up, be sure to be short. When a market acts terribly relative to everything else on a powerful day, put down a bet against it. Divergence between correlated markets signals major turns.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:divergence",
       "timeframe:daily",
@@ -642,7 +642,7 @@
       "Ranging"
     ],
     "content": "Always think of your entry point as last night's close. Don't be concerned about where you got into a position. The only relevant question is whether you are bullish or bearish on the position TODAY. This prevents anchoring bias.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -663,7 +663,7 @@
       "ExtremeFear"
     ],
     "content": "Markets look their very best when setting new highs — that is often the BEST time to sell. To be a good trader you must be a contrarian. The best money is made at market turns, not by catching trends in the middle.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:daily",
@@ -686,7 +686,7 @@
       "ExtremeFear"
     ],
     "content": "Go against hysteria and panic — 95% of the time you will make money if you can stick it out. When market moves in gaps, it's hysteria. But first examine the situation fully. Just because you see panic doesn't automatically mean you should trade against it.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -707,7 +707,7 @@
       "Ranging"
     ],
     "content": "Variant perception: develop perceptions at variance with the general market view. Play those variant perceptions until they are no longer variant. The key is the perception must be CONTRARIAN — if everyone agrees with you, the edge is gone.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:daily",
@@ -748,7 +748,7 @@
       "Ranging"
     ],
     "content": "Yass: The mathematics of strategy matter more than the story. Calculate expected value mathematically. If the math doesn't work, no amount of narrative will save the trade. Quantify everything.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:rotation",
       "timeframe:daily",
@@ -769,7 +769,7 @@
       "ExtremeFear"
     ],
     "content": "Magazine covers are contrary indicators. 'Are Interest Rates Going to 20%?' = bond market bottom. 'How High Can Oil Prices Go?' = oil top. Read the covers, forget the articles inside. Seykota's media indicator.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -790,7 +790,7 @@
       "Ranging"
     ],
     "content": "The worst thing for a beginning trader is to have your first trade work. It creates overconfidence and reckless behavior. Walton lost all of $10K borrowed from father within 3 weeks of initial winning trade.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -810,7 +810,7 @@
       "Ranging"
     ],
     "content": "Galante: Go against the current. When everyone is buying, be cautious. When everyone is selling, look for opportunities. Contrarian value approach with strict risk management on each position.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "setup_type:risk_management",
@@ -831,7 +831,7 @@
       "Ranging"
     ],
     "content": "A greedy trader always blows out. Kovner knew brilliant traders who knew markets better than he did, but he kept money and they didn't. The difference: position size. For every 1 contract Kovner traded, they traded 10.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:risk_management",
       "timeframe:daily",
@@ -850,7 +850,7 @@
       "Trending"
     ],
     "content": "When market has enormous move, most of the time it is right to view it as emotional and extreme. Maintain distance from the emotionalism. Steinhardt bought heavily on Oct 19, 1987 crash day — contrarian trade on extreme move.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "setup_type:psychology",
@@ -870,7 +870,7 @@
       "Trending"
     ],
     "content": "Minervini: The Volatility Contraction Pattern (VCP) — price consolidates with decreasing volatility (tightening range) after a run-up. The contraction represents institutional accumulation. Breakout from VCP with volume surge is the buy signal.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "timeframe:daily",
@@ -890,7 +890,7 @@
       "Ranging"
     ],
     "content": "Shaw: Quantitative risk models must account for tail risk — the rare events that don't appear in normal distributions. 10-sigma events happen more often than models predict. Always prepare for the worst case.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -910,7 +910,7 @@
       "Ranging"
     ],
     "content": "Lipschutz: What matters is what the market is focusing on RIGHT NOW. One day its interest rate differentials, next day capital appreciation. Same news bullish or bearish depending on current narrative.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:rotation",
       "timeframe:daily",
@@ -930,7 +930,7 @@
       "Ranging"
     ],
     "content": "Seidler: Cannot win at leverage that makes you fearful. Reduce position until you can think clearly and objectively. Fear distorts judgment.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -949,7 +949,7 @@
       "Trending"
     ],
     "content": "Minervini: VCP — price consolidates with decreasing volatility. Tightening range = institutional accumulation. Breakout with volume surge = buy signal.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "timeframe:daily",
@@ -970,7 +970,7 @@
       "BreakingNews"
     ],
     "content": "CRYPTO BUBBLE vs NETWORK EFFECT: Sharp crypto gains resemble tech bubbles but differ fundamentally—Bitcoin isn't a company that can lose profitability. The network effect means value grows as adoption increases. However, protocol-level failures CAN collapse price. Don't confuse network-effect growth with speculative bubbles, but don't ignore protocol risk either.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:bubble_detection",
       "timeframe:daily",
@@ -1012,7 +1012,7 @@
       "AltSeason"
     ],
     "content": "ALTCOIN CLASSIFICATION: Altcoins = any cryptocurrency alternative to Bitcoin. Layer-1s (ETH, SOL, AVAX) compete on smart contract platforms. Layer-2s (MATIC, ARB) scale Layer-1s. DeFi tokens (UNI, AAVE) power financial protocols. Memecoins (DOGE, SHIB) trade on narrative alone. Each category has different risk/reward profiles and correlation to BTC. Diversify across categories.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:rotation",
       "timeframe:daily",
@@ -1035,7 +1035,7 @@
       "FomcDate"
     ],
     "content": "STABLECOIN DYNAMICS: USDT, USDC, DAI maintain 1:1 USD peg. Stablecoins are crypto's cash equivalent—used for trading pairs, yield farming, and risk-off positioning. Monitor stablecoin dominance (percentage of total crypto market cap in stables)—rising stablecoin dominance = market risk-off; falling = risk-on. Stablecoin depeg events create systemic cascading liquidations.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1055,7 +1055,7 @@
       "HighVolatility"
     ],
     "content": "FORK EVENTS AS TRADING SIGNALS: Hard forks create new chains/tokens (e.g., BTC→BCH). Accidental forks from coding errors. Hard forks are contentious splits—holders receive free tokens on both chains. Pre-fork: accumulate for airdrop. Post-fork: sell the weaker chain quickly as it typically dumps. Monitor GitHub for fork signals and community sentiment splits.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1095,7 +1095,7 @@
       "LiquidationCluster"
     ],
     "content": "VOLATILITY SMILE IN CRYPTO OPTIONS: Unlike equity options, crypto options show extreme skew—put IV >> call IV (crash fear premium). The smile is asymmetric and steepens during fear events. When selling options, this skew means puts are overpriced relative to calls. However, tail risk in crypto is real—selling puts collects premium but carries catastrophic risk.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1114,7 +1114,7 @@
       "HighVolatility"
     ],
     "content": "GAMMA RISK NEAR CRYPTO OPTION EXPIRY: Gamma explodes for ATM options in final 48 hours before expiry. Small BTC price moves cause massive delta swings. If short options near expiry, gamma risk can force panic hedging. Crypto options expire 08:00 UTC Friday on Deribit. Position around these expiries carefully—pin risk and gamma squeezes are common.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:hedging",
       "timeframe:daily",
@@ -1155,7 +1155,7 @@
       "ExtremeFear"
     ],
     "content": "SURVIVORSHIP BIAS IN CRYPTO: You only see the winners. For every BTC millionaire, thousands lost everything on dead altcoins. The visible success stories create false sense of easy profits. In crypto, 95%+ of altcoins go to zero. When evaluating trading strategies, ALWAYS ask: what happened to the people who tried this and failed? Their silence is informative.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1177,7 +1177,7 @@
       "LiquidationCluster"
     ],
     "content": "RUSSIAN ROULETTE ANALOGY: A strategy that makes money 99% of the time but has a 1% chance of total ruin is NOT a good strategy—it's a time bomb. Crypto leverage traders often use this model: small consistent gains, then catastrophic liquidation. Never evaluate a strategy by average returns alone. The worst-case outcome must be survivable. Risk of ruin > expected return.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1197,7 +1197,7 @@
       "Trending"
     ],
     "content": "LUCK vs SKILL ATTRIBUTION: In a large market of traders, some will have extraordinary returns by pure chance. In crypto's bull markets, nearly everyone is a 'genius.' The true test of skill is performance across market cycles—bull AND bear. If a trader's edge disappears in bear markets, they had no edge—just directional luck. Require 100+ trades minimum to evaluate skill.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:monthly",
@@ -1217,7 +1217,7 @@
       "ExtremeFear"
     ],
     "content": "EMOTIONAL AVOIDANCE OF LOSS: Humans feel losses 2-2.5x more intensely than equivalent gains (loss aversion). In crypto, this leads to holding losers too long (hoping for recovery) and cutting winners too quickly (locking in gains). Counter: automate exits with predetermined stop-losses and take-profit levels. Remove emotional decision-making from the execution loop entirely.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "setup_type:risk_management",
@@ -1238,7 +1238,7 @@
       "AltSeason"
     ],
     "content": "NOISE vs SIGNAL IN CRYPTO: Daily price movements are mostly noise. Watching 1-minute charts creates emotional reactions to randomness. The signal-to-noise ratio improves dramatically with longer timeframes—weekly charts contain more signal than 5-minute charts. Check prices less frequently. Set alerts for key levels instead of watching screens. CNBC/Bloomberg explanations of daily moves are post-hoc narrative fitting.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:rotation",
       "setup_type:psychology",
@@ -1261,7 +1261,7 @@
       "BreakingNews"
     ],
     "content": "NARRATIVE ECONOMICS IN CRYPTO: Prices are driven by stories, not fundamentals. Bitcoin narratives shift: digital gold → inflation hedge → institutional adoption → national reserve. Each narrative attracts different capital. When a narrative exhausts its marginal buyer, price stagnates. Track narrative evolution—if media is recycling old narratives, the cycle is mature.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:rotation",
       "timeframe:monthly",
@@ -1281,7 +1281,7 @@
       "AltSeason"
     ],
     "content": "TULIP MANIA → CRYPTO PARALLEL: In 1637, tulip bulb prices rose 20x in months, then collapsed to near-zero. The pattern: 1) Novel asset with limited supply. 2) Speculation divorced from utility. 3) Leveraged buying. 4) Sudden liquidity withdrawal. 5) Cascade of forced selling. Every altcoin mania mirrors this. When valuations have no connection to utility, you're in tulip territory.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:bubble_detection",
       "setup_type:valuation",
@@ -1302,7 +1302,7 @@
       "AltSeason"
     ],
     "content": "THE MADNESS OF CROWDS - DELUSION STAGES: 1) Attention—the new asset captures public imagination. 2) Enthusiasm—early profits create FOMO. 3) Delusion—rational thinking is abandoned. 4) The 'hook'—a compelling story prevents exit ('BTC to $1M'). 5) Panic—reality intrudes, mass exit. In crypto, these stages can compress into weeks. Social media accelerates every stage.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1323,7 +1323,7 @@
       "AltSeason"
     ],
     "content": "PUMP AND DUMP PATTERNS: Historical market manipulation from 1700s South Sea Bubble mirrors modern crypto pump-and-dumps. Signs: 1) Unexplained volume surge in low-cap token. 2) Social media hype campaign. 3) Price rises 500%+ in hours. 4) Insiders sell into retail buying. 5) Price collapses 90%+ in hours. If you didn't get in before the pump, NEVER chase it.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:bubble_detection",
       "timeframe:daily",
@@ -1344,7 +1344,7 @@
       "Trending"
     ],
     "content": "CONTRARIAN CONVICTION: Being right AND early feels identical to being wrong. Burry was mocked for 2+ years before the housing collapse validated his thesis. In crypto, if your analysis shows overvaluation but the market keeps rising, you're not wrong—your timing may be off. The solution: size positions so you can survive being early. Small contrarian bets, add on confirmation.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "setup_type:valuation",
@@ -1365,7 +1365,7 @@
       "FundingRateExtreme"
     ],
     "content": "LEVERAGE AS SYSTEMIC RISK: Excessive leverage was the detonator in 2008 and is in every crypto crash. When aggregate leverage (open interest, funding rates, margin debt) reaches extremes, the system is fragile. One catalyst triggers cascading liquidations. Monitor: BTC futures OI, aggregate funding rates, DeFi utilization rates. Extreme readings = reduce exposure immediately.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1387,7 +1387,7 @@
       "ExtremeFear"
     ],
     "content": "MODEL RISK: LTCM's Nobel laureates used models that assumed normal distributions and stable correlations. Reality: fat tails and correlation shifts. In crypto, models built on 2-3 years of data will fail spectacularly during regime changes. Always stress-test models against: -50% BTC in 24h, -90% altcoin collapse, exchange outages, and stablecoin depegs.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1408,7 +1408,7 @@
       "HighVolatility"
     ],
     "content": "THE HUMAN FACTOR IN RISK: LTCM traders were so confident in their models that they personally invested their entire net worth alongside fund capital. Overconfidence killed them. In crypto, never let confidence in a thesis override risk management. Even if you're 'certain' BTC will recover, position-size as if it might not. Hubris is the precursor to ruin.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:risk_management",
       "timeframe:daily",
@@ -1429,7 +1429,7 @@
       "ExtremeFear"
     ],
     "content": "REFLEXIVITY THEORY FOR CRYPTO: Participant perceptions don't just reflect reality—they SHAPE it. In crypto: rising prices attract users → more development → better fundamentals → higher prices (virtuous cycle). Falling prices → user exodus → less development → worse fundamentals → lower prices (vicious cycle). This is reflexivity. Crypto is MORE reflexive than any traditional market.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:reflexivity",
       "timeframe:monthly",
@@ -1449,7 +1449,7 @@
       "Trending"
     ],
     "content": "THREE PHASES OF A PRICE MOVE: 1) Accumulation/markup (smart money buys, price grinds up). 2) Public participation (retail FOMO, parabolic advance). 3) Distribution/markdown (smart money sells to retail, price collapses). Apply to crypto cycles: Phase 1 = post-bear-market accumulation. Phase 2 = bull run. Phase 3 = blow-off top distribution. Identify phase before sizing positions.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "timeframe:monthly",
@@ -1469,7 +1469,7 @@
       "BtcDominant"
     ],
     "content": "FIRM FOUNDATION THEORY: Assets have intrinsic value based on future earnings/cash flows. Applying to BTC: Stock-to-Flow, NVT Ratio, and Metcalfe's Law provide pseudo-fundamental valuations. When price significantly exceeds these models (>2 standard deviations), the asset is overvalued relative to its network fundamentals. Mean reversion is likely within 6-18 months.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:valuation",
       "timeframe:daily",
@@ -1510,7 +1510,7 @@
       "LiquidationCluster"
     ],
     "content": "BUYING DURING CAPITULATION: The Big Short's heroes bought protection BEFORE the crash. The lesson for crypto: buy during calm (cheap puts, low leverage, build cash position) so you're prepared. During actual capitulation, you need dry powder AND conviction. The best crypto buying opportunities come when on-chain metrics show maximum pain (SOPR <0.85, MVRV <0.5, exchange outflows surging).",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:crisis_entry",
       "timeframe:daily",
@@ -1529,7 +1529,7 @@
       "HighVolatility"
     ],
     "content": "DOLLAR-COST AVERAGING SUPERIORITY: For most investors, DCA into BTC/ETH outperforms lump-sum timing. The math: DCA reduces variance of outcomes by spreading entry across time. For crypto, weekly DCA over 12 months captures multiple price levels. Combine with value-aware DCA: invest more when MVRV is low, less when MVRV is high. This enhances returns by 15-30% vs blind DCA.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "timeframe:weekly",
@@ -1550,7 +1550,7 @@
       "OIDivergence"
     ],
     "content": "CREDIT CYCLE IN CRYPTO: The crypto credit cycle: 1) Low rates → DeFi yield farming booms. 2) Yield compression → leverage increases. 3) Leverage limits hit → yield sources dry up. 4) Rate hikes/contagion → forced deleveraging. 5) Cascade → credit crisis (Terra, 3AC, Celsius). Monitor DeFi TVL and lending rates. Declining yields + rising leverage = late cycle.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:crisis_entry",
       "timeframe:monthly",
@@ -1592,7 +1592,7 @@
       "Ranging"
     ],
     "content": "BACKTESTING CRYPTO SPECIFIC PITFALLS: 1) Survivorship bias (dead coins excluded). 2) Look-ahead bias (using data not available at trade time). 3) Overfitting (too many parameters for limited data). 4) Ignoring slippage (10-100bps in crypto). 5) Ignoring exchange downtime. 6) Ignoring fork/airdrop effects. 7) Exchange-specific liquidity differences. Address ALL before trusting any backtest.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1612,7 +1612,7 @@
       "ExtremeFear"
     ],
     "content": "WYCKOFF SPRING AS REFLEXIVE BOTTOM: Soros's reflexivity explains why Wyckoff springs mark bottoms—the panic selling that creates the spring is the final capitulation of weak hands. Once exhausted, the reflexive loop reverses: rising prices attract buyers, which raises prices further. The spring IS the moment where the far-from-equilibrium downward trend exhausts itself.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:reflexivity",
       "setup_type:crisis_entry",
@@ -1634,7 +1634,7 @@
       "LiquidityExpansion"
     ],
     "content": "CRYPTO MARKET HOURS: While crypto trades 24/7, distinct sessions exist. Asian session (00:00-08:00 UTC): historically bearish bias for BTC. European session (08:00-16:00 UTC): higher volatility, more institutional flow. US session (13:30-21:00 UTC): highest volume, most directional moves. Weekend sessions: lower volume, more susceptible to manipulation. Trade during highest-volume sessions for best execution.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:intraday",
@@ -1653,7 +1653,7 @@
       "SessionClose"
     ],
     "content": "PORTFOLIO REBALANCING CADENCE: Malkiel advocates regular rebalancing to maintain target allocations. In crypto, rebalance monthly or when any position deviates >20% from target weight. This forces you to sell winners and buy losers—a systematic contrarian strategy. In bull markets, rebalancing reduces returns slightly but in bear markets it dramatically reduces drawdowns.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:monthly",
@@ -1673,7 +1673,7 @@
       "HalvingProximity"
     ],
     "content": "HALVING ANTICIPATION CYCLE: The crypto market prices in halving events 6-12 months in advance. Track halving proximity: 12+ months before = accumulation phase. 6-12 months = early markup. 0-6 months = anticipation peak. Post-halving = 'buy the rumor, sell the news' potential. In the weeks before halving, watch for increasing spot demand and declining exchange reserves.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "timeframe:monthly",
@@ -1692,7 +1692,7 @@
       "Trending"
     ],
     "content": "COT report analysis: When speculators reach extreme net long/short positions (top/bottom 5% of 3-year range), reversal is likely. Commercials are wrong at extremes but right at turning points - follow their positioning.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1712,7 +1712,7 @@
       "ExtremeFear"
     ],
     "content": "Magazine cover indicator: When mainstream media features a currency trend on the cover (The Economist, Time), the trend is near exhaustion. 'Euroshambles' cover (Sept 2000) marked EUR/USD all-time low. Contrarian signal at extremes.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:daily",
@@ -1734,7 +1734,7 @@
       "ExtremeGreed"
     ],
     "content": "COT report: Speculators net positioning at 3-year extremes (>90th or <10th percentile) signals reversal. When commercials and speculators both extreme in same direction, signal is strongest. Use as filter, not timing tool.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1755,7 +1755,7 @@
       "Ranging"
     ],
     "content": "Combining sentiment with technicals: Only take trades when sentiment extreme aligns with key technical level. Magazine cover + Fibonacci 61.8% retracement + COT extreme = highest conviction setup.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1774,7 +1774,7 @@
       "Trending"
     ],
     "content": "Retail positioning as contrarian signal: When 80%+ of retail traders are long, price tends to fall. When 80%+ are short, price tends to rise. Broker-provided sentiment data is a free edge.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:daily",
@@ -1794,7 +1794,7 @@
       "ExtremeGreed"
     ],
     "content": "Fear and greed cycle: Fear causes early exit of winners. Greed causes holding losers too long. The solution is mechanical rules: fixed stops, predetermined targets, position sizing formula.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:risk_management",
       "timeframe:monthly",
@@ -1836,7 +1836,7 @@
       "BtcDominant"
     ],
     "content": "Network value to transactions ratio (NVT): crypto equivalent of P/E ratio. NVT = Market Cap / Daily Transaction Volume. High NVT suggests overvaluation. Low NVT suggests undervaluation.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:valuation",
       "timeframe:daily",
@@ -1857,7 +1857,7 @@
       "HalvingProximity"
     ],
     "content": "MVRV Z-Score above 7 signals Bitcoin overvaluation historically. Below 0 signals undervaluation. Use as a regime filter for crypto allocation not as a precise timing tool.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:valuation",
       "timeframe:daily",
@@ -1878,7 +1878,7 @@
       "Trending"
     ],
     "content": "SOPR (Spent Output Profit Ratio) reset to 1.0 after a correction indicates profit-taking has exhausted. When SOPR resets from above to 1.0 and bounces it often signals continuation of uptrend.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1898,7 +1898,7 @@
       "Ranging"
     ],
     "content": "END OF RISING MARKET: 1) Buying climax. 2) Narrow spread up on high vol. 3) UTAD. 4) Low vol rallies. 5) Volume declining each rally. 6) Failed tests. 3+ signals = distribution phase.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1918,7 +1918,7 @@
       "Ranging"
     ],
     "content": "COT INDEX FORMULA: (Current Net Position - Min Net)/(Max Net - Min Net) x 100 over lookback period (typically 52 weeks). Above 80 = extreme bullish. Below 20 = extreme bearish. These extremes signal reversals.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1937,7 +1937,7 @@
       "Trending"
     ],
     "content": "COT REVERSAL SIGNAL: Commercial hedgers reach extreme position AND begin reversing. The KEY is the REVERSAL from extreme, not just reaching extreme. Hedgers may be early but rarely wrong on direction.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1957,7 +1957,7 @@
       "Ranging"
     ],
     "content": "COMBINING COT WITH TECHNICALS: COT extreme + technical reversal pattern = highest probability trade. COT alone provides DIRECTIONAL bias. Technicals provide TIMING. Together they are complementary.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1976,7 +1976,7 @@
       "Trending"
     ],
     "content": "COT IN FUTURES MARKETS: Report covers futures positions for major markets. Most useful in commodities and financial futures. Less useful in individual stocks. Best for index, currency, commodity trading.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -1996,7 +1996,7 @@
       "Ranging"
     ],
     "content": "LONG-TERM vs SHORT-TERM COT: COT is a LONG-TERM indicator (weekly data). Extremes can persist for weeks/months before reversal. Use for POSITION trading bias, not day trading signals.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -2017,7 +2017,7 @@
       "Ranging"
     ],
     "content": "SPREAD ANALYSIS WITH COT: Commercial spread positions (long nearby, short deferred or vice versa) reveal hedging patterns. Extreme spread positions indicate supply/demand imbalances in specific contract months.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:hedging",
       "timeframe:daily",
@@ -2037,7 +2037,7 @@
       "Ranging"
     ],
     "content": "COT DIVERGENCE WITH PRICE: Most powerful COT signal. Price makes extreme but commercial positioning NOT confirming. Example: price new high but hedgers covering shorts = distribution occurring. Strong reversal signal.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:divergence",
       "timeframe:daily",
@@ -2056,7 +2056,7 @@
       "Trending"
     ],
     "content": "COT IN CURRENCIES: Commercial hedgers in currencies = actual users of currency (multinationals, governments). Their extreme positioning reflects real economic activity. Useful for major currency pairs.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -2076,7 +2076,7 @@
       "Ranging"
     ],
     "content": "COT + TECHNICAL CONFLUENCE: COT extreme (hedger reversal) + technical pattern (Edwards/Magee) + volume confirmation (Coulling) + swing structure (Grimes) = highest probability trade. All four aligned.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -2096,7 +2096,7 @@
       "Ranging"
     ],
     "content": "SMART MONEY DETECTION FRAMEWORK: Coulling VPA (volume-price divergence) + Bernstein COT (hedger positioning) + Wyckoff concepts (accumulation/distribution). Three independent methods to detect institutional activity.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "setup_type:divergence",
@@ -2139,7 +2139,7 @@
       "Trending"
     ],
     "content": "STABLECOIN MINTING FLOWS — Buy Signal: When Tether (USDT) or USDC mints large batches of new stablecoins, it signals institutional capital preparing to enter the market. Track total stablecoin supply as a leading indicator. Rapid stablecoin supply increase during market fear = smart money deploying dry powder. Stablecoin supply decrease = capital leaving crypto. USDT dominance (USDT market cap / total crypto market cap) rising during fear = capital flight to safety WITHIN crypto (not leaving). USDT dominance falling during rally = capital rotating into risk assets.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -2199,7 +2199,7 @@
       "ExtremeFear"
     ],
     "content": "EXCHANGE BALANCE MULTI-YEAR LOWS: Total BTC held on exchanges declining to multi-year lows = supply squeeze. When exchange balance is low, any demand increase creates outsized price moves because there's less supply available for sale. Track: 1) Total exchange balance (declining = bullish), 2) Exchange balance rate of change (accelerating decline = very bullish), 3) Exchange balance relative to total supply. Current trend: Exchange balance has been in structural decline since 2020 as BTC moves to cold storage and ETF custody. This is a long-term bullish structural shift.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -2221,7 +2221,7 @@
       "ExtremeGreed"
     ],
     "content": "WALLET TRACKING VIA ON-CHAIN DATA: Track wallets with >1000 BTC for accumulation/distribution signals. Whale accumulation pattern: Multiple large outflows from exchange to cold storage within short timeframe. Whale distribution pattern: Large transfers from cold storage to exchange. Tools: Whale Alert (real-time large transactions), Blockchain.com (wallet clustering), Glassnode (cohort analysis). Key insight: Whales accumulate during fear and distribute during euphoria — track their behavior as a contrarian signal. A single whale transfer is noise; a PATTERN of transfers is signal.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "setup_type:dca_entry",
@@ -2245,7 +2245,7 @@
       "LowVolatility"
     ],
     "content": "RISK MANAGEMENT RULES: Risk max 1% of portfolio per trade. 3 consecutive losses = done for the day. Calculate position size BEFORE entering: size = (account_balance × risk_pct) / (entry - stop_loss). Take partial profits at key levels (TP1=50%, TP2=30%, TP3=20%). Scale into WINNING positions, NEVER into losing ones. Keep 20-30% in stablecoins for opportunities. Never invest more than you can afford to lose.",
-    "priority": 4,
+    "priority": 5,
     "tags": [
       "setup_type:risk_management",
       "timeframe:daily",
@@ -2265,7 +2265,7 @@
       "ExtremeGreed"
     ],
     "content": "EXCHANGE FLOWS: Bullish = coins moving OFF exchanges (people holding, reducing sell pressure). Bearish = coins moving ONTO exchanges (preparing to sell). STABLECOIN INFLOW to exchanges = buying pressure building. Outflow = capital leaving. WHALE TRACKING: Large wallet movements signal institutional activity. Follow wallets with 1000+ BTC. Use Arkham Intelligence, Whale Alert, Nansen.ai.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -2286,7 +2286,7 @@
       "Ranging"
     ],
     "content": "MARKET CYCLES IN CRYPTO: 4-year cycle tied to Bitcoin halving. ACCUMULATION (0-6 months post-halving): quiet, smart money buying, low retail interest. MARKUP (6-18 months): price rises, media attention, retail enters. DISTRIBUTION (18-24 months): euphoria, everyone is a genius, 'this time is different'. MARKDOWN (24-36 months): bear market, capitulation, 'crypto is dead'. Position accordingly — accumulate in markdown, distribute in markup.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "setup_type:crisis_entry",
@@ -2308,7 +2308,7 @@
       "Ranging"
     ],
     "content": "ALTCOIN SELECTION CRITERIA: 1) Strong team with track record. 2) Working product (not just whitepaper). 3) Active development (GitHub commits). 4) Real users/adoption. 5) Tokenomics (supply, inflation, burn mechanisms). 6) Narrative alignment (is it in a hot narrative?). 7) Exchange listings (more listings = more liquidity). 8) Market cap relative to peers. Avoid: anonymous teams, no product, purely hype-driven, excessive token unlocks.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:rotation",
       "timeframe:daily",
@@ -2329,7 +2329,7 @@
       "HighVolatility"
     ],
     "content": "FUTURES STRATEGY — HEDGE LOCK: Open a long AND short position simultaneously on the same pair to lock in profit or limit loss. Use when: price is at a decision point and direction is unclear, or you have profit you want to protect without closing. Exit the losing side when direction becomes clear. Risk: funding rates apply to both positions. Only use for short-term hedging (hours, not days). Never hold a hedge overnight without monitoring funding.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:hedging",
       "timeframe:daily",
@@ -2351,7 +2351,7 @@
       "LowVolatility"
     ],
     "content": "PORTFOLIO ALLOCATION: 50-60% BTC (core, never below 40%). 20-30% ETH. 10-20% quality altcoins (narrative plays). Keep 10-20% stablecoins for dips. Take profits on the way up in tranches (25% at each target). Never invest more than you can afford to lose. Use hardware wallet for long-term. DCA: dollar cost average weekly/monthly. Accumulate during fear, distribute during greed.",
-    "priority": 4,
+    "priority": 5,
     "tags": [
       "setup_type:dca_entry",
       "setup_type:rotation",
@@ -2376,7 +2376,7 @@
       "HighVolatility"
     ],
     "content": "MARKET CYCLES (4-Year): Phase 1 (Post-Halving Accumulation): 0-6 months, quiet, smart money buying. Phase 2 (Markup): 6-18 months, price rises, media attention, retail enters. Phase 3 (Distribution): 18-24 months, euphoria, 'this time is different'. Phase 4 (Markdown): 24-36 months, bear market, capitulation. We are in Phase 2-3 of the 2024 cycle. Position accordingly.",
-    "priority": 4,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "setup_type:crisis_entry",
@@ -4068,7 +4068,7 @@
       "HighVolatility"
     ],
     "content": "Volatility regime adjustment: In high VIX (>25) environment, reduce position sizes by 50%, widen stops by 50%, and reduce number of open positions. Capital preservation in storms, aggressive in calm.",
-    "priority": 3,
+    "priority": 4,
     "tags": [
       "setup_type:risk_management",
       "timeframe:daily",
@@ -4790,7 +4790,7 @@
       "ExtremeGreed"
     ],
     "content": "SURVIVORSHIP BIAS: 1000 flippers, 10 get 10 heads. Those 10 write books. Skill often luck.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -4810,7 +4810,7 @@
       "ExtremeFear"
     ],
     "content": "LOSS AVERSION: 2.5x worse. Holding losers, selling winners. Mechanical rules. Remove emotion.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -4831,7 +4831,7 @@
       "ExtremeGreed"
     ],
     "content": "NARRATIVE FALLACY: Stories for randomness. 5 wins = found edge. Combat: stats, 100+ trades.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:rotation",
       "timeframe:daily",
@@ -4851,7 +4851,7 @@
       "Ranging"
     ],
     "content": "MONEYBALL: Find undervalued edges. Most use same indicators. Edge in unconventional: unusual options, on-chain, sentiment.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:valuation",
       "timeframe:daily",
@@ -4871,7 +4871,7 @@
       "Trending"
     ],
     "content": "FEAR PARADOX: Scariest trades often best. Panicking crowd = best risk/reward. Fear = crowd on wrong side.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -4890,7 +4890,7 @@
       "ExtremeGreed"
     ],
     "content": "BUBBLE CHECKLIST: Rising prices, tech excitement, volume, media, new era, valuations, confidence, new products.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:bubble_detection",
       "setup_type:valuation",
@@ -4911,7 +4911,7 @@
       "ExtremeGreed"
     ],
     "content": "NATURAL EXPERIMENTS: Bubbles same pattern worldwide. Crypto identical to equity bubbles.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:bubble_detection",
       "timeframe:daily",
@@ -4931,7 +4931,7 @@
       "ExtremeGreed"
     ],
     "content": "DOW 10K: Brokerage celebrating milestones = crowd lost perspective. Warning not buy signal.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -4950,7 +4950,7 @@
       "ExtremeGreed"
     ],
     "content": "HINDSIGHT BIAS: Everyone knew after. Write predictions BEFORE events. Track hit rate.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -4970,7 +4970,7 @@
       "ExtremeGreed"
     ],
     "content": "LUDIC FALLACY: Casino models for markets flawed. Rules change, distribution unknown, Black Swans exist.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -4989,7 +4989,7 @@
       "ExtremeGreed"
     ],
     "content": "NARRATIVE: Every bubble this time is different. 1920s radio, 1960s conglomerates, 1990s internet, 2020s AI.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:bubble_detection",
       "setup_type:rotation",
@@ -5010,7 +5010,7 @@
       "ExtremeFear"
     ],
     "content": "SELLING CLIMAX: 1) Extreme volume spike. 2) Wide spread down. 3) Panic/capitulation. 4) Followed by narrow spread or reversal. Smart money ACCUMULATING from panicked sellers. Transfer from weak to strong hands.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:crisis_entry",
       "timeframe:daily",
@@ -5030,7 +5030,7 @@
       "HighVolatility"
     ],
     "content": "UPTHRUST AFTER DISTRIBUTION (UTAD): An upthrust occurring at the TOP of a trading range after prolonged distribution phase. Price spikes above range resistance to trap late buyers, then reverses sharply back inside. This is the FINAL TRAP before markdown begins. Short entry on reversal candle closing back inside range.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5050,7 +5050,7 @@
       "HighVolatility"
     ],
     "content": "SHAKEOUT/SPRING: Wide spread DOWN candle that pierces below established support then reverses. Designed to trigger retail stop-losses below support. If volume is LOW this is a spring (accumulation trap). If volume is HIGH this may be a genuine breakdown. Price must RECOVER above support quickly to confirm.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "setup_type:risk_management",
@@ -5071,7 +5071,7 @@
       "Ranging"
     ],
     "content": "PSEUDO DEMAND: UP bar on HIGH volume that APPEARS bullish but is distribution. Smart money marks up to attract buyers then sells. High vol up bar failing to make progress reveals the trap.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5090,7 +5090,7 @@
       "Trending"
     ],
     "content": "SMART MONEY ACCUMULATION: Downtrend, volume spike (climax), rally, return to lows on MUCH LOWER vol, narrowing range. Each low on lower vol = fewer sellers. SM absorbing supply.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "timeframe:daily",
@@ -5110,7 +5110,7 @@
       "Trending"
     ],
     "content": "SMART MONEY DISTRIBUTION: Uptrend, extreme volume (climax), drop, rally to highs on MUCH LOWER vol, narrowing range. Each rally on lower vol = fewer buyers. SM distributing.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5130,7 +5130,7 @@
       "Trending"
     ],
     "content": "VOLUME PROFILE IN TRENDING MARKETS: In a healthy uptrend volume builds progressively at higher price levels indicating acceptance is shifting upward. When volume starts building at the WRONG levels (high volume forming at lows during uptrend) the trend is in distribution phase. Volume profile shift signals trend phase shift.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5150,7 +5150,7 @@
       "Ranging"
     ],
     "content": "HIDDEN BUYING PATTERN: Price drops during the bar but recovers to close at or near the HIGH of the bar on above-average volume. The selling was ABSORBED by smart money buying the dip intrabar while retail was panicking. A high volume hammer appearing at support is a high probability long entry signal.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5170,7 +5170,7 @@
       "Trending"
     ],
     "content": "SPRINGBOARD EFFECT: When price consolidates at a level with progressively DECLINING volume and NARROWING range, a springboard formation is building. Smart money has completed their accumulation or distribution phase. The inevitable breakout will be EXPLOSIVE in nature. The tighter the range and lower the volume, the bigger the eventual move.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "timeframe:daily",
@@ -5189,7 +5189,7 @@
       "Trending"
     ],
     "content": "VOLUME-PRICE DIVERGENCE: Price making new highs on declining volume = distribution. Price making new lows on declining volume = accumulation. Divergence is WARNING not immediate signal.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "setup_type:divergence",
@@ -5209,7 +5209,7 @@
       "Trending"
     ],
     "content": "DISTRIBUTION TOPS: Prolonged sideways action at highs with heavy volume. Smart money selling to eager buyers. When distribution complete, decline is swift and sustained.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5228,7 +5228,7 @@
       "Trending"
     ],
     "content": "ACCUMULATION BOTTOMS: Prolonged sideways at lows with heavy volume. Smart money buying from panicked sellers. When complete, advance is strong and sustained.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:dca_entry",
       "timeframe:daily",
@@ -5248,7 +5248,7 @@
       "Ranging"
     ],
     "content": "COT REPORT STRUCTURE: Published weekly (Friday). Shows positions of: Commercial Hedgers (smart money), Large Speculators (trend followers), Small Speculators (retail/contrarian). Net long/short positions per market.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:weekly",
@@ -5268,7 +5268,7 @@
       "Ranging"
     ],
     "content": "COMMERCIAL HEDGERS = SMART MONEY: They have fundamental knowledge of their market. When commercials are EXTREMELY net long = bullish signal. EXTREMELY net short = bearish. They are the best contrarian indicator at extremes.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:daily",
@@ -5287,7 +5287,7 @@
       "Trending"
     ],
     "content": "LARGE SPECULATORS: Trend followers, CTAs, hedge funds. They follow momentum. EXTREME net long = trend may be overextended. EXTREME net short = trend may be overextended. They are WRONG at extremes.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5307,7 +5307,7 @@
       "Ranging"
     ],
     "content": "SMALL SPECULATORS: Retail traders, smallest positions. Contrarian indicator - WRONG most often at extremes. When small specs are EXTREMELY bullish = market top. EXTREMELY bearish = market bottom.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:daily",
@@ -5327,7 +5327,7 @@
       "Ranging"
     ],
     "content": "HEDGER DIVERGENCE: Price makes new high but commercial hedgers are LESS short (or turning long). Bullish divergence. Price new low but hedgers LESS long (or turning short). Bearish divergence.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:divergence",
       "timeframe:daily",
@@ -5346,7 +5346,7 @@
       "Trending"
     ],
     "content": "COMMITMENT OF TRADERS SIGNALS: 1) Hedger extreme + reversal = strong signal. 2) Speculator extreme = warning. 3) Open interest rising + price rising = trend healthy. 4) OI falling + price rising = trend weak.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5366,7 +5366,7 @@
       "Ranging"
     ],
     "content": "OPEN INTEREST ANALYSIS: Rising OI + rising price = new money entering, trend healthy. Rising OI + falling price = new shorts, bearish. Falling OI + rising price = short covering, weak. Falling OI + falling = long liquidation, near bottom.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5385,7 +5385,7 @@
       "Trending"
     ],
     "content": "COMMERCIAL HEDGER AS SMART MONEY: Commercials hedge real physical exposure. They KNOW their market fundamentals. Their positioning reflects where they see value. Follow hedger direction at extremes.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5404,7 +5404,7 @@
       "Trending"
     ],
     "content": "LARGE SPEC AS TREND FOLLOWER: Large specs ride trends via systematic strategies. They ADD to winning positions. Their extreme positioning = trend maturity, not immediate reversal. They are last to exit.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5424,7 +5424,7 @@
       "Ranging"
     ],
     "content": "SMALL SPEC AS CONTRARIAN: Small specs are consistently wrong at extremes. Maximum small spec bullish = top approaching. Maximum bearish = bottom approaching. Their sentiment is a reliable fade.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "timeframe:daily",
@@ -5443,7 +5443,7 @@
       "Trending"
     ],
     "content": "COMMITMENT OF TRADERS DIVERGENCE: Price new high but hedger net position improving (less short). Strongest signal when combined with declining OI. This divergence precedes major reversals.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:divergence",
       "timeframe:daily",
@@ -5463,7 +5463,7 @@
       "Ranging"
     ],
     "content": "COT REPORTING LAG: Report reflects positions as of Tuesday, released Friday. 3-day lag. Use for POSITION bias not intraday. Combine with daily technical signals for timing.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:intraday",
@@ -5483,7 +5483,7 @@
       "Trending"
     ],
     "content": "HEDGING vs SPECULATING: Commercials hedge to OFFSET physical risk. Their futures positions are OPPOSITE to physical exposure. Understanding this reveals what their positioning MEANS for price.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:contrarian",
       "setup_type:hedging",
@@ -5503,7 +5503,7 @@
       "Trending"
     ],
     "content": "CONCENTRATION RATIOS: When single trader or small group holds extreme percentage of open interest = concentration risk. These positions MUST eventually unwind. Creates opportunity for counter-position.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5522,7 +5522,7 @@
       "Trending"
     ],
     "content": "MULTI-MARKET COT ANALYSIS: Compare hedger positioning across RELATED markets. If commercials bullish on crude AND heating oil AND gasoline = strong sector signal. Disagreement between related markets = mixed.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5542,7 +5542,7 @@
       "Ranging"
     ],
     "content": "OI DIVERGENCE WITH PRICE: Rising price + falling OI = trend weakening (only short covering). Falling price + falling OI = trend weakening (only long liquidation). New trend requires RISING OI confirmation.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:divergence",
       "timeframe:daily",
@@ -5562,7 +5562,7 @@
       "ExtremeFear"
     ],
     "content": "EXTREME POSITIONING CLUSTERS: When ALL three groups (hedgers, large specs, small specs) reach extremes simultaneously = very rare, very powerful reversal signal. Position against the crowd.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5583,7 +5583,7 @@
       "Ranging"
     ],
     "content": "SENTIMENT INTEGRATION: COT positioning + Coulling smart money volume patterns + Williams market participant analysis = three-layer sentiment model. Hedger position + volume footprint + momentum = complete picture.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5603,7 +5603,7 @@
       "Ranging"
     ],
     "content": "EDGE QUANTIFICATION: Each book provides different edge components. Volume edge (Coulling). Pattern edge (Edwards/Magee). Momentum edge (Williams). Structural edge (Grimes). Sentiment edge (Bernstein). Stack edges.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5622,7 +5622,7 @@
       "ExtremeFear"
     ],
     "content": "CAPITULATION DETECTION: Coulling selling climax volume + Bernstein commercial hedgers turning net long + Williams AO divergence at wave 5 low + Edwards/Magee reversal day = capitulation bottom. Multi-source confirmation.",
-    "priority": 2,
+    "priority": 3,
     "tags": [
       "setup_type:divergence",
       "setup_type:crisis_entry",
@@ -5643,7 +5643,7 @@
       "ExtremeFear"
     ],
     "content": "Trading is very competitive and you have to handle getting your butt kicked. There are enormous emotional ups and downs. The emotional burden is substantial — if you personalize losses, you can't trade. Tullis taught PTJ steel-hard emotional control.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "timeframe:daily",
@@ -5663,7 +5663,7 @@
       "Ranging"
     ],
     "content": "Trading is emotion. It is mass psychology, greed, and fear. It is all the same in every situation and every market. If you can trade one market, you can trade them all — the principles are universal. Marcus on market universality.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "timeframe:daily",
@@ -5684,7 +5684,7 @@
       "Ranging"
     ],
     "content": "Tharp: The quality of your trading is proportional to the quality of your self-knowledge. Know your biases, your triggers, your emotional patterns. Self-awareness is the foundation of consistent trading performance.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "timeframe:daily",
@@ -5704,7 +5704,7 @@
       "ExtremeGreed"
     ],
     "content": "EMOTIONAL ROLLER COASTER: Most traders spend all time looking for trades, then squirm from pain or grin from pleasure while in them. They manage nothing—they ride emotions. Winning requires managing your emotions BEFORE managing trades. Pre-define entries, stops, targets, and size BEFORE the trade. Then execute the plan mechanically. Emotion is the enemy of execution.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "setup_type:risk_management",
@@ -5726,7 +5726,7 @@
       "ExtremeGreed"
     ],
     "content": "CRYPTO TRADING PSYCHOLOGY: Regret is the most dangerous emotion. Regret of not buying → FOMO entry at top. Regret of not selling → bag-holding through crash. Regret of selling too early → chasing the re-entry. Counter: every trade is independent. Past trades don't matter. Focus on current risk/reward. 'What is the right action NOW?' not 'What should I have done?'.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "timeframe:daily",
@@ -5747,7 +5747,7 @@
       "ExtremeGreed"
     ],
     "content": "Emotional detachment: Good traders are dedicated but not emotionally married to trades. They accept losses and make decisions intellectually. During losing streaks, take a break - continuing to trade breeds greater losses.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "timeframe:daily",
@@ -5768,7 +5768,7 @@
       "ExtremeGreed"
     ],
     "content": "Common mistakes: Overtrading, no stop losses, risking too much, revenge trading, moving stops, ignoring the trend. Every one of these is a discipline problem, not a knowledge problem.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "setup_type:risk_management",
@@ -5792,7 +5792,7 @@
       "HighVolatility"
     ],
     "content": "The investor chief problem and worst enemy is likely himself. Emotional discipline trumps analytical ability. Develop sound intellectual framework and keep emotions from corroding it.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "timeframe:daily",
@@ -5813,7 +5813,7 @@
       "ExtremeGreed"
     ],
     "content": "Be fearful when others greedy and greedy when others fearful. Maximum pessimism = best buying. Maximum optimism = best selling. Requires extreme emotional discipline.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "timeframe:daily",
@@ -5835,7 +5835,7 @@
       "ExtremeGreed"
     ],
     "content": "Two yous: the higher-level rational you must design systems the lower-level emotional you follows. Set rules and guardrails BEFORE emotional moments arrive. Pre-commit to process.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "timeframe:daily",
@@ -5856,7 +5856,7 @@
       "ExtremeGreed"
     ],
     "content": "TEMPERAMENT: Rationality in euphoria and panic. Emotional discipline > analytical brilliance.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:psychology",
       "timeframe:daily",
@@ -5877,7 +5877,7 @@
       "AltSeason"
     ],
     "content": "BTC DOMINANCE: BTC's share of total crypto market cap. RISING dominance = money flowing into BTC, altcoins weakening — stay in BTC. FALLING dominance = money flowing into altcoins (alt season approaching). BTC.D above 60% = BTC season, avoid alts. BTC.D below 40% = alt season, rotate into quality alts. STABLECOIN DOMINANCE: rising = capital sitting on sidelines (bearish). Falling = capital deploying (bullish). Track on TradingView: BTC.D and USDT.D.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5898,7 +5898,7 @@
       "ExtremeGreed"
     ],
     "content": "LIQUIDATION HEATMAPS: Show where leveraged positions will be liquidated. Price tends to MOVE TOWARD liquidation clusters — exchanges profit from liquidations. Use CoinGlass. When large liquidations cluster at a specific level, expect price to HUNT that level before reversing. Long liquidation cluster below = expect dip. Short liquidation cluster above = expect pump. This is one of the most reliable signals in crypto.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:general",
       "timeframe:daily",
@@ -5921,7 +5921,7 @@
       "LowVolatility"
     ],
     "content": "HEDGE MODE — SIMULTANEOUS LONG AND SHORT: Crypto futures allow holding both long and short positions on the same pair simultaneously. Use cases: 1) Lock profit without triggering a taxable event. 2) Reduce exposure during uncertainty without closing. 3) Play both sides of a range. Risks: funding rates apply to BOTH positions (can be expensive). Margin is consumed for both positions. Only use for short-duration hedging. Always have a plan to exit the hedge.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:hedging",
       "timeframe:daily",
@@ -5941,7 +5941,7 @@
       "Ranging"
     ],
     "content": "NARRATIVE ROTATION: Crypto moves in narrative cycles. Layer 1s → DeFi → NFTs → AI tokens → RWA → Gaming → Meme coins. Identify which narrative is in favor via CoinGecko categories. Rotate into narrative LEADERS, not laggards. When a narrative goes parabolic (300%+ in weeks), it's near the top. Each cycle has 2-3 dominant narratives. Being in the RIGHT narrative matters more than picking the right coin within a narrative.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:rotation",
       "timeframe:monthly",
@@ -5961,7 +5961,7 @@
       "HighVolatility"
     ],
     "content": "BTC DOMINANCE AS ROTATION SIGNAL: When BTC.D rising → stay in BTC, alts underperform. When BTC.D starts falling after BTC rally → signal to rotate into alts. Rotation order: BTC rallies first → ETH follows → large caps → mid caps → small caps → meme coins (euphoria top). BTC.D break below key support = alt season confirmed. Break above key resistance = back to BTC season.",
-    "priority": 1,
+    "priority": 3,
     "tags": [
       "setup_type:rotation",
       "timeframe:daily",

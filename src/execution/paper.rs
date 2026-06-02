@@ -17,6 +17,18 @@ pub struct PaperTrader {
     fee_rate: f64,
     slippage_pct: f64,
     last_reset_date: NaiveDate,
+    /// Current ATR for dynamic slippage calculation
+    current_atr: f64,
+    /// Average ATR over lookback period (for scaling slippage)
+    avg_atr: f64,
+    /// Top-of-book depth (sum of top 5 bid/ask volumes) per pair
+    book_depth: HashMap<String, f64>,
+    /// Kraken maker fee rate (0.16% vs 0.26% taker)
+    maker_fee_rate: f64,
+    /// Current best bid per pair (for maker routing)
+    best_bid: HashMap<String, f64>,
+    /// Current best ask per pair (for maker routing)
+    best_ask: HashMap<String, f64>,
 }
 
 impl PaperTrader {
@@ -29,7 +41,79 @@ impl PaperTrader {
             fee_rate,
             slippage_pct,
             last_reset_date: Utc::now().date_naive(),
+            current_atr: 0.0,
+            avg_atr: 0.0,
+            book_depth: HashMap::new(),
+            maker_fee_rate: 0.0016, // Kraken maker fee: 0.16%
+            best_bid: HashMap::new(),
+            best_ask: HashMap::new(),
         }
+    }
+
+    /// Update ATR values for dynamic slippage calculation.
+    pub fn update_atr(&mut self, current_atr: f64, avg_atr: f64) {
+        self.current_atr = current_atr;
+        self.avg_atr = avg_atr;
+    }
+
+    /// Update order book depth for a pair (sum of top 5 bid/ask volumes).
+    pub fn update_book_depth(&mut self, pair: &str, depth: f64) {
+        self.book_depth.insert(pair.to_string(), depth);
+    }
+
+    /// Update best bid/ask for maker-fee routing.
+    pub fn update_book_prices(&mut self, pair: &str, bid: f64, ask: f64) {
+        self.best_bid.insert(pair.to_string(), bid);
+        self.best_ask.insert(pair.to_string(), ask);
+    }
+
+    /// Get current spread in basis points for a pair.
+    pub fn spread_bps(&self, pair: &str) -> f64 {
+        if let (Some(&bid), Some(&ask)) = (self.best_bid.get(pair), self.best_ask.get(pair)) {
+            if bid > 0.0 {
+                return (ask - bid) / bid * 10000.0;
+            }
+        }
+        0.0
+    }
+
+    /// Should we use a limit order (maker) instead of market (taker)?
+    ///
+    /// If spread > fee differential (taker - maker = 0.10%), posting a limit
+    /// order at bid/ask saves more than the spread costs.
+    fn should_use_maker(&self, pair: &str) -> bool {
+        let spread = self.spread_bps(pair);
+        let fee_diff_bps = (self.fee_rate - self.maker_fee_rate) * 10000.0;
+        spread > fee_diff_bps
+    }
+
+    /// Calculate dynamic slippage for an order.
+    ///
+    /// Slippage increases with:
+    /// - Order size relative to book depth (larger orders move the market)
+    /// - Current ATR vs average ATR (volatile markets have wider spreads)
+    fn dynamic_slippage(&self, pair: &str, order_value: f64) -> f64 {
+        let base = self.slippage_pct;
+
+        // ATR multiplier: scales from 1.0 (calm) to 3.0 (very volatile)
+        let atr_mult = if self.avg_atr > 0.0 {
+            1.0 + (self.current_atr / self.avg_atr).min(3.0)
+        } else {
+            1.0
+        };
+
+        // Book depth impact: order_value / depth
+        let depth_impact = if let Some(&depth) = self.book_depth.get(pair) {
+            if depth > 0.0 {
+                (order_value / depth).min(0.01) // Cap at 1% additional slippage
+            } else {
+                0.0
+            }
+        } else {
+            0.0
+        };
+
+        base * atr_mult + depth_impact
     }
 
     pub fn update_prices(&mut self, prices: &HashMap<String, f64>) {
@@ -371,9 +455,38 @@ impl ExecutionEngine for PaperTrader {
         quantity: f64,
         price: Option<f64>,
     ) -> Result<Order, ExecutionError> {
-        let fill_price = price.unwrap_or(0.0);
+        let raw_price = price.unwrap_or(0.0);
+        let order_value = raw_price * quantity;
+
+        // Maker-fee routing: if spread > fee differential, use limit at bid/ask
+        let use_maker = self.should_use_maker(pair);
+        let effective_fee = if use_maker {
+            self.maker_fee_rate
+        } else {
+            self.fee_rate
+        };
+
+        let slippage = if use_maker {
+            0.0 // Limit order at bid/ask — no slippage
+        } else {
+            self.dynamic_slippage(pair, order_value)
+        };
+
+        let fill_price = if use_maker {
+            // Post at bid (buy) or ask (sell) — fill at the passive side
+            match side {
+                Side::Long => self.best_bid.get(pair).copied().unwrap_or(raw_price),
+                Side::Short => self.best_ask.get(pair).copied().unwrap_or(raw_price),
+            }
+        } else {
+            match side {
+                Side::Long => raw_price * (1.0 + slippage),
+                Side::Short => raw_price * (1.0 - slippage),
+            }
+        };
+
         let cost = fill_price * quantity;
-        let fee = cost * self.fee_rate;
+        let fee = cost * effective_fee;
 
         if cost + fee > self.account.balance {
             return Err(ExecutionError::InsufficientBalance {
@@ -403,8 +516,12 @@ impl ExecutionEngine for PaperTrader {
         };
 
         info!(
-            "Paper order filled: {} {} {} @ {:.2}",
-            order.side, quantity, pair, fill_price
+            "Paper order filled: {} {} {} @ {:.2} ({})",
+            order.side,
+            quantity,
+            pair,
+            fill_price,
+            if use_maker { "MAKER" } else { "TAKER" }
         );
 
         Ok(order)

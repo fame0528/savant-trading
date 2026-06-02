@@ -69,10 +69,125 @@ fn determine_conditions(ctx: &FullContext) -> Vec<MarketCondition> {
         crate::insight::onchain::derive_conditions(&ctx.market_context.onchain);
     conditions.extend(onchain_conditions);
 
+    // Indicator-derived conditions — map RSI/ADX/EMA/volume to knowledge conditions
+    conditions.extend(derive_indicator_conditions(ctx.indicators, ctx.candles));
+
     conditions
 }
 
-/// Static version of determine_conditions for use outside FullContext.
+/// Derive market conditions from indicator values.
+///
+/// Maps RSI, ADX, EMA, and volume readings to knowledge conditions so the
+/// MMR selector can match units that are relevant to the current chart state.
+fn derive_indicator_conditions(
+    indicators: &IndicatorValues,
+    candles: &[Candle],
+) -> Vec<MarketCondition> {
+    let mut conditions = Vec::new();
+
+    // RSI extremes
+    if let Some(rsi) = indicators.rsi {
+        if rsi < 30.0 {
+            conditions.push(MarketCondition::Oversold);
+        } else if rsi > 70.0 {
+            conditions.push(MarketCondition::Overbought);
+        }
+    }
+
+    // ADX trend strength
+    if let Some(adx) = indicators.adx {
+        if adx > 25.0 {
+            conditions.push(MarketCondition::StrongTrend);
+        } else if adx < 20.0 {
+            conditions.push(MarketCondition::WeakTrend);
+        }
+    }
+
+    // EMA alignment
+    if let (Some(fast), Some(slow)) = (indicators.ema_fast, indicators.ema_slow) {
+        if fast > slow {
+            conditions.push(MarketCondition::TrendAlignment);
+        }
+    }
+
+    // Volume expansion (current volume > 1.5x 20-period SMA)
+    if let Some(last) = candles.last() {
+        if candles.len() >= 20 {
+            let vol_sma: f64 = candles[candles.len() - 20..]
+                .iter()
+                .map(|c| c.volume)
+                .sum::<f64>()
+                / 20.0;
+            if vol_sma > 0.0 && last.volume > vol_sma * 1.5 {
+                conditions.push(MarketCondition::VolumeExpansion);
+            }
+        }
+    }
+
+    conditions
+}
+
+/// Generate context tags from indicator values for knowledge matching.
+///
+/// Tags use the SAME prefixed format as knowledge unit tags (`namespace:value`)
+/// so that `select_with_tags()` score matching actually fires. Only tags that
+/// exist in the knowledge vocabulary are generated — verified against the
+/// actual tag distribution in the 2,959 knowledge units.
+pub fn generate_context_tags(indicators: &IndicatorValues) -> Vec<String> {
+    let mut tags = Vec::new();
+
+    // Regime subtype from RSI — maps to existing regime_subtype tags
+    if let Some(rsi) = indicators.rsi {
+        if rsi < 30.0 {
+            tags.push("regime_subtype:capitulation".to_string());
+            tags.push("setup_type:reversal".to_string());
+            tags.push("trigger:confirmation".to_string());
+        } else if rsi > 70.0 {
+            tags.push("regime_subtype:extreme_greed".to_string());
+            tags.push("setup_type:distribution".to_string());
+            tags.push("trigger:confirmation".to_string());
+        } else if rsi < 40.0 {
+            tags.push("regime_subtype:ranging".to_string());
+            tags.push("setup_type:analysis".to_string());
+        } else if rsi > 60.0 {
+            tags.push("regime_subtype:trending".to_string());
+            tags.push("setup_type:analysis".to_string());
+        }
+    }
+
+    // Regime from ADX — maps to existing regime tags
+    if let Some(adx) = indicators.adx {
+        if adx > 25.0 {
+            tags.push("regime:trending".to_string());
+            tags.push("regime_subtype:trending".to_string());
+            tags.push("trigger:confirmation".to_string());
+        } else if adx < 20.0 {
+            tags.push("regime:ranging".to_string());
+            tags.push("regime_subtype:ranging".to_string());
+            tags.push("regime_subtype:neutral".to_string());
+        }
+    }
+
+    // Setup type from EMA alignment — maps to existing setup_type tags
+    if let (Some(fast), Some(slow)) = (indicators.ema_fast, indicators.ema_slow) {
+        let spread_pct = ((fast - slow) / slow).abs() * 100.0;
+        if fast > slow {
+            tags.push("setup_type:breakout".to_string());
+            tags.push("regime_subtype:trending".to_string());
+        } else {
+            tags.push("setup_type:reversal".to_string());
+        }
+        if spread_pct > 0.5 {
+            tags.push("trigger:confirmation".to_string());
+        }
+    }
+
+    // Deduplicate (some branches push the same tag)
+    tags.sort();
+    tags.dedup();
+    tags
+}
+
 pub fn determine_conditions_static(
     regime: MarketRegime,
     fear_greed: Option<u32>,

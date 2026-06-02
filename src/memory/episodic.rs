@@ -487,7 +487,7 @@ impl EpisodicMemory {
     /// Get total trade count.
     pub async fn total_trades(&self) -> Result<i64, sqlx::Error> {
         let row =
-            sqlx::query("SELECT COUNT(*) as count FROM agent_episodes WHERE status = 'closed'")
+            sqlx::query("SELECT COUNT(*) as count FROM agent_episodes WHERE status IN ('closed', 'executed', 'test_action', 'test_hold')")
                 .fetch_one(&self.pool)
                 .await?;
         Ok(row.get("count"))

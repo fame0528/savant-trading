@@ -4,6 +4,96 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.4.3] — 2026-06-01
+
+### Added
+
+- **SSE Streaming LLM Provider** — `chat_stream()` for real-time response streaming via Server-Sent Events. Keeps connection alive during long reasoning (mimo v2.5 pro can take 30-90s). Parses both `delta.content` and `delta.reasoning` fields. Streaming fallback to non-streaming on failure. 180s timeout.
+- **Semantic Consolidation** — `memory/semantic.rs`: SQL aggregations against episodic memory to extract regime/session/pair edge matrix, conviction calibration, category edge. Populates `semantic_patterns` table. Rolling 90-day pattern decay. PF calculated from wins/losses ratio (not pnl).
+- **Anti-Pattern Detection** — `memory/anti_pattern.rs`: SQL queries for conditions where win_rate < 30%. Category-level detection via `episode_market_context.condition_tags`. Narrative constraints for prompt injection. Auto-eviction when conditions recover.
+- **Multi-Asset Correlation** — `risk/correlation.rs`: Rolling Pearson correlation matrix between active pairs. Effective position counting (correlated pairs count as 1.5-2x).
+- **Portfolio Heat Tracking** — `risk/circuit_breaker.rs`: Total risk exposure / equity calculation. Blocks new trades when heat > 40%. Spread width halt at 50bps.
+- **Dynamic Slippage** — `execution/paper.rs`: Slippage scales with ATR volatility and order book depth. `update_atr()` and `update_book_depth()` methods.
+- **Maker-Fee Routing** — `execution/paper.rs`: If spread > fee differential (10bps), posts limit order at bid/ask instead of crossing with market. Saves 10bps per trade.
+- **Knowledge Lifecycle** — `agent/knowledge.rs`: `utility_score` field on KnowledgeUnit (serde default 1.0). MMR scoring adjusted: `base * (1 + log2(utility))`. `save_utility_scores()` and `load_utility_scores()` for persistence.
+- **SOUL.md Evolution** — `sandbox/feedback.rs`: `<!-- MUTABLE -->` markers on Section XIII+. `extract_mutable_sections()`, `apply_mutation_to_soul()`. Teacher LLM prompts (critique + GEPA mutation). `soul_versions` table for version control with auto-rollback.
+- **Train/Val Split** — `sandbox/scenarios.rs`: `load_train_scenarios()` (first 40), `load_val_scenarios()` (last 20). `load_scenarios_by_difficulty()`, `worst_category()`.
+- **WS Exponential Backoff** — `data/websocket.rs`: Reconnection uses exponential backoff (1s→30s cap) with ±20% jitter. CancelAllOrders signal after 3 consecutive failures.
+- **BGeometrics On-Chain** — `insight/onchain.rs`: Replaced dead CoinMetrics/CoinGecko (403) with BGeometrics API. Free, no key, daily MVRV/SOPR/NUPL. Range validation on all values.
+- **OKX Funding Primary** — `insight/funding_rates.rs`: OKX as primary funding source. Free, no key, no geo-block. Kraken as fallback with range validation (-2% to +2%).
+- **RSS Cap + Source Diversity** — `insight/rss.rs`: `fetch_all_feeds_capped()` with per-feed 5s timeout, source diversity (top 2 per source), relevance scoring, cap enforcement.
+- **Conditions Summary** — `insight/aggregator.rs`: `conditions_summary()` with SOUL.md thresholds. Actionable market assessments instead of raw data dump. RSS sentiment classification with negation handling.
+- **TTL Cache** — `data/cache.rs`: TTL-based cache with LRU eviction. Graceful degradation (serve stale on API failure). Tests included.
+- **Training Pipeline** — `engine.rs`: `run_training_batch()` with memory capture, Brier score, confidence distribution, category edge, auto-lessons, knowledge utility update, semantic consolidation, anti-pattern detection. All phases wrapped in error boundaries.
+- **Training CLI** — `main.rs`: `savant --test --train` with filters (-c, -a, -n). `savant report --test` for full audit.
+- **Training Report** — `monitor/training_report.rs`: P&L simulation, conviction calibration, confidence curve, category edge, anti-patterns, knowledge utility, lessons summary, semantic patterns, recent episodes.
+- **SQLite Backup** — `engine.rs`: `backup_databases()` with rolling timestamped backups. Keeps last 7 copies.
+- **Knowledge Selection Overhaul** — Indicator-derived conditions (RSI/ADX/EMA/volume → MarketCondition). Context tags use prefixed format. Unit cap (20). Scoring: tags×3, conditions×2, priority×1.
+- **Knowledge Priority Migration** — All 2,959 units migrated from uniform 5 to differentiated 2-5. Risk catch-alls fixed. Execution units given conditions.
+- **Random Scenario Generator** — `sandbox/scenarios.rs`: `generate_random_scenarios()` with weighted categories (weak areas get 3x). Expected actions derived from mock data. Every run is unique.
+- **Protocol v0.1.0** — ECHO.md, protocol.config.yaml, templates, coding-standards synced from GitHub.
+- **Training Workflow** — `docs/TRAINING-WORKFLOW.md`: Formalized closed-loop TRAIN → AUDIT → IDENTIFY → FIX → RETRAIN cycle.
+- **/api/training** — Endpoint returning training metrics, config, episode count.
+
+### Changed
+
+- **Double-sleep bug fixed** — Engine had `time::sleep()` followed by `tokio::select!` with another sleep. Removed extra sleep.
+- **Dry-run uses build_context()** — Same path as live engine. No custom prompt building.
+- **Debug logging in engine** — Phase 1 and Phase 2 have debug-level logging.
+- **Knowledge JSON files** — All 10 files migrated: priorities 2-5, risk catch-alls trimmed, execution units given conditions.
+- **Max retries reduced** — 1 streaming + 1 fallback = 2 total per pair (was 3+1=4).
+- **LLM timeout increased** — 180s (was 90s). Handles large prompts.
+- **Dev folder restructured** — `findings` → `fids`, `archived` → `archive`, removed `baselines`/`plans`.
+- **FID lifecycle** — Closed FIDs auto-archived per ECHO Protocol.
+- **LEARNINGS.md** — Updated with session lessons.
+
+### Fixed
+
+- Context tag format mismatch — Tags were plain words, knowledge units use prefixed format.
+- Risk catch-all conditions — 301/350 risk units always matched. Trimmed by content.
+- Execution units invisible — 0 conditions → [Trending, Ranging].
+- Kraken funding rate garbage — -45% per 8hr. Replaced with OKX (0.01%).
+- Dead on-chain APIs — CoinMetrics/CoinGecko 403. Replaced with BGeometrics.
+- RSS bloat — 333 items when config says 10. Cap enforced.
+- Format string errors in action test output.
+- Byte index panic on multi-byte UTF-8 chars in reasoning truncation.
+
+### Tests
+
+- 136 total tests (was 119)
+- Cache: 5 tests
+- Correlation: 4 tests
+- Circuit breaker: 3 new tests (spread width)
+- On-chain: 10 tests
+- All tests passing, zero clippy warnings
+- **Training Config** — `core/config.rs`: `TrainingConfig` struct with all training parameters. `config/default.toml`: `[training]` section with min_sample_size, failure_win_rate, max_portfolio_heat, backup_interval, utility_learning_rate, etc.
+- **SQLite Backup** — `engine.rs`: `backup_databases()` function with rolling timestamped backups. Keeps last 7 copies. Called before training starts.
+- **/api/training Endpoint** — Returns total episodes, semantic pattern count, Brier estimate, training config, SOUL.md version.
+- **Persistent Training Pipeline** — `engine.rs`: `run_action_test()` and `run_training()` with memory capture, Brier score, confidence distribution, category edge, auto-lesson generation, progressive difficulty, convergence detection.
+- **6th Prompt Layer Wiring** — Memory context now includes semantic patterns + anti-patterns alongside win rates and recent episodes.
+- **Knowledge Selection Overhaul** — Indicator-derived conditions (RSI/ADX/EMA/volume → MarketCondition). Context tags use prefixed format matching knowledge vocabulary (`regime_subtype:trending` not `strong_trend`). Unit cap (20). Scoring rebalanced: tags × 3, conditions × 2, priority × 1.
+- **Knowledge Priority Migration** — All 2,959 units migrated from uniform priority 5 to differentiated 2-5 based on content specificity. Risk catch-all conditions fixed. Execution units given conditions.
+
+### Changed
+
+- **Double-sleep bug fixed** — Engine had `time::sleep()` followed by `tokio::select!` with another sleep, doubling the tick interval. Removed the extra sleep.
+- **Dry-run uses build_context()** — Dry-run now calls the exact same `build_context()` as the live engine. No more custom prompt building.
+- **Debug logging in engine** — Phase 1 (candle fetch, order book, higher TF, pre-filter) and Phase 2 (LLM streaming) have debug-level logging for hang diagnosis.
+- **Knowledge JSON files** — All 10 files migrated: priorities 2-5, risk catch-alls trimmed, execution units given [Trending, Ranging] conditions.
+
+### Fixed
+
+- Context tag format mismatch — Tags were plain words (`oversold`, `strong_trend`) but knowledge units use prefixed format (`regime_subtype:capitulation`, `setup_type:breakout`). Zero overlap meant zero tag matching. Fixed to use matching format.
+- Risk catch-all conditions — 301/350 risk units had 5+ conditions (ExtremeFear, ExtremeGreed, HighVolatility, LowVolatility + more), always matching regardless of market state. Trimmed by content relevance.
+- Execution units invisible — 282 execution units had zero conditions, never selected by the condition filter. Added [Trending, Ranging].
+- Format string errors in action test output.
+
+### Tests
+
+- 119 total tests (was 112)
+- Knowledge: tests updated for utility_score field
+- All tests passing, zero clippy warnings
+
 ## [0.4.2] — 2026-05-31
 
 ### Added

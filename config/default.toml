@@ -5,9 +5,9 @@ rest_url = "https://api.kraken.com"
 
 [trading]
 # Starting pairs — engine can discover more via Kraken API
-pairs = ["BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD", "ADA/USD", "DOGE/USD", "AVAX/USD", "DOT/USD", "LINK/USD", "MATIC/USD", "UNI/USD", "ATOM/USD", "ALGO/USD", "FIL/USD", "NEAR/USD"]
+pairs = ["BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD", "DOGE/USD"]
 # Set to true to scan all Kraken USD pairs for opportunity
-scan_all_pairs = false
+scan_all_pairs = true
 timeframe = "5m"
 timeframes = ["5m", "1h", "4h"]
 base_currency = "USD"
@@ -65,6 +65,7 @@ price_tolerance_pct = 10.0
 max_retries = 3
 temperature = 0.7
 max_tokens = 4096
+timeout_secs = 180
 
 [insight]
 funding_rate_enabled = true
@@ -76,3 +77,25 @@ news_sentiment_enabled = true
 rss_enabled = true
 rss_max_items = 10
 onchain_enabled = true
+
+[training]
+# Minimum sample size for semantic pattern promotion
+min_sample_size = 5
+# Win rate threshold below which a condition is an anti-pattern
+failure_win_rate = 0.30
+# Maximum portfolio heat (total risk / equity)
+max_portfolio_heat = 0.40
+# SQLite backup interval in hours
+backup_interval_hours = 6
+# Maximum number of backup files to keep
+max_backups = 7
+# Knowledge utility learning rate (per episode)
+utility_learning_rate = 0.05
+# Minimum utility score before knowledge unit is archived
+utility_archive_threshold = 0.30
+# Maximum active experience replay lessons
+max_active_lessons = 50
+# Brier score threshold for confidence cap enforcement
+brier_cap_threshold = 0.25
+# Minimum trades before memory context activates
+memory_context_min_trades = 5
