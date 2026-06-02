@@ -562,6 +562,7 @@ mod tests {
                 quantity: 1.0,
                 pnl: 5.0,
                 pnl_pct: 5.0,
+                fees: 0.0,
                 strategy_name: "test".to_string(),
                 opened_at: chrono::Utc::now(),
                 closed_at: chrono::Utc::now(),

@@ -136,6 +136,7 @@ impl TradeJournal {
                 quantity: row.get("quantity"),
                 pnl: row.get("pnl"),
                 pnl_pct: row.get("pnl_pct"),
+                fees: 0.0,
                 strategy_name: row.get("strategy_name"),
                 opened_at,
                 closed_at,

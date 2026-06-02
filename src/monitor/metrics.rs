@@ -114,6 +114,7 @@ mod tests {
             quantity: 1.0,
             pnl,
             pnl_pct: pnl / 100.0 * 100.0,
+            fees: 0.0,
             strategy_name: "test".to_string(),
             opened_at: Utc::now(),
             closed_at: Utc::now(),

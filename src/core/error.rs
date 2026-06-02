@@ -32,6 +32,8 @@ pub enum ExecutionError {
     PositionNotFound(String),
     #[error("Exchange error: {0}")]
     ExchangeError(String),
+    #[error("{0}")]
+    Other(String),
 }
 
 #[derive(Error, Debug)]

@@ -233,6 +233,7 @@ pub struct TradeRecord {
     pub quantity: f64,
     pub pnl: f64,
     pub pnl_pct: f64,
+    pub fees: f64,
     pub strategy_name: String,
     pub opened_at: DateTime<Utc>,
     pub closed_at: DateTime<Utc>,
