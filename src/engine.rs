@@ -535,6 +535,21 @@ pub async fn run(
         // Refresh insight every 5 ticks (all pairs, single funding API call)
         if tick.is_multiple_of(5) {
             insight.refresh_multi(&active_pairs).await;
+
+            // Project insight to vault
+            if vault_config.enabled {
+                let ctx = insight.cached();
+                let session_str = savant_trading::core::session::session_context();
+                let rss_count = ctx.rss_items.len();
+                let _ = vault_writer.project_insight(
+                    ctx.sentiment.fear_greed_index.map(|v| v as i32),
+                    ctx.sentiment.fear_greed_label.as_deref(),
+                    ctx.funding.funding_rate,
+                    ctx.onchain.mvrv,
+                    ctx.onchain.sopr,
+                    (&session_str, rss_count),
+                );
+            }
         }
 
         // === PHASE 1: Fetch data for all pairs (sequential, fast) ===
@@ -2179,6 +2194,13 @@ async fn run_training_batch(
         .bind(&heuristic)
         .execute(test_memory.pool())
         .await;
+
+        // Project lesson to vault
+        let lesson_vault_config = VaultConfig::default();
+        if lesson_vault_config.enabled {
+            let lesson_vault = VaultWriter::new(lesson_vault_config);
+            let _ = lesson_vault.project_lesson(scen_id, "high_conviction_failure", &heuristic);
+        }
     }
     if lessons_count > 0 {
         info!(
@@ -2436,6 +2458,32 @@ async fn run_training_batch(
             chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC"),
         );
         let _ = vault.project_sandbox(&report);
+
+        // Project training session to vault
+        let session_summary = format!(
+            "# Training Session — {}\n\n\
+             **Scenarios:** {}\n\
+             **Actions:** {} ({:.0}%)\n\
+             **Holds:** {} ({:.0}%)\n\
+             **Errors:** {}\n\
+             **Brier Score:** {:.4}\n\
+             **Lessons:** {}\n\
+             **Anti-Patterns:** {}\n\
+             **Episodes in DB:** {}\n",
+            chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC"),
+            all_responses.len(),
+            action_count,
+            action_count as f64 / total * 100.0,
+            hold_count,
+            hold_count as f64 / total * 100.0,
+            error_count,
+            brier_score,
+            lessons_count,
+            anti_pattern_narratives.len(),
+            test_memory.total_trades().await.unwrap_or(0),
+        );
+        let session_id = format!("session_{}", chrono::Utc::now().format("%Y%m%d_%H%M%S"));
+        let _ = vault.project_session(&session_id, &session_summary);
     }
 
     // 6c. Knowledge utility update — actually update and persist scores

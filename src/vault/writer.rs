@@ -462,6 +462,54 @@ impl VaultWriter {
         Ok(())
     }
 
+    /// Project a lesson learned to Vault/Lessons/.
+    pub fn project_lesson(
+        &self,
+        lesson_id: &str,
+        error_type: &str,
+        heuristic: &str,
+    ) -> std::io::Result<()> {
+        if !self.config.enabled {
+            return Ok(());
+        }
+        let root = Path::new(&self.config.vault_path);
+        let lessons_dir = root.join("Lessons");
+        fs::create_dir_all(&lessons_dir)?;
+
+        let now = Utc::now().format("%Y-%m-%d_%H%M%S").to_string();
+        let file_path = lessons_dir.join(format!("{}_{}.md", now, lesson_id));
+        fs::write(
+            &file_path,
+            format!(
+                "# Lesson: {}\n\n**Type:** {}\n**Timestamp:** {}\n\n## Heuristic\n\n{}\n",
+                lesson_id,
+                error_type,
+                Utc::now().to_rfc3339(),
+                heuristic,
+            ),
+        )?;
+
+        debug!("Projected lesson to vault: {}", lesson_id);
+        Ok(())
+    }
+
+    /// Project a training session summary to Vault/Sessions/.
+    pub fn project_session(&self, session_id: &str, summary_md: &str) -> std::io::Result<()> {
+        if !self.config.enabled {
+            return Ok(());
+        }
+        let root = Path::new(&self.config.vault_path);
+        let sessions_dir = root.join("Sessions");
+        fs::create_dir_all(&sessions_dir)?;
+
+        let now = Utc::now().format("%Y-%m-%d_%H%M%S").to_string();
+        let file_path = sessions_dir.join(format!("{}_{}.md", now, session_id));
+        fs::write(&file_path, summary_md)?;
+
+        debug!("Projected session to vault: {}", session_id);
+        Ok(())
+    }
+
     /// Ensure the vault directory exists and is scaffolded.
     pub fn ensure_scaffolded(&self) -> std::io::Result<()> {
         let root = Path::new(&self.config.vault_path);
