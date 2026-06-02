@@ -99,6 +99,120 @@ pub fn confidence_penalty_from_brier(brier: &BrierScore) -> f64 {
     }
 }
 
+/// Isotonic Regression calibrator using Pool Adjacent Violators (PAVA).
+///
+/// Maps raw LLM confidence scores to calibrated probabilities based on
+/// historical (confidence, outcome) pairs. Non-parametric — makes no
+/// assumptions about the distribution shape.
+///
+/// Usage:
+/// 1. Train on historical data: `let cal = IsotonicCalibrator::fit(&data);`
+/// 2. Calibrate new scores: `let calibrated = cal.calibrate(raw_confidence);`
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IsotonicCalibrator {
+    /// Sorted (confidence, calibrated_probability) pairs
+    thresholds: Vec<(f64, f64)>,
+}
+
+impl IsotonicCalibrator {
+    /// Fit an Isotonic Regression model from (confidence, outcome) pairs.
+    ///
+    /// Implements the Pool Adjacent Violators Algorithm (PAVA):
+    /// - Sort by predicted confidence
+    /// - Merge adjacent bins that violate monotonicity
+    /// - Result: a non-decreasing mapping from confidence to probability
+    pub fn fit(predictions: &[(f64, bool)]) -> Self {
+        if predictions.is_empty() {
+            return Self {
+                thresholds: vec![(0.0, 0.0), (1.0, 1.0)],
+            };
+        }
+
+        // Sort by confidence score
+        let mut sorted: Vec<(f64, f64)> = predictions
+            .iter()
+            .map(|(conf, outcome)| (*conf, if *outcome { 1.0 } else { 0.0 }))
+            .collect();
+        sorted.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
+
+        // Pool Adjacent Violators Algorithm
+        let mut bins: Vec<(f64, f64, usize)> = sorted
+            .iter()
+            .map(|(conf, outcome)| (*conf, *outcome, 1))
+            .collect();
+
+        loop {
+            let mut violated = false;
+            let mut new_bins: Vec<(f64, f64, usize)> = Vec::new();
+
+            for bin in &bins {
+                if let Some(last) = new_bins.last_mut() {
+                    if bin.1 < last.1 {
+                        // Violation: merge with previous bin
+                        let total_count = last.2 + bin.2;
+                        last.1 =
+                            (last.1 * last.2 as f64 + bin.1 * bin.2 as f64) / total_count as f64;
+                        last.0 =
+                            (last.0 * last.2 as f64 + bin.0 * bin.2 as f64) / total_count as f64;
+                        last.2 = total_count;
+                        violated = true;
+                    } else {
+                        new_bins.push(*bin);
+                    }
+                } else {
+                    new_bins.push(*bin);
+                }
+            }
+
+            bins = new_bins;
+            if !violated {
+                break;
+            }
+        }
+
+        // Convert bins to threshold pairs
+        let thresholds: Vec<(f64, f64)> =
+            bins.iter().map(|(conf, prob, _)| (*conf, *prob)).collect();
+
+        Self { thresholds }
+    }
+
+    /// Calibrate a raw confidence score using the fitted model.
+    ///
+    /// Uses linear interpolation between threshold points.
+    /// Clamps to [0.0, 1.0].
+    pub fn calibrate(&self, raw_confidence: f64) -> f64 {
+        if self.thresholds.is_empty() {
+            return raw_confidence;
+        }
+
+        // Below first threshold: use first calibrated probability
+        if raw_confidence <= self.thresholds[0].0 {
+            return self.thresholds[0].1;
+        }
+
+        // Above last threshold: use last calibrated probability
+        if raw_confidence >= self.thresholds.last().unwrap().0 {
+            return self.thresholds.last().unwrap().1;
+        }
+
+        // Linear interpolation between adjacent thresholds
+        for i in 0..self.thresholds.len() - 1 {
+            let (x0, y0) = self.thresholds[i];
+            let (x1, y1) = self.thresholds[i + 1];
+            if raw_confidence >= x0 && raw_confidence <= x1 {
+                if (x1 - x0).abs() < f64::EPSILON {
+                    return y0;
+                }
+                let t = (raw_confidence - x0) / (x1 - x0);
+                return y0 + t * (y1 - y0);
+            }
+        }
+
+        raw_confidence
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -150,5 +264,46 @@ mod tests {
             uncertainty: 0.15,
         };
         assert_eq!(confidence_penalty_from_brier(&poor), 0.5);
+    }
+
+    #[test]
+    fn isotonic_perfect_calibration() {
+        let data = vec![
+            (0.1, false),
+            (0.2, false),
+            (0.3, false),
+            (0.4, false),
+            (0.5, true),
+            (0.6, true),
+            (0.7, true),
+            (0.8, true),
+            (0.9, true),
+        ];
+        let cal = IsotonicCalibrator::fit(&data);
+        // Low confidence → low calibrated probability
+        assert!(cal.calibrate(0.1) < 0.3);
+        // High confidence → high calibrated probability
+        assert!(cal.calibrate(0.9) > 0.7);
+    }
+
+    #[test]
+    fn isotonic_miscalibrated_model() {
+        // Model outputs 80% confidence but only wins 40% of the time
+        let data: Vec<(f64, bool)> = (0..100)
+            .map(|i| {
+                let outcome = i < 40; // 40% win rate
+                (0.8, outcome)
+            })
+            .collect();
+        let cal = IsotonicCalibrator::fit(&data);
+        let calibrated = cal.calibrate(0.8);
+        // Should be close to 0.4 (actual win rate), not 0.8 (reported confidence)
+        assert!((calibrated - 0.4).abs() < 0.1);
+    }
+
+    #[test]
+    fn isotonic_empty_data() {
+        let cal = IsotonicCalibrator::fit(&[]);
+        assert_eq!(cal.calibrate(0.5), 0.5);
     }
 }
