@@ -251,7 +251,8 @@ pub async fn run(
         api_key: std::env::var(&config.ai.api_key_env).unwrap_or_default(),
         max_tokens: config.ai.max_tokens,
         temperature: config.ai.temperature,
-        timeout_secs: 180,
+        top_p: config.ai.top_p,
+        timeout_secs: config.ai.timeout_secs,
     };
 
     let agent_config = AgentConfig {
@@ -1445,7 +1446,7 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
         &ctx,
         &knowledge_base,
         &composer,
-        config.ai.knowledge_token_budget,
+        3000, // Reduced for training speed — full 8000 used in live engine
     );
 
     println!(
@@ -1468,7 +1469,8 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
         api_key: std::env::var(&config.ai.api_key_env).unwrap_or_default(),
         max_tokens: config.ai.max_tokens,
         temperature: config.ai.temperature,
-        timeout_secs: 180,
+        top_p: config.ai.top_p,
+        timeout_secs: config.ai.timeout_secs,
     };
     let provider = savant_trading::agent::provider::LlmProvider::new(llm_config);
     let messages = vec![savant_trading::agent::provider::Message {
@@ -1893,8 +1895,8 @@ async fn run_training_batch(
         });
     }
 
-    // PHASE 2: LLM calls via streaming
-    let semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(5));
+    // PHASE 2: LLM calls via streaming — optimized for throughput
+    let semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(20));
     struct ScenarioResponse {
         scenario_id: String,
         scenario_name: String,
@@ -1922,9 +1924,10 @@ async fn run_training_batch(
                     endpoint,
                     model,
                     api_key: key,
-                    max_tokens: 8192,
-                    temperature: 0.7,
-                    timeout_secs: 120,
+                    max_tokens: 131072,
+                    temperature: 0.6,
+                    top_p: 0.95,
+                    timeout_secs: 300,
                 },
             );
             let messages = vec![savant_trading::agent::provider::Message {
@@ -1932,7 +1935,7 @@ async fn run_training_batch(
                 content: usr,
             }];
             let start = std::time::Instant::now();
-            let response = provider.chat_stream(&sys, &messages).await;
+            let response = provider.chat(&sys, &messages).await;
             ScenarioResponse {
                 scenario_id: ps.scenario_id,
                 scenario_name: ps.scenario_name,
@@ -2562,7 +2565,8 @@ pub async fn run_sandbox(config: AppConfig) -> anyhow::Result<()> {
                     api_key: key.clone(),
                     max_tokens: config.ai.max_tokens,
                     temperature: config.ai.temperature,
-                    timeout_secs: 120,
+                    top_p: config.ai.top_p,
+                    timeout_secs: config.ai.timeout_secs,
                 },
             )
         })

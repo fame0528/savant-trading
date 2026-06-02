@@ -14,6 +14,7 @@ pub struct LlmConfig {
     pub api_key: String,
     pub max_tokens: u32,
     pub temperature: f64,
+    pub top_p: f64,
     pub timeout_secs: u64,
 }
 
@@ -23,9 +24,10 @@ impl Default for LlmConfig {
             endpoint: "https://opengateway.gitlawb.com/v1".to_string(),
             model: "mimo-v2.5-pro".to_string(),
             api_key: std::env::var("OPENGATEWAY_API_KEY").unwrap_or_default(),
-            max_tokens: 4096,
-            temperature: 0.7,
-            timeout_secs: 120,
+            max_tokens: 131072,
+            temperature: 0.6,
+            top_p: 0.95,
+            timeout_secs: 300,
         }
     }
 }
@@ -172,6 +174,7 @@ impl LlmProvider {
             "messages": all_messages,
             "max_tokens": self.config.max_tokens,
             "temperature": self.config.temperature,
+            "top_p": self.config.top_p,
             "stream": stream,
         })
     }

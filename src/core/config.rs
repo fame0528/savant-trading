@@ -87,6 +87,12 @@ fn default_brier_cap_threshold() -> f64 {
 fn default_memory_context_min_trades() -> i64 {
     5
 }
+fn default_top_p() -> f64 {
+    0.95
+}
+fn default_timeout_secs() -> u64 {
+    300
+}
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct AiConfig {
@@ -102,6 +108,10 @@ pub struct AiConfig {
     pub max_retries: u32,
     pub temperature: f64,
     pub max_tokens: u32,
+    #[serde(default = "default_top_p")]
+    pub top_p: f64,
+    #[serde(default = "default_timeout_secs")]
+    pub timeout_secs: u64,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -295,12 +305,14 @@ impl Default for AppConfig {
                 api_key_env: "OPENGATEWAY_API_KEY".into(),
                 autonomy_level: 3,
                 max_decisions_per_hour: 5,
-                context_window_candles: 100,
-                knowledge_token_budget: 8000,
+                context_window_candles: 500,
+                knowledge_token_budget: 20000,
                 price_tolerance_pct: 10.0,
                 max_retries: 3,
-                temperature: 0.7,
-                max_tokens: 4096,
+                temperature: 0.6,
+                top_p: 0.95,
+                max_tokens: 131072,
+                timeout_secs: 300,
             },
             insight: InsightConfig {
                 funding_rate_enabled: true,

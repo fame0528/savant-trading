@@ -9,11 +9,13 @@ pairs = ["BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD", "DOGE/USD"]
 # Set to true to scan all Kraken USD pairs for opportunity
 scan_all_pairs = true
 timeframe = "5m"
-timeframes = ["5m", "1h", "4h"]
+timeframes = ["5m", "1h", "4h", "1d"]
 base_currency = "USD"
 starting_balance = 50.0
 database_url = "sqlite:data/savant.db"
-fee_rate = 0.0026
+# Kraken Pro base tier: 0.40% taker / 0.25% maker
+# At $50 balance we are in lowest volume tier
+fee_rate = 0.0040
 slippage_pct = 0.0005
 
 [risk]
@@ -21,17 +23,21 @@ max_risk_per_trade = 0.20
 # Position allocation — how much of the bankroll goes into each trade
 # At $50 with 5 max positions: each position = $10 (20% of bankroll)
 # The bot should be FULLY DEPLOYED, not sitting on cash
-# risk_pct = position allocation per trade (not stop-loss distance)
+# Safety comes from stop losses + daily loss + drawdown limits, not from shrinking positions
 dynamic_risk_tiers = [
     { balance = 500.0, risk_pct = 0.20 },    # 5 positions × 20% = 100% deployed
     { balance = 5000.0, risk_pct = 0.10 },    # 5 positions × 10% = 50% deployed
     { balance = 50000.0, risk_pct = 0.05 },   # 5 positions × 5% = 25% deployed
     { balance = 999999.0, risk_pct = 0.02 },  # 5 positions × 2% = 10% deployed
 ]
-max_daily_loss = 0.20
-max_drawdown = 0.40
+# Tightened safety nets (FID-015):
+# At $50: daily_loss=$5, drawdown=$10. Survivable.
+# At $500: daily_loss=$50, drawdown=$100. Meaningful protection.
+max_daily_loss = 0.10
+max_drawdown = 0.20
 max_positions = 5
-min_rr_ratio = 1.5
+# Higher R:R compensates for full deployment risk at small balances
+min_rr_ratio = 2.0
 
 [strategy.momentum]
 ema_period = 100
@@ -59,13 +65,18 @@ model = "mimo-v2.5-pro"
 api_key_env = "OPENGATEWAY_API_KEY"
 autonomy_level = 3
 max_decisions_per_hour = 20
-context_window_candles = 100
-knowledge_token_budget = 8000
+# Expanded to use more of the 1M context window (FID-015)
+context_window_candles = 500
+knowledge_token_budget = 20000
 price_tolerance_pct = 10.0
 max_retries = 3
-temperature = 0.7
-max_tokens = 4096
-timeout_secs = 180
+# 0.6 optimal for MoE reasoning models emitting structured JSON (FID-015)
+temperature = 0.6
+# Nucleus sampling — limits token pool to top 95% probability mass
+top_p = 0.95
+max_tokens = 131072
+# Reasoning model needs room for chain-of-thought (FID-015)
+timeout_secs = 300
 
 [insight]
 funding_rate_enabled = true
