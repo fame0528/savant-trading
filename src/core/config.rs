@@ -214,9 +214,9 @@ impl AppConfig {
                 "At least one trading pair required".into(),
             ));
         }
-        if self.risk.max_risk_per_trade <= 0.0 || self.risk.max_risk_per_trade > 0.1 {
+        if self.risk.max_risk_per_trade <= 0.0 || self.risk.max_risk_per_trade > 0.25 {
             return Err(ConfigError::ValidationError(
-                "max_risk_per_trade must be between 0 and 0.1 (10%)".into(),
+                "max_risk_per_trade must be between 0 and 0.25 (25%)".into(),
             ));
         }
         if self.risk.max_daily_loss <= 0.0 || self.risk.max_daily_loss > 0.5 {

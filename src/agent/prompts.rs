@@ -136,6 +136,7 @@ impl KnowledgeUnit {
             crate::agent::knowledge::KnowledgeTopic::PriceAction => "Price Action",
             crate::agent::knowledge::KnowledgeTopic::MarketRegime => "Market Regime",
             crate::agent::knowledge::KnowledgeTopic::CryptoNative => "Crypto Native",
+            crate::agent::knowledge::KnowledgeTopic::TradingSystems => "Trading Systems",
         }
     }
 }

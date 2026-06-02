@@ -50,6 +50,7 @@ pub enum KnowledgeTopic {
     PriceAction,
     MarketRegime,
     CryptoNative,
+    TradingSystems,
 }
 
 /// Market conditions that trigger knowledge injection.
@@ -83,6 +84,8 @@ pub enum MarketCondition {
     WeakTrend,
     VolumeExpansion,
     TrendAlignment,
+    Crypto24h,
+    TradingSystems,
 }
 
 /// The knowledge base — holds all loaded knowledge units and provides
