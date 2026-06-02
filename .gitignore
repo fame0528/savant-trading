@@ -21,10 +21,12 @@ dev/baselines/
 
 # === Data (runtime-generated) ===
 /data/
+/data/kraken_ticks/
 *.db
 *.db-shm
 *.db-wal
 /logs/
+tick_candles_*.json
 
 # === Knowledge source books (1.8GB, too large for git) ===
 knowledge/books/

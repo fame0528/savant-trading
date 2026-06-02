@@ -33,11 +33,13 @@ pub enum TickSide {
 
 /// Parse a single line of Kraken tick CSV.
 ///
-/// Format: timestamp,price,volume,side,order_type,misc
-/// Example: 1622505600.123456,37000.00,0.001,b,l,
+/// Format: timestamp,price,volume
+/// Example: 1706803466,0.23,50.0
+///
+/// Kraken's historical data uses this simple 3-field format.
 pub fn parse_tick_line(line: &str) -> Option<Tick> {
     let parts: Vec<&str> = line.trim().split(',').collect();
-    if parts.len() < 4 {
+    if parts.len() < 3 {
         return None;
     }
 
@@ -49,12 +51,6 @@ pub fn parse_tick_line(line: &str) -> Option<Tick> {
     let price: f64 = parts[1].parse().ok()?;
     let volume: f64 = parts[2].parse().ok()?;
 
-    let side = match parts[3] {
-        "b" | "B" => TickSide::Buy,
-        "s" | "S" => TickSide::Sell,
-        _ => TickSide::Buy, // Default
-    };
-
     // Skip zero-volume or zero-price trades
     if volume <= 0.0 || price <= 0.0 {
         return None;
@@ -64,7 +60,7 @@ pub fn parse_tick_line(line: &str) -> Option<Tick> {
         timestamp,
         price,
         volume,
-        side,
+        side: TickSide::Buy, // Not provided in Kraken historical data
     })
 }
 
@@ -159,6 +155,19 @@ pub fn parse_tick_file(path: &Path) -> Result<Vec<Tick>, String> {
     Ok(ticks)
 }
 
+/// Map standard pair names to Kraken's historical data filenames.
+///
+/// Kraken uses XBT instead of BTC, and some pairs have different naming.
+fn kraken_filename_pair(pair: &str) -> String {
+    match pair.to_uppercase().replace('/', "").as_str() {
+        "BTCUSD" => "XBTUSD".to_string(),
+        "BTCEUR" => "XBTEUR".to_string(),
+        "BTCGBP" => "XBTGBP".to_string(),
+        "DOGEUSD" => "DOGEUSD".to_string(),
+        other => other.to_string(),
+    }
+}
+
 /// Parse all tick CSV files in a directory (recursively).
 ///
 /// Kraken data is organized as: pair/PAIR_*.csv or just *.csv files.
@@ -188,13 +197,14 @@ pub fn parse_tick_directory(dir: &Path, pair_filter: &str) -> Result<Vec<Tick>, 
                 .file_name()
                 .and_then(|f| f.to_str())
                 .unwrap_or("")
-                .to_uppercase();
+                .to_uppercase()
+                .replace(".CSV", "");
+            let kraken_name = kraken_filename_pair(pair_filter);
             let pair_upper = pair_filter.to_uppercase();
-            let pair_no_slash = pair_upper.replace('/', "");
 
             if pair_filter.is_empty()
-                || filename.contains(&pair_no_slash)
-                || filename.contains(&pair_upper)
+                || filename == kraken_name
+                || filename == pair_upper.replace('/', "")
             {
                 match parse_tick_file(&path) {
                     Ok(mut ticks) => {
