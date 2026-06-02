@@ -4,6 +4,25 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.4.4] — 2026-06-02
+
+### Added (FID-015 — Gemini Deep Research Optimization Overhaul)
+
+- **Config Overhaul** — Corrected fee rate (0.26% → 0.40% taker), tightened risk (daily loss 20% → 10%, drawdown 40% → 20%), raised R:R (1.5 → 2.0), temperature 0.6 + top_p 0.95, knowledge budget 8K → 20K chars, candles 100 → 500, timeout 180s → 300s, max_tokens 131072 (128K), added 1d timeframe.
+- **Maker Order Support** — `order_type` field (LIMIT/MARKET) in TradeDecision. Paper trader maker fee corrected to 0.25%.
+- **Prompt Architecture** — XML-tagged prompts (`<identity>`, `<risk_constraints>`, `<strategy_knowledge>`, `<trading_rules>`, `<output_format>`, `<thinking>`). 5-step structured reasoning framework.
+- **Session Liquidity Profiles** — 9 UTC-based sessions (Deep Asian 0.5x, US-EU Overlap 1.2x). Breakout confidence penalties for low-liquidity sessions.
+- **Garman-Klass Volatility** — OHLC-based volatility estimator in indicator engine. More accurate than ATR for stop-loss sizing.
+- **Isotonic Regression** — PAVA confidence calibrator. Maps raw LLM confidence to calibrated probability. Wired into training report.
+- **Four-Factor Causal Attribution** — Loss classification (Setup/Process/Market/Trader) in training pipeline.
+- **Historical Tick Data** — `data/historical.rs` fetches and caches 30 days of 5m candles from Kraken. `--historical` CLI flag.
+- **JSON Repair** — Enhanced `repair_json_string()` with mid-word truncation detection, extra-text-after-JSON stripping, partial_extract fallback on repaired strings.
+
+### Fixed
+
+- **maker_fee_rate** — Paper trader maker fee corrected from 0.16% to 0.25% (actual Kraken base tier).
+- **Garman-Klass in context** — Now displayed alongside ATR in market data section.
+
 ## [0.4.3] — 2026-06-01
 
 ### Added

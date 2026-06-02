@@ -74,4 +74,38 @@
 
 ---
 
+## Session 2026-0602-0000: Gemini Deep Research, FID-015, Full Optimization Overhaul
+
+**Key Learnings:**
+
+- Gemini Deep Research produced two 300+ line reports with 23 academic citations. Both agreed on: temperature 0.6, risk overhaul, prompt architecture changes. Disagreed on system prompt removal (needs A/B test).
+- **Never trust fee assumptions.** Kraken base tier is 0.40% taker / 0.25% maker, not 0.26%. At $50, this difference invalidates every R:R calculation.
+- **Small accounts need different risk framework.** Kelly Criterion / 2% risk assumes you can survive losing streaks. At $50, you can't. Full deployment + tight safety nets is the correct approach.
+- **Reasoning models need different prompt architecture.** System prompts and few-shot examples degrade MoE reasoning models. XML-tagged user prompts with structured reasoning steps work better.
+- **max_tokens must match model specs.** MiMo v2.5 Pro has 128K output. We were capping at 2048-8192. The model's "thinking" consumed the entire budget, leaving no room for JSON.
+- **Non-streaming `chat()` is faster but produces broken JSON at low max_tokens.** At 131072 tokens, it works perfectly. At 2048, 77% parse errors.
+- **Isotonic Regression (PAVA)** is the correct mathematical approach for LLM confidence calibration. Don't trust the model's self-reported confidence — calibrate it with historical outcomes.
+- **Session liquidity matters.** Deep Asian (02:00-06:00 UTC) has 42% less order book depth. Breakouts fail 40% more often. The agent should penalize confidence during low-liquidity sessions.
+- **Garman-Klass volatility** uses OHLC data (not just close) for more accurate volatility measurement. Better for dynamic stop-loss widths.
+- **Four-factor causal attribution** (Setup/Process/Market/Trader) gives the agent WHY it failed, not just THAT it failed. Injecting this into memory context accelerates learning.
+
+**Agent Behavior (post FID-015):**
+
+- Brier trajectory: 0.355 → 0.211 → **0.172** → 0.256. Best ever at 0.172.
+- 50-75% confidence: 80-100% accuracy. Well-calibrated.
+- 75-100% confidence: 50-100% accuracy. High variance at small sample.
+- LONG trades appearing: 5 across 4 runs. Short bias broken.
+- Trend Bull category: improved from 25% to 100% in run 4.
+- 0 errors across all runs. JSON repair + 131072 tokens eliminated parse failures.
+- Avg latency: 85-92s per scenario (non-streaming).
+
+**Technical Insights:**
+
+- OpenGateway returns compressed responses (zstd/br) that PowerShell can't decode. Use Rust reqwest client for API testing.
+- `extract_json()` fails silently when there's no `}` in truncated JSON — falls through to full string. `repair_json_string` must handle this.
+- `partial_extract` should try the REPAIRED string first, not the original. This one change fixed truncated string recovery.
+- Kraken OHLC API returns max 720 candles per request. For 30 days of 5m data (~8,640 candles), need ~12 paginated requests at 1 req/sec.
+
+---
+
 <!-- Add new entries above this line -->

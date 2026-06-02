@@ -44,7 +44,7 @@ impl PaperTrader {
             current_atr: 0.0,
             avg_atr: 0.0,
             book_depth: HashMap::new(),
-            maker_fee_rate: 0.0016, // Kraken maker fee: 0.16%
+            maker_fee_rate: 0.0025, // Kraken maker fee: 0.25%
             best_bid: HashMap::new(),
             best_ask: HashMap::new(),
         }

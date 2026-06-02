@@ -194,7 +194,7 @@ impl TuiApp {
                     Style::default().fg(NEON_CYAN).add_modifier(Modifier::BOLD),
                 ),
                 Span::styled(
-                    format!("  v0.4.3  │  UP {:02}:{:02}:{:02}", hours, mins, secs),
+                    format!("  v0.4.4  │  UP {:02}:{:02}:{:02}", hours, mins, secs),
                     Style::default().fg(DIM_CYAN),
                 ),
             ]),

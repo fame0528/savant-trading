@@ -111,6 +111,7 @@ async fn main() -> anyhow::Result<()> {
                     ta.action_only,
                     ta.count,
                     ta.full,
+                    ta.historical,
                 )
                 .await;
             }
@@ -124,7 +125,7 @@ async fn main() -> anyhow::Result<()> {
         _ => {}
     }
 
-    info!("=== SAVANT TRADING ENGINE v0.4.3 ===");
+    info!("=== SAVANT TRADING ENGINE v0.4.4 ===");
     info!(
         "Mode: {}",
         if config.mode.paper_trading {
@@ -207,7 +208,7 @@ async fn run_backtest_cmd(config: &AppConfig) -> anyhow::Result<()> {
 }
 
 fn print_help() {
-    println!("SAVANT TRADING ENGINE v0.4.3");
+    println!("SAVANT TRADING ENGINE v0.4.4");
     println!();
     println!("USAGE:");
     println!("  savant                    Start trading engine + API server");

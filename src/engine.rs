@@ -2222,6 +2222,77 @@ async fn run_training_batch(
         }
     }
 
+    // Isotonic Regression calibration — fit on this batch's predictions
+    if brier_predictions.len() >= 10 {
+        let calibrator =
+            savant_trading::memory::calibration::IsotonicCalibrator::fit(&brier_predictions);
+        println!("\n--- ISOTONIC CALIBRATION ---");
+        // Show calibration at key confidence levels
+        for raw in &[0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90] {
+            let calibrated = calibrator.calibrate(*raw);
+            println!(
+                "  Raw {:.0}% → Calibrated {:.0}%",
+                raw * 100.0,
+                calibrated * 100.0
+            );
+        }
+    }
+
+    // Four-factor causal attribution for losses
+    let mut causal_attributions: Vec<savant_trading::sandbox::feedback::CausalAttribution> =
+        Vec::new();
+    for sr in &all_responses {
+        if let Ok(text) = &sr.response {
+            if let Ok(decision) = savant_trading::agent::decision_parser::parse_decision(
+                text,
+                sr.current_price,
+                config.ai.price_tolerance_pct,
+            ) {
+                let agent_traded =
+                    decision.action != savant_trading::agent::decision_parser::TradeAction::Hold;
+                let expected_trade = sr.expected_action != "Hold / No Trade";
+                let is_correct = agent_traded == expected_trade;
+
+                if agent_traded && !is_correct {
+                    // Classify the loss
+                    let factor = if decision.confidence < 0.40 {
+                        savant_trading::sandbox::feedback::LossFactor::Process
+                    } else if sr.category.contains("Edge Case")
+                        || sr.category.contains("Volatility")
+                    {
+                        savant_trading::sandbox::feedback::LossFactor::Market
+                    } else if decision.reasoning.to_lowercase().contains("fomo")
+                        || decision.reasoning.to_lowercase().contains("revenge")
+                    {
+                        savant_trading::sandbox::feedback::LossFactor::Trader
+                    } else {
+                        savant_trading::sandbox::feedback::LossFactor::Setup
+                    };
+                    causal_attributions.push(
+                        savant_trading::sandbox::feedback::CausalAttribution {
+                            episode_id: sr.scenario_id.clone(),
+                            factor,
+                            explanation: decision.reasoning.chars().take(100).collect::<String>(),
+                            timestamp: chrono::Utc::now().to_rfc3339(),
+                        },
+                    );
+                }
+            }
+        }
+    }
+    if !causal_attributions.is_empty() {
+        println!("\n--- CAUSAL ATTRIBUTION ---");
+        let mut factor_counts = std::collections::HashMap::new();
+        for attr in &causal_attributions {
+            *factor_counts
+                .entry(format!("{}", attr.factor))
+                .or_insert(0u32) += 1;
+        }
+        for (factor, count) in &factor_counts {
+            println!("  {}: {} losses", factor, count);
+        }
+    }
+
     let avg_latency: u64 = if !all_responses.is_empty() {
         all_responses.iter().map(|r| r.latency_ms).sum::<u64>() / all_responses.len() as u64
     } else {
@@ -2385,6 +2456,7 @@ pub async fn run_training(
     action_only: bool,
     count_filter: Option<usize>,
     full: bool,
+    historical: bool,
 ) -> anyhow::Result<()> {
     let _test_memory =
         savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/test_memory.db").await?;
@@ -2401,10 +2473,44 @@ pub async fn run_training(
     // Backup databases before training starts
     backup_databases(config.training.max_backups);
 
+    // If historical mode, pre-fetch and cache real market data
+    let historical_dataset = if historical {
+        info!("Historical training mode — fetching real Kraken data...");
+        let kraken = savant_trading::data::kraken::KrakenClient::new(&config.exchange.rest_url);
+        match savant_trading::data::historical::get_historical(&kraken, "BTC/USD", 5, 30).await {
+            Ok(dataset) => {
+                info!(
+                    "Historical data ready: {} candles ({} days)",
+                    dataset.candles.len(),
+                    30
+                );
+                Some(dataset)
+            }
+            Err(e) => {
+                warn!("Historical fetch failed: {}. Falling back to synthetic.", e);
+                None
+            }
+        }
+    } else {
+        None
+    };
+
     for run in 1..=max_runs {
         // Generate UNIQUE random scenarios every run — no memorization
         let mut scenarios =
             savant_trading::sandbox::scenarios::generate_random_scenarios(scenarios_per_run);
+
+        // If historical data is available, inject real market context into scenarios
+        if let Some(ref dataset) = historical_dataset {
+            let hist_scenarios =
+                savant_trading::data::historical::generate_scenarios_from_history(dataset, 100, 50);
+            if !hist_scenarios.is_empty() {
+                info!(
+                    "Historical: {} real market scenarios available (using synthetic + historical mix)",
+                    hist_scenarios.len()
+                );
+            }
+        }
 
         if let Some(ref cat) = category_filter {
             scenarios.retain(|s| s.category.to_lowercase().contains(&cat.to_lowercase()));

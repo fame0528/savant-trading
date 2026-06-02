@@ -264,14 +264,20 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
     }
 
     // Indicators
+    let gk_str = ctx
+        .indicators
+        .garman_klass
+        .map(|g| format!("{:.2}", g))
+        .unwrap_or_else(|| "N/A".to_string());
     msg.push_str(&format!(
-        "Indicators: EMA_FAST={:?} EMA_SLOW={:?} RSI={:?} ATR={:?} ADX={:?} VWAP={:?}\n",
+        "Indicators: EMA_FAST={:?} EMA_SLOW={:?} RSI={:?} ATR={:?} ADX={:?} VWAP={:?} GarmanKlass={}\n",
         ctx.indicators.ema_fast,
         ctx.indicators.ema_slow,
         ctx.indicators.rsi,
         ctx.indicators.atr,
         ctx.indicators.adx,
         ctx.indicators.vwap,
+        gk_str,
     ));
 
     // Regime
