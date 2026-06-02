@@ -22,6 +22,8 @@ pub struct TradeDecision {
     pub action: TradeAction,
     pub pair: String,
     pub side: Side,
+    #[serde(default = "default_order_type")]
+    pub order_type: String,
     pub entry_price: f64,
     pub stop_loss: f64,
     pub take_profit_1: f64,
@@ -32,6 +34,10 @@ pub struct TradeDecision {
     pub reasoning: String,
     pub knowledge_sources: Vec<String>,
     pub risk_reward: f64,
+}
+
+fn default_order_type() -> String {
+    "LIMIT".to_string()
 }
 
 impl TradeDecision {
@@ -336,6 +342,11 @@ fn partial_extract(json: &str) -> Option<TradeDecision> {
             .unwrap_or("BTC/USD")
             .to_string(),
         side: Side::Long,
+        order_type: value
+            .get("order_type")
+            .and_then(|v| v.as_str())
+            .unwrap_or("LIMIT")
+            .to_string(),
         entry_price: value
             .get("entry_price")
             .and_then(|v| v.as_f64())

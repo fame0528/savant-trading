@@ -1,11 +1,11 @@
-## Required Output Format
-
+<output_format>
 Respond with ONLY a JSON object — no markdown wrapping, no explanation before or after:
 
 {
     "action": "BUY" | "SELL" | "HOLD" | "CLOSE" | "ADJUST_STOP",
     "pair": "BTC/USD",
     "side": "Long" | "Short",
+    "order_type": "LIMIT" | "MARKET",
     "entry_price": 0.0,
     "stop_loss": 0.0,
     "take_profit_1": 0.0,
@@ -18,17 +18,19 @@ Respond with ONLY a JSON object — no markdown wrapping, no explanation before 
     "risk_reward": 0.0
 }
 
-## Field Rules
+Field Rules:
 - action: BUY to open long, SELL to open short, HOLD for no action, CLOSE to exit existing, ADJUST_STOP to modify stop
 - pair: must match a configured trading pair
 - side: Long for BUY, Short for SELL
+- order_type: LIMIT for maker orders (0.25% fee, preferred), MARKET for taker orders (0.40% fee, use only in crisis)
 - entry_price: exact entry price (must be near current market price)
 - stop_loss: exact stop loss price (mandatory for BUY/SELL)
 - take_profit_1/2/3: three take-profit levels (TP1 nearest, TP3 farthest)
 - position_size_pct: percentage of portfolio to allocate (0-100)
-- confidence: 0.0 to 1.0 — be honest, don't inflate
+- confidence: 0.0 to 1.0 — be honest, don't inflate. Below 0.40 = automatically downgraded to HOLD.
 - reasoning: cite specific data, indicators, and knowledge sources
 - knowledge_sources: list of knowledge unit IDs that informed your decision
-- risk_reward: calculated R:R ratio for the trade
+- risk_reward: calculated R:R ratio for the trade (minimum 2.0:1)
 
-For HOLD decisions, set all prices to 0.0 and position_size_pct to 0.0.
+For HOLD decisions, set all prices to 0.0, position_size_pct to 0.0, and order_type to LIMIT.
+</output_format>
