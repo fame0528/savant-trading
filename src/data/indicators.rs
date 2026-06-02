@@ -282,6 +282,7 @@ impl IndicatorEngine {
                 adx: None,
                 vwap: None,
                 volume_sma: None,
+                garman_klass: None,
             };
         }
 
@@ -295,6 +296,7 @@ impl IndicatorEngine {
         let adx_vals = Self::adx(candles, adx_period);
         let vwap_vals = Self::vwap(candles);
         let vol_sma = Self::sma(&volumes, 20);
+        let gk_vals = Self::garman_klass(candles, 14);
 
         IndicatorValues {
             ema_fast: ema20.last().copied(),
@@ -304,7 +306,39 @@ impl IndicatorEngine {
             adx: adx_vals.last().copied(),
             vwap: vwap_vals.last().copied(),
             volume_sma: vol_sma.last().copied(),
+            garman_klass: gk_vals.last().copied(),
         }
+    }
+
+    /// Garman-Klass volatility estimator — uses OHLC data for more accurate
+    /// volatility measurement than ATR (which only uses close/high/low).
+    ///
+    /// Formula: GK = 0.5 * ln(H/L)^2 - (2*ln(2)-1) * ln(C/O)^2
+    /// Averaged over `period` candles and annualized.
+    pub fn garman_klass(candles: &[Candle], period: usize) -> Vec<f64> {
+        if candles.len() < period {
+            return vec![];
+        }
+
+        let mut result = Vec::with_capacity(candles.len() - period + 1);
+
+        for window in candles.windows(period) {
+            let sum: f64 = window
+                .iter()
+                .map(|c| {
+                    let hl_ratio = (c.high / c.low).max(0.0001).ln();
+                    let co_ratio = (c.close / c.open).max(0.0001).ln();
+                    0.5 * hl_ratio.powi(2) - (2.0 * 2.0_f64.ln() - 1.0) * co_ratio.powi(2)
+                })
+                .sum();
+            // Annualize: multiply by sqrt(periods_per_day * 365)
+            // For 5m candles: 288 periods/day, sqrt(288*365) ≈ 324
+            let avg = sum / period as f64;
+            let annualized = avg.sqrt() * 324.0;
+            result.push(annualized);
+        }
+
+        result
     }
 }
 

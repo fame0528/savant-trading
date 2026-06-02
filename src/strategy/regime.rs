@@ -77,6 +77,7 @@ mod tests {
             adx,
             vwap: None,
             volume_sma: None,
+            garman_klass: None,
         }
     }
 

@@ -301,6 +301,7 @@ pub struct IndicatorValues {
     pub adx: Option<f64>,
     pub vwap: Option<f64>,
     pub volume_sma: Option<f64>,
+    pub garman_klass: Option<f64>,
 }
 
 #[derive(Debug, Clone)]
