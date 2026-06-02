@@ -116,7 +116,8 @@ pub fn parse_decision(
                 Ok(d) => d,
                 Err(repair_err) => {
                     // Pass 3: partial extraction — salvage what we can
-                    match partial_extract(&normalized) {
+                    // Try partial on repaired first (may have fixed truncation), then original
+                    match partial_extract(&repaired).or_else(|| partial_extract(&normalized)) {
                         Some(d) => d,
                         None => {
                             tracing::debug!(
@@ -278,8 +279,19 @@ fn repair_json_string(json: &str) -> String {
     let mut s = json.to_string();
 
     // Fix: unclosed string at end (truncated response)
+    // Count quotes, but also check if we're inside a string at EOF
     let quote_count = s.matches('"').count();
-    if !quote_count.is_multiple_of(2) {
+    let mut in_str = false;
+    let mut prev = ' ';
+    for c in s.chars() {
+        if c == '"' && prev != '\\' {
+            in_str = !in_str;
+        }
+        prev = c;
+    }
+    let in_string_at_eof = in_str;
+
+    if !quote_count.is_multiple_of(2) || in_string_at_eof {
         s.push('"');
     }
 
@@ -315,6 +327,35 @@ fn repair_json_string(json: &str) -> String {
             result.push(c);
         }
         prev_char = c;
+    }
+
+    // Fix: extra text after JSON object (reasoning/thinking leaking into content)
+    // Find the first '{' and track brace depth to find the matching '}'
+    if let Some(start) = result.find('{') {
+        let mut depth = 0i32;
+        let mut end = start;
+        let mut in_str = false;
+        let mut prev = ' ';
+        for (i, c) in result[start..].char_indices() {
+            if c == '"' && prev != '\\' {
+                in_str = !in_str;
+            }
+            if !in_str {
+                if c == '{' {
+                    depth += 1;
+                } else if c == '}' {
+                    depth -= 1;
+                    if depth == 0 {
+                        end = start + i + 1;
+                        break;
+                    }
+                }
+            }
+            prev = c;
+        }
+        if end > start {
+            result = result[start..end].to_string();
+        }
     }
 
     result
@@ -541,5 +582,31 @@ mod tests {
 
         let result = parse_decision(json, 65000.0, 10.0);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn repair_extra_text_after_json() {
+        // Simulates reasoning leaking into content field
+        let response = r#"{"action":"Hold","pair":"BTC/USD","side":"Long","entry_price":0.0,"stop_loss":0.0,"take_profit_1":0.0,"take_profit_2":0.0,"take_profit_3":0.0,"position_size_pct":0.0,"confidence":0.0,"reasoning":"No setup","knowledge_sources":[],"risk_reward":0.0}
+Some extra reasoning text that leaked into the response..."#;
+
+        let decision = parse_decision(response, 65000.0, 10.0).unwrap();
+        assert_eq!(decision.action, TradeAction::Hold);
+    }
+
+    #[test]
+    fn repair_truncated_string() {
+        // Simulates a response cut mid-string — the repair should handle this
+        // via partial_extract (3rd pass) if repair_json_string can't fix it
+        let response = r#"{"action":"Hold","pair":"BTC/USD","side":"Long","entry_price":0.0,"stop_loss":0.0,"take_profit_1":0.0,"take_profit_2":0.0,"take_profit_3":0.0,"position_size_pct":0.0,"confidence":0.0,"reasoning":"No actionable setup due to conf"#;
+
+        let result = parse_decision(response, 65000.0, 10.0);
+        // Should succeed via either repair or partial_extract
+        assert!(
+            result.is_ok(),
+            "Truncated string should be salvageable: {:?}",
+            result.err()
+        );
+        assert_eq!(result.unwrap().action, TradeAction::Hold);
     }
 }
