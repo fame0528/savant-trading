@@ -284,3 +284,201 @@ pub async fn get_top_volatile_pairs(
     info!("Top {} volatile pairs: {:?}", result.len(), result);
     result
 }
+
+// ============================================================
+// DEX API endpoints (v4) — on-chain DEX data
+// ============================================================
+
+/// DEX pair OHLCV data from CoinMarketCap.
+#[derive(Debug, Clone, Deserialize)]
+pub struct DexOhlcv {
+    pub time_open: String,
+    pub time_close: String,
+    pub open: f64,
+    pub high: f64,
+    pub low: f64,
+    pub close: f64,
+    pub volume: f64,
+    #[serde(rename = "market_cap")]
+    pub market_cap: Option<f64>,
+}
+
+/// DEX trade data from CoinMarketCap.
+#[derive(Debug, Clone, Deserialize)]
+pub struct DexTrade {
+    #[serde(rename = "transactionHash")]
+    pub transaction_hash: Option<String>,
+    pub price: f64,
+    pub amount: f64,
+    pub side: Option<String>,
+    pub timestamp: String,
+}
+
+/// Fetch historical OHLCV data for a DEX pair.
+///
+/// This gives us candle data for ANY on-chain pair — including meme coins
+/// that aren't on centralized exchanges yet.
+///
+/// `pair_address`: The contract address of the DEX pair
+/// `network`: The blockchain network (e.g., "ethereum", "solana", "base")
+/// `interval`: Candle interval ("1m", "5m", "1h", "1d")
+/// `count`: Number of candles to fetch
+pub async fn fetch_dex_ohlcv(
+    client: &reqwest::Client,
+    api_key: &str,
+    pair_address: &str,
+    network: &str,
+    interval: &str,
+    count: u32,
+) -> Result<Vec<DexOhlcv>, String> {
+    let url = format!("{}/v4/dex/pairs/ohlcv/historical", CMC_BASE_URL);
+
+    let resp = client
+        .get(&url)
+        .header("X-CMC_PRO_API_KEY", api_key)
+        .header("Accept", "application/json")
+        .query(&[
+            ("address", pair_address),
+            ("network", network),
+            ("interval", interval),
+            ("count", &count.to_string()),
+        ])
+        .send()
+        .await
+        .map_err(|e| format!("CMC DEX OHLCV request failed: {}", e))?;
+
+    if !resp.status().is_success() {
+        let status = resp.status();
+        let body = resp.text().await.unwrap_or_default();
+        return Err(format!("CMC DEX OHLCV error {}: {}", status, body));
+    }
+
+    let json: serde_json::Value = resp
+        .json()
+        .await
+        .map_err(|e| format!("CMC DEX OHLCV parse error: {}", e))?;
+
+    let data = json["data"]
+        .as_array()
+        .ok_or_else(|| "CMC DEX OHLCV missing 'data' field".to_string())?;
+
+    let mut candles = Vec::new();
+    for item in data {
+        if let Ok(candle) = serde_json::from_value::<DexOhlcv>(item.clone()) {
+            candles.push(candle);
+        }
+    }
+
+    info!(
+        "CMC DEX OHLCV: fetched {} candles for {} on {}",
+        candles.len(),
+        pair_address,
+        network
+    );
+    Ok(candles)
+}
+
+/// Fetch the latest trades for a DEX pair.
+///
+/// Returns up to 100 most recent trades with transaction hashes.
+/// Useful for real-time on-chain trade analysis.
+pub async fn fetch_dex_trades(
+    client: &reqwest::Client,
+    api_key: &str,
+    pair_address: &str,
+    network: &str,
+) -> Result<Vec<DexTrade>, String> {
+    let url = format!("{}/v4/dex/pairs/trade/latest", CMC_BASE_URL);
+
+    let resp = client
+        .get(&url)
+        .header("X-CMC_PRO_API_KEY", api_key)
+        .header("Accept", "application/json")
+        .query(&[("address", pair_address), ("network", network)])
+        .send()
+        .await
+        .map_err(|e| format!("CMC DEX trades request failed: {}", e))?;
+
+    if !resp.status().is_success() {
+        let status = resp.status();
+        let body = resp.text().await.unwrap_or_default();
+        return Err(format!("CMC DEX trades error {}: {}", status, body));
+    }
+
+    let json: serde_json::Value = resp
+        .json()
+        .await
+        .map_err(|e| format!("CMC DEX trades parse error: {}", e))?;
+
+    let data = json["data"]
+        .as_array()
+        .ok_or_else(|| "CMC DEX trades missing 'data' field".to_string())?;
+
+    let mut trades = Vec::new();
+    for item in data {
+        if let Ok(trade) = serde_json::from_value::<DexTrade>(item.clone()) {
+            trades.push(trade);
+        }
+    }
+
+    info!(
+        "CMC DEX trades: fetched {} trades for {} on {}",
+        trades.len(),
+        pair_address,
+        network
+    );
+    Ok(trades)
+}
+
+/// DEX listing with market data.
+#[derive(Debug, Clone, Deserialize)]
+pub struct DexListing {
+    pub id: u32,
+    pub name: String,
+    pub slug: String,
+    #[serde(rename = "num_market_pairs")]
+    pub num_market_pairs: Option<u32>,
+}
+
+/// Fetch top DEX exchanges ranked by volume.
+pub async fn fetch_dex_listings(
+    client: &reqwest::Client,
+    api_key: &str,
+    limit: u32,
+) -> Result<Vec<DexListing>, String> {
+    let url = format!("{}/v4/dex/listings/quotes", CMC_BASE_URL);
+
+    let resp = client
+        .get(&url)
+        .header("X-CMC_PRO_API_KEY", api_key)
+        .header("Accept", "application/json")
+        .query(&[("limit", limit.to_string())])
+        .send()
+        .await
+        .map_err(|e| format!("CMC DEX listings request failed: {}", e))?;
+
+    if !resp.status().is_success() {
+        let status = resp.status();
+        let body = resp.text().await.unwrap_or_default();
+        return Err(format!("CMC DEX listings error {}: {}", status, body));
+    }
+
+    let json: serde_json::Value = resp
+        .json()
+        .await
+        .map_err(|e| format!("CMC DEX listings parse error: {}", e))?;
+
+    let data = json["data"]
+        .as_array()
+        .ok_or_else(|| "CMC DEX listings missing 'data' field".to_string())?;
+
+    let mut listings = Vec::new();
+    for item in data {
+        if let Ok(listing) = serde_json::from_value::<DexListing>(item.clone()) {
+            listings.push(listing);
+        }
+    }
+
+    info!("CMC DEX listings: fetched {} exchanges", listings.len());
+    Ok(listings)
+}
