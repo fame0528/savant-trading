@@ -24,6 +24,7 @@ dev/baselines/
 *.db
 *.db-shm
 *.db-wal
+/logs/
 
 # === Knowledge source books (1.8GB, too large for git) ===
 knowledge/books/
