@@ -13,6 +13,7 @@
 //! - `aggregator` — Unified MarketContext combining all sources
 
 pub mod aggregator;
+pub mod coinmarketcap;
 pub mod flows;
 pub mod funding_rates;
 pub mod liquidation;

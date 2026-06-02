@@ -4,8 +4,22 @@ ws_url = "wss://ws.kraken.com/v2"
 rest_url = "https://api.kraken.com"
 
 [trading]
-# Starting pairs — engine can discover more via Kraken API
-pairs = ["BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD", "DOGE/USD"]
+# Core pairs — always tracked, highest liquidity
+# BTC & ETH are the foundation. Top 10 + meme coins are where the action is.
+pairs = [
+    # Core (always trade)
+    "BTC/USD", "ETH/USD",
+    # Top 10 by market cap
+    "SOL/USD", "XRP/USD", "ADA/USD", "AVAX/USD", "DOT/USD", "LINK/USD",
+    # High volatility / momentum
+    "DOGE/USD", "SHIB/USD", "PEPE/USD", "WIF/USD", "BONK/USD",
+    # DeFi / L2
+    "UNI/USD", "AAVE/USD", "ARB/USD", "OP/USD", "LDO/USD", "PENDLE/USD",
+    # AI / narrative
+    "RENDER/USD", "FET/USD", "GRT/USD",
+    # Other volatile
+    "LTC/USD", "ATOM/USD", "NEAR/USD", "INJ/USD", "TIA/USD", "SUI/USD",
+]
 # Set to true to scan all Kraken USD pairs for opportunity
 scan_all_pairs = true
 timeframe = "5m"
@@ -88,6 +102,17 @@ news_sentiment_enabled = true
 rss_enabled = true
 rss_max_items = 10
 onchain_enabled = true
+
+[insight.coinmarketcap]
+# CoinMarketCap API for dynamic pair discovery
+# Free tier: 10K calls/month, data refreshed every 1 minute
+api_key_env = "COINMARKETCAP_API_KEY"
+# How many top coins to fetch for pair discovery
+top_coins_limit = 100
+# Minimum 24h volume to consider a pair tradeable (USD)
+min_volume_24h = 1000000
+# Minimum volatility score to include in active trading
+min_volatility_score = 5.0
 
 [training]
 # Minimum sample size for semantic pattern promotion

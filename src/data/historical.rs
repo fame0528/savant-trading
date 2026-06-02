@@ -214,6 +214,70 @@ pub async fn get_historical(
     fetch_historical(client, pair, interval_minutes, days).await
 }
 
+/// Get the best available historical data — tick data first, then API.
+///
+/// Priority order:
+/// 1. Tick-derived candles (from 12GB Kraken download) — most comprehensive
+/// 2. Cached API candles (from Kraken OHLC endpoint) — limited to 720 candles
+/// 3. Fresh API fetch — limited to 720 candles
+///
+/// This function is the single entry point for training data.
+pub async fn get_best_historical(
+    client: &crate::data::kraken::KrakenClient,
+    pair: &str,
+    interval_minutes: u32,
+) -> Result<HistoricalDataset, String> {
+    // 1. Try tick-derived candles (from processed Kraken tick CSVs)
+    let tick_cache = format!(
+        "data/tick_candles_{}_{}m.json",
+        pair.replace('/', "_"),
+        interval_minutes
+    );
+    if let Some(tick_data) = crate::data::tick_data::TickDerivedCandles::load_cache(&tick_cache) {
+        info!(
+            "Using tick-derived candles: {} candles from {} ticks ({} to {})",
+            tick_data.candle_count,
+            tick_data.tick_count,
+            chrono::DateTime::from_timestamp(tick_data.start_ts, 0)
+                .map(|d| d.format("%Y-%m-%d").to_string())
+                .unwrap_or_else(|| "?".into()),
+            chrono::DateTime::from_timestamp(tick_data.end_ts, 0)
+                .map(|d| d.format("%Y-%m-%d").to_string())
+                .unwrap_or_else(|| "?".into()),
+        );
+        return Ok(HistoricalDataset {
+            meta: HistoricalMeta {
+                pair: pair.to_string(),
+                interval_minutes,
+                start_ts: tick_data.start_ts,
+                end_ts: tick_data.end_ts,
+                candle_count: tick_data.candle_count,
+                fetched_at: chrono::Utc::now().to_rfc3339(),
+            },
+            candles: tick_data.candles,
+        });
+    }
+
+    // 2. Try cached API candles
+    if let Some(cached) = HistoricalDataset::load_from_cache(pair, interval_minutes) {
+        if let Ok(fetched_at) = DateTime::parse_from_rfc3339(&cached.meta.fetched_at) {
+            let age = Utc::now() - fetched_at.with_timezone(&Utc);
+            if age < Duration::hours(24) {
+                info!(
+                    "Using cached API candles (age: {} hours, {} candles)",
+                    age.num_hours(),
+                    cached.meta.candle_count
+                );
+                return Ok(cached);
+            }
+        }
+    }
+
+    // 3. Fetch fresh from API
+    info!("No tick data or cache found — fetching from Kraken API (720 candle limit)");
+    fetch_historical(client, pair, interval_minutes, 30).await
+}
+
 /// Generate synthetic scenarios from historical candle windows.
 ///
 /// Takes windows of `scenario_len` candles from the historical data.
