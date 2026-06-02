@@ -17,6 +17,7 @@ struct TestArgs {
     action_only: bool,
     count: Option<usize>,
     sandbox: bool,
+    full: bool,
 }
 
 fn parse_test_args(args: &[String]) -> TestArgs {
@@ -37,6 +38,9 @@ fn parse_test_args(args: &[String]) -> TestArgs {
             }
             "--sandbox" | "-s" => {
                 ta.sandbox = true;
+            }
+            "--full" => {
+                ta.full = true;
             }
             _ => {}
         }
@@ -97,7 +101,14 @@ async fn main() -> anyhow::Result<()> {
             // Check for --train flag
             if args.iter().any(|a| a == "--train") {
                 info!("=== SAVANT TRAINING ===");
-                return engine::run_training(config, ta.category, ta.action_only, ta.count).await;
+                return engine::run_training(
+                    config,
+                    ta.category,
+                    ta.action_only,
+                    ta.count,
+                    ta.full,
+                )
+                .await;
             }
             info!("=== SAVANT ACTION TEST ===");
             return engine::run_action_test(config, ta.category, ta.action_only, ta.count).await;
@@ -207,7 +218,8 @@ fn print_help() {
     println!("  savant --test -a                      Only scenarios expecting Buy/Sell");
     println!("  savant --test -n 20                   Run first N scenarios");
     println!("  savant --test -c \"Crash\" -a -n 10    Combine filters");
-    println!("  savant --test --train                 Training mode (loop until convergence)");
+    println!("  savant --test --train                 Training mode (5 runs by default)");
+    println!("  savant --test --train --full           Full training mode (20 runs)");
     println!("  savant --test --train -a -n 20        Training with filters");
     println!("  savant --test --sandbox               Legacy sandbox with grading");
     println!();

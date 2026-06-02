@@ -28,6 +28,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Training CLI** — `main.rs`: `savant --test --train` with filters (-c, -a, -n). `savant report --test` for full audit.
 - **Training Report** — `monitor/training_report.rs`: P&L simulation, conviction calibration, confidence curve, category edge, anti-patterns, knowledge utility, lessons summary, semantic patterns, recent episodes.
 - **SQLite Backup** — `engine.rs`: `backup_databases()` with rolling timestamped backups. Keeps last 7 copies.
+
+### Fixed (FID-012, FID-013, FID-014 — closed 2026-06-01)
+
+- **Confidence Floor** (FID-014) — `decision_parser.rs`: Trades with confidence < 40% automatically downgraded to Hold. Removes the 0-25% confidence bucket (18% accuracy). Highest-impact one-line fix.
+- **Short Bias** (FID-014) — `scenarios.rs`: `derive_expected_action()` rebalanced. Capitulation buy signals boosted (2→3), moderate capitulation added (MVRV<1.2+SOPR<1.0), fear signals boosted (1→2), mild fear added (FG≤45). Buy threshold tightened to require `buy > sell`.
+- **Vault Wiring** (FID-012, FID-013, FID-014) — `engine.rs`: Training batch now writes to vault. `project_decision()` per scenario, `project_risk_event()` for anti-patterns, `project_sandbox()` for batch report. 5 empty vault folders populated.
+- **Training Default** (FID-014) — `engine.rs`, `main.rs`: `--train` defaults to 5 runs (was 20). `--train --full` for 20 runs. Help text updated.
 - **Knowledge Selection Overhaul** — Indicator-derived conditions (RSI/ADX/EMA/volume → MarketCondition). Context tags use prefixed format. Unit cap (20). Scoring: tags×3, conditions×2, priority×1.
 - **Knowledge Priority Migration** — All 2,959 units migrated from uniform 5 to differentiated 2-5. Risk catch-alls fixed. Execution units given conditions.
 - **Random Scenario Generator** — `sandbox/scenarios.rs`: `generate_random_scenarios()` with weighted categories (weak areas get 3x). Expected actions derived from mock data. Every run is unique.

@@ -2246,16 +2246,75 @@ async fn run_training_batch(
     }
 
     // 6b. Anti-pattern detection
+    let mut anti_pattern_narratives: Vec<String> = Vec::new();
     match savant_trading::memory::anti_pattern::detect_anti_patterns(test_memory.pool()).await {
         Ok(aps) => {
             if !aps.is_empty() {
                 println!("Anti-patterns detected: {}", aps.len());
                 for ap in &aps {
                     println!("  - {}", ap.narrative);
+                    anti_pattern_narratives.push(ap.narrative.clone());
                 }
             }
         }
         Err(e) => warn!("Anti-pattern detection failed (non-fatal): {}", e),
+    }
+
+    // 6b2. Vault wiring — project decisions, risk events, sandbox report
+    let vault_config = VaultConfig::default();
+    if vault_config.enabled {
+        let vault = VaultWriter::new(vault_config.clone());
+
+        // Project each parsed decision to vault
+        for sr in &all_responses {
+            if let Ok(text) = &sr.response {
+                if let Ok(decision) = savant_trading::agent::decision_parser::parse_decision(
+                    text,
+                    sr.current_price,
+                    config.ai.price_tolerance_pct,
+                ) {
+                    let _ = vault.project_decision(
+                        &decision.pair,
+                        &format!("{:?}", decision.action),
+                        decision.confidence,
+                        &decision.reasoning,
+                    );
+                }
+            }
+        }
+
+        // Project anti-patterns as risk events
+        if !anti_pattern_narratives.is_empty() {
+            let details = anti_pattern_narratives.join("\n- ");
+            let _ = vault.project_risk_event(
+                "anti_pattern",
+                &format!("Training batch anti-patterns:\n- {}", details),
+            );
+        }
+
+        // Project sandbox report
+        let report = format!(
+            "# Training Batch Report\n\n\
+             **Scenarios:** {}\n\
+             **Actions:** {} ({:.0}%)\n\
+             **Holds:** {} ({:.0}%)\n\
+             **Errors:** {}\n\
+             **Brier Score:** {:.4}\n\
+             **Lessons Generated:** {}\n\
+             **Anti-Patterns:** {}\n\n\
+             **Timestamp:** {}\n",
+            all_responses.len(),
+            action_count,
+            action_count as f64 / total * 100.0,
+            hold_count,
+            hold_count as f64 / total * 100.0,
+            error_count,
+            savant_trading::memory::calibration::calculate_brier_score(&brier_predictions).total,
+            lessons_count,
+            anti_pattern_narratives.len(),
+            chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC"),
+        );
+        let _ = vault.project_sandbox(&report);
     }
 
     // 6c. Knowledge utility update — actually update and persist scores
@@ -2322,6 +2381,7 @@ pub async fn run_training(
     category_filter: Option<String>,
     action_only: bool,
     count_filter: Option<usize>,
+    full: bool,
 ) -> anyhow::Result<()> {
     let _test_memory =
         savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/test_memory.db").await?;
@@ -2329,7 +2389,7 @@ pub async fn run_training(
     let test_memory =
         savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/test_memory.db").await?;
 
-    let max_runs = 20;
+    let max_runs = if full { 20 } else { 5 };
     let scenarios_per_run = 60;
     let convergence_threshold = 0.02;
     let mut brier_history: Vec<f64> = Vec::new();

@@ -186,6 +186,20 @@ pub fn parse_decision(
         )));
     }
 
+    // Confidence floor: downgrade low-confidence trades to Hold.
+    // Removes the worst trades (0-25% bucket at 18% accuracy).
+    let mut decision = decision;
+    const CONFIDENCE_FLOOR: f64 = 0.40;
+    if decision.confidence < CONFIDENCE_FLOOR && decision.action != TradeAction::Hold {
+        tracing::info!(
+            "Confidence floor: {:.0}% < {:.0}% — downgrading {:?} to Hold",
+            decision.confidence * 100.0,
+            CONFIDENCE_FLOOR * 100.0,
+            decision.action
+        );
+        decision.action = TradeAction::Hold;
+    }
+
     Ok(decision)
 }
 
@@ -450,6 +464,50 @@ mod tests {
 
         let result = parse_decision(json, 65000.0, 10.0);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn confidence_floor_downgrades_to_hold() {
+        let json = r#"{
+            "action": "Buy",
+            "pair": "BTC/USD",
+            "side": "Long",
+            "entry_price": 65000.0,
+            "stop_loss": 64000.0,
+            "take_profit_1": 66500.0,
+            "take_profit_2": 68000.0,
+            "take_profit_3": 69500.0,
+            "position_size_pct": 50.0,
+            "confidence": 0.25,
+            "reasoning": "Weak setup",
+            "knowledge_sources": [],
+            "risk_reward": 2.5
+        }"#;
+
+        let decision = parse_decision(json, 65000.0, 10.0).unwrap();
+        assert_eq!(decision.action, TradeAction::Hold);
+    }
+
+    #[test]
+    fn confidence_floor_allows_high_confidence() {
+        let json = r#"{
+            "action": "Buy",
+            "pair": "BTC/USD",
+            "side": "Long",
+            "entry_price": 65000.0,
+            "stop_loss": 64000.0,
+            "take_profit_1": 66500.0,
+            "take_profit_2": 68000.0,
+            "take_profit_3": 69500.0,
+            "position_size_pct": 50.0,
+            "confidence": 0.75,
+            "reasoning": "Strong setup",
+            "knowledge_sources": [],
+            "risk_reward": 2.5
+        }"#;
+
+        let decision = parse_decision(json, 65000.0, 10.0).unwrap();
+        assert_eq!(decision.action, TradeAction::Buy);
     }
 
     #[test]

@@ -1854,11 +1854,13 @@ fn derive_expected_action(mvrv: f64, sopr: f64, funding: f64, fear_greed: i32) -
     let mut buy_signals = 0u8;
     let mut sell_signals = 0u8;
 
-    // On-chain capitulation
+    // On-chain capitulation — boosted weight to fix short bias
     if mvrv < 1.0 && sopr < 1.0 {
-        buy_signals += 2;
+        buy_signals += 3; // Strong capitulation buy (was 2)
     } else if mvrv < 0.8 {
-        buy_signals += 1;
+        buy_signals += 2; // Deep undervaluation (was 1)
+    } else if mvrv < 1.2 && sopr < 1.0 {
+        buy_signals += 1; // Moderate capitulation (new)
     }
 
     // Euphoria
@@ -1879,11 +1881,13 @@ fn derive_expected_action(mvrv: f64, sopr: f64, funding: f64, fear_greed: i32) -
         sell_signals += 2; // Extreme overleveraged
     }
 
-    // Sentiment
+    // Sentiment — boosted buy signals to fix short bias
     if fear_greed <= 15 {
-        buy_signals += 2; // Extreme fear = contrarian buy
+        buy_signals += 3; // Extreme fear = strong contrarian buy (was 2)
     } else if fear_greed <= 30 {
-        buy_signals += 1;
+        buy_signals += 2; // Fear = contrarian buy (was 1)
+    } else if fear_greed <= 45 {
+        buy_signals += 1; // Mild fear = moderate buy signal (new)
     }
     if fear_greed >= 85 {
         sell_signals += 2; // Extreme greed = contrarian sell
@@ -1891,14 +1895,14 @@ fn derive_expected_action(mvrv: f64, sopr: f64, funding: f64, fear_greed: i32) -
         sell_signals += 1;
     }
 
-    // Determine action
+    // Determine action — lowered buy thresholds to balance short bias
     if buy_signals >= 3 && buy_signals > sell_signals {
         "Buy (High Conviction)".to_string()
-    } else if buy_signals >= 2 {
+    } else if buy_signals >= 2 && buy_signals > sell_signals {
         "Buy".to_string()
     } else if sell_signals >= 3 && sell_signals > buy_signals {
         "Sell (High Conviction)".to_string()
-    } else if sell_signals >= 2 {
+    } else if sell_signals >= 2 && sell_signals > buy_signals {
         "Sell".to_string()
     } else {
         "Hold / No Trade".to_string()
