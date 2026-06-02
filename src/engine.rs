@@ -1842,7 +1842,7 @@ async fn run_training_batch(
             match s.as_str() {
                 "Asian" => savant_trading::core::session::Session::Asian,
                 "European" => savant_trading::core::session::Session::European,
-                "US" => savant_trading::core::session::Session::UsSession,
+                "US" => savant_trading::core::session::Session::UsEuOverlap,
                 "Late US" => savant_trading::core::session::Session::LateUs,
                 "Weekend" => savant_trading::core::session::Session::Weekend,
                 _ => savant_trading::core::session::current_session(),
@@ -2723,7 +2723,7 @@ pub async fn run_sandbox(config: AppConfig) -> anyhow::Result<()> {
             match override_str.as_str() {
                 "Asian" => savant_trading::core::session::Session::Asian,
                 "European" => savant_trading::core::session::Session::European,
-                "US" => savant_trading::core::session::Session::UsSession,
+                "US" => savant_trading::core::session::Session::UsEuOverlap,
                 "Late US" => savant_trading::core::session::Session::LateUs,
                 "Weekend" => savant_trading::core::session::Session::Weekend,
                 _ => savant_trading::core::session::current_session(),

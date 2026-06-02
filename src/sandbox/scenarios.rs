@@ -833,7 +833,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             event: None,
         },
         mock_data: MockData {
-            session_override: Some("UsSession".into()),
+            session_override: Some("UsEuOverlap".into()),
             news_headlines: vec![
                 "US market open brings surge of volume to crypto markets".into(),
                 "Wall Street traders drive Bitcoin higher at NYSE open".into(),
