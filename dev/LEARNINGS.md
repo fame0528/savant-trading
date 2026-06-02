@@ -145,4 +145,28 @@
 
 ---
 
+---
+## Session 2026-0602-1811: Recovery from Set-Content breakage + clippy fix sweep + historical_to_scenario
+
+**Key Learnings:**
+
+- **`Set-Content -NoNewline` on a PowerShell array joins ALL elements into ONE LINE with no separator.** Content is preserved but newlines are obliterated. Never use this pattern for Rust files. Use `[regex]::Replace` on raw string content, or `Out-File -Encoding utf8NoBom` after joining with `` `n ``.
+- **When recovering from a single-line file, `git checkout` + `git show HEAD:file` restores the file.** Then re-apply changes one at a time with the Edit tool (not regex bulk replacements) to maintain control.
+- **`items_after_test_module` in `scenarios.rs` is structural — the test module must be at EOF.** The prior author placed `mod tests {}` mid-file with 11+ pub functions after it. Fix: move `mod tests` to EOF, keep all pub functions before it.
+- **`derive_historical_mock_data` thresholds must be > 2% net price change for bull/bear classification.** Test candles with < 2% change produce neutral mock data. Lesson: verify test thresholds match the actual function logic by checking boundary conditions.
+- **Reachability verification (Law 4) proved critical.** After adding `historical_to_scenario`, a grep confirmed it's called at `engine.rs:2897`. Without this check, the function would have been dead code — it compiles but is never called.
+- **PowerShell `nul` is a reserved Windows device name.** Git cannot index a file named `nul` because Windows treats it as the null device. Solution: `git add --all -- ':!nul'` to exclude it.
+- **The 5 named constants pattern** (`HISTORICAL_TREND_THRESHOLD`, `STRENGTH_SCALE_FACTOR`, `VOLATILITY_*_THRESHOLD`, `MOCK_SENTIMENT_THRESHOLD`) satisfies ECHO Law 9 (no magic numbers) while keeping algorithmic thresholds readable.
+
+**Technical Insights:**
+
+- `Candle::close` at index 0 vs last is the correct basis for trend detection in `derive_historical_trend`. The net percentage change between first and last close determines direction; average per-candle return (via `windows(2)`) determines strength.
+- `VolatilityRegime` classification uses `(high - low) / close` averaged across all candles. The thresholds (10%, 3%, 1%) were validated against this formula.
+- `engine.rs:2094` branches on `candles_override`: `Some(real) → clone directly`, `None → generate synthetic via apply_scenario`. This is the correct architecture for mixing historical and synthetic data.
+
+**Agent Behavior:**
+
+- ECHO Protocol Perfection Loop was correctly followed once violations were acknowledged: RED (identify all 7 errors + 3 additional issues) → GREEN (fix them) → AUDIT (verify with test + clippy) → COMPLETE.
+- The earlier violation (bulk regex without reading 0-EOF) wasted ~45 minutes on recovery. Following Law 1 strictly would have saved time.
+
 <!-- Add new entries above this line -->
