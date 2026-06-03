@@ -90,6 +90,7 @@ impl SharedEngineData {
     }
 
     /// Log an activity entry. Keeps last 200 entries.
+    /// Uses try_write() to avoid blocking the engine if the API server holds a read lock.
     pub async fn log_activity(&self, level: ActivityLevel, pair: &str, message: &str) {
         let entry = ActivityEntry {
             timestamp: chrono::Local::now().format("%H:%M:%S").to_string(),
@@ -97,10 +98,31 @@ impl SharedEngineData {
             pair: pair.to_string(),
             message: message.to_string(),
         };
-        let mut log = self.activity_log.write().await;
-        log.push(entry);
-        if log.len() > 200 {
-            log.drain(0..100);
+        match self.activity_log.try_write() {
+            Ok(mut log) => {
+                log.push(entry);
+                if log.len() > 200 {
+                    log.drain(0..100);
+                }
+            }
+            Err(_) => {
+                // Lock held by API server — skip this log entry rather than stalling engine
+            }
+        }
+    }
+
+    /// Push a decision record. Non-blocking — skips if lock is held.
+    pub fn push_decision(&self, record: DecisionRecord) {
+        match self.decisions.try_write() {
+            Ok(mut decisions) => {
+                decisions.push(record);
+                if decisions.len() > 100 {
+                    decisions.drain(0..50);
+                }
+            }
+            Err(_) => {
+                // Lock held — skip rather than stall
+            }
         }
     }
 }

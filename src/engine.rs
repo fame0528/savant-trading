@@ -771,8 +771,29 @@ pub async fn run(
                 let ob_imbalance = order_books.get(pair.as_str()).map(|ob| ob.imbalance(5));
                 let current_price = candle_data.last().map(|c| c.close).unwrap_or(0.0);
 
-                // Skip memory query — no trades yet, DB empty
-                let memory_ctx_str: Option<String> = None;
+                // Query memory context with timeout to prevent SQLite deadlocks
+                let memory_ctx_str = if let Some(ref mem) = memory {
+                    match tokio::time::timeout(
+                        std::time::Duration::from_secs(2),
+                        savant_trading::memory::context::query_memory_context(
+                            mem,
+                            pair,
+                            &format!("{}", regime),
+                            current_session.name(),
+                        ),
+                    ).await {
+                        Ok(mem_ctx) => {
+                            let formatted = savant_trading::memory::context::format_memory_prompt(&mem_ctx);
+                            if formatted.is_empty() { None } else { Some(formatted) }
+                        }
+                        Err(_) => {
+                            warn!("Memory query timed out for {}", pair);
+                            None
+                        }
+                    }
+                } else {
+                    None
+                };
 
                 let ctx = FullContext {
                     candles: &candle_data,
@@ -816,10 +837,7 @@ pub async fn run(
         }
 
         // === PHASE 2: Send all LLM calls in parallel via streaming ===
-        info!(
-            "Phase 2: {} pairs queued for LLM evaluation",
-            pair_data_vec.len()
-        );
+        eprintln!("Phase 2: {} pairs queued for LLM evaluation", pair_data_vec.len());
         struct PairResult {
             pair: String,
             response: Result<String, savant_trading::agent::provider::LlmError>,
@@ -828,7 +846,7 @@ pub async fn run(
         }
 
         // Save pair data for episodic capture (before consuming in JoinSet)
-        let pair_data_for_memory: Vec<(
+        let _pair_data_for_memory: Vec<(
             String,
             savant_trading::core::types::IndicatorValues,
             savant_trading::core::types::MarketRegime,
@@ -862,12 +880,12 @@ pub async fn run(
                     content: usr,
                 }];
                 let start = std::time::Instant::now();
-                tracing::info!("LLM evaluating {}...", pd.pair);
+                eprintln!("[LLM] Evaluating {}...", pd.pair);
                 let response = provider.chat_stream(&sys, &messages).await;
                 let elapsed = start.elapsed().as_millis();
                 match &response {
-                    Ok(text) => tracing::info!("LLM complete {}: {} chars in {}ms", pd.pair, text.len(), elapsed),
-                    Err(e) => tracing::warn!("LLM error {}: {}", pd.pair, e),
+                    Ok(text) => eprintln!("[LLM] Complete {}: {} chars in {}ms", pd.pair, text.len(), elapsed),
+                    Err(e) => eprintln!("[LLM] Error {}: {}", pd.pair, e),
                 }
                 PairResult {
                     pair: pd.pair,
@@ -958,13 +976,7 @@ pub async fn run(
                         confidence: decision.confidence,
                         reasoning: decision.reasoning.clone(),
                     };
-                    {
-                        let mut decisions = shared.decisions.write().await;
-                        decisions.push(decision_record);
-                        if decisions.len() > 100 {
-                            decisions.drain(0..50);
-                        }
-                    }
+                    shared.push_decision(decision_record);
 
                     // Log to vault
                     if vault_config.enabled {
@@ -978,9 +990,9 @@ pub async fn run(
                         }
                     }
 
-                    // Capture episodic memory
+                    // Capture episodic memory with timeout to prevent SQLite deadlocks
                     if let Some(ref mem) = memory {
-                        let pair_data = pair_data_for_memory
+                        let pair_data = _pair_data_for_memory
                             .iter()
                             .find(|(p, _, _)| *p == decision.pair);
                         let (atr_val, adx_val, rsi_val, regime_str) = pair_data
@@ -1000,19 +1012,10 @@ pub async fn run(
                             regime: regime_str,
                             session: current_session.name().to_string(),
                             funding_rate: insight.cached().funding.funding_rate,
-                            funding_rate_annualized: insight
-                                .cached()
-                                .funding
-                                .funding_rate_annualized,
-                            fear_greed_index: insight
-                                .cached()
-                                .sentiment
-                                .fear_greed_index
-                                .map(|v| v as i32),
+                            funding_rate_annualized: insight.cached().funding.funding_rate_annualized,
+                            fear_greed_index: insight.cached().sentiment.fear_greed_index.map(|v| v as i32),
                             fear_greed_label: insight.cached().sentiment.fear_greed_label.clone(),
-                            order_book_imbalance: order_books
-                                .get(decision.pair.as_str())
-                                .map(|ob| ob.imbalance(5)),
+                            order_book_imbalance: order_books.get(decision.pair.as_str()).map(|ob| ob.imbalance(5)),
                             mvrv: insight.cached().onchain.mvrv,
                             sopr: insight.cached().onchain.sopr,
                             nvt_signal: insight.cached().onchain.nvt_signal,
@@ -1027,16 +1030,19 @@ pub async fn run(
                             pnl_pct: None,
                             is_win: None,
                             achieved_rr: None,
-                            status: if decision.action
-                                == savant_trading::agent::decision_parser::TradeAction::Hold
-                            {
+                            status: if decision.action == savant_trading::agent::decision_parser::TradeAction::Hold {
                                 "held".to_string()
                             } else {
                                 "executed".to_string()
                             },
                         };
-                        if let Err(e) = mem.capture_episode(&snapshot).await {
-                            warn!("Episodic capture failed: {}", e);
+                        match tokio::time::timeout(
+                            std::time::Duration::from_secs(2),
+                            mem.capture_episode(&snapshot),
+                        ).await {
+                            Ok(Ok(_)) => {}
+                            Ok(Err(e)) => warn!("Episodic capture failed: {}", e),
+                            Err(_) => warn!("Episodic capture timed out for {}", decision.pair),
                         }
                     }
 
