@@ -8,6 +8,49 @@ use std::collections::HashMap;
 
 use crate::core::types::Candle;
 
+/// Risk bucket categorization for pairs (FID-035).
+#[derive(Debug, Clone, PartialEq)]
+pub enum RiskBucket {
+    /// Macro L1/L2 infrastructure: BTC, ETH, SOL, ADA, AVAX
+    Macro,
+    /// Legacy/utility networks: XRP, LINK, DOGE
+    Legacy,
+    /// High-beta meme/culture: PEPE, SHIB, FLOKI, TURBO, MOG
+    Meme,
+}
+
+/// Risk bucket configuration.
+pub struct RiskBuckets {
+    pub macro_pairs: Vec<String>,
+    pub legacy_pairs: Vec<String>,
+    pub meme_pairs: Vec<String>,
+}
+
+impl RiskBuckets {
+    /// Categorize a pair into its risk bucket.
+    pub fn categorize(&self, pair: &str) -> RiskBucket {
+        if self.meme_pairs.iter().any(|p| p == pair) {
+            RiskBucket::Meme
+        } else if self.legacy_pairs.iter().any(|p| p == pair) {
+            RiskBucket::Legacy
+        } else {
+            RiskBucket::Macro
+        }
+    }
+
+    /// Count open positions from a specific bucket.
+    pub fn count_bucket_positions(
+        &self,
+        bucket: &RiskBucket,
+        positions: &[String],
+    ) -> usize {
+        positions
+            .iter()
+            .filter(|p| self.categorize(p) == *bucket)
+            .count()
+    }
+}
+
 /// Correlation matrix between pairs.
 ///
 /// Stores pairwise Pearson correlation coefficients. Used by the circuit

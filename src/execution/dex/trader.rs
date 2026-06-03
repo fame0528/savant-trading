@@ -150,6 +150,23 @@ pub struct DexTrader<B: DexBackend> {
     // ---- Production safety (FID-018) ----
     state_path: PathBuf,
     gas_halted: bool,
+
+    // ---- Retry queue (FID-035) ----
+    /// Failed swaps that should be retried on the next cycle.
+    retry_queue: Vec<RetrySwap>,
+    /// Maximum retries per swap before giving up.
+    max_retries: u32,
+}
+
+/// A pending swap in the retry queue.
+#[derive(Debug, Clone)]
+pub struct RetrySwap {
+    pub pair: String,
+    pub side: Side,
+    pub quantity: f64,
+    pub entry_price: f64,
+    pub attempts: u32,
+    pub last_error: String,
 }
 
 impl<B: DexBackend + 'static> DexTrader<B> {
@@ -194,6 +211,8 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             order_counter: 0,
             state_path: PathBuf::from("data/dex_state.json"),
             gas_halted: false,
+            retry_queue: Vec::new(),
+            max_retries: 3,
         };
 
         // FID-018: Load persisted state on startup (crash recovery)
@@ -248,6 +267,43 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
     pub fn wallet_address(&self) -> Address {
         self.wallet_address
+    }
+
+    // ---- Retry queue (FID-035) ----
+
+    /// Add a failed swap to the retry queue.
+    pub fn enqueue_retry(&mut self, pair: &str, side: Side, quantity: f64, entry_price: f64, error: &str) {
+        self.retry_queue.push(RetrySwap {
+            pair: pair.to_string(),
+            side,
+            quantity,
+            entry_price,
+            attempts: 1,
+            last_error: error.to_string(),
+        });
+        log_warn!("RETRY", "Enqueued {} {} for retry (error: {})", pair, side, error);
+    }
+
+    /// Drain the retry queue, returning swaps that should be retried.
+    /// Expired entries (attempts >= max_retries) are discarded.
+    pub fn drain_retry_queue(&mut self) -> Vec<RetrySwap> {
+        let mut to_retry = Vec::new();
+        let kept = Vec::new();
+        for swap in self.retry_queue.drain(..) {
+            if swap.attempts >= self.max_retries {
+                log_warn!("RETRY", "Discarding {} {} — max retries ({}) reached", swap.pair, swap.side, self.max_retries);
+            } else {
+                to_retry.push(swap);
+            }
+        }
+        // Put back entries that weren't drained
+        self.retry_queue = kept;
+        to_retry
+    }
+
+    /// Get the number of pending retries.
+    pub fn pending_retries(&self) -> usize {
+        self.retry_queue.len()
     }
 
     // ---- JSON-RPC ----

@@ -70,6 +70,22 @@ impl PositionSizer {
         take_profit: f64,
         side: Side,
     ) -> Option<PositionSize> {
+        self.calculate_with_atr(account, entry, stop_loss, take_profit, side, None)
+    }
+
+    /// Calculate position size with optional ATR-based risk adjustment (FID-035).
+    ///
+    /// For meme coins with high ATR (5%+), limits risk to prevent oversized positions.
+    /// `atr` is the current ATR value. If provided, risk is capped at `atr * quantity * 0.5`.
+    pub fn calculate_with_atr(
+        &self,
+        account: &AccountState,
+        entry: f64,
+        stop_loss: f64,
+        take_profit: f64,
+        side: Side,
+        atr: Option<f64>,
+    ) -> Option<PositionSize> {
         let risk_pct = self.effective_risk_pct(account.balance);
         let risk_amount = account.balance * risk_pct;
 
@@ -97,6 +113,15 @@ impl PositionSizer {
         }
 
         let mut quantity = risk_amount / risk_per_unit;
+
+        // ATR-based risk cap (FID-035): for high-volatility assets,
+        // limit position size so risk doesn't exceed ATR * 0.5
+        if let Some(atr_val) = atr {
+            let atr_risk_cap = atr_val * quantity * 0.5;
+            if risk_amount > atr_risk_cap {
+                quantity = atr_risk_cap / risk_per_unit;
+            }
+        }
 
         let max_qty = (account.balance * self.max_position_pct) / entry;
         if quantity > max_qty {

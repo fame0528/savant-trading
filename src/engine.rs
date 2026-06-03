@@ -606,6 +606,9 @@ pub async fn run(
         config.risk.max_positions,
     );
 
+    // GoPlus security client (FID-035): honeypot/tax detection for meme coins
+    let goplus_client = Some(savant_trading::security::goplus::GoPlusClient::new());
+
     let interval_seconds = parse_timeframe(&config.trading.timeframe);
 
     info!(
@@ -775,6 +778,23 @@ pub async fn run(
                 let candle_data: Vec<Candle> = store.candles().iter().cloned().collect();
                 if candle_data.len() < 50 {
                     continue;
+                }
+
+                // GoPlus security check (FID-035): reject honeypots/taxed tokens
+                // before LLM evaluation. Meme coins can have hidden taxes or be
+                // un-sellable. This check prevents wasting LLM cycles on bad tokens.
+                if let Some(ref goplus) = goplus_client {
+                    let base_symbol = pair.split('/').next().unwrap_or(pair);
+                    match goplus.check_by_symbol(base_symbol).await {
+                        Ok(false) => {
+                            log_warn!("SECURITY", "Rejected {} — GoPlus flagged as unsafe", pair);
+                            continue;
+                        }
+                        Err(e) => {
+                            log_warn!("SECURITY", "GoPlus check failed for {} ({}), proceeding", pair, e);
+                        }
+                        _ => {} // Safe or unknown — proceed
+                    }
                 }
 
                 let indicators =

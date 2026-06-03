@@ -27,6 +27,7 @@ pub mod memory;
 pub mod monitor;
 pub mod risk;
 pub mod sandbox;
+pub mod security;
 pub mod strategy;
 pub mod tui;
 pub mod vault;
