@@ -221,6 +221,18 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             trader.save_state().ok();
         }
 
+        // Additional check: if positions exist but no trades have ever completed,
+        // the positions are likely phantom from reverted swaps.
+        if !trader.positions.is_empty() && trader.closed_trades.is_empty() {
+            warn!(
+                "PHANTOM POSITIONS DETECTED: {} positions tracked but zero completed trades. \
+                 Clearing positions — likely from reverted swaps.",
+                trader.positions.len()
+            );
+            trader.positions.clear();
+            trader.save_state().ok();
+        }
+
         info!(
             "DexTrader initialized: backend={}, chain_id={}, wallet={:#x}, balance=${:.2}",
             trader.backend.name(),
