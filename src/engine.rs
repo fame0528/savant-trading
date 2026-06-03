@@ -940,9 +940,14 @@ pub async fn run(
                 config.ai.price_tolerance_pct,
             ) {
                 Ok(decision) => {
+                    let reasoning_short = if decision.reasoning.len() > 100 {
+                        format!("{}...", &decision.reasoning[..100])
+                    } else {
+                        decision.reasoning.clone()
+                    };
                     log_decision!("DECISION", "{:?} {} @ {:.4} | Conf: {:.0}% | R:R {:.1} | {}",
                         decision.action, decision.side, decision.entry_price,
-                        decision.confidence * 100.0, decision.risk_reward, decision.reasoning);
+                        decision.confidence * 100.0, decision.risk_reward, reasoning_short);
 
                     // Log ALL decisions including Hold (CRIT-2)
                     let decision_record = savant_trading::core::shared::DecisionRecord {

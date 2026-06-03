@@ -59,7 +59,10 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
 
     let now = chrono::Utc::now();
     let est = now - chrono::Duration::hours(5);
-    let ts = est.format("%m-%d-%Y %H:%M").to_string();
+    let hour = est.format("%I").to_string();
+    let hour = hour.trim_start_matches('0');
+    let rest = est.format("%M %p").to_string();
+    let ts = format!("{} {} {}", est.format("%m-%d-%Y"), hour, rest);
 
     eprintln!(
         "{}{}[Savant Trading]{} {}[{}]{} {}{}[{}]{} {}{}",
