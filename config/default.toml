@@ -17,12 +17,16 @@ slippage_pct = 0.005
 # Core pairs — always tracked, highest liquidity
 # BTC & ETH are the foundation. Top 10 + meme coins are where the action is.
 pairs = [
-    # Core macro — high liquidity, tight spreads
-    "BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD",
-    "DOGE/USD", "ADA/USD", "LINK/USD", "AVAX/USD",
-    # Meme/high-volatility — higher ATR, more setups (FID-035)
-    "PEPE/USD", "SHIB/USD", "FLOKI/USD", "TURBO/USD", "MOG/USD",
+    # Core — verified Arbitrum token addresses, high liquidity
+    "ETH/USD", "LINK/USD", "DOGE/USD",
+    # DeFi — Arbitrum-native tokens
+    "ARB/USD", "UNI/USD", "AAVE/USD",
+    # Meme — verified Arbitrum addresses
+    "PEPE/USD",
 ]
+# NOTE: BTC, SOL, XRP, ADA, AVAX, SHIB, FLOKI, TURBO, MOG are NOT swappable
+# on Arbitrum via 0x API — they don't have Arbitrum token addresses.
+# To trade these, need multi-source candle architecture (FID-038) or Solana fallback.
 # Set to true to scan all Kraken USD pairs for opportunity
 # WARNING: Scans 455+ pairs, takes 15+ minutes per cycle. Only enable if needed.
 scan_all_pairs = false

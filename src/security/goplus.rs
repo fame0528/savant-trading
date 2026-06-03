@@ -171,8 +171,7 @@ impl GoPlusClient {
     pub async fn check_by_symbol(&self, symbol: &str) -> Result<bool, ExecutionError> {
         // Core assets — skip security check (they're established, not meme coins)
         const CORE_ASSETS: &[&str] = &[
-            "BTC", "ETH", "SOL", "XRP", "ADA", "LINK", "AVAX",
-            "DOGE", "ARB", "OP", "AAVE", "UNI", "LDO", "PENDLE",
+            "ETH", "LINK", "DOGE", "ARB", "UNI", "AAVE", "LDO", "PENDLE",
             "RENDER", "FET", "GRT",
         ];
 

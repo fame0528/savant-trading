@@ -39,9 +39,12 @@ pub const DIM: &str = "\x1b[2m";
 // ── Trading pairs for highlighting ───────────────────────────────────────
 
 const TRADING_PAIRS: &[&str] = &[
-    "BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD",
-    "DOGE/USD", "ADA/USD", "LINK/USD", "AVAX/USD",
-    "PEPE/USD", "SHIB/USD", "FLOKI/USD", "TURBO/USD", "MOG/USD",
+    "ETH/USD", "LINK/USD", "DOGE/USD",
+    "ARB/USD", "UNI/USD", "AAVE/USD",
+    "PEPE/USD",
+    "BTC/USD", "SOL/USD", "XRP/USD",  // Keep for tracing logs (Kraken data)
+    "ADA/USD", "AVAX/USD",
+    "SHIB/USD", "FLOKI/USD", "TURBO/USD", "MOG/USD",
     "BTC/USDC", "ETH/USDC", "SOL/USDC", "XRP/USDC",
 ];
 
