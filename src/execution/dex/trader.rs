@@ -539,13 +539,41 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             .map_err(|e| ExecutionError::Other(format!("Invalid calldata: {}", e)))?;
 
         let value = Self::parse_wei_value(&swap_tx.value);
-        eprintln!("[SWAP] Signing tx: to={:#x} data_len={} value={} gas={}", to, data.len(), value, swap_tx.gas);
-        let result = self.sign_and_send(to, &data, value, swap_tx.gas).await;
-        match &result {
-            Ok(hash) => eprintln!("[SWAP] TX broadcast OK: {}", hash),
-            Err(e) => eprintln!("[SWAP] TX broadcast FAILED: {}", e),
+
+        // Retry logic: up to 3 attempts for transient failures (gas spike, network error)
+        let max_retries = 3;
+        let mut last_err = None;
+        for attempt in 1..=max_retries {
+            eprintln!("[SWAP] Signing tx (attempt {}/{}): to={:#x} data_len={} value={} gas={}",
+                attempt, max_retries, to, data.len(), value, swap_tx.gas);
+            let result = self.sign_and_send(to, &data, value, swap_tx.gas).await;
+            match result {
+                Ok(hash) => {
+                    eprintln!("[SWAP] TX broadcast OK: {}", hash);
+                    return Ok(hash);
+                }
+                Err(e) => {
+                    let err_str = e.to_string();
+                    let is_transient = err_str.contains("max fee per gas")
+                        || err_str.contains("nonce too low")
+                        || err_str.contains("replacement transaction underpriced")
+                        || err_str.contains("network")
+                        || err_str.contains("timeout")
+                        || err_str.contains("ECONNRESET");
+
+                    if is_transient && attempt < max_retries {
+                        eprintln!("[SWAP] Transient failure (attempt {}/{}): {} — retrying in 2s",
+                            attempt, max_retries, err_str);
+                        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                        last_err = Some(e);
+                    } else {
+                        eprintln!("[SWAP] TX broadcast FAILED (attempt {}/{}): {}", attempt, max_retries, err_str);
+                        return Err(e);
+                    }
+                }
+            }
         }
-        result
+        Err(last_err.unwrap_or_else(|| ExecutionError::Other("Swap failed after all retries".into())))
     }
 
     // ---- Stop monitoring ----
