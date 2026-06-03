@@ -25,7 +25,11 @@ impl ZeroXBackend {
     /// `api_key` is the 0x API key (obtainable from the
     /// [0x Dashboard](https://dashboard.0x.org/)).
     pub fn new(api_key: String) -> Self {
-        Self::with_client(api_key, reqwest::Client::new())
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(30))
+            .build()
+            .unwrap_or_else(|_| reqwest::Client::new());
+        Self::with_client(api_key, client)
     }
 
     /// Create a new 0x backend with a custom [`reqwest::Client`].

@@ -27,7 +27,11 @@ impl InchBackend {
     ///
     /// `api_key` is obtained from the [1inch Developer Portal](https://business.1inch.com/).
     pub fn new(api_key: String) -> Self {
-        Self::with_client(api_key, reqwest::Client::new())
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(30))
+            .build()
+            .unwrap_or_else(|_| reqwest::Client::new());
+        Self::with_client(api_key, client)
     }
 
     /// Create a new 1inch backend with a custom [`reqwest::Client`].

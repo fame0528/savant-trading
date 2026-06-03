@@ -941,9 +941,11 @@ pub async fn run(
                         reasoning: decision.reasoning.clone(),
                     };
                     shared.push_decision(decision_record);
+                    eprintln!("[PHASE3] Decision logged for {}", decision.pair);
 
                     // Log to vault
                     if vault_config.enabled {
+                        eprintln!("[PHASE3] Writing to vault: {}", decision.pair);
                         if let Err(e) = vault_writer.project_decision(
                             &decision.pair,
                             &format!("{:?}", decision.action),
@@ -952,9 +954,11 @@ pub async fn run(
                         ) {
                             warn!("Vault decision projection failed: {}", e);
                         }
+                        eprintln!("[PHASE3] Vault done for {}", decision.pair);
                     }
 
                     // Capture episodic memory with timeout to prevent SQLite deadlocks
+                    eprintln!("[PHASE3] Episodic capture for {}", decision.pair);
                     if let Some(ref mem) = memory {
                         let pair_data = _pair_data_for_memory
                             .iter()
@@ -1009,6 +1013,7 @@ pub async fn run(
                             Err(_) => warn!("Episodic capture timed out for {}", decision.pair),
                         }
                     }
+                    eprintln!("[PHASE3] Episodic done for {}", decision.pair);
 
                     // Skip execution for Hold decisions
                     if decision.action == savant_trading::agent::decision_parser::TradeAction::Hold
@@ -1024,6 +1029,7 @@ pub async fn run(
                     );
 
                     // Execute if autonomous
+                    eprintln!("[PHASE3] Checking execution for {} (action={:?})", decision.pair, decision.action);
                     if matches!(autonomy, AutonomyLevel::Autonomous) {
                         match circuit_breaker.check(paper.account()) {
                             CircuitBreakerResult::Triggered(reason) => {
