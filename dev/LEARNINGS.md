@@ -170,3 +170,36 @@
 - The earlier violation (bulk regex without reading 0-EOF) wasted ~45 minutes on recovery. Following Law 1 strictly would have saved time.
 
 <!-- Add new entries above this line -->
+
+## Session 2026-06-03-0500: DEX Execution Pipeline, Console Logging, Project Audit
+
+**Key Learnings:**
+
+- **Always add timeouts to network calls.** `reqwest::Client::new()` has NO default timeout. A single hung RPC call can freeze the entire engine. Fix: `tokio::time::timeout(60s, ...)` around all swap execution calls.
+- **Gas prices are stale by the time a tx is broadcast.** The 0x API returns a gas estimate from a few seconds ago. By the time the tx is signed and broadcast, baseFee has risen. Fix: 50% buffer on `maxFeePerGas` (`baseFee + baseFee/2 + priority`).
+- **`tracing` deadlocks with `RwLock`.** The API server and engine share `SharedEngineData` behind an `RwLock`. Both use the same `tracing` subscriber. When the engine writes via `tracing::info!` and the API reads via `tracing`, they deadlock. Fix: use `eprintln!()` for all Phase 3 logging.
+- **Single source of truth for logging prevents format drift.** Created `src/core/console.rs` with one `savant_log()` function and 11 thin macros. All console output goes through the same path. No scattered color logic.
+- **`#[macro_use]` on module declaration propagates macros to the entire crate.** But binary files (`src/engine.rs`) that are NOT part of the lib need explicit `use crate::log_*` imports.
+- **Phantom positions are a real problem.** The PaperTrader can accumulate positions that don't exist on-chain. Fix: auto-reconcile on startup — if executor has no positions but PaperTrader does, clear PaperTrader.
+- **The AI is correctly disciplined.** It waits for valid setups with 3+ action triggers instead of forcing trades. In a ranging market with only 2/3 triggers met, holding is the correct decision.
+- **Retry logic is essential for on-chain execution.** A single transient failure (gas spike, nonce collision) shouldn't kill a trade. 3 retries with 2s delay handles most transient issues.
+- **`nul` is a reserved Windows device name.** Git cannot index a file named `nul`. Solution: add to `.gitignore`.
+
+**Agent Behavior:**
+
+- Engine ran for ~12 hours across multiple sessions
+- AI made 50+ Hold decisions across 8 pairs — all disciplined
+- 2 Buy signals fired (ETH/USD, AVAX/USD) — one rejected by position sizer, one reached 0x API
+- No successful on-chain swap yet — market conditions not meeting 3+ trigger threshold
+- Fear & Greed at 11 (Extreme Fear), SOPR at 0.9741 (capitulation), MVRV at 1.25 (neutral)
+
+**Technical Insights:**
+
+- 0x API v2 uses `permit2/quote` endpoint with `0x-version: v2` header
+- Transaction data nested under `response.transaction` key (not flat)
+- Permit2 approval needed for USDC → `0x000000000022d473030f116ddee9f6b43ac78ba3`
+- Arbitrum baseFee fluctuates ~1-2% between quote and broadcast
+- `eth_sendRawTransaction` can hang indefinitely without timeout
+- Receipt verification (`wait_for_receipt`) prevents phantom positions from reverted swaps
+
+---

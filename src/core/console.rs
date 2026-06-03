@@ -3,7 +3,6 @@
 /// Format: `[Savant Trading] [MM-DD-YYYY HH:mm] [ACTION] [RESULT]`
 ///
 /// Every log in the system goes through `savant_log()`. Macros are thin wrappers.
-
 pub const CYAN: &str = "\x1b[36m";
 pub const GREEN: &str = "\x1b[32m";
 pub const ORANGE: &str = "\x1b[33m";
@@ -63,11 +62,11 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
     let ts = est.format("%m-%d-%Y %H:%M").to_string();
 
     eprintln!(
-        "{}{}[Savant Trading]{} {}[{}]{} {}{}[{}]{} {}{}{}{}",
+        "{}{}[Savant Trading]{} {}[{}]{} {}{}[{}]{} {}{}",
         BOLD, CYAN, RESET,
         GREY, ts, RESET,
         action_color, BOLD, action, RESET,
-        result_color, result, RESET, "",
+        result_color, result,
     );
 }
 

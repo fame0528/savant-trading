@@ -4,6 +4,30 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.6.0] — 2026-06-03
+
+### Added
+
+- **Enterprise console logging** — `src/core/console.rs` with single `savant_log()` function. Format: `[Savant Trading] [MM-DD-YYYY HH:mm] [ACTION] [RESULT]`. Cyan brand prefix, grey timestamps, white/green/orange/red results. EST timezone. 11 thin macros (`log_phase!`, `log_llm!`, `log_decision!`, `log_trade!`, `log_swap!`, `log_swap_ok!`, `log_swap_fail!`, `log_vault!`, `log_circuit!`, `log_warn!`).
+- **3-retry logic for swap failures** — Retries on gas spike, nonce collision, network error, timeout. 2s delay between retries. Permanent failures (insufficient balance, invalid params) fail immediately.
+- **Phantom position reconciliation** — DexTrader auto-clears positions on startup when balance drift > $1 or positions exist with zero completed trades. PaperTrader auto-reconciles when executor has no positions.
+- **Position sizer logging** — Logs reason when returning None (stop/R:R invalid, entry/stop/tp1 values).
+- **60s timeout on swap execution** — `tokio::time::timeout(60s)` around `place_order()` and `close_position()` prevents indefinite hangs.
+- **50% gas buffer** — `maxFeePerGas = baseFee + baseFee/2 + priority` prevents `max fee per gas less than block base fee` errors on Arbitrum.
+- **Kraken rebase prompt** — `dev/KRAKEN-REBASE-PROMPT.md` (385 lines) with ECHO Protocol boot sequence, file map, architecture docs, conflict zones, verification checklist.
+
+### Fixed
+
+- **Swap execution hang (FID-027)** — `place_order()` hung indefinitely when RPC call had no timeout. Added 60s timeout + retry logic.
+- **Gas price too low** — 0x API returned stale gas estimate. Added 50% buffer to `maxFeePerGas`.
+- **Console logging inconsistency (FID-028)** — Mix of `tracing` and `eprintln!`, no colors, no timestamps. Unified through `savant_log()`.
+- **Clippy warnings** — Fixed 3 warnings: empty line after doc comment, empty format string, `and_then` → `map`.
+
+### Changed
+
+- **Version bump** — 0.5.0 → 0.6.0 (DEX execution fixes + console logging)
+- **All version references updated** — Cargo.toml, VERSION, README
+
 ## [0.5.0] — 2026-06-03
 
 ### Fixed

@@ -1,4 +1,4 @@
-# SAVANT TRADING v0.5.0
+# SAVANT TRADING v0.6.0
 
 <!-- markdownlint-disable MD033 -->
 <div align="center">
@@ -11,7 +11,7 @@ A production-grade, Rust-native trading engine where an AI agent IS the brain �
 
 **Free, Unlimited AI — MIMO v2.5 Pro:** Ships with [OpenGateway](https://gitlawb.com/opengateway) as the inference provider — an open gateway sponsored by Xiaomi MiMo. 1M context window, 131K max output.
 
-[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![Kraken](https://img.shields.io/badge/Kraken-Exchange-%23000000?style=flat-square&logo=bitcoin&logoColor=%2300fbff)](https://www.kraken.com/)[![OpenGateway](https://img.shields.io/badge/OpenGateway-MIMO%20v2.5%20Pro-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://gitlawb.com/opengateway)[![Version](https://img.shields.io/badge/Version-0.5.0-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![Kraken](https://img.shields.io/badge/Kraken-Exchange-%23000000?style=flat-square&logo=bitcoin&logoColor=%2300fbff)](https://www.kraken.com/)[![OpenGateway](https://img.shields.io/badge/OpenGateway-MIMO%20v2.5%20Pro-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://gitlawb.com/opengateway)[![Version](https://img.shields.io/badge/Version-0.6.0-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
 
 </div>
 
@@ -80,6 +80,8 @@ Rule-Based Strategies ──→ Optional parallel signals (comparison only)
 - **Modular Prompts** — System prompt composed from 5 independent layers + 6th memory context layer
 - **Structured Decisions** — AI outputs JSON with entry, stop, 3 take-profit levels, confidence score, and reasoning
 - **Fallback Mode** — Rule-based strategies activate automatically if LLM is unavailable
+- **DEX Execution** — 0x and 1inch backends on Arbitrum (no KYC). EIP-1559 signing, Permit2 approval, receipt verification, 3-retry logic, 50% gas buffer
+- **Enterprise Console** — Structured output: `[Savant Trading] [MM-DD-YYYY HH:mm] [ACTION] [RESULT]`. Cyan brand, grey timestamps, color-coded results
 
 ---
 
@@ -149,7 +151,7 @@ All non-secret settings are in `config/default.toml`:
 ```toml
 [exchange]
 name = "kraken"
-backend = "kraken"               # "kraken" (CEX), "0x" (DEX), "1inch" (DEX)
+backend = "0x"                     # "kraken" (CEX), "0x" (DEX), "1inch" (DEX)
 ws_url = "wss://ws.kraken.com/v2"
 rest_url = "https://api.kraken.com"
 
@@ -160,12 +162,8 @@ slippage_pct = 0.005
 
 [trading]
 pairs = [
-    "BTC/USD", "ETH/USD",          # Core
-    "SOL/USD", "XRP/USD", "ADA/USD", "AVAX/USD", "DOT/USD", "LINK/USD",
-    "DOGE/USD", "SHIB/USD", "PEPE/USD", "WIF/USD", "BONK/USD",            # Momentum
-    "UNI/USD", "AAVE/USD", "ARB/USD", "OP/USD", "LDO/USD", "PENDLE/USD", # DeFi/L2
-    "RENDER/USD", "FET/USD", "GRT/USD",                                   # AI/narrative
-    "LTC/USD", "ATOM/USD", "NEAR/USD", "INJ/USD", "TIA/USD", "SUI/USD",  # Other
+    "BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD",
+    "DOGE/USD", "ADA/USD", "LINK/USD", "AVAX/USD",
 ]
 scan_all_pairs = false           # 455+ pairs, 15+ min/cycle — only if needed
 timeframe = "5m"
@@ -177,45 +175,21 @@ slippage_pct = 0.0005
 
 [risk]
 max_risk_per_trade = 0.20        # 20% per trade ($10 at $50 — fully deployed)
-max_daily_loss = 0.10            # 10% daily halt
-max_drawdown = 0.20              # 20% drawdown kill switch
-max_positions = 5
+max_daily_loss = 0.05            # 5% daily halt
+max_drawdown = 0.10              # 10% drawdown kill switch
+max_positions = 3
 min_rr_ratio = 2.0
 
 [ai]
-provider = "opengateway"
-endpoint = "https://opengateway.gitlawb.com/v1"
-model = "mimo-v2.5-pro"
+provider = "openrouter"
+model = "xiaomi/mimo-v2.5-pro"
 autonomy_level = 3
 max_decisions_per_hour = 20
 knowledge_token_budget = 20000
 temperature = 0.6
 top_p = 0.95
-max_tokens = 131072              # Matches MiMo v2.5 Pro output capacity
+max_tokens = 16384
 timeout_secs = 300
-
-[insight]
-fear_greed_enabled = true
-funding_rate_enabled = true
-liquidation_enabled = true
-btc_dominance_enabled = true
-exchange_flows_enabled = true
-news_sentiment_enabled = true
-rss_enabled = true
-rss_max_items = 10
-onchain_enabled = true
-
-[training]
-min_sample_size = 5
-failure_win_rate = 0.30
-max_portfolio_heat = 0.40
-backup_interval_hours = 6
-max_backups = 7
-utility_learning_rate = 0.05
-utility_archive_threshold = 0.30
-max_active_lessons = 50
-brier_cap_threshold = 0.25
-memory_context_min_trades = 5
 ```
 
 ---
@@ -380,8 +354,8 @@ The risk layer is **independent of the AI brain** — the agent cannot override 
 | Circuit Breaker | Threshold | Action |
 |----------------|-----------|--------|
 | Single trade risk | 20% of portfolio ($10 at $50) | Max position size calculated automatically |
-| Daily loss limit | 10% | All trading halted for the day |
-| Drawdown kill switch | 20% | All positions closed, bot stops, manual restart required |
+| Daily loss limit | 5% | All trading halted for the day |
+| Drawdown kill switch | 10% | All positions closed, bot stops, manual restart required |
 | Consecutive failures | 3 LLM failures | Fallback to rule-based strategies temporarily |
 
 ---

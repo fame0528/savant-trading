@@ -437,8 +437,8 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                     }
                     let status = val["status"]
                         .as_str()
-                        .and_then(|s: &str| {
-                            if s == "0x1" { Some(1u64) } else { Some(0u64) }
+                        .map(|s: &str| {
+                            if s == "0x1" { 1u64 } else { 0u64 }
                         })
                         .unwrap_or(0);
                     let gas_used = u64::from_str_radix(
