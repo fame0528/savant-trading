@@ -316,6 +316,21 @@ pub async fn run(
         }
     }
 
+    // Reconcile: if the executor has no positions (e.g., phantom positions were
+    // cleared during DexTrader init), clear PaperTrader positions too.
+    // This prevents the engine from managing phantom positions that don't exist on-chain.
+    if let Some(ref ex) = executor {
+        if ex.open_positions().is_empty() && !paper.positions().is_empty() {
+            warn!(
+                "PHANTOM POSITIONS: executor has 0 positions but PaperTrader has {}. Clearing PaperTrader.",
+                paper.positions().len()
+            );
+            paper.positions_mut().clear();
+            paper.account_mut().open_positions = 0;
+            paper.account_mut().unrealized_pnl = 0.0;
+        }
+    }
+
     let journal = match TradeJournal::new(&config.trading.database_url).await {
         Ok(j) => {
             info!("Trade journal connected: {}", config.trading.database_url);
@@ -1033,7 +1048,7 @@ pub async fn run(
                     if matches!(autonomy, AutonomyLevel::Autonomous) {
                         match circuit_breaker.check(paper.account()) {
                             CircuitBreakerResult::Triggered(reason) => {
-                                warn!("AI decision blocked by circuit breaker: {}", reason);
+                                eprintln!("[PHASE3] CIRCUIT BREAKER: {} — {}", decision.pair, reason);
                                 let _ = std::fs::write(
                                     "savant.blocked",
                                     format!("{}\nReason: {}\n", Utc::now().to_rfc3339(), reason),
@@ -1066,8 +1081,20 @@ pub async fn run(
                                             );
                                         } else {
                                             for (pos_id, pos) in &positions_to_close {
+                                                eprintln!("[PHASE3] Closing position {} for {} (action={:?})", pos_id, decision.pair, decision.action);
                                                 let close_result = if let Some(ref mut ex) = executor {
-                                                    ex.close_position(pos_id).await
+                                                    match tokio::time::timeout(
+                                                        std::time::Duration::from_secs(60),
+                                                        ex.close_position(pos_id),
+                                                    ).await {
+                                                        Ok(result) => result,
+                                                        Err(_) => {
+                                                            eprintln!("[PHASE3] TIMEOUT: close_position for {} took >60s", pos_id);
+                                                            Err(savant_trading::core::error::ExecutionError::Other(
+                                                                format!("close_position timed out after 60s for {}", pos_id)
+                                                            ))
+                                                        }
+                                                    }
                                                 } else {
                                                     paper.close_position(pos_id).await
                                                 };
@@ -1128,6 +1155,7 @@ pub async fn run(
                                     }
                                     TradeAction::Buy => {
                                         // --- OPEN LOGIC ---
+                                        eprintln!("[PHASE3] Buy path entered for {} — calculating position size", decision.pair);
                                         let ps = position_sizer.calculate(
                                             paper.account(),
                                             decision.entry_price,
@@ -1159,14 +1187,25 @@ pub async fn run(
                                                     decision.pair, decision.side,
                                                 );
                                             } else {
+                                                eprintln!("[PHASE3] Placing order for {} via executor...", decision.pair);
                                                 let order = if let Some(ref mut ex) = executor {
-                                                    ex.place_order(
-                                                        &decision.pair,
-                                                        decision.side,
-                                                        ps.quantity,
-                                                        Some(decision.entry_price),
-                                                    )
-                                                    .await
+                                                    match tokio::time::timeout(
+                                                        std::time::Duration::from_secs(60),
+                                                        ex.place_order(
+                                                            &decision.pair,
+                                                            decision.side,
+                                                            ps.quantity,
+                                                            Some(decision.entry_price),
+                                                        ),
+                                                    ).await {
+                                                        Ok(result) => result,
+                                                        Err(_) => {
+                                                            eprintln!("[PHASE3] TIMEOUT: place_order for {} took >60s", decision.pair);
+                                                            Err(savant_trading::core::error::ExecutionError::Other(
+                                                                format!("place_order timed out after 60s for {}", decision.pair)
+                                                            ))
+                                                        }
+                                                    }
                                                 } else {
                                                     paper
                                                         .place_order(
@@ -1262,6 +1301,9 @@ pub async fn run(
                                                     Err(e) => error!("AI order failed: {}", e),
                                                 }
                                             }
+                                        } else {
+                                            eprintln!("[PHASE3] Position sizer returned None for {} — stop/R:R invalid. entry={} stop={} tp1={}",
+                                                decision.pair, decision.entry_price, decision.stop_loss, decision.take_profit_1);
                                         }
                                     }
                                     TradeAction::Hold => unreachable!(),
