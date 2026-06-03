@@ -900,36 +900,13 @@ pub async fn run(
         while let Some(result) = join_set.join_next().await {
             match result {
                 Ok(pr) => {
-                    match &pr.response {
-                        Ok(_) => {
-                            shared
-                                .log_activity(
-                                    savant_trading::core::shared::ActivityLevel::Thinking,
-                                    &pr.pair,
-                                    "AI response received",
-                                )
-                                .await
-                        }
-                        Err(e) => {
-                            shared
-                                .log_activity(
-                                    savant_trading::core::shared::ActivityLevel::Error,
-                                    &pr.pair,
-                                    &format!("LLM error: {}", e),
-                                )
-                                .await
-                        }
-                    }
                     all_results.push(pr);
                 }
                 Err(e) => warn!("Parallel task panicked: {}", e),
             }
         }
-        info!(
-            "Parallel evaluation complete: {}/{} pairs",
-            all_results.len(),
-            active_pairs.len()
-        );
+        eprintln!("Phase 3: Processing {} LLM results...", all_results.len());
+        eprintln!("Phase 2 complete: {}/{} pairs evaluated", all_results.len(), active_pairs.len());
 
         // === PHASE 3: Process all results sequentially ===
         for pr in all_results {
@@ -947,22 +924,9 @@ pub async fn run(
                 config.ai.price_tolerance_pct,
             ) {
                 Ok(decision) => {
-                    // Log decision to activity feed with reasoning
-                    shared
-                        .log_activity(
-                            savant_trading::core::shared::ActivityLevel::Decision,
-                            &decision.pair,
-                            &format!(
-                                "{:?} {} @ {:.4} | Conf: {:.0}% | R:R {:.1} | {}",
-                                decision.action,
-                                decision.side,
-                                decision.entry_price,
-                                decision.confidence * 100.0,
-                                decision.risk_reward,
-                                decision.reasoning,
-                            ),
-                        )
-                        .await;
+                    eprintln!("[AI] {:?} {} @ {:.4} | Conf: {:.0}% | R:R {:.1} | {}",
+                        decision.action, decision.side, decision.entry_price,
+                        decision.confidence * 100.0, decision.risk_reward, decision.reasoning);
 
                     // Log ALL decisions including Hold (CRIT-2)
                     let decision_record = savant_trading::core::shared::DecisionRecord {
@@ -1140,15 +1104,9 @@ pub async fn run(
                                                             notes: format!("AI {:?} via {}", decision.action, decision.pair),
                                                         };
 
-                                                        shared.log_activity(
-                                                            savant_trading::core::shared::ActivityLevel::Trade,
-                                                            &decision.pair,
-                                                            &format!(
-                                                                "CLOSED {:?} {} | Pos: {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
-                                                                decision.action, decision.pair, pos_id,
-                                                                exit_price, pnl, pnl_pct,
-                                                            ),
-                                                        ).await;
+                                                        eprintln!("[TRADE] CLOSED {:?} {} | Pos: {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
+                                                            decision.action, decision.pair, pos_id,
+                                                            exit_price, pnl, pnl_pct);
 
                                                         event_bus.publish(TradingEvent::PositionClosed(trade));
                                                     }
@@ -1289,15 +1247,9 @@ pub async fn run(
                                                                 f.write_all(alert_line.as_bytes())
                                                             });
 
-                                                        shared.log_activity(
-                                                            savant_trading::core::shared::ActivityLevel::Trade,
-                                                            &decision.pair,
-                                                            &format!(
-                                                                "OPENED {} {:?} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4} | Risk: ${:.2}",
-                                                                decision.side, decision.action, decision.entry_price,
-                                                                ps.quantity, decision.stop_loss, decision.take_profit_1, ps.risk_amount,
-                                                            ),
-                                                        ).await;
+                                                        eprintln!("[TRADE] OPENED {} {:?} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4} | Risk: ${:.2}",
+                                                            decision.side, decision.action, decision.entry_price,
+                                                            ps.quantity, decision.stop_loss, decision.take_profit_1, ps.risk_amount);
 
                                                         event_bus.publish(TradingEvent::PositionOpened(pos));
                                                     }
