@@ -432,7 +432,9 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             chain_id: self.chain_id,
         };
 
+        eprintln!("[SWAP] Calling 0x API: {} -> {} amount={}", swap_params.src_token, swap_params.dst_token, swap_params.amount);
         let swap_tx = self.backend.build_swap_tx(&swap_params).await?;
+        eprintln!("[SWAP] 0x quote OK: to={} gas={} value={}", swap_tx.to, swap_tx.gas, swap_tx.value);
 
         let to: Address = swap_tx
             .to
@@ -443,8 +445,13 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             .map_err(|e| ExecutionError::Other(format!("Invalid calldata: {}", e)))?;
 
         let value = Self::parse_wei_value(&swap_tx.value);
-
-        self.sign_and_send(to, &data, value, swap_tx.gas).await
+        eprintln!("[SWAP] Signing tx: to={:#x} data_len={} value={} gas={}", to, data.len(), value, swap_tx.gas);
+        let result = self.sign_and_send(to, &data, value, swap_tx.gas).await;
+        match &result {
+            Ok(hash) => eprintln!("[SWAP] TX broadcast OK: {}", hash),
+            Err(e) => eprintln!("[SWAP] TX broadcast FAILED: {}", e),
+        }
+        result
     }
 
     // ---- Stop monitoring ----
