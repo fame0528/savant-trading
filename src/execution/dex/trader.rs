@@ -326,7 +326,9 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             Err(_) => U256::from(100_000_000u64),
         };
 
-        Ok((priority, base_fee + priority))
+        // 50% buffer on baseFee to handle baseFee increases between quote and broadcast
+        let buffered_base = base_fee + (base_fee / U256::from(2));
+        Ok((priority, buffered_base + priority))
     }
 
     // ---- Transaction signing & broadcasting ----
