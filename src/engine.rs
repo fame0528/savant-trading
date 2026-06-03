@@ -896,12 +896,12 @@ pub async fn run(
                     content: usr,
                 }];
                 let start = std::time::Instant::now();
-                log_llm!("LLM", "Evaluating {}...", pd.pair);
+                log_llm!("LLM", "[EVALUATING] [{}]", pd.pair);
                 let response = provider.chat_stream(&sys, &messages).await;
                 let elapsed = start.elapsed().as_millis();
                 match &response {
-                    Ok(text) => log_llm_done!("LLM", "Complete {}: {} chars in {}ms", pd.pair, text.len(), elapsed),
-                    Err(e) => log_swap_fail!("LLM", "Error {}: {}", pd.pair, e),
+                    Ok(text) => log_llm_done!("LLM", "[COMPLETE] [{}] {} chars in {}ms", pd.pair, text.len(), elapsed),
+                    Err(e) => log_swap_fail!("LLM", "[ERROR] [{}] {}", pd.pair, e),
                 }
                 PairResult {
                     pair: pd.pair,
@@ -962,7 +962,7 @@ pub async fn run(
                         reasoning: decision.reasoning.clone(),
                     };
                     shared.push_decision(decision_record);
-                    log_vault!("DECISION", "Logged for {}", decision.pair);
+                    log_decision!("DECISION", "Logged for {}", decision.pair);
 
                     // Log to vault
                     if vault_config.enabled {

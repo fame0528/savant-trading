@@ -58,10 +58,11 @@ fn parse_test_args(args: &[String]) -> TestArgs {
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
 
+    // Re-enable ANSI on tracing — the RESET at end of savant_log() prevents bleeding
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
         .with_timer(savant_trading::core::console::SavantTimer)
-        .with_ansi(false)
+        .with_ansi(true)
         .with_env_filter(
             tracing_subscriber::EnvFilter::try_from_default_env()
                 .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("savant_trading=info")),

@@ -4,33 +4,41 @@
 ///
 /// Every log in the system goes through `savant_log()`. Macros are thin wrappers.
 ///
-/// Color rules:
-///   - Compound codes (`\x1b[1;36m` = bold+cyan) prevent RESET from killing bold
-///   - Single RESET at end of each line prevents bleeding to next line
-///   - Pair names (BTC/USD, ETH/USD, etc.) highlighted in result text
-// ── ANSI compound codes ─────────────────────────────────────────────────
-// Foreground only (no bold)
+/// Color schema:
+///   - Cyan bold — brand prefix, decisions, swap actions
+///   - Green — success, LLM complete
+///   - Orange — warnings, trade actions
+///   - Red — errors, failures, circuit breaker
+///   - White — emphasis, results, data
+///   - Grey — timestamps, LLM evaluation, background info
+///
+/// Rules:
+///   - Action and result MUST have different colors (contrast)
+///   - Pair names wrapped in brackets and highlighted: `[BTC/USD]`
+///   - Single RESET at end of line prevents bleeding
+// ── ANSI codes ──────────────────────────────────────────────────────────
+// Foreground only
 pub const CYAN_FG: &str = "\x1b[36m";
 pub const GREEN_FG: &str = "\x1b[32m";
 pub const ORANGE_FG: &str = "\x1b[33m";
 pub const RED_FG: &str = "\x1b[31m";
 pub const WHITE_FG: &str = "\x1b[97m";
-pub const GREY_FG: &str = "\x1b[90m";
+pub const GREY_FG: &str = "\x1b[37m";       // Light grey (readable on black bg)
 
-// Bold + foreground (compound — no RESET needed between uses)
+// Bold + foreground (compound — preserves bold across color changes)
 pub const CYAN_BOLD: &str = "\x1b[1;36m";
 pub const GREEN_BOLD: &str = "\x1b[1;32m";
 pub const ORANGE_BOLD: &str = "\x1b[1;33m";
 pub const RED_BOLD: &str = "\x1b[1;31m";
 pub const WHITE_BOLD: &str = "\x1b[1;97m";
 
-// Dim + foreground
-pub const GREY_DIM: &str = "\x1b[2;90m";
+// Dim — used only for background info (vault, episodic)
+pub const GREY_DIM: &str = "\x1b[90m";       // Grey (no dim modifier — readable on black)
 
-// Single reset — use ONLY at end of line
+// Reset — use ONLY at end of line
 pub const RESET: &str = "\x1b[0m";
 
-// Legacy aliases (for code that uses old names)
+// Legacy aliases
 pub const CYAN: &str = CYAN_FG;
 pub const GREEN: &str = GREEN_FG;
 pub const ORANGE: &str = ORANGE_FG;
@@ -40,19 +48,23 @@ pub const GREY: &str = GREY_FG;
 pub const BOLD: &str = "\x1b[1m";
 pub const DIM: &str = "\x1b[2m";
 
-// ── Known trading pairs for highlighting ─────────────────────────────────
+// ── Trading pairs for highlighting ───────────────────────────────────────
+
 const TRADING_PAIRS: &[&str] = &[
     "BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD",
     "DOGE/USD", "ADA/USD", "LINK/USD", "AVAX/USD",
     "BTC/USDC", "ETH/USDC", "SOL/USDC", "XRP/USDC",
 ];
 
-/// Highlight trading pair names in result text with cyan.
+/// Highlight trading pair names in result text with cyan bold brackets.
+/// `BTC/USD` → `[BTC/USD]` in cyan bold
 fn highlight_pairs(text: &str) -> String {
     let mut result = text.to_string();
     for pair in TRADING_PAIRS {
-        if result.contains(pair) {
-            result = result.replace(pair, &format!("{}{}{}", CYAN_BOLD, pair, RESET));
+        // Only highlight if not already in brackets
+        let bracketed = format!("[{}]", pair);
+        if result.contains(pair) && !result.contains(&bracketed) {
+            result = result.replace(pair, &format!("{}[{}]{}", CYAN_BOLD, pair, RESET));
         }
     }
     result
@@ -79,43 +91,45 @@ impl tracing_subscriber::fmt::time::FormatTime for SavantTimer {
 }
 
 /// Log level determines action + result colors.
+///
+/// KEY RULE: action and result MUST have different colors for contrast.
 pub enum LogLevel {
-    /// System phase headers — bold white action, white result
+    /// Bold white action, white result — system phase headers
     Phase,
-    /// LLM evaluation in progress — grey action, dim result
+    /// Grey action, white result — LLM evaluation in progress
     Llm,
-    /// LLM evaluation complete — grey action, green result
+    /// Grey action, green result — LLM evaluation complete
     LlmDone,
-    /// AI decision output — bold white action, white result
+    /// Bold cyan action, white result — AI decisions
     Decision,
-    /// Trade opened/closed — bold orange action, orange result
+    /// Bold orange action, orange result — trade opened/closed
     Trade,
-    /// Swap in progress — bold cyan action, dim result
+    /// Bold cyan action, dim result — swap in progress
     Swap,
-    /// Swap success — bold green action, green result
+    /// Bold green action, green result — swap success
     SwapOk,
-    /// Swap failure — bold red action, red result
+    /// Bold red action, red result — swap failure
     SwapFail,
-    /// Vault/episodic write — dim grey action, dim result
+    /// Dim grey action, dim result — vault/episodic
     Vault,
-    /// Circuit breaker — bold red action, red result
+    /// Bold red action, red result — circuit breaker
     Circuit,
-    /// Warning — bold orange action, orange result
+    /// Bold orange action, orange result — warnings
     Warn,
 }
 
 /// Single log function — ALL console output goes through here.
 ///
-/// Format: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]`
+/// Format: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] RESULT`
 ///
 /// Uses compound ANSI codes to preserve bold across sections.
 /// Single RESET at end prevents color bleeding to next line.
 pub fn savant_log(level: LogLevel, action: &str, result: &str) {
     let (action_style, result_style) = match level {
         LogLevel::Phase => (WHITE_BOLD, WHITE_FG),
-        LogLevel::Llm => (GREY_DIM, GREY_DIM),
-        LogLevel::LlmDone => (GREY_DIM, GREEN_FG),
-        LogLevel::Decision => (WHITE_BOLD, WHITE_FG),
+        LogLevel::Llm => (GREY_FG, WHITE_FG),       // Grey action, white result
+        LogLevel::LlmDone => (GREY_FG, GREEN_FG),    // Grey action, green result
+        LogLevel::Decision => (CYAN_BOLD, WHITE_FG),  // Cyan action, white result
         LogLevel::Trade => (ORANGE_BOLD, ORANGE_FG),
         LogLevel::Swap => (CYAN_BOLD, GREY_DIM),
         LogLevel::SwapOk => (GREEN_BOLD, GREEN_FG),
@@ -129,13 +143,14 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
     let highlighted = highlight_pairs(result);
 
     // Format: [Savant Trading] [TIME] [ACTION] RESULT
-    // Bold cyan prefix, grey timestamp, bold action, result in level color
+    // Each section uses compound codes — no RESET between sections
+    // Single RESET at end prevents bleeding
     eprintln!(
-        "{}[Savant Trading]{} {}[{}]{} {}[{}]{} {}{}",
-        CYAN_BOLD, RESET,       // Always bold cyan prefix
-        GREY_FG, ts, RESET,     // Grey timestamp
-        action_style, action, RESET,  // Bold action in level color
-        result_style, highlighted,    // Result in level color (no RESET — pair highlighting handles it)
+        "{}[Savant Trading]{} {}[{}]{} {}[{}]{} {}{}{}",
+        CYAN_BOLD, RESET,
+        GREY_FG, ts, RESET,
+        action_style, action, RESET,
+        result_style, highlighted, RESET,
     );
 }
 
