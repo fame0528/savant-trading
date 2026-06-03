@@ -238,11 +238,23 @@ impl LlmProvider {
     }
 
     fn build_body(&self, system: &str, messages: &[Message], stream: bool) -> serde_json::Value {
-        let mut all_messages = vec![Message {
-            role: "system".to_string(),
-            content: system.to_string(),
-        }];
-        all_messages.extend_from_slice(messages);
+        // KV cache optimization (FID-035): Mark system message with cache_control
+        // so OpenRouter can cache the static prefix (rules, risk, knowledge).
+        // Dynamic content (candles, indicators) is in user messages only.
+        // Expected: 40-60% reduction in TTFT for repeated evaluations.
+        let system_msg = serde_json::json!({
+            "role": "system",
+            "content": system,
+            "cache_control": { "type": "ephemeral" }
+        });
+
+        let mut all_messages = vec![system_msg];
+        for msg in messages {
+            all_messages.push(serde_json::json!({
+                "role": msg.role,
+                "content": msg.content
+            }));
+        }
 
         serde_json::json!({
             "model": self.config.model,
