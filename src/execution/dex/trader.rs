@@ -694,7 +694,9 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         };
         let fee_est = exit_price * pos.quantity * 0.001;
         let pnl = gross_pnl - fee_est;
-        self.balance += gross_pnl;
+        // Return full proceeds: entry value + PnL
+        let proceeds = pos.entry_price * pos.quantity + gross_pnl;
+        self.balance += proceeds;
 
         self.closed_trades.push(TradeRecord {
             id: uuid::Uuid::new_v4().to_string(),

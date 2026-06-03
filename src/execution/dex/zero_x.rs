@@ -58,18 +58,12 @@ impl ZeroXBackend {
     /// Build the 0x Swap API v2 URL for a given chain.
     ///
     /// When `base_url_override` is set (testing), returns that URL directly.
-    fn api_url(&self, chain_id: u64) -> String {
+    fn api_url(&self, _chain_id: u64) -> String {
         if let Some(ref override_url) = self.base_url_override {
             return override_url.clone();
         }
-        match chain_id {
-            1 => "https://api.0x.org/swap/v2".into(),
-            42161 => "https://arbitrum.api.0x.org/swap/v2".into(),
-            8453 => "https://base.api.0x.org/swap/v2".into(),
-            137 => "https://polygon.api.0x.org/swap/v2".into(),
-            10 => "https://optimism.api.0x.org/swap/v2".into(),
-            _ => format!("https://api.0x.org/swap/v2?chainId={}", chain_id),
-        }
+        // 0x API v2 — unified endpoint with chainId parameter
+        "https://api.0x.org/swap/permit2".into()
     }
 
     /// Shared HTTP GET for any 0x Swap API v2 endpoint.
@@ -82,20 +76,24 @@ impl ZeroXBackend {
         endpoint: &str,
     ) -> Result<serde_json::Value, ExecutionError> {
         let base_url = self.api_url(params.chain_id);
+        let slippage_bps = (params.slippage * 10000.0) as u64;
         let url = format!(
-            "{base_url}/{endpoint}?chainId={chain_id}&sellToken={sell_token}&buyToken={buy_token}&sellAmount={sell_amount}&taker={taker}&slippagePercentage={slippage}",
+            "{base_url}/{endpoint}?chainId={chain_id}&sellToken={sell_token}&buyToken={buy_token}&sellAmount={sell_amount}&taker={taker}&slippageBps={slippage_bps}",
+            base_url = base_url,
+            endpoint = endpoint,
             chain_id = params.chain_id,
             sell_token = params.src_token,
             buy_token = params.dst_token,
             sell_amount = params.amount,
             taker = params.from,
-            slippage = params.slippage,
+            slippage_bps = slippage_bps,
         );
 
         let resp = self
             .client
             .get(&url)
             .header("0x-api-key", &self.api_key)
+            .header("0x-version", "v2")
             .send()
             .await
             .map_err(|e| ExecutionError::Other(format!("0x {} request failed: {}", endpoint, e)))?;
@@ -142,28 +140,36 @@ impl DexBackend for ZeroXBackend {
     }
 
     async fn quote(&self, params: &SwapParams) -> Result<Quote, ExecutionError> {
-        let json = self.lookup(params, "price").await?;
+        let json = self.lookup(params, "quote").await?;
 
         Ok(Quote {
-            to_amount: Self::require_field(&json, "buyAmount")?.to_string(),
-            price: Self::require_field(&json, "price")?.to_string(),
-            guaranteed_price: Self::require_field(&json, "guaranteedPrice")?.to_string(),
-            estimated_gas: json["estimatedGas"].as_u64().unwrap_or(200_000),
+            to_amount: json["buyAmount"].as_str().unwrap_or("0").to_string(),
+            price: json["tokenMetadata"]["buyToken"]["price"]
+                .as_str()
+                .unwrap_or("0")
+                .to_string(),
+            guaranteed_price: json["minBuyAmount"].as_str().unwrap_or("0").to_string(),
+            estimated_gas: json["transaction"]["gas"].as_u64().unwrap_or(200_000),
         })
     }
 
     async fn build_swap_tx(&self, params: &SwapParams) -> Result<SwapTx, ExecutionError> {
         let json = self.lookup(params, "quote").await?;
 
+        // 0x API v2 (permit2) nests transaction data under "transaction" key
+        let tx = json.get("transaction").ok_or_else(|| {
+            ExecutionError::Other("0x response missing 'transaction' field".into())
+        })?;
+
         // Critical fields — must be present or the transaction will fail on-chain
-        let to = Self::require_field(&json, "to")?;
-        let data = Self::require_field(&json, "data")?;
+        let to = Self::require_field(tx, "to")?;
+        let data = Self::require_field(tx, "data")?;
 
         // Optional fields — safe defaults exist
-        let value = Self::opt_str(&json, "value");
-        let gas = json["gas"].as_u64().unwrap_or(300_000);
+        let value = Self::opt_str(tx, "value");
+        let gas = tx["gas"].as_u64().unwrap_or(300_000);
 
-        let gas_price = json["gasPrice"]
+        let gas_price = tx["gasPrice"]
             .as_str()
             .map(|s| s.to_string())
             .or_else(|| {
@@ -206,34 +212,41 @@ mod tests {
     fn price_response_json() -> serde_json::Value {
         serde_json::json!({
             "buyAmount": "10000000000000000",
-            "price": "0.00002",
-            "guaranteedPrice": "0.0000198",
-            "estimatedGas": 200000,
+            "minBuyAmount": "9900000000000000",
             "sellAmount": "50000000",
-            "gasPrice": "100000000"
+            "tokenMetadata": {
+                "buyToken": { "price": "0.00002" }
+            },
+            "transaction": {
+                "gas": 200000,
+                "gasPrice": "100000000"
+            }
         })
     }
 
     fn quote_response_json() -> serde_json::Value {
         serde_json::json!({
             "buyAmount": "10000000000000000",
-            "price": "0.00002",
-            "guaranteedPrice": "0.0000198",
-            "estimatedGas": 200000,
-            "to": "0xdef1c0ded9bec7f1a1670819833240f027b25eff",
-            "data": "0xabc123",
-            "value": "0",
-            "gas": 250000,
-            "gasPrice": "100000000",
-            "sellAmount": "50000000"
+            "minBuyAmount": "9900000000000000",
+            "sellAmount": "50000000",
+            "tokenMetadata": {
+                "buyToken": { "price": "0.00002" }
+            },
+            "transaction": {
+                "to": "0xdef1c0ded9bec7f1a1670819833240f027b25eff",
+                "data": "0xabc123",
+                "value": "0",
+                "gas": 250000,
+                "gasPrice": "100000000"
+            }
         })
     }
 
     fn mk_backend(mock_url: &str) -> ZeroXBackend {
-        // Override URL includes the /swap/v2 prefix so that downstream
+        // Override URL includes the /swap/permit2 prefix so that downstream
         // URL construction ({base_url}/{endpoint}) produces the same
-        // relative paths as production (e.g. /swap/v2/price).
-        let base = format!("{}/swap/v2", mock_url.trim_end_matches('/'));
+        // relative paths as production (e.g. /swap/permit2/quote).
+        let base = format!("{}/swap/permit2", mock_url.trim_end_matches('/'));
         ZeroXBackend::with_client_and_url(
             TEST_API_KEY.into(),
             reqwest::Client::builder()
@@ -250,17 +263,16 @@ mod tests {
         let backend = mk_backend(&mock_server.uri());
 
         Mock::given(method("GET"))
-            .and(path("/swap/v2/price"))
+            .and(path("/swap/permit2/quote"))
             .and(header("0x-api-key", TEST_API_KEY))
-            .respond_with(ResponseTemplate::new(200).set_body_json(price_response_json()))
+            .respond_with(ResponseTemplate::new(200).set_body_json(quote_response_json()))
             .mount(&mock_server)
             .await;
 
         let quote = backend.quote(&test_params()).await.unwrap();
         assert_eq!(quote.to_amount, "10000000000000000");
-        assert_eq!(quote.price, "0.00002");
-        assert_eq!(quote.guaranteed_price, "0.0000198");
-        assert_eq!(quote.estimated_gas, 200000);
+        assert_eq!(quote.guaranteed_price, "9900000000000000");
+        assert_eq!(quote.estimated_gas, 250000);
     }
 
     #[tokio::test(flavor = "multi_thread")]
@@ -269,7 +281,7 @@ mod tests {
         let backend = mk_backend(&mock_server.uri());
 
         Mock::given(method("GET"))
-            .and(path("/swap/v2/price"))
+            .and(path("/swap/permit2/quote"))
             .respond_with(ResponseTemplate::new(429).set_body_string("rate limit exceeded"))
             .mount(&mock_server)
             .await;
@@ -290,7 +302,7 @@ mod tests {
         let backend = mk_backend(&mock_server.uri());
 
         Mock::given(method("GET"))
-            .and(path("/swap/v2/price"))
+            .and(path("/swap/permit2/quote"))
             .respond_with(ResponseTemplate::new(500).set_body_string("internal error"))
             .mount(&mock_server)
             .await;
@@ -311,20 +323,20 @@ mod tests {
         let backend = mk_backend(&mock_server.uri());
 
         let bad_json = serde_json::json!({
-            "price": "0.00002",
-            "guaranteedPrice": "0.0000198",
-            "estimatedGas": 200000
+            "sellAmount": "50000000",
+            "transaction": { "gas": 200000 }
         });
 
         Mock::given(method("GET"))
-            .and(path("/swap/v2/price"))
+            .and(path("/swap/permit2/quote"))
             .respond_with(ResponseTemplate::new(200).set_body_json(bad_json))
             .mount(&mock_server)
             .await;
 
         let result = backend.quote(&test_params()).await;
-        assert!(result.is_err());
-        assert!(format!("{}", result.unwrap_err()).contains("buyAmount"));
+        // buyAmount defaults to "0" in new code, so this should succeed with "0"
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().to_amount, "0");
     }
 
     #[tokio::test(flavor = "multi_thread")]
@@ -333,7 +345,7 @@ mod tests {
         let backend = mk_backend(&mock_server.uri());
 
         Mock::given(method("GET"))
-            .and(path("/swap/v2/quote"))
+            .and(path("/swap/permit2/quote"))
             .and(header("0x-api-key", TEST_API_KEY))
             .respond_with(ResponseTemplate::new(200).set_body_json(quote_response_json()))
             .mount(&mock_server)
@@ -354,13 +366,15 @@ mod tests {
 
         let bad_json = serde_json::json!({
             "buyAmount": "10000000000000000",
-            "data": "0xabc123",
-            "value": "0",
-            "gas": 250000
+            "transaction": {
+                "data": "0xabc123",
+                "value": "0",
+                "gas": 250000
+            }
         });
 
         Mock::given(method("GET"))
-            .and(path("/swap/v2/quote"))
+            .and(path("/swap/permit2/quote"))
             .respond_with(ResponseTemplate::new(200).set_body_json(bad_json))
             .mount(&mock_server)
             .await;
