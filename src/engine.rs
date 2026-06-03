@@ -872,8 +872,8 @@ pub async fn run(
                     )
                     .await;
 
-                // Pre-filter: skip pairs with no actionable signal
-                // Only send to LLM if indicators show a potential setup
+                // Pre-filter: log signal status but always send to LLM
+                // The AI decides, not a hard-coded filter (mimo is free)
                 let has_signal = has_actionable_signal(
                     &indicators,
                     regime,
@@ -883,18 +883,11 @@ pub async fn run(
                 );
                 let has_position = positions.iter().any(|p| p.pair == *pair);
                 debug!(
-                    "Phase 1: {} signal={} position={} → {}",
-                    pair,
-                    has_signal,
-                    has_position,
-                    if has_signal || has_position {
-                        "SENDING TO LLM"
-                    } else {
-                        "SKIPPED"
-                    }
+                    "Phase 1: {} signal={} position={}",
+                    pair, has_signal, has_position,
                 );
                 if !has_signal && !has_position {
-                    continue;
+                    debug!("Phase 1: {} — no actionable signal, sending to LLM anyway", pair);
                 }
 
                 shared
