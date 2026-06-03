@@ -59,6 +59,32 @@ fn parse_test_args(args: &[String]) -> TestArgs {
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
 
+    // Catch panics and log them before crashing — without this, panics
+    // from reqwest/tokio kill the engine silently with exit code 0xffffffff
+    std::panic::set_hook(Box::new(|panic_info| {
+        let msg = if let Some(s) = panic_info.payload().downcast_ref::<String>() {
+            s.clone()
+        } else if let Some(s) = panic_info.payload().downcast_ref::<&str>() {
+            s.to_string()
+        } else {
+            "unknown panic".to_string()
+        };
+        let location = panic_info.location()
+            .map(|l| format!("{}:{}:{}", l.file(), l.line(), l.column()))
+            .unwrap_or_else(|| "unknown location".to_string());
+        eprintln!(
+            "{}[Savant Trading]{} {}[PANIC]{} {}{} at {}{}",
+            savant_trading::core::console::CYAN_BOLD,
+            savant_trading::core::console::RESET,
+            savant_trading::core::console::RED_BOLD,
+            savant_trading::core::console::RESET,
+            savant_trading::core::console::RED_FG,
+            msg,
+            location,
+            savant_trading::core::console::RESET,
+        );
+    }));
+
     // Uniform console output — both tracing and savant_log use the same format:
     // [Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]
     tracing_subscriber::registry()
