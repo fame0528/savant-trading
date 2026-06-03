@@ -2,6 +2,7 @@ use std::path::Path;
 use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
 use tracing::{info, warn};
+use tracing_subscriber::prelude::*;
 
 use savant_trading::backtest::engine::{run_backtest, BacktestConfig};
 use savant_trading::core::config::AppConfig;
@@ -58,12 +59,11 @@ fn parse_test_args(args: &[String]) -> TestArgs {
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
 
-    // Re-enable ANSI on tracing — the RESET at end of savant_log() prevents bleeding
-    tracing_subscriber::fmt()
-        .with_writer(std::io::stderr)
-        .with_timer(savant_trading::core::console::SavantTimer)
-        .with_ansi(true)
-        .with_env_filter(
+    // Uniform console output — both tracing and savant_log use the same format:
+    // [Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]
+    tracing_subscriber::registry()
+        .with(savant_trading::core::console::SavantLayer)
+        .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
                 .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("savant_trading=info")),
         )

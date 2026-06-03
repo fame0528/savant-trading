@@ -1,41 +1,29 @@
-/// Enterprise console logging — single source of truth for all output.
-///
-/// Format: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]`
-///
-/// Every log in the system goes through `savant_log()`. Macros are thin wrappers.
-///
-/// Color schema:
-///   - Cyan bold — brand prefix, decisions, swap actions
-///   - Green — success, LLM complete
-///   - Orange — warnings, trade actions
-///   - Red — errors, failures, circuit breaker
-///   - White — emphasis, results, data
-///   - Grey — timestamps, LLM evaluation, background info
-///
-/// Rules:
-///   - Action and result MUST have different colors (contrast)
-///   - Pair names wrapped in brackets and highlighted: `[BTC/USD]`
-///   - Single RESET at end of line prevents bleeding
+// Enterprise console logging — single source of truth for ALL output.
+//
+// Format: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]`
+//
+// Both `savant_log()` macros AND `tracing` events use the same format.
+// This file provides:
+//   - `savant_log()` — direct styled logging for engine events
+//   - `SavantLayer` — custom tracing Layer for library/framework events
+//   - ANSI color constants
+//   - Pair name highlighting
 // ── ANSI codes ──────────────────────────────────────────────────────────
-// Foreground only
+
 pub const CYAN_FG: &str = "\x1b[36m";
 pub const GREEN_FG: &str = "\x1b[32m";
 pub const ORANGE_FG: &str = "\x1b[33m";
 pub const RED_FG: &str = "\x1b[31m";
 pub const WHITE_FG: &str = "\x1b[97m";
-pub const GREY_FG: &str = "\x1b[37m";       // Light grey (readable on black bg)
+pub const GREY_FG: &str = "\x1b[37m";
 
-// Bold + foreground (compound — preserves bold across color changes)
 pub const CYAN_BOLD: &str = "\x1b[1;36m";
 pub const GREEN_BOLD: &str = "\x1b[1;32m";
 pub const ORANGE_BOLD: &str = "\x1b[1;33m";
 pub const RED_BOLD: &str = "\x1b[1;31m";
 pub const WHITE_BOLD: &str = "\x1b[1;97m";
 
-// Dim — used only for background info (vault, episodic)
-pub const GREY_DIM: &str = "\x1b[90m";       // Grey (no dim modifier — readable on black)
-
-// Reset — use ONLY at end of line
+pub const GREY_DIM: &str = "\x1b[90m";
 pub const RESET: &str = "\x1b[0m";
 
 // Legacy aliases
@@ -56,12 +44,10 @@ const TRADING_PAIRS: &[&str] = &[
     "BTC/USDC", "ETH/USDC", "SOL/USDC", "XRP/USDC",
 ];
 
-/// Highlight trading pair names in result text with cyan bold brackets.
-/// `BTC/USD` → `[BTC/USD]` in cyan bold
+/// Highlight trading pair names with cyan bold brackets.
 fn highlight_pairs(text: &str) -> String {
     let mut result = text.to_string();
     for pair in TRADING_PAIRS {
-        // Only highlight if not already in brackets
         let bracketed = format!("[{}]", pair);
         if result.contains(pair) && !result.contains(&bracketed) {
             result = result.replace(pair, &format!("{}[{}]{}", CYAN_BOLD, pair, RESET));
@@ -81,55 +67,28 @@ pub fn est_now() -> String {
     format!("{} {}:{} {}", est.format("%m-%d-%Y"), hour, minute, ampm)
 }
 
-/// Custom tracing timer — outputs EST timestamps matching the console format.
-pub struct SavantTimer;
+// ── savant_log — direct styled logging ───────────────────────────────────
 
-impl tracing_subscriber::fmt::time::FormatTime for SavantTimer {
-    fn format_time(&self, w: &mut tracing_subscriber::fmt::format::Writer<'_>) -> std::fmt::Result {
-        write!(w, "{}", est_now())
-    }
-}
-
-/// Log level determines action + result colors.
-///
-/// KEY RULE: action and result MUST have different colors for contrast.
 pub enum LogLevel {
-    /// Bold white action, white result — system phase headers
     Phase,
-    /// Grey action, white result — LLM evaluation in progress
     Llm,
-    /// Grey action, green result — LLM evaluation complete
     LlmDone,
-    /// Bold cyan action, white result — AI decisions
     Decision,
-    /// Bold orange action, orange result — trade opened/closed
     Trade,
-    /// Bold cyan action, dim result — swap in progress
     Swap,
-    /// Bold green action, green result — swap success
     SwapOk,
-    /// Bold red action, red result — swap failure
     SwapFail,
-    /// Dim grey action, dim result — vault/episodic
     Vault,
-    /// Bold red action, red result — circuit breaker
     Circuit,
-    /// Bold orange action, orange result — warnings
     Warn,
 }
 
-/// Single log function — ALL console output goes through here.
-///
-/// Format: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] RESULT`
-///
-/// Uses compound ANSI codes to preserve bold across sections.
-/// Single RESET at end prevents color bleeding to next line.
 pub fn savant_log(level: LogLevel, action: &str, result: &str) {
     let (action_style, result_style) = match level {
         LogLevel::Phase => (WHITE_BOLD, WHITE_FG),
-        LogLevel::Llm => (GREY_FG, WHITE_FG),       // Grey action, white result
-        LogLevel::LlmDone => (GREY_FG, GREEN_FG),    // Grey action, green result
-        LogLevel::Decision => (CYAN_BOLD, WHITE_FG),  // Cyan action, white result
+        LogLevel::Llm => (GREY_FG, WHITE_FG),
+        LogLevel::LlmDone => (GREY_FG, GREEN_FG),
+        LogLevel::Decision => (CYAN_BOLD, WHITE_FG),
         LogLevel::Trade => (ORANGE_BOLD, ORANGE_FG),
         LogLevel::Swap => (CYAN_BOLD, GREY_DIM),
         LogLevel::SwapOk => (GREEN_BOLD, GREEN_FG),
@@ -142,9 +101,6 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
     let ts = est_now();
     let highlighted = highlight_pairs(result);
 
-    // Format: [Savant Trading] [TIME] [ACTION] RESULT
-    // Each section uses compound codes — no RESET between sections
-    // Single RESET at end prevents bleeding
     eprintln!(
         "{}[Savant Trading]{} {}[{}]{} {}[{}]{} {}{}{}",
         CYAN_BOLD, RESET,
@@ -154,125 +110,170 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
     );
 }
 
+// ── SavantLayer — custom tracing Layer ───────────────────────────────────
+//
+// Formats ALL tracing events in the same `[Savant Trading] [TIME] [LEVEL] msg`
+// format as savant_log. This makes tracing output uniform with our styled logs.
+
+use tracing_subscriber::Layer;
+use std::fmt::Write as FmtWrite;
+
+pub struct SavantLayer;
+
+impl<S> Layer<S> for SavantLayer
+where
+    S: tracing::Subscriber,
+{
+    fn on_event(
+        &self,
+        event: &tracing::Event<'_>,
+        _ctx: tracing_subscriber::layer::Context<'_, S>,
+    ) {
+        let metadata = event.metadata();
+        let level = metadata.level();
+
+        // Map tracing level to action label and color
+        let (action, action_color, result_color) = match *level {
+            tracing::Level::ERROR => ("ERROR", RED_BOLD, RED_FG),
+            tracing::Level::WARN => ("WARN", ORANGE_BOLD, ORANGE_FG),
+            tracing::Level::INFO => ("INFO", GREY_FG, WHITE_FG),
+            tracing::Level::DEBUG => ("DEBUG", GREY_DIM, GREY_DIM),
+            tracing::Level::TRACE => ("TRACE", GREY_DIM, GREY_DIM),
+        };
+
+        // Extract the message from the event
+        let mut message = String::new();
+        let mut visitor = MessageVisitor(&mut message);
+        event.record(&mut visitor);
+
+        // Extract target (module path) as a short label
+        let target = metadata.target();
+        let short_target = target
+            .rsplit("::")
+            .next()
+            .unwrap_or(target);
+
+        let ts = est_now();
+        let highlighted = highlight_pairs(&message);
+
+        // Format: [Savant Trading] [TIME] [LEVEL] [module] message
+        eprintln!(
+            "{}[Savant Trading]{} {}[{}]{} {}[{}]{} {}[{}]{} {}{}{}",
+            CYAN_BOLD, RESET,
+            GREY_FG, ts, RESET,
+            action_color, action, RESET,
+            GREY_DIM, short_target, RESET,
+            result_color, highlighted, RESET,
+        );
+    }
+}
+
+/// Visitor to extract the message from a tracing event.
+struct MessageVisitor<'a>(&'a mut String);
+
+impl tracing::field::Visit for MessageVisitor<'_> {
+    fn record_debug(&mut self, field: &tracing::field::Field, value: &dyn std::fmt::Debug) {
+        if field.name() == "message" {
+            let _ = write!(self.0, "{:?}", value);
+        } else {
+            let _ = write!(self.0, " {}={:?}", field.name(), value);
+        }
+    }
+
+    fn record_str(&mut self, field: &tracing::field::Field, value: &str) {
+        if field.name() == "message" {
+            self.0.push_str(value);
+        } else {
+            let _ = write!(self.0, " {}={}", field.name(), value);
+        }
+    }
+}
+
+// ── Timer for tracing subscriber ─────────────────────────────────────────
+
+pub struct SavantTimer;
+
+impl tracing_subscriber::fmt::time::FormatTime for SavantTimer {
+    fn format_time(&self, w: &mut tracing_subscriber::fmt::format::Writer<'_>) -> std::fmt::Result {
+        write!(w, "{}", est_now())
+    }
+}
+
 // ── Thin macros ──────────────────────────────────────────────────────────
 
 #[macro_export]
 macro_rules! log_phase {
     ($action:expr, $($arg:tt)*) => {{
-        $crate::core::console::savant_log(
-            $crate::core::console::LogLevel::Phase,
-            $action,
-            &format!($($arg)*),
-        );
+        $crate::core::console::savant_log($crate::core::console::LogLevel::Phase, $action, &format!($($arg)*));
     }};
 }
 
 #[macro_export]
 macro_rules! log_llm {
     ($action:expr, $($arg:tt)*) => {{
-        $crate::core::console::savant_log(
-            $crate::core::console::LogLevel::Llm,
-            $action,
-            &format!($($arg)*),
-        );
+        $crate::core::console::savant_log($crate::core::console::LogLevel::Llm, $action, &format!($($arg)*));
     }};
 }
 
 #[macro_export]
 macro_rules! log_llm_done {
     ($action:expr, $($arg:tt)*) => {{
-        $crate::core::console::savant_log(
-            $crate::core::console::LogLevel::LlmDone,
-            $action,
-            &format!($($arg)*),
-        );
+        $crate::core::console::savant_log($crate::core::console::LogLevel::LlmDone, $action, &format!($($arg)*));
     }};
 }
 
 #[macro_export]
 macro_rules! log_decision {
     ($action:expr, $($arg:tt)*) => {{
-        $crate::core::console::savant_log(
-            $crate::core::console::LogLevel::Decision,
-            $action,
-            &format!($($arg)*),
-        );
+        $crate::core::console::savant_log($crate::core::console::LogLevel::Decision, $action, &format!($($arg)*));
     }};
 }
 
 #[macro_export]
 macro_rules! log_trade {
     ($action:expr, $($arg:tt)*) => {{
-        $crate::core::console::savant_log(
-            $crate::core::console::LogLevel::Trade,
-            $action,
-            &format!($($arg)*),
-        );
+        $crate::core::console::savant_log($crate::core::console::LogLevel::Trade, $action, &format!($($arg)*));
     }};
 }
 
 #[macro_export]
 macro_rules! log_swap {
     ($action:expr, $($arg:tt)*) => {{
-        $crate::core::console::savant_log(
-            $crate::core::console::LogLevel::Swap,
-            $action,
-            &format!($($arg)*),
-        );
+        $crate::core::console::savant_log($crate::core::console::LogLevel::Swap, $action, &format!($($arg)*));
     }};
 }
 
 #[macro_export]
 macro_rules! log_swap_ok {
     ($action:expr, $($arg:tt)*) => {{
-        $crate::core::console::savant_log(
-            $crate::core::console::LogLevel::SwapOk,
-            $action,
-            &format!($($arg)*),
-        );
+        $crate::core::console::savant_log($crate::core::console::LogLevel::SwapOk, $action, &format!($($arg)*));
     }};
 }
 
 #[macro_export]
 macro_rules! log_swap_fail {
     ($action:expr, $($arg:tt)*) => {{
-        $crate::core::console::savant_log(
-            $crate::core::console::LogLevel::SwapFail,
-            $action,
-            &format!($($arg)*),
-        );
+        $crate::core::console::savant_log($crate::core::console::LogLevel::SwapFail, $action, &format!($($arg)*));
     }};
 }
 
 #[macro_export]
 macro_rules! log_vault {
     ($action:expr, $($arg:tt)*) => {{
-        $crate::core::console::savant_log(
-            $crate::core::console::LogLevel::Vault,
-            $action,
-            &format!($($arg)*),
-        );
+        $crate::core::console::savant_log($crate::core::console::LogLevel::Vault, $action, &format!($($arg)*));
     }};
 }
 
 #[macro_export]
 macro_rules! log_circuit {
     ($action:expr, $($arg:tt)*) => {{
-        $crate::core::console::savant_log(
-            $crate::core::console::LogLevel::Circuit,
-            $action,
-            &format!($($arg)*),
-        );
+        $crate::core::console::savant_log($crate::core::console::LogLevel::Circuit, $action, &format!($($arg)*));
     }};
 }
 
 #[macro_export]
 macro_rules! log_warn {
     ($action:expr, $($arg:tt)*) => {{
-        $crate::core::console::savant_log(
-            $crate::core::console::LogLevel::Warn,
-            $action,
-            &format!($($arg)*),
-        );
+        $crate::core::console::savant_log($crate::core::console::LogLevel::Warn, $action, &format!($($arg)*));
     }};
 }
