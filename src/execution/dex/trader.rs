@@ -7,6 +7,7 @@
 
 use async_trait::async_trait;
 use chrono::Utc;
+use futures_util::FutureExt;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -529,14 +530,25 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
         log_swap!("0x API", "Calling: {} -> {} amount={}", swap_params.src_token, swap_params.dst_token, swap_params.amount);
 
-        // Fast-fail: 15s timeout on the 0x API call itself.
+        // Fast-fail: 15s timeout + catch_unwind on the 0x API call.
         // The reqwest client has a 30s timeout but doesn't cover DNS/TLS hangs.
-        // This catches hangs at the API level before the 60s engine timeout.
+        // catch_unwind prevents panics in the HTTP client from killing the engine.
         let swap_tx = match tokio::time::timeout(
             std::time::Duration::from_secs(15),
-            self.backend.build_swap_tx(&swap_params),
+            std::panic::AssertUnwindSafe(self.backend.build_swap_tx(&swap_params)).catch_unwind(),
         ).await {
-            Ok(result) => result?,
+            Ok(Ok(result)) => result?,
+            Ok(Err(panic_err)) => {
+                let msg = if let Some(s) = panic_err.downcast_ref::<String>() {
+                    s.clone()
+                } else if let Some(s) = panic_err.downcast_ref::<&str>() {
+                    s.to_string()
+                } else {
+                    "unknown panic in 0x API".to_string()
+                };
+                log_swap_fail!("0x API", "Panicked: {}", msg);
+                return Err(ExecutionError::Other(format!("0x API panicked: {}", msg)));
+            }
             Err(_) => {
                 log_swap_fail!("0x API", "Timeout after 15s — API hung");
                 return Err(ExecutionError::Other("0x API timeout after 15s".into()));
