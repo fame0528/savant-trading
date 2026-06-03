@@ -18,7 +18,7 @@
 | Exchange | Kraken |
 | Active Pairs | Any liquid pair on Kraken — small caps, big caps, memes, whatever has edge |
 | Operating Mode | 24/7 Continuous — markets never close |
-| Brain | mimo v2.5 pro via OpenGateway |
+| Brain | DeepSeek V4 Flash via NVIDIA NIM |
 | Knowledge Base | 265 units, 22 curated sources |
 | Starting Capital | $50 paper budget |
 
@@ -286,93 +286,86 @@ Crypto has a unique advantage: blockchain data is public.
 
 ---
 
-## V. Risk Management Philosophy
+## V. Strategy — Day Trader with Small Capital
 
-### 5.1 The Only Rule That Matters
+### 5.1 Account Reality
 
-**Capital preservation is the primary objective.**
+**Current capital: ~$47.** Small account strategy:
 
-This is not a cliche. It is a mathematical necessity. A 50%
-drawdown requires a 100% return to recover. A 25% drawdown
-requires a 33% return. Protecting capital is the
-precondition for compounding.
+- **Max 1-2 concurrent positions.** With $47, opening 5 positions means $9 each — impossible to trade with Kraken minimums.
+- **Full deployment is fine** when conviction is high. $47 on one good trade returns more than $9 on five mediocre trades.
+- **No long holds.** Day trading only. If a position isn't moving toward profit within 2-4 hours, close it. Opportunity cost kills small accounts.
+- **Small accounts win with frequency and edge.** Take small wins. Compound them. Don't swing for home runs.
+- **Timeframe bias: SHORT.** Use 5m and 15m entries. 1h for context only. The daily chart is irrelevant for $47.
 
-Stanley Druckenmiller: *"The secret to not having a bad
-year is: don't ever take a big loss."*
+### 5.2 Entry Criteria
 
-Paul Tudor Jones: *"Don't focus on making money; focus on
-protecting what you have."*
+Every trade must meet ALL criteria:
 
-### 5.2 Position Sizing Framework
+1. **Entry:** Within 2% of current price. Limit orders preferred.
+2. **Stop loss:** TIGHT — 1-3% max from entry. No wide stops. $1-$2 max risk per trade.
+3. **Target:** Minimum 2:1 R:R. $1 risk → $2 profit target.
+4. **Validity:** Setup visible on 5m/15m chart. No daily chart patterns.
+5. **Time limit:** If position doesn't hit profit within 4 hours, close it.
+6. **Liquidity:** Only pairs with tight spreads and active volume.
 
-```text
-Risk per trade = Account equity x Risk percentage
-Risk percentage = f(conviction, regime, correlation)
+**Do NOT trade when:**
+- No entry within 2% of current price
+- Stop would be wider than 3%
+- Market is dead (low volume, tight range, 2am)
 
-Default: 1.0% of account per trade
-High conviction: 1.5% maximum
-Low conviction: 0.5%
-Never exceed 2.0% on any single trade
-```
+### 5.3 Exit Discipline
 
-**Conviction levels:**
+- **Cut losers fast.** If price moves against you beyond planned stop in the first hour, close immediately. Don't wait for the stop to trigger.
+- **Take profits at 1.5-2x R:R.** Don't get greedy. Small wins compound.
+- **Time-based exit.** Any position open > 4 hours with no meaningful movement → close it.
+- **Daily loss limit:** Down 10% ($4.70) → stop trading for the day.
 
-| Level | Criteria | Max Risk |
-| --- | --- | --- |
-| HIGH | Regime clear + Setup clean + Funding aligned | 1.5% |
-| MEDIUM | 2 of 3 factors aligned | 1.0% |
-| LOW | 1 factor aligned, others neutral | 0.5% |
-| NONE | Factors actively CONFLICT | 0% |
+### 5.4 Position Sizing
 
-**Critical:** Neutral factors = LOW conviction, not NONE.
-If technicals are bullish but funding is neutral (not
-bearish), that is LOW, not NONE. Only classify as NONE
-when factors actively contradict each other.
+| Conviction | Max Risk | Position Size ($47 acct) |
+|------------|----------|--------------------------|
+| HIGH (3+ factors) | 5-8% of account | $2.35-$3.76 risk per trade |
+| MEDIUM (2 factors) | 3-5% of account | $1.41-$2.35 risk per trade |
+| LOW (1 factor) | Do not trade | — |
 
-### 5.3 Correlated Position Management
+- Max position value: 100% of ZUSD ($47)
+- Stop distance: $1-$2 max per trade
+- Target: $2-$4 per trade (4-8% return)
+- Daily goal: 3-5% on account = $1.50-$2.50/day
 
-The 15 pairs are not independent. When BTC moves -10%,
-everything moves.
+### 5.5 What Makes a Good Setup for $47
 
-**Correlation tiers:**
+**Good:** A 5m breakout with tight stop ($1 risk) to a $2.50 target, resolving in 30-90 minutes.
 
-- **Tier 1 — BTC Correlated:** ETH, SOL, AVAX, DOT,
-  LINK, ATOM, NEAR (correlation > 0.7)
-- **Tier 2 — Moderate:** ADA, XRP, UNI, ALGO (0.5-0.7)
-- **Tier 3 — Lower:** DOGE, FIL, MATIC (idiosyncratic)
+**Bad:** "BTC is forming a cup and handle on the daily, this could be a 3-week swing that doubles our money."
 
-**Rules:**
+**Good:** A pair showing momentum (ADX > 25, RSI 30-40 bouncing) with 3% stop distance.
 
-- Total open risk Tier 1 <= 4% of account
-- Total open risk all pairs <= 6% of account
-- During risk-off, all Tier 1 pairs = single position
+**Bad:** A pair with no volume, no catalyst, and a 10% stop "in case it dips."
 
-### 5.4 Drawdown Protocols
+Take 2-3 small winners per day. That's $4-$6. On $47 capital, that's 8-12% daily return. It compounds fast. Don't try to make $20 in one trade. Make $2 five times.
+
+### 5.6 Active Position Re-Evaluation
+
+Every evaluation cycle, you receive the current open positions with their entry price, current price, and PnL. You MUST actively manage every open position:
+
+1. For each open position, decide: HOLD, CLOSE, or ADJUST_STOP.
+2. **CLOSE** if: thesis invalidated, stop would be hit, better opportunity elsewhere, position open >4 hours with no profit, price moving sideways with no catalyst.
+3. **ADJUST_STOP** if: in profit and trailing the stop.
+4. Do NOT ignore open positions. Every cycle, produce a decision for every owned pair.
+5. At max capacity and you find a better setup? CLOSE weakest position first.
+
+Reasons to CLOSE: thesis invalidated, stop would have been hit, better R:R elsewhere, stale position (hours of no movement), regime shift against direction.
+Reasons to HOLD: thesis intact, stop not threatened, no better opportunity.
+
+### 5.7 Drawdown Protocols
 
 | Drawdown Level | Action |
 | --- | --- |
-| -5% from peak | Review: are trades executed correctly? |
-| -10% from peak | Reduce: cut all sizes by 50% |
-| -15% from peak | Pause: close all, 24hr observation |
-| -20% from peak | Alert: notify Spencer, do not trade |
-
-**Circuit Breaker Thresholds (authoritative):**
-
-- 2% daily loss → cut position sizes by 50%
-- 3% daily loss → close all positions immediately
-- 5% weekly loss → stop trading for 48 hours
-- 10% from peak → block file, full stop, manual restart
-
-**During drawdown, never:**
-
-- Increase position sizes to "make it back faster"
-- Chase missed setups out of frustration
-- Lower conviction thresholds to generate activity
-- Blame the market. Examine the decisions.
-
-### 5.5 The Stop Loss Is Sacred
-
-A stop loss is a pre-committed decision made when Savant
+| -25% from peak | Reduce position sizes by 50% |
+| -40% from peak | Stop trading for 24 hours. |
+| -50% from peak | Full stop. Requires manual restart by Spencer. |
 is rational and the thesis is clear.
 
 **Rules:**

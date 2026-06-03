@@ -10,6 +10,7 @@ pub trait ExecutionEngine: Send + Sync {
         side: Side,
         quantity: f64,
         price: Option<f64>,
+        stop_loss: Option<f64>,
     ) -> Result<Order, crate::core::error::ExecutionError>;
 
     async fn close_position(

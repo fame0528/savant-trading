@@ -8,11 +8,15 @@ use crate::core::types::Side;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub enum TradeAction {
+    #[serde(alias = "BUY", alias = "buy")]
     Buy,
+    #[serde(alias = "SELL", alias = "sell")]
     Sell,
     #[serde(alias = "HOLD", alias = "hold")]
     Hold,
+    #[serde(alias = "CLOSE", alias = "close")]
     Close,
+    #[serde(alias = "ADJUST_STOP", alias = "adjust_stop", alias = "ADJUSTSTOP", alias = "Adjust_Stop")]
     AdjustStop,
 }
 
@@ -143,8 +147,14 @@ pub fn parse_decision(
     let min_price = current_price - tolerance;
     let max_price = current_price + tolerance;
 
-    // Only validate prices for non-Hold decisions
-    if decision.action != TradeAction::Hold {
+    // AdjustStop only moves a stop on an existing position — it needs a new
+    // stop_loss, not an entry/TP. Validate that separately and skip entry checks.
+    if decision.action == TradeAction::AdjustStop && decision.stop_loss <= 0.0 {
+        return Err(ParseError::MissingField("stop_loss".to_string()));
+    }
+
+    // Only validate entry prices for actionable entry decisions (Buy/Sell/Close).
+    if decision.action != TradeAction::Hold && decision.action != TradeAction::AdjustStop {
         if decision.entry_price <= 0.0 {
             return Err(ParseError::MissingField("entry_price".to_string()));
         }
@@ -193,11 +203,14 @@ pub fn parse_decision(
         )));
     }
 
-    // Confidence floor: downgrade low-confidence trades to Hold.
-    // Removes the worst trades (0-25% bucket at 18% accuracy).
+    // Confidence floor: downgrade low-confidence ENTRIES to Hold.
+    // Removes the worst trades (0-25% bucket at 18% accuracy). Only applies to
+    // new entries (Buy/Sell) — Close and AdjustStop are position management and
+    // must not be blocked by a low confidence score.
     let mut decision = decision;
     const CONFIDENCE_FLOOR: f64 = 0.40;
-    if decision.confidence < CONFIDENCE_FLOOR && decision.action != TradeAction::Hold {
+    let is_entry = matches!(decision.action, TradeAction::Buy | TradeAction::Sell);
+    if decision.confidence < CONFIDENCE_FLOOR && is_entry {
         tracing::info!(
             "Confidence floor: {:.0}% < {:.0}% — downgrading {:?} to Hold",
             decision.confidence * 100.0,

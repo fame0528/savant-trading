@@ -265,9 +265,9 @@ impl AccountState {
         }
     }
 
-    pub fn update_equity(&mut self, unrealized: f64) {
+    pub fn update_equity(&mut self, unrealized: f64, cost_basis: f64) {
         self.unrealized_pnl = unrealized;
-        self.equity = self.balance + unrealized;
+        self.equity = self.balance + cost_basis + unrealized;
         if self.equity > self.peak_equity {
             self.peak_equity = self.equity;
         }

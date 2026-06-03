@@ -4,4 +4,5 @@
 //! - `paper` — Paper trading simulator with stop/TP monitoring
 
 pub mod engine;
+pub mod kraken;
 pub mod paper;

@@ -21,7 +21,7 @@ pairs = [
     "LTC/USD", "ATOM/USD", "NEAR/USD", "INJ/USD", "TIA/USD", "SUI/USD",
 ]
 # Set to true to scan all Kraken USD pairs for opportunity
-scan_all_pairs = true
+scan_all_pairs = false
 timeframe = "5m"
 timeframes = ["5m", "1h", "4h", "1d"]
 base_currency = "USD"
@@ -31,6 +31,10 @@ database_url = "sqlite:data/savant.db"
 # At $50 balance we are in lowest volume tier
 fee_rate = 0.0040
 slippage_pct = 0.0005
+# Entry style: "marketable" (fill near market, capped slippage, re-anchored R:R)
+# or "post_only" (maker fee, but frequently misses fills). See canary.toml notes.
+entry_mode = "marketable"
+max_entry_slippage_pct = 0.15
 
 [risk]
 max_risk_per_trade = 0.20
@@ -52,6 +56,17 @@ max_drawdown = 0.20
 max_positions = 5
 # Higher R:R compensates for full deployment risk at small balances
 min_rr_ratio = 2.0
+# Minimum NET (after-fee) TP1 move, %. TP1 must exceed round-trip fees by this
+# margin or the trade is skipped. At 0.4% taker fees, scalps under ~2% gross lose
+# to fees even when they "win" — this forces the AI toward trades with real edge.
+# Raise it (e.g. 2.0) for fewer/higher-quality trades; lower it for more activity.
+min_net_target_pct = 1.5
+# Only open longs with the higher-timeframe trend (BTC not in a downtrend).
+trend_filter = true
+# Tier 2 selectivity (see canary.toml for notes).
+max_spread_bps = 25.0
+max_position_correlation = 0.85
+max_position_hours = 6.0
 
 [strategy.momentum]
 ema_period = 100
@@ -70,13 +85,19 @@ adx_ranging_threshold = 20.0
 atr_volatility_multiplier = 1.5
 
 [mode]
-paper_trading = true
+paper_trading = false
 
 [ai]
-provider = "opengateway"
-endpoint = "https://opengateway.gitlawb.com/v1"
-model = "mimo-v2.5-pro"
-api_key_env = "OPENGATEWAY_API_KEY"
+# Active provider is OpenRouter (the README's "mimo/OpenGateway" is aspirational;
+# the engine reads provider/endpoint/model from here). Keep these three in sync.
+# Cheap models that handle this structured-JSON decision task well:
+#   deepseek/deepseek-v4-flash  (current — cheapest, fast)
+#   google/gemini-2.5-flash     (very cheap, strong reasoning, reliable JSON)
+#   openai/gpt-5-mini           (steadier JSON, slightly pricier)
+provider = "openrouter"
+endpoint = "https://openrouter.ai/api/v1"
+model = "deepseek/deepseek-v4-flash"
+api_key_env = "OPENROUTER_API_KEY"
 autonomy_level = 3
 max_decisions_per_hour = 20
 # Expanded to use more of the 1M context window (FID-015)

@@ -17,6 +17,7 @@ use savant_trading::data::kraken::KrakenClient;
 use savant_trading::data::market_data::MarketDataStore;
 use savant_trading::data::orderbook::OrderBookManager;
 use savant_trading::execution::engine::ExecutionEngine;
+use savant_trading::execution::kraken::KrakenTrader;
 use savant_trading::execution::paper::PaperTrader;
 use savant_trading::insight::aggregator::{InsightAggregator, InsightConfig};
 use savant_trading::monitor::journal::TradeJournal;
@@ -168,13 +169,154 @@ pub async fn run(
         config.trading.fee_rate,
         config.trading.slippage_pct,
     );
+    // In live mode the tracked balance is the Kraken TOTAL (cash + positions),
+    // so equity/drawdown must not double-count position value.
+    if !config.mode.paper_trading {
+        paper.set_live_mode(true);
+    }
+
+    // Live trading: create KrakenTrader and fetch real balance
+    let mut live_trader: Option<KrakenTrader> = if !config.mode.paper_trading {
+        let api_key = std::env::var("KRAKEN_API_KEY").unwrap_or_default();
+        let api_secret = std::env::var("KRAKEN_API_SECRET").unwrap_or_default();
+        if api_key.is_empty() || api_secret.is_empty() {
+            error!("LIVE mode requires KRAKEN_API_KEY and KRAKEN_API_SECRET in .env");
+            return Err(anyhow::anyhow!("Missing Kraken API credentials"));
+        }
+        let mut trader = KrakenTrader::new(
+            &config.exchange.rest_url,
+            &api_key,
+            &api_secret,
+            config.trading.starting_balance,
+            config.trading.fee_rate,
+        );
+        // Long-only: a spot account cannot short. Override with SAVANT_ALLOW_SHORTS=1
+        // only if the account has margin enabled.
+        let allow_shorts = std::env::var("SAVANT_ALLOW_SHORTS").map(|v| v == "1").unwrap_or(false);
+        trader.set_allow_shorts(allow_shorts);
+        trader.set_entry_mode(&config.trading.entry_mode, config.trading.max_entry_slippage_pct);
+        info!("Entry mode: {} (max slippage {:.2}%)", config.trading.entry_mode, config.trading.max_entry_slippage_pct);
+        // Load per-pair decimals / minimums / altnames so orders format correctly
+        // (sub-penny coins, lot precision) and respect Kraken's per-pair minimums.
+        if let Err(e) = trader.load_pair_meta().await {
+            warn!("Failed to load Kraken pair metadata ({}), using fallback formatting", e);
+        }
+        match trader.fetch_balance().await {
+            Ok(balance) => {
+                info!("LIVE MODE — Kraken balance: ${:.2}", balance);
+                paper.set_balance(balance);
+                // Store the real Kraken balance for later use after state load
+                let mut acct = shared.account.write().await;
+                *acct = paper.account().clone();
+            }
+            Err(e) => {
+                error!("Failed to fetch Kraken balance: {}", e);
+                return Err(anyhow::anyhow!("Kraken balance fetch failed: {}", e));
+            }
+        }
+        Some(trader)
+    } else {
+        info!("PAPER MODE — simulated trading");
+        None
+    };
 
     // PROD-3: Load saved state if exists
     let state_path = "data/paper_state.json";
+    let kraken_usd_balance = paper.account().balance;
+
+    // LIVE mode: re-scan Kraken for current positions, skip stale state
+    if !config.mode.paper_trading && std::path::Path::new(state_path).exists() {
+        let _ = std::fs::remove_file(state_path);
+        info!("LIVE mode — removed stale state file, reconciling from Kraken");
+    }
+
     if std::path::Path::new(state_path).exists() {
         match paper.load_state(state_path) {
-            Ok(()) => info!("Restored state from {}", state_path),
+            Ok(()) => {
+                info!("Restored state from {} ({} positions, {} closed trades)", state_path,
+                    paper.positions().len(), paper.closed_trades().len());
+            if !config.mode.paper_trading {
+                    let kraken_balance = kraken_usd_balance;
+                    paper.set_balance(kraken_balance);
+                    info!("LIVE mode — restored {} positions, reset balance to Kraken: ${:.2}",
+                        paper.positions().len(), kraken_balance);
+                    }
+            }
             Err(e) => warn!("Failed to load state ({}), starting fresh", e),
+        }
+    }
+
+    // Reconcile non-ZUSD assets on Kraken as tracked positions
+    if let Some(ref mut trader) = live_trader {
+        // Clear any stale resting orders (e.g. stop-losses from a prior run)
+        // so we start from a clean slate and don't orphan exchange orders.
+        if let Err(e) = trader.cancel_all().await {
+            warn!("Startup CancelAll failed (continuing): {}", e);
+        }
+        if let Ok(assets) = trader.fetch_balance_raw().await {
+            for (asset, amount) in &assets {
+                if amount <= &0.0 || asset == "ZUSD" || asset == "USD" { continue; }
+                let clean = asset.trim_start_matches('X').trim_start_matches('Z');
+                let pair = format!("{}/USD", clean);
+                if paper.positions().values().any(|p| p.pair == pair) { continue; }
+                let ticker = trader.get_ticker_price(&pair).await.unwrap_or(0.0);
+                let usd_value = amount * if ticker > 0.0 { ticker } else { 1.0 };
+                if usd_value < 1.0 && ticker > 0.0 { continue; }
+                info!("Reconciling orphaned Kraken asset {} {} (${:.2}) → tracking as {} position", amount, asset, usd_value, pair);
+                let pos = Position {
+                    id: format!("reconciled-{}", asset),
+                    pair: pair.clone(),
+                    side: savant_trading::core::types::Side::Long,
+                    quantity: *amount,
+                    entry_price: ticker,
+                    current_price: ticker,
+                    stop_loss: 0.0,
+                    take_profit_1: 0.0,
+                    take_profit_2: 0.0,
+                    take_profit_3: 0.0,
+                    unrealized_pnl: 0.0,
+                    risk_amount: 0.0,
+                    strategy_name: "reconciliation".to_string(),
+                    opened_at: chrono::Utc::now(),
+                    scale_level: ScaleLevel::Full,
+                };
+                // Auto-liquidation of leftover assets on startup is OPT-IN.
+                // By default we TRACK the asset as a position (no stop) and let
+                // the AI manage it — a crash+restart no longer dumps the book.
+                let liquidate = std::env::var("SAVANT_LIQUIDATE_ON_START")
+                    .map(|v| v == "1")
+                    .unwrap_or(false);
+                if liquidate {
+                    if let Err(e) = trader.market_sell_all(&pair, *amount).await {
+                        warn!("Failed to auto-close orphaned {}: {}", pair, e);
+                    } else {
+                        info!("Auto-closed orphaned {} ({}) on Kraken", pair, amount);
+                    }
+                } else {
+                    info!("Tracking orphaned {} as open position (set SAVANT_LIQUIDATE_ON_START=1 to sell on boot)", pair);
+                    paper.positions_mut().insert(pos.id.clone(), pos);
+                }
+            }
+        }
+}
+    {
+
+        let mut shared_positions = shared.positions.write().await;
+        *shared_positions = paper.positions().values().cloned().collect();
+        let mut shared_account = shared.account.write().await;
+        *shared_account = paper.account().clone();
+        shared_account.open_positions = paper.positions().len();
+    }
+    // Save reconciled state so it survives restarts
+    if let Err(e) = paper.save_state("data/paper_state.json") {
+        warn!("State save after reconciliation failed: {}", e);
+    }
+    // Re-fetch balance after auto-close so cleanup sales don't trigger drawdown
+    if let Some(ref mut trader) = live_trader {
+        if let Ok(balance) = trader.fetch_balance().await {
+            paper.set_balance(balance);
+            paper.reset_peak();
+            info!("Post-reconciliation equity: ${:.2} (peak reset)", balance);
         }
     }
 
@@ -194,7 +336,7 @@ pub async fn run(
 
     if let Some(ref j) = journal {
         let trades = j.get_trades(10000).await.unwrap_or_default();
-        if !trades.is_empty() {
+        if !trades.is_empty() && config.mode.paper_trading {
             let total_pnl: f64 = trades.iter().map(|t| t.pnl).sum();
             let restored_balance = config.trading.starting_balance + total_pnl;
             info!(
@@ -263,8 +405,9 @@ pub async fn run(
         max_retries: config.ai.max_retries,
     };
 
+    let model_name = llm_config.model.clone();
     let agent = AgentOrchestrator::new(llm_config, agent_config, knowledge_base, composer);
-    info!("AI agent initialized: {:?} mode, mimo v2.5 pro", autonomy);
+    info!("AI agent initialized: {:?} mode, {}", autonomy, model_name);
 
     // === INSIGHT SETUP ===
     let insight_config = InsightConfig {
@@ -413,8 +556,25 @@ pub async fn run(
         config.strategy.regime.atr_volatility_multiplier,
     );
 
-    let position_sizer =
-        PositionSizer::new(config.risk.max_risk_per_trade, config.risk.min_rr_ratio);
+    // Use the dynamic risk tiers from config (previously ignored — the sizer
+    // fell back to hardcoded defaults, sizing positions far smaller than intended).
+    let position_sizer = {
+        let sizer = PositionSizer::new(config.risk.max_risk_per_trade, config.risk.min_rr_ratio);
+        if config.risk.dynamic_risk_tiers.is_empty() {
+            sizer
+        } else {
+            let tiers = config
+                .risk
+                .dynamic_risk_tiers
+                .iter()
+                .map(|t| savant_trading::risk::position::RiskTier {
+                    balance: t.balance,
+                    risk_pct: t.risk_pct,
+                })
+                .collect();
+            sizer.with_tiers(tiers)
+        }
+    };
 
     let circuit_breaker = CircuitBreaker::new(
         config.risk.max_daily_loss,
@@ -484,9 +644,21 @@ pub async fn run(
     let mut ws_ticker_prices: HashMap<String, f64> = HashMap::new();
 
     let mut tick = 0u64;
+    // Rate-limit how many NEW positions we open per rolling hour (config.ai.max_decisions_per_hour).
+    let mut exec_count_hour: u32 = 0;
+    let mut hour_window_start = std::time::Instant::now();
+    // Per-unit initial risk (entry - original stop) per position id, for R-multiple
+    // based auto break-even / trailing-stop management.
+    let mut initial_risk: HashMap<String, f64> = HashMap::new();
+    // Cross-pair correlation matrix (rebuilt periodically) for the correlation cap.
+    let mut corr_matrix = savant_trading::risk::correlation::CorrelationMatrix::new();
 
     loop {
         tick += 1;
+        if hour_window_start.elapsed().as_secs() >= 3600 {
+            exec_count_hour = 0;
+            hour_window_start = std::time::Instant::now();
+        }
 
         // SPRINT-2: Drain WebSocket messages (non-blocking)
         let mut ws_messages_drained = 0u32;
@@ -506,8 +678,21 @@ pub async fn run(
                 }
                 savant_trading::data::websocket::WsMessage::CancelAllOrders { reason } => {
                     warn!("WS CANCEL-ALL TRIGGERED: {}", reason);
-                    // In paper mode, close all positions as a safety measure.
-                    // In live mode, this would call Kraken's CancelAll endpoint.
+                    // Real kill-switch: cancel resting orders and flatten the book on Kraken.
+                    if let Some(ref mut live) = live_trader {
+                        if let Err(e) = live.cancel_all().await {
+                            error!("CancelAll on Kraken failed: {}", e);
+                        }
+                        let ids: Vec<String> = live.positions().keys().cloned().collect();
+                        for id in ids {
+                            if let Err(e) = live.close_position(&id).await {
+                                error!("Emergency close failed for {}: {}", id, e);
+                            }
+                        }
+                        if let Ok(bal) = live.fetch_balance().await {
+                            paper.set_balance(bal);
+                        }
+                    }
                     let pairs: Vec<String> = paper.positions().keys().cloned().collect();
                     for pair in &pairs {
                         if let Some(pos) = paper.positions().get(pair) {
@@ -517,6 +702,8 @@ pub async fn run(
                             );
                         }
                     }
+                    paper.positions_mut().clear();
+                    paper.account_mut().open_positions = 0;
                     shared
                         .log_activity(
                             savant_trading::core::shared::ActivityLevel::Warning,
@@ -563,6 +750,9 @@ pub async fn run(
         }
 
         let mut pair_data_vec: Vec<PairData> = Vec::new();
+        // Higher-timeframe trend per pair (Some(true)=up, Some(false)=down/flat),
+        // computed in Phase 1, used to gate long entries in Phase 3.
+        let mut pair_trend: HashMap<String, bool> = HashMap::new();
         let market_ctx = insight.cached().clone();
         let positions: Vec<Position> = paper.positions().values().cloned().collect();
         let recent_trades = paper.closed_trades().to_vec();
@@ -671,6 +861,24 @@ pub async fn run(
                     pair,
                     higher_tf_candles.len()
                 );
+
+                // Higher-timeframe trend: prefer 1d, then 4h, then 1h. Uptrend =
+                // last close above its EMA AND the EMA rising. Used to keep this
+                // long-only bot from buying dips into a downtrend.
+                {
+                    let pick = ["1d", "4h", "1h"];
+                    let chosen = pick.iter().find_map(|want| {
+                        higher_tf_candles
+                            .iter()
+                            .find(|(tf, _)| tf == want)
+                            .map(|(_, c)| c)
+                    });
+                    if let Some(htf) = chosen {
+                        if let Some(up) = htf_uptrend(htf) {
+                            pair_trend.insert(pair.clone(), up);
+                        }
+                    }
+                }
 
                 shared
                     .log_activity(
@@ -781,6 +989,18 @@ pub async fn run(
             }
         }
 
+        // Rebuild the correlation matrix periodically (slow-changing) so the
+        // correlation cap can avoid stacking the same bet across pairs.
+        if config.risk.max_position_correlation < 1.0 && tick % 10 == 1 {
+            let mut pc: HashMap<String, Vec<Candle>> = HashMap::new();
+            for (pair, store) in market_stores.iter() {
+                if store.len() >= 20 {
+                    pc.insert(pair.clone(), store.candles().iter().cloned().collect());
+                }
+            }
+            corr_matrix = savant_trading::risk::correlation::build_correlation_matrix(&pc, 100);
+        }
+
         // === PHASE 2: Send all LLM calls in parallel via streaming ===
         info!(
             "Phase 2: {} pairs queued for LLM evaluation (streaming)",
@@ -804,7 +1024,7 @@ pub async fn run(
             .collect();
 
         let mut join_set = tokio::task::JoinSet::new();
-        let eval_semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(10));
+        let eval_semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(5));
         for pd in pair_data_vec {
             let provider = agent.provider_clone();
             let sys = pd.system_prompt.clone();
@@ -1006,6 +1226,48 @@ pub async fn run(
                         continue;
                     }
 
+                    // Handle Close decisions — exit open position
+                    if decision.action == savant_trading::agent::decision_parser::TradeAction::Close {
+                        info!("AI DECISION: CLOSE {} | Reason: {}", decision.pair, decision.reasoning);
+                        if matches!(autonomy, AutonomyLevel::Autonomous) {
+                            let paper_key = paper.positions().iter()
+                                .find(|(_, p)| p.pair == decision.pair)
+                                .map(|(k, _)| k.clone());
+                            if let Some(key) = paper_key {
+                                if let Some(ref mut live) = live_trader {
+                                    // Live: close on Kraken first (source of truth), then
+                                    // mirror into paper and re-sync the real balance.
+                                    let live_key = live.positions().iter()
+                                        .find(|(_, p)| p.pair == decision.pair)
+                                        .map(|(k, _)| k.clone());
+                                    if let Some(lk) = live_key {
+                                        if let Err(e) = live.close_position(&lk).await {
+                                            warn!("Live close failed for {}: {}", decision.pair, e);
+                                        }
+                                    }
+                                    paper.positions_mut().remove(&key);
+                                    paper.account_mut().open_positions = paper.positions().len();
+                                    if let Ok(bal) = live.fetch_balance().await {
+                                        paper.set_balance(bal);
+                                    }
+                                } else {
+                                    paper.close_position(&key).await.ok();
+                                }
+                                shared.log_activity(
+                                    savant_trading::core::shared::ActivityLevel::Trade,
+                                    &decision.pair,
+                                    &format!("AI CLOSED ({})", decision.reasoning),
+                                ).await;
+                                if let Err(e) = paper.save_state("data/paper_state.json") {
+                                    warn!("State save after AI close failed: {}", e);
+                                }
+                            } else {
+                                warn!("AI wanted to close {} but no open position found", decision.pair);
+                            }
+                        }
+                        continue;
+                    }
+
                     info!(
                         "AI DECISION: {:?} {} {} @ {:.2} | SL: {:.2} | TP1: {:.2} | Conf: {:.0}% | R:R: {:.2} | Reason: {}",
                         decision.action, decision.pair, decision.side,
@@ -1013,16 +1275,164 @@ pub async fn run(
                         decision.confidence * 100.0, decision.risk_reward, decision.reasoning,
                     );
 
+                    // Handle AdjustStop — trail/move the stop on an open position
+                    // (lock in gains) instead of opening anything new.
+                    if decision.action == savant_trading::agent::decision_parser::TradeAction::AdjustStop {
+                        if matches!(autonomy, AutonomyLevel::Autonomous) {
+                            let new_sl = decision.stop_loss;
+                            let cur = pr.current_price;
+                            let key = paper.positions().iter()
+                                .find(|(_, p)| p.pair == decision.pair)
+                                .map(|(k, p)| (k.clone(), p.side));
+                            match key {
+                                Some((k, side)) => {
+                                    // Stop must stay on the correct side of price or it triggers instantly.
+                                    let valid = match side {
+                                        savant_trading::core::types::Side::Long => new_sl > 0.0 && new_sl < cur,
+                                        savant_trading::core::types::Side::Short => new_sl > cur,
+                                    };
+                                    if !valid {
+                                        warn!("AdjustStop {} rejected: new stop {:.6} on wrong side of price {:.6}", decision.pair, new_sl, cur);
+                                    } else {
+                                        if let Some(pos) = paper.positions_mut().get_mut(&k) {
+                                            pos.stop_loss = new_sl;
+                                        }
+                                        if let Some(ref mut live) = live_trader {
+                                            live.adjust_stop(&k, new_sl).await;
+                                        }
+                                        {
+                                            let mut sp = shared.positions.write().await;
+                                            *sp = paper.positions().values().cloned().collect();
+                                        }
+                                        let _ = paper.save_state("data/paper_state.json");
+                                        info!("AdjustStop: {} stop moved to {:.6}", decision.pair, new_sl);
+                                        shared.log_activity(
+                                            savant_trading::core::shared::ActivityLevel::Trade,
+                                            &decision.pair,
+                                            &format!("Stop trailed to {:.6} ({})", new_sl, decision.reasoning),
+                                        ).await;
+                                    }
+                                }
+                                None => warn!("AdjustStop for {} but no open position", decision.pair),
+                            }
+                        }
+                        continue;
+                    }
+
+                    // Long-only: a spot account cannot open shorts. Skip rather
+                    // than record a phantom position the exchange never opened.
+                    let allow_shorts_live = std::env::var("SAVANT_ALLOW_SHORTS").map(|v| v == "1").unwrap_or(false);
+                    if decision.side == savant_trading::core::types::Side::Short && !allow_shorts_live {
+                        info!("Long-only mode: skipping SHORT signal for {}", decision.pair);
+                        shared.log_activity(
+                            savant_trading::core::shared::ActivityLevel::Info,
+                            &decision.pair,
+                            "Skipped SHORT (long-only spot account)",
+                        ).await;
+                        continue;
+                    }
+
+                    // Net-of-fee target floor: the TP1 move must clear estimated
+                    // round-trip fees (maker entry + taker exit) by min_net_target_pct,
+                    // or the trade loses to fees even when it "wins". Skip if too tight.
+                    let tp_move_pct = if decision.entry_price > 0.0 {
+                        ((decision.take_profit_1 - decision.entry_price) / decision.entry_price).abs() * 100.0
+                    } else {
+                        0.0
+                    };
+                    // Entry fee depends on mode: marketable = taker (fee_rate),
+                    // post-only = maker (~0.25%). Exit is always taker (fee_rate).
+                    let entry_fee = if config.trading.entry_mode == "marketable" { config.trading.fee_rate } else { 0.0025 };
+                    let round_trip_fee_pct = (entry_fee + config.trading.fee_rate) * 100.0;
+                    let required_tp_pct = round_trip_fee_pct + config.risk.min_net_target_pct;
+                    if tp_move_pct < required_tp_pct {
+                        info!(
+                            "Skipping {}: TP1 move {:.2}% < required {:.2}% (fees {:.2}% + min net {:.2}%)",
+                            decision.pair, tp_move_pct, required_tp_pct,
+                            round_trip_fee_pct, config.risk.min_net_target_pct
+                        );
+                        shared.log_activity(
+                            savant_trading::core::shared::ActivityLevel::Info,
+                            &decision.pair,
+                            &format!("Skipped: TP {:.2}% < {:.2}% needed to clear fees", tp_move_pct, required_tp_pct),
+                        ).await;
+                        continue;
+                    }
+
+                    // Trend filter — don't fight the tape. Skip long entries when
+                    // the pair's higher-timeframe trend is a confirmed downtrend,
+                    // or when BTC (which alts follow) is in a confirmed downtrend.
+                    if config.risk.trend_filter
+                        && decision.side == savant_trading::core::types::Side::Long
+                    {
+                        let pair_state = pair_trend.get(&decision.pair).copied();
+                        let btc_down = matches!(pair_trend.get("BTC/USD"), Some(false));
+                        if pair_state == Some(false) || btc_down {
+                            let why = if btc_down { "BTC downtrend" } else { "pair downtrend" };
+                            info!("Trend filter: skipping LONG {} ({})", decision.pair, why);
+                            shared.log_activity(
+                                savant_trading::core::shared::ActivityLevel::Info,
+                                &decision.pair,
+                                &format!("Skipped LONG: {} (trade with the trend)", why),
+                            ).await;
+                            continue;
+                        }
+                    }
+
+                    // Spread/liquidity gate — the bid/ask spread is a hidden fee.
+                    if config.risk.max_spread_bps > 0.0 {
+                        if let Some(ob) = order_books.get(decision.pair.as_str()) {
+                            if let (Some(spread), Some(mid)) = (ob.spread(), ob.mid_price()) {
+                                if mid > 0.0 {
+                                    let spread_bps = spread / mid * 10000.0;
+                                    if spread_bps > config.risk.max_spread_bps {
+                                        info!("Spread gate: skipping {} (spread {:.1} bps > {:.1})",
+                                            decision.pair, spread_bps, config.risk.max_spread_bps);
+                                        shared.log_activity(
+                                            savant_trading::core::shared::ActivityLevel::Info,
+                                            &decision.pair,
+                                            &format!("Skipped: spread {:.1} bps too wide", spread_bps),
+                                        ).await;
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Correlation cap — don't stack the same bet. Skip if the new
+                    // pair is too correlated with any currently open position.
+                    if config.risk.max_position_correlation < 1.0 {
+                        let max_corr = paper
+                            .positions()
+                            .values()
+                            .filter(|p| p.pair != decision.pair)
+                            .map(|p| corr_matrix.get(&decision.pair, &p.pair).abs())
+                            .fold(0.0f64, f64::max);
+                        if max_corr > config.risk.max_position_correlation {
+                            info!("Correlation cap: skipping {} (corr {:.2} > {:.2} with an open position)",
+                                decision.pair, max_corr, config.risk.max_position_correlation);
+                            shared.log_activity(
+                                savant_trading::core::shared::ActivityLevel::Info,
+                                &decision.pair,
+                                &format!("Skipped: {:.2} correlated with open position", max_corr),
+                            ).await;
+                            continue;
+                        }
+                    }
+
                     // Execute if autonomous
                     if matches!(autonomy, AutonomyLevel::Autonomous) {
+                        if exec_count_hour >= config.ai.max_decisions_per_hour {
+                            warn!(
+                                "Decision rate cap reached ({}/hr) — skipping {} entry",
+                                config.ai.max_decisions_per_hour, decision.pair
+                            );
+                            continue;
+                        }
                         match circuit_breaker.check(paper.account()) {
                             CircuitBreakerResult::Triggered(reason) => {
                                 warn!("AI decision blocked by circuit breaker: {}", reason);
-                                let _ = std::fs::write(
-                                    "savant.blocked",
-                                    format!("{}\nReason: {}\n", Utc::now().to_rfc3339(), reason),
-                                );
-                                error!("CIRCUIT BREAKER TRIGGERED — wrote savant.blocked.");
                             }
                             CircuitBreakerResult::Ok => {
                                 let ps = position_sizer.calculate(
@@ -1041,28 +1451,91 @@ pub async fn run(
                                         ps.risk_amount *= session_mult;
                                     }
 
-                                    let order = paper
-                                        .place_order(
+                                    // LIVE MODE: place on Kraken FIRST and use the REAL fill.
+                                    // If the live order fails, do not record a phantom position.
+                                    let mut entry_price = decision.entry_price;
+                                    let mut fill_qty = ps.quantity;
+                                    if let Some(ref mut live) = live_trader {
+                                        match live.place_order(
                                             &decision.pair,
                                             decision.side,
                                             ps.quantity,
                                             Some(decision.entry_price),
-                                        )
-                                        .await;
+                                            Some(decision.stop_loss),
+                                        ).await {
+                                            Ok(kraken_order) => {
+                                                entry_price = kraken_order.filled_price.unwrap_or(decision.entry_price);
+                                                fill_qty = kraken_order.quantity;
+                                                info!(
+                                                    "LIVE order FILLED on Kraken: txid={} @ {:.6} qty {:.8}",
+                                                    kraken_order.id, entry_price, fill_qty
+                                                );
+                                                if let Ok(bal) = live.fetch_balance().await {
+                                                    paper.set_balance(bal);
+                                                }
+                                            }
+                                            Err(e) => {
+                                                error!("LIVE Kraken order FAILED: {} — no position recorded", e);
+                                                shared.log_activity(
+                                                    savant_trading::core::shared::ActivityLevel::Error,
+                                                    &decision.pair,
+                                                    &format!("LIVE order rejected: {}", e),
+                                                ).await;
+                                                continue;
+                                            }
+                                        }
+                                    }
+
+                                    // Re-anchor stop/TP to the ACTUAL fill price so the planned
+                                    // R:R (percentage distances) is preserved even if the fill
+                                    // came in slightly off the AI's planned entry. Scaling all
+                                    // levels by fill/planned keeps every distance % identical.
+                                    let mut sl = decision.stop_loss;
+                                    let mut tp1 = decision.take_profit_1;
+                                    let mut tp2 = decision.take_profit_2;
+                                    let mut tp3 = decision.take_profit_3;
+                                    if decision.entry_price > 0.0 {
+                                        let f = entry_price / decision.entry_price;
+                                        if (f - 1.0).abs() > 0.0005 {
+                                            sl *= f; tp1 *= f; tp2 *= f; tp3 *= f;
+                                            info!(
+                                                "Re-anchored {} levels to fill {:.6} (planned {:.6}): SL {:.6} TP1 {:.6}",
+                                                decision.pair, entry_price, decision.entry_price, sl, tp1
+                                            );
+                                        }
+                                    }
+
+                                    // Paper accounting mirror (display/state). In live mode this
+                                    // tracks the same fill; in paper mode it is the real simulation.
+                                    let order = if live_trader.is_some() {
+                                        Ok(())
+                                    } else {
+                                        paper
+                                            .place_order(
+                                                &decision.pair,
+                                                decision.side,
+                                                fill_qty,
+                                                Some(entry_price),
+                                                Some(sl),
+                                            )
+                                            .await
+                                            .map(|_| ())
+                                    };
 
                                     match order {
                                         Ok(_) => {
+                                            exec_count_hour += 1;
                                             let pos = Position {
                                                 id: format!("ai-{}", tick),
                                                 pair: decision.pair.clone(),
                                                 side: decision.side,
-                                                entry_price: decision.entry_price,
-                                                current_price: decision.entry_price,
-                                                quantity: ps.quantity,
-                                                stop_loss: decision.stop_loss,
-                                                take_profit_1: decision.take_profit_1,
-                                                take_profit_2: decision.take_profit_2,
-                                                take_profit_3: decision.take_profit_3,
+                                                entry_price,
+                                                current_price: entry_price,
+                                                quantity: fill_qty,
+                                                stop_loss: sl,
+                                                take_profit_1: tp1,
+                                                take_profit_2: tp2,
+                                                take_profit_3: tp3,
                                                 unrealized_pnl: 0.0,
                                                 risk_amount: ps.risk_amount,
                                                 strategy_name: "ai-agent".to_string(),
@@ -1072,9 +1545,39 @@ pub async fn run(
                                             paper
                                                 .positions_mut()
                                                 .insert(pos.id.clone(), pos.clone());
+                                            if let Some(ref mut live) = live_trader {
+                                                live.positions_mut()
+                                                    .insert(pos.id.clone(), pos.clone());
+                                                // Bracket the position on the exchange: a resting
+                                                // stop (downside protection) AND a resting take-profit
+                                                // (auto-captures the win), both trigger orders so they
+                                                // coexist without reserving spot balance. OCO-managed.
+                                                live.place_stop(
+                                                    &decision.pair,
+                                                    decision.side,
+                                                    fill_qty,
+                                                    sl,
+                                                    &pos.id,
+                                                ).await;
+                                                live.place_tp(
+                                                    &decision.pair,
+                                                    decision.side,
+                                                    fill_qty,
+                                                    tp1,
+                                                    &pos.id,
+                                                ).await;
+                                            }
+                                            initial_risk.insert(pos.id.clone(), (entry_price - sl).abs());
                                             paper.account_mut().open_positions =
                                                 paper.positions().len();
                                             paper.account_mut().trades_today += 1;
+                                            {
+                                                let mut shared_positions = shared.positions.write().await;
+                                                *shared_positions = paper.positions().values().cloned().collect();
+                                            }
+                                            if let Err(e) = paper.save_state("data/paper_state.json") {
+                                                warn!("State save failed: {}", e);
+                                            }
                                             info!("AI position opened: {}", decision.pair);
 
                                             // Write trade alert to file for external monitoring
@@ -1084,10 +1587,10 @@ pub async fn run(
                                                 "pair": decision.pair,
                                                 "side": format!("{:?}", decision.side),
                                                 "action": format!("{:?}", decision.action),
-                                                "entry_price": decision.entry_price,
-                                                "stop_loss": decision.stop_loss,
-                                                "take_profit_1": decision.take_profit_1,
-                                                "quantity": ps.quantity,
+                                                "entry_price": entry_price,
+                                                "stop_loss": sl,
+                                                "take_profit_1": tp1,
+                                                "quantity": fill_qty,
                                                 "risk_amount": ps.risk_amount,
                                                 "confidence": decision.confidence,
                                                 "risk_reward": decision.risk_reward,
@@ -1107,8 +1610,8 @@ pub async fn run(
                                                 &decision.pair,
                                                 &format!(
                                                     "OPENED {} {:?} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4} | Risk: ${:.2}",
-                                                    decision.side, decision.action, decision.entry_price,
-                                                    ps.quantity, decision.stop_loss, decision.take_profit_1, ps.risk_amount,
+                                                    decision.side, decision.action, entry_price,
+                                                    fill_qty, sl, tp1, ps.risk_amount,
                                                 ),
                                             ).await;
 
@@ -1135,7 +1638,122 @@ pub async fn run(
         for (pair, price) in &ws_ticker_prices {
             all_prices.insert(pair.clone(), *price);
         }
-        let closed = paper.check_stops(&all_prices);
+
+        // === AUTO BREAK-EVEN + TRAILING STOPS ===
+        // For each open long, compute its R-multiple from initial risk. At +1R
+        // move the stop to a fee-covered break-even; past +2R trail it 1R under
+        // price. Only ever tighten (move up). Converts would-be losers into
+        // break-evens and locks in runners — the biggest expectancy lever.
+        {
+            // Drop risk entries for positions that have closed.
+            initial_risk.retain(|id, _| paper.positions().contains_key(id));
+            let round_trip = (config.trading.fee_rate + 0.0025) * 1.5; // fee cushion for BE
+            let mut adjustments: Vec<(String, f64)> = Vec::new();
+            for (id, pos) in paper.positions().iter() {
+                if pos.side != savant_trading::core::types::Side::Long {
+                    continue;
+                }
+                let r0 = match initial_risk.get(id) {
+                    Some(&r) if r > 0.0 => r,
+                    _ => continue,
+                };
+                let price = match all_prices.get(&pos.pair) {
+                    Some(&p) if p > 0.0 => p,
+                    _ => continue,
+                };
+                let r_mult = (price - pos.entry_price) / r0;
+                let mut desired = pos.stop_loss;
+                if r_mult >= 1.0 {
+                    let be = pos.entry_price * (1.0 + round_trip); // break-even + fees
+                    desired = desired.max(be);
+                }
+                if r_mult >= 2.0 {
+                    let trail = price - r0; // lock in ~1R below current
+                    desired = desired.max(trail);
+                }
+                // Only tighten upward, and never above current price.
+                if desired > pos.stop_loss + (pos.entry_price * 0.0002) && desired < price {
+                    adjustments.push((id.clone(), desired));
+                }
+            }
+            for (id, new_sl) in adjustments {
+                if let Some(p) = paper.positions_mut().get_mut(&id) {
+                    p.stop_loss = new_sl;
+                }
+                if let Some(ref mut live) = live_trader {
+                    live.adjust_stop(&id, new_sl).await;
+                }
+                info!("Trailing stop: {} -> {:.6}", id, new_sl);
+            }
+        }
+
+        // === STALE-POSITION EXIT ===
+        // Close positions that have been open too long with no profit — frees
+        // capital for better setups and stops slow fee/spread bleed.
+        if config.risk.max_position_hours > 0.0 {
+            let now = chrono::Utc::now();
+            let stale: Vec<String> = paper
+                .positions()
+                .iter()
+                .filter(|(_, p)| {
+                    let age_h = (now - p.opened_at).num_seconds() as f64 / 3600.0;
+                    let price = all_prices.get(&p.pair).copied().unwrap_or(p.current_price);
+                    let in_profit = match p.side {
+                        savant_trading::core::types::Side::Long => price > p.entry_price,
+                        savant_trading::core::types::Side::Short => price < p.entry_price,
+                    };
+                    age_h >= config.risk.max_position_hours && !in_profit
+                })
+                .map(|(id, _)| id.clone())
+                .collect();
+            for id in stale {
+                info!("Stale-exit: closing {} (open > {:.0}h, no profit)", id, config.risk.max_position_hours);
+                if let Some(ref mut live) = live_trader {
+                    if let Err(e) = live.close_position(&id).await {
+                        warn!("Stale-exit live close failed for {}: {}", id, e);
+                    }
+                    if let Ok(bal) = live.fetch_balance().await {
+                        paper.set_balance(bal);
+                    }
+                } else {
+                    paper.close_position(&id).await.ok();
+                }
+                paper.positions_mut().remove(&id);
+                paper.account_mut().open_positions = paper.positions().len();
+                shared.log_activity(
+                    savant_trading::core::shared::ActivityLevel::Trade,
+                    "SYSTEM",
+                    &format!("Stale-exit closed {} (no profit after {:.0}h)", id, config.risk.max_position_hours),
+                ).await;
+            }
+        }
+
+        // Live mode: the exchange is the source of truth. check_stops_live
+        // closes the FULL position at market on Kraken (no partial scale-outs)
+        // and records the REAL fill, so local and exchange books stay aligned.
+        // Paper mode keeps the simulated scale-out behaviour.
+        let closed = if let Some(ref mut live) = live_trader {
+            let live_closed = live.check_stops_live(&all_prices).await;
+            for t in &live_closed {
+                let pk = paper
+                    .positions()
+                    .iter()
+                    .find(|(_, p)| p.pair == t.pair && p.side == t.side)
+                    .map(|(k, _)| k.clone());
+                if let Some(k) = pk {
+                    paper.positions_mut().remove(&k);
+                }
+            }
+            if !live_closed.is_empty() {
+                if let Ok(bal) = live.fetch_balance().await {
+                    paper.set_balance(bal);
+                }
+            }
+            paper.account_mut().open_positions = paper.positions().len();
+            live_closed
+        } else {
+            paper.check_stops(&all_prices)
+        };
         for trade in closed {
             info!(
                 "CLOSED: {} {} | PnL: ${:.2} ({:.2}%) | {}",
@@ -1185,6 +1803,9 @@ pub async fn run(
                 if let Err(e) = j.record_trade(&trade).await {
                     warn!("Failed to record trade: {}", e);
                 }
+            }
+            if let Err(e) = paper.save_state("data/paper_state.json") {
+                warn!("State save after close failed: {}", e);
             }
 
             // WIRE-2: Update CUSUM chart on trade close
@@ -1245,9 +1866,23 @@ pub async fn run(
         }
         paper.update_prices(&all_prices);
 
+        let account = paper.account();
+        {
+            let mut shared_account = shared.account.write().await;
+            *shared_account = account.clone();
+            let mut shared_positions = shared.positions.write().await;
+            *shared_positions = paper.positions().values().cloned().collect();
+        }
+
         if tick.is_multiple_of(10) {
-            let account = paper.account();
-            let trades = paper.closed_trades();
+            // In live mode the realized trades live on the Kraken trader; use those
+            // so the dashboard/API show the real closed-trade record and P&L.
+            let trades_vec: Vec<_> = if let Some(ref live) = live_trader {
+                live.closed_trades().to_vec()
+            } else {
+                paper.closed_trades().to_vec()
+            };
+            let trades = &trades_vec[..];
             let metrics = PerformanceMetrics::calculate(trades);
             info!(
                 "[STATUS] Balance: ${:.2} | Equity: ${:.2} | DD: {:.1}% | AI: {} | {}",
@@ -3224,6 +3859,36 @@ pub async fn run_sandbox(config: AppConfig) -> anyhow::Result<()> {
 
 /// Pre-filter: does this pair have an actionable signal worth sending to LLM?
 /// Returns true if any indicator suggests a potential setup.
+/// Higher-timeframe trend classification from a candle series.
+/// `Some(true)` = uptrend (last close above a rising EMA),
+/// `Some(false)` = confirmed downtrend (last close below a falling EMA),
+/// `None` = flat/ambiguous or insufficient data.
+fn htf_uptrend(candles: &[savant_trading::core::types::Candle]) -> Option<bool> {
+    let n = candles.len();
+    if n < 25 {
+        return None;
+    }
+    let closes: Vec<f64> = candles.iter().map(|c| c.close).collect();
+    let period = 20usize;
+    let k = 2.0 / (period as f64 + 1.0);
+    let mut ema = closes[0];
+    let mut emas = Vec::with_capacity(n);
+    for (i, &c) in closes.iter().enumerate() {
+        ema = if i == 0 { c } else { c * k + ema * (1.0 - k) };
+        emas.push(ema);
+    }
+    let last = *closes.last().unwrap();
+    let ema_last = *emas.last().unwrap();
+    let ema_back = emas[n - 5];
+    if last > ema_last && ema_last > ema_back {
+        Some(true)
+    } else if last < ema_last && ema_last < ema_back {
+        Some(false)
+    } else {
+        None
+    }
+}
+
 fn has_actionable_signal(
     indicators: &savant_trading::core::types::IndicatorValues,
     regime: savant_trading::core::types::MarketRegime,

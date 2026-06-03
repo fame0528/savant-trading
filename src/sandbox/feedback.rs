@@ -229,7 +229,7 @@ pub async fn rollback_soul_version(pool: &SqlitePool) -> Result<Option<SoulVersi
 
 /// Build a Teacher LLM prompt for critiquing a failed trade.
 ///
-/// The Teacher Agent uses the same mimo v2.5 pro model ("model empathy")
+/// The Teacher Agent uses the same DeepSeek V4 Flash model
 /// to analyze the reasoning trace and generate a corrective heuristic.
 pub fn build_teacher_critique_prompt(
     reasoning: &str,

@@ -1,6 +1,6 @@
 //! Savant Trading Engine — AI-native autonomous crypto trading system for Kraken exchange.
 //!
-//! Built in Rust with tokio async runtime. The AI agent (mimo v2.5 pro) IS the brain,
+//! Built in Rust with tokio async runtime. The AI agent (DeepSeek V4 Flash via NVIDIA NIM) IS the brain,
 //! informed by 11 curated trading transcripts and live market insight data.
 //!
 //! # Architecture

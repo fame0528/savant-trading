@@ -29,6 +29,10 @@ pub struct PaperTrader {
     best_bid: HashMap<String, f64>,
     /// Current best ask per pair (for maker routing)
     best_ask: HashMap<String, f64>,
+    /// In live mode `balance` is the Kraken TOTAL (cash + position market value),
+    /// so equity must NOT re-add position cost basis (that double-counts and
+    /// produces a fake drawdown / false KILL_SWITCH).
+    live_mode: bool,
 }
 
 impl PaperTrader {
@@ -47,7 +51,13 @@ impl PaperTrader {
             maker_fee_rate: 0.0025, // Kraken maker fee: 0.25%
             best_bid: HashMap::new(),
             best_ask: HashMap::new(),
+            live_mode: false,
         }
+    }
+
+    /// Mark this tracker as mirroring a live Kraken account (balance = total equity).
+    pub fn set_live_mode(&mut self, live: bool) {
+        self.live_mode = live;
     }
 
     /// Update ATR values for dynamic slippage calculation.
@@ -126,6 +136,7 @@ impl PaperTrader {
         }
 
         let mut total_unrealized = 0.0;
+        let mut total_cost_basis = 0.0;
         for pos in self.positions.values_mut() {
             if let Some(&price) = prices.get(&pos.pair) {
                 pos.current_price = price;
@@ -134,9 +145,24 @@ impl PaperTrader {
                     Side::Short => (pos.entry_price - price) * pos.quantity,
                 };
                 total_unrealized += pos.unrealized_pnl;
+                total_cost_basis += pos.entry_price * pos.quantity;
             }
         }
-        self.account.update_equity(total_unrealized);
+        if self.live_mode {
+            // balance already IS total equity (Kraken values crypto at market).
+            // Do not add cost basis again — just track peak/drawdown off balance.
+            self.account.unrealized_pnl = total_unrealized;
+            self.account.equity = self.account.balance;
+            if self.account.equity > self.account.peak_equity {
+                self.account.peak_equity = self.account.equity;
+            }
+            if self.account.peak_equity > 0.0 {
+                self.account.drawdown_pct =
+                    (self.account.peak_equity - self.account.equity) / self.account.peak_equity;
+            }
+        } else {
+            self.account.update_equity(total_unrealized, total_cost_basis);
+        }
     }
 
     pub fn check_stops(&mut self, prices: &HashMap<String, f64>) -> Vec<TradeRecord> {
@@ -375,11 +401,15 @@ impl PaperTrader {
         &mut self.account
     }
 
-    pub fn set_balance(&mut self, balance: f64) {
-        self.account.balance = balance;
-        self.account.equity = balance;
-        self.account.peak_equity = balance;
-    }
+pub fn set_balance(&mut self, balance: f64) {
+    self.account.balance = balance;
+    self.account.equity = balance;
+}
+
+pub fn reset_peak(&mut self) {
+    self.account.peak_equity = self.account.equity;
+    self.account.drawdown_pct = 0.0;
+}
 
     /// Save engine state to disk for crash recovery (PROD-3).
     pub fn save_state(&self, path: &str) -> Result<(), String> {
@@ -454,6 +484,7 @@ impl ExecutionEngine for PaperTrader {
         side: Side,
         quantity: f64,
         price: Option<f64>,
+        _stop_loss: Option<f64>,
     ) -> Result<Order, ExecutionError> {
         let raw_price = price.unwrap_or(0.0);
         let order_value = raw_price * quantity;

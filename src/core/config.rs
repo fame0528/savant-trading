@@ -145,6 +145,24 @@ pub struct TradingConfig {
     pub database_url: String,
     pub fee_rate: f64,
     pub slippage_pct: f64,
+    /// Live entry order style:
+    ///   "post_only"  = maker limit at the AI price; cheapest, but often won't
+    ///                  fill (price must come back to the exact level).
+    ///   "marketable" = limit at current market +/- max_entry_slippage_pct so it
+    ///                  fills immediately (taker) with bounded slippage; stop/TP
+    ///                  are re-anchored to the real fill to preserve R:R.
+    #[serde(default = "default_entry_mode")]
+    pub entry_mode: String,
+    /// Max slippage (%) allowed for marketable entries.
+    #[serde(default = "default_max_entry_slippage_pct")]
+    pub max_entry_slippage_pct: f64,
+}
+
+fn default_entry_mode() -> String {
+    "marketable".to_string()
+}
+fn default_max_entry_slippage_pct() -> f64 {
+    0.15
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -162,6 +180,44 @@ pub struct RiskConfig {
     pub max_drawdown: f64,
     pub max_positions: usize,
     pub min_rr_ratio: f64,
+    /// Minimum NET (after-fee) take-profit-1 move required to take a trade, in
+    /// percent. The TP1 must clear estimated round-trip fees by at least this
+    /// margin or the setup is skipped — prevents fee-losing scalps.
+    #[serde(default = "default_min_net_target_pct")]
+    pub min_net_target_pct: f64,
+    /// Only open longs when the higher-timeframe trend is up (and BTC isn't in a
+    /// confirmed downtrend). A long-only bot loses buying dips in downtrends.
+    #[serde(default = "default_true")]
+    pub trend_filter: bool,
+    /// Skip entries when the pair's bid/ask spread exceeds this (basis points).
+    /// Spread is a hidden fee — wide spreads quietly eat the edge. 0 disables.
+    #[serde(default = "default_max_spread_bps")]
+    pub max_spread_bps: f64,
+    /// Don't open a new position more correlated than this with any open
+    /// position (avoids stacking the same bet). 1.0 disables.
+    #[serde(default = "default_max_position_correlation")]
+    pub max_position_correlation: f64,
+    /// Close a position that's been open this many hours with no profit (frees
+    /// capital, avoids slow bleed). 0 disables.
+    #[serde(default = "default_max_position_hours")]
+    pub max_position_hours: f64,
+}
+
+fn default_true() -> bool {
+    true
+}
+fn default_max_spread_bps() -> f64 {
+    25.0
+}
+fn default_max_position_correlation() -> f64 {
+    0.85
+}
+fn default_max_position_hours() -> f64 {
+    6.0
+}
+
+fn default_min_net_target_pct() -> f64 {
+    1.5
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -251,9 +307,11 @@ impl Default for AppConfig {
                 database_url: "sqlite:data/savant.db".into(),
                 fee_rate: 0.0026,
                 slippage_pct: 0.0005,
+                entry_mode: default_entry_mode(),
+                max_entry_slippage_pct: default_max_entry_slippage_pct(),
             },
             risk: RiskConfig {
-                max_risk_per_trade: 0.20,
+                max_risk_per_trade: 0.08,
                 dynamic_risk_tiers: vec![
                     RiskTier {
                         balance: 500.0,
@@ -273,9 +331,14 @@ impl Default for AppConfig {
                     },
                 ],
                 max_daily_loss: 0.20,
-                max_drawdown: 0.40,
+                max_drawdown: 1.0,
                 max_positions: 5,
                 min_rr_ratio: 1.5,
+                min_net_target_pct: default_min_net_target_pct(),
+                trend_filter: true,
+                max_spread_bps: default_max_spread_bps(),
+                max_position_correlation: default_max_position_correlation(),
+                max_position_hours: default_max_position_hours(),
             },
             strategy: StrategyConfig {
                 momentum: MomentumConfig {
@@ -299,10 +362,10 @@ impl Default for AppConfig {
                 paper_trading: true,
             },
             ai: AiConfig {
-                provider: "opengateway".into(),
-                endpoint: "https://opengateway.gitlawb.com/v1".into(),
-                model: "mimo-v2.5-pro".into(),
-                api_key_env: "OPENGATEWAY_API_KEY".into(),
+                provider: "openrouter".into(),
+                endpoint: "https://openrouter.ai/api/v1".into(),
+                model: "deepseek/deepseek-v4-flash".into(),
+                api_key_env: "OPENROUTER_API_KEY".into(),
                 autonomy_level: 3,
                 max_decisions_per_hour: 5,
                 context_window_candles: 500,

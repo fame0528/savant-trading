@@ -57,6 +57,15 @@ fn parse_test_args(args: &[String]) -> TestArgs {
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
 
+    std::panic::set_hook(Box::new(|info| {
+        let loc = info.location().map(|l| format!("{}:{}", l.file(), l.line())).unwrap_or_default();
+        let msg = info.payload().downcast_ref::<&str>().map(|s| s.to_string())
+            .or_else(|| info.payload().downcast_ref::<String>().cloned())
+            .unwrap_or_else(|| "unknown panic".to_string());
+        eprintln!("PANIC at {}: {}", loc, msg);
+        std::process::exit(1);
+    }));
+
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::try_from_default_env()
@@ -66,7 +75,12 @@ async fn main() -> anyhow::Result<()> {
 
     let args: Vec<String> = std::env::args().collect();
 
-    let config = AppConfig::load(Path::new("config/default.toml")).unwrap_or_else(|e| {
+    // Allow selecting an alternate config (e.g. the canary) without clobbering
+    // config/default.toml:  SAVANT_CONFIG=config/canary.toml savant
+    let config_path = std::env::var("SAVANT_CONFIG")
+        .unwrap_or_else(|_| "config/default.toml".to_string());
+    info!("Loading config from {}", config_path);
+    let config = AppConfig::load(Path::new(&config_path)).unwrap_or_else(|e| {
         warn!("Config load failed ({}), using defaults", e);
         AppConfig::default()
     });
@@ -180,7 +194,7 @@ async fn main() -> anyhow::Result<()> {
     info!("Pairs: {:?}", config.trading.pairs);
     info!("Starting balance: ${:.2}", config.trading.starting_balance);
 
-    let shared = SharedEngineData::new();
+    let shared = SharedEngineData::with_balance(config.trading.starting_balance);
     let shared_clone = shared.clone();
     let api_config = config.clone();
     let engine_running = Arc::new(AtomicBool::new(true));

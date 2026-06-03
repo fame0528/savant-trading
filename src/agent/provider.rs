@@ -1,7 +1,7 @@
 //! OpenAI-compatible LLM HTTP client.
 //!
 //! Supports both non-streaming and SSE streaming modes.
-//! Streaming keeps the connection alive during long reasoning (mimo v2.5 pro)
+//! Streaming keeps the connection alive during long reasoning (deepseek)
 //! and provides real-time visibility into the model's thinking.
 
 use futures_util::StreamExt;
@@ -21,9 +21,9 @@ pub struct LlmConfig {
 impl Default for LlmConfig {
     fn default() -> Self {
         Self {
-            endpoint: "https://opengateway.gitlawb.com/v1".to_string(),
-            model: "mimo-v2.5-pro".to_string(),
-            api_key: std::env::var("OPENGATEWAY_API_KEY").unwrap_or_default(),
+            endpoint: "https://openrouter.ai/api/v1".to_string(),
+            model: "deepseek/deepseek-v4-flash".to_string(),
+            api_key: std::env::var("OPENROUTER_API_KEY").unwrap_or_default(),
             max_tokens: 131072,
             temperature: 0.6,
             top_p: 0.95,

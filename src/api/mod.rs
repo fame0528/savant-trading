@@ -38,6 +38,7 @@ pub struct EngineStatus {
     pub pairs: Vec<String>,
     pub autonomy_level: u8,
     pub ai_status: String,
+    pub balance: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -76,6 +77,7 @@ pub async fn start_server(
             pairs: config.trading.pairs.clone(),
             autonomy_level: config.ai.autonomy_level,
             ai_status: "idle".to_string(),
+            balance: config.trading.starting_balance,
         })),
         shared,
         engine_running,
@@ -95,6 +97,7 @@ pub async fn start_server(
         .route("/api/config", get(get_config))
         .route("/api/portfolio", get(get_portfolio))
         .route("/api/positions", get(get_positions))
+        .route("/api/assets", get(get_assets))
         .route("/api/trades", get(get_trades))
         .route("/api/decisions", get(get_decisions))
         .route("/api/insight", get(get_insight))
@@ -120,6 +123,8 @@ pub async fn start_server(
 async fn get_status(State(state): State<AppState>) -> Json<ApiResponse<EngineStatus>> {
     let mut status = state.engine_status.read().await.clone();
     status.running = state.engine_running.load(Ordering::Relaxed);
+    let account = state.shared.account.read().await;
+    status.balance = account.balance;
     Json(ApiResponse::ok(status))
 }
 
@@ -148,6 +153,19 @@ async fn get_portfolio(State(state): State<AppState>) -> Json<ApiResponse<serde_
         "open_positions": account.open_positions,
         "trades_today": account.trades_today,
     })))
+}
+
+async fn get_assets(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
+    let account = state.shared.account.read().await;
+    let positions = state.shared.positions.read().await;
+    let mut breakdown = serde_json::Map::new();
+    breakdown.insert("ZUSD".to_string(), serde_json::json!(account.balance));
+    for pos in positions.iter() {
+        let val = pos.current_price * pos.quantity;
+        let asset = pos.pair.replace("/USD", "");
+        breakdown.insert(asset, serde_json::json!(val));
+    }
+    Json(ApiResponse::ok(serde_json::Value::Object(breakdown)))
 }
 
 async fn get_positions(State(state): State<AppState>) -> Json<ApiResponse<Vec<serde_json::Value>>> {
@@ -340,6 +358,9 @@ async fn get_activity(State(state): State<AppState>) -> Json<ApiResponse<Vec<ser
         .iter()
         .rev()
         .take(100)
+        .collect::<Vec<_>>()
+        .into_iter()
+        .rev()
         .map(|e| {
             serde_json::json!({
                 "timestamp": e.timestamp,
@@ -502,6 +523,7 @@ mod tests {
             pairs: vec!["BTC/USD".to_string()],
             autonomy_level: 3,
             ai_status: "active".to_string(),
+            balance: 1000.0,
         };
         let json = serde_json::to_string(&status).unwrap();
         assert!(json.contains("PAPER"));

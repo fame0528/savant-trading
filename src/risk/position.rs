@@ -1,5 +1,8 @@
 use crate::core::types::{AccountState, Side};
 
+/// Minimum notional value for a Kraken order (config/default.toml syncs to this)
+const MIN_ORDER_VALUE: f64 = 1.0;
+
 pub struct RiskTier {
     pub balance: f64,
     pub risk_pct: f64,
@@ -8,7 +11,9 @@ pub struct RiskTier {
 pub struct PositionSizer {
     max_risk_per_trade: f64,
     min_rr_ratio: f64,
+    min_order_value: f64,
     dynamic_risk_tiers: Vec<RiskTier>,
+    max_position_pct: f64,
 }
 
 impl PositionSizer {
@@ -16,6 +21,10 @@ impl PositionSizer {
         Self {
             max_risk_per_trade,
             min_rr_ratio,
+            min_order_value: MIN_ORDER_VALUE,
+            max_position_pct: 0.30,
+            // Fallback tiers (monotonic by balance) — only used if config
+            // provides none. Config's dynamic_risk_tiers normally override these.
             dynamic_risk_tiers: vec![
                 RiskTier {
                     balance: 500.0,
@@ -87,7 +96,25 @@ impl PositionSizer {
             return None;
         }
 
-        let quantity = risk_amount / risk_per_unit;
+        let mut quantity = risk_amount / risk_per_unit;
+
+        let max_qty = (account.balance * self.max_position_pct) / entry;
+        if quantity > max_qty {
+            quantity = max_qty;
+        }
+        let cost = entry * quantity;
+        if cost > account.balance {
+            quantity = (account.balance * 0.99) / entry;
+        }
+
+        if quantity <= 0.0 {
+            return None;
+        }
+
+        let cost = entry * quantity;
+        if cost < self.min_order_value {
+            return None;
+        }
 
         Some(PositionSize {
             quantity,
@@ -119,7 +146,9 @@ mod tests {
         assert!(result.is_some());
         let ps = result.unwrap();
         assert_eq!(ps.risk_amount, 10.0); // 20% of 50
-        assert_eq!(ps.quantity, 2.0);
+        // Risk-based size would be 10/5 = 2.0 units ($200 notional), but the
+        // max_position_pct cap (30% of $50 = $15 notional) limits it to 0.15.
+        assert_eq!(ps.quantity, 0.15);
     }
 
     #[test]

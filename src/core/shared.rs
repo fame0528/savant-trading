@@ -71,8 +71,12 @@ pub struct ActivityEntry {
 
 impl SharedEngineData {
     pub fn new() -> Self {
+        Self::with_balance(0.0)
+    }
+
+    pub fn with_balance(balance: f64) -> Self {
         Self {
-            account: Arc::new(RwLock::new(AccountState::new(0.0))),
+            account: Arc::new(RwLock::new(AccountState::new(balance))),
             positions: Arc::new(RwLock::new(Vec::new())),
             closed_trades: Arc::new(RwLock::new(Vec::new())),
             insight: Arc::new(RwLock::new(MarketContext::default())),
