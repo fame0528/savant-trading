@@ -1162,6 +1162,20 @@ pub async fn run(
                                     TradeAction::Buy => {
                                         // --- OPEN LOGIC ---
                                         log_phase!("BUY", "Calculating position size for {}", decision.pair);
+
+                                        // Price tolerance check (FID-035): reject if price drifted
+                                        // too far from AI's entry during LLM evaluation (20-60s window)
+                                        let current_price = market_stores
+                                            .get(&decision.pair)
+                                            .and_then(|s| s.last().map(|c| c.close))
+                                            .unwrap_or(decision.entry_price);
+                                        let drift = ((current_price - decision.entry_price) / decision.entry_price).abs() * 100.0;
+                                        if drift > config.ai.price_tolerance_pct {
+                                            log_warn!("TOLERANCE", "Price drifted {:.1}% for {} (entry={:.4} current={:.4}) — skipping",
+                                                drift, decision.pair, decision.entry_price, current_price);
+                                            continue;
+                                        }
+
                                         let ps = position_sizer.calculate(
                                             paper.account(),
                                             decision.entry_price,

@@ -15,7 +15,7 @@ pub const GREEN_FG: &str = "\x1b[32m";
 pub const ORANGE_FG: &str = "\x1b[33m";
 pub const RED_FG: &str = "\x1b[31m";
 pub const WHITE_FG: &str = "\x1b[97m";
-pub const GREY_FG: &str = "\x1b[37m";
+pub const GREY_FG: &str = "\x1b[90m";
 
 pub const CYAN_BOLD: &str = "\x1b[1;36m";
 pub const GREEN_BOLD: &str = "\x1b[1;32m";
@@ -41,16 +41,21 @@ pub const DIM: &str = "\x1b[2m";
 const TRADING_PAIRS: &[&str] = &[
     "BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD",
     "DOGE/USD", "ADA/USD", "LINK/USD", "AVAX/USD",
+    "PEPE/USD", "SHIB/USD", "FLOKI/USD", "TURBO/USD", "MOG/USD",
     "BTC/USDC", "ETH/USDC", "SOL/USDC", "XRP/USDC",
 ];
 
 /// Highlight trading pair names with cyan bold brackets.
+/// Works on both bare (`BTC/USD`) and already-bracketed (`[BTC/USD]`) pairs.
 fn highlight_pairs(text: &str) -> String {
     let mut result = text.to_string();
     for pair in TRADING_PAIRS {
-        let bracketed = format!("[{}]", pair);
-        if result.contains(pair) && !result.contains(&bracketed) {
-            result = result.replace(pair, &format!("{}[{}]{}", CYAN_BOLD, pair, RESET));
+        if result.contains(pair) {
+            // Skip if already highlighted (has ANSI codes around it)
+            let highlighted = format!("{}[{}]{}", CYAN_BOLD, pair, RESET);
+            if !result.contains(&highlighted) {
+                result = result.replace(pair, &highlighted);
+            }
         }
     }
     result
@@ -97,7 +102,7 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
         LogLevel::Swap => (CYAN_BOLD, GREY_DIM),
         LogLevel::SwapOk => (GREEN_BOLD, GREEN_FG),
         LogLevel::SwapFail => (RED_BOLD, RED_FG),
-        LogLevel::Vault => (GREY_DIM, GREY_DIM),
+        LogLevel::Vault => (GREY_DIM, GREY_FG),
         LogLevel::Circuit => (RED_BOLD, RED_FG),
         LogLevel::Warn => (ORANGE_BOLD, ORANGE_FG),
     };

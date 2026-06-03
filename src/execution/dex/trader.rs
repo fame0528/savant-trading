@@ -530,6 +530,29 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
         log_swap!("0x API", "Calling: {} -> {} amount={}", swap_params.src_token, swap_params.dst_token, swap_params.amount);
 
+        // Spread filter (FID-035): Check spread before executing swap.
+        // At $11 positions, 30bps spread = $0.033 friction. With 3% stop ($0.33),
+        // friction consumes 28% of margin. Above 30bps, friction exceeds 40%.
+        match self.backend.quote(&swap_params).await {
+            Ok(quote) => {
+                let buy: f64 = quote.to_amount.parse().unwrap_or(0.0);
+                let sell: f64 = swap_params.amount.parse().unwrap_or(0.0);
+                if buy > 0.0 && sell > 0.0 {
+                    let spread_bps = ((sell - buy) / buy).abs() * 10000.0;
+                    if spread_bps > 30.0 {
+                        log_warn!("SPREAD", "Rejected {} — spread {:.0}bps exceeds 30bps limit", swap_params.src_token, spread_bps);
+                        return Err(ExecutionError::Other(format!(
+                            "Spread {:.0}bps exceeds 30bps limit for {}", spread_bps, swap_params.src_token
+                        )));
+                    }
+                    log_swap!("SPREAD", "OK: {:.0}bps for {}", spread_bps, swap_params.src_token);
+                }
+            }
+            Err(e) => {
+                log_warn!("SPREAD", "Quote failed ({}), proceeding without spread check", e);
+            }
+        }
+
         // Fast-fail: 15s timeout + catch_unwind on the 0x API call.
         // The reqwest client has a 30s timeout but doesn't cover DNS/TLS hangs.
         // catch_unwind prevents panics in the HTTP client from killing the engine.

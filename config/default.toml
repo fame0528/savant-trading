@@ -17,9 +17,11 @@ slippage_pct = 0.005
 # Core pairs — always tracked, highest liquidity
 # BTC & ETH are the foundation. Top 10 + meme coins are where the action is.
 pairs = [
-    # High-liquidity only — tight spreads on 0x, low slippage
+    # Core macro — high liquidity, tight spreads
     "BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD",
     "DOGE/USD", "ADA/USD", "LINK/USD", "AVAX/USD",
+    # Meme/high-volatility — higher ATR, more setups (FID-035)
+    "PEPE/USD", "SHIB/USD", "FLOKI/USD", "TURBO/USD", "MOG/USD",
 ]
 # Set to true to scan all Kraken USD pairs for opportunity
 # WARNING: Scans 455+ pairs, takes 15+ minutes per cycle. Only enable if needed.
@@ -54,6 +56,16 @@ max_drawdown = 0.10
 max_positions = 3
 # Higher R:R compensates for full deployment risk at small balances
 min_rr_ratio = 2.0
+# Spread filter — reject trades where spread > 30bps (FID-035)
+# At $11 positions, 30bps = $0.033 friction. Round-trip gas = $0.06.
+# Total friction = $0.093. With 3% stop ($0.33), friction = 28% of margin.
+max_spread_bps = 30
+# Risk buckets for correlation cap (FID-035)
+# Max 1 open position from meme bucket at any time
+[risk.buckets]
+macro = ["BTC/USD", "ETH/USD", "SOL/USD", "ADA/USD", "AVAX/USD"]
+legacy = ["XRP/USD", "LINK/USD", "DOGE/USD"]
+meme = ["PEPE/USD", "SHIB/USD", "FLOKI/USD", "TURBO/USD", "MOG/USD"]
 
 [strategy.momentum]
 ema_period = 100
@@ -84,7 +96,7 @@ max_decisions_per_hour = 20
 # Expanded to use more of the 1M context window (FID-015)
 context_window_candles = 500
 knowledge_token_budget = 20000
-price_tolerance_pct = 10.0
+price_tolerance_pct = 0.5
 max_retries = 3
 # 0.6 optimal for MoE reasoning models emitting structured JSON (FID-015)
 temperature = 0.6
