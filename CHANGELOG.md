@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- **FID-035 Phase 2** — GoPlus Security API (honeypot/tax detection for meme coins). Risk buckets (macro/legacy/meme) with correlation cap. ATR-based position sizing (`calculate_with_atr()`).
+- **FID-035 Phase 3** — Retry queue for failed swaps (max 3 attempts, retried next cycle).
 - **FID-035 Phase 1** — Meme coin expansion: 13 pairs (8 core + PEPE, SHIB, FLOKI, TURBO, MOG). Spread filter (30bps max). Price tolerance (0.5% drift). Risk buckets (macro/legacy/meme). `highlight_pairs()` updated.
 - **FID-034** — ANSI color placement fix.
 - **FID-033** — Uniform console output via custom tracing Layer.
