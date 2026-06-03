@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0603-001-inherited-base-clippy-lints.md`
 **ID:** FID-2026-0603-001
 **Severity:** low
-**Status:** analyzed
+**Status:** closed
 **Created:** 2026-06-03 14:44
 **Author:** savant-agent (Kraken rebase session)
 

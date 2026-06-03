@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0603-038-arbitrum-tokens-and-candle-sources.md`
 **ID:** FID-2026-0603-038
 **Severity:** critical
-**Status:** implemented
+**Status:** closed
 **Created:** 2026-06-03 18:30
 **Author:** Agent
 
