@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- **FID-035 Phase 3** — Dual timeframe (5m→15m aggregation, no extra API calls). Emergency liquidation CLI (`--liquidate` flag). Retry queue for failed swaps (max 3 attempts).
+- **FID-035 Phase 3** — Dual timeframe (5m→15m aggregation, no extra API calls). KV cache optimization (`cache_control: ephemeral` on system message for OpenRouter prefix caching). Emergency liquidation CLI (`--liquidate` flag). Retry queue for failed swaps (max 3 attempts).
 - **FID-035 Phase 2** — GoPlus Security API (honeypot/tax detection for meme coins). Risk buckets (macro/legacy/meme) with correlation cap. ATR-based position sizing (`calculate_with_atr()`).
 - **FID-035 Phase 1** — Meme coin expansion: 13 pairs (8 core + PEPE, SHIB, FLOKI, TURBO, MOG). Spread filter (30bps max). Price tolerance (0.5% drift). `highlight_pairs()` updated.
 - **FID-034** — ANSI color placement fix.
