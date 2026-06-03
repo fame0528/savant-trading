@@ -81,7 +81,10 @@ Rule-Based Strategies ──→ Optional parallel signals (comparison only)
 - **Structured Decisions** — AI outputs JSON with entry, stop, 3 take-profit levels, confidence score, and reasoning
 - **Fallback Mode** — Rule-based strategies activate automatically if LLM is unavailable
 - **DEX Execution** — 0x and 1inch backends on Arbitrum (no KYC). EIP-1559 signing, Permit2 approval, receipt verification, 3-retry logic, 50% gas buffer
-- **Enterprise Console** — Structured output: `[Savant Trading] [MM-DD-YYYY HH:mm] [ACTION] [RESULT]`. Cyan brand, grey timestamps, color-coded results
+- **Enterprise Console** — Structured output: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]`. Cyan brand, grey timestamps, color-coded results
+- **Casing-Tolerant Parser** — AI responses parse correctly regardless of casing (BUY/Buy/buy all work)
+- **Position Sizer Safety** — Min order value ($1), max position pct (30%), balance cap prevents overexposure
+- **HTML Dashboard** — Single-file vanilla JS dashboard at `/dashboard.html` with glassmorphic design
 
 ---
 
@@ -134,12 +137,18 @@ cargo run
 Copy `.env.example` to `.env` and configure:
 
 ```bash
-# OpenGateway API key (optional — has built-in defaults)
-OPENGATEWAY_API_KEY=your_key_here
+# OpenRouter API key (required for AI decisions)
+OPENROUTER_API_KEY=your_key_here
 
-# Kraken API keys (required for live trading only)
+# Kraken API keys (required for Kraken CEX trading only)
 KRAKEN_API_KEY=your_key
 KRAKEN_API_SECRET=your_secret
+
+# 0x API key (required for DEX trading only)
+ZEROEX_API_KEY=your_key
+
+# Wallet private key (required for DEX trading only)
+WALLET_PRIVATE_KEY=your_key
 ```
 
 ---
@@ -213,6 +222,7 @@ savant-trading/
 │   │   └── walk_forward.rs       # Walk-forward optimization
 │   ├── core/                     # Types, config, errors
 │   │   ├── config.rs
+│   │   ├── console.rs            # Enterprise logging (savant_log, SavantTimer)
 │   │   ├── types.rs
 │   │   ├── error.rs
 │   │   ├── events.rs
@@ -280,7 +290,9 @@ savant-trading/
 │   ├── main.rs                   # CLI entry point
 │   └── lib.rs                    # Module declarations
 ├── config/
-│   └── default.toml              # All non-secret configuration
+│   ├── default.toml              # All non-secret configuration
+│   └── canary.toml               # Canary config for testing
+├── dashboard.html                # Single-file vanilla JS dashboard
 ├── knowledge/                    # 10 JSON knowledge files (2,959 units)
 ├── templates/
 │   ├── FID-TEMPLATE.md           # Finding ID template
@@ -292,9 +304,13 @@ savant-trading/
 │   └── KNOWLEDGE-EXPANSION-EXECUTION.md
 ├── dev/
 │   ├── LEARNINGS.md              # Cross-session knowledge
-│   ├── fids/                     # Active FIDs (0 active)
-│   │   └── archive/              # 50 archived FIDs
+│   ├── MERGE-STRATEGY.md         # Merge strategy for parallel branches
+│   ├── HANDOFF-OTHER-DEV.md      # Instructions for other dev's agent
+│   ├── fids/                     # Active FIDs
+│   │   └── archive/              # Archived FIDs
 │   └── session-summaries/        # Session history
+├── stats.ps1                     # Performance scoreboard
+├── run-canary.ps1                # Canary mode launcher
 ├── .env.example                  # Environment template
 ├── .gitignore
 ├── Cargo.toml
@@ -343,7 +359,9 @@ cargo run -- --help
 ```
 
 **API endpoints** (available at `http://localhost:8080/api/`):
-`/status` `/config` `/portfolio` `/positions` `/trades` `/decisions` `/insight` `/knowledge` `/risk` `/session` `/activity` `/memory` `/training`
+`/status` `/config` `/portfolio` `/positions` `/assets` `/trades` `/decisions` `/insight` `/knowledge` `/risk` `/session` `/activity` `/memory` `/training`
+
+**Dashboard:** `http://localhost:8080/dashboard.html`
 
 ---
 
@@ -382,17 +400,16 @@ ls dev/fids/archive/
 # 50 archived FIDs from development history (FID-001 through 024)
 ```
 
-### Current FID Status (end of session)
+### Current FID Status
 
-All FIDs (FID-001 through FID-024) are closed and archived — clean slate.
+| FID | Description | Status |
+|-----|-------------|--------|
+| FID-029 | Port Kraken improvements from feat/kraken-execution-v2 | analyzed |
 
 | FIDs | Count | Location |
 |------|-------|----------|
-| Active (numbered) | 0 | `dev/fids/` |
-| Archived (files) | 50 | `dev/fids/archive/` |
-
-```
-```
+| Active (numbered) | 1 | `dev/fids/` |
+| Archived (files) | 50+ | `dev/fids/archive/` |
 
 ### ECHO Protocol
 
