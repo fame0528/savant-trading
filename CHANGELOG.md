@@ -8,17 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- **Casing-tolerant decision parser** — `BUY`/`SELL`/`CLOSE`/`ADJUST_STOP` aliases added to `TradeAction` enum. AI responses now parse correctly regardless of casing.
-- **AdjustStop validation fix** — Skips entry price check, only validates stop_loss. ADJUST_STOP actions no longer rejected.
-- **Confidence floor exemption** — Close/AdjustStop (position management) not blocked by low confidence score.
-- **Position sizer improvements** — Min order value ($1), max position pct (30%), balance cap. Prevents orders below Kraken minimums.
-- **HTML dashboard** — `dashboard.html` single-file vanilla JS dashboard with glassmorphic design.
-- **Dashboard route** — `/dashboard.html` and `/` serve the dashboard from the API server.
-- **Canary config** — `config/canary.toml` for testing new features.
-- **Scoreboard script** — `stats.ps1` for tracking performance.
-- **Launcher script** — `run-canary.ps1` for canary mode.
-- **FID-029** — Port Kraken improvements from feat/kraken-execution-v2 branch (status: analyzed).
-- **FID-030** — 0x API intermittently hangs (status: analyzed).
+- **FID-035** — Meme coin expansion + safety rails. 13 pairs total (PEPE, SHIB, FLOKI, TURBO, MOG). Spread filter (30bps), GoPlus security API, correlation cap, dual timeframe, KV cache optimization. Based on Gemini Deep Research (68 pages, 69 citations).
+- **FID-034** — ANSI color placement fix.
+- **FID-033** — Uniform console output via custom tracing Layer.
 - **Merge strategy** — `dev/MERGE-STRATEGY.md` documenting cherry-pick approach.
 - **Handoff docs** — `dev/HANDOFF-OTHER-DEV.md`, `dev/AGENT-PROMPT-PRESTON.md` (archived after consumption).
 - **12h EST timestamps** — `SavantTimer` for tracing subscriber, `est_now()` shared function.
