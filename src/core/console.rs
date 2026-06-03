@@ -83,8 +83,12 @@ pub enum LogLevel {
     Warn,
 }
 
+/// Print a styled log line.
+///
+/// Format: `[Savant Trading] [TIME] [ACTION] RESULT`
+/// Colors are applied BEFORE the text, RESET after each segment.
 pub fn savant_log(level: LogLevel, action: &str, result: &str) {
-    let (action_style, result_style) = match level {
+    let (action_color, result_color) = match level {
         LogLevel::Phase => (WHITE_BOLD, WHITE_FG),
         LogLevel::Llm => (GREY_FG, WHITE_FG),
         LogLevel::LlmDone => (GREY_FG, GREEN_FG),
@@ -101,24 +105,42 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
     let ts = est_now();
     let highlighted = highlight_pairs(result);
 
-    eprintln!(
-        "{}[Savant Trading]{} {}[{}]{} {}[{}]{} {}{}{}",
-        CYAN_BOLD, RESET,
-        GREY_FG, ts, RESET,
-        action_style, action, RESET,
-        result_style, highlighted, RESET,
+    // Build the line manually to ensure correct ANSI placement:
+    // color BEFORE text, RESET AFTER text
+    let line = format!(
+        "{cyan}[Savant Trading]{reset} {grey}[{ts}]{reset} {action_c}[{action}]{reset} {result_c}{result}{reset}",
+        cyan = CYAN_BOLD,
+        reset = RESET,
+        grey = GREY_FG,
+        ts = ts,
+        action_c = action_color,
+        action = action,
+        result_c = result_color,
+        result = highlighted,
     );
+    eprintln!("{}", line);
 }
 
 // ── SavantLayer — custom tracing Layer ───────────────────────────────────
-//
-// Formats ALL tracing events in the same `[Savant Trading] [TIME] [LEVEL] msg`
-// format as savant_log. This makes tracing output uniform with our styled logs.
 
 use tracing_subscriber::Layer;
 use std::fmt::Write as FmtWrite;
 
 pub struct SavantLayer;
+
+/// Capitalize module name: `funding_rates` → `FundingRates`, `kraken` → `Kraken`
+fn capitalize_module(name: &str) -> String {
+    name.split('_')
+        .map(|word| {
+            let mut chars = word.chars();
+            match chars.next() {
+                Some(first) => format!("{}{}", first.to_uppercase(), chars.as_str()),
+                None => String::new(),
+            }
+        })
+        .collect::<Vec<_>>()
+        .join("")
+}
 
 impl<S> Layer<S> for SavantLayer
 where
@@ -146,25 +168,32 @@ where
         let mut visitor = MessageVisitor(&mut message);
         event.record(&mut visitor);
 
-        // Extract target (module path) as a short label
+        // Extract target (module path) as a short, capitalized label
         let target = metadata.target();
         let short_target = target
             .rsplit("::")
             .next()
             .unwrap_or(target);
+        let formatted_target = capitalize_module(short_target);
 
         let ts = est_now();
         let highlighted = highlight_pairs(&message);
 
-        // Format: [Savant Trading] [TIME] [LEVEL] [module] message
-        eprintln!(
-            "{}[Savant Trading]{} {}[{}]{} {}[{}]{} {}[{}]{} {}{}{}",
-            CYAN_BOLD, RESET,
-            GREY_FG, ts, RESET,
-            action_color, action, RESET,
-            GREY_DIM, short_target, RESET,
-            result_color, highlighted, RESET,
+        // Format: [Savant Trading] [TIME] [LEVEL] [Module] message
+        let line = format!(
+            "{cyan}[Savant Trading]{reset} {grey}[{ts}]{reset} {action_c}[{action}]{reset} {target_c}[{target}]{reset} {result_c}{msg}{reset}",
+            cyan = CYAN_BOLD,
+            reset = RESET,
+            grey = GREY_FG,
+            ts = ts,
+            action_c = action_color,
+            action = action,
+            target_c = GREY_DIM,
+            target = formatted_target,
+            result_c = result_color,
+            msg = highlighted,
         );
+        eprintln!("{}", line);
     }
 }
 
@@ -174,7 +203,13 @@ struct MessageVisitor<'a>(&'a mut String);
 impl tracing::field::Visit for MessageVisitor<'_> {
     fn record_debug(&mut self, field: &tracing::field::Field, value: &dyn std::fmt::Debug) {
         if field.name() == "message" {
-            let _ = write!(self.0, "{:?}", value);
+            // Remove surrounding quotes from Debug format
+            let debug_str = format!("{:?}", value);
+            if debug_str.starts_with('"') && debug_str.ends_with('"') {
+                self.0.push_str(&debug_str[1..debug_str.len()-1]);
+            } else {
+                self.0.push_str(&debug_str);
+            }
         } else {
             let _ = write!(self.0, " {}={:?}", field.name(), value);
         }
@@ -186,16 +221,6 @@ impl tracing::field::Visit for MessageVisitor<'_> {
         } else {
             let _ = write!(self.0, " {}={}", field.name(), value);
         }
-    }
-}
-
-// ── Timer for tracing subscriber ─────────────────────────────────────────
-
-pub struct SavantTimer;
-
-impl tracing_subscriber::fmt::time::FormatTime for SavantTimer {
-    fn format_time(&self, w: &mut tracing_subscriber::fmt::format::Writer<'_>) -> std::fmt::Result {
-        write!(w, "{}", est_now())
     }
 }
 
