@@ -4,6 +4,25 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.7.0] — 2026-06-03
+
+### Added
+
+- **Casing-tolerant decision parser** — `BUY`/`SELL`/`CLOSE`/`ADJUST_STOP` aliases added to `TradeAction` enum. AI responses now parse correctly regardless of casing.
+- **AdjustStop validation fix** — Skips entry price check, only validates stop_loss. ADJUST_STOP actions no longer rejected.
+- **Confidence floor exemption** — Close/AdjustStop (position management) not blocked by low confidence score.
+- **Position sizer improvements** — Min order value ($1), max position pct (30%), balance cap. Prevents orders below Kraken minimums.
+- **HTML dashboard** — `dashboard.html` single-file vanilla JS dashboard with glassmorphic design.
+- **Canary config** — `config/canary.toml` for testing new features.
+- **Scoreboard script** — `stats.ps1` for tracking performance.
+- **Launcher script** — `run-canary.ps1` for canary mode.
+- **FID-029** — Port Kraken improvements from feat/kraken-execution-v2 branch (status: analyzed).
+- **Merge strategy** — `dev/MERGE-STRATEGY.md` documenting cherry-pick approach.
+
+### Changed
+
+- **Version bump** — 0.6.0 → 0.7.0 (cherry-picked improvements from other dev's branch)
+
 ## [0.6.0] — 2026-06-03
 
 ### Added
