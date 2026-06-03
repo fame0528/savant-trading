@@ -1,0 +1,160 @@
+# =============================================================================
+# CANARY CONFIG — small, long-only live validation run.
+#
+# Purpose: prove the live execution path works end-to-end (real fills, real
+# stops/TPs, real balance sync) on 2-3 high-liquidity pairs with minimal size
+# BEFORE turning the full pair list loose.
+#
+# Run with:  savant   (after copying this over config/default.toml, or point
+#            your launcher at it). Keep your usual default.toml as the
+#            full-deployment config.
+#
+# Safety notes:
+#   - paper_trading = false  -> THIS TRADES REAL MONEY on the live account.
+#   - Long-only: shorts are skipped automatically (spot account).
+#   - Start the engine, watch data/alerts.jsonl and the API /status for a few
+#     fills, confirm stops/TPs behave, THEN widen pairs / raise positions.
+# =============================================================================
+
+[exchange]
+name = "kraken"
+ws_url = "wss://ws.kraken.com/v2"
+rest_url = "https://api.kraken.com"
+
+[trading]
+# Full pair universe (already curated from thousands of Kraken pairs). Scanning
+# all of these only widens the AI's MENU — actual exposure is bounded by
+# max_positions below, not by the number of pairs scanned. Sub-penny coins
+# (SHIB/PEPE/BONK) are decimal-handled correctly now; the post-only entries +
+# fee floor will naturally filter the ones with no edge.
+pairs = [
+    # Core
+    "BTC/USD", "ETH/USD",
+    # Top 10 by market cap
+    "SOL/USD", "XRP/USD", "ADA/USD", "AVAX/USD", "DOT/USD", "LINK/USD",
+    # High volatility / momentum
+    "DOGE/USD", "SHIB/USD", "PEPE/USD", "WIF/USD", "BONK/USD",
+    # DeFi / L2
+    "UNI/USD", "AAVE/USD", "ARB/USD", "OP/USD", "LDO/USD", "PENDLE/USD",
+    # AI / narrative
+    "RENDER/USD", "FET/USD", "GRT/USD",
+    # Other volatile
+    "LTC/USD", "ATOM/USD", "NEAR/USD", "INJ/USD", "TIA/USD", "SUI/USD",
+]
+scan_all_pairs = false
+timeframe = "5m"
+timeframes = ["5m", "1h", "4h", "1d"]
+base_currency = "USD"
+starting_balance = 45.0
+database_url = "sqlite:data/savant.db"
+# Kraken low-volume tier taker fee. Round-trip ~0.8% — min_rr_ratio compensates.
+fee_rate = 0.0040
+slippage_pct = 0.0005
+# Entry style: "marketable" fills near current market (taker) with a capped
+# slippage so the bot actually trades; stop/TP are re-anchored to the real fill
+# to preserve R:R. Use "post_only" for maker fees but expect many missed fills.
+entry_mode = "marketable"
+max_entry_slippage_pct = 0.15
+
+[risk]
+max_risk_per_trade = 0.20
+# Fewer, larger positions during the canary so each fill clears Kraken minimums.
+dynamic_risk_tiers = [
+    { balance = 500.0, risk_pct = 0.20 },
+    { balance = 5000.0, risk_pct = 0.10 },
+    { balance = 50000.0, risk_pct = 0.05 },
+    { balance = 999999.0, risk_pct = 0.02 },
+]
+max_daily_loss = 0.10
+max_drawdown = 0.20
+# Cap concurrent exposure during validation. With ~10 pairs, allow a few
+# concurrent positions (3 x 30% notional = up to ~90% deployed).
+max_positions = 3
+# High R:R so the ~0.8% round-trip fee doesn't eat the edge.
+min_rr_ratio = 2.0
+# TP1 must clear round-trip fees by this NET margin or the trade is skipped.
+# 0.80% => required TP1 move ~1.45% (0.65% fees + 0.80% net). The AI's 5m/1h
+# setups mostly target 1-2%, so 1.5% starved it of trades; 0.80% lets the
+# larger setups through while still rejecting fee-losing scalps.
+# Raise toward 1.5 for fewer/higher-edge trades; lower toward 0.5 for more.
+min_net_target_pct = 0.80
+# Only open longs with the higher-timeframe trend (and not while BTC is in a
+# confirmed downtrend). A long-only bot bleeds buying dips in downtrends.
+trend_filter = true
+# Tier 2 selectivity:
+# Skip entries when the bid/ask spread is wider than this (basis points) — the
+# spread is a hidden fee. 25 bps = 0.25%.
+max_spread_bps = 25.0
+# Don't open a new position more correlated than this with an open one (avoids
+# 3 longs that are really one BTC bet). 1.0 disables.
+max_position_correlation = 0.85
+# Close a position open this many hours with no profit (free capital, stop bleed).
+max_position_hours = 6.0
+
+[strategy.momentum]
+ema_period = 100
+volume_spike_multiplier = 2.0
+atr_compression_threshold = 0.7
+
+[strategy.mean_reversion]
+profile_periods = 100
+value_area_pct = 0.70
+volume_spike_multiplier = 1.5
+
+[strategy.regime]
+adx_period = 14
+adx_trending_threshold = 25.0
+adx_ranging_threshold = 20.0
+atr_volatility_multiplier = 1.5
+
+[mode]
+paper_trading = false
+
+[ai]
+provider = "openrouter"
+endpoint = "https://openrouter.ai/api/v1"
+# Cheap + fast structured-JSON model. Alternatives if you want to compare:
+#   google/gemini-2.5-flash   — very cheap, strong reasoning, reliable JSON
+#   openai/gpt-5-mini         — slightly pricier, very steady tool/JSON output
+model = "deepseek/deepseek-v4-flash"
+api_key_env = "OPENROUTER_API_KEY"
+autonomy_level = 3
+# Conservative during canary — at most a few new positions per hour.
+max_decisions_per_hour = 6
+context_window_candles = 500
+knowledge_token_budget = 20000
+price_tolerance_pct = 10.0
+max_retries = 3
+temperature = 0.6
+top_p = 0.95
+max_tokens = 131072
+timeout_secs = 300
+
+[insight]
+funding_rate_enabled = true
+liquidation_enabled = true
+fear_greed_enabled = true
+btc_dominance_enabled = true
+exchange_flows_enabled = true
+news_sentiment_enabled = true
+rss_enabled = true
+rss_max_items = 10
+onchain_enabled = true
+
+[insight.coinmarketcap]
+api_key_env = "COINMARKETCAP_API_KEY"
+top_coins_limit = 100
+min_volume_24h = 1000000
+min_volatility_score = 5.0
+
+[training]
+min_sample_size = 5
+failure_win_rate = 0.30
+max_portfolio_heat = 0.40
+backup_interval_hours = 6
+max_backups = 7
+utility_learning_rate = 0.05
+utility_archive_threshold = 0.30
+max_active_lessons = 50
+brier_cap_threshold = 0.25
+memory_context_min_trades = 5
