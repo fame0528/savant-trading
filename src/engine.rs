@@ -755,7 +755,7 @@ pub async fn run(
         let current_session = savant_trading::core::session::current_session();
 
         for pair in &active_pairs {
-            debug!("Phase 1: Processing {}", pair);
+            info!("Phase 1: Processing {} ({}/{})", pair, active_pairs.iter().position(|p| p == pair).map(|i| i+1).unwrap_or(0), active_pairs.len());
             shared
                 .log_activity(
                     savant_trading::core::shared::ActivityLevel::Info,

@@ -23,8 +23,12 @@ pub struct KrakenClient {
 
 impl KrakenClient {
     pub fn new(rest_url: &str) -> Self {
+        let client = Client::builder()
+            .timeout(std::time::Duration::from_secs(15))
+            .build()
+            .unwrap_or_else(|_| Client::new());
         Self {
-            client: Client::new(),
+            client,
             rest_url: rest_url.to_string(),
             api_key: None,
             api_secret: None,
@@ -39,8 +43,12 @@ impl KrakenClient {
 
     /// Create a client with private API credentials.
     pub fn with_credentials(rest_url: &str, api_key: &str, api_secret: &str) -> Self {
+        let client = Client::builder()
+            .timeout(std::time::Duration::from_secs(15))
+            .build()
+            .unwrap_or_else(|_| Client::new());
         Self {
-            client: Client::new(),
+            client,
             rest_url: rest_url.to_string(),
             api_key: Some(api_key.to_string()),
             api_secret: Some(api_secret.to_string()),
