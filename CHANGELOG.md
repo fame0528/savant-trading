@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **0x API hang (FID-030)** — `build_swap_tx()` hung indefinitely due to DNS/TLS issues. Added 15s fast-fail timeout at API level.
 - **0x API panic crash (FID-031)** — `build_swap_tx()` panicked from reqwest/tokio internals, killing the engine. Added `catch_unwind` around API call.
 - **Console color inconsistency (FID-032)** — RESET between sections killed bold, result color bled to next line. Rewrote `savant_log()` with compound ANSI codes, single RESET at end, pair name highlighting. Brightened grey colors for black background readability. Bracketed action labels `[EVALUATING] [BTC/USD]`. Re-enabled tracing ANSI.
+- **ANSI color placement (FID-034)** — Color codes placed after text in format string, so colors applied to nothing. Fixed with named format params. Capitalized module names. Stripped Debug quotes from tracing messages.
 - **Uniform console output (FID-033)** — Two formatting systems running (savant_log vs tracing). Created custom `SavantLayer` tracing Layer. All output now uses `[Savant Trading] [TIME] [ACTION] [RESULT]` format with consistent colors.
 - **Tracing color bleeding** — tracing's ANSI codes were bleeding into `savant_log()` output. Replaced `fmt()` subscriber with custom `SavantLayer`.
 - **12h clock format** — `est_timestamp()` now returns `MM-DD-YYYY H:MM AM/PM` instead of 24h format.
