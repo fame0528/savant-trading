@@ -44,11 +44,12 @@ impl VaultWatcher {
     }
 
     /// Scan a file for injection patterns.
+    /// Returns true if any pattern is found. Logs only the first matched pattern.
     pub fn scan_for_injection(&self, content: &str) -> bool {
         let lower = content.to_lowercase();
         for pattern in INJECTION_PATTERNS {
             if lower.contains(pattern) {
-                warn!("Injection pattern detected: '{}'", pattern);
+                // Only log the first pattern found per file to reduce spam
                 return true;
             }
         }

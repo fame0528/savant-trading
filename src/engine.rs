@@ -1013,20 +1013,18 @@ pub async fn run(
 
                     // Log to vault
                     if vault_config.enabled {
-                        log_vault!("VAULT", "Writing {}", decision.pair);
-                        if let Err(e) = vault_writer.project_decision(
+                        match vault_writer.project_decision(
                             &decision.pair,
                             &format!("{:?}", decision.action),
                             decision.confidence,
                             &decision.reasoning,
                         ) {
-                            warn!("Vault decision projection failed: {}", e);
+                            Ok(()) => log_vault!("VAULT", "Saved {}", decision.pair),
+                            Err(e) => log_warn!("VAULT", "Failed {}: {}", decision.pair, e),
                         }
-                        log_vault!("VAULT", "Done {}", decision.pair);
                     }
 
                     // Capture episodic memory with timeout to prevent SQLite deadlocks
-                    log_vault!("EPISODIC", "Capture {}", decision.pair);
                     if let Some(ref mem) = memory {
                         let pair_data = _pair_data_for_memory
                             .iter()
@@ -1076,12 +1074,11 @@ pub async fn run(
                             std::time::Duration::from_secs(2),
                             mem.capture_episode(&snapshot),
                         ).await {
-                            Ok(Ok(_)) => {}
-                            Ok(Err(e)) => warn!("Episodic capture failed: {}", e),
-                            Err(_) => warn!("Episodic capture timed out for {}", decision.pair),
+                            Ok(Ok(_)) => log_vault!("EPISODIC", "Saved {}", decision.pair),
+                            Ok(Err(e)) => log_warn!("EPISODIC", "Failed {}: {}", decision.pair, e),
+                            Err(_) => log_warn!("EPISODIC", "Timeout {}", decision.pair),
                         }
                     }
-                    log_vault!("EPISODIC", "Done {}", decision.pair);
 
                     // Skip execution for Hold decisions
                     if decision.action == savant_trading::agent::decision_parser::TradeAction::Hold

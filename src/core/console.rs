@@ -105,7 +105,7 @@ pub enum LogLevel {
 pub fn savant_log(level: LogLevel, action: &str, result: &str) {
     let (action_color, result_color) = match level {
         LogLevel::Phase => (WHITE_BOLD, WHITE_FG),
-        LogLevel::Llm => (GREY_FG, WHITE_FG),
+        LogLevel::Llm => (WHITE_FG, GREY_FG),
         LogLevel::LlmDone => (GREY_FG, GREEN_FG),
         LogLevel::Decision => (CYAN_BOLD, WHITE_FG),
         LogLevel::Trade => (ORANGE_BOLD, ORANGE_FG),
@@ -152,6 +152,16 @@ fn capitalize_module(name: &str) -> String {
         "funding_rates" => return "Funding Rates".to_string(),
         "coinmarketcap" => return "CoinMarketCap".to_string(),
         "goplus" => return "GoPlus".to_string(),
+        "kraken" => return "Kraken Data".to_string(),
+        "trader" => return "DEX Trader".to_string(),
+        "paper" => return "Paper Trader".to_string(),
+        "episodic" => return "Episodic Memory".to_string(),
+        "aggregator" => return "Insight".to_string(),
+        "liquidation" => return "Liquidation".to_string(),
+        "rss" => return "RSS".to_string(),
+        "news" => return "News".to_string(),
+        "watcher" => return "Vault Watcher".to_string(),
+        "market_data" => return "Market Data".to_string(),
         _ => {}
     }
     // Default: capitalize each word, join with space
