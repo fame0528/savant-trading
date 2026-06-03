@@ -831,6 +831,33 @@ pub async fn run(
                     None
                 };
 
+                // Dual timeframe (FID-035): Aggregate 5m candles into 15m
+                // for higher-timeframe trend context. No extra API calls needed.
+                let higher_tf_candles = {
+                    let mut htf = Vec::new();
+                    if candle_data.len() >= 6 {
+                        let mut tf_15m = Vec::new();
+                        for chunk in candle_data.chunks(3) {
+                            if chunk.len() == 3 {
+                                let open = chunk[0].open;
+                                let high = chunk.iter().map(|c| c.high).fold(f64::NEG_INFINITY, f64::max);
+                                let low = chunk.iter().map(|c| c.low).fold(f64::INFINITY, f64::min);
+                                let close = chunk[2].close;
+                                let volume = chunk.iter().map(|c| c.volume).sum::<f64>();
+                                let timestamp = chunk[2].timestamp;
+                                tf_15m.push(Candle {
+                                    pair: pair.clone(),
+                                    open, high, low, close, volume, timestamp,
+                                });
+                            }
+                        }
+                        if !tf_15m.is_empty() {
+                            htf.push(("15m".to_string(), tf_15m));
+                        }
+                    }
+                    htf
+                };
+
                 let ctx = FullContext {
                     candles: &candle_data,
                     indicators: &indicators,
@@ -848,7 +875,7 @@ pub async fn run(
                     order_book_imbalance: ob_imbalance,
                     session: current_session,
                     memory_context: memory_ctx_str,
-                    higher_tf_candles: Vec::new(),
+                    higher_tf_candles,
                     context_tags: savant_trading::agent::context_builder::generate_context_tags(
                         &indicators,
                     ),

@@ -123,6 +123,9 @@ async fn main() -> anyhow::Result<()> {
             let engine_running = Arc::new(AtomicBool::new(false));
             return api::start_server(config, shared, engine_running).await;
         }
+        Some("--liquidate") => {
+            return emergency_liquidate().await;
+        }
         Some("backtest") => {
             info!("=== SAVANT BACKTEST ===");
             return run_backtest_cmd(&config).await;
@@ -344,4 +347,68 @@ fn print_help() {
     println!("API: http://localhost:8080/api/");
     println!("  /status /portfolio /positions /trades /decisions");
     println!("  /insight /knowledge /risk /session /activity /memory");
+}
+
+/// Emergency liquidation — reads dex_state.json and closes all open positions.
+/// Used when the engine crashes while holding positions.
+async fn emergency_liquidate() -> anyhow::Result<()> {
+    use savant_trading::execution::dex::DexTrader;
+    use savant_trading::execution::dex::zero_x::ZeroXBackend;
+    use savant_trading::execution::engine::ExecutionEngine;
+
+    let state_path = std::path::Path::new("data/dex_state.json");
+    if !state_path.exists() {
+        println!("No dex_state.json found — nothing to liquidate.");
+        return Ok(());
+    }
+
+    let json = std::fs::read_to_string(state_path)?;
+    let state: serde_json::Value = serde_json::from_str(&json)?;
+    let positions = state["positions"].as_array();
+
+    match positions {
+        Some(pos) if pos.is_empty() => {
+            println!("No open positions in dex_state.json — nothing to liquidate.");
+            return Ok(());
+        }
+        Some(pos) => {
+            println!("Found {} open position(s). Liquidating...", pos.len());
+        }
+        None => {
+            println!("No positions field in dex_state.json — nothing to liquidate.");
+            return Ok(());
+        }
+    }
+
+    // Load config and create executor
+    let config = savant_trading::core::config::AppConfig::load(std::path::Path::new("config/default.toml"))?;
+    let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)?;
+    let api_key = std::env::var(&config.exchange.dex.api_key_env)?;
+
+    let backend = ZeroXBackend::new(api_key);
+    let mut trader = DexTrader::new(
+        backend,
+        &wallet_key,
+        &config.exchange.dex.rpc_url,
+        config.exchange.dex.chain_id,
+        config.exchange.dex.slippage_pct,
+        config.trading.starting_balance,
+    ).await?;
+
+    // Close all positions
+    let positions: Vec<String> = trader.open_positions().iter().map(|p| p.id.clone()).collect();
+    for pos_id in &positions {
+        println!("Closing position {}...", pos_id);
+        match trader.close_position(pos_id).await {
+            Ok(order) => {
+                println!("  Closed: {} @ {:.4}", pos_id, order.filled_price.unwrap_or(0.0));
+            }
+            Err(e) => {
+                println!("  Failed to close {}: {}", pos_id, e);
+            }
+        }
+    }
+
+    println!("Liquidation complete. Final balance: ${:.2}", trader.balance());
+    Ok(())
 }
