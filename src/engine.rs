@@ -627,7 +627,6 @@ pub async fn run(
             Err(e) => error!("Candle fetch task panicked: {}", e),
         }
     }
-
     // Initial insight fetch (single call for all pairs)
     info!(
         "Fetching initial market insight for {} pairs...",
@@ -1050,16 +1049,17 @@ pub async fn run(
                     content: usr,
                 }];
                 let start = std::time::Instant::now();
+                tracing::info!("LLM evaluating {}...", pd.pair);
                 let response = provider.chat_stream(&sys, &messages).await;
                 let elapsed = start.elapsed().as_millis();
                 match &response {
-                    Ok(text) => tracing::debug!(
-                        "LLM stream complete for {}: {} chars in {}ms",
+                    Ok(text) => tracing::info!(
+                        "LLM complete {}: {} chars in {}ms",
                         pd.pair,
                         text.len(),
                         elapsed
                     ),
-                    Err(e) => tracing::warn!("LLM stream error for {}: {}", pd.pair, e),
+                    Err(e) => tracing::warn!("LLM error {}: {}", pd.pair, e),
                 }
                 PairResult {
                     pair: pd.pair,

@@ -17,18 +17,9 @@ slippage_pct = 0.005
 # Core pairs — always tracked, highest liquidity
 # BTC & ETH are the foundation. Top 10 + meme coins are where the action is.
 pairs = [
-    # Core (always trade)
-    "BTC/USD", "ETH/USD",
-    # Top 10 by market cap
-    "SOL/USD", "XRP/USD", "ADA/USD", "AVAX/USD", "DOT/USD", "LINK/USD",
-    # High volatility / momentum
-    "DOGE/USD", "SHIB/USD", "PEPE/USD", "WIF/USD", "BONK/USD",
-    # DeFi / L2
-    "UNI/USD", "AAVE/USD", "ARB/USD", "OP/USD", "LDO/USD", "PENDLE/USD",
-    # AI / narrative
-    "RENDER/USD", "FET/USD", "GRT/USD",
-    # Other volatile
-    "LTC/USD", "ATOM/USD", "NEAR/USD", "INJ/USD", "TIA/USD", "SUI/USD",
+    # High-liquidity only — tight spreads on 0x, low slippage
+    "BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD",
+    "DOGE/USD", "ADA/USD", "LINK/USD", "AVAX/USD",
 ]
 # Set to true to scan all Kraken USD pairs for opportunity
 # WARNING: Scans 455+ pairs, takes 15+ minutes per cycle. Only enable if needed.
@@ -58,9 +49,9 @@ dynamic_risk_tiers = [
 # Tightened safety nets (FID-015):
 # At $50: daily_loss=$5, drawdown=$10. Survivable.
 # At $500: daily_loss=$50, drawdown=$100. Meaningful protection.
-max_daily_loss = 0.10
-max_drawdown = 0.20
-max_positions = 5
+max_daily_loss = 0.05
+max_drawdown = 0.10
+max_positions = 3
 # Higher R:R compensates for full deployment risk at small balances
 min_rr_ratio = 2.0
 
