@@ -13,6 +13,7 @@ use std::path::{Path, PathBuf};
 use tracing::{error, info, warn};
 
 use crate::core::error::ExecutionError;
+use crate::{log_swap, log_swap_ok, log_swap_fail, log_warn};
 use crate::core::types::{Order, OrderStatus, OrderType, Position, ScaleLevel, Side, TradeRecord};
 use crate::execution::engine::ExecutionEngine;
 
@@ -405,7 +406,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
         // Wait for transaction receipt and verify it succeeded on-chain.
         // Without this, phantom positions get recorded for reverted swaps.
-        eprintln!("[SWAP] Waiting for receipt {}...", tx_hash);
+        log_swap!("SWAP", "Waiting for receipt {}...", tx_hash);
         let receipt = self.wait_for_receipt(&tx_hash).await?;
         if receipt.status != 1 {
             return Err(ExecutionError::Other(format!(
@@ -413,7 +414,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                 tx_hash
             )));
         }
-        eprintln!("[SWAP] TX confirmed on-chain: {} (gas={})", tx_hash, receipt.gas_used);
+        log_swap_ok!("SWAP", "Confirmed on-chain: {} (gas={})", tx_hash, receipt.gas_used);
 
         Ok(tx_hash)
     }
@@ -526,9 +527,9 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             chain_id: self.chain_id,
         };
 
-        eprintln!("[SWAP] Calling 0x API: {} -> {} amount={}", swap_params.src_token, swap_params.dst_token, swap_params.amount);
+        log_swap!("0x API", "Calling: {} -> {} amount={}", swap_params.src_token, swap_params.dst_token, swap_params.amount);
         let swap_tx = self.backend.build_swap_tx(&swap_params).await?;
-        eprintln!("[SWAP] 0x quote OK: to={} gas={} value={}", swap_tx.to, swap_tx.gas, swap_tx.value);
+        log_swap_ok!("0x QUOTE", "OK: to={} gas={} value={}", swap_tx.to, swap_tx.gas, swap_tx.value);
 
         let to: Address = swap_tx
             .to
@@ -544,32 +545,32 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         let max_retries = 3;
         let mut last_err = None;
         for attempt in 1..=max_retries {
-            eprintln!("[SWAP] Signing tx (attempt {}/{}): to={:#x} data_len={} value={} gas={}",
+            log_swap!("SIGN", "Tx (attempt {}/{}): to={:#x} data_len={} value={} gas={}",
                 attempt, max_retries, to, data.len(), value, swap_tx.gas);
             let result = self.sign_and_send(to, &data, value, swap_tx.gas).await;
             match result {
-                Ok(hash) => {
-                    eprintln!("[SWAP] TX broadcast OK: {}", hash);
-                    return Ok(hash);
-                }
-                Err(e) => {
-                    let err_str = e.to_string();
-                    let is_transient = err_str.contains("max fee per gas")
-                        || err_str.contains("nonce too low")
-                        || err_str.contains("replacement transaction underpriced")
-                        || err_str.contains("network")
-                        || err_str.contains("timeout")
-                        || err_str.contains("ECONNRESET");
+                    Ok(hash) => {
+                        log_swap_ok!("BROADCAST", "OK: {}", hash);
+                        return Ok(hash);
+                    }
+                    Err(e) => {
+                        let err_str = e.to_string();
+                        let is_transient = err_str.contains("max fee per gas")
+                            || err_str.contains("nonce too low")
+                            || err_str.contains("replacement transaction underpriced")
+                            || err_str.contains("network")
+                            || err_str.contains("timeout")
+                            || err_str.contains("ECONNRESET");
 
-                    if is_transient && attempt < max_retries {
-                        eprintln!("[SWAP] Transient failure (attempt {}/{}): {} — retrying in 2s",
-                            attempt, max_retries, err_str);
+                        if is_transient && attempt < max_retries {
+                            log_warn!("BROADCAST", "Transient failure (attempt {}/{}): {} — retrying in 2s",
+                                attempt, max_retries, err_str);
                         tokio::time::sleep(std::time::Duration::from_secs(2)).await;
                         last_err = Some(e);
-                    } else {
-                        eprintln!("[SWAP] TX broadcast FAILED (attempt {}/{}): {}", attempt, max_retries, err_str);
-                        return Err(e);
-                    }
+                        } else {
+                            log_swap_fail!("BROADCAST", "FAILED (attempt {}/{}): {}", attempt, max_retries, err_str);
+                            return Err(e);
+                        }
                 }
             }
         }

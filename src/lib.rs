@@ -18,6 +18,7 @@
 
 pub mod agent;
 pub mod backtest;
+#[macro_use]
 pub mod core;
 pub mod data;
 pub mod execution;

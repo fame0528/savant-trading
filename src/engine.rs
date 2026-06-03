@@ -6,6 +6,7 @@ use tracing::{debug, error, info, warn};
 
 use savant_trading::agent::context_builder::FullContext;
 use savant_trading::agent::knowledge::KnowledgeBase;
+use savant_trading::{log_phase, log_llm, log_llm_done, log_decision, log_vault, log_swap, log_swap_fail, log_trade, log_circuit, log_warn};
 use savant_trading::agent::openrouter_management::OpenRouterManagementClient;
 use savant_trading::agent::orchestrator::{AgentConfig, AgentOrchestrator, AutonomyLevel};
 use savant_trading::agent::prompts::{self, PromptComposer};
@@ -852,7 +853,7 @@ pub async fn run(
         }
 
         // === PHASE 2: Send all LLM calls in parallel via streaming ===
-        eprintln!("Phase 2: {} pairs queued for LLM evaluation", pair_data_vec.len());
+        log_phase!("PHASE2", "{} pairs queued for LLM evaluation", pair_data_vec.len());
         struct PairResult {
             pair: String,
             response: Result<String, savant_trading::agent::provider::LlmError>,
@@ -895,12 +896,12 @@ pub async fn run(
                     content: usr,
                 }];
                 let start = std::time::Instant::now();
-                eprintln!("[LLM] Evaluating {}...", pd.pair);
+                log_llm!("LLM", "Evaluating {}...", pd.pair);
                 let response = provider.chat_stream(&sys, &messages).await;
                 let elapsed = start.elapsed().as_millis();
                 match &response {
-                    Ok(text) => eprintln!("[LLM] Complete {}: {} chars in {}ms", pd.pair, text.len(), elapsed),
-                    Err(e) => eprintln!("[LLM] Error {}: {}", pd.pair, e),
+                    Ok(text) => log_llm_done!("LLM", "Complete {}: {} chars in {}ms", pd.pair, text.len(), elapsed),
+                    Err(e) => log_swap_fail!("LLM", "Error {}: {}", pd.pair, e),
                 }
                 PairResult {
                     pair: pd.pair,
@@ -920,8 +921,8 @@ pub async fn run(
                 Err(e) => warn!("Parallel task panicked: {}", e),
             }
         }
-        eprintln!("Phase 3: Processing {} LLM results...", all_results.len());
-        eprintln!("Phase 2 complete: {}/{} pairs evaluated", all_results.len(), active_pairs.len());
+        log_phase!("PHASE3", "Processing {} LLM results...", all_results.len());
+        log_phase!("PHASE2", "Complete: {}/{} pairs evaluated", all_results.len(), active_pairs.len());
 
         // === PHASE 3: Process all results sequentially ===
         for pr in all_results {
@@ -939,7 +940,7 @@ pub async fn run(
                 config.ai.price_tolerance_pct,
             ) {
                 Ok(decision) => {
-                    eprintln!("[AI] {:?} {} @ {:.4} | Conf: {:.0}% | R:R {:.1} | {}",
+                    log_decision!("DECISION", "{:?} {} @ {:.4} | Conf: {:.0}% | R:R {:.1} | {}",
                         decision.action, decision.side, decision.entry_price,
                         decision.confidence * 100.0, decision.risk_reward, decision.reasoning);
 
@@ -956,11 +957,11 @@ pub async fn run(
                         reasoning: decision.reasoning.clone(),
                     };
                     shared.push_decision(decision_record);
-                    eprintln!("[PHASE3] Decision logged for {}", decision.pair);
+                    log_vault!("DECISION", "Logged for {}", decision.pair);
 
                     // Log to vault
                     if vault_config.enabled {
-                        eprintln!("[PHASE3] Writing to vault: {}", decision.pair);
+                        log_vault!("VAULT", "Writing {}", decision.pair);
                         if let Err(e) = vault_writer.project_decision(
                             &decision.pair,
                             &format!("{:?}", decision.action),
@@ -969,11 +970,11 @@ pub async fn run(
                         ) {
                             warn!("Vault decision projection failed: {}", e);
                         }
-                        eprintln!("[PHASE3] Vault done for {}", decision.pair);
+                        log_vault!("VAULT", "Done {}", decision.pair);
                     }
 
                     // Capture episodic memory with timeout to prevent SQLite deadlocks
-                    eprintln!("[PHASE3] Episodic capture for {}", decision.pair);
+                    log_vault!("EPISODIC", "Capture {}", decision.pair);
                     if let Some(ref mem) = memory {
                         let pair_data = _pair_data_for_memory
                             .iter()
@@ -1028,7 +1029,7 @@ pub async fn run(
                             Err(_) => warn!("Episodic capture timed out for {}", decision.pair),
                         }
                     }
-                    eprintln!("[PHASE3] Episodic done for {}", decision.pair);
+                    log_vault!("EPISODIC", "Done {}", decision.pair);
 
                     // Skip execution for Hold decisions
                     if decision.action == savant_trading::agent::decision_parser::TradeAction::Hold
@@ -1044,11 +1045,11 @@ pub async fn run(
                     );
 
                     // Execute if autonomous
-                    eprintln!("[PHASE3] Checking execution for {} (action={:?})", decision.pair, decision.action);
+                    log_phase!("EXECUTION", "Checking {} (action={:?})", decision.pair, decision.action);
                     if matches!(autonomy, AutonomyLevel::Autonomous) {
                         match circuit_breaker.check(paper.account()) {
                             CircuitBreakerResult::Triggered(reason) => {
-                                eprintln!("[PHASE3] CIRCUIT BREAKER: {} — {}", decision.pair, reason);
+                                log_circuit!("CIRCUIT BREAKER", "{} — {}", decision.pair, reason);
                                 let _ = std::fs::write(
                                     "savant.blocked",
                                     format!("{}\nReason: {}\n", Utc::now().to_rfc3339(), reason),
@@ -1081,7 +1082,7 @@ pub async fn run(
                                             );
                                         } else {
                                             for (pos_id, pos) in &positions_to_close {
-                                                eprintln!("[PHASE3] Closing position {} for {} (action={:?})", pos_id, decision.pair, decision.action);
+                                                log_trade!("CLOSE", "Position {} for {} (action={:?})", pos_id, decision.pair, decision.action);
                                                 let close_result = if let Some(ref mut ex) = executor {
                                                     match tokio::time::timeout(
                                                         std::time::Duration::from_secs(60),
@@ -1089,7 +1090,7 @@ pub async fn run(
                                                     ).await {
                                                         Ok(result) => result,
                                                         Err(_) => {
-                                                            eprintln!("[PHASE3] TIMEOUT: close_position for {} took >60s", pos_id);
+                                                            log_swap_fail!("TIMEOUT", "close_position for {} took >60s", pos_id);
                                                             Err(savant_trading::core::error::ExecutionError::Other(
                                                                 format!("close_position timed out after 60s for {}", pos_id)
                                                             ))
@@ -1137,7 +1138,7 @@ pub async fn run(
                                                             notes: format!("AI {:?} via {}", decision.action, decision.pair),
                                                         };
 
-                                                        eprintln!("[TRADE] CLOSED {:?} {} | Pos: {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
+                                                        log_trade!("CLOSED", "{:?} {} | Pos: {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
                                                             decision.action, decision.pair, pos_id,
                                                             exit_price, pnl, pnl_pct);
 
@@ -1155,7 +1156,7 @@ pub async fn run(
                                     }
                                     TradeAction::Buy => {
                                         // --- OPEN LOGIC ---
-                                        eprintln!("[PHASE3] Buy path entered for {} — calculating position size", decision.pair);
+                                        log_phase!("BUY", "Calculating position size for {}", decision.pair);
                                         let ps = position_sizer.calculate(
                                             paper.account(),
                                             decision.entry_price,
@@ -1187,7 +1188,7 @@ pub async fn run(
                                                     decision.pair, decision.side,
                                                 );
                                             } else {
-                                                eprintln!("[PHASE3] Placing order for {} via executor...", decision.pair);
+                                                log_swap!("ORDER", "Placing for {} via executor...", decision.pair);
                                                 let order = if let Some(ref mut ex) = executor {
                                                     match tokio::time::timeout(
                                                         std::time::Duration::from_secs(60),
@@ -1200,7 +1201,7 @@ pub async fn run(
                                                     ).await {
                                                         Ok(result) => result,
                                                         Err(_) => {
-                                                            eprintln!("[PHASE3] TIMEOUT: place_order for {} took >60s", decision.pair);
+                                                            log_swap_fail!("TIMEOUT", "place_order for {} took >60s", decision.pair);
                                                             Err(savant_trading::core::error::ExecutionError::Other(
                                                                 format!("place_order timed out after 60s for {}", decision.pair)
                                                             ))
@@ -1292,7 +1293,7 @@ pub async fn run(
                                                                 f.write_all(alert_line.as_bytes())
                                                             });
 
-                                                        eprintln!("[TRADE] OPENED {} {:?} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4} | Risk: ${:.2}",
+                                                        log_trade!("OPENED", "{} {:?} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4} | Risk: ${:.2}",
                                                             decision.side, decision.action, decision.entry_price,
                                                             ps.quantity, decision.stop_loss, decision.take_profit_1, ps.risk_amount);
 
@@ -1302,7 +1303,7 @@ pub async fn run(
                                                 }
                                             }
                                         } else {
-                                            eprintln!("[PHASE3] Position sizer returned None for {} — stop/R:R invalid. entry={} stop={} tp1={}",
+                                            log_warn!("SIZING", "None for {} — stop/R:R invalid. entry={} stop={} tp1={}",
                                                 decision.pair, decision.entry_price, decision.stop_loss, decision.take_profit_1);
                                         }
                                     }

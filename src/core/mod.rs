@@ -6,6 +6,7 @@
 //! - `types` — Shared data structures (Candle, Signal, Position, Order, etc.)
 
 pub mod config;
+pub mod console;
 pub mod error;
 pub mod events;
 pub mod session;
