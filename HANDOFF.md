@@ -2,7 +2,7 @@
 
 ## Current State
 
-- **Version:** 0.4.4
+- **Version:** 0.5.0
 - **Protocol:** ECHO v0.1.0
 - **Tests:** 187 (182 lib + 4 main + 1 doc-test)
 - **Clippy:** Zero warnings (`cargo clippy -- -D warnings` clean)
@@ -103,7 +103,7 @@ ECHO compliance audit passed — all 15 laws verified, 12-point audit checklist 
 - Call-graph reachability: `create_provider()`, `create_executor()`, `OpenRouterManagementClient` all confirmed
 - Zero `unwrap()` / `expect()` in non-test code
 - Zero `TODO` / `FIXME` / `HACK` / `XXX` / `todo!()` in source
-- **VERSION file was `0.1.0` (protocol version) instead of `0.4.4` (project version) — FIXED**
+- **VERSION file was `0.1.0` (protocol version) instead of `0.5.0` (project version) — FIXED**
 - 39 files exceed 300-line limit (acceptable for Rust, `engine.rs` is 3,591 lines)
 - All quality gates passed
 
@@ -115,7 +115,7 @@ ECHO compliance audit passed — all 15 laws verified, 12-point audit checklist 
 |------|---------|
 | `ECHO.md` | ECHO Protocol v0.1.0 — 15 laws, Perfection Loop FSM, session lifecycle |
 | `protocol.config.yaml` | Project config: language, commands, paths, quality limits |
-| `VERSION` | Now `0.4.4` (was `0.1.0`) |
+| `VERSION` | Now `0.5.0` (was `0.1.0`) |
 | `CHANGELOG.md` | All changes tracked per version |
 | `HANDOFF.md` | (this file) — session-to-session handoff |
 | `config/default.toml` | All runtime config (fee, risk, AI, trading, DEX, training) |
@@ -199,7 +199,7 @@ cargo run -- backtest                         # Historical backtest
 
 1. **ALL FIDs are closed and archived** — FID-001 through FID-024. No open items. Fresh start.
 2. **50 archived FIDs** in `dev/fids/archive/`. Don't re-open — create new FIDs if issues recur.
-3. **VERSION is `0.4.4`** matching `Cargo.toml` and `protocol.config.yaml`'s `project.version`. Do NOT confuse with `protocol.version` (`0.1.0`).
+3. **VERSION is `0.5.0`** matching `Cargo.toml` and `protocol.config.yaml`'s `project.version`. Do NOT confuse with `protocol.version` (`0.1.0`).
 4. **The dashboard is a separate Next.js project** at `dashboard/`. User has not approved work on it.
 5. **DEX tests require no API keys** — wiremock provides hermetic HTTP mocks. 12 tests cover 0x and 1inch backends.
 6. **ECHO Protocol boot sequence:** Read ECHO.md → protocol.config.yaml → coding-standards/ → LEARNINGS.md → dev/fids/ → session summary.

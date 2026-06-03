@@ -145,7 +145,10 @@ impl OpenRouterManagementClient {
     }
 
     /// List the most recent API keys, with optional pagination offset.
-    pub async fn list_keys(&self, offset: Option<usize>) -> Result<Vec<ApiKeyInfo>, ManagementError> {
+    pub async fn list_keys(
+        &self,
+        offset: Option<usize>,
+    ) -> Result<Vec<ApiKeyInfo>, ManagementError> {
         let mut url = self.base_url.clone();
         if let Some(off) = offset {
             url.push_str(&format!("?offset={}", off));
@@ -158,8 +161,9 @@ impl OpenRouterManagementClient {
 
     /// Create a new API key with the given parameters.
     pub async fn create_key(&self, req: CreateKeyRequest) -> Result<CreatedKey, ManagementError> {
-        let body = serde_json::to_value(&req)
-            .map_err(|e| ManagementError::InvalidResponse(format!("create_key serialize: {}", e)))?;
+        let body = serde_json::to_value(&req).map_err(|e| {
+            ManagementError::InvalidResponse(format!("create_key serialize: {}", e))
+        })?;
         let resp = self.post(&self.base_url, body).await?;
         serde_json::from_value(resp)
             .map_err(|e| ManagementError::InvalidResponse(format!("create_key parse: {}", e)))
@@ -176,10 +180,15 @@ impl OpenRouterManagementClient {
     }
 
     /// Update an existing API key (name, disabled, limit_reset, etc.).
-    pub async fn update_key(&self, hash: &str, req: UpdateKeyRequest) -> Result<ApiKeyInfo, ManagementError> {
+    pub async fn update_key(
+        &self,
+        hash: &str,
+        req: UpdateKeyRequest,
+    ) -> Result<ApiKeyInfo, ManagementError> {
         let url = format!("{}/{}", self.base_url, hash);
-        let body = serde_json::to_value(&req)
-            .map_err(|e| ManagementError::InvalidResponse(format!("update_key serialize: {}", e)))?;
+        let body = serde_json::to_value(&req).map_err(|e| {
+            ManagementError::InvalidResponse(format!("update_key serialize: {}", e))
+        })?;
         let resp = self.patch(&url, body).await?;
         let data: SingleKeyResponse = serde_json::from_value(resp)
             .map_err(|e| ManagementError::InvalidResponse(format!("update_key parse: {}", e)))?;
@@ -206,7 +215,11 @@ impl OpenRouterManagementClient {
         self.check_response(resp).await
     }
 
-    async fn post(&self, url: &str, body: serde_json::Value) -> Result<serde_json::Value, ManagementError> {
+    async fn post(
+        &self,
+        url: &str,
+        body: serde_json::Value,
+    ) -> Result<serde_json::Value, ManagementError> {
         let resp = self
             .client
             .post(url)
@@ -219,7 +232,11 @@ impl OpenRouterManagementClient {
         self.check_response(resp).await
     }
 
-    async fn patch(&self, url: &str, body: serde_json::Value) -> Result<serde_json::Value, ManagementError> {
+    async fn patch(
+        &self,
+        url: &str,
+        body: serde_json::Value,
+    ) -> Result<serde_json::Value, ManagementError> {
         let resp = self
             .client
             .patch(url)
@@ -253,7 +270,10 @@ impl OpenRouterManagementClient {
         }
     }
 
-    async fn check_response(&self, resp: reqwest::Response) -> Result<serde_json::Value, ManagementError> {
+    async fn check_response(
+        &self,
+        resp: reqwest::Response,
+    ) -> Result<serde_json::Value, ManagementError> {
         let status = resp.status();
         if !status.is_success() {
             let body = resp.text().await.unwrap_or_default();

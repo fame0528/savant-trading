@@ -37,7 +37,10 @@ pub trait ExecutionEngine: Send + Sync {
 
     /// Place a stop-loss order on the exchange for a tracked position.
     /// Default: no-op (stops are monitored client-side).
-    async fn place_stop_loss(&mut self, _position_id: &str) -> Result<(), crate::core::error::ExecutionError> {
+    async fn place_stop_loss(
+        &mut self,
+        _position_id: &str,
+    ) -> Result<(), crate::core::error::ExecutionError> {
         Ok(())
     }
 }

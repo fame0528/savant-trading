@@ -35,14 +35,22 @@ impl InchBackend {
     /// This variant allows injecting a mock HTTP client in tests via
     /// `wiremock`.  Production code should use [`Self::new`].
     pub fn with_client(api_key: String, client: reqwest::Client) -> Self {
-        Self { api_key, client, base_url_override: None }
+        Self {
+            api_key,
+            client,
+            base_url_override: None,
+        }
     }
 
     /// Create a new 1inch backend with custom client and base URL.
     ///
     /// Used by tests to route requests to a wiremock server.
     pub fn with_client_and_url(api_key: String, client: reqwest::Client, base_url: String) -> Self {
-        Self { api_key, client, base_url_override: Some(base_url) }
+        Self {
+            api_key,
+            client,
+            base_url_override: Some(base_url),
+        }
     }
 
     fn api_url(&self, chain_id: u64) -> String {
@@ -96,11 +104,7 @@ impl DexBackend for InchBackend {
         let to_amount = json["dstAmount"]
             .as_str()
             .map(|s| s.to_string())
-            .or_else(|| {
-                json["dstAmount"]
-                    .as_i64()
-                    .map(|v| v.to_string())
-            })
+            .or_else(|| json["dstAmount"].as_i64().map(|v| v.to_string()))
             .ok_or_else(|| ExecutionError::Other("1inch response missing 'dstAmount'".into()))?;
 
         let src_amount = json["srcAmount"]
@@ -203,8 +207,8 @@ impl DexBackend for InchBackend {
 mod tests {
     use super::*;
     use crate::execution::dex::SwapParams;
+    use wiremock::matchers::{header, method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
-    use wiremock::matchers::{method, path, header};
 
     const TEST_API_KEY: &str = "test-1inch-key-00000000";
 
@@ -254,7 +258,8 @@ mod tests {
             TEST_API_KEY.into(),
             reqwest::Client::builder()
                 .timeout(std::time::Duration::from_secs(5))
-                .build().unwrap(),
+                .build()
+                .unwrap(),
             base,
         )
     }
@@ -328,8 +333,11 @@ mod tests {
         let result = backend.quote(&test_params()).await;
         assert!(result.is_err());
         let err_str = format!("{}", result.unwrap_err());
-        assert!(err_str.contains("dstAmount") || err_str.contains("missing"),
-            "Expected error about missing dstAmount, got: {}", err_str);
+        assert!(
+            err_str.contains("dstAmount") || err_str.contains("missing"),
+            "Expected error about missing dstAmount, got: {}",
+            err_str
+        );
     }
 
     #[tokio::test(flavor = "multi_thread")]
@@ -375,7 +383,10 @@ mod tests {
         let result = backend.build_swap_tx(&test_params()).await;
         assert!(result.is_err());
         let err_str = format!("{}", result.unwrap_err());
-        assert!(err_str.contains("tx.to") || err_str.contains("missing"),
-            "Expected error about missing 'tx.to', got: {}", err_str);
+        assert!(
+            err_str.contains("tx.to") || err_str.contains("missing"),
+            "Expected error about missing 'tx.to', got: {}",
+            err_str
+        );
     }
 }

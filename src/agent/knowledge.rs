@@ -512,6 +512,6 @@ mod tests {
             },
         ]);
         let selected = base.select(&[MarketCondition::Trending], 10000);
-    assert_eq!(selected[0].id, "a"); // higher utility wins
+        assert_eq!(selected[0].id, "a"); // higher utility wins
     }
 }

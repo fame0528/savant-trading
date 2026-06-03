@@ -6,26 +6,26 @@ use tracing::{debug, error, info, warn};
 
 use savant_trading::agent::context_builder::FullContext;
 use savant_trading::agent::knowledge::KnowledgeBase;
+use savant_trading::agent::openrouter_management::OpenRouterManagementClient;
 use savant_trading::agent::orchestrator::{AgentConfig, AgentOrchestrator, AutonomyLevel};
 use savant_trading::agent::prompts::{self, PromptComposer};
-use savant_trading::agent::openrouter_management::OpenRouterManagementClient;
 use savant_trading::agent::provider::create_provider;
 use savant_trading::core::config::AppConfig;
 use savant_trading::core::events::EventBus;
-use savant_trading::core::types::{Candle, Position, ScaleLevel, Side, TradingEvent};
+use savant_trading::core::types::{Candle, Position, ScaleLevel, Side, TradeRecord, TradingEvent};
 use savant_trading::data::indicators::IndicatorEngine;
 use savant_trading::data::kraken::KrakenClient;
 use savant_trading::data::market_data::MarketDataStore;
 use savant_trading::data::orderbook::OrderBookManager;
-use savant_trading::execution::dex::DexTrader;
-use savant_trading::execution::dex::zero_x::ZeroXBackend;
 use savant_trading::execution::dex::inch::InchBackend;
+use savant_trading::execution::dex::zero_x::ZeroXBackend;
+use savant_trading::execution::dex::DexTrader;
 use savant_trading::execution::engine::ExecutionEngine;
 use savant_trading::execution::kraken::{KrakenTrader, KrakenTraderConfig};
 use savant_trading::execution::paper::PaperTrader;
 use savant_trading::insight::aggregator::{InsightAggregator, InsightConfig};
 use savant_trading::monitor::journal::TradeJournal;
-use savant_trading::monitor::metrics::PerformanceMetrics;
+use savant_trading::monitor::metrics::{Metrics, PerformanceMetrics};
 use savant_trading::risk::circuit_breaker::{CircuitBreaker, CircuitBreakerResult};
 use savant_trading::risk::position::PositionSizer;
 use savant_trading::strategy::mean_reversion::MeanReversionStrategy;
@@ -66,7 +66,9 @@ pub fn parse_timeframe_minutes(tf: &str) -> u32 {
 ///   - `"kraken"` → [`KrakenTrader`] (requires KRAKEN_API_KEY/Secret env vars)
 ///   - `"0x"`     → [`DexTrader<ZeroXBackend>`] (requires WALLET_PRIVATE_KEY + ZEROEX_API_KEY)
 ///   - `"1inch"`  → [`DexTrader<InchBackend>`] (requires WALLET_PRIVATE_KEY + 1INCH_API_KEY)
-async fn create_executor(config: &AppConfig) -> Result<Option<Box<dyn ExecutionEngine>>, anyhow::Error> {
+async fn create_executor(
+    config: &AppConfig,
+) -> Result<Option<Box<dyn ExecutionEngine>>, anyhow::Error> {
     if config.mode.paper_trading {
         info!("Paper trading mode: using PaperTrader");
         return Ok(None);
@@ -74,10 +76,12 @@ async fn create_executor(config: &AppConfig) -> Result<Option<Box<dyn ExecutionE
 
     match config.exchange.backend.as_str() {
         "kraken" => {
-            let api_key = std::env::var("KRAKEN_API_KEY")
-                .map_err(|_| anyhow::anyhow!("KRAKEN_API_KEY not set — required for Kraken live trading"))?;
-            let api_secret = std::env::var("KRAKEN_API_SECRET")
-                .map_err(|_| anyhow::anyhow!("KRAKEN_API_SECRET not set — required for Kraken live trading"))?;
+            let api_key = std::env::var("KRAKEN_API_KEY").map_err(|_| {
+                anyhow::anyhow!("KRAKEN_API_KEY not set — required for Kraken live trading")
+            })?;
+            let api_secret = std::env::var("KRAKEN_API_SECRET").map_err(|_| {
+                anyhow::anyhow!("KRAKEN_API_SECRET not set — required for Kraken live trading")
+            })?;
 
             let kraken_config = KrakenTraderConfig {
                 starting_balance: config.trading.starting_balance,
@@ -102,10 +106,18 @@ async fn create_executor(config: &AppConfig) -> Result<Option<Box<dyn ExecutionE
             Ok(Some(Box::new(trader)))
         }
         "0x" => {
-            let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)
-                .map_err(|_| anyhow::anyhow!("{} not set — required for 0x DEX trading", config.exchange.dex.wallet_key_env))?;
-            let api_key = std::env::var(&config.exchange.dex.api_key_env)
-                .map_err(|_| anyhow::anyhow!("{} not set — required for 0x API", config.exchange.dex.api_key_env))?;
+            let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env).map_err(|_| {
+                anyhow::anyhow!(
+                    "{} not set — required for 0x DEX trading",
+                    config.exchange.dex.wallet_key_env
+                )
+            })?;
+            let api_key = std::env::var(&config.exchange.dex.api_key_env).map_err(|_| {
+                anyhow::anyhow!(
+                    "{} not set — required for 0x API",
+                    config.exchange.dex.api_key_env
+                )
+            })?;
 
             let backend = ZeroXBackend::new(api_key);
             let trader = DexTrader::new(
@@ -119,14 +131,25 @@ async fn create_executor(config: &AppConfig) -> Result<Option<Box<dyn ExecutionE
             .await
             .map_err(|e| anyhow::anyhow!("Failed to create DexTrader (0x): {}", e))?;
 
-            info!("LIVE trading mode: DexTrader (0x) initialized on chain {}", config.exchange.dex.chain_id);
+            info!(
+                "LIVE trading mode: DexTrader (0x) initialized on chain {}",
+                config.exchange.dex.chain_id
+            );
             Ok(Some(Box::new(trader)))
         }
         "1inch" => {
-            let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)
-                .map_err(|_| anyhow::anyhow!("{} not set — required for 1inch DEX trading", config.exchange.dex.wallet_key_env))?;
-            let api_key = std::env::var(&config.exchange.dex.api_key_env)
-                .map_err(|_| anyhow::anyhow!("{} not set — required for 1inch API", config.exchange.dex.api_key_env))?;
+            let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env).map_err(|_| {
+                anyhow::anyhow!(
+                    "{} not set — required for 1inch DEX trading",
+                    config.exchange.dex.wallet_key_env
+                )
+            })?;
+            let api_key = std::env::var(&config.exchange.dex.api_key_env).map_err(|_| {
+                anyhow::anyhow!(
+                    "{} not set — required for 1inch API",
+                    config.exchange.dex.api_key_env
+                )
+            })?;
 
             let backend = InchBackend::new(api_key);
             let trader = DexTrader::new(
@@ -140,7 +163,10 @@ async fn create_executor(config: &AppConfig) -> Result<Option<Box<dyn ExecutionE
             .await
             .map_err(|e| anyhow::anyhow!("Failed to create DexTrader (1inch): {}", e))?;
 
-            info!("LIVE trading mode: DexTrader (1inch) initialized on chain {}", config.exchange.dex.chain_id);
+            info!(
+                "LIVE trading mode: DexTrader (1inch) initialized on chain {}",
+                config.exchange.dex.chain_id
+            );
             Ok(Some(Box::new(trader)))
         }
         other => Err(anyhow::anyhow!("Unknown exchange backend '{}'", other)),
@@ -368,7 +394,10 @@ pub async fn run(
     };
 
     let agent = AgentOrchestrator::new(provider, agent_config, knowledge_base, composer);
-    info!("AI agent initialized: {:?} mode with provider '{}'", autonomy, config.ai.provider);
+    info!(
+        "AI agent initialized: {:?} mode with provider '{}'",
+        autonomy, config.ai.provider
+    );
 
     // === OPENROUTER MANAGEMENT (optional, only if management key is set) ===
     if config.ai.provider == "openrouter" {
@@ -845,7 +874,13 @@ pub async fn run(
 
                 // Pre-filter: skip pairs with no actionable signal
                 // Only send to LLM if indicators show a potential setup
-                let has_signal = has_actionable_signal(&indicators, regime, ob_imbalance, current_price, candles.last().map(|c| c.volume));
+                let has_signal = has_actionable_signal(
+                    &indicators,
+                    regime,
+                    ob_imbalance,
+                    current_price,
+                    candles.last().map(|c| c.volume),
+                );
                 let has_position = positions.iter().any(|p| p.pair == *pair);
                 debug!(
                     "Phase 1: {} signal={} position={} → {}",
@@ -1192,132 +1227,245 @@ pub async fn run(
                                 error!("CIRCUIT BREAKER TRIGGERED — wrote savant.blocked.");
                             }
                             CircuitBreakerResult::Ok => {
-                                let ps = position_sizer.calculate(
-                                    paper.account(),
-                                    decision.entry_price,
-                                    decision.stop_loss,
-                                    decision.take_profit_1,
-                                    decision.side,
-                                );
+                                use savant_trading::agent::decision_parser::TradeAction;
 
-                                if let Some(mut ps) = ps {
-                                    let session = savant_trading::core::session::current_session();
-                                    let session_mult = session.position_size_multiplier();
-                                    if session_mult != 1.0 {
-                                        ps.quantity *= session_mult;
-                                        ps.risk_amount *= session_mult;
-                                    }
-
-                                    let order = if let Some(ref mut ex) = executor {
-                                        ex.place_order(
-                                            &decision.pair,
-                                            decision.side,
-                                            ps.quantity,
-                                            Some(decision.entry_price),
-                                        )
-                                        .await
-                                    } else {
-                                        paper
-                                            .place_order(
-                                                &decision.pair,
-                                                decision.side,
-                                                ps.quantity,
-                                                Some(decision.entry_price),
-                                            )
-                                            .await
-                                    };
-
-                                    match order {
-                                        Ok(_) => {
-                                            let pos = Position {
-                                                id: format!("ai-{}", tick),
-                                                pair: decision.pair.clone(),
-                                                side: decision.side,
-                                                entry_price: decision.entry_price,
-                                                current_price: decision.entry_price,
-                                                quantity: ps.quantity,
-                                                stop_loss: decision.stop_loss,
-                                                take_profit_1: decision.take_profit_1,
-                                                take_profit_2: decision.take_profit_2,
-                                                take_profit_3: decision.take_profit_3,
-                                                unrealized_pnl: 0.0,
-                                                risk_amount: ps.risk_amount,
-                                                strategy_name: "ai-agent".to_string(),
-                                                opened_at: chrono::Utc::now(),
-                                                scale_level: ScaleLevel::Full,
+                                match decision.action {
+                                    TradeAction::Sell | TradeAction::Close => {
+                                        // --- CLOSE LOGIC ---
+                                        // Find existing positions for this pair and close them.
+                                        let positions_to_close: Vec<(String, Position)> = {
+                                            let positions = if let Some(ref ex) = executor {
+                                                ex.open_positions()
+                                            } else {
+                                                paper.positions().values().collect()
                                             };
-                                            // Track position in PaperTrader for state/reporting
-                                            paper
-                                                .positions_mut()
-                                                .insert(pos.id.clone(), pos.clone());
-                                            paper.account_mut().open_positions =
-                                                paper.positions().len();
-                                            paper.account_mut().trades_today += 1;
-                                            info!("AI position opened: {}", decision.pair);
+                                            positions.into_iter()
+                                                .filter(|p| p.pair == decision.pair)
+                                                .map(|p| (p.id.clone(), p.clone()))
+                                                .collect()
+                                        };
 
-                                            // Place stop-loss on Kraken for live mode
-                                            // Must use the KrakenTrader's internal position ID, not PaperTrader's ID
-                                            if let Some(ref mut ex) = executor {
-                                                // Find the Kraken position that was just created by matching pair + side
-                                                // (KrakenTrader assigns its own ID format: "{txid}-{counter}")
-                                                if let Some(kraken_pos) =
-                                                    ex.open_positions().iter().find(|p| {
-                                                        p.pair == pos.pair && p.side == pos.side
-                                                    })
-                                                {
-                                                    let kraken_id = kraken_pos.id.clone();
-                                                    kraken_position_map
-                                                        .insert(pos.id.clone(), kraken_id.clone());
-                                                    if let Err(e) =
-                                                        ex.place_stop_loss(&kraken_id).await
-                                                    {
-                                                        warn!("Failed to place stop-loss for Kraken position {}: {}", kraken_id, e);
-                                                    } else {
-                                                        info!("Stop-loss placed on Kraken for position {} @ {:.4}", kraken_id, pos.stop_loss);
-                                                    }
+                                        if positions_to_close.is_empty() {
+                                            warn!(
+                                                "AI {:?} for {} but no open positions found — skipping",
+                                                decision.action, decision.pair,
+                                            );
+                                        } else {
+                                            for (pos_id, pos) in &positions_to_close {
+                                                let close_result = if let Some(ref mut ex) = executor {
+                                                    ex.close_position(pos_id).await
                                                 } else {
-                                                    warn!("Kraken position not found for stop-loss after placing order for {}", pos.pair);
+                                                    paper.close_position(pos_id).await
+                                                };
+
+                                                match close_result {
+                                                    Ok(order) => {
+                                                        let exit_price = order.filled_price
+                                                            .or(order.price)
+                                                            .unwrap_or(pos.current_price);
+                                                        let pnl = match pos.side {
+                                                            Side::Long => (exit_price - pos.entry_price) * pos.quantity,
+                                                            Side::Short => (pos.entry_price - exit_price) * pos.quantity,
+                                                        };
+                                                        let pnl_pct = if pos.entry_price > 0.0 {
+                                                            pnl / (pos.entry_price * pos.quantity) * 100.0
+                                                        } else {
+                                                            0.0
+                                                        };
+
+                                                        info!(
+                                                            "AI {:?} {} — closed position {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
+                                                            decision.action, decision.pair, pos_id,
+                                                            exit_price, pnl, pnl_pct,
+                                                        );
+                                                        paper.account_mut().trades_today += 1;
+
+                                                        let trade = TradeRecord {
+                                                            id: format!("ai-close-{}", tick),
+                                                            pair: pos.pair.clone(),
+                                                            side: pos.side,
+                                                            entry_price: pos.entry_price,
+                                                            exit_price,
+                                                            quantity: pos.quantity,
+                                                            pnl,
+                                                            pnl_pct,
+                                                            fees: 0.0,
+                                                            strategy_name: pos.strategy_name.clone(),
+                                                            opened_at: pos.opened_at,
+                                                            closed_at: chrono::Utc::now(),
+                                                            notes: format!("AI {:?} via {}", decision.action, decision.pair),
+                                                        };
+
+                                                        shared.log_activity(
+                                                            savant_trading::core::shared::ActivityLevel::Trade,
+                                                            &decision.pair,
+                                                            &format!(
+                                                                "CLOSED {:?} {} | Pos: {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
+                                                                decision.action, decision.pair, pos_id,
+                                                                exit_price, pnl, pnl_pct,
+                                                            ),
+                                                        ).await;
+
+                                                        event_bus.publish(TradingEvent::PositionClosed(trade));
+                                                    }
+                                                    Err(e) => {
+                                                        error!(
+                                                            "AI {:?} {} failed for position {}: {}",
+                                                            decision.action, decision.pair, pos_id, e,
+                                                        );
+                                                    }
                                                 }
                                             }
-
-                                            // Write trade alert to file for external monitoring
-                                            let alert = serde_json::json!({
-                                                "type": "TRADE_OPENED",
-                                                "timestamp": chrono::Utc::now().to_rfc3339(),
-                                                "pair": decision.pair,
-                                                "side": format!("{:?}", decision.side),
-                                                "action": format!("{:?}", decision.action),
-                                                "entry_price": decision.entry_price,
-                                                "stop_loss": decision.stop_loss,
-                                                "take_profit_1": decision.take_profit_1,
-                                                "quantity": ps.quantity,
-                                                "risk_amount": ps.risk_amount,
-                                                "confidence": decision.confidence,
-                                                "risk_reward": decision.risk_reward,
-                                            });
-                                            let alert_line = format!("{}\n", alert);
-                                            let _ = std::fs::OpenOptions::new()
-                                                .create(true)
-                                                .append(true)
-                                                .open("data/alerts.jsonl")
-                                                .and_then(|mut f| {
-                                                    use std::io::Write;
-                                                    f.write_all(alert_line.as_bytes())
-                                                });
-
-                                            shared.log_activity(
-                                                savant_trading::core::shared::ActivityLevel::Trade,
-                                                &decision.pair,
-                                                &format!(
-                                                    "OPENED {} {:?} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4} | Risk: ${:.2}",
-                                                    decision.side, decision.action, decision.entry_price,
-                                                    ps.quantity, decision.stop_loss, decision.take_profit_1, ps.risk_amount,
-                                                ),
-                                            ).await;
-
-                                            event_bus.publish(TradingEvent::PositionOpened(pos));
                                         }
-                                        Err(e) => error!("AI order failed: {}", e),
+                                    }
+                                    TradeAction::Buy => {
+                                        // --- OPEN LOGIC ---
+                                        let ps = position_sizer.calculate(
+                                            paper.account(),
+                                            decision.entry_price,
+                                            decision.stop_loss,
+                                            decision.take_profit_1,
+                                            decision.side,
+                                        );
+
+                                        if let Some(mut ps) = ps {
+                                            let session = savant_trading::core::session::current_session();
+                                            let session_mult = session.position_size_multiplier();
+                                            if session_mult != 1.0 {
+                                                ps.quantity *= session_mult;
+                                                ps.risk_amount *= session_mult;
+                                            }
+
+                                            // Duplicate guard: skip if already have open position on this pair+side
+                                            let already_open = {
+                                                let positions = if let Some(ref ex) = executor {
+                                                    ex.open_positions()
+                                                } else {
+                                                    paper.positions().values().collect()
+                                                };
+                                                positions.iter().any(|p| p.pair == decision.pair && p.side == decision.side)
+                                            };
+                                            if already_open {
+                                                info!(
+                                                    "AI BUY {} {:?} — already have open position, skipping duplicate",
+                                                    decision.pair, decision.side,
+                                                );
+                                            } else {
+                                                let order = if let Some(ref mut ex) = executor {
+                                                    ex.place_order(
+                                                        &decision.pair,
+                                                        decision.side,
+                                                        ps.quantity,
+                                                        Some(decision.entry_price),
+                                                    )
+                                                    .await
+                                                } else {
+                                                    paper
+                                                        .place_order(
+                                                            &decision.pair,
+                                                            decision.side,
+                                                            ps.quantity,
+                                                            Some(decision.entry_price),
+                                                        )
+                                                        .await
+                                                };
+
+                                                match order {
+                                                    Ok(_) => {
+                                                        let pos = Position {
+                                                            id: format!("ai-{}", tick),
+                                                            pair: decision.pair.clone(),
+                                                            side: decision.side,
+                                                            entry_price: decision.entry_price,
+                                                            current_price: decision.entry_price,
+                                                            quantity: ps.quantity,
+                                                            stop_loss: decision.stop_loss,
+                                                            take_profit_1: decision.take_profit_1,
+                                                            take_profit_2: decision.take_profit_2,
+                                                            take_profit_3: decision.take_profit_3,
+                                                            unrealized_pnl: 0.0,
+                                                            risk_amount: ps.risk_amount,
+                                                            strategy_name: "ai-agent".to_string(),
+                                                            opened_at: chrono::Utc::now(),
+                                                            scale_level: ScaleLevel::Full,
+                                                        };
+                                                        // Track position in PaperTrader for state/reporting
+                                                        paper
+                                                            .positions_mut()
+                                                            .insert(pos.id.clone(), pos.clone());
+                                                        paper.account_mut().open_positions =
+                                                            paper.positions().len();
+                                                        paper.account_mut().trades_today += 1;
+                                                        info!("AI position opened: {}", decision.pair);
+
+                                                        // Place stop-loss on Kraken for live mode
+                                                        if let Some(ref mut ex) = executor {
+                                                            if let Some(kraken_pos) =
+                                                                ex.open_positions().iter().find(|p| {
+                                                                    p.pair == pos.pair && p.side == pos.side
+                                                                })
+                                                            {
+                                                                let kraken_id = kraken_pos.id.clone();
+                                                                kraken_position_map
+                                                                    .insert(pos.id.clone(), kraken_id.clone());
+                                                                if let Err(e) =
+                                                                    ex.place_stop_loss(&kraken_id).await
+                                                                {
+                                                                    warn!("Failed to place stop-loss for Kraken position {}: {}", kraken_id, e);
+                                                                } else {
+                                                                    info!("Stop-loss placed on Kraken for position {} @ {:.4}", kraken_id, pos.stop_loss);
+                                                                }
+                                                            } else {
+                                                                warn!("Kraken position not found for stop-loss after placing order for {}", pos.pair);
+                                                            }
+                                                        }
+
+                                                        // Write trade alert to file for external monitoring
+                                                        let alert = serde_json::json!({
+                                                            "type": "TRADE_OPENED",
+                                                            "timestamp": chrono::Utc::now().to_rfc3339(),
+                                                            "pair": decision.pair,
+                                                            "side": format!("{:?}", decision.side),
+                                                            "action": format!("{:?}", decision.action),
+                                                            "entry_price": decision.entry_price,
+                                                            "stop_loss": decision.stop_loss,
+                                                            "take_profit_1": decision.take_profit_1,
+                                                            "quantity": ps.quantity,
+                                                            "risk_amount": ps.risk_amount,
+                                                            "confidence": decision.confidence,
+                                                            "risk_reward": decision.risk_reward,
+                                                        });
+                                                        let alert_line = format!("{}\n", alert);
+                                                        let _ = std::fs::OpenOptions::new()
+                                                            .create(true)
+                                                            .append(true)
+                                                            .open("data/alerts.jsonl")
+                                                            .and_then(|mut f| {
+                                                                use std::io::Write;
+                                                                f.write_all(alert_line.as_bytes())
+                                                            });
+
+                                                        shared.log_activity(
+                                                            savant_trading::core::shared::ActivityLevel::Trade,
+                                                            &decision.pair,
+                                                            &format!(
+                                                                "OPENED {} {:?} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4} | Risk: ${:.2}",
+                                                                decision.side, decision.action, decision.entry_price,
+                                                                ps.quantity, decision.stop_loss, decision.take_profit_1, ps.risk_amount,
+                                                            ),
+                                                        ).await;
+
+                                                        event_bus.publish(TradingEvent::PositionOpened(pos));
+                                                    }
+                                                    Err(e) => error!("AI order failed: {}", e),
+                                                }
+                                            }
+                                        }
+                                    }
+                                    TradeAction::Hold => unreachable!(),
+                                    TradeAction::AdjustStop => {
+                                        // TODO: Update stop-loss on existing position
+                                        info!("AI ADJUST_STOP for {} — not yet implemented, skipping", decision.pair);
                                     }
                                 }
                             }
@@ -1962,6 +2110,9 @@ struct TrainingRunResult {
     #[allow(dead_code)]
     total: u32,
     lessons_generated: u32,
+    metrics: Metrics,
+    #[allow(dead_code)]
+    starting_balance: f64,
 }
 
 /// Run a single training batch. Called by `run_training` in a loop.
@@ -2326,6 +2477,7 @@ async fn run_training_batch(
     let mut hold_count = 0u32;
     let mut error_count = 0u32;
     let mut high_conviction_failures: Vec<(String, String, f64, String)> = Vec::new();
+    let mut trades: Vec<TradeRecord> = Vec::new();
 
     for sr in &all_responses {
         match &sr.response {
@@ -2433,6 +2585,22 @@ async fn run_training_batch(
                             }
                         };
 
+                        trades.push(TradeRecord {
+                            id: sr.scenario_id.clone(),
+                            pair: "BTC/USD".into(),
+                            side: decision.side,
+                            entry_price: decision.entry_price,
+                            exit_price: decision.entry_price,
+                            quantity: 1.0,
+                            pnl: trade_pnl,
+                            pnl_pct: trade_pnl / 50.0 * 100.0,
+                            fees: 0.0,
+                            strategy_name: sr.category.clone(),
+                            opened_at: chrono::Utc::now(),
+                            closed_at: chrono::Utc::now(),
+                            notes: String::new(),
+                        });
+
                         println!(
                             "  {} | {} | {:?} {} @ {:.2} | Conf: {:.0}% | R:R {:.1} | P&L ${:+.2} | {}",
                             sr.scenario_name,
@@ -2458,6 +2626,13 @@ async fn run_training_batch(
             }
         }
     }
+
+    // Compute P&L metrics from collected trades
+    let metrics = if !trades.is_empty() {
+        PerformanceMetrics::calculate(&trades)
+    } else {
+        Metrics::default()
+    };
 
     // PHASE 4: Auto-generate lessons from high-conviction failures
     let lessons_count = high_conviction_failures.len() as u32;
@@ -2656,6 +2831,32 @@ async fn run_training_batch(
     println!("\nAvg latency: {}ms", avg_latency);
     println!("Episodes captured: {}", brier_predictions.len());
     println!("Lessons auto-generated: {}", lessons_count);
+
+    // Wallet report (matches SandboxMetrics::report_card format)
+    let pnl_pct = if metrics.total_trades > 0 {
+        metrics.total_pnl / 50.0 * 100.0
+    } else {
+        0.0
+    };
+    println!("\n═══════════════════════════════════════════");
+    println!("         TRAINING WALLET REPORT");
+    println!("═══════════════════════════════════════════");
+    println!("Starting Balance:  ${:.2}", 50.0);
+    println!("Final Balance:     ${:.2}", 50.0 + metrics.total_pnl);
+    println!(
+        "Total P&L:         ${:+.2} ({:+.2}%)",
+        metrics.total_pnl, pnl_pct
+    );
+    println!("Trades:            {} taken", metrics.total_trades);
+    println!(
+        "Win Rate:          {:.1}% ({}W / {}L)",
+        metrics.win_rate * 100.0,
+        metrics.wins,
+        metrics.losses
+    );
+    println!("Profit Factor:     {:.2}", metrics.profit_factor);
+    println!("Max Drawdown:      -{:.2}%", metrics.max_drawdown * 100.0);
+    println!("═══════════════════════════════════════════\n");
     println!("{}\n", "=".repeat(80));
 
     let brier_score = if !brier_predictions.is_empty() {
@@ -2827,6 +3028,8 @@ async fn run_training_batch(
         error_count,
         total: all_responses.len() as u32,
         lessons_generated: lessons_count,
+        metrics,
+        starting_balance: 50.0,
     })
 }
 
@@ -2935,12 +3138,13 @@ pub async fn run_training(
         brier_history.push(result.brier_score);
 
         println!(
-            "Run {} Brier: {:.4} | Actions: {} | Holds: {} | Lessons: {}",
+            "Run {} Brier: {:.4} | Actions: {} | Holds: {} | Lessons: {} | P&L ${:+.2}",
             run,
             result.brier_score,
             result.action_count,
-            result.action_count,
-            result.lessons_generated
+            result.hold_count,
+            result.lessons_generated,
+            result.metrics.total_pnl,
         );
 
         // Convergence check
@@ -3021,8 +3225,12 @@ pub async fn run_action_test(
     let total_episodes = test_memory.total_trades().await.unwrap_or(0);
     println!("Total episodes in test DB: {}", total_episodes);
     println!(
-        "Brier: {:.4} | Actions: {} | Lessons: {}",
-        result.brier_score, result.action_count, result.lessons_generated
+        "Brier: {:.4} | Actions: {} | Holds: {} | Lessons: {} | P&L ${:+.2}",
+        result.brier_score,
+        result.action_count,
+        result.hold_count,
+        result.lessons_generated,
+        result.metrics.total_pnl,
     );
 
     Ok(())
@@ -3539,8 +3747,8 @@ fn has_actionable_signal(
     indicators: &savant_trading::core::types::IndicatorValues,
     _regime: savant_trading::core::types::MarketRegime,
     ob_imbalance: Option<f64>,
-    current_price: f64,  // NEW: needed for VWAP deviation check
-    current_volume: Option<f64>,  // NEW: needed for volume spike check
+    current_price: f64,          // NEW: needed for VWAP deviation check
+    current_volume: Option<f64>, // NEW: needed for volume spike check
 ) -> bool {
     // RSI extreme — oversold or overbought
     if let Some(rsi) = indicators.rsi {

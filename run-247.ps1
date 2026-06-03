@@ -29,7 +29,7 @@ function Log($msg, $file) {
 }
 
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "  SAVANT TRADING ENGINE v0.4.4" -ForegroundColor Cyan
+Write-Host "  SAVANT TRADING ENGINE v0.5.0" -ForegroundColor Cyan
 Write-Host "  24/7 Operation" -ForegroundColor Cyan
 Write-Host "  Started: $(Get-Date)" -ForegroundColor Cyan
 Write-Host "" -ForegroundColor Cyan

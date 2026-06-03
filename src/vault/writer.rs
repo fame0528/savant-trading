@@ -124,7 +124,7 @@ impl VaultWriter {
         } else {
             let header = format!(
                 "# Trades — {}\n\n\
-                 > Savant Trading Engine v0.4.4 | 24/7 Crypto Paper Trading\n\n\
+                 > Savant Trading Engine v0.5.0 | 24/7 Crypto Paper Trading\n\n\
                  | Metric | Value |\n\
                  |--------|-------|\n\
                  | Date | {} |\n\
@@ -201,7 +201,7 @@ impl VaultWriter {
         } else {
             let header = format!(
                 "# AI Decisions — {}\n\n\
-                 > Savant Trading Engine v0.4.4 | 24/7 Crypto Paper Trading\n\n\
+                 > Savant Trading Engine v0.5.0 | 24/7 Crypto Paper Trading\n\n\
                  | Metric | Value |\n\
                  |--------|-------|\n\
                  | Date | {} |\n\

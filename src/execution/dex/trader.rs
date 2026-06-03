@@ -18,10 +18,10 @@ use crate::execution::engine::ExecutionEngine;
 
 use super::{amount_to_wei, resolve_pair, DexBackend, TokenInfo};
 
-use alloy_core::primitives::{Address, U256};
 use alloy_core::primitives::hex;
-use k256::ecdsa::{SigningKey, RecoveryId, Signature};
-use sha3::{Keccak256, Digest};
+use alloy_core::primitives::{Address, U256};
+use k256::ecdsa::{RecoveryId, Signature, SigningKey};
+use sha3::{Digest, Keccak256};
 
 // ---------------------------------------------------------------------------
 // RLP helpers for EIP-1559
@@ -144,7 +144,7 @@ pub struct DexTrader<B: DexBackend> {
     gas_halted: bool,
 }
 
-impl<B: DexBackend> DexTrader<B> {
+impl<B: DexBackend + 'static> DexTrader<B> {
     /// Create a new DexTrader.
     pub async fn new(
         backend: B,
@@ -164,7 +164,8 @@ impl<B: DexBackend> DexTrader<B> {
         let verifying_key = signing_key.verifying_key();
         let encoded = verifying_key.to_encoded_point(false).to_bytes().to_vec();
         let hash = Keccak256::digest(&encoded[1..]);
-        let addr_bytes: [u8; 20] = hash[12..32].try_into()
+        let addr_bytes: [u8; 20] = hash[12..32]
+            .try_into()
             .map_err(|_| ExecutionError::Other("Failed to derive address".into()))?;
         let wallet_address = Address::from(addr_bytes);
 
@@ -190,9 +191,17 @@ impl<B: DexBackend> DexTrader<B> {
             info!("DexTrader: restored state from {:?}", state_path);
         }
 
+        // Sync real on-chain balances immediately — don't trust config starting_balance
+        if let Err(e) = trader.sync_balance().await {
+            warn!("DexTrader: initial sync_balance failed ({}), using config balance", e);
+        }
+
         info!(
-            "DexTrader initialized: backend={}, chain_id={}, wallet={:#x}",
-            trader.backend.name(), trader.chain_id, trader.wallet_address,
+            "DexTrader initialized: backend={}, chain_id={}, wallet={:#x}, balance=${:.2}",
+            trader.backend.name(),
+            trader.chain_id,
+            trader.wallet_address,
+            trader.balance,
         );
 
         Ok(trader)
@@ -204,7 +213,11 @@ impl<B: DexBackend> DexTrader<B> {
 
     // ---- JSON-RPC ----
 
-    async fn rpc_call(&self, method: &str, params: serde_json::Value) -> Result<serde_json::Value, ExecutionError> {
+    async fn rpc_call(
+        &self,
+        method: &str,
+        params: serde_json::Value,
+    ) -> Result<serde_json::Value, ExecutionError> {
         let body = serde_json::json!({
             "jsonrpc": "2.0",
             "method": method,
@@ -212,47 +225,64 @@ impl<B: DexBackend> DexTrader<B> {
             "id": 1u64,
         });
 
-        let resp = self.client
+        let resp = self
+            .client
             .post(&self.rpc_url)
             .json(&body)
             .send()
             .await
             .map_err(|e| ExecutionError::Other(format!("RPC {} failed: {}", method, e)))?;
 
-        let json: serde_json::Value = resp.json().await
+        let json: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| ExecutionError::Other(format!("RPC {} parse: {}", method, e)))?;
 
         if let Some(err) = json.get("error") {
-            return Err(ExecutionError::Other(format!("RPC {} error: {}", method, err)));
+            return Err(ExecutionError::Other(format!(
+                "RPC {} error: {}",
+                method, err
+            )));
         }
 
-        json.get("result").cloned()
+        json.get("result")
+            .cloned()
             .ok_or_else(|| ExecutionError::Other(format!("RPC {} missing result", method)))
     }
 
     async fn get_nonce(&self) -> Result<u64, ExecutionError> {
         let addr = format!("{:#x}", self.wallet_address);
-        let res = self.rpc_call("eth_getTransactionCount", serde_json::json!([addr, "latest"])).await?;
-        let s = res
-            .as_str()
-            .ok_or_else(|| ExecutionError::Other("eth_getTransactionCount returned non-string result".into()))?;
+        let res = self
+            .rpc_call(
+                "eth_getTransactionCount",
+                serde_json::json!([addr, "latest"]),
+            )
+            .await?;
+        let s = res.as_str().ok_or_else(|| {
+            ExecutionError::Other("eth_getTransactionCount returned non-string result".into())
+        })?;
         u64::from_str_radix(s.trim_start_matches("0x"), 16)
             .map_err(|e| ExecutionError::Other(format!("Invalid nonce: {}", e)))
     }
 
     async fn get_gas_prices(&self) -> Result<(U256, U256), ExecutionError> {
         let base_res = self.rpc_call("eth_gasPrice", serde_json::json!([])).await?;
-        let base_str = base_res
-            .as_str()
-            .ok_or_else(|| ExecutionError::Other("eth_gasPrice returned non-string result".into()))?;
+        let base_str = base_res.as_str().ok_or_else(|| {
+            ExecutionError::Other("eth_gasPrice returned non-string result".into())
+        })?;
         let base_fee = U256::from_str_radix(base_str.trim_start_matches("0x"), 16)
             .map_err(|e| ExecutionError::Other(format!("Invalid gas price: {}", e)))?;
 
-        let priority = match self.rpc_call("eth_maxPriorityFeePerGas", serde_json::json!([])).await {
+        let priority = match self
+            .rpc_call("eth_maxPriorityFeePerGas", serde_json::json!([]))
+            .await
+        {
             Ok(val) => {
-                let s = val
-                    .as_str()
-                    .ok_or_else(|| ExecutionError::Other("eth_maxPriorityFeePerGas returned non-string result".into()))?;
+                let s = val.as_str().ok_or_else(|| {
+                    ExecutionError::Other(
+                        "eth_maxPriorityFeePerGas returned non-string result".into(),
+                    )
+                })?;
                 U256::from_str_radix(s.trim_start_matches("0x"), 16)
                     .unwrap_or(U256::from(100_000_000u64))
             }
@@ -262,7 +292,7 @@ impl<B: DexBackend> DexTrader<B> {
         Ok((priority, base_fee + priority))
     }
 
-        // ---- Transaction signing & broadcasting ----
+    // ---- Transaction signing & broadcasting ----
 
     /// Sign and broadcast an EIP-1559 transaction. Returns the tx hash.
     async fn sign_and_send(
@@ -276,8 +306,14 @@ impl<B: DexBackend> DexTrader<B> {
         let (priority_fee, max_fee) = self.get_gas_prices().await?;
 
         let encoded = rlp_encode_unsigned(
-            self.chain_id, nonce, priority_fee, max_fee, gas_limit,
-            to.as_slice(), value, data,
+            self.chain_id,
+            nonce,
+            priority_fee,
+            max_fee,
+            gas_limit,
+            to.as_slice(),
+            value,
+            data,
         );
 
         // *** CRITICAL ***
@@ -288,7 +324,8 @@ impl<B: DexBackend> DexTrader<B> {
         let hash = Keccak256::digest(&signing_payload);
 
         // Sign: hash → (Signature, RecoveryId)
-        let (signature, recid): (Signature, RecoveryId) = self.signing_key
+        let (signature, recid): (Signature, RecoveryId) = self
+            .signing_key
             .sign_prehash_recoverable(&hash)
             .map_err(|e| ExecutionError::Other(format!("Signing failed: {}", e)))?;
 
@@ -297,9 +334,17 @@ impl<B: DexBackend> DexTrader<B> {
         let y_parity: u64 = recid.is_y_odd().into();
 
         let signed_tx = rlp_encode_signed(
-            self.chain_id, nonce, priority_fee, max_fee, gas_limit,
-            to.as_slice(), value, data,
-            &r, &s, y_parity,
+            self.chain_id,
+            nonce,
+            priority_fee,
+            max_fee,
+            gas_limit,
+            to.as_slice(),
+            value,
+            data,
+            &r,
+            &s,
+            y_parity,
         );
 
         // Wire format: 0x02 || rlp([chain_id, nonce, ..., y_parity, r, s])
@@ -307,17 +352,21 @@ impl<B: DexBackend> DexTrader<B> {
         raw_tx.extend_from_slice(&signed_tx);
 
         let raw_tx_hex = format!("0x{}", hex::encode(&raw_tx));
-        let result = self.rpc_call("eth_sendRawTransaction", serde_json::json!([raw_tx_hex])).await?;
+        let result = self
+            .rpc_call("eth_sendRawTransaction", serde_json::json!([raw_tx_hex]))
+            .await?;
         let tx_hash = result
             .as_str()
-            .ok_or_else(|| ExecutionError::Other("eth_sendRawTransaction returned no tx hash".into()))?
+            .ok_or_else(|| {
+                ExecutionError::Other("eth_sendRawTransaction returned no tx hash".into())
+            })?
             .to_string();
 
         info!("DEX tx broadcast: hash={}", tx_hash);
         Ok(tx_hash)
     }
 
-        /// Parse a wei value string from a DEX API response.
+    /// Parse a wei value string from a DEX API response.
     ///
     /// The 0x and 1inch APIs may return `value` as either:
     /// - Hex `"0x0"` or `"0xde0b6b3a7640000"` (Ethereum JSON-RPC convention)
@@ -337,7 +386,12 @@ impl<B: DexBackend> DexTrader<B> {
 
     // ---- Swap execution ----
 
-    async fn execute_swap(&self, src_token: &TokenInfo, dst_token: &TokenInfo, amount_wei: &str) -> Result<String, ExecutionError> {
+    async fn execute_swap(
+        &self,
+        src_token: &TokenInfo,
+        dst_token: &TokenInfo,
+        amount_wei: &str,
+    ) -> Result<String, ExecutionError> {
         // FID-018: Halt if ETH gas too low
         if self.gas_halted {
             return Err(ExecutionError::Other(
@@ -352,7 +406,10 @@ impl<B: DexBackend> DexTrader<B> {
         // The 0x / 1inch API accepts both addresses and symbols natively and
         // resolves symbols to the most liquid deployed contract on-chain.
         let src_id = if src_token.address.is_empty() {
-            warn!("Token '{}' not in local DB — resolving via API symbol lookup", src_token.symbol);
+            warn!(
+                "Token '{}' not in local DB — resolving via API symbol lookup",
+                src_token.symbol
+            );
             src_token.symbol.clone()
         } else {
             src_token.address.clone()
@@ -374,7 +431,9 @@ impl<B: DexBackend> DexTrader<B> {
 
         let swap_tx = self.backend.build_swap_tx(&swap_params).await?;
 
-        let to: Address = swap_tx.to.parse()
+        let to: Address = swap_tx
+            .to
+            .parse()
             .map_err(|e| ExecutionError::Other(format!("Invalid 'to' '{}': {}", swap_tx.to, e)))?;
 
         let data = hex::decode(swap_tx.data.trim_start_matches("0x"))
@@ -470,7 +529,11 @@ impl<B: DexBackend> DexTrader<B> {
                         exit_price: pos.stop_loss,
                         quantity: pos.quantity,
                         pnl,
-                        pnl_pct: if pos.entry_price > 0.0 { pnl / (pos.entry_price * pos.quantity) * 100.0 } else { 0.0 },
+                        pnl_pct: if pos.entry_price > 0.0 {
+                            pnl / (pos.entry_price * pos.quantity) * 100.0
+                        } else {
+                            0.0
+                        },
                         fees: 0.0,
                         strategy_name: pos.strategy_name.clone(),
                         opened_at: pos.opened_at,
@@ -486,7 +549,9 @@ impl<B: DexBackend> DexTrader<B> {
             }
         }
 
-        for id in to_remove { self.positions.remove(&id); }
+        for id in to_remove {
+            self.positions.remove(&id);
+        }
 
         // FID-018: Persist state after stop-loss closes
         if !closed.is_empty() {
@@ -507,13 +572,28 @@ impl<B: DexBackend> DexTrader<B> {
 
 #[async_trait]
 impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
-    async fn place_order(&mut self, pair: &str, side: Side, quantity: f64, price: Option<f64>) -> Result<Order, ExecutionError> {
+    async fn place_order(
+        &mut self,
+        pair: &str,
+        side: Side,
+        quantity: f64,
+        price: Option<f64>,
+    ) -> Result<Order, ExecutionError> {
         // FID-018: Halt if ETH gas too low
         if self.gas_halted {
             return Err(ExecutionError::Other(
                 "Trading halted — ETH gas balance too low. Fund wallet to resume.".into(),
             ));
         }
+
+        // Safety: refuse to trade if tracked balance is zero or negative
+        if self.balance <= 0.0 {
+            return Err(ExecutionError::Other(format!(
+                "Trading halted — balance is ${:.2}. Fund wallet with USDC to resume.",
+                self.balance
+            )));
+        }
+
         self.order_counter += 1;
 
         let (src_token, dst_token) = resolve_pair(pair, side)?;
@@ -521,50 +601,77 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         let order_value = entry_price * quantity;
         let amount_wei = amount_to_wei(order_value, src_token.decimals);
 
-        info!("DEX {} {} {} | src={} dst={} qty_wei={}",
+        info!(
+            "DEX {} {} {} | src={} dst={} qty_wei={}",
             if side == Side::Long { "BUY" } else { "SELL" },
-            quantity, pair, src_token.symbol, dst_token.symbol, amount_wei);
+            quantity,
+            pair,
+            src_token.symbol,
+            dst_token.symbol,
+            amount_wei
+        );
 
-        let tx_hash = self.execute_swap(&src_token, &dst_token, &amount_wei).await?;
+        let tx_hash = self
+            .execute_swap(&src_token, &dst_token, &amount_wei)
+            .await?;
 
         info!("DEX filled: {} | tx={}", pair, tx_hash);
 
         let fill_price = entry_price;
         let position_id = format!("dex-{}-{}", self.order_counter, pair.replace('/', "_"));
 
-        self.positions.insert(position_id.clone(), Position {
-            id: position_id,
-            pair: pair.to_string(), side,
-            entry_price: fill_price, current_price: fill_price,
-            stop_loss: 0.0, take_profit_1: 0.0, take_profit_2: 0.0, take_profit_3: 0.0,
-            quantity, unrealized_pnl: 0.0, risk_amount: 0.0,
-            strategy_name: format!("dex_{}", self.backend.name()),
-            opened_at: Utc::now(), scale_level: ScaleLevel::Full,
-        });
+        self.positions.insert(
+            position_id.clone(),
+            Position {
+                id: position_id,
+                pair: pair.to_string(),
+                side,
+                entry_price: fill_price,
+                current_price: fill_price,
+                stop_loss: 0.0,
+                take_profit_1: 0.0,
+                take_profit_2: 0.0,
+                take_profit_3: 0.0,
+                quantity,
+                unrealized_pnl: 0.0,
+                risk_amount: 0.0,
+                strategy_name: format!("dex_{}", self.backend.name()),
+                opened_at: Utc::now(),
+                scale_level: ScaleLevel::Full,
+            },
+        );
 
         self.balance -= order_value * 1.001;
 
         Ok(Order {
             id: format!("dex-{}-{}", self.order_counter, tx_hash),
-            pair: pair.to_string(), side,
+            pair: pair.to_string(),
+            side,
             order_type: OrderType::Market,
-            price: Some(fill_price), quantity,
+            price: Some(fill_price),
+            quantity,
             status: OrderStatus::Filled,
-            created_at: Utc::now(), filled_at: Some(Utc::now()),
+            created_at: Utc::now(),
+            filled_at: Some(Utc::now()),
             filled_price: Some(fill_price),
         })
     }
 
     async fn close_position(&mut self, position_id: &str) -> Result<Order, ExecutionError> {
-        let pos = self.positions.remove(position_id)
+        let pos = self
+            .positions
+            .remove(position_id)
             .ok_or_else(|| ExecutionError::PositionNotFound(position_id.to_string()))?;
 
         self.order_counter += 1;
 
-        let (src_token, dst_token) = resolve_pair(&pos.pair, match pos.side {
-            Side::Long => Side::Short,
-            Side::Short => Side::Long,
-        })?;
+        let (src_token, dst_token) = resolve_pair(
+            &pos.pair,
+            match pos.side {
+                Side::Long => Side::Short,
+                Side::Short => Side::Long,
+            },
+        )?;
         let qty_wei = amount_to_wei(pos.quantity, src_token.decimals);
 
         let tx_hash = self.execute_swap(&src_token, &dst_token, &qty_wei).await?;
@@ -581,12 +688,21 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
 
         self.closed_trades.push(TradeRecord {
             id: uuid::Uuid::new_v4().to_string(),
-            pair: pos.pair.clone(), side: pos.side,
-            entry_price: pos.entry_price, exit_price,
-            quantity: pos.quantity, pnl,
-            pnl_pct: if pos.entry_price > 0.0 { pnl / (pos.entry_price * pos.quantity) * 100.0 } else { 0.0 },
-            fees: fee_est, strategy_name: pos.strategy_name.clone(),
-            opened_at: pos.opened_at, closed_at: Utc::now(),
+            pair: pos.pair.clone(),
+            side: pos.side,
+            entry_price: pos.entry_price,
+            exit_price,
+            quantity: pos.quantity,
+            pnl,
+            pnl_pct: if pos.entry_price > 0.0 {
+                pnl / (pos.entry_price * pos.quantity) * 100.0
+            } else {
+                0.0
+            },
+            fees: fee_est,
+            strategy_name: pos.strategy_name.clone(),
+            opened_at: pos.opened_at,
+            closed_at: Utc::now(),
             notes: format!("DEX close via {}", self.backend.name()),
         });
 
@@ -598,11 +714,16 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         Ok(Order {
             id: format!("dex-close-{}-{}", self.order_counter, tx_hash),
             pair: pos.pair,
-            side: match pos.side { Side::Long => Side::Short, Side::Short => Side::Long },
+            side: match pos.side {
+                Side::Long => Side::Short,
+                Side::Short => Side::Long,
+            },
             order_type: OrderType::Market,
-            price: Some(exit_price), quantity: pos.quantity,
+            price: Some(exit_price),
+            quantity: pos.quantity,
             status: OrderStatus::Filled,
-            created_at: Utc::now(), filled_at: Some(Utc::now()),
+            created_at: Utc::now(),
+            filled_at: Some(Utc::now()),
             filled_price: Some(exit_price),
         })
     }
@@ -643,7 +764,10 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         } else if self.gas_halted {
             // Was halted, now OK — resume
             self.gas_halted = false;
-            info!("ETH gas balance restored ({:.6} ETH) — resuming trading", eth_balance);
+            info!(
+                "ETH gas balance restored ({:.6} ETH) — resuming trading",
+                eth_balance
+            );
         }
 
         // 2. Query USDC balance via eth_call to balanceOf()

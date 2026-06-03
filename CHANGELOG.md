@@ -4,6 +4,17 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.5.0] — 2026-06-03
+
+### Fixed
+
+- **FID-026: Sell/Close action handling (critical)** — Engine ignored AI's `Sell` and `Close` decisions. All non-Hold actions (including Sell, Close) fell through to `place_order()`, which always **opened** a new position. The agent could never exit positions except via stop-loss. On DEX, this caused on-chain swap failures when the wallet didn't own the base token (nonce stayed 0). On Kraken CEX, Sell opened a new short instead of closing an existing long. Fixed by adding action-aware branching: `Sell` → finds existing position for pair → `close_position()`; `Close` → finds ALL positions for pair → `close_position()` each; `Buy` → duplicate guard before `place_order()`. Creates proper `TradeRecord` with PnL for event bus. Backend-agnostic fix (both Kraken and DEX). Verified: 187/187 tests pass, clippy clean.
+
+### Changed
+
+- **Version bump** — 0.4.4 → 0.5.0 (critical sell logic fix = minor version bump)
+- **All version references updated** — Cargo.toml, VERSION, README, protocol.config.yaml, main.rs, vault writer, scripts, HANDOFF.md, run scripts
+
 ## [0.4.4] — 2026-06-02
 
 ### Closed (FID-016, FID-017, FID-018, FID-019, FID-020, FID-021, FID-022, FID-023, FID-024 — archived 2026-06-02)

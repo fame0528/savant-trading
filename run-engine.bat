@@ -1,7 +1,7 @@
 @echo off
-title SAVANT TRADING ENGINE v0.4.4
+title SAVANT TRADING ENGINE v0.5.0
 echo ============================================
-echo  SAVANT TRADING ENGINE v0.4.4
+echo  SAVANT TRADING ENGINE v0.5.0
 echo  Paper Trading Mode — 24/7 Operation
 echo  Started: %date% %time%
 echo ============================================

@@ -2,7 +2,7 @@
 
 ## Current State
 
-- **Version:** 0.4.4
+- **Version:** 0.5.0
 - **Protocol:** ECHO v0.1.0
 - **Tests:** 143 (139 lib + 4 binary)
 - **Clippy:** Zero warnings

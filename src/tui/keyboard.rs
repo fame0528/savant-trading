@@ -102,7 +102,9 @@ pub fn dispatch_key(key: KeyEvent) -> Option<KeyAction> {
         // Search
         KeyCode::Char('/') => Some(KeyAction::Search),
         KeyCode::Char('n') => Some(KeyAction::NextMatch),
-        KeyCode::Char('N') if key.modifiers.contains(KeyModifiers::SHIFT) => Some(KeyAction::PrevMatch),
+        KeyCode::Char('N') if key.modifiers.contains(KeyModifiers::SHIFT) => {
+            Some(KeyAction::PrevMatch)
+        }
 
         // Table interaction
         KeyCode::Enter => Some(KeyAction::EnterDetail),

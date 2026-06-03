@@ -33,14 +33,22 @@ impl ZeroXBackend {
     /// This variant allows injecting a mock HTTP client in tests via
     /// `wiremock`.  Production code should use [`Self::new`].
     pub fn with_client(api_key: String, client: reqwest::Client) -> Self {
-        Self { api_key, client, base_url_override: None }
+        Self {
+            api_key,
+            client,
+            base_url_override: None,
+        }
     }
 
     /// Create a new 0x backend with custom client and base URL.
     ///
     /// Used by tests to route requests to a wiremock server.
     pub fn with_client_and_url(api_key: String, client: reqwest::Client, base_url: String) -> Self {
-        Self { api_key, client, base_url_override: Some(base_url) }
+        Self {
+            api_key,
+            client,
+            base_url_override: Some(base_url),
+        }
     }
 
     /// Build the 0x Swap API v2 URL for a given chain.
@@ -86,15 +94,14 @@ impl ZeroXBackend {
             .header("0x-api-key", &self.api_key)
             .send()
             .await
-            .map_err(|e| {
-                ExecutionError::Other(format!("0x {} request failed: {}", endpoint, e))
-            })?;
+            .map_err(|e| ExecutionError::Other(format!("0x {} request failed: {}", endpoint, e)))?;
 
         if !resp.status().is_success() {
             let status = resp.status();
             let body = resp.text().await.unwrap_or_default();
             return Err(ExecutionError::Other(format!(
-                "0x {} returned {}: {}", endpoint, status, body,
+                "0x {} returned {}: {}",
+                endpoint, status, body,
             )));
         }
 
@@ -108,7 +115,10 @@ impl ZeroXBackend {
     /// Critical fields like `to`, `data`, `sellAmount`, `buyAmount` MUST be
     /// present — silently defaulting to `"0"` would produce a transaction that
     /// fails on-chain.
-    fn require_field<'a>(json: &'a serde_json::Value, field: &str) -> Result<&'a str, ExecutionError> {
+    fn require_field<'a>(
+        json: &'a serde_json::Value,
+        field: &str,
+    ) -> Result<&'a str, ExecutionError> {
         json[field].as_str().ok_or_else(|| {
             ExecutionError::Other(format!("0x response missing required field '{}'", field))
         })
@@ -173,8 +183,8 @@ impl DexBackend for ZeroXBackend {
 mod tests {
     use super::*;
     use crate::execution::dex::SwapParams;
+    use wiremock::matchers::{header, method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
-    use wiremock::matchers::{method, path, header};
 
     const TEST_API_KEY: &str = "test-0x-key-00000000";
 
@@ -224,7 +234,8 @@ mod tests {
             TEST_API_KEY.into(),
             reqwest::Client::builder()
                 .timeout(std::time::Duration::from_secs(5))
-                .build().unwrap(),
+                .build()
+                .unwrap(),
             base,
         )
     }
@@ -262,8 +273,11 @@ mod tests {
         let result = backend.quote(&test_params()).await;
         assert!(result.is_err());
         let err_str = format!("{}", result.unwrap_err());
-        assert!(err_str.contains("429") || err_str.contains("rate limit"),
-            "Expected 429 error, got: {}", err_str);
+        assert!(
+            err_str.contains("429") || err_str.contains("rate limit"),
+            "Expected 429 error, got: {}",
+            err_str
+        );
     }
 
     #[tokio::test(flavor = "multi_thread")]
@@ -280,8 +294,11 @@ mod tests {
         let result = backend.quote(&test_params()).await;
         assert!(result.is_err());
         let err_str = format!("{}", result.unwrap_err());
-        assert!(err_str.contains("500") || err_str.contains("internal"),
-            "Expected 500 error, got: {}", err_str);
+        assert!(
+            err_str.contains("500") || err_str.contains("internal"),
+            "Expected 500 error, got: {}",
+            err_str
+        );
     }
 
     #[tokio::test(flavor = "multi_thread")]
@@ -347,7 +364,10 @@ mod tests {
         let result = backend.build_swap_tx(&test_params()).await;
         assert!(result.is_err());
         let err_str = format!("{}", result.unwrap_err());
-        assert!(err_str.contains("to") || err_str.contains("missing"),
-            "Expected error about missing 'to' field, got: {}", err_str);
+        assert!(
+            err_str.contains("to") || err_str.contains("missing"),
+            "Expected error about missing 'to' field, got: {}",
+            err_str
+        );
     }
 }

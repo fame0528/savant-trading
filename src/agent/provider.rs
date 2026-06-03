@@ -83,13 +83,14 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                 ],
             )
         }
-        _ => {
+        "nvidia" => {
+            let nv = &ai_cfg.nvidia;
             (
                 LlmConfig {
-                    endpoint: ai_cfg.endpoint.clone(),
-                    model: ai_cfg.model.clone(),
-                    api_key: std::env::var(&ai_cfg.api_key_env).unwrap_or_default(),
-                    max_tokens: ai_cfg.max_tokens,
+                    endpoint: nv.endpoint.clone(),
+                    model: nv.model.clone(),
+                    api_key: std::env::var(&nv.api_key_env).unwrap_or_default(),
+                    max_tokens: ai_cfg.max_tokens.min(16384),
                     temperature: ai_cfg.temperature,
                     top_p: ai_cfg.top_p,
                     timeout_secs: ai_cfg.timeout_secs,
@@ -98,6 +99,19 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                 vec![],
             )
         }
+        _ => (
+            LlmConfig {
+                endpoint: ai_cfg.endpoint.clone(),
+                model: ai_cfg.model.clone(),
+                api_key: std::env::var(&ai_cfg.api_key_env).unwrap_or_default(),
+                max_tokens: ai_cfg.max_tokens,
+                temperature: ai_cfg.temperature,
+                top_p: ai_cfg.top_p,
+                timeout_secs: ai_cfg.timeout_secs,
+                extra_headers: vec![],
+            },
+            vec![],
+        ),
     };
     base.extra_headers = extra_headers;
 

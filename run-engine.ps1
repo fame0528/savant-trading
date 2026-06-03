@@ -11,7 +11,7 @@ $logFile = "$logDir\engine_$timestamp.log"
 if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir | Out-Null }
 
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "  SAVANT TRADING ENGINE v0.4.4" -ForegroundColor Cyan
+Write-Host "  SAVANT TRADING ENGINE v0.5.0" -ForegroundColor Cyan
 Write-Host "  Paper Trading Mode — 24/7 Operation" -ForegroundColor Cyan
 Write-Host "  Started: $(Get-Date)" -ForegroundColor Cyan
 Write-Host "  Log: $logFile" -ForegroundColor Cyan

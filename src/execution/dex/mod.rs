@@ -102,24 +102,24 @@ pub trait DexBackend: Send + Sync {
 /// Arbitrum token addresses — keyed by uppercase symbol.
 /// Sources: official Arbitrum token list, verified contract addresses.
 const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
-    ("ETH",   "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", 18),
-    ("WETH",  "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", 18),
-    ("USDC",  "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", 6),
-    ("USDT",  "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", 6),
-    ("DAI",   "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", 18),
-    ("WBTC",  "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", 8),
-    ("ARB",   "0x912CE59144191C1204E64559FE8253a0e49E6548", 18),
-    ("LINK",  "0xf97f4df75117a78c1A5a0DBb814Ab92458339c73", 18),
-    ("UNI",   "0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0", 18),
-    ("PEPE",  "0x25d887Ce7a49172BF65CB5E54e78C488Ef5954e6", 18),
-    ("DOGE",  "0xC4dDa7D2Bc614E8dCbf2E0B2E11178c1c4f8258f", 18),
+    ("ETH", "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", 18),
+    ("WETH", "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", 18),
+    ("USDC", "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", 6),
+    ("USDT", "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", 6),
+    ("DAI", "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", 18),
+    ("WBTC", "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", 8),
+    ("ARB", "0x912CE59144191C1204E64559FE8253a0e49E6548", 18),
+    ("LINK", "0xf97f4df75117a78c1A5a0DBb814Ab92458339c73", 18),
+    ("UNI", "0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0", 18),
+    ("PEPE", "0x25d887Ce7a49172BF65CB5E54e78C488Ef5954e6", 18),
+    ("DOGE", "0xC4dDa7D2Bc614E8dCbf2E0B2E11178c1c4f8258f", 18),
     // DeFi / L2 — verified on Arbiscan
-    ("AAVE",  "0xba5DdD1f9d7F570dc94a51479a000E3BCE967196", 18),
-    ("LDO",   "0x13Ad51ed4F1B7e9Dc168d8a00CB3f4DDD85EFA60", 18),
-    ("PENDLE","0x081e7d23F079975cB6780ED0d7249a5b5123d513", 18),
-    ("RENDER","0x618E75Ac0c33204D5417B672323C6415a77f0ED5", 18),
-    ("FET",   "0x9485293237199462A0ae66497793aF94B73D5C05", 18),
-    ("GRT",   "0x9623063377AD1B27A4dC83bE7b22f8d895CF95E0", 18),
+    ("AAVE", "0xba5DdD1f9d7F570dc94a51479a000E3BCE967196", 18),
+    ("LDO", "0x13Ad51ed4F1B7e9Dc168d8a00CB3f4DDD85EFA60", 18),
+    ("PENDLE", "0x081e7d23F079975cB6780ED0d7249a5b5123d513", 18),
+    ("RENDER", "0x618E75Ac0c33204D5417B672323C6415a77f0ED5", 18),
+    ("FET", "0x9485293237199462A0ae66497793aF94B73D5C05", 18),
+    ("GRT", "0x9623063377AD1B27A4dC83bE7b22f8d895CF95E0", 18),
 ];
 
 use std::collections::HashMap;
@@ -159,7 +159,10 @@ fn token_map() -> &'static HashMap<&'static str, (&'static str, u8)> {
 /// - The API always returns the current most liquid version
 /// - Works for ALL tokens without manual address research
 /// - Adapts automatically when bridges/liquidity shift
-pub fn resolve_pair(pair: &str, side: crate::core::types::Side) -> Result<(TokenInfo, TokenInfo), ExecutionError> {
+pub fn resolve_pair(
+    pair: &str,
+    side: crate::core::types::Side,
+) -> Result<(TokenInfo, TokenInfo), ExecutionError> {
     let parts: Vec<&str> = pair.split('/').collect();
     if parts.len() != 2 {
         return Err(ExecutionError::Other(format!(
@@ -267,7 +270,10 @@ mod tests {
         let (src, dst) = resolve_pair("FAKE/USDC", Side::Long).unwrap();
         assert_eq!(src.symbol, "USDC");
         assert_eq!(dst.symbol, "FAKE");
-        assert!(dst.address.is_empty(), "unknown token should have empty address (symbol-based)");
+        assert!(
+            dst.address.is_empty(),
+            "unknown token should have empty address (symbol-based)"
+        );
         assert_eq!(dst.decimals, 18, "unknown token defaults to 18 decimals");
     }
 
@@ -278,7 +284,10 @@ mod tests {
         assert_eq!(src.symbol, "USDC");
         assert_eq!(dst.symbol, "SOL");
         assert!(src.address.starts_with("0x"), "USDC should have address");
-        assert!(dst.address.is_empty(), "SOL should have empty address (symbol-based)");
+        assert!(
+            dst.address.is_empty(),
+            "SOL should have empty address (symbol-based)"
+        );
     }
 
     #[test]

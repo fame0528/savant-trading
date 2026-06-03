@@ -35,7 +35,11 @@ pub fn side_color(side: Side) -> Color {
 }
 
 pub fn pnl_color(pnl: f64) -> Color {
-    if pnl >= 0.0 { NEON_GREEN } else { NEON_RED }
+    if pnl >= 0.0 {
+        NEON_GREEN
+    } else {
+        NEON_RED
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -46,7 +50,11 @@ pub fn pnl_color(pnl: f64) -> Color {
 pub fn titled_block(title: &str, border_color: Color) -> Block<'static> {
     Block::default()
         .title(format!(" ◆ {} ", title))
-        .title_style(Style::default().fg(border_color).add_modifier(ratatui::style::Modifier::BOLD))
+        .title_style(
+            Style::default()
+                .fg(border_color)
+                .add_modifier(ratatui::style::Modifier::BOLD),
+        )
         .borders(Borders::ALL)
         .border_style(Style::default().fg(border_color))
 }
@@ -57,7 +65,12 @@ pub fn empty_message(msg: &str) -> Paragraph<'static> {
         Line::from(""),
         Line::from(vec![
             Span::styled("  ◇ ", Style::default().fg(DIM_CYAN)),
-            Span::styled(msg.to_string(), Style::default().fg(DIM_CYAN).add_modifier(ratatui::style::Modifier::ITALIC)),
+            Span::styled(
+                msg.to_string(),
+                Style::default()
+                    .fg(DIM_CYAN)
+                    .add_modifier(ratatui::style::Modifier::ITALIC),
+            ),
         ]),
     ])
 }
@@ -84,14 +97,15 @@ pub fn ascii_gauge(value_pct: f64, width: usize, color: Color) -> Line<'static> 
 #[allow(dead_code)]
 pub fn search_bar(query: &str) -> Paragraph<'static> {
     let prompt = if query.is_empty() {
-        " Search: (type to filter, Esc to cancel, Enter to confirm)"
-            .to_string()
+        " Search: (type to filter, Esc to cancel, Enter to confirm)".to_string()
     } else {
         format!(" Search: {}█", query)
     };
     Paragraph::new(Line::from(Span::styled(
         prompt,
-        Style::default().fg(NEON_YELLOW).add_modifier(ratatui::style::Modifier::BOLD),
+        Style::default()
+            .fg(NEON_YELLOW)
+            .add_modifier(ratatui::style::Modifier::BOLD),
     )))
     .block(
         Block::default()
@@ -151,7 +165,9 @@ pub fn stat_row(items: Vec<(&str, String, Color)>) -> Line<'static> {
         }
         spans.push(Span::styled(
             format!("{}{}", label, value),
-            Style::default().fg(*color).add_modifier(ratatui::style::Modifier::BOLD),
+            Style::default()
+                .fg(*color)
+                .add_modifier(ratatui::style::Modifier::BOLD),
         ));
     }
     Line::from(spans)

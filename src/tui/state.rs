@@ -7,9 +7,7 @@
 use std::time::Instant;
 
 use crate::core::config::AppConfig;
-use crate::core::shared::{
-    ActivityEntry, DecisionRecord, MemorySnapshot, SharedEngineData,
-};
+use crate::core::shared::{ActivityEntry, DecisionRecord, MemorySnapshot, SharedEngineData};
 use crate::core::types::{AccountState, Position, TradeRecord};
 use crate::insight::aggregator::MarketContext;
 
@@ -133,31 +131,45 @@ impl TuiSnapshot {
     /// Refresh all fields from shared engine data.
     pub fn refresh(&mut self, shared: &SharedEngineData) {
         // Use try_read to avoid blocking the render loop
-        self.account = shared.account.try_read()
+        self.account = shared
+            .account
+            .try_read()
             .map(|g| g.clone())
             .unwrap_or_else(|_| AccountState::new(0.0));
 
-        self.positions = shared.positions.try_read()
+        self.positions = shared
+            .positions
+            .try_read()
             .map(|g| g.clone())
             .unwrap_or_default();
 
-        self.decisions = shared.decisions.try_read()
+        self.decisions = shared
+            .decisions
+            .try_read()
             .map(|g| g.clone())
             .unwrap_or_default();
 
-        self.insight = shared.insight.try_read()
+        self.insight = shared
+            .insight
+            .try_read()
             .map(|g| g.clone())
             .unwrap_or_default();
 
-        self.activity = shared.activity_log.try_read()
+        self.activity = shared
+            .activity_log
+            .try_read()
             .map(|g| g.clone())
             .unwrap_or_default();
 
-        self.closed_trades = shared.closed_trades.try_read()
+        self.closed_trades = shared
+            .closed_trades
+            .try_read()
             .map(|g| g.clone())
             .unwrap_or_default();
 
-        self.memory = shared.memory_snapshot.try_read()
+        self.memory = shared
+            .memory_snapshot
+            .try_read()
             .map(|g| g.clone())
             .unwrap_or_else(|_| MemorySnapshot {
                 brier_score: None,

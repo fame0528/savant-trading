@@ -2122,7 +2122,13 @@ fn derive_historical_volatility(candles: &[Candle]) -> VolatilityRegime {
 
     let avg_range: f64 = candles
         .iter()
-        .filter_map(|c| if c.close > 0.0 { Some((c.high - c.low) / c.close) } else { None })
+        .filter_map(|c| {
+            if c.close > 0.0 {
+                Some((c.high - c.low) / c.close)
+            } else {
+                None
+            }
+        })
         .sum::<f64>()
         / candles.len() as f64;
 

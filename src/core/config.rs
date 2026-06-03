@@ -162,6 +162,36 @@ impl Default for OpenRouterConfig {
     }
 }
 
+fn default_nvidia_endpoint() -> String {
+    "https://integrate.api.nvidia.com/v1".into()
+}
+fn default_nvidia_api_key_env() -> String {
+    "NVIDIA_API_KEY".into()
+}
+fn default_nvidia_model() -> String {
+    "deepseek-ai/deepseek-v4-flash".into()
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct NvidiaConfig {
+    #[serde(default = "default_nvidia_endpoint")]
+    pub endpoint: String,
+    #[serde(default = "default_nvidia_api_key_env")]
+    pub api_key_env: String,
+    #[serde(default = "default_nvidia_model")]
+    pub model: String,
+}
+
+impl Default for NvidiaConfig {
+    fn default() -> Self {
+        Self {
+            endpoint: default_nvidia_endpoint(),
+            api_key_env: default_nvidia_api_key_env(),
+            model: default_nvidia_model(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct AiConfig {
     pub provider: String,
@@ -182,6 +212,8 @@ pub struct AiConfig {
     pub timeout_secs: u64,
     #[serde(default)]
     pub openrouter: OpenRouterConfig,
+    #[serde(default)]
+    pub nvidia: NvidiaConfig,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -226,11 +258,21 @@ pub struct DexConfig {
     pub slippage_pct: f64,
 }
 
-fn default_chain_id() -> u64 { 42161 }
-fn default_rpc_url() -> String { "https://arb1.arbitrum.io/rpc".into() }
-fn default_wallet_key_env() -> String { "WALLET_PRIVATE_KEY".into() }
-fn default_dex_api_key_env() -> String { "ZEROEX_API_KEY".into() }
-fn default_dex_slippage() -> f64 { 0.005 }
+fn default_chain_id() -> u64 {
+    42161
+}
+fn default_rpc_url() -> String {
+    "https://arb1.arbitrum.io/rpc".into()
+}
+fn default_wallet_key_env() -> String {
+    "WALLET_PRIVATE_KEY".into()
+}
+fn default_dex_api_key_env() -> String {
+    "ZEROEX_API_KEY".into()
+}
+fn default_dex_slippage() -> f64 {
+    0.005
+}
 
 impl Default for DexConfig {
     fn default() -> Self {
@@ -351,10 +393,10 @@ impl AppConfig {
         }
         // Validate AI provider
         match self.ai.provider.as_str() {
-            "opengateway" | "openrouter" => {}
+            "opengateway" | "openrouter" | "nvidia" => {}
             other => {
                 return Err(ConfigError::ValidationError(format!(
-                    "Invalid ai.provider '{}': must be 'opengateway' or 'openrouter'",
+                    "Invalid ai.provider '{}': must be 'opengateway', 'openrouter', or 'nvidia'",
                     other
                 )));
             }
@@ -431,10 +473,10 @@ impl Default for AppConfig {
                 paper_trading: true,
             },
             ai: AiConfig {
-                provider: "openrouter".into(),
-                endpoint: "https://openrouter.ai/api/v1".into(),
-                model: "openrouter/owl-alpha".into(),
-                api_key_env: "OPENROUTER_API_KEY".into(),
+                provider: "nvidia".into(),
+                endpoint: "https://integrate.api.nvidia.com/v1".into(),
+                model: "deepseek-ai/deepseek-v4-flash".into(),
+                api_key_env: "NVIDIA_API_KEY".into(),
                 autonomy_level: 3,
                 max_decisions_per_hour: 5,
                 context_window_candles: 500,
@@ -446,6 +488,7 @@ impl Default for AppConfig {
                 max_tokens: 131072,
                 timeout_secs: 300,
                 openrouter: OpenRouterConfig::default(),
+                nvidia: NvidiaConfig::default(),
             },
             insight: InsightConfig {
                 funding_rate_enabled: true,

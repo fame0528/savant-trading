@@ -8,7 +8,7 @@
 :: Close the window to stop.
 :: ============================================================
 
-echo Starting Savant Trading Engine v0.4.4...
+echo Starting Savant Trading Engine v0.5.0...
 echo.
 echo Phase 1: Training on real Kraken tick data (224M ticks, 8 pairs)
 echo Phase 2: Training report

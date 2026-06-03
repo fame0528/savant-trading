@@ -52,22 +52,22 @@ use crate::core::shared::SharedEngineData;
 
 use self::keyboard::{dispatch_key, KeyAction};
 use self::state::TuiState;
-use self::widgets::*;
 use self::tabs::draw_tab;
+use self::widgets::*;
 
 // ── Tab label constants ──
 
 const TAB_NAMES: &[(&str, Color)] = &[
-    (" Act ", NEON_CYAN),    // 0
-    (" Ovrv ", NEON_CYAN),   // 1
-    (" Port ", NEON_GREEN),  // 2
-    (" Pos ", NEON_CYAN),    // 3
-    (" Trad ", NEON_MAGENTA),// 4
-    (" Mkt ", NEON_YELLOW),  // 5
-    (" AI ", NEON_YELLOW),   // 6
-    (" Risk ", NEON_RED),    // 7
-    (" Mem ", NEON_MAGENTA), // 8
-    (" Cfg ", ACCENT_BLUE),  // 9
+    (" Act ", NEON_CYAN),     // 0
+    (" Ovrv ", NEON_CYAN),    // 1
+    (" Port ", NEON_GREEN),   // 2
+    (" Pos ", NEON_CYAN),     // 3
+    (" Trad ", NEON_MAGENTA), // 4
+    (" Mkt ", NEON_YELLOW),   // 5
+    (" AI ", NEON_YELLOW),    // 6
+    (" Risk ", NEON_RED),     // 7
+    (" Mem ", NEON_MAGENTA),  // 8
+    (" Cfg ", ACCENT_BLUE),   // 9
 ];
 
 // ── TuiApp ──────────────────────────────────────────────────────
@@ -191,16 +191,26 @@ impl TuiApp {
     // ── Render ─────────────────────────────────────────────────
 
     fn draw(&self, f: &mut Frame) {
+        // Outer horizontal layout: center content with a max width
+        let outer = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([
+                Constraint::Fill(1),
+                Constraint::Max(160),
+                Constraint::Fill(1),
+            ])
+            .split(f.area());
+
         let root = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
-                Constraint::Length(7),  // Banner
-                Constraint::Length(3),  // Stats bar
-                Constraint::Length(3),  // Tab bar
-                Constraint::Min(6),     // Tab content
-                Constraint::Length(3),  // Footer
+                Constraint::Length(7), // Banner
+                Constraint::Length(3), // Stats bar
+                Constraint::Length(3), // Tab bar
+                Constraint::Min(6),    // Tab content
+                Constraint::Length(3), // Footer
             ])
-            .split(f.area());
+            .split(outer[1]);
 
         self.draw_banner(f, root[0]);
         self.draw_stats_bar(f, root[1]);
@@ -233,11 +243,22 @@ impl TuiApp {
             Line::from(vec![
                 Span::styled(
                     "  ╚════██║██╔══██║╚██╗ ██╔╝██╔══██║██║╚██╗██║   ██║   ",
-                    Style::default().fg(ACCENT_BLUE).add_modifier(Modifier::BOLD),
+                    Style::default()
+                        .fg(ACCENT_BLUE)
+                        .add_modifier(Modifier::BOLD),
                 ),
-                Span::styled("  TRADING ENGINE", Style::default().fg(NEON_CYAN).add_modifier(Modifier::BOLD)),
                 Span::styled(
-                    format!("  v{}  │  UP {:02}:{:02}:{:02}", env!("CARGO_PKG_VERSION"), hours, mins, secs),
+                    "  TRADING ENGINE",
+                    Style::default().fg(NEON_CYAN).add_modifier(Modifier::BOLD),
+                ),
+                Span::styled(
+                    format!(
+                        "  v{}  │  UP {:02}:{:02}:{:02}",
+                        env!("CARGO_PKG_VERSION"),
+                        hours,
+                        mins,
+                        secs
+                    ),
                     Style::default().fg(DIM_CYAN),
                 ),
             ]),
@@ -256,13 +277,21 @@ impl TuiApp {
                     "  ╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ",
                     Style::default().fg(DIM_CYAN),
                 ),
-                Span::styled("  PATIENT BY NECESSITY", Style::default().fg(NEON_CYAN).add_modifier(Modifier::ITALIC)),
+                Span::styled(
+                    "  PATIENT BY NECESSITY",
+                    Style::default()
+                        .fg(NEON_CYAN)
+                        .add_modifier(Modifier::ITALIC),
+                ),
             ]),
         ];
 
         f.render_widget(
-            Paragraph::new(banner_lines)
-                .block(Block::default().borders(Borders::ALL).border_style(Style::default().fg(NEON_CYAN))),
+            Paragraph::new(banner_lines).block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(NEON_CYAN)),
+            ),
             area,
         );
     }
@@ -276,32 +305,65 @@ impl TuiApp {
         let dd_pct = a.drawdown_pct * 100.0;
         let session = crate::core::session::current_session();
 
-        let pnl_color_s = if a.daily_pnl >= 0.0 { NEON_GREEN } else { NEON_RED };
+        let pnl_color_s = if a.daily_pnl >= 0.0 {
+            NEON_GREEN
+        } else {
+            NEON_RED
+        };
         let pnl_arrow = if a.daily_pnl >= 0.0 { "▲" } else { "▼" };
-        let dd_color_s = if dd_pct > 10.0 { NEON_RED } else if dd_pct > 5.0 { NEON_YELLOW } else { NEON_GREEN };
+        let dd_color_s = if dd_pct > 10.0 {
+            NEON_RED
+        } else if dd_pct > 5.0 {
+            NEON_YELLOW
+        } else {
+            NEON_GREEN
+        };
 
         let stats = Line::from(vec![
             Span::styled("  BAL ", Style::default().fg(DIM_CYAN)),
-            Span::styled(format!("${:.2}  ", a.balance), Style::default().fg(NEON_GREEN).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                format!("${:.2}  ", a.balance),
+                Style::default().fg(NEON_GREEN).add_modifier(Modifier::BOLD),
+            ),
             Span::styled("│  EQUITY ", Style::default().fg(DIM_CYAN)),
-            Span::styled(format!("${:.2}  ", a.equity), Style::default().fg(NEON_CYAN).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                format!("${:.2}  ", a.equity),
+                Style::default().fg(NEON_CYAN).add_modifier(Modifier::BOLD),
+            ),
             Span::styled("│  P&L ", Style::default().fg(DIM_CYAN)),
-            Span::styled(format!("{}${:.2}  ", pnl_arrow, a.daily_pnl.abs()), Style::default().fg(pnl_color_s).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                format!("{}${:.2}  ", pnl_arrow, a.daily_pnl.abs()),
+                Style::default()
+                    .fg(pnl_color_s)
+                    .add_modifier(Modifier::BOLD),
+            ),
             Span::styled("│  DD ", Style::default().fg(DIM_CYAN)),
-            Span::styled(format!("{:.1}%  ", dd_pct), Style::default().fg(dd_color_s).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                format!("{:.1}%  ", dd_pct),
+                Style::default().fg(dd_color_s).add_modifier(Modifier::BOLD),
+            ),
             Span::styled("│  POS ", Style::default().fg(DIM_CYAN)),
             Span::styled(format!("{}  ", pos_count), Style::default().fg(NEON_CYAN)),
             Span::styled("│  TRADES ", Style::default().fg(DIM_CYAN)),
             Span::styled(format!("{}  ", trade_count), Style::default().fg(NEON_CYAN)),
             Span::styled("│  SESSION ", Style::default().fg(DIM_CYAN)),
-            Span::styled(format!("{}  ", session.name()), Style::default().fg(NEON_MAGENTA)),
+            Span::styled(
+                format!("{}  ", session.name()),
+                Style::default().fg(NEON_MAGENTA),
+            ),
             Span::styled("│  ", Style::default().fg(DIM_CYAN)),
-            Span::styled(chrono::Local::now().format("%H:%M:%S").to_string(), Style::default().fg(DIM_CYAN)),
+            Span::styled(
+                chrono::Local::now().format("%H:%M:%S").to_string(),
+                Style::default().fg(DIM_CYAN),
+            ),
         ]);
 
         f.render_widget(
-            Paragraph::new(stats)
-                .block(Block::default().borders(Borders::ALL).border_style(Style::default().fg(DIM_CYAN))),
+            Paragraph::new(stats).block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(DIM_CYAN)),
+            ),
             area,
         );
     }
@@ -335,8 +397,11 @@ impl TuiApp {
         spans.push(Span::styled(help_hint, Style::default().fg(DIM_CYAN)));
 
         f.render_widget(
-            Paragraph::new(Line::from(spans))
-                .block(Block::default().borders(Borders::ALL).border_style(Style::default().fg(NEON_CYAN))),
+            Paragraph::new(Line::from(spans)).block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(NEON_CYAN)),
+            ),
             area,
         );
     }
@@ -345,13 +410,23 @@ impl TuiApp {
 
     fn draw_footer(&self, f: &mut Frame, area: ratatui::layout::Rect) {
         let s = &self.state.snapshot;
-        let mode_color = if s.mode_label == "LIVE" { NEON_RED } else { NEON_GREEN };
+        let mode_color = if s.mode_label == "LIVE" {
+            NEON_RED
+        } else {
+            NEON_GREEN
+        };
 
         let footer = Line::from(vec![
             Span::styled("  ", Style::default()),
-            Span::styled("[Q]uit", Style::default().fg(NEON_RED).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[Q]uit",
+                Style::default().fg(NEON_RED).add_modifier(Modifier::BOLD),
+            ),
             Span::styled("  │  ", Style::default().fg(DIM_CYAN)),
-            Span::styled("SAVANT TRADING ENGINE", Style::default().fg(NEON_CYAN).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "SAVANT TRADING ENGINE",
+                Style::default().fg(NEON_CYAN).add_modifier(Modifier::BOLD),
+            ),
             Span::styled("  │  ", Style::default().fg(DIM_CYAN)),
             Span::styled(&s.backend_name, Style::default().fg(NEON_YELLOW)),
             Span::styled("  │  ", Style::default().fg(DIM_CYAN)),
@@ -364,7 +439,10 @@ impl TuiApp {
             Span::styled("  │  ", Style::default().fg(DIM_CYAN)),
             Span::styled(&s.model_name, Style::default().fg(ACCENT_BLUE)),
             Span::styled("  │  ", Style::default().fg(DIM_CYAN)),
-            Span::styled("24/7", Style::default().fg(NEON_GREEN).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "24/7",
+                Style::default().fg(NEON_GREEN).add_modifier(Modifier::BOLD),
+            ),
         ]);
 
         if self.state.show_help {
@@ -380,16 +458,22 @@ impl TuiApp {
             ];
 
             f.render_widget(
-                Paragraph::new(help)
-                    .block(Block::default().borders(Borders::ALL).border_style(Style::default().fg(NEON_YELLOW))),
+                Paragraph::new(help).block(
+                    Block::default()
+                        .borders(Borders::ALL)
+                        .border_style(Style::default().fg(NEON_YELLOW)),
+                ),
                 area,
             );
             return;
         }
 
         f.render_widget(
-            Paragraph::new(footer)
-                .block(Block::default().borders(Borders::ALL).border_style(Style::default().fg(DIM_CYAN))),
+            Paragraph::new(footer).block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(DIM_CYAN)),
+            ),
             area,
         );
     }

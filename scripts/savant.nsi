@@ -3,7 +3,7 @@
 ;  scripts/savant.nsi
 ;
 ;  Build with:
-;    makensis -DVERSION="0.4.4" -DSRC_DIR="dist/staging" -DOUT_DIR="dist" savant.nsi
+;    makensis -DVERSION="0.5.0" -DSRC_DIR="dist/staging" -DOUT_DIR="dist" savant.nsi
 ;
 ;  Requirements:
 ;    - NSIS 3.x                  https://nsis.sourceforge.io
@@ -22,7 +22,7 @@ ShowUnInstDetails hide
 
 ; ── Version Info ──────────────────────────────────────────────────
 !ifndef VERSION
-  !define VERSION "0.4.4"
+  !define VERSION "0.5.0"
 !endif
 
 !ifndef SRC_DIR
