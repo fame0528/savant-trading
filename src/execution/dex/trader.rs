@@ -528,7 +528,21 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         };
 
         log_swap!("0x API", "Calling: {} -> {} amount={}", swap_params.src_token, swap_params.dst_token, swap_params.amount);
-        let swap_tx = self.backend.build_swap_tx(&swap_params).await?;
+
+        // Fast-fail: 15s timeout on the 0x API call itself.
+        // The reqwest client has a 30s timeout but doesn't cover DNS/TLS hangs.
+        // This catches hangs at the API level before the 60s engine timeout.
+        let swap_tx = match tokio::time::timeout(
+            std::time::Duration::from_secs(15),
+            self.backend.build_swap_tx(&swap_params),
+        ).await {
+            Ok(result) => result?,
+            Err(_) => {
+                log_swap_fail!("0x API", "Timeout after 15s — API hung");
+                return Err(ExecutionError::Other("0x API timeout after 15s".into()));
+            }
+        };
+
         log_swap_ok!("0x QUOTE", "OK: to={} gas={} value={}", swap_tx.to, swap_tx.gas, swap_tx.value);
 
         let to: Address = swap_tx

@@ -171,6 +171,25 @@
 
 <!-- Add new entries above this line -->
 
+## Session 2026-06-03-1500: Merge Strategy, 0x API Fix, /dev Cleanup
+
+**Key Learnings:**
+
+- **Full merge of divergent branches is dangerous.** 10 conflict zones in a 4500-line file (engine.rs) make manual resolution error-prone. Cherry-picking specific files is safer.
+- **`reqwest` timeout doesn't cover all hang scenarios.** DNS resolution and TLS handshake hangs bypass the reqwest timeout. Always add `tokio::time::timeout` around external API calls at the call site, not just at the HTTP client level.
+- **Fast-fail at API level (15s) is better than slow-fail at engine level (60s).** The 15s timeout on `build_swap_tx()` catches 0x API hangs before the 60s engine timeout, preserving the opportunity to retry.
+- **ECHO Protocol /dev folder must be maintained every session.** FIDs must be archived when resolved, LEARNINGS.md must be updated, session summaries must be created. Skipping this creates technical debt.
+- **Handoff docs should be archived after consumption.** Once a document has been sent to the recipient, move it to `dev/archive/` to keep the active /dev folder clean.
+
+**Agent Behavior:**
+
+- Attempted full merge → detected 10 conflict zones → aborted → switched to cherry-pick approach (correct)
+- FID-030 created with full Perfection Loop (RED/GREEN/AUDIT)
+- Resolved FIDs archived (026, 027, 028)
+- Session summary and LEARNINGS.md updated
+
+---
+
 ## Session 2026-06-03-0500: DEX Execution Pipeline, Console Logging, Project Audit
 
 **Key Learnings:**

@@ -7,7 +7,7 @@ use axum::{
     extract::{Path, State},
     http::header,
     middleware,
-    response::Json,
+    response::{Html, Json},
     routing::{get, post},
     Router,
 };
@@ -107,6 +107,8 @@ pub async fn start_server(
         .route("/api/training", get(get_training))
         .route("/api/engine/start", post(start_engine))
         .route("/api/engine/stop", post(stop_engine))
+        .route("/dashboard.html", get(dashboard))
+        .route("/", get(dashboard))
         .with_state(state)
         .layer(cors)
         .layer(middleware::from_fn(rate_limit_middleware));
@@ -479,6 +481,13 @@ async fn get_training(State(state): State<AppState>) -> Json<ApiResponse<serde_j
         error: None,
         timestamp: chrono::Utc::now().to_rfc3339(),
     })
+}
+
+async fn dashboard() -> Html<String> {
+    match std::fs::read_to_string("dashboard.html") {
+        Ok(content) => Html(content),
+        Err(_) => Html("<h1>Dashboard not found</h1><p>Place dashboard.html in the project root.</p>".to_string()),
+    }
 }
 
 #[cfg(test)]
