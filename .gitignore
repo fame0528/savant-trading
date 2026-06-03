@@ -54,6 +54,7 @@ savant-vault/
 .DS_Store
 Thumbs.db
 desktop.ini
+nul
 
 # === IDE ===
 .vscode/
