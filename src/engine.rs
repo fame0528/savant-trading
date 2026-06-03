@@ -738,7 +738,7 @@ pub async fn run(
             }
         }
 
-        // === PHASE 1: Fetch data for all pairs (sequential, fast) ===
+        // === PHASE 1: Parallel fetch + sequential processing ===
         struct PairData {
             pair: String,
             indicators: savant_trading::core::types::IndicatorValues,
@@ -754,62 +754,124 @@ pub async fn run(
         let recent_trades = paper.closed_trades().to_vec();
         let current_session = savant_trading::core::session::current_session();
 
+        // === PHASE 1a: Parallel fetch — candles + order books for ALL pairs ===
+        let mut fetch_set = tokio::task::JoinSet::new();
+        let rest_url = config.exchange.rest_url.clone();
+        let base_tf = config.trading.timeframe.clone();
+        let higher_tfs: Vec<String> = config.trading.timeframes.clone();
         for pair in &active_pairs {
-            info!("Phase 1: Processing {} ({}/{})", pair, active_pairs.iter().position(|p| p == pair).map(|i| i+1).unwrap_or(0), active_pairs.len());
+            let kc = KrakenClient::new(&rest_url);
+            let pair_c = pair.clone();
+            let tf = base_tf.clone();
+            let tfs = higher_tfs.clone();
+            fetch_set.spawn(async move {
+                // Base candle
+                let candles = kc
+                    .get_ohlc(&pair_c, parse_timeframe_minutes(&tf), None)
+                    .await;
+                // Order book
+                let order_book = kc.get_order_book(&pair_c, 10).await;
+                // Higher TF candles
+                let mut htf = Vec::new();
+                for htf_tf in &tfs {
+                    if *htf_tf == tf {
+                        continue;
+                    }
+                    match kc
+                        .get_ohlc(&pair_c, parse_timeframe_minutes(htf_tf), None)
+                        .await
+                    {
+                        Ok(mut c) => {
+                            if c.len() > 1 {
+                                c.pop();
+                            }
+                            if !c.is_empty() {
+                                htf.push((htf_tf.clone(), c));
+                            }
+                        }
+                        Err(e) => {
+                            tracing::warn!("HTF fetch failed for {} {}: {}", pair_c, htf_tf, e);
+                        }
+                    }
+                }
+                (pair_c, candles, order_book, htf)
+            });
+        }
+
+        struct FetchedData {
+            pair: String,
+            candles: Vec<Candle>,
+            order_book: Option<savant_trading::core::types::OrderBook>,
+            higher_tf_candles: Vec<(String, Vec<Candle>)>,
+        }
+
+        let mut fetched: Vec<FetchedData> = Vec::new();
+        while let Some(result) = fetch_set.join_next().await {
+            match result {
+                Ok((pair, candles_result, ob_result, htf)) => {
+                    let candles = match candles_result {
+                        Ok(mut c) => {
+                            if c.len() > 1 {
+                                c.pop();
+                            }
+                            c
+                        }
+                        Err(e) => {
+                            error!("Candle fetch error for {}: {}", pair, e);
+                            continue;
+                        }
+                    };
+                    let order_book = match ob_result {
+                        Ok(ob) => Some(ob),
+                        Err(e) => {
+                            warn!("Order book fetch failed for {}: {}", pair, e);
+                            None
+                        }
+                    };
+                    fetched.push(FetchedData {
+                        pair,
+                        candles,
+                        order_book,
+                        higher_tf_candles: htf,
+                    });
+                }
+                Err(e) => error!("Fetch task panicked: {}", e),
+            }
+        }
+
+        // === PHASE 1b: Sequential processing — indicators, context, LLM prep ===
+        for fd in fetched {
+            let pair = fd.pair;
+            info!("Phase 1: Processing {}", pair);
             shared
                 .log_activity(
                     savant_trading::core::shared::ActivityLevel::Info,
-                    pair,
+                    &pair,
                     "Fetching candles + order book...",
                 )
                 .await;
 
-            let candles_result = kraken
-                .get_ohlc(
-                    pair,
-                    parse_timeframe_minutes(&config.trading.timeframe),
-                    None,
-                )
-                .await;
-
-            debug!("Phase 1: Candle fetch done for {}", pair);
-
-            let mut candles = match candles_result {
-                Ok(c) => c,
-                Err(e) => {
-                    error!("Data fetch error for {}: {}", pair, e);
-                    continue;
-                }
-            };
-
-            if candles.len() > 1 {
-                candles.pop();
-            }
-
             if let Some(store) = market_stores.get_mut(pair.as_str()) {
-                if let Some(last) = candles.last() {
+                if let Some(last) = fd.candles.last() {
                     store.add_candle(last.clone());
                 }
 
-                // Fetch order book
-                if let Some(ob_manager) = order_books.get_mut(pair.as_str()) {
-                    match kraken.get_order_book(pair, 10).await {
-                        Ok(book) => {
-                            ob_manager.update(book);
-                            let imbalance = ob_manager.imbalance(5);
-                            if imbalance > 0.3 {
-                                info!(
-                                    "Order book imbalance for {}: {:.2} (bid-heavy)",
-                                    pair, imbalance
-                                );
-                            } else if imbalance < -0.3 {
-                                info!(
-                                    "Order book imbalance for {}: {:.2} (ask-heavy)",
-                                    pair, imbalance
-                                );
-                            }
-                        }
-                        Err(e) => warn!("Order book fetch failed for {}: {}", pair, e),
+                // Update order book
+                if let (Some(ob_manager), Some(book)) =
+                    (order_books.get_mut(pair.as_str()), fd.order_book)
+                {
+                    ob_manager.update(book);
+                    let imbalance = ob_manager.imbalance(5);
+                    if imbalance > 0.3 {
+                        info!(
+                            "Order book imbalance for {}: {:.2} (bid-heavy)",
+                            pair, imbalance
+                        );
+                    } else if imbalance < -0.3 {
+                        info!(
+                            "Order book imbalance for {}: {:.2} (ask-heavy)",
+                            pair, imbalance
+                        );
                     }
                 }
                 debug!("Phase 1: Order book done for {}", pair);
@@ -828,30 +890,8 @@ pub async fn run(
                 ));
                 let ob_imbalance = order_books.get(pair.as_str()).map(|ob| ob.imbalance(5));
                 let current_price = candle_data.last().map(|c| c.close).unwrap_or(0.0);
+                let higher_tf_candles = fd.higher_tf_candles;
 
-                // SPRINT-1: Fetch higher timeframe candles for multi-TF context
-                let mut higher_tf_candles: Vec<(String, Vec<Candle>)> = Vec::new();
-                for tf in &config.trading.timeframes {
-                    if *tf == config.trading.timeframe {
-                        continue;
-                    }
-                    match kraken
-                        .get_ohlc(pair, parse_timeframe_minutes(tf), None)
-                        .await
-                    {
-                        Ok(mut htf_candles) => {
-                            if htf_candles.len() > 1 {
-                                htf_candles.pop();
-                            }
-                            if !htf_candles.is_empty() {
-                                higher_tf_candles.push((tf.clone(), htf_candles));
-                            }
-                        }
-                        Err(e) => {
-                            warn!("Higher TF fetch failed for {} {}: {}", pair, tf, e);
-                        }
-                    }
-                }
                 debug!(
                     "Phase 1: Higher TF done for {} ({} timeframes)",
                     pair,
@@ -861,7 +901,7 @@ pub async fn run(
                 shared
                     .log_activity(
                         savant_trading::core::shared::ActivityLevel::Info,
-                        pair,
+                        &pair,
                         &format!(
                             "Indicators: RSI={:.1} ADX={:.1} ATR={:.4} Regime={:?}",
                             indicators.rsi.unwrap_or(0.0),
@@ -872,14 +912,12 @@ pub async fn run(
                     )
                     .await;
 
-                // Pre-filter: log signal status but always send to LLM
-                // The AI decides, not a hard-coded filter (mimo is free)
                 let has_signal = has_actionable_signal(
                     &indicators,
                     regime,
                     ob_imbalance,
                     current_price,
-                    candles.last().map(|c| c.volume),
+                    candle_data.last().map(|c| c.volume),
                 );
                 let has_position = positions.iter().any(|p| p.pair == *pair);
                 debug!(
@@ -893,16 +931,15 @@ pub async fn run(
                 shared
                     .log_activity(
                         savant_trading::core::shared::ActivityLevel::Thinking,
-                        pair,
+                        &pair,
                         "Sending to AI brain...",
                     )
                     .await;
 
-                // Query memory context (WIRE-1)
                 let memory_ctx_str = if let Some(ref mem) = memory {
                     let mem_ctx = savant_trading::memory::context::query_memory_context(
                         mem,
-                        pair,
+                        &pair,
                         &format!("{}", regime),
                         current_session.name(),
                     )
@@ -925,7 +962,7 @@ pub async fn run(
                     market_context: &market_ctx,
                     positions: &positions,
                     account: paper.account(),
-                    pair,
+                    pair: &pair,
                     recent_trades: if recent_trades.is_empty() {
                         None
                     } else {
@@ -956,7 +993,7 @@ pub async fn run(
                 );
 
                 pair_data_vec.push(PairData {
-                    pair: pair.clone(),
+                    pair,
                     indicators,
                     regime,
                     current_price,
