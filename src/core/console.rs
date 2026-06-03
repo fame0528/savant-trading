@@ -46,16 +46,23 @@ const TRADING_PAIRS: &[&str] = &[
 ];
 
 /// Highlight trading pair names with cyan bold brackets.
-/// Works on both bare (`BTC/USD`) and already-bracketed (`[BTC/USD]`) pairs.
+/// Only wraps bare pairs — skips already-bracketed pairs to avoid `[[BTC/USD]]`.
 fn highlight_pairs(text: &str) -> String {
     let mut result = text.to_string();
     for pair in TRADING_PAIRS {
+        // Skip if already bracketed: [BTC/USD]
+        let bracketed = format!("[{}]", pair);
+        if result.contains(&bracketed) {
+            continue;
+        }
+        // Skip if already highlighted with ANSI codes
+        let highlighted = format!("{}[{}]{}", CYAN_BOLD, pair, RESET);
+        if result.contains(&highlighted) {
+            continue;
+        }
+        // Only highlight bare pairs
         if result.contains(pair) {
-            // Skip if already highlighted (has ANSI codes around it)
-            let highlighted = format!("{}[{}]{}", CYAN_BOLD, pair, RESET);
-            if !result.contains(&highlighted) {
-                result = result.replace(pair, &highlighted);
-            }
+            result = result.replace(pair, &highlighted);
         }
     }
     result
@@ -135,6 +142,16 @@ pub struct SavantLayer;
 
 /// Capitalize module name: `funding_rates` → `FundingRates`, `kraken` → `Kraken`
 fn capitalize_module(name: &str) -> String {
+    // Special cases for well-known module names
+    match name {
+        "onchain" => return "On Chain".to_string(),
+        "websocket" => return "WebSocket".to_string(),
+        "funding_rates" => return "Funding Rates".to_string(),
+        "coinmarketcap" => return "CoinMarketCap".to_string(),
+        "goplus" => return "GoPlus".to_string(),
+        _ => {}
+    }
+    // Default: capitalize each word, join with space
     name.split('_')
         .map(|word| {
             let mut chars = word.chars();
@@ -144,7 +161,7 @@ fn capitalize_module(name: &str) -> String {
             }
         })
         .collect::<Vec<_>>()
-        .join("")
+        .join(" ")
 }
 
 impl<S> Layer<S> for SavantLayer

@@ -166,19 +166,30 @@ impl GoPlusClient {
     }
 
     /// Check a token by symbol (uses known Arbitrum addresses).
-    /// Returns `true` if safe or if address is unknown (don't block on missing data).
+    /// Returns `Ok(true)` if safe, `Ok(false)` if rejected.
+    /// Core assets (BTC, ETH, etc.) are skipped — they don't need security checks.
     pub async fn check_by_symbol(&self, symbol: &str) -> Result<bool, ExecutionError> {
+        // Core assets — skip security check (they're established, not meme coins)
+        const CORE_ASSETS: &[&str] = &[
+            "BTC", "ETH", "SOL", "XRP", "ADA", "LINK", "AVAX",
+            "DOGE", "ARB", "OP", "AAVE", "UNI", "LDO", "PENDLE",
+            "RENDER", "FET", "GRT",
+        ];
+
+        let upper = symbol.to_uppercase();
+        if CORE_ASSETS.contains(&upper.as_str()) {
+            return Ok(true); // Core assets are safe — skip check
+        }
+
         // Known Arbitrum addresses for meme coins
         let known_addresses: HashMap<&str, &str> = HashMap::from([
             ("PEPE", "0x25d887Ce7a49172BF65CB5E54e78C488Ef5954e6"),
-            ("DOGE", "0xC4dDa7D2Bc614E8dCbf2E0B2E11178c1c4f8258f"),
             ("SHIB", "0x503Fa02e9c600a63E40f1b8F0c76b8d8Ef1B2B19"),
             ("FLOKI", "0x22e89898A04eaf433f95643b1F0D57eC22E74E63"),
             ("TURBO", "0x2Cd44D8F4FA2bC2A2B8F5a8e1Ea22A3c5a312345"),
             ("MOG", "0x2Da56AcB9Ea78330f947bD57C54119Debda7AF71"),
         ]);
 
-        let upper = symbol.to_uppercase();
         if let Some(address) = known_addresses.get(upper.as_str()) {
             self.check_token(address, symbol).await
         } else {
