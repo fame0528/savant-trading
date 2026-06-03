@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0603-035-meme-coin-expansion.md`
 **ID:** FID-2026-0603-035
 **Severity:** critical
-**Status:** created
+**Status:** analyzed
 **Created:** 2026-06-03 17:15
 **Author:** Agent
 
@@ -54,6 +54,12 @@ MVRV: 1.25 (neutral)
 SOPR: 0.9741 (capitulation)
 ATR compression: all 8 pairs < 0.5%
 
+# Existing code that can be reused:
+circuit_breaker.max_spread_bps = 50 (needs lowering to 30)
+config.ai.price_tolerance_pct = 10.0 (needs tightening to 0.5)
+CorrelationMatrix exists in src/risk/correlation.rs
+PaperTrader.spread_bps() exists in src/execution/paper.rs
+
 # Gemini Research recommendation:
 Expand to 13 pairs: +PEPE, SHIB, FLOKI, TURBO, MOG
 Exclude from Arbitrum: WIF, BONK (Solana-native, thin liquidity)
@@ -83,7 +89,7 @@ pairs = [
 
 #### 2. Spread Filter (NEW — src/risk/spread_filter.rs)
 
-The circuit breaker has `max_spread_bps` (50bps) but it's a blunt halt. Need a pre-execution spread check that rejects individual trades:
+The circuit breaker already has `max_spread_bps = 50.0` (src/risk/circuit_breaker.rs:24). Need a pre-execution spread check that rejects individual trades:
 
 ```
 Spread > 30bps → reject trade (too expensive for $11 positions)
@@ -93,7 +99,7 @@ Spread < 15bps → ideal
 
 **Math:** At $11 positions, 30bps spread = $0.033 friction. Round-trip gas = $0.06. Total friction = $0.093. With 3% stop distance ($0.33), friction consumes 28% of stop margin. Above 30bps, friction exceeds 40% — unacceptable.
 
-**Implementation:** Query 0x API quote, calculate `spread = (buyAmount - sellAmount) / sellAmount`. If > 0.003, reject.
+**Implementation:** Query 0x API quote, calculate `spread = (buyAmount - sellAmount) / sellAmount`. If > 0.003, reject. **Reuse existing:** `circuit_breaker.max_spread_bps` — lower from 50 to 30 for meme coins.
 
 #### 3. GoPlus Security API (NEW — src/security/goplus.rs)
 
@@ -124,12 +130,13 @@ Current: 5m candles only. Meme coins need 15m for structure + 5m for execution.
 
 #### 5. Correlation Cap (src/risk/correlation.rs)
 
-Meme coins are highly correlated. Opening PEPE + SHIB + MOG = one bet, not three.
+Meme coins are highly correlated. Opening PEPE + SHIB + MOG = one bet, not three. **Existing:** `CorrelationMatrix` already tracks pairwise Pearson correlation (src/risk/correlation.rs). Circuit breaker already uses it via `check_with_heat()`.
 
 **Implementation:**
 - Define risk buckets: A (Macro L1/L2), B (Legacy/Utility), C (High-Beta Meme)
 - Max 1 open position from Bucket C at any time
 - If AI detects setups in multiple meme coins, rank by ATR/ADX and pick best one
+- **Reuse existing:** `CorrelationMatrix` — add bucket categorization and cap enforcement
 
 #### 6. KV Cache Optimization (src/agent/provider.rs)
 
@@ -152,12 +159,13 @@ The 0x API intermittently hangs. Current: 15s timeout + 3 retries. But if ALL re
 
 #### 8. Price Tolerance Check (src/engine.rs)
 
-The AI's entry price might be stale by the time the swap executes. If current price > entry + 0.5%, reject.
+The AI's entry price might be stale by the time the swap executes. Config already has `price_tolerance_pct = 10.0` — tighten to 0.5% for meme coins.
 
 **Implementation:**
 - After AI returns Buy decision, check current price vs entry_price
 - If drift > 0.5%, log warning and skip
 - Prevents buying into pumps that happened during LLM evaluation
+- **Reuse existing:** `config.ai.price_tolerance_pct` — just tighten the value
 
 #### 9. Emergency Liquidation (src/execution/dex/trader.rs)
 
@@ -235,10 +243,10 @@ Implement in 3 phases: (1) immediate pair expansion + spread filter, (2) safety 
 
 ### Loop 1
 
-- **RED:** Engine starved of setups — 8 pairs ranging, meme coins needed. No spread filter, no honeypot detection, no correlation cap.
-- **GREEN:** (pending)
-- **AUDIT:** (pending)
-- **CHANGE DELTA:** (pending)
+- **RED:** Engine starved of setups — 8 pairs ranging, ATR < 0.5%. No spread filter, no honeypot detection, no correlation cap. Gemini Deep Research identified 5 meme coins with Arbitrum liquidity (PEPE, SHIB, FLOKI, TURBO, MOG). WIF/BONK excluded (Solana-native, thin Arbitrum liquidity).
+- **GREEN:** (pending — implementation not started)
+- **AUDIT:** FID verified against template. All sections present: Summary, Environment, Detailed Description, Problem, Root Cause, Evidence, Impact Assessment, Proposed Solution, Approach, Steps, Verification, Perfection Loop, Resolution, Lessons Learned. Config already has `price_tolerance_pct = 10.0` — needs tightening to 0.5% for meme coins. Circuit breaker already has `max_spread_bps = 50.0` — needs lowering to 30bps for meme coins.
+- **CHANGE DELTA:** 0% (FID creation only, no code changes yet)
 
 ## Resolution
 
@@ -258,3 +266,8 @@ Implement in 3 phases: (1) immediate pair expansion + spread filter, (2) safety 
 - Dual timeframe (15m + 5m) filters HFT noise on meme coins.
 - Correlation cap prevents stacking correlated meme positions.
 - KV cache optimization cuts LLM latency 40-60%.
+- WIF/BONK are Solana-native — bridged Arbitrum liquidity too thin for 30bps spread filter.
+- Existing code (CorrelationMatrix, spread_bps, price_tolerance_pct) can be reused — don't duplicate.
+- Price tolerance check prevents buying into pumps that happened during LLM evaluation (20-60s window).
+- Retry queue prevents losing trades when 0x API intermittently fails.
+- Emergency liquidation CLI is critical safety net for DEX positions (no exchange kill switch).
