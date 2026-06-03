@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- **FID-035** — Meme coin expansion + safety rails. 13 pairs total (PEPE, SHIB, FLOKI, TURBO, MOG). Spread filter (30bps), GoPlus security API, correlation cap, dual timeframe, KV cache optimization. Based on Gemini Deep Research (68 pages, 69 citations).
+- **FID-035 Phase 1** — Meme coin expansion: 13 pairs (8 core + PEPE, SHIB, FLOKI, TURBO, MOG). Spread filter (30bps max). Price tolerance (0.5% drift). Risk buckets (macro/legacy/meme). `highlight_pairs()` updated.
 - **FID-034** — ANSI color placement fix.
 - **FID-033** — Uniform console output via custom tracing Layer.
 - **Merge strategy** — `dev/MERGE-STRATEGY.md` documenting cherry-pick approach.
