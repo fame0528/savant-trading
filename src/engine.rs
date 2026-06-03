@@ -651,9 +651,9 @@ pub async fn run(
     // Track latest WS ticker prices
     let mut ws_ticker_prices: HashMap<String, f64> = HashMap::new();
 
-    // Track PaperTrader position ID → KrakenTrader position ID mapping
+    // Track PaperTrader position ID → ExecutionEngine position ID mapping
     // Used for stop-loss placement and position close routing across the two systems
-    let mut kraken_position_map: HashMap<String, String> = HashMap::new();
+    let mut executor_position_map: HashMap<String, String> = HashMap::new();
 
     let mut tick = 0u64;
 
@@ -690,17 +690,17 @@ pub async fn run(
                     // In live mode, cancel all orders and clear position tracking
                     if let Some(ref mut ex) = executor {
                         if let Err(e) = ex.kill().await {
-                            error!("Kraken kill failed: {}", e);
+                            error!("Executor kill failed: {}", e);
                         }
-                        // Clear position mapping since Kraken cancelled everything
-                        kraken_position_map.clear();
+                        // Clear position mapping since executor cancelled everything
+                        executor_position_map.clear();
                     }
-                    // Clear PaperTrader positions to match Kraken state (AFTER logging)
+                    // Clear PaperTrader positions to match executor state (AFTER logging)
                     let cleared_count = paper.positions().len();
                     paper.positions_mut().clear();
                     paper.account_mut().open_positions = 0;
                     info!(
-                        "Cleared {} local positions to match Kraken cancel-all",
+                        "Cleared {} local positions to match executor cancel-all",
                         cleared_count
                     );
                     shared
@@ -1398,25 +1398,25 @@ pub async fn run(
                                                         paper.account_mut().trades_today += 1;
                                                         info!("AI position opened: {}", decision.pair);
 
-                                                        // Place stop-loss on Kraken for live mode
+                                                        // Place stop-loss on executor for live mode
                                                         if let Some(ref mut ex) = executor {
-                                                            if let Some(kraken_pos) =
+                                                            if let Some(exec_pos) =
                                                                 ex.open_positions().iter().find(|p| {
                                                                     p.pair == pos.pair && p.side == pos.side
                                                                 })
                                                             {
-                                                                let kraken_id = kraken_pos.id.clone();
-                                                                kraken_position_map
-                                                                    .insert(pos.id.clone(), kraken_id.clone());
+                                                                let exec_id = exec_pos.id.clone();
+                                                                executor_position_map
+                                                                    .insert(pos.id.clone(), exec_id.clone());
                                                                 if let Err(e) =
-                                                                    ex.place_stop_loss(&kraken_id).await
+                                                                    ex.place_stop_loss(&exec_id).await
                                                                 {
-                                                                    warn!("Failed to place stop-loss for Kraken position {}: {}", kraken_id, e);
+                                                                    warn!("Failed to place stop-loss for position {}: {}", exec_id, e);
                                                                 } else {
-                                                                    info!("Stop-loss placed on Kraken for position {} @ {:.4}", kraken_id, pos.stop_loss);
+                                                                    info!("Stop-loss placed for position {} @ {:.4}", exec_id, pos.stop_loss);
                                                                 }
                                                             } else {
-                                                                warn!("Kraken position not found for stop-loss after placing order for {}", pos.pair);
+                                                                warn!("Position not found for stop-loss after placing order for {}", pos.pair);
                                                             }
                                                         }
 
@@ -1495,7 +1495,7 @@ pub async fn run(
 
         let closed = paper.check_stops(&all_prices);
 
-        // In live mode, close positions on Kraken that PaperTrader closed via stops
+        // In live mode, close positions on executor that PaperTrader closed via stops
         for trade in &closed {
             if let Some(ref mut ex) = executor {
                 // Match closed trade to paper position by pair + side + entry_price
@@ -1508,19 +1508,19 @@ pub async fn run(
                     })
                     .map(|(id, _, _, _)| id.clone());
 
-                // Look up the Kraken position ID from the stored mapping
-                let kraken_id = paper_id
+                // Look up the executor position ID from the stored mapping
+                let exec_id = paper_id
                     .as_ref()
-                    .and_then(|pid| kraken_position_map.get(pid))
+                    .and_then(|pid| executor_position_map.get(pid))
                     .cloned();
 
-                if let Some(ref kid) = kraken_id {
-                    if let Err(e) = ex.close_position(kid).await {
-                        warn!("Failed to close Kraken position {}: {}", kid, e);
+                if let Some(ref eid) = exec_id {
+                    if let Err(e) = ex.close_position(eid).await {
+                        warn!("Failed to close executor position {}: {}", eid, e);
                     } else {
                         // Clean up the mapping entry after successful close
                         if let Some(ref pid) = paper_id {
-                            kraken_position_map.remove(pid);
+                            executor_position_map.remove(pid);
                         }
                     }
                 } else {
@@ -1533,7 +1533,7 @@ pub async fn run(
                         .map(|p| p.id.clone());
                     if let Some(fid) = fallback_id {
                         if let Err(e) = ex.close_position(&fid).await {
-                            warn!("Failed to close fallback Kraken position {}: {}", fid, e);
+                            warn!("Failed to close fallback position {}: {}", fid, e);
                         }
                     }
                 }

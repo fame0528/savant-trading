@@ -7,7 +7,7 @@
 
 project:
   name: "savant-trading"
-  description: "Automated crypto trading engine — Kraken exchange"
+  description: "AI-native autonomous crypto trading engine — Kraken CEX + DEX"
   version: "0.5.0"
 
 protocol:

@@ -3,7 +3,7 @@ name = "savant-trading"
 version = "0.5.0"
 edition = "2021"
 rust-version = "1.91"
-description = "Automated crypto trading engine — Kraken exchange"
+description = "AI-native autonomous crypto trading engine — Kraken CEX + DEX"
 
 [dependencies]
 # Async runtime

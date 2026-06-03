@@ -106,7 +106,7 @@ timeout_secs = 300
 # OpenRouter-specific configuration (only used when provider = "openrouter")
 [ai.openrouter]
 endpoint = "https://openrouter.ai/api/v1"
-model = "openai/gpt-4o"
+model = "xiaomi/mimo-v2.5-pro"
 api_key_env = "OPENROUTER_API_KEY"
 # Your site URL — OpenRouter uses this for ranking
 referer = "https://github.com/spencer-thompson/savant-trading"
