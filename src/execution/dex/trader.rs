@@ -23,6 +23,12 @@ use alloy_core::primitives::{Address, U256};
 use k256::ecdsa::{RecoveryId, Signature, SigningKey};
 use sha3::{Digest, Keccak256};
 
+/// Minimal transaction receipt for on-chain verification.
+struct TxReceipt {
+    status: u64,
+    gas_used: u64,
+}
+
 // ---------------------------------------------------------------------------
 // RLP helpers for EIP-1559
 // ---------------------------------------------------------------------------
@@ -195,8 +201,24 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         }
 
         // Sync real on-chain balances immediately — don't trust config starting_balance
+        let balance_before_sync = trader.balance;
         if let Err(e) = trader.sync_balance().await {
             warn!("DexTrader: initial sync_balance failed ({}), using config balance", e);
+        }
+
+        // Reconcile: if tracked balance drifted significantly from actual on-chain balance,
+        // the tracked positions are likely phantom (from reverted swaps that were recorded
+        // as successful). Clear them to prevent the engine from managing non-existent positions.
+        let drift = (balance_before_sync - trader.balance).abs();
+        if drift > 1.0 && !trader.positions.is_empty() {
+            warn!(
+                "PHANTOM POSITIONS DETECTED: balance drift ${:.2} with {} tracked positions. \
+                 Clearing all positions to reconcile with on-chain state.",
+                drift,
+                trader.positions.len()
+            );
+            trader.positions.clear();
+            trader.save_state().ok();
         }
 
         info!(
@@ -366,7 +388,65 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             .to_string();
 
         info!("DEX tx broadcast: hash={}", tx_hash);
+
+        // Wait for transaction receipt and verify it succeeded on-chain.
+        // Without this, phantom positions get recorded for reverted swaps.
+        eprintln!("[SWAP] Waiting for receipt {}...", tx_hash);
+        let receipt = self.wait_for_receipt(&tx_hash).await?;
+        if receipt.status != 1 {
+            return Err(ExecutionError::Other(format!(
+                "Swap tx {} reverted on-chain (status=0)",
+                tx_hash
+            )));
+        }
+        eprintln!("[SWAP] TX confirmed on-chain: {} (gas={})", tx_hash, receipt.gas_used);
+
         Ok(tx_hash)
+    }
+
+    /// Poll for transaction receipt with exponential backoff.
+    /// Returns error if receipt not found within 60 seconds or tx reverted.
+    async fn wait_for_receipt(&self, tx_hash: &str) -> Result<TxReceipt, ExecutionError> {
+        let params = serde_json::json!([tx_hash]);
+        let max_attempts = 30;
+        let mut delay_ms = 1000u64;
+
+        for attempt in 0..max_attempts {
+            match self.rpc_call("eth_getTransactionReceipt", params.clone()).await {
+                Ok(val) => {
+                    if val.is_null() {
+                        // Receipt not yet available
+                        tokio::time::sleep(std::time::Duration::from_millis(delay_ms)).await;
+                        delay_ms = (delay_ms * 2).min(5000);
+                        continue;
+                    }
+                    let status = val["status"]
+                        .as_str()
+                        .and_then(|s: &str| {
+                            if s == "0x1" { Some(1u64) } else { Some(0u64) }
+                        })
+                        .unwrap_or(0);
+                    let gas_used = u64::from_str_radix(
+                        val["gasUsed"].as_str().unwrap_or("0x0").trim_start_matches("0x"),
+                        16,
+                    )
+                    .unwrap_or(0);
+                    return Ok(TxReceipt { status, gas_used });
+                }
+                Err(e) => {
+                    if attempt < max_attempts - 1 {
+                        tokio::time::sleep(std::time::Duration::from_millis(delay_ms)).await;
+                        delay_ms = (delay_ms * 2).min(5000);
+                        continue;
+                    }
+                    return Err(e);
+                }
+            }
+        }
+        Err(ExecutionError::Other(format!(
+            "Timeout waiting for receipt of {}",
+            tx_hash
+        )))
     }
 
     /// Parse a wei value string from a DEX API response.
