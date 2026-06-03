@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0603-032-console-color-inconsistency.md`
 **ID:** FID-2026-0603-032
 **Severity:** medium
-**Status:** analyzed
+**Status:** fixed
 **Created:** 2026-06-03 15:50
 **Author:** Agent
 
