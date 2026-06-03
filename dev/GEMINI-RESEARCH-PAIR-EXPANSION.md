@@ -81,8 +81,17 @@ Meme coins tend to move together. If we add PEPE, WIF, and BONK:
 
 ## Constraints
 
-- Must work with 0x API on Arbitrum
+- Must work with 0x API on Arbitrum (primary) OR Jupiter API on Solana (fallback)
 - Must work with Kraken candle data
 - Must not break existing 8-pair configuration
 - Must maintain 1% risk per trade
 - Must not exceed $35 capital constraints
+
+## Solana Fallback Consideration
+
+If Arbitrum DEX path fails to land swaps, we may pivot to Solana:
+- Jupiter aggregator has better meme coin liquidity
+- Solana gas is cheaper than Arbitrum
+- More meme coin volume on Solana DEXes
+- Would need: Jupiter API integration, Solana RPC, SPL token resolution, new wallet
+- The `ExecutionEngine` trait makes this a clean backend swap
