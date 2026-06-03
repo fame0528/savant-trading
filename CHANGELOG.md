@@ -13,15 +13,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Confidence floor exemption** — Close/AdjustStop (position management) not blocked by low confidence score.
 - **Position sizer improvements** — Min order value ($1), max position pct (30%), balance cap. Prevents orders below Kraken minimums.
 - **HTML dashboard** — `dashboard.html` single-file vanilla JS dashboard with glassmorphic design.
+- **Dashboard route** — `/dashboard.html` and `/` serve the dashboard from the API server.
 - **Canary config** — `config/canary.toml` for testing new features.
 - **Scoreboard script** — `stats.ps1` for tracking performance.
 - **Launcher script** — `run-canary.ps1` for canary mode.
 - **FID-029** — Port Kraken improvements from feat/kraken-execution-v2 branch (status: analyzed).
+- **FID-030** — 0x API intermittently hangs (status: analyzed).
 - **Merge strategy** — `dev/MERGE-STRATEGY.md` documenting cherry-pick approach.
+- **Handoff docs** — `dev/HANDOFF-OTHER-DEV.md`, `dev/AGENT-PROMPT-PRESTON.md` (archived after consumption).
+- **12h EST timestamps** — `SavantTimer` for tracing subscriber, `est_now()` shared function.
+- **15s timeout on 0x API** — `tokio::time::timeout(15s)` around `build_swap_tx()` prevents indefinite API hangs.
+
+### Fixed
+
+- **0x API hang (FID-030)** — `build_swap_tx()` hung indefinitely due to DNS/TLS issues. Added 15s fast-fail timeout at API level.
+- **Tracing color bleeding** — tracing's ANSI codes were bleeding into `savant_log()` output. Disabled tracing colors (`with_ansi(false)`).
+- **12h clock format** — `est_timestamp()` now returns `MM-DD-YYYY H:MM AM/PM` instead of 24h format.
+- **Decision reasoning truncation** — Console log truncates reasoning to 100 chars (full text in vault/episodic).
+- **Clippy warnings** — Fixed 3 warnings (empty line, empty format string, `and_then` → `map`).
 
 ### Changed
 
 - **Version bump** — 0.6.0 → 0.7.0 (cherry-picked improvements from other dev's branch)
+- **Tracing subscriber** — Uses `SavantTimer` for EST timestamps, `with_ansi(false)` to prevent color bleeding.
+- **Preston branch created** — `origin/preston` for other dev's Kraken porting work.
+
+### Archived
+
+- **FID-026** — Sell/Close action handling (resolved → archived)
+- **FID-027** — Swap execution hang (resolved → archived)
+- **FID-028** — Console logging (resolved → archived)
+- **FID-025** — NVIDIA NIM provider (verified → archived)
+- **Handoff docs** — MERGE-STRATEGY, HANDOFF-OTHER-DEV, AGENT-PROMPT-PRESTON (consumed → archived)
 
 ## [0.6.0] — 2026-06-03
 

@@ -178,6 +178,9 @@
 - **Full merge of divergent branches is dangerous.** 10 conflict zones in a 4500-line file (engine.rs) make manual resolution error-prone. Cherry-picking specific files is safer.
 - **`reqwest` timeout doesn't cover all hang scenarios.** DNS resolution and TLS handshake hangs bypass the reqwest timeout. Always add `tokio::time::timeout` around external API calls at the call site, not just at the HTTP client level.
 - **Fast-fail at API level (15s) is better than slow-fail at engine level (60s).** The 15s timeout on `build_swap_tx()` catches 0x API hangs before the 60s engine timeout, preserving the opportunity to retry.
+- **ANSI color codes from tracing subscriber bleed into custom log output.** When using both `tracing` and custom `eprintln!` logging, tracing's ANSI reset codes can leave state that affects the next line's colors. Fix: `with_ansi(false)` on the tracing subscriber.
+- **Process panics in HTTP client kill the entire engine.** A panic inside `reqwest` or `tokio` during an API call causes the entire process to exit with code 0xffffffff. Fix: wrap external API calls in `tokio::task::spawn` + `catch_unwind` or use `std::panic::set_hook` to catch and log.
+- **The 0x API on Arbitrum is intermittently unreliable.** It can hang (no response), return stale quotes, or cause panics. Need fallback to 1inch or retry logic at the API level.
 - **ECHO Protocol /dev folder must be maintained every session.** FIDs must be archived when resolved, LEARNINGS.md must be updated, session summaries must be created. Skipping this creates technical debt.
 - **Handoff docs should be archived after consumption.** Once a document has been sent to the recipient, move it to `dev/archive/` to keep the active /dev folder clean.
 
