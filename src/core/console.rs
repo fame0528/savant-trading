@@ -1,8 +1,10 @@
 /// Enterprise console logging — single source of truth for all output.
 ///
-/// Format: `[Savant Trading] [MM-DD-YYYY HH:mm] [ACTION] [RESULT]`
+/// Format: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]`
 ///
 /// Every log in the system goes through `savant_log()`. Macros are thin wrappers.
+///
+/// `tracing` logs also use the same EST timestamp via `SavantTimer`.
 pub const CYAN: &str = "\x1b[36m";
 pub const GREEN: &str = "\x1b[32m";
 pub const ORANGE: &str = "\x1b[33m";
@@ -12,6 +14,29 @@ pub const GREY: &str = "\x1b[90m";
 pub const BOLD: &str = "\x1b[1m";
 pub const DIM: &str = "\x1b[2m";
 pub const RESET: &str = "\x1b[0m";
+
+/// Returns current EST time formatted as `MM-DD-YYYY H:MM AM/PM`.
+pub fn est_now() -> String {
+    let now = chrono::Utc::now();
+    let est = now - chrono::Duration::hours(5);
+    let hour = est.format("%I").to_string();
+    let hour = hour.trim_start_matches('0');
+    let minute = est.format("%M").to_string();
+    let ampm = est.format("%p").to_string();
+    format!("{} {}:{} {}", est.format("%m-%d-%Y"), hour, minute, ampm)
+}
+
+/// Custom tracing timer — outputs EST timestamps matching the console format.
+///
+/// Used by `tracing_subscriber::fmt().with_timer(SavantTimer)` so that both
+/// `tracing` logs and `eprintln!` logs use the same timestamp style.
+pub struct SavantTimer;
+
+impl tracing_subscriber::fmt::time::FormatTime for SavantTimer {
+    fn format_time(&self, w: &mut tracing_subscriber::fmt::format::Writer<'_>) -> std::fmt::Result {
+        write!(w, "{}", est_now())
+    }
+}
 
 /// Log level determines action + result colors.
 pub enum LogLevel {
@@ -57,12 +82,7 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
         LogLevel::Warn => (ORANGE, ORANGE),
     };
 
-    let now = chrono::Utc::now();
-    let est = now - chrono::Duration::hours(5);
-    let hour = est.format("%I").to_string();
-    let hour = hour.trim_start_matches('0');
-    let rest = est.format("%M %p").to_string();
-    let ts = format!("{} {} {}", est.format("%m-%d-%Y"), hour, rest);
+    let ts = est_now();
 
     eprintln!(
         "{}{}[Savant Trading]{} {}[{}]{} {}{}[{}]{} {}{}",

@@ -60,6 +60,8 @@ async fn main() -> anyhow::Result<()> {
 
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
+        .with_timer(savant_trading::core::console::SavantTimer)
+        .with_ansi(true)
         .with_env_filter(
             tracing_subscriber::EnvFilter::try_from_default_env()
                 .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("savant_trading=info")),
