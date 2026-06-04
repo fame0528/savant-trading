@@ -935,6 +935,24 @@ pub async fn run(
                     dead_tokens.insert(pair.to_string());
                     continue;
                 }
+                // DEX safety: reject tokens with near-zero price diversity
+                // (prevents ultra-low-liquidity tokens from being traded)
+                let unique_closes: Vec<f64> = {
+                    let mut closes: Vec<f64> = candle_data.iter().map(|c| c.close).collect();
+                    closes.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+                    let mut deduped = Vec::new();
+                    for c in closes {
+                        if deduped.is_empty() || (c - deduped.last().unwrap()).abs() > 0.000001 {
+                            deduped.push(c);
+                        }
+                    }
+                    deduped
+                };
+                if unique_closes.len() < 5 {
+                    // 200 candles with < 5 unique close prices = dead or illiquid
+                    dead_tokens.insert(pair.to_string());
+                    continue;
+                }
 
                 // GoPlus security check (FID-035): reject honeypots/taxed tokens
                 // before LLM evaluation. Meme coins can have hidden taxes or be
