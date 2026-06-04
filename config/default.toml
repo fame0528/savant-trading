@@ -98,7 +98,7 @@ max_daily_loss = 0.05
 max_drawdown = 0.10
 max_positions = 3
 # Higher R:R compensates for full deployment risk at small balances
-min_rr_ratio = 2.0
+min_rr_ratio = 1.5
 # Spread filter — reject trades where spread > 30bps (FID-035)
 # At $11 positions, 30bps = $0.033 friction. Round-trip gas = $0.06.
 # Total friction = $0.093. With 3% stop ($0.33), friction = 28% of margin.
