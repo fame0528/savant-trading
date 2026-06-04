@@ -1435,7 +1435,17 @@ pub async fn run(
                                                 };
                                                 positions.iter().any(|p| p.pair == decision.pair && p.side == decision.side)
                                             };
-                                            if already_open {
+                                            // Concentration cap: no single position >33% of total portfolio
+                                            let total_portfolio = if let Some(ref ex) = executor {
+                                                ex.balance()
+                                            } else {
+                                                paper.account().balance
+                                            };
+                                            let order_value = decision.entry_price * ps.quantity;
+                                            if order_value > total_portfolio * 0.33 {
+                                                log_swap_fail!("BUY REJECTED", "{} — pos ${:.2} exceeds 33% of portfolio (${:.2})",
+                                                    decision.pair, order_value, total_portfolio);
+                                            } else if already_open {
                                                 info!(
                                                     "AI BUY {} {:?} — already have open position, skipping duplicate",
                                                     decision.pair, decision.side,
