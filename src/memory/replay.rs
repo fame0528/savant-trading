@@ -61,7 +61,7 @@ pub async fn query_missed_opportunities(
         r#"
         SELECT episode_id, pair, regime, reasoning
         FROM agent_episodes
-        WHERE action = 'Hold'
+        WHERE action = 'Pass'
           AND conviction_level = 'NONE'
         ORDER BY timestamp DESC
         LIMIT ?

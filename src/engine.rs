@@ -120,7 +120,14 @@ async fn create_executor(
                 )
             })?;
 
-            let backend = ZeroXBackend::new(api_key);
+            let signing_key = {
+                let key_hex = wallet_key.trim_start_matches("0x");
+                let key_bytes = alloy_core::primitives::hex::decode(key_hex)
+                    .map_err(|e| anyhow::anyhow!("Invalid wallet key hex: {}", e))?;
+                k256::ecdsa::SigningKey::from_bytes(key_bytes.as_slice().into())
+                    .map_err(|e| anyhow::anyhow!("Invalid wallet key for signing: {}", e))?
+            };
+            let backend = ZeroXBackend::new(api_key, signing_key);
             let trader = DexTrader::new(
                 backend,
                 &wallet_key,
@@ -273,37 +280,53 @@ pub async fn run(
     // Token discovery (FID-039): Discover high-volume Arbitrum tokens
     // and merge with config pairs. Only runs when backend is DEX.
     let active_pairs = if !config.mode.paper_trading && config.exchange.backend != "kraken" {
+        // First: load ALL tokens from the static ARBITRUM_TOKENS database
+        let mut all_token_entries: Vec<(String, String, u8)> = Vec::new();
+        for &(sym, addr, dec) in savant_trading::execution::dex::ARBITRUM_TOKENS {
+            all_token_entries.push((sym.to_string(), addr.to_string(), dec));
+        }
+        savant_trading::execution::dex::extend_token_db(&all_token_entries);
+        info!("Token DB: {} static tokens loaded", all_token_entries.len());
+
+        // Create pairs from all static tokens
+        let mut merged: Vec<String> = active_pairs;
+        for &(sym, _, _) in savant_trading::execution::dex::ARBITRUM_TOKENS {
+            let pair = format!("{}/USD", sym);
+            if !merged.contains(&pair) {
+                merged.push(pair);
+            }
+        }
+
+        // Then: discover additional tokens from Blockscot API
         match savant_trading::data::token_discovery::discover_tokens(
-            1_000_000.0,  // min $1M daily volume
-            500,           // min 500 holders
-            200,           // scan top 200 tokens
+            100_000.0,   // min $100K daily volume
+            100,           // min 100 holders
+            500,           // scan top 500 tokens
         ).await {
             Ok(discovered) => {
                 let discovered_pairs = savant_trading::data::token_discovery::tokens_to_pairs(&discovered);
-                info!("Token discovery: {} high-volume Arbitrum tokens found", discovered.len());
+                info!("Token discovery: {} additional Arbitrum tokens found", discovered.len());
 
-                // Feed discovered addresses into the token DB for swap execution
+                // Feed discovered addresses into the token DB
                 let token_entries: Vec<(String, String, u8)> = discovered.iter()
                     .map(|t| (t.symbol.clone(), t.address.clone(), t.decimals))
                     .collect();
                 savant_trading::execution::dex::extend_token_db(&token_entries);
-                info!("Token DB: {} discovered addresses added", token_entries.len());
 
-                // Merge: config pairs + discovered pairs (deduplicate)
-                let mut merged = active_pairs;
+                // Merge discovered pairs
                 for pair in discovered_pairs {
                     if !merged.contains(&pair) {
                         merged.push(pair);
                     }
                 }
-                info!("Total pairs after discovery: {}", merged.len());
-                merged
             }
             Err(e) => {
-                warn!("Token discovery failed ({}), using config pairs only", e);
-                active_pairs
+                warn!("Token discovery failed ({}), using static tokens only", e);
             }
         }
+
+        info!("Total pairs after merge: {}", merged.len());
+        merged
     } else {
         active_pairs
     };
@@ -656,10 +679,19 @@ pub async fn run(
     );
 
     // Parallel candle fetch — all pairs simultaneously
-    // Uses SourceRouter: Kraken first, CoinGecko fallback for tokens Kraken doesn't have
+    // Source rotation: Kraken → OKX → KuCoin → Gate.io → CryptoCompare → CoinGecko → GeckoTerminal
+    // All free, no API keys required (except CoinGecko which has a demo key).
+    // Binance/Bybit excluded: geo-blocked in US (HTTP 451/403).
+    // CMC excluded: free tier doesn't support OHLCV endpoint.
+    // DexScreener excluded: free API has no OHLCV endpoint.
     let candle_router = std::sync::Arc::new(savant_trading::data::sources::SourceRouter::new(vec![
         Box::new(savant_trading::data::sources::kraken::KrakenSource::new(&config.exchange.rest_url)),
+        Box::new(savant_trading::data::sources::okx::OkxSource::new()),
+        Box::new(savant_trading::data::sources::kucoin::KuCoinSource::new()),
+        Box::new(savant_trading::data::sources::gate::GateSource::new()),
+        Box::new(savant_trading::data::sources::cryptocompare::CryptoCompareSource::new()),
         Box::new(savant_trading::data::sources::coingecko::CoinGeckoSource::new()),
+        Box::new(savant_trading::data::sources::geckoterminal::GeckoTerminalSource::new()),
     ]));
 
     let mut candle_futures = tokio::task::JoinSet::new();
@@ -669,7 +701,7 @@ pub async fn run(
         let tf = config.trading.timeframe.clone();
         candle_futures.spawn(async move {
             let result = router
-                .fetch_candles(&pair_clone, parse_timeframe_minutes(&tf), 721)
+                .fetch_candles(&pair_clone, parse_timeframe_minutes(&tf), 200)
                 .await;
             (pair_clone, result)
         });
@@ -704,8 +736,9 @@ pub async fn run(
     );
 
     // SPRINT-2: Spawn WebSocket connection for real-time data
+    // Only subscribe to Kraken-supported pairs (config pairs), not discovered tokens
     let (ws_tx, mut ws_rx) = savant_trading::data::websocket::create_channel();
-    let ws_pairs = active_pairs.clone();
+    let ws_pairs: Vec<String> = config.trading.pairs.clone();
     let ws_url = config.exchange.ws_url.clone();
     tokio::spawn(async move {
         savant_trading::data::websocket::connect(&ws_url, ws_pairs, ws_tx).await;
@@ -821,7 +854,43 @@ pub async fn run(
         for pair in &active_pairs {
             if let Some(store) = market_stores.get(pair.as_str()) {
                 let candle_data: Vec<Candle> = store.candles().iter().cloned().collect();
-                if candle_data.len() < 50 {
+                if candle_data.len() < 20 {
+                    continue;
+                }
+
+                // Pre-filter: Skip stablecoins (pegged to $1, no tradeable edge)
+                let base_symbol = pair.split('/').next().unwrap_or(pair);
+                const STABLECOINS: &[&str] = &[
+                    "USDC", "USDC.E", "USDT", "DAI", "USDS", "USDE", "FDUSD",
+                    "PYUSD", "GHO", "CRVUSD", "TUSD", "LUSD", "FRAX", "USDD",
+                    "USD0", "SUSDS", "SUSDE", "AUSD",
+                ];
+                if STABLECOINS.contains(&base_symbol) {
+                    continue;
+                }
+
+                // Pre-filter: Skip xStock tokens (require 0x opt-in, 403 on swap)
+                const XSTOCKS: &[&str] = &[
+                    "SPYX", "QQQX", "GLDX", "CRCLX",
+                ];
+                if XSTOCKS.contains(&base_symbol) {
+                    continue;
+                }
+
+                // Pre-filter: Skip pairs with mostly-zero candles (corrupted Kraken data)
+                // FID-044: Lowered from 50% to 30% — SourceRouter now rejects all-zero
+                // candles, so surviving data from Binance/CoinGecko should be mostly valid.
+                let nonzero_count = candle_data.iter().filter(|c| c.close > 0.0 && c.volume > 0.0).count();
+                let nonzero_pct = nonzero_count as f64 / candle_data.len() as f64;
+                if nonzero_pct < 0.3 {
+                    continue;
+                }
+
+                // Pre-filter: Skip pairs with negligible volume (< $100 average)
+                // FID-044: Skip this filter in DEX mode — Kraken spot volume is low for
+                // Arbitrum tokens, but real volume is on-chain. The LLM can evaluate them.
+                let avg_volume: f64 = candle_data.iter().map(|c| c.volume).sum::<f64>() / candle_data.len() as f64;
+                if avg_volume < 100.0 && (config.mode.paper_trading || config.exchange.backend == "kraken") {
                     continue;
                 }
 
@@ -829,7 +898,6 @@ pub async fn run(
                 // before LLM evaluation. Meme coins can have hidden taxes or be
                 // un-sellable. This check prevents wasting LLM cycles on bad tokens.
                 if let Some(ref goplus) = goplus_client {
-                    let base_symbol = pair.split('/').next().unwrap_or(pair);
                     match goplus.check_by_symbol(base_symbol).await {
                         Ok(false) => {
                             log_warn!("SECURITY", "Rejected {} — GoPlus flagged as unsafe", pair);
@@ -988,12 +1056,12 @@ pub async fn run(
                     content: usr,
                 }];
                 let start = std::time::Instant::now();
-                log_llm!("LLM", "[EVALUATING] [{}]", pd.pair);
+                log_llm!("LLM", "EVALUATING {}", pd.pair);
                 let response = provider.chat_stream(&sys, &messages).await;
                 let elapsed = start.elapsed().as_millis();
                 match &response {
-                    Ok(text) => log_llm_done!("LLM", "[COMPLETE] [{}] {} chars in {}ms", pd.pair, text.len(), elapsed),
-                    Err(e) => log_swap_fail!("LLM", "[ERROR] [{}] {}", pd.pair, e),
+                    Ok(text) => log_llm_done!("LLM", "COMPLETE {} {} chars in {}ms", pd.pair, text.len(), elapsed),
+                    Err(e) => log_swap_fail!("LLM", "ERROR {} {}", pd.pair, e),
                 }
                 PairResult {
                     pair: pd.pair,
@@ -1032,14 +1100,23 @@ pub async fn run(
                 config.ai.price_tolerance_pct,
             ) {
                 Ok(decision) => {
-                    let reasoning_short = if decision.reasoning.len() > 100 {
-                        format!("{}...", &decision.reasoning[..100])
+                    // Compact decision log: [PASS] LONG BTC/USD | 0% | R:R 0.0 | reason...
+                    let reasoning_short: String = decision.reasoning.chars().take(60).collect();
+                    let reasoning_short = if decision.reasoning.len() > 60 {
+                        format!("{}...", reasoning_short)
                     } else {
-                        decision.reasoning.clone()
+                        reasoning_short
                     };
-                    log_decision!("DECISION", "{:?} {} @ {:.4} | Conf: {:.0}% | R:R {:.1} | {}",
-                        decision.action, decision.side, decision.entry_price,
-                        decision.confidence * 100.0, decision.risk_reward, reasoning_short);
+                    let action_label = match decision.action {
+                        savant_trading::agent::decision_parser::TradeAction::Pass => "PASS",
+                        savant_trading::agent::decision_parser::TradeAction::Buy => "BUY",
+                        savant_trading::agent::decision_parser::TradeAction::Sell => "SELL",
+                        savant_trading::agent::decision_parser::TradeAction::Close => "CLOSE",
+                        savant_trading::agent::decision_parser::TradeAction::AdjustStop => "ADJUST",
+                    };
+                    log_decision!(action_label, "[{}] [{}] | {:.0}% | R:{:.1} | {}",
+                        decision.side, decision.pair, decision.confidence * 100.0,
+                        decision.risk_reward, reasoning_short);
 
                     // Log ALL decisions including Hold (CRIT-2)
                     let decision_record = savant_trading::core::shared::DecisionRecord {
@@ -1054,7 +1131,6 @@ pub async fn run(
                         reasoning: decision.reasoning.clone(),
                     };
                     shared.push_decision(decision_record);
-                    log_decision!("DECISION", "Logged for {}", decision.pair);
 
                     // Log to vault
                     if vault_config.enabled {
@@ -1109,7 +1185,7 @@ pub async fn run(
                             pnl_pct: None,
                             is_win: None,
                             achieved_rr: None,
-                            status: if decision.action == savant_trading::agent::decision_parser::TradeAction::Hold {
+                            status: if decision.action == savant_trading::agent::decision_parser::TradeAction::Pass {
                                 "held".to_string()
                             } else {
                                 "executed".to_string()
@@ -1126,7 +1202,7 @@ pub async fn run(
                     }
 
                     // Skip execution for Hold decisions
-                    if decision.action == savant_trading::agent::decision_parser::TradeAction::Hold
+                    if decision.action == savant_trading::agent::decision_parser::TradeAction::Pass
                     {
                         continue;
                     }
@@ -1415,7 +1491,7 @@ pub async fn run(
                                                 decision.pair, decision.entry_price, decision.stop_loss, decision.take_profit_1);
                                         }
                                     }
-                                    TradeAction::Hold => unreachable!(),
+                                    TradeAction::Pass => unreachable!(),
                                     TradeAction::AdjustStop => {
                                         // TODO: Update stop-loss on existing position
                                         info!("AI ADJUST_STOP for {} — not yet implemented, skipping", decision.pair);
@@ -1727,6 +1803,10 @@ pub async fn run(
                 }
             }
         }
+
+        // Cycle complete — inform user before sleeping
+        log_phase!("CYCLE",
+            "Cycle {} complete. Next in {}s. Sleeping...", tick, interval_seconds);
 
         // PROD-1: Graceful shutdown on Ctrl+C
         tokio::select! {
@@ -2442,7 +2522,7 @@ async fn run_training_batch(
                 ) {
                     Ok(decision) => {
                         let agent_traded = decision.action
-                            != savant_trading::agent::decision_parser::TradeAction::Hold;
+                            != savant_trading::agent::decision_parser::TradeAction::Pass;
                         let expected_traded = expected_is_trade(&sr.expected_action);
                         let is_correct = agent_traded == expected_traded;
                         let is_hold = !agent_traded;
@@ -2732,7 +2812,7 @@ async fn run_training_batch(
                 config.ai.price_tolerance_pct,
             ) {
                 let agent_traded =
-                    decision.action != savant_trading::agent::decision_parser::TradeAction::Hold;
+                    decision.action != savant_trading::agent::decision_parser::TradeAction::Pass;
                 let expected_trade = sr.expected_action != "Hold / No Trade";
                 let is_correct = agent_traded == expected_trade;
 
@@ -2939,7 +3019,7 @@ async fn run_training_batch(
             ) {
                 let expected_traded = expected_is_trade(&sr.expected_action);
                 let agent_traded =
-                    decision.action != savant_trading::agent::decision_parser::TradeAction::Hold;
+                    decision.action != savant_trading::agent::decision_parser::TradeAction::Pass;
                 let is_correct = agent_traded == expected_traded;
 
                 // Update utility scores for knowledge units that were in context

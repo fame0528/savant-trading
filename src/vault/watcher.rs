@@ -7,7 +7,7 @@
 //! before ingesting.
 
 use std::path::{Path, PathBuf};
-use tracing::{debug, warn};
+use tracing::debug;
 
 /// Injection patterns to scan for (from Savant's scan_prompt).
 const INJECTION_PATTERNS: &[&str] = &[
@@ -78,7 +78,7 @@ impl VaultWatcher {
                             lessons.push((name, content));
                             debug!("Read lesson: {:?}", path.file_name());
                         } else {
-                            warn!(
+                            debug!(
                                 "Skipping lesson with injection patterns: {:?}",
                                 path.file_name()
                             );

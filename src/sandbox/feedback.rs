@@ -353,7 +353,7 @@ pub fn analyze_failures(summary: &SandboxSummary) -> FailureAnalysis {
     let poor_rr: Vec<&ScenarioResult> = summary
         .results
         .iter()
-        .filter(|r| r.grade.tier_2_rr_score < 0.3 && r.action_taken != "Hold")
+        .filter(|r| r.grade.tier_2_rr_score < 0.3 && r.action_taken != "Pass")
         .collect();
 
     if poor_rr.len() > 3 {

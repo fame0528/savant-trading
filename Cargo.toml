@@ -1,9 +1,9 @@
 [package]
 name = "savant-trading"
-version = "0.7.1"
+version = "0.8.0"
 edition = "2021"
 rust-version = "1.91"
-description = "AI-native autonomous crypto trading engine — Kraken CEX + DEX"
+description = "AI-native autonomous crypto trading engine — Multi-chain DEX (Arbitrum, 0x API)"
 
 [dependencies]
 # Async runtime
@@ -63,11 +63,11 @@ rand = "0.8"
 # Async traits
 async-trait = "0.1"
 
-# Ethereum/DEX — core types (Address, U256, Bytes, hex)
-alloy-core = { version = "1.6", features = ["std"] }
+# Ethereum/DEX — core types (Address, U256, Bytes, hex) + EIP-712 signing
+alloy-core = { version = "1.6", features = ["std", "sol-types"] }
 # ECDSA secp256k1 — wallet transaction signing
 k256 = { version = "0.13", features = ["ecdsa", "std"] }
-# Keccak-256 — Ethereum signing hash
+# Keccak-256 — Ethereum signing hash (must match k256's digest version: 0.10)
 sha3 = "0.10"
 # RLP — Ethereum transaction encoding
 rlp = "0.5"

@@ -12,8 +12,8 @@ pub enum TradeAction {
     Buy,
     #[serde(alias = "SELL", alias = "sell")]
     Sell,
-    #[serde(alias = "HOLD", alias = "hold")]
-    Hold,
+    #[serde(alias = "HOLD", alias = "hold", alias = "PASS", alias = "pass", alias = "SKIP", alias = "skip")]
+    Pass,
     #[serde(alias = "CLOSE", alias = "close")]
     Close,
     #[serde(alias = "ADJUST_STOP", alias = "adjust_stop", alias = "ADJUSTSTOP", alias = "Adjust_Stop")]
@@ -49,7 +49,7 @@ impl TradeDecision {
     /// Where p = confidence, reward = distance to TP1, risk = distance to stop.
     /// Returns Some(ev) for Buy/Sell, None for Hold.
     pub fn expected_value(&self) -> Option<f64> {
-        if self.action == TradeAction::Hold {
+        if self.action == TradeAction::Pass {
             return None;
         }
 
@@ -154,7 +154,7 @@ pub fn parse_decision(
     }
 
     // Only validate entry prices for actionable entry decisions (Buy/Sell/Close).
-    if decision.action != TradeAction::Hold && decision.action != TradeAction::AdjustStop {
+    if decision.action != TradeAction::Pass && decision.action != TradeAction::AdjustStop {
         if decision.entry_price <= 0.0 {
             return Err(ParseError::MissingField("entry_price".to_string()));
         }
@@ -217,7 +217,7 @@ pub fn parse_decision(
             CONFIDENCE_FLOOR * 100.0,
             decision.action
         );
-        decision.action = TradeAction::Hold;
+        decision.action = TradeAction::Pass;
     }
 
     Ok(decision)
@@ -267,12 +267,12 @@ fn extract_json(response: &str) -> &str {
 
 /// Normalize LLM JSON output — fix common casing issues.
 fn normalize_llm_json(json: &str) -> String {
-    json.replace("\"action\": \"HOLD\"", "\"action\": \"Hold\"")
+    json.replace("\"action\": \"HOLD\"", "\"action\": \"Pass\"")
         .replace("\"action\": \"BUY\"", "\"action\": \"Buy\"")
         .replace("\"action\": \"SELL\"", "\"action\": \"Sell\"")
         .replace("\"action\": \"CLOSE\"", "\"action\": \"Close\"")
         .replace("\"action\": \"ADJUSTSTOP\"", "\"action\": \"AdjustStop\"")
-        .replace("\"action\":\"HOLD\"", "\"action\":\"Hold\"")
+        .replace("\"action\":\"HOLD\"", "\"action\":\"Pass\"")
         .replace("\"action\":\"BUY\"", "\"action\":\"Buy\"")
         .replace("\"action\":\"SELL\"", "\"action\":\"Sell\"")
         .replace("\"action\":\"CLOSE\"", "\"action\":\"Close\"")
@@ -383,7 +383,7 @@ fn partial_extract(json: &str) -> Option<TradeDecision> {
     let action = match action_str {
         "Buy" | "BUY" | "buy" => TradeAction::Buy,
         "Sell" | "SELL" | "sell" => TradeAction::Sell,
-        "Hold" | "HOLD" | "hold" => TradeAction::Hold,
+        "Hold" | "HOLD" | "hold" | "Pass" | "PASS" | "pass" | "Skip" | "SKIP" | "skip" => TradeAction::Pass,
         "Close" | "CLOSE" | "close" => TradeAction::Close,
         _ => return None,
     };
@@ -489,7 +489,7 @@ mod tests {
         let response = r#"Here is my decision:
 ```json
 {
-    "action": "Hold",
+    "action": "Pass",
     "pair": "BTC/USD",
     "side": "Long",
     "entry_price": 0.0,
@@ -506,7 +506,7 @@ mod tests {
 ```"#;
 
         let decision = parse_decision(response, 65000.0, 10.0).unwrap();
-        assert_eq!(decision.action, TradeAction::Hold);
+        assert_eq!(decision.action, TradeAction::Pass);
     }
 
     #[test]
@@ -550,7 +550,7 @@ mod tests {
         }"#;
 
         let decision = parse_decision(json, 65000.0, 10.0).unwrap();
-        assert_eq!(decision.action, TradeAction::Hold);
+        assert_eq!(decision.action, TradeAction::Pass);
     }
 
     #[test]
@@ -600,18 +600,18 @@ mod tests {
     #[test]
     fn repair_extra_text_after_json() {
         // Simulates reasoning leaking into content field
-        let response = r#"{"action":"Hold","pair":"BTC/USD","side":"Long","entry_price":0.0,"stop_loss":0.0,"take_profit_1":0.0,"take_profit_2":0.0,"take_profit_3":0.0,"position_size_pct":0.0,"confidence":0.0,"reasoning":"No setup","knowledge_sources":[],"risk_reward":0.0}
+        let response = r#"{"action":"Pass","pair":"BTC/USD","side":"Long","entry_price":0.0,"stop_loss":0.0,"take_profit_1":0.0,"take_profit_2":0.0,"take_profit_3":0.0,"position_size_pct":0.0,"confidence":0.0,"reasoning":"No setup","knowledge_sources":[],"risk_reward":0.0}
 Some extra reasoning text that leaked into the response..."#;
 
         let decision = parse_decision(response, 65000.0, 10.0).unwrap();
-        assert_eq!(decision.action, TradeAction::Hold);
+        assert_eq!(decision.action, TradeAction::Pass);
     }
 
     #[test]
     fn repair_truncated_string() {
         // Simulates a response cut mid-string — the repair should handle this
         // via partial_extract (3rd pass) if repair_json_string can't fix it
-        let response = r#"{"action":"Hold","pair":"BTC/USD","side":"Long","entry_price":0.0,"stop_loss":0.0,"take_profit_1":0.0,"take_profit_2":0.0,"take_profit_3":0.0,"position_size_pct":0.0,"confidence":0.0,"reasoning":"No actionable setup due to conf"#;
+        let response = r#"{"action":"Pass","pair":"BTC/USD","side":"Long","entry_price":0.0,"stop_loss":0.0,"take_profit_1":0.0,"take_profit_2":0.0,"take_profit_3":0.0,"position_size_pct":0.0,"confidence":0.0,"reasoning":"No actionable setup due to conf"#;
 
         let result = parse_decision(response, 65000.0, 10.0);
         // Should succeed via either repair or partial_extract
@@ -620,6 +620,6 @@ Some extra reasoning text that leaked into the response..."#;
             "Truncated string should be salvageable: {:?}",
             result.err()
         );
-        assert_eq!(result.unwrap().action, TradeAction::Hold);
+        assert_eq!(result.unwrap().action, TradeAction::Pass);
     }
 }

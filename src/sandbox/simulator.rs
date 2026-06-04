@@ -100,7 +100,7 @@ impl VirtualWallet {
     }
 
     fn simulate(&mut self, p: TradeParams<'_>) -> Option<SimTrade> {
-        if p.action == "Hold" || p.position_size <= 0.0 || p.remaining_candles.is_empty() {
+        if p.action == "Pass" || p.position_size <= 0.0 || p.remaining_candles.is_empty() {
             return None;
         }
 
@@ -475,7 +475,7 @@ mod tests {
         let mut wallet = VirtualWallet::new(50.0, 0.0026, 0.0005);
         let candles = make_candles(10, 100.0, 1.0);
         let result = wallet.simulate_trade(
-            "T1", "Hold", "Long", 100.0, 95.0, 110.0, 0.0, 0.0, 10.0, &candles, 0,
+            "T1", "Pass", "Long", 100.0, 95.0, 110.0, 0.0, 0.0, 10.0, &candles, 0,
         );
         assert!(result.is_none());
         assert_eq!(wallet.trades.len(), 0);

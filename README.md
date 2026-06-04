@@ -1,4 +1,4 @@
-# SAVANT TRADING v0.7.1
+# SAVANT TRADING v0.8.0
 
 <!-- markdownlint-disable MD033 -->
 <div align="center">
@@ -7,11 +7,11 @@
 
 **AI-Native Autonomous Crypto Trading Engine**
 
-A production-grade, Rust-native trading engine where an AI agent IS the brain — powered by 2,959 knowledge units across 10 enterprise-grade JSON files via mimo v2.5 pro through OpenGateway.
+A production-grade, Rust-native trading engine where an AI agent IS the brain — powered by 2,959 knowledge units across 10 enterprise-grade JSON files.
 
-**Free, Unlimited AI — MIMO v2.5 Pro:** Ships with [OpenGateway](https://gitlawb.com/opengateway) as the inference provider — an open gateway sponsored by Xiaomi MiMo. 1M context window, 131K max output.
+**AI Brain:** MiMo v2.5 Pro via [OpenRouter](https://openrouter.ai/xiaomi/mimo-v2.5-pro). 1M context window, 131K max output.
 
-[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![Kraken](https://img.shields.io/badge/Kraken-Exchange-%23000000?style=flat-square&logo=bitcoin&logoColor=%2300fbff)](https://www.kraken.com/)[![OpenGateway](https://img.shields.io/badge/OpenGateway-MIMO%20v2.5%20Pro-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://gitlawb.com/opengateway)[![Version](https://img.shields.io/badge/Version-0.7.1-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![Kraken](https://img.shields.io/badge/Kraken-Exchange-%23000000?style=flat-square&logo=bitcoin&logoColor=%2300fbff)](https://www.kraken.com/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-MiMo%20v2.5%20Pro-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/xiaomi/mimo-v2.5-pro)[![Version](https://img.shields.io/badge/Version-0.8.0-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
 
 </div>
 
@@ -54,7 +54,7 @@ Rule-Based Strategies ──→ Optional parallel signals (comparison only)
 
 ## Features
 
-- **AI Agent Brain** — mimo v2.5 pro via OpenGateway makes all trading decisions using full market context
+- **AI Agent Brain** — MiMo v2.5 Pro via OpenRouter makes all trading decisions using full market context
 - **SSE Streaming** — Real-time LLM response streaming, no timeout risk during long reasoning
 - **Multi-Timeframe Analysis** — Fetches 5m + 1H + 4H candles per pair; higher timeframe context injected into AI prompt
 - **Knowledge Base** — 2,959 units across 10 enterprise-grade JSON files, MMR selection with utility scoring, indicator-driven context tags
@@ -80,8 +80,10 @@ Rule-Based Strategies ──→ Optional parallel signals (comparison only)
 - **Modular Prompts** — System prompt composed from 5 independent layers + 6th memory context layer
 - **Structured Decisions** — AI outputs JSON with entry, stop, 3 take-profit levels, confidence score, and reasoning
 - **Fallback Mode** — Rule-based strategies activate automatically if LLM is unavailable
-- **DEX Execution** — 0x and 1inch backends on Arbitrum (no KYC). EIP-1559 signing, Permit2 approval, receipt verification, 3-retry logic, 50% gas buffer
-- **Enterprise Console** — Structured output: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]`. Cyan brand, grey timestamps, color-coded results
+- **DEX Execution** — 0x API v2 on Arbitrum (no KYC). EIP-1559 signing, Permit2 EIP-712 approval (with 32-byte length prefix), eth_call dry-run, receipt verification, 3-retry logic, 50% gas buffer
+- **Multi-Source Candles** — 8 sources: Kraken, OKX, KuCoin, Gate.io, CryptoCompare, CoinGecko, GeckoTerminal, Binance. Automatic fallback with all-zero rejection.
+- **198 Arbitrum Tokens** — Real addresses from CoinGecko API. Covers all high-volume tokens on Arbitrum One.
+- **Enterprise Console** — Structured output: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]`. Cyan brand, grey timestamps, color-coded results (BUY=green, SELL=red, PASS=grey)
 - **Casing-Tolerant Parser** — AI responses parse correctly regardless of casing (BUY/Buy/buy all work)
 - **Position Sizer Safety** — Min order value ($1), max position pct (30%), balance cap prevents overexposure
 - **HTML Dashboard** — Single-file vanilla JS dashboard at `/dashboard.html` with glassmorphic design

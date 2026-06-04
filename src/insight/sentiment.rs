@@ -26,10 +26,14 @@ pub async fn fetch_fear_greed(client: &reqwest::Client) -> Option<(u32, String)>
     Some((value, label))
 }
 
-/// Fetch BTC dominance from CoinGecko (free, no auth).
+/// Fetch BTC dominance from CoinGecko (Demo API key supported).
 pub async fn fetch_btc_dominance(client: &reqwest::Client) -> Option<(f64, f64)> {
     let url = "https://api.coingecko.com/api/v3/global";
-    let resp = client.get(url).send().await.ok()?;
+    let mut req = client.get(url);
+    if let Ok(key) = std::env::var("COINGECKO_API_KEY") {
+        req = req.header("x-cg-demo-api-key", key);
+    }
+    let resp = req.send().await.ok()?;
     let json: serde_json::Value = resp.json().await.ok()?;
     let data = json.get("data")?;
     let btc_dom = data.get("market_cap_percentage")?.get("btc")?.as_f64()?;

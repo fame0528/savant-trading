@@ -15,6 +15,7 @@ use crate::core::error::ExecutionError;
 
 pub struct CoinGeckoSource {
     client: reqwest::Client,
+    api_key: Option<String>,
 }
 
 impl CoinGeckoSource {
@@ -24,6 +25,7 @@ impl CoinGeckoSource {
                 .timeout(std::time::Duration::from_secs(15))
                 .build()
                 .unwrap_or_else(|_| reqwest::Client::new()),
+            api_key: std::env::var("COINGECKO_API_KEY").ok(),
         }
     }
 
@@ -31,8 +33,8 @@ impl CoinGeckoSource {
     fn coin_id(&self, pair: &str) -> Option<&str> {
         let base = pair.split('/').next()?;
         match base {
-            "BTC" => Some("bitcoin"),
-            "ETH" => Some("ethereum"),
+            "BTC" | "WBTC" => Some("bitcoin"),
+            "ETH" | "WETH" => Some("ethereum"),
             "SOL" => Some("solana"),
             "XRP" => Some("ripple"),
             "DOGE" => Some("dogecoin"),
@@ -63,6 +65,57 @@ impl CoinGeckoSource {
             "NEAR" => Some("near"),
             "ATOM" => Some("cosmos"),
             "FTM" => Some("fantom"),
+            "MORPHO" => Some("morpho"),
+            "GNO" => Some("gnosis"),
+            "ETHFI" => Some("ether-fi"),
+            "CAKE" => Some("pancakeswap-token"),
+            "TBTC" => Some("tbitcoin"),
+            "WLD" => Some("worldcoin-wld"),
+            "ONDO" => Some("ondo-finance"),
+            "KAS" => Some("kaspa"),
+            "POL" => Some("polygon-ecosystem-token"),
+            "FIL" => Some("filecoin"),
+            "IMX" => Some("immutable-x"),
+            "GMX" => Some("gmx"),
+            "RDNT" => Some("radiant-capital"),
+            "MAGIC" => Some("magic"),
+            "STG" => Some("stargate-finance"),
+            "DYDX" => Some("dydx-chain"),
+            "APE" => Some("apecoin"),
+            "BLUR" => Some("blur"),
+            "ENS" => Some("ethereum-name-service"),
+            "LQTY" => Some("liquity"),
+            "ALCX" => Some("alchemix"),
+            "FOX" => Some("shapeshift-fox-token"),
+            "MKR" => Some("maker"),
+            "SNX" => Some("havven"),
+            "YFI" => Some("yearn-finance"),
+            "1INCH" => Some("1inch"),
+            "BAL" => Some("balancer"),
+            "TUSD" => Some("true-usd"),
+            "FRAX" => Some("frax"),
+            "LUSD" => Some("liquity-usd"),
+            "USDD" => Some("usdd"),
+            "GHO" => Some("gho"),
+            "crvUSD" => Some("crvusd"),
+            "PYUSD" => Some("paypal-usd"),
+            "RAIN" => Some("rain"),
+            "EDGE" => Some("edge"),
+            "POND" => Some("marlin"),
+            "W" => Some("wormhole"),
+            "ATH" => Some("aethir"),
+            "ORDER" => Some("orderly-network"),
+            "CHIP" => Some("chip"),
+            "CELR" => Some("celer-network"),
+            "HOT" => Some("holotoken"),
+            "CBBTC" => Some("coinbase-wrapped-btc"),
+            "GNS" => Some("gains-network"),
+            "FXS" => Some("frax-share"),
+            "LUNC" => Some("terra-luna"),
+            "MBOX" => Some("mobox"),
+            "TRB" => Some("tellor"),
+            "LPT" => Some("livepeer"),
+            "HYPER" => Some("hyperlane"),
             _ => None,
         }
     }
@@ -106,9 +159,11 @@ impl CandleSource for CoinGeckoSource {
             coin_id, days
         );
 
-        let resp = self
-            .client
-            .get(&url)
+        let mut req = self.client.get(&url);
+        if let Some(ref key) = self.api_key {
+            req = req.header("x-cg-demo-api-key", key);
+        }
+        let resp = req
             .send()
             .await
             .map_err(|e| ExecutionError::Other(format!("CoinGecko request failed: {}", e)))?;

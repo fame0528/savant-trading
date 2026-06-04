@@ -12,7 +12,7 @@
 
 use std::collections::HashMap;
 use std::sync::Mutex;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 use crate::core::error::ExecutionError;
 
@@ -98,7 +98,7 @@ impl GoPlusClient {
         let result = match result {
             Some(r) => r,
             None => {
-                warn!("GoPlus: no result for {} ({})", token_symbol, contract_address);
+                debug!("GoPlus: no result for {} ({})", token_symbol, contract_address);
                 return Ok(true); // Don't reject if no data
             }
         };
@@ -165,7 +165,7 @@ impl GoPlusClient {
         Ok(is_safe)
     }
 
-    /// Check a token by symbol (uses known Arbitrum addresses).
+    /// Check a token by symbol (uses token DB for Arbitrum addresses).
     /// Returns `Ok(true)` if safe, `Ok(false)` if rejected.
     /// Core assets (BTC, ETH, etc.) are skipped — they don't need security checks.
     pub async fn check_by_symbol(&self, symbol: &str) -> Result<bool, ExecutionError> {
@@ -180,17 +180,9 @@ impl GoPlusClient {
             return Ok(true); // Core assets are safe — skip check
         }
 
-        // Known Arbitrum addresses for meme coins
-        let known_addresses: HashMap<&str, &str> = HashMap::from([
-            ("PEPE", "0x25d887Ce7a49172BF65CB5E54e78C488Ef5954e6"),
-            ("SHIB", "0x503Fa02e9c600a63E40f1b8F0c76b8d8Ef1B2B19"),
-            ("FLOKI", "0x22e89898A04eaf433f95643b1F0D57eC22E74E63"),
-            ("TURBO", "0x2Cd44D8F4FA2bC2A2B8F5a8e1Ea22A3c5a312345"),
-            ("MOG", "0x2Da56AcB9Ea78330f947bD57C54119Debda7AF71"),
-        ]);
-
-        if let Some(address) = known_addresses.get(upper.as_str()) {
-            self.check_token(address, symbol).await
+        // Look up address from token DB (includes discovered tokens)
+        if let Some((address, _decimals)) = crate::execution::dex::lookup_token(&upper) {
+            self.check_token(&address, symbol).await
         } else {
             // Unknown address — don't block, just warn
             warn!("GoPlus: no known address for {} — skipping security check", symbol);

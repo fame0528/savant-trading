@@ -86,12 +86,13 @@ pub async fn fetch_news(client: &reqwest::Client) -> NewsData {
     data
 }
 
-/// Fetch trending coins from CoinGecko (free, no key).
+/// Fetch trending coins from CoinGecko (Demo API key supported).
 async fn fetch_coingecko_trending(client: &reqwest::Client, data: &mut NewsData) {
-    match client
-        .get("https://api.coingecko.com/api/v3/search/trending")
-        .send()
-        .await
+    let mut req = client.get("https://api.coingecko.com/api/v3/search/trending");
+    if let Ok(key) = std::env::var("COINGECKO_API_KEY") {
+        req = req.header("x-cg-demo-api-key", key);
+    }
+    match req.send().await
     {
         Ok(resp) => {
             if !resp.status().is_success() {

@@ -8,8 +8,17 @@
 //!   - CoinGeckoSource — broader coverage, thousands of tokens
 //!   - DeFiLlamaSource — DEX-native, Arbitrum pairs
 
+pub mod binance;
+pub mod bybit;
+pub mod cmc;
 pub mod coingecko;
+pub mod cryptocompare;
+pub mod dexscreener;
+pub mod gate;
+pub mod geckoterminal;
 pub mod kraken;
+pub mod kucoin;
+pub mod okx;
 
 use async_trait::async_trait;
 use crate::core::types::Candle;
@@ -60,7 +69,8 @@ impl SourceRouter {
 
     /// Fetch candles from the first source that has them.
     ///
-    /// Tries each source in order. If a source returns an error or empty data,
+    /// Tries each source in order. If a source returns an error, empty data,
+    /// or all-zero candles (e.g. Kraken returning zeros for unsupported tokens),
     /// tries the next source. Returns an error only if ALL sources fail.
     pub async fn fetch_candles(
         &self,
@@ -74,19 +84,40 @@ impl SourceRouter {
             }
             match source.fetch_candles(pair, timeframe_minutes, count).await {
                 Ok(candles) if !candles.is_empty() => {
+                    // FID-044: Reject all-zero candle responses (e.g. Kraken returning
+                    // zeros for tokens it doesn't support). These are not real data.
+                    let nonzero = candles.iter().filter(|c| c.close > 0.0).count();
+                    if nonzero == 0 {
+                        tracing::debug!(
+                            "[{}] All-zero candles for {} — trying next source",
+                            source.name(),
+                            pair
+                        );
+                        continue;
+                    }
                     tracing::info!(
-                        "[{}] Fetched {} candles for {}",
+                        "[{}] Fetched {} candles for {} ({} non-zero)",
                         source.name(),
                         candles.len(),
-                        pair
+                        pair,
+                        nonzero
                     );
                     return Ok(candles);
                 }
                 Ok(_) => {
-                    tracing::debug!("[{}] Empty response for {}", source.name(), pair);
+                    tracing::info!(
+                        "[{}] Empty response for {} — trying next source",
+                        source.name(),
+                        pair
+                    );
                 }
                 Err(e) => {
-                    tracing::debug!("[{}] Failed for {}: {}", source.name(), pair, e);
+                    tracing::info!(
+                        "[{}] Failed for {}: {} — trying next source",
+                        source.name(),
+                        pair,
+                        e
+                    );
                 }
             }
         }

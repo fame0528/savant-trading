@@ -1,5 +1,45 @@
 # LEARNINGS
 
+## Session 2026-06-04: Permit2 Signature Fix + Multi-Source Candle Architecture
+
+**Key Learnings:**
+
+- **Permit2 signature format requires 32-byte length prefix.** The 0x API v2 expects `calldata || sig_length (32 bytes, big-endian) || signature (65 bytes)`. We were appending just the signature without the length prefix. This caused EVERY swap to revert with "out of memory" / panic 0x41 (array out of bounds). One missing field = 4 days of debugging.
+- **Use the API-provided `permit2.hash` field.** The 0x response includes a pre-computed EIP-712 hash in `permit2.hash`. Sign this directly instead of computing your own hash from the EIP-712 typed data. If they don't match, the signature is invalid.
+- **Binance is geo-blocked in the US (HTTP 451).** Bybit too (HTTP 403 via CloudFront). Don't include them in the source rotation.
+- **CoinGecko free tier has strict rate limits.** 10K calls/month, and parallel requests trigger 429s. Use as last resort.
+- **CryptoCompare free tier works well.** 100K calls/month, no geo-blocking. Good middle-tier source.
+- **GeckoTerminal has 30 req/min limit.** Too low for parallel fetching of 100+ tokens. Needs rate limiting.
+- **OKX and KuCoin are the best free CEX sources.** High rate limits, broad token coverage, no geo-blocking.
+- **xStock tokens (SPYX, QQQX, GLDX, CRCLX) require 0x opt-in.** These are tokenized securities that need special authorization. Filter them out.
+- **`eth_call` dry-run catches malformed calldata before broadcast.** Essential for catching signing errors before spending gas.
+- **Quote failure must abort the swap.** Previously we proceeded without spread check on quote failure. Now we abort — if the quote fails, the swap will fail too.
+- **0x supports 20+ chains including Solana.** Cross-Chain API enables swaps across Arbitrum, Ethereum, Base, Solana, etc. Could expand to thousands of tokens.
+
+## Session 2026-06-03-2200: Permit2 EIP-712 Signing (FID-042)
+
+**Key Learnings:**
+
+- **0x API v2 uses Permit2.** Every swap requires an EIP-712 signature over the `PermitTransferFrom` struct. The signature is appended to the calldata as `r || s || v` (65 bytes). Without this, ALL swaps revert.
+- **EIP-712 signing requires computing two hashes.** Domain separator hash: `keccak256(EIP712Domain(typehash) || name_hash || chain_id || address)`. Struct hash: `keccak256(PermitTransferFrom(typehash) || permitted_hash || spender || nonce || deadline)`. Final hash: `keccak256("\x19\x01" || domain_sep || struct_hash)`.
+- **`alloy_core::primitives::Address` doesn't have `to_be_bytes`.** Use `as_slice()` and pad to 32 bytes manually (left-padded with zeros).
+- **`Address::parse_checksummed` requires a second argument.** Pass `None` for chain ID when not validating checksum.
+- **Gas buffer prevents out-of-gas failures.** The 0x API returns stale gas estimates. Adding 20% buffer prevents transactions from running out of gas.
+- **FallbackBackend pattern.** A generic `FallbackBackend` that wraps two `DexBackend` implementations and tries primary first, then secondary. Clean separation of concerns.
+- **Duplicate `impl` blocks cause cryptic errors.** When merging code, watch for duplicate `impl` blocks that define the same methods. Rust's error messages don't clearly indicate this.
+- **`hex::encode` requires importing the hex module.** Use `alloy_core::primitives::hex` for hex encoding in the alloy ecosystem.
+
+## Session 2026-06-03-2000: Spread Filter Fix (FID-041)
+
+**Key Learnings:**
+
+- **Never compare raw wei amounts across different token decimals.** USDC has 6 decimals, most ERC-20s have 18. Raw wei comparisons produce 10000bps (100%) spread regardless of actual liquidity. Always convert to a common currency (USD) before computing ratios.
+- **The 0x API v2 returns `tokenMetadata.buyToken.decimals` and `tokenMetadata.buyToken.price`.** Use these for accurate spread calculations. The `buyAmount` field is in the token's native decimals (wei).
+- **1inch API doesn't return token decimals in quote response.** Fall back to the local token database (`dst_token.decimals` from `resolve_pair()`).
+- **Dust output rejection is a safety net.** If `buy_tokens < 0.000001`, the swap will fail on-chain or produce negligible value. Reject before spread check.
+- **Division-by-zero guards are essential.** If `market_price <= 0.0` or `buy_tokens <= 0.0`, skip spread check with warning. Don't crash.
+- **Missing metadata should degrade gracefully.** If `tokenMetadata` is missing from API response, skip spread check with warning. Don't block the trade.
+
 ## Session 2026-06-03-1500: DEX Execution, Token Discovery, Console Logging
 
 **Key Learnings:**

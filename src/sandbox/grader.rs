@@ -38,7 +38,7 @@ pub fn tier_1_compliance(
 
     // Check: Hold when scenario demands action is a compliance failure
     let expected_lower = expected_action.to_lowercase();
-    if action == "Hold" && (expected_lower.contains("buy") || expected_lower.contains("sell")) {
+    if action == "Pass" && (expected_lower.contains("buy") || expected_lower.contains("sell")) {
         return (
             false,
             Some(format!("Missed trade: expected {}", expected_action)),
@@ -46,7 +46,7 @@ pub fn tier_1_compliance(
     }
 
     // Check: Hold decisions are otherwise compliant (no risk taken)
-    if action == "Hold" {
+    if action == "Pass" {
         return (true, None);
     }
 
@@ -88,7 +88,7 @@ pub fn tier_2_rr_score(
     expected_action: &str,
 ) -> (f64, String) {
     // Hold decisions get neutral score if no action expected, zero if action was expected
-    if action == "Hold" {
+    if action == "Pass" {
         let expected_lower = expected_action.to_lowercase();
         if expected_lower.contains("buy") || expected_lower.contains("sell") {
             return (0.0, "Hold when trade expected — zero R:R".into());
@@ -204,7 +204,7 @@ pub fn tier_3_reasoning_score(reasoning: &str, expected_action: &str) -> (f64, S
     let expected_lower = expected_action.to_lowercase();
     let expects_action = expected_lower.contains("buy") || expected_lower.contains("sell");
 
-    if expected_action == "Hold" && score >= 0.3 {
+    if expected_action == "Pass" && score >= 0.3 {
         score += 0.1;
         evidence.push("Correctly identified unfavorable conditions");
     }
@@ -261,7 +261,7 @@ mod tests {
 
     #[test]
     fn tier_1_hold_always_passes() {
-        let (pass, _) = tier_1_compliance("Hold", 0.0, 0.0, 0.0, "No setup", "Hold");
+        let (pass, _) = tier_1_compliance("Pass", 0.0, 0.0, 0.0, "No setup", "Pass");
         assert!(pass);
     }
 
@@ -299,7 +299,7 @@ mod tests {
 
     #[test]
     fn tier_2_hold_neutral() {
-        let (score, _) = tier_2_rr_score(0.0, 0.0, 0.0, "Hold", "Hold");
+        let (score, _) = tier_2_rr_score(0.0, 0.0, 0.0, "Pass", "Pass");
         assert_eq!(score, 0.5);
     }
 

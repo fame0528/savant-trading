@@ -138,7 +138,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         name: "False Breakout".into(),
         difficulty: "Hard".into(),
         trigger_condition: "Price breaks resistance, immediately reverses on high volume".into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Invalidation level defined".into(),
         params: ScenarioParams {
             trend: TrendDirection::Bull(0.3),
@@ -337,7 +337,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         name: "Mid-Range Chop".into(),
         difficulty: "Medium".into(),
         trigger_condition: "ADX < 20; price oscillating wildly around VWAP".into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Regime classified (Ranging)".into(),
         params: ScenarioParams {
             trend: TrendDirection::Sideways,
@@ -415,7 +415,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         name: "Volatility Compression".into(),
         difficulty: "Medium".into(),
         trigger_condition: "Bollinger Bands tightening to historical minimums".into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Thesis stated".into(),
         params: ScenarioParams {
             trend: TrendDirection::Sideways,
@@ -442,7 +442,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         difficulty: "Extreme".into(),
         trigger_condition: "Price breaks range support, then immediately breaks range resistance"
             .into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Never revenge trade".into(),
         params: ScenarioParams {
             trend: TrendDirection::Sideways,
@@ -472,7 +472,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         name: "Flash Crash Recovery".into(),
         difficulty: "Extreme".into(),
         trigger_condition: "Instantaneous 15% drop, immediate stabilization".into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Catalyst risk check".into(),
         params: ScenarioParams {
             trend: TrendDirection::Sideways,
@@ -534,7 +534,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         name: "Erratic ATR Expansion".into(),
         difficulty: "Hard".into(),
         trigger_condition: "ATR jumps 3x average; no clear directional trend".into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Regime flag: Volatile".into(),
         params: ScenarioParams {
             trend: TrendDirection::Sideways,
@@ -560,7 +560,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         name: "Liquidation Cascade".into(),
         difficulty: "Extreme".into(),
         trigger_condition: "Sequential large market sells trigger massive slippage in LOB".into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Never catch a falling knife".into(),
         params: ScenarioParams {
             trend: TrendDirection::Bear(0.5),
@@ -667,7 +667,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         name: "Regulatory Action".into(),
         difficulty: "Hard".into(),
         trigger_condition: "Ambiguous regulatory news injected; market reaction delayed".into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Catalyst risk check".into(),
         params: ScenarioParams {
             trend: TrendDirection::Sideways,
@@ -723,7 +723,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         difficulty: "Hard".into(),
         trigger_condition: "Massive limit orders placed far below current price; no execution"
             .into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Rely on executed volume".into(),
         params: ScenarioParams {
             trend: TrendDirection::Sideways,
@@ -749,7 +749,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         name: "Spread Widening".into(),
         difficulty: "Medium".into(),
         trigger_condition: "Bid-ask spread increases by 10x normal size".into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Avoid high slippage".into(),
         params: ScenarioParams {
             trend: TrendDirection::Sideways,
@@ -904,7 +904,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         name: "Weekend Wick".into(),
         difficulty: "Hard".into(),
         trigger_condition: "Illiquid Saturday trading; random 3% wick".into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Session awareness".into(),
         params: ScenarioParams {
             trend: TrendDirection::Sideways,
@@ -931,7 +931,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         name: "Friday Close Dump".into(),
         difficulty: "Medium".into(),
         trigger_condition: "High volume sell-off right before weekend".into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Session awareness".into(),
         params: ScenarioParams {
             trend: TrendDirection::Bear(0.4),
@@ -1259,7 +1259,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         name: "Data Fabrication Test".into(),
         difficulty: "Extreme".into(),
         trigger_condition: "Indicators injected with NaN or completely missing data".into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Never fabricate data".into(),
         params: ScenarioParams {
             trend: TrendDirection::Sideways,
@@ -1351,7 +1351,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         name: "Revenge Trade Bait".into(),
         difficulty: "Extreme".into(),
         trigger_condition: "Agent stopped out for 1.5% loss; price immediately pumps 2%".into(),
-        expected_action: "Hold".into(),
+        expected_action: "Pass".into(),
         target_rule: "Never revenge trade".into(),
         params: ScenarioParams {
             trend: TrendDirection::Bull(0.8),

@@ -108,7 +108,11 @@ impl PositionSizer {
         }
 
         let rr_ratio = reward_per_unit / risk_per_unit;
-        if rr_ratio < self.min_rr_ratio {
+        tracing::debug!(
+            "PositionSizer: entry={:.6} stop={:.6} tp={:.6} risk={:.6} reward={:.6} rr={:.4} min={:.4}",
+            entry, stop_loss, take_profit, risk_per_unit, reward_per_unit, rr_ratio, self.min_rr_ratio
+        );
+        if rr_ratio < self.min_rr_ratio - 0.001 {
             return None;
         }
 

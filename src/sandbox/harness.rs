@@ -100,7 +100,7 @@ pub fn always_hold_benchmark(scenarios: &[super::scenarios::Scenario]) -> Vec<Sc
                 scenario_name: s.name.clone(),
                 category: s.category.clone(),
                 difficulty: s.difficulty.clone(),
-                action_taken: "Hold".into(),
+                action_taken: "Pass".into(),
                 grade,
                 latency_ms: 0,
             }
@@ -441,13 +441,13 @@ mod tests {
 
         for scenario in &scenarios[..5] {
             let grade =
-                grade_scenario_deterministic(scenario, "Hold", 0.0, 0.0, 0.0, 0.0, "No setup");
+                grade_scenario_deterministic(scenario, "Pass", 0.0, 0.0, 0.0, 0.0, "No setup");
             results.push(ScenarioResult {
                 scenario_id: scenario.id.clone(),
                 scenario_name: scenario.name.clone(),
                 category: scenario.category.clone(),
                 difficulty: scenario.difficulty.clone(),
-                action_taken: "Hold".into(),
+                action_taken: "Pass".into(),
                 grade,
                 latency_ms: 100,
             });
@@ -471,7 +471,7 @@ mod tests {
                 scenario_name: scenario.name.clone(),
                 category: scenario.category.clone(),
                 difficulty: scenario.difficulty.clone(),
-                action_taken: "Hold".into(),
+                action_taken: "Pass".into(),
                 grade,
                 latency_ms: 100,
             });

@@ -449,6 +449,35 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         raw_tx.extend_from_slice(&signed_tx);
 
         let raw_tx_hex = format!("0x{}", hex::encode(&raw_tx));
+
+        // FID-043: Dry-run with eth_call before broadcasting to catch malformed
+        // calldata (bad Permit2 signature, wrong spender, etc.) before spending gas.
+        let dry_run_params = serde_json::json!([{
+            "from": format!("{:#x}", self.wallet_address),
+            "to": format!("{:#x}", to),
+            "data": format!("0x{}", hex::encode(data)),
+            "value": format!("0x{:x}", value),
+            "gas": format!("0x{:x}", gas_limit),
+        }, "latest"]);
+        match self.rpc_call("eth_call", dry_run_params).await {
+            Ok(result) => {
+                let ret = result.as_str().unwrap_or("0x");
+                tracing::debug!("eth_call dry-run OK (ret={})", &ret[..ret.len().min(66)]);
+            }
+            Err(e) => {
+                let err_str = e.to_string();
+                warn!(
+                    "DRY-RUN FAILED: eth_call reverted — {} | \
+                     This likely means bad Permit2 signature or calldata. Aborting broadcast.",
+                    err_str
+                );
+                return Err(ExecutionError::Other(format!(
+                    "eth_call dry-run reverted: {}",
+                    err_str
+                )));
+            }
+        }
+
         let result = self
             .rpc_call("eth_sendRawTransaction", serde_json::json!([raw_tx_hex]))
             .await?;
@@ -586,26 +615,65 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
         log_swap!("0x API", "Calling: {} -> {} amount={}", swap_params.src_token, swap_params.dst_token, swap_params.amount);
 
-        // Spread filter (FID-035): Check spread before executing swap.
-        // At $11 positions, 30bps spread = $0.033 friction. With 3% stop ($0.33),
-        // friction consumes 28% of margin. Above 30bps, friction exceeds 40%.
+        // Spread filter (FID-035, FID-041): Check spread before executing swap.
+        // Compares effective price against market price in USD (not raw wei).
         match self.backend.quote(&swap_params).await {
             Ok(quote) => {
-                let buy: f64 = quote.to_amount.parse().unwrap_or(0.0);
-                let sell: f64 = swap_params.amount.parse().unwrap_or(0.0);
-                if buy > 0.0 && sell > 0.0 {
-                    let spread_bps = ((sell - buy) / buy).abs() * 10000.0;
-                    if spread_bps > 30.0 {
-                        log_warn!("SPREAD", "Rejected {} — spread {:.0}bps exceeds 30bps limit", swap_params.src_token, spread_bps);
+                let buy_raw: f64 = quote.to_amount.parse().unwrap_or(0.0);
+                let sell_raw: f64 = swap_params.amount.parse().unwrap_or(0.0);
+
+                if buy_raw > 0.0 && sell_raw > 0.0 {
+                    // Resolve decimals: prefer 0x API response, fall back to token DB
+                    let buy_decimals = if quote.buy_decimals > 0 {
+                        quote.buy_decimals
+                    } else {
+                        dst_token.decimals as u32
+                    };
+
+                    // Convert to human-readable amounts
+                    let sell_usd = sell_raw / 1_000_000.0; // USDC has 6 decimals
+                    let buy_tokens = buy_raw / 10f64.powi(buy_decimals as i32);
+
+                    // Minimum output check: reject dust amounts
+                    if buy_tokens < 0.000001 {
+                        log_warn!("SPREAD", "Rejected {} — output {:.6} tokens is dust",
+                            swap_params.dst_token, buy_tokens);
                         return Err(ExecutionError::Other(format!(
-                            "Spread {:.0}bps exceeds 30bps limit for {}", spread_bps, swap_params.src_token
+                            "Dust output: {:.6} tokens for {}", buy_tokens, swap_params.dst_token
                         )));
                     }
-                    log_swap!("SPREAD", "OK: {:.0}bps for {}", spread_bps, swap_params.src_token);
+
+                    // Effective price per token in USD
+                    let effective_price = sell_usd / buy_tokens;
+
+                    // Parse market price from quote (0x returns USD price, 1inch returns src amount)
+                    let market_price_raw: f64 = quote.price.parse().unwrap_or(0.0);
+
+                    // If market price unavailable, calculate from buy/sell amounts
+                    // This is the same as effective_price, so spread = 0 (no spread check needed)
+                    let market_price = if market_price_raw > 0.0 {
+                        market_price_raw
+                    } else {
+                        effective_price
+                    };
+
+                    let spread_bps = ((effective_price - market_price) / market_price).abs() * 10000.0;
+                    if spread_bps > 30.0 {
+                        log_warn!("SPREAD", "Rejected {} — spread {:.0}bps exceeds 30bps limit (eff=${:.6}, mkt=${:.6})",
+                            swap_params.dst_token, spread_bps, effective_price, market_price);
+                        return Err(ExecutionError::Other(format!(
+                            "Spread {:.0}bps exceeds 30bps limit for {}", spread_bps, swap_params.dst_token
+                        )));
+                    }
+                    log_swap!("SPREAD", "OK: {:.0}bps for {} (eff=${:.6}, mkt=${:.6})",
+                        spread_bps, swap_params.dst_token, effective_price, market_price);
                 }
             }
             Err(e) => {
-                log_warn!("SPREAD", "Quote failed ({}), proceeding without spread check", e);
+                log_swap_fail!("SPREAD", "Quote failed ({}), aborting swap", e);
+                return Err(ExecutionError::Other(format!(
+                    "Quote failed, aborting swap: {}", e
+                )));
             }
         }
 

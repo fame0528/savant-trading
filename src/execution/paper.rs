@@ -442,7 +442,7 @@ impl PaperTrader {
         }
 
         info!(
-            "State loaded: balance=${:.2}, positions={}, trades={}",
+            "Balance tracker: ${:.2} | {} positions | {} trades",
             self.account.balance,
             self.positions.len(),
             self.closed_trades.len()

@@ -126,6 +126,7 @@ impl DexBackend for InchBackend {
             price: src_amount.to_string(),
             guaranteed_price: to_amount,
             estimated_gas: est_gas,
+            buy_decimals: 0, // 1inch doesn't return decimals; trader resolves from token DB
         })
     }
 

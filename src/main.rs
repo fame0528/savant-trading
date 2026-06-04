@@ -385,7 +385,14 @@ async fn emergency_liquidate() -> anyhow::Result<()> {
     let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)?;
     let api_key = std::env::var(&config.exchange.dex.api_key_env)?;
 
-    let backend = ZeroXBackend::new(api_key);
+    let signing_key = {
+        let key_hex = wallet_key.trim_start_matches("0x");
+        let key_bytes = alloy_core::primitives::hex::decode(key_hex)
+            .map_err(|e| anyhow::anyhow!("Invalid wallet key hex: {}", e))?;
+        k256::ecdsa::SigningKey::from_bytes(key_bytes.as_slice().into())
+            .map_err(|e| anyhow::anyhow!("Invalid wallet key for signing: {}", e))?
+    };
+    let backend = ZeroXBackend::new(api_key, signing_key);
     let mut trader = DexTrader::new(
         backend,
         &wallet_key,

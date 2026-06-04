@@ -125,7 +125,7 @@ impl AgentOrchestrator {
                             self.consecutive_failures = 0;
 
                             return match decision.action {
-                                TradeAction::Hold => {
+                                TradeAction::Pass => {
                                     info!(
                                         "Agent hold: {} — {} (confidence: {:.0}%)",
                                         decision.pair,

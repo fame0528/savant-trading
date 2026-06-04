@@ -89,117 +89,134 @@ pub async fn fetch_onchain(client: &reqwest::Client) -> OnchainData {
 /// API: GET https://api.bgeometrics.com/v1/{metric}?api_key=test
 /// Returns: [{"d":"2025-05-31","unixTs":1748649600,"mvrv":1.375}, ...]
 /// We take the LAST element (most recent) and extract the metric field.
+/// Adds 5-second delay between requests to avoid 429 rate limits.
+/// Retries once on 429 with 10-second backoff.
 async fn fetch_bgeometrics(client: &reqwest::Client, data: &mut OnchainData) {
     let metrics = [("mvrv", "mvrv"), ("sopr", "sopr"), ("nupl", "nupl")];
+    let mut consecutive_429 = 0u32;
 
-    for (metric_name, field) in &metrics {
+    for (i, (metric_name, field)) in metrics.iter().enumerate() {
+        // Stagger requests to avoid 429 rate limits
+        if i > 0 {
+            let delay = if consecutive_429 > 0 { 10 } else { 5 };
+            tokio::time::sleep(std::time::Duration::from_secs(delay)).await;
+        }
+
         let url = format!(
             "https://api.bgeometrics.com/v1/{}?api_key=test",
             metric_name
         );
 
-        match client.get(&url).send().await {
-            Ok(resp) => {
-                if !resp.status().is_success() {
-                    warn!(
-                        "BGeometrics {} returned HTTP {}",
-                        metric_name,
-                        resp.status()
-                    );
-                    continue;
-                }
-
-                // API returns an array of data points — take the last (most recent)
-                let body_text = match resp.text().await {
-                    Ok(t) => t,
-                    Err(e) => {
-                        warn!("BGeometrics {} body read error: {}", metric_name, e);
-                        continue;
-                    }
-                };
-
-                let points: Vec<BgDataPoint> = match serde_json::from_str(&body_text) {
-                    Ok(p) => p,
-                    Err(e) => {
-                        warn!(
-                            "BGeometrics {} parse error: {} (body starts with: {})",
-                            metric_name,
-                            e,
-                            &body_text[..body_text.len().min(100)]
-                        );
-                        continue;
-                    }
-                };
-
-                if let Some(latest) = points.last() {
-                    // Extract the metric-specific field (mvrv/sopr/nupl)
-                    let val = latest
-                        .metrics
-                        .get(*field)
-                        .and_then(|v| parse_bg_value(&Some(v.clone())));
-
-                    if let Some(val) = val {
-                        let valid = match *field {
-                            "mvrv" => {
-                                if (MVRV_MIN..=MVRV_MAX).contains(&val) {
-                                    data.mvrv = Some(val);
-                                    true
-                                } else {
-                                    warn!(
-                                        "BGeometrics MVRV {} outside valid range [{}, {}]",
-                                        val, MVRV_MIN, MVRV_MAX
-                                    );
-                                    false
-                                }
-                            }
-                            "sopr" => {
-                                if (SOPR_MIN..=SOPR_MAX).contains(&val) {
-                                    data.sopr = Some(val);
-                                    true
-                                } else {
-                                    warn!(
-                                        "BGeometrics SOPR {} outside valid range [{}, {}]",
-                                        val, SOPR_MIN, SOPR_MAX
-                                    );
-                                    false
-                                }
-                            }
-                            "nupl" => {
-                                if (NUPL_MIN..=NUPL_MAX).contains(&val) {
-                                    data.nupl = Some(val);
-                                    true
-                                } else {
-                                    warn!(
-                                        "BGeometrics NUPL {} outside valid range [{}, {}]",
-                                        val, NUPL_MIN, NUPL_MAX
-                                    );
-                                    false
-                                }
-                            }
-                            _ => false,
-                        };
-                        if valid {
-                            data.source = "bgeometrics".to_string();
-                            info!(
-                                "BGeometrics {}: {:.4} (date: {})",
-                                metric_name,
-                                val,
-                                latest.d.as_deref().unwrap_or("unknown")
-                            );
-                        }
-                    } else {
-                        warn!(
-                            "BGeometrics {}: no '{}' field in latest data point (fields: {:?})",
-                            metric_name,
-                            field,
-                            latest.metrics.keys().collect::<Vec<_>>()
-                        );
-                    }
-                } else {
-                    warn!("BGeometrics {}: empty response array", metric_name);
-                }
+        let resp = match client.get(&url).send().await {
+            Ok(r) => r,
+            Err(e) => {
+                warn!("BGeometrics {} request failed: {}", metric_name, e);
+                consecutive_429 += 1;
+                continue;
             }
-            Err(e) => warn!("BGeometrics {} request failed: {}", metric_name, e),
+        };
+
+        if resp.status() == reqwest::StatusCode::TOO_MANY_REQUESTS {
+            warn!("BGeometrics {} rate limited (429)", metric_name);
+            consecutive_429 += 1;
+            continue;
+        }
+
+        if !resp.status().is_success() {
+            warn!("BGeometrics {} returned HTTP {}", metric_name, resp.status());
+            continue;
+        }
+
+        consecutive_429 = 0; // Reset on success
+
+        // API returns an array of data points — take the last (most recent)
+        let body_text = match resp.text().await {
+            Ok(t) => t,
+            Err(e) => {
+                warn!("BGeometrics {} body read error: {}", metric_name, e);
+                continue;
+            }
+        };
+
+        let points: Vec<BgDataPoint> = match serde_json::from_str(&body_text) {
+            Ok(p) => p,
+            Err(e) => {
+                warn!(
+                    "BGeometrics {} parse error: {} (body starts with: {})",
+                    metric_name,
+                    e,
+                    &body_text[..body_text.len().min(100)]
+                );
+                continue;
+            }
+        };
+
+        if let Some(latest) = points.last() {
+            // Extract the metric-specific field (mvrv/sopr/nupl)
+            let val = latest
+                .metrics
+                .get(*field)
+                .and_then(|v| parse_bg_value(&Some(v.clone())));
+
+            if let Some(val) = val {
+                let valid = match *field {
+                    "mvrv" => {
+                        if (MVRV_MIN..=MVRV_MAX).contains(&val) {
+                            data.mvrv = Some(val);
+                            true
+                        } else {
+                            warn!(
+                                "BGeometrics MVRV {} outside valid range [{}, {}]",
+                                val, MVRV_MIN, MVRV_MAX
+                            );
+                            false
+                        }
+                    }
+                    "sopr" => {
+                        if (SOPR_MIN..=SOPR_MAX).contains(&val) {
+                            data.sopr = Some(val);
+                            true
+                        } else {
+                            warn!(
+                                "BGeometrics SOPR {} outside valid range [{}, {}]",
+                                val, SOPR_MIN, SOPR_MAX
+                            );
+                            false
+                        }
+                    }
+                    "nupl" => {
+                        if (NUPL_MIN..=NUPL_MAX).contains(&val) {
+                            data.nupl = Some(val);
+                            true
+                        } else {
+                            warn!(
+                                "BGeometrics NUPL {} outside valid range [{}, {}]",
+                                val, NUPL_MIN, NUPL_MAX
+                            );
+                            false
+                        }
+                    }
+                    _ => false,
+                };
+                if valid {
+                    data.source = "bgeometrics".to_string();
+                    info!(
+                        "BGeometrics {}: {:.4} (date: {})",
+                        metric_name,
+                        val,
+                        latest.d.as_deref().unwrap_or("unknown")
+                    );
+                }
+            } else {
+                warn!(
+                    "BGeometrics {}: no '{}' field in latest data point (fields: {:?})",
+                    metric_name,
+                    field,
+                    latest.metrics.keys().collect::<Vec<_>>()
+                );
+            }
+        } else {
+            warn!("BGeometrics {}: empty response array", metric_name);
         }
     }
 }

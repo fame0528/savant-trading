@@ -1,13 +1,12 @@
 // Enterprise console logging — single source of truth for ALL output.
 //
-// Format: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]`
+// Format: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] Result`
 //
 // Both `savant_log()` macros AND `tracing` events use the same format.
 // This file provides:
 //   - `savant_log()` — direct styled logging for engine events
 //   - `SavantLayer` — custom tracing Layer for library/framework events
 //   - ANSI color constants
-//   - Pair name highlighting
 // ── ANSI codes ──────────────────────────────────────────────────────────
 
 pub const CYAN_FG: &str = "\x1b[36m";
@@ -36,40 +35,6 @@ pub const GREY: &str = GREY_FG;
 pub const BOLD: &str = "\x1b[1m";
 pub const DIM: &str = "\x1b[2m";
 
-// ── Trading pairs for highlighting ───────────────────────────────────────
-
-const TRADING_PAIRS: &[&str] = &[
-    "BTC/USD", "ETH/USD", "LINK/USD", "DOGE/USD",
-    "ARB/USD", "UNI/USD", "AAVE/USD",
-    "PEPE/USD", "BONK/USD",
-    "SOL/USD", "XRP/USD", "ADA/USD", "AVAX/USD",
-    "SHIB/USD", "FLOKI/USD", "TURBO/USD", "MOG/USD",
-    "BTC/USDC", "ETH/USDC", "SOL/USDC", "XRP/USDC",
-];
-
-/// Highlight trading pair names with cyan bold brackets.
-/// Only wraps bare pairs — skips already-bracketed pairs to avoid `[[BTC/USD]]`.
-fn highlight_pairs(text: &str) -> String {
-    let mut result = text.to_string();
-    for pair in TRADING_PAIRS {
-        // Skip if already bracketed: [BTC/USD]
-        let bracketed = format!("[{}]", pair);
-        if result.contains(&bracketed) {
-            continue;
-        }
-        // Skip if already highlighted with ANSI codes
-        let highlighted = format!("{}[{}]{}", CYAN_BOLD, pair, RESET);
-        if result.contains(&highlighted) {
-            continue;
-        }
-        // Only highlight bare pairs
-        if result.contains(pair) {
-            result = result.replace(pair, &highlighted);
-        }
-    }
-    result
-}
-
 /// Returns current EST time formatted as `MM-DD-YYYY H:MM AM/PM`.
 pub fn est_now() -> String {
     let now = chrono::Utc::now();
@@ -88,6 +53,11 @@ pub enum LogLevel {
     Llm,
     LlmDone,
     Decision,
+    DecisionBuy,
+    DecisionSell,
+    DecisionPass,
+    DecisionClose,
+    DecisionAdjust,
     Trade,
     Swap,
     SwapOk,
@@ -99,40 +69,35 @@ pub enum LogLevel {
 
 /// Print a styled log line.
 ///
-/// Format: `[Savant Trading] [TIME] [ACTION] RESULT`
-/// Colors are applied BEFORE the text, RESET after each segment.
+/// Format: `[Savant Trading] [TIME] [ACTION] Result`
+/// Colors flow continuously — no RESET between segments.
 pub fn savant_log(level: LogLevel, action: &str, result: &str) {
     let (action_color, result_color) = match level {
         LogLevel::Phase => (WHITE_BOLD, WHITE_FG),
-        LogLevel::Llm => (WHITE_FG, GREY_FG),
-        LogLevel::LlmDone => (GREY_FG, GREEN_FG),
+        LogLevel::Llm => (CYAN_FG, WHITE_FG),
+        LogLevel::LlmDone => (GREEN_FG, GREEN_FG),
         LogLevel::Decision => (CYAN_BOLD, WHITE_FG),
+        LogLevel::DecisionBuy => (GREEN_BOLD, GREEN_FG),
+        LogLevel::DecisionSell => (RED_BOLD, RED_FG),
+        LogLevel::DecisionPass => (WHITE_FG, WHITE_FG),
+        LogLevel::DecisionClose => (ORANGE_BOLD, ORANGE_FG),
+        LogLevel::DecisionAdjust => (ORANGE_FG, ORANGE_FG),
         LogLevel::Trade => (ORANGE_BOLD, ORANGE_FG),
-        LogLevel::Swap => (CYAN_BOLD, GREY_DIM),
+        LogLevel::Swap => (CYAN_FG, WHITE_FG),
         LogLevel::SwapOk => (GREEN_BOLD, GREEN_FG),
         LogLevel::SwapFail => (RED_BOLD, RED_FG),
-        LogLevel::Vault => (GREY_DIM, GREY_FG),
+        LogLevel::Vault => (GREY_FG, WHITE_FG),
         LogLevel::Circuit => (RED_BOLD, RED_FG),
         LogLevel::Warn => (ORANGE_BOLD, ORANGE_FG),
     };
 
     let ts = est_now();
-    let highlighted = highlight_pairs(result);
 
-    // Build the line manually to ensure correct ANSI placement:
-    // color BEFORE text, RESET AFTER text
-    let line = format!(
-        "{cyan}[Savant Trading]{reset} {grey}[{ts}]{reset} {action_c}[{action}]{reset} {result_c}{result}{reset}",
-        cyan = CYAN_BOLD,
-        reset = RESET,
-        grey = GREY_FG,
-        ts = ts,
-        action_c = action_color,
-        action = action,
-        result_c = result_color,
-        result = highlighted,
+    // Colors flow continuously — RESET only before result to apply result_color
+    eprintln!(
+        "\x1b[1;36m[Savant Trading] \x1b[90m[{}] {}[{}]\x1b[0m {}{}",
+        ts, action_color, action, result_color, result
     );
-    eprintln!("{}", line);
 }
 
 // ── SavantLayer — custom tracing Layer ───────────────────────────────────
@@ -153,7 +118,7 @@ fn capitalize_module(name: &str) -> String {
         "goplus" => return "GoPlus".to_string(),
         "kraken" => return "Kraken Data".to_string(),
         "trader" => return "DEX Trader".to_string(),
-        "paper" => return "Paper Trader".to_string(),
+        "paper" => return "Balance".to_string(),
         "episodic" => return "Episodic Memory".to_string(),
         "aggregator" => return "Insight".to_string(),
         "liquidation" => return "Liquidation".to_string(),
@@ -188,12 +153,12 @@ where
         let metadata = event.metadata();
         let level = metadata.level();
 
-        // Map tracing level to action label and color
-        let (action, action_color, result_color) = match *level {
+        // Map tracing level to label and colors
+        let (action, action_color, msg_color) = match *level {
             tracing::Level::ERROR => ("ERROR", RED_BOLD, RED_FG),
             tracing::Level::WARN => ("WARN", ORANGE_BOLD, ORANGE_FG),
-            tracing::Level::INFO => ("INFO", GREY_FG, WHITE_FG),
-            tracing::Level::DEBUG => ("DEBUG", GREY_DIM, GREY_DIM),
+            tracing::Level::INFO => ("INFO", WHITE_FG, WHITE_FG),
+            tracing::Level::DEBUG => ("DEBUG", GREY_FG, GREY_FG),
             tracing::Level::TRACE => ("TRACE", GREY_DIM, GREY_DIM),
         };
 
@@ -211,21 +176,11 @@ where
         let formatted_target = capitalize_module(short_target);
 
         let ts = est_now();
-        let highlighted = highlight_pairs(&message);
 
-        // Format: [Savant Trading] [TIME] [LEVEL] [Module] message
+        // Colors flow continuously — RESET only before message to apply msg_color
         let line = format!(
-            "{cyan}[Savant Trading]{reset} {grey}[{ts}]{reset} {action_c}[{action}]{reset} {target_c}[{target}]{reset} {result_c}{msg}{reset}",
-            cyan = CYAN_BOLD,
-            reset = RESET,
-            grey = GREY_FG,
-            ts = ts,
-            action_c = action_color,
-            action = action,
-            target_c = GREY_DIM,
-            target = formatted_target,
-            result_c = result_color,
-            msg = highlighted,
+            "\x1b[1;36m[Savant Trading] \x1b[90m[{}] {}[{}] \x1b[90m[{}]\x1b[0m {}{}",
+            ts, action_color, action, formatted_target, msg_color, message
         );
         eprintln!("{}", line);
     }
@@ -284,7 +239,15 @@ macro_rules! log_llm_done {
 #[macro_export]
 macro_rules! log_decision {
     ($action:expr, $($arg:tt)*) => {{
-        $crate::core::console::savant_log($crate::core::console::LogLevel::Decision, $action, &format!($($arg)*));
+        let level = match $action {
+            "BUY" => $crate::core::console::LogLevel::DecisionBuy,
+            "SELL" => $crate::core::console::LogLevel::DecisionSell,
+            "PASS" => $crate::core::console::LogLevel::DecisionPass,
+            "CLOSE" => $crate::core::console::LogLevel::DecisionClose,
+            "ADJUST" => $crate::core::console::LogLevel::DecisionAdjust,
+            _ => $crate::core::console::LogLevel::Decision,
+        };
+        $crate::core::console::savant_log(level, $action, &format!($($arg)*));
     }};
 }
 

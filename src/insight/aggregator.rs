@@ -273,6 +273,9 @@ pub struct InsightAggregator {
     onchain_disabled: bool,
     news_disabled: bool,
     rss_disabled: bool,
+    // TTL cache for on-chain data (BGeometrics rate limit)
+    last_onchain_fetch: Option<std::time::Instant>,
+    onchain_ttl: std::time::Duration,
 }
 
 impl InsightAggregator {
@@ -285,6 +288,8 @@ impl InsightAggregator {
             onchain_disabled: false,
             news_disabled: false,
             rss_disabled: false,
+            last_onchain_fetch: None,
+            onchain_ttl: std::time::Duration::from_secs(1800), // 30 minutes (on-chain data changes daily)
         }
     }
 
@@ -317,14 +322,29 @@ impl InsightAggregator {
             self.cached.flows = flows::fetch_flows(&self.client, None).await;
         }
 
-        // On-chain analytics — CoinMetrics (circuit breaker: disable after first failure)
+        // On-chain analytics — BGeometrics (rate-limited, cached for 15 minutes)
         if self.config.onchain_enabled && !self.onchain_disabled {
-            let onchain_data = onchain::fetch_onchain(&self.client).await;
-            if onchain_data.source == "none" {
-                self.onchain_disabled = true;
-                info!("On-chain API disabled (no data available)");
+            let should_fetch = match self.last_onchain_fetch {
+                Some(last) => last.elapsed() >= self.onchain_ttl,
+                None => true,
+            };
+
+            if should_fetch {
+                let onchain_data = onchain::fetch_onchain(&self.client).await;
+                if onchain_data.source == "none" {
+                    self.onchain_disabled = true;
+                    info!("On-chain API disabled (no data available)");
+                } else {
+                    self.last_onchain_fetch = Some(std::time::Instant::now());
+                }
+                self.cached.onchain = onchain_data;
+            } else {
+                let remaining = self.onchain_ttl - self.last_onchain_fetch.unwrap().elapsed();
+                tracing::debug!(
+                    "On-chain data cached — {}s until refresh",
+                    remaining.as_secs()
+                );
             }
-            self.cached.onchain = onchain_data;
         }
 
         // News — CoinGecko trending (circuit breaker: disable after first failure)
