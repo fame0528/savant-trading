@@ -112,11 +112,17 @@ impl SourceRouter {
                     );
                 }
                 Err(e) => {
+                    let err_str = e.to_string();
+                    let short_err = if err_str.len() > 80 {
+                        format!("{}...", &err_str[..77])
+                    } else {
+                        err_str
+                    };
                     tracing::info!(
-                        "[{}] Failed for {}: {} — trying next source",
+                        "[{}] Failed for {}: {}",
                         source.name(),
                         pair,
-                        e
+                        short_err
                     );
                 }
             }
