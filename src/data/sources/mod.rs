@@ -89,31 +89,31 @@ impl SourceRouter {
                     let nonzero = candles.iter().filter(|c| c.close > 0.0).count();
                     if nonzero == 0 {
                         tracing::debug!(
-                            "{}: All-zero candles for {} — trying next",
+                            "{}: All-zero candles for \x1b[96m[{}]\x1b[36m",
                             source.name(),
                             pair
                         );
                         continue;
                     }
                     tracing::info!(
-                        "{}: {} candles for {} ({} non-zero)",
+                        "{}: \x1b[96m[{}]\x1b[36m {} candles ({} non-zero)",
                         source.name(),
-                        candles.len(),
                         pair,
+                        candles.len(),
                         nonzero
                     );
                     return Ok(candles);
                 }
                 Ok(_) => {
                     tracing::info!(
-                        "{}: No data for {}",
+                        "{}: No data for \x1b[96m[{}]\x1b[36m",
                         source.name(),
                         pair
                     );
                 }
                 Err(_) => {
                     tracing::info!(
-                        "{}: No data for {}",
+                        "{}: No data for \x1b[96m[{}]\x1b[36m",
                         source.name(),
                         pair
                     );
