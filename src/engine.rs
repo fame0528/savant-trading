@@ -1131,7 +1131,7 @@ pub async fn run(
                         savant_trading::agent::decision_parser::TradeAction::Close => "CLOSE",
                         savant_trading::agent::decision_parser::TradeAction::AdjustStop => "ADJUST",
                     };
-                    log_decision!(action_label, "[{}] [{}] | {:.0}% | R:{:.1} | {}",
+                    log_decision!(action_label, "[{}] \x1b[90m[{}]\x1b[0m | {:.0}% | R:{:.1} | {}",
                         decision.side, decision.pair, decision.confidence * 100.0,
                         decision.risk_reward, reasoning_short);
 
