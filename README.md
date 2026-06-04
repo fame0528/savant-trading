@@ -5,13 +5,13 @@
 
 <img src="img/savant.png" alt="Savant Logo" width="180" />
 
-**AI-Native Autonomous Crypto Trading Engine**
+**AI-Native Autonomous DEX Trading Engine**
 
-A production-grade, Rust-native trading engine where an AI agent IS the brain — powered by 2,959 knowledge units across 10 enterprise-grade JSON files.
+No KYC. No CEX. Arbitrum on-chain swaps via 0x API — powered by 2,959 knowledge units across 10 enterprise-grade JSON files.
 
-**AI Brain:** MiMo v2.5 Pro via [OpenRouter](https://openrouter.ai/xiaomi/mimo-v2.5-pro). 1M context window, 131K max output.
+**Model-agnostic:** Any OpenAI-compatible LLM via [OpenRouter](https://openrouter.ai/). Tested with MiMo v2.5 Pro (1M context, 131K output).
 
-[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![Kraken](https://img.shields.io/badge/Kraken-Exchange-%23000000?style=flat-square&logo=bitcoin&logoColor=%2300fbff)](https://www.kraken.com/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-MiMo%20v2.5%20Pro-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/xiaomi/mimo-v2.5-pro)[![Version](https://img.shields.io/badge/Version-0.8.0-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![0x](https://img.shields.io/badge/0x-DEX-%23000000?style=flat-square&logo=ethereum&logoColor=%2300fbff)](https://0x.org/)[![Arbitrum](https://img.shields.io/badge/Arbitrum-L2-%23000000?style=flat-square&logo=arbitrum&logoColor=%2300fbff)](https://arbitrum.io/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-LLM-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/)[![Version](https://img.shields.io/badge/Version-0.8.0-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
 
 </div>
 
@@ -19,95 +19,110 @@ A production-grade, Rust-native trading engine where an AI agent IS the brain �
 
 ## Overview
 
-Savant Trading is an autonomous crypto trading engine built on a fundamental insight: **the AI agent IS the brain, not an afterthought**.
+Savant Trading is an autonomous on-chain trading engine. It evaluates 200+ tokens per cycle across 6 candle sources, runs each through an LLM agent with full market context, and executes BUY decisions directly on Arbitrum via 0x API — no centralized exchange, no KYC.
 
-Traditional algorithmic engines use hardcoded rule-based strategies (momentum, mean reversion, RSI crossovers). Savant Trading inverts this — an LLM agent receives all market context (candles, indicators, sentiment, derivatives data, macro context) and makes trading decisions using knowledge extracted from 11 curated transcripts of world-class traders and AI trading experiments.
+Traditional algorithmic engines use hardcoded strategies (momentum, RSI crossovers). Savant inverts this — an LLM agent receives candles, indicators, sentiment, on-chain data, and macro context, then makes trading decisions using knowledge extracted from 150+ books and world-class trader transcripts.
 
-### Architecture
+**Kraken CEX support** is available as a secondary backend but is not the primary focus.
+
+### How It Works
 
 ```
-Transcripts ──────→ Knowledge Base (11 curated transcripts)
-                            ↓
-System Prompt ←──── Modular prompt composer (5 layers)
-                            ↓
-Market Data ──────┐
-Insight Data ─────┤
-Positions ────────┤──→ AI Brain (mimo v2.5 pro) → Trade Decisions → Execution
-Account State ────┤
-Trade History ────┘
-
-Rule-Based Strategies ──→ Optional parallel signals (comparison only)
+Candle Sources (6) ────┐
+On-Chain Data ─────────┤
+Sentiment / Macro ─────┤──→ LLM Agent ──→ TradeDecision (JSON)
+Knowledge Base ────────┤                       │
+(2,959 units)          │              ┌────────┘
+                       │              ▼
+                  ┌────┘         BUY Signal?
+                  │              │
+                  │    ┌─────────┴─────────┐
+                  │    ▼                   ▼
+                  │  PASS              EXECUTE
+                  │  (skip)        0x API on Arbitrum
+                  │                ├─ Permit2 signing
+                  │                ├─ ERC-20 approve
+                  │                ├─ eth_call dry-run
+                  │                └─ broadcast + verify
 ```
 
 ### Key Design Decisions
 
 | Decision | Rationale |
 |----------|-----------|
-| **AI is the brain** | Rule-based strategies can't adapt to novel conditions. The LLM reasons across all context. |
-| **Transcripts as knowledge** | 11 curated transcripts from world-class traders provide structured trading wisdom, not raw text dumps. |
-| **Dynamic knowledge injection** | Knowledge units are selected based on current market conditions — high volatility triggers Fabio's order flow rules, extreme fear triggers contrarian playbook. |
-| **5-layer system prompt** | Base identity → Risk constraints → Strategy knowledge → Transcript knowledge → Output format. Each layer is independent and composable. |
-| **3 autonomy levels** | Suggest (log only), Confirm (human-in-the-loop), Autonomous (full auto). Start with Suggest, graduate to Autonomous. |
-| **Fallback to rules** | If the LLM fails 3 consecutive ticks, rule-based strategies take over temporarily. |
+| **DEX-first, no KYC** | 0x API on Arbitrum. Swap any token on-chain. No exchange account needed. |
+| **AI is the brain** | The LLM reasons across all context — candles, indicators, sentiment, on-chain data. No hardcoded strategies. |
+| **Multi-chain ready** | 0x supports 20+ EVM chains. Currently running on Arbitrum; Base, Optimism, BSC supported in code. |
+| **Model-agnostic** | Any OpenAI-compatible model works. MiMo v2.5 Pro is what we test with, but the provider layer supports switching. |
+| **5-layer system prompt** | Base identity → Risk constraints → Strategy knowledge → Transcript knowledge → Output format. |
+| **6 candle sources** | Kraken, OKX, KuCoin, Gate.io, CryptoCompare, CoinGecko. Automatic fallback with all-zero rejection. |
+| **3 autonomy levels** | Suggest (log only), Confirm (human-in-the-loop), Autonomous (full auto). |
 
 ---
 
 ## Features
 
-- **AI Agent Brain** — MiMo v2.5 Pro via OpenRouter makes all trading decisions using full market context
-- **SSE Streaming** — Real-time LLM response streaming, no timeout risk during long reasoning
-- **Multi-Timeframe Analysis** — Fetches 5m + 1H + 4H candles per pair; higher timeframe context injected into AI prompt
-- **Knowledge Base** — 2,959 units across 10 enterprise-grade JSON files, MMR selection with utility scoring, indicator-driven context tags
-- **Closed-Loop Training** — Semantic consolidation, anti-pattern detection, GEPA mutation, Teacher LLM, version control, auto-rollback
-- **Persistent Memory** — SQLite WAL episodic memory, Brier score calibration, CUSUM edge decay, experience replay
-- **Training Pipeline** — Progressive difficulty, convergence detection, confidence distribution, category edge tracking, auto-lesson generation
-- **Live Market Insight** — Fear & Greed Index, BTC Dominance, funding rates, liquidation clusters, exchange flows, on-chain analytics (MVRV, SOPR, NVT), news sentiment
-- **Multi-Asset Correlation** — Pearson correlation matrix, effective position counting for correlated pairs
-- **Portfolio Heat** — Total risk exposure tracking, blocks trades when heat exceeds 40% of equity
-- **Dynamic Slippage** — Slippage scales with ATR volatility and order book depth
-- **Pair Discovery** — `scan_all_pairs` can discover 455+ Kraken USD pairs (off by default — 15+ min/cycle)
-- **Kraken Integration** — REST + WebSocket (exponential backoff reconnection) for candle data, order execution, and account management
-- **Paper Trading** — Full simulation with realistic fees (0.40% Kraken taker) and dynamic slippage modeling
-- **Scale-Out Execution** — TP1 → 50% close + break-even stop, TP2 → 60% of remainder, TP3 → full close
-- **Circuit Breakers** — Independent risk layer the AI cannot override: daily loss limit, drawdown kill switch, max positions, portfolio heat
-- **Backtesting Engine** — Historical strategy validation with walk-forward optimization and Sharpe ratio
-- **REST API with CORS** — 16 endpoints including /api/training for training metrics
-- **SQLite Backup** — Automatic rolling backup rotation (last 7 copies, 6-hour interval)
-- **Sandbox Testing** — GARCH(1,1) synthetic OHLCV, 60 scenarios (11 categories), 3-tier grading, train/val split
-- **SOUL.md Evolution** — Immutable/mutable zones, GEPA textual optimization, pareto gatekeeper, version control
-- **Trade Journal** — SQLite persistence for every trade, equity curve, and daily performance summaries
-- **Glass House** — Obsidian vault integration for transparent trading state
-- **Modular Prompts** — System prompt composed from 5 independent layers + 6th memory context layer
-- **Structured Decisions** — AI outputs JSON with entry, stop, 3 take-profit levels, confidence score, and reasoning
-- **Fallback Mode** — Rule-based strategies activate automatically if LLM is unavailable
-- **DEX Execution** — 0x API v2 on Arbitrum (no KYC). EIP-1559 signing, Permit2 EIP-712 approval (with 32-byte length prefix), ERC-20 approve(max) for Permit2, eth_call dry-run, receipt verification, 3-retry logic, 50% gas buffer
-- **Multi-Source Candles** — 8 sources: Kraken, OKX, KuCoin, Gate.io, CryptoCompare, CoinGecko, GeckoTerminal, Binance. Automatic fallback with all-zero rejection.
-- **198 Arbitrum Tokens** — Real addresses from CoinGecko API. Covers all high-volume tokens on Arbitrum One.
-- **Enterprise Console** — Structured output: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]`. Cyan brand, grey timestamps, color-coded results (BUY=green, SELL=red, PASS=grey)
-- **Casing-Tolerant Parser** — AI responses parse correctly regardless of casing (BUY/Buy/buy all work)
-- **Position Sizer Safety** — Min order value ($1), max position pct (30%), balance cap prevents overexposure
-- **HTML Dashboard** — Single-file vanilla JS dashboard at `/dashboard.html` with glassmorphic design
+### DEX Execution (Primary)
+- **0x API v2 on Arbitrum** — No KYC. Permit2 EIP-712 signing, ERC-20 approve(max), eth_call dry-run, receipt verification
+- **201 Arbitrum Tokens** — CoinGecko-verified addresses for all high-volume tokens
+- **Multi-chain support** — Code-ready for Base, Optimism, BSC, Polygon, and 15+ other chains
+- **Gasless API** — 0x pays gas upfront, deducted from swap output (no ETH needed)
+- **Cross-Chain API** — Bridge tokens across chains in one transaction
+- **Permit2 signing** — Correct `calldata || sig_len (32 bytes) || sig (65 bytes)` format
+- **Fallback backend** — 0x primary, 1inch secondary on failure
+- **Spread filtering** — Rejects trades with >30bps spread
+- **Security checks** — GoPlus API for honeypot/tax detection on meme tokens
+- **xStock filter** — SPYX, QQQX, GLDX, CRCLX filtered (require 0x opt-in)
+
+### Market Data
+- **6 active candle sources** — Kraken, OKX, KuCoin, Gate.io, CryptoCompare, CoinGecko
+- **Automatic source rotation** — Falls back through sources on failure, rejects all-zero responses
+- **Multi-timeframe** — 5m, 1H, 4H, 1D candles per pair
+- **Indicators** — EMA, RSI, ATR, ADX, VWAP, Bollinger Bands, Volume Profile
+- **WebSocket** — Kraken WebSocket v2 for real-time price updates
+
+### AI Agent
+- **LLM-agnostic** — Any OpenAI-compatible model via OpenRouter. Tested with MiMo v2.5 Pro
+- **SSE streaming** — Real-time response streaming, no timeout risk during long reasoning
+- **Structured output** — JSON with entry, stop, 3 take-profit levels, confidence, reasoning
+- **Knowledge base** — 2,959 units across 10 JSON files, MMR selection with utility scoring
+- **Closed-loop training** — Semantic consolidation, anti-pattern detection, GEPA mutation
+- **Persistent memory** — SQLite WAL episodic memory, Brier score calibration, CUSUM edge decay
+
+### Risk & Safety
+- **Circuit breakers** — Independent of AI, cannot be overridden: daily loss limit, drawdown kill switch, max positions
+- **Position sizing** — Dynamic risk per trade, ATR-based sizing, minimum order value ($1)
+- **Portfolio heat** — Total risk exposure tracking, blocks trades at 40% of equity
+- **Price tolerance** — Rejects trades if price drifts >0.5% during LLM evaluation
+- **eth_call dry-run** — Simulates transaction on-chain before broadcasting
+- **Receipt verification** — Confirms swap succeeded on-chain before recording position
+
+### Infrastructure
+- **Paper trading** — Full simulation for testing strategies
+- **Backtesting** — Historical validation with walk-forward optimization
+- **REST API** — 16 endpoints at `http://localhost:8080/api/`
+- **HTML Dashboard** — Single-file vanilla JS at `/dashboard.html`
+- **Enterprise console** — Color-coded output: `[Savant Trading] [TIME] [ACTION] [RESULT]`
+- **Kraken CEX** — REST + WebSocket integration (secondary, available as fallback)
 
 ---
 
 ## Knowledge Base
 
-The AI agent's trading knowledge comes from 150+ books and transcripts, organized into 10 enterprise-grade JSON files with 2,959 tagged knowledge units:
+2,959 tagged knowledge units across 10 JSON files, extracted from 150+ books and trader transcripts:
 
 | File | Units | Domain |
 |------|-------|--------|
 | `knowledge_technical_analysis.json` | 506 | RSI, EMA, ADX, MACD, Bollinger, Fibonacci, divergences |
 | `knowledge_psychology.json` | 319 | Cognitive biases, tilt, deliberate practice, emotional regulation |
 | `knowledge_crypto_native.json` | 319 | On-chain analytics, DeFi, funding rates, liquidation cascades |
-| `knowledge_risk_management.json` | 350 | Kelly Criterion, drawdown recovery, position sizing, anti-martingale |
-| `knowledge_sentiment.json` | 291 | Fear & Greed, social sentiment, news analysis, crowd psychology |
+| `knowledge_risk_management.json` | 350 | Kelly Criterion, drawdown recovery, position sizing |
+| `knowledge_sentiment.json` | 291 | Fear & Greed, social sentiment, news analysis |
 | `knowledge_execution.json` | 282 | Order types, slippage, fill optimization, rate limits |
 | `knowledge_market_regimes.json` | 250 | Trending, ranging, volatile, capitulation detection |
 | `knowledge_trading_systems.json` | 226 | Backtesting, walk-forward, Monte Carlo, strategy design |
 | `knowledge_price_action.json` | 216 | Wyckoff, candle patterns, support/resistance, liquidity |
 | `knowledge_fundamentals.json` | 200 | Macro analysis, halving cycles, ETF flows, regulatory |
-
-Knowledge units are tagged with `setup_type`, `regime_subtype`, `trigger`, `indicator`, and `risk_context` for precise MMR selection. A `utility_score` field tracks empirical correlation with successful trades — units that help the agent win get promoted, units that correlate with losses get suppressed.
 
 ---
 
@@ -115,22 +130,24 @@ Knowledge units are tagged with `setup_type`, `regime_subtype`, `trigger`, `indi
 
 ### Prerequisites
 
-- Rust 1.91+ (install via [rustup](https://rustup.rs/))
-- Kraken account (for live trading — paper trading works without)
+- Rust 1.91+ ([rustup](https://rustup.rs/))
+- OpenRouter API key (or any OpenAI-compatible provider)
+- 0x API key ([free at dashboard.0x.org](https://dashboard.0x.org/))
+- An Arbitrum wallet with USDC + ETH for gas
 
 ### Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/savant-trading.git
+git clone https://github.com/fame0528/savant-trading.git
 cd savant-trading
 
-# Copy environment template
+# Copy environment template and fill in your keys
 cp .env.example .env
 
 # Build
 cargo build --release
 
-# Run paper trading
+# Run DEX trading on Arbitrum
 cargo run
 ```
 
@@ -142,65 +159,97 @@ Copy `.env.example` to `.env` and configure:
 # OpenRouter API key (required for AI decisions)
 OPENROUTER_API_KEY=your_key_here
 
-# Kraken API keys (required for Kraken CEX trading only)
-KRAKEN_API_KEY=your_key
-KRAKEN_API_SECRET=your_secret
-
-# 0x API key (required for DEX trading only)
+# 0x API key (required for DEX trading)
 ZEROEX_API_KEY=your_key
 
-# Wallet private key (required for DEX trading only)
-WALLET_PRIVATE_KEY=your_key
+# Wallet private key (required for DEX trading — 0x-prefixed hex)
+WALLET_PRIVATE_KEY=your_private_key
+
+# Kraken API keys (optional — only if using Kraken CEX backend)
+KRAKEN_API_KEY=your_key
+KRAKEN_API_SECRET=your_secret
 ```
 
 ---
 
 ## Configuration
 
-All non-secret settings are in `config/default.toml`:
+All settings in `config/default.toml`:
 
 ```toml
 [exchange]
-name = "kraken"
-backend = "0x"                     # "kraken" (CEX), "0x" (DEX), "1inch" (DEX)
-ws_url = "wss://ws.kraken.com/v2"
-rest_url = "https://api.kraken.com"
+name = "kraken"                    # Candle source (Kraken WebSocket)
+backend = "0x"                     # Execution: "0x" (DEX), "1inch" (DEX), "kraken" (CEX)
 
 [exchange.dex]
-chain_id = 42161                 # Arbitrum
+chain_id = 42161                   # Arbitrum
 rpc_url = "https://arb1.arbitrum.io/rpc"
 slippage_pct = 0.005
 
 [trading]
 pairs = [
-    "BTC/USD", "ETH/USD", "SOL/USD", "XRP/USD",
-    "DOGE/USD", "ADA/USD", "LINK/USD", "AVAX/USD",
+    "BTC/USD", "ETH/USD", "LINK/USD", "DOGE/USD",
+    "ARB/USD", "UNI/USD", "AAVE/USD", "PEPE/USD", "BONK/USD",
 ]
-scan_all_pairs = false           # 455+ pairs, 15+ min/cycle — only if needed
 timeframe = "5m"
 timeframes = ["5m", "1h", "4h", "1d"]
-base_currency = "USD"
 starting_balance = 50.0
-fee_rate = 0.0040                # Kraken Pro base tier taker
-slippage_pct = 0.0005
 
 [risk]
-max_risk_per_trade = 0.20        # 20% per trade ($10 at $50 — fully deployed)
-max_daily_loss = 0.05            # 5% daily halt
-max_drawdown = 0.10              # 10% drawdown kill switch
+max_risk_per_trade = 0.20          # 20% per trade
+max_daily_loss = 0.05              # 5% daily halt
+max_drawdown = 0.10                # 10% kill switch
 max_positions = 3
 min_rr_ratio = 2.0
 
 [ai]
 provider = "openrouter"
-model = "xiaomi/mimo-v2.5-pro"
+model = "xiaomi/mimo-v2.5-pro"     # Any OpenAI-compatible model
 autonomy_level = 3
-max_decisions_per_hour = 20
-knowledge_token_budget = 20000
 temperature = 0.6
-top_p = 0.95
 max_tokens = 16384
-timeout_secs = 300
+```
+
+### Multi-Chain Configuration
+
+```toml
+[chains.arbitrum]
+chain_id = 42161
+rpc_url = "https://arb1.arbitrum.io/rpc"
+enabled = true
+
+[chains.base]
+chain_id = 8453
+rpc_url = "https://mainnet.base.org"
+enabled = false                     # Enable when wallet is funded on Base
+```
+
+---
+
+## CLI Commands
+
+```bash
+# DEX trading on Arbitrum (default)
+cargo run
+
+# Dry run — one cycle, no execution
+cargo run -- --dry-run
+
+# Action test — sandbox scenarios
+cargo run -- --test
+cargo run -- --test -c "Trend Bull" -a -n 20
+
+# Training mode — loop until Brier converges
+cargo run -- --test --train
+
+# Historical data training
+cargo run -- --historical
+
+# API server only (no engine)
+cargo run -- --api-only
+
+# Backtest
+cargo run -- backtest
 ```
 
 ---
@@ -210,155 +259,33 @@ timeout_secs = 300
 ```
 savant-trading/
 ├── src/
-│   ├── agent/                    # AI brain
-│   │   ├── soul.md               # 560-line AI persona (loaded via include_str!)
-│   │   ├── knowledge.rs          # Knowledge unit types and selection
-│   │   ├── prompts.rs            # Modular system prompt composer
-│   │   ├── provider.rs           # OpenAI-compatible LLM client
-│   │   ├── context_builder.rs    # Aggregates data into LLM context
-│   │   ├── decision_parser.rs    # Extracts TradeDecision from JSON
-│   │   └── orchestrator.rs       # Main decision loop
-│   ├── backtest/                 # Historical strategy validation
-│   │   ├── engine.rs             # Candle replay through Strategy trait
-│   │   ├── metrics.rs            # Sharpe, drawdown, win rate, profit factor
-│   │   └── walk_forward.rs       # Walk-forward optimization
-│   ├── core/                     # Types, config, errors
-│   │   ├── config.rs
-│   │   ├── console.rs            # Enterprise logging (savant_log, SavantTimer)
-│   │   ├── types.rs
-│   │   ├── error.rs
-│   │   ├── events.rs
-│   │   ├── session.rs
-│   │   └── shared.rs
-│   ├── data/                     # Market data
-│   │   ├── kraken.rs             # Kraken REST client
-│   │   ├── market_data.rs        # Candle store
-│   │   ├── indicators.rs         # EMA, RSI, ATR, ADX, VWAP
-│   │   ├── orderbook.rs          # Order book
-│   │   └── websocket.rs          # Kraken WebSocket v2 client
-│   ├── execution/                # Trade execution
-│   │   ├── engine.rs             # Execution engine trait
-│   │   ├── paper.rs              # Paper trading simulator
-│   │   └── dex/                  # DEX backends (0x, 1inch on Arbitrum)
-│   │       ├── mod.rs            # Token resolution, DexTrader
-│   │       ├── trader.rs         # DexTrader execution logic
-│   │       ├── zero_x.rs         # 0x API backend
-│   │       └── inch.rs           # 1inch API backend
-│   ├── insight/                  # Live market insight
-│   │   ├── aggregator.rs         # Unified MarketContext
-│   │   ├── sentiment.rs          # Fear & Greed, BTC Dominance
-│   │   ├── funding_rates.rs      # Derivatives data
-│   │   ├── liquidation.rs        # Liquidation clusters
-│   │   ├── flows.rs              # Exchange inflow/outflow
-│   │   ├── onchain.rs            # MVRV, SOPR, NVT
-│   │   ├── news.rs               # News and social sentiment
-│   │   └── rss.rs                # RSS feed fetcher (15 sources)
-│   ├── memory/                   # Episodic memory + calibration
-│   │   ├── episodic.rs           # SQLite WAL decision ledger
-│   │   ├── context.rs            # 6th prompt layer (memory injection)
-│   │   ├── calibration.rs        # Brier score confidence calibration
-│   │   ├── cusum.rs              # CUSUM edge decay detection
-│   │   ├── replay.rs             # Experience replay (lessons from history)
-│   │   ├── semantic.rs           # Semantic consolidation (SQL → patterns)
-│   │   └── anti_pattern.rs       # Anti-pattern detection
-│   ├── sandbox/                  # Synthetic scenario testing
-│   │   ├── generator.rs          # GARCH(1,1) OHLCV generator
-│   │   ├── scenarios.rs          # 50 curated scenarios (11 categories)
-│   │   ├── grader.rs             # 3-tier grading rubric
-│   │   ├── harness.rs            # Scenario runner + report cards
-│   │   ├── feedback.rs           # GEPA-style SOUL.md mutation
-│   │   ├── mock.rs               # Mock API presets
-│   │   └── report.rs             # Report card generation
-│   ├── monitor/                  # Journaling and reporting
-│   │   ├── journal.rs            # SQLite trade journal
-│   │   ├── metrics.rs            # Performance metrics
-│   │   └── report.rs             # CLI reporting
-│   ├── risk/                     # Risk management
-│   │   ├── position.rs           # Position sizing
-│   │   ├── stop_loss.rs          # Stop loss and break-even
-│   │   ├── circuit_breaker.rs    # Drawdown protection + portfolio heat
-│   │   └── correlation.rs        # Multi-asset Pearson correlation matrix
-│   ├── strategy/                 # Rule-based strategies (optional)
-│   │   ├── momentum.rs
-│   │   ├── mean_reversion.rs
-│   │   └── regime.rs
-│   ├── vault/                    # Obsidian vault integration
-│   │   ├── writer.rs
-│   │   ├── watcher.rs
-│   │   └── config.rs
-│   ├── tui/                      # Real-time TUI dashboard (ratatui)
-│   ├── api/                      # REST API server (axum)
-│   ├── engine.rs                 # Main trading loop
-│   ├── main.rs                   # CLI entry point
-│   └── lib.rs                    # Module declarations
+│   ├── agent/                       # AI brain (prompts, provider, parser, orchestrator)
+│   ├── execution/
+│   │   └── dex/                     # DEX backends (0x, 1inch on Arbitrum)
+│   │       ├── mod.rs               # 201 tokens, ChainConfig, multi-chain resolution
+│   │       ├── trader.rs            # DexTrader — EIP-1559 signing, Permit2, eth_call
+│   │       ├── zero_x.rs            # 0x Permit2 + Gasless + Cross-Chain API
+│   │       └── inch.rs              # 1inch fallback backend
+│   ├── data/
+│   │   └── sources/                 # 6 candle sources + SourceRouter
+│   │       ├── kraken.rs, okx.rs, kucoin.rs, gate.io.rs
+│   │       ├── cryptocompare.rs, coingecko.rs
+│   │       └── mod.rs               # SourceRouter with all-zero rejection
+│   ├── insight/                     # Sentiment, on-chain, funding, news
+│   ├── risk/                        # Position sizing, circuit breakers, correlation
+│   ├── memory/                      # Episodic memory, calibration, replay
+│   ├── sandbox/                     # GARCH(1,1) synthetic OHLCV, scenarios
+│   ├── engine.rs                    # Main trading loop (3,850 lines)
+│   └── main.rs                      # CLI entry point
 ├── config/
-│   ├── default.toml              # All non-secret configuration
-│   └── canary.toml               # Canary config for testing
-├── dashboard.html                # Single-file vanilla JS dashboard
-├── knowledge/                    # 10 JSON knowledge files (2,959 units)
-├── templates/
-│   ├── FID-TEMPLATE.md           # Finding ID template
-│   └── SESSION-SUMMARY.md        # Session summary template
-├── transcripts/                  # Curated trading knowledge (11 transcripts)
-├── docs/                         # Research documents (Nova audit in progress)
-├── dev/
-│   ├── LEARNINGS.md              # Cross-session knowledge
-│   ├── fids/                     # Active FIDs
-│   │   └── archive/              # 70 archived FIDs
-│   └── session-summaries/        # Session history
-├── stats.ps1                     # Performance scoreboard
-├── run-canary.ps1                # Canary mode launcher
-├── .env.example                  # Environment template
-├── .gitignore
+│   └── default.toml                 # All non-secret configuration
+├── knowledge/                       # 10 JSON knowledge files (2,959 units)
+├── docs/
+│   └── llms-full.md                 # Full 0x API reference
+├── dev/                             # Session docs, FIDs, LEARNINGS
 ├── Cargo.toml
-├── ECHO.md                       # Agent protocol
-└── README.md
+└── ECHO.md                          # Agent protocol
 ```
-
----
-
-## CLI Commands
-
-```bash
-# Paper trading + API server (default)
-cargo run
-
-# Dry run (one AI decision cycle, print pipeline)
-cargo run -- --dry-run
-
-# API server only (no engine)
-cargo run -- --api-only
-
-# Backtest on historical data
-cargo run -- backtest
-
-# View performance report
-cargo run -- report
-
-# Action test (all scenarios with memory capture)
-cargo run -- --test
-
-# Action test with filters
-cargo run -- --test -c "Trend Bull"         # Filter by category
-cargo run -- --test -a                       # Only Buy/Sell scenarios
-cargo run -- --test -n 20                    # First N scenarios
-cargo run -- --test -c "Crash" -a -n 10      # Combine filters
-
-# Training mode (loop until Brier converges)
-cargo run -- --test --train
-cargo run -- --test --train -a -n 20
-
-# Historical data training (30 days of 5m candles)
-cargo run -- --historical
-
-# Help
-cargo run -- --help
-```
-
-**API endpoints** (available at `http://localhost:8080/api/`):
-`/status` `/config` `/portfolio` `/positions` `/assets` `/trades` `/decisions` `/insight` `/knowledge` `/risk` `/session` `/activity` `/memory` `/training`
-
-**Dashboard:** `http://localhost:8080/dashboard.html`
 
 ---
 
@@ -368,49 +295,36 @@ The risk layer is **independent of the AI brain** — the agent cannot override 
 
 | Circuit Breaker | Threshold | Action |
 |----------------|-----------|--------|
-| Single trade risk | 20% of portfolio ($10 at $50) | Max position size calculated automatically |
-| Daily loss limit | 5% | All trading halted for the day |
-| Drawdown kill switch | 10% | All positions closed, bot stops, manual restart required |
-| Consecutive failures | 3 LLM failures | Fallback to rule-based strategies temporarily |
+| Single trade risk | 20% of portfolio | Max position size calculated automatically |
+| Daily loss limit | 5% | All trading halted |
+| Drawdown kill switch | 10% | All positions closed, manual restart required |
+| Price tolerance | 0.5% drift | Trade rejected (price moved during LLM eval) |
+| Spread filter | 30 bps | Trade rejected (insufficient liquidity) |
+| Security (GoPlus) | Tax >1%, pausable | Trade rejected (unsafe token) |
+| Gas halt | <0.002 ETH | Trading halted until wallet is funded |
 
 ---
 
 ## Development
 
-### Building
-
 ```bash
 cargo build
+cargo test           # 208 tests
 cargo clippy -- -D warnings
-cargo fmt --check
 ```
-
-### Finding IDs (FIDs)
-
-All bugs and improvements are tracked as Finding IDs in `dev/fids/`:
-
-```bash
-ls dev/fids/
-# (empty — all FIDs closed and archived)
-
-ls dev/fids/archive/
-# 50 archived FIDs from development history (FID-001 through 024)
-```
-
-### Current FID Status
-
-| FIDs | Count | Location |
-|------|-------|----------|
-| Active | 0 | `dev/fids/` (clean slate) |
-| Archived | 70 | `dev/fids/archive/` |
 
 ### ECHO Protocol
 
-All development follows the ECHO Protocol defined in `ECHO.md` — a universal agent bootstrap with:
-
-- 4 immutable process laws (Read-0-EOF, Present-Before-Act, Verify-Before-Proceed, No-Speculation)
+All development follows the [ECHO Protocol](ECHO.md):
+- 4 immutable process laws (Read-0-EOF, Present-Before-Act, Verify-Before-Proceed, Call-Graph Reachability)
 - Perfection Loop FSM (RED → GREEN → AUDIT → SELF-CORRECT → COMPLETE)
 - Session lifecycle management
+
+### Findings
+
+Bugs and improvements tracked as FIDs in `dev/fids/`:
+- 0 active FIDs
+- 71 archived
 
 ---
 

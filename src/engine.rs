@@ -1263,10 +1263,9 @@ pub async fn run(
                                         };
 
                                         if positions_to_close.is_empty() {
-                                            warn!(
-                                                "AI {:?} for {} but no open positions found — skipping",
-                                                decision.action, decision.pair,
-                                            );
+                                            // DEX cannot SHORT — must own token to sell it.
+                                            // AI Sell signal skipped until a LONG position is opened first.
+                                            log_phase!("SELL", "{} — no own tokens, cannot SHORT (DEX requires owning the asset)", decision.pair);
                                         } else {
                                             for (pos_id, pos) in &positions_to_close {
                                                 log_trade!("CLOSE", "Position {} for {} (action={:?})", pos_id, decision.pair, decision.action);
