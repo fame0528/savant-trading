@@ -126,7 +126,11 @@ const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
 ];
 
 use std::collections::HashMap;
-use std::sync::OnceLock;
+use std::sync::{Mutex, OnceLock};
+
+/// Runtime token extensions — discovered tokens added at startup.
+/// Merged with the static `ARBITRUM_TOKENS` during resolution.
+static TOKEN_EXTENSIONS: Mutex<Option<HashMap<String, (String, u8)>>> = Mutex::new(None);
 
 pub fn token_map() -> &'static HashMap<&'static str, (&'static str, u8)> {
     static MAP: OnceLock<HashMap<&str, (&str, u8)>> = OnceLock::new();
@@ -137,6 +141,31 @@ pub fn token_map() -> &'static HashMap<&'static str, (&'static str, u8)> {
         }
         m
     })
+}
+
+/// Add discovered tokens to the runtime extension database.
+/// These are merged with the static `ARBITRUM_TOKENS` during resolution.
+pub fn extend_token_db(tokens: &[(String, String, u8)]) {
+    let mut ext = TOKEN_EXTENSIONS.lock().unwrap();
+    let map = ext.get_or_insert_with(HashMap::new);
+    for (symbol, address, decimals) in tokens {
+        map.insert(symbol.clone(), (address.clone(), *decimals));
+    }
+}
+
+/// Look up a token by symbol — checks extensions first, then static DB.
+pub fn lookup_token(symbol: &str) -> Option<(String, u8)> {
+    // Check runtime extensions first
+    let ext = TOKEN_EXTENSIONS.lock().unwrap();
+    if let Some(ref map) = *ext {
+        if let Some(&(ref addr, dec)) = map.get(symbol) {
+            return Some((addr.clone(), dec));
+        }
+    }
+    drop(ext);
+
+    // Fall back to static DB
+    token_map().get(symbol).map(|&(addr, dec)| (addr.to_string(), dec))
 }
 
 /// Resolve a trading pair (e.g. `"ETH/USDC"`) into source + destination
@@ -181,13 +210,11 @@ pub fn resolve_pair(
         parts[1].to_uppercase()
     };
 
-    let map = token_map();
-
-    // Resolve base token — use local DB, or fall back to symbol-based resolution
-    let base = match map.get(base_sym.as_str()) {
-        Some(&(addr, dec)) => TokenInfo {
+    // Resolve base token — check runtime extensions first, then static DB
+    let base = match lookup_token(&base_sym) {
+        Some((addr, dec)) => TokenInfo {
             symbol: base_sym,
-            address: addr.to_string(),
+            address: addr,
             decimals: dec,
         },
         None => TokenInfo {
@@ -197,11 +224,11 @@ pub fn resolve_pair(
         },
     };
 
-    // Resolve quote token — same fallback pattern
-    let quote = match map.get(quote_sym.as_str()) {
-        Some(&(addr, dec)) => TokenInfo {
+    // Resolve quote token — same pattern
+    let quote = match lookup_token(&quote_sym) {
+        Some((addr, dec)) => TokenInfo {
             symbol: quote_sym,
-            address: addr.to_string(),
+            address: addr,
             decimals: dec,
         },
         None => TokenInfo {

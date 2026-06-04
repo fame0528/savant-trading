@@ -282,6 +282,13 @@ pub async fn run(
                 let discovered_pairs = savant_trading::data::token_discovery::tokens_to_pairs(&discovered);
                 info!("Token discovery: {} high-volume Arbitrum tokens found", discovered.len());
 
+                // Feed discovered addresses into the token DB for swap execution
+                let token_entries: Vec<(String, String, u8)> = discovered.iter()
+                    .map(|t| (t.symbol.clone(), t.address.clone(), t.decimals))
+                    .collect();
+                savant_trading::execution::dex::extend_token_db(&token_entries);
+                info!("Token DB: {} discovered addresses added", token_entries.len());
+
                 // Merge: config pairs + discovered pairs (deduplicate)
                 let mut merged = active_pairs;
                 for pair in discovered_pairs {
