@@ -140,6 +140,34 @@ impl PaperTrader {
     }
 
     pub fn check_stops(&mut self, prices: &HashMap<String, f64>) -> Vec<TradeRecord> {
+        // Pass 1: Trail stop-losses as prices move in our favor.
+        // Only for Full-scale positions (not yet scaled out at TP1).
+        for pos in self.positions.values_mut() {
+            if pos.scale_level != ScaleLevel::Full {
+                continue;
+            }
+            if let Some(&price) = prices.get(&pos.pair) {
+                let initial_risk = match pos.side {
+                    Side::Long => pos.entry_price - pos.stop_loss,
+                    Side::Short => pos.stop_loss - pos.entry_price,
+                };
+                if initial_risk <= 0.0 {
+                    continue;
+                }
+                let trail_level = match pos.side {
+                    Side::Long => price - initial_risk,
+                    Side::Short => price + initial_risk,
+                };
+                let should_trail = match pos.side {
+                    Side::Long => trail_level > pos.stop_loss,
+                    Side::Short => trail_level < pos.stop_loss,
+                };
+                if should_trail {
+                    pos.stop_loss = trail_level;
+                }
+            }
+        }
+
         let mut closed = Vec::new();
         let mut to_remove = Vec::new();
         let mut to_update: Vec<(String, f64, ScaleLevel)> = Vec::new();
