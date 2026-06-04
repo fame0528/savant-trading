@@ -102,24 +102,27 @@ pub trait DexBackend: Send + Sync {
 /// Arbitrum token addresses — keyed by uppercase symbol.
 /// Sources: official Arbitrum token list, verified contract addresses.
 const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
+    // Core — verified via Blockscot API (https://arbitrum.blockscout.com/api/v2/tokens)
     ("ETH", "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", 18),
     ("WETH", "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", 18),
     ("USDC", "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", 6),
     ("USDT", "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", 6),
     ("DAI", "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", 18),
     ("WBTC", "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", 8),
+    ("BTC", "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", 8), // BTC = WBTC on Arbitrum
     ("ARB", "0x912CE59144191C1204E64559FE8253a0e49E6548", 18),
-    ("LINK", "0xf97f4df75117a78c1A5a0DBb814Ab92458339c73", 18),
+    ("LINK", "0xf97f4df75117a78c1A5a0DBb814Af92458539FB4", 18),
     ("UNI", "0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0", 18),
-    ("PEPE", "0x25d887Ce7a49172BF65CB5E54e78C488Ef5954e6", 18),
-    ("DOGE", "0xC4dDa7D2Bc614E8dCbf2E0B2E11178c1c4f8258f", 18),
-    // DeFi / L2 — verified on Arbiscan
+    ("PEPE", "0x25d887Ce7a35172C62FeBFD67a1856F20FaEbB00", 18),
+    // DeFi / L2 — verified via Blockscot API
     ("AAVE", "0xba5DdD1f9d7F570dc94a51479a000E3BCE967196", 18),
     ("LDO", "0x13Ad51ed4F1B7e9Dc168d8a00CB3f4DDD85EFA60", 18),
-    ("PENDLE", "0x081e7d23F079975cB6780ED0d7249a5b5123d513", 18),
-    ("RENDER", "0x618E75Ac0c33204D5417B672323C6415a77f0ED5", 18),
-    ("FET", "0x9485293237199462A0ae66497793aF94B73D5C05", 18),
-    ("GRT", "0x9623063377AD1B27A4dC83bE7b22f8d895CF95E0", 18),
+    ("PENDLE", "0x0c880f6761F1af8d9Aa9C466984b80DAb9a8c9e8", 18),
+    ("RENDER", "0xC8a4EeA31E9B6b61c406DF013DD4FEc76f21E279", 18), // RNDR on Arbitrum
+    ("FET", "0x8D2cD4BF7E2196d5204bb15264BdD5E789D00Bad", 8),
+    ("GRT", "0x9623063377AD1B27544C965cCd7342f7EA7e88C7", 18),
+    ("BONK", "0x09199d9A5F4448D0848e4395D065e1ad9c4a1F74", 5),
+    ("DOT", "0x8d010bf9C26881788b4e6bf5Fd1bdC358c8F90b8", 18),
 ];
 
 use std::collections::HashMap;
@@ -319,7 +322,7 @@ mod tests {
         let (src, dst) = resolve_pair("DOT/USDC", Side::Long).unwrap();
         assert_eq!(src.symbol, "USDC");
         assert_eq!(dst.symbol, "DOT");
-        assert!(dst.address.is_empty());
+        assert!(dst.address.starts_with("0x8d01"), "DOT should have Arbitrum address");
     }
 
     #[test]
@@ -365,7 +368,7 @@ mod tests {
         let (_src, dst) = resolve_pair("PENDLE/USDC", Side::Long).unwrap();
         assert_eq!(_src.symbol, "USDC");
         assert_eq!(dst.symbol, "PENDLE");
-        assert!(dst.address.starts_with("0x081e"));
+        assert!(dst.address.starts_with("0x0c88"), "PENDLE should have Arbitrum address");
     }
 
     #[test]
@@ -373,7 +376,7 @@ mod tests {
         let (_src, dst) = resolve_pair("RENDER/USDC", Side::Long).unwrap();
         assert_eq!(_src.symbol, "USDC");
         assert_eq!(dst.symbol, "RENDER");
-        assert!(dst.address.starts_with("0x618E"));
+        assert!(dst.address.starts_with("0xC8a4"), "RENDER (RNDR) should have Arbitrum address");
     }
 
     #[test]
@@ -381,7 +384,7 @@ mod tests {
         let (_src, dst) = resolve_pair("FET/USDC", Side::Long).unwrap();
         assert_eq!(_src.symbol, "USDC");
         assert_eq!(dst.symbol, "FET");
-        assert!(dst.address.starts_with("0x9485"));
+        assert!(dst.address.starts_with("0x8D2c"), "FET should have Arbitrum address");
     }
 
     #[test]

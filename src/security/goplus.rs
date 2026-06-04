@@ -171,8 +171,8 @@ impl GoPlusClient {
     pub async fn check_by_symbol(&self, symbol: &str) -> Result<bool, ExecutionError> {
         // Core assets — skip security check (they're established, not meme coins)
         const CORE_ASSETS: &[&str] = &[
-            "ETH", "LINK", "DOGE", "ARB", "UNI", "AAVE", "LDO", "PENDLE",
-            "RENDER", "FET", "GRT",
+            "BTC", "ETH", "LINK", "DOGE", "ARB", "UNI", "AAVE", "LDO", "PENDLE",
+            "GRT", "BONK", "DOT",
         ];
 
         let upper = symbol.to_uppercase();

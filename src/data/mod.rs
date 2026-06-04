@@ -14,4 +14,5 @@ pub mod market_data;
 pub mod orderbook;
 pub mod sources;
 pub mod tick_data;
+pub mod token_discovery;
 pub mod websocket;
