@@ -696,11 +696,11 @@ pub async fn run(
     );
 
     // Parallel candle fetch — all pairs simultaneously
-    // Source rotation: Kraken → OKX → KuCoin → Gate.io → CryptoCompare → CoinGecko → GeckoTerminal
+    // Source rotation: Kraken → OKX → KuCoin → Gate.io → CryptoCompare → CoinGecko
     // All free, no API keys required (except CoinGecko which has a demo key).
     // Binance/Bybit excluded: geo-blocked in US (HTTP 451/403).
     // CMC excluded: free tier doesn't support OHLCV endpoint.
-    // DexScreener excluded: free API has no OHLCV endpoint.
+    // GeckoTerminal excluded (FID-046): 99% failed requests, 30 req/min rate limit.
     let candle_router = std::sync::Arc::new(savant_trading::data::sources::SourceRouter::new(vec![
         Box::new(savant_trading::data::sources::kraken::KrakenSource::new(&config.exchange.rest_url)),
         Box::new(savant_trading::data::sources::okx::OkxSource::new()),
@@ -708,7 +708,6 @@ pub async fn run(
         Box::new(savant_trading::data::sources::gate::GateSource::new()),
         Box::new(savant_trading::data::sources::cryptocompare::CryptoCompareSource::new()),
         Box::new(savant_trading::data::sources::coingecko::CoinGeckoSource::new()),
-        Box::new(savant_trading::data::sources::geckoterminal::GeckoTerminalSource::new()),
     ]));
 
     let mut candle_futures = tokio::task::JoinSet::new();
@@ -767,6 +766,9 @@ pub async fn run(
     // Track PaperTrader position ID → ExecutionEngine position ID mapping
     // Used for stop-loss placement and position close routing across the two systems
     let mut executor_position_map: HashMap<String, String> = HashMap::new();
+
+    // FID-046: Dead token cache — skip pairs that returned all-zero candles
+    let mut dead_tokens: std::collections::HashSet<String> = std::collections::HashSet::new();
 
     let mut tick = 0u64;
 
@@ -862,13 +864,26 @@ pub async fn run(
         }
 
         // === PHASE 1b: Sequential processing — indicators, context, LLM prep ===
+        // FID-046: Show balance at cycle start
+        if let Some(ref ex) = executor {
+            log_phase!("CYCLE", "Balance: ${:.2} USDC | Chain: {} (id={}) | Cycle #{}",
+                ex.balance(), "Arbitrum", 42161, tick);
+        }
         let mut pair_data_vec: Vec<PairData> = Vec::new();
         let market_ctx = insight.cached().clone();
         let positions: Vec<Position> = paper.positions().values().cloned().collect();
         let recent_trades = paper.closed_trades().to_vec();
         let current_session = savant_trading::core::session::current_session();
 
+        // FID-046: Retry dead tokens every 10 cycles
+        if tick.is_multiple_of(10) {
+            dead_tokens.clear();
+        }
+
         for pair in &active_pairs {
+            if dead_tokens.contains(pair.as_str()) {
+                continue;
+            }
             if let Some(store) = market_stores.get(pair.as_str()) {
                 let candle_data: Vec<Candle> = store.candles().iter().cloned().collect();
                 if candle_data.len() < 20 {
@@ -900,6 +915,9 @@ pub async fn run(
                 let nonzero_count = candle_data.iter().filter(|c| c.close > 0.0 && c.volume > 0.0).count();
                 let nonzero_pct = nonzero_count as f64 / candle_data.len() as f64;
                 if nonzero_pct < 0.3 {
+                    if nonzero_count == 0 {
+                        dead_tokens.insert(pair.to_string());
+                    }
                     continue;
                 }
 
@@ -1102,6 +1120,10 @@ pub async fn run(
         log_phase!("PHASE2", "Complete: {}/{} pairs evaluated", all_results.len(), active_pairs.len());
 
         // === PHASE 3: Process all results sequentially ===
+        let total_results = all_results.len();
+        let mut pass_count = 0usize;
+        let mut pass_confident = false;
+        let mut buy_sell_count = 0usize;
         for pr in all_results {
             let response = match pr.response {
                 Ok(r) => r,
@@ -1221,8 +1243,14 @@ pub async fn run(
                     // Skip execution for Hold decisions
                     if decision.action == savant_trading::agent::decision_parser::TradeAction::Pass
                     {
+                        if decision.confidence >= 0.25 {
+                            pass_confident = true;
+                        }
+                        pass_count += 1;
                         continue;
                     }
+
+                    buy_sell_count += 1;
 
                     info!(
                         "AI DECISION: {:?} {} {} @ {:.2} | SL: {:.2} | TP1: {:.2} | Conf: {:.0}% | R:R: {:.2} | Reason: {}",
@@ -1503,8 +1531,20 @@ pub async fn run(
                                                 }
                                             }
                                         } else {
-                                            log_swap_fail!("BUY REJECTED", "{} — R:R invalid (claim:2.0, actual: entry={} stop={} tp1={})",
-                                                decision.pair, decision.entry_price, decision.stop_loss, decision.take_profit_1);
+                                            let actual_rr = match decision.side {
+                                                Side::Long => {
+                                                    if decision.entry_price > decision.stop_loss && decision.stop_loss > 0.0 {
+                                                        (decision.take_profit_1 - decision.entry_price) / (decision.entry_price - decision.stop_loss)
+                                                    } else { 0.0 }
+                                                }
+                                                Side::Short => {
+                                                    if decision.stop_loss > decision.entry_price && decision.entry_price > 0.0 {
+                                                        (decision.entry_price - decision.take_profit_1) / (decision.stop_loss - decision.entry_price)
+                                                    } else { 0.0 }
+                                                }
+                                            };
+                                            log_swap_fail!("BUY REJECTED", "{} — claimed R:R={:.1}, actual={:.1} (entry={} stop={} tp={})",
+                                                decision.pair, decision.risk_reward, actual_rr, decision.entry_price, decision.stop_loss, decision.take_profit_1);
                                         }
                                     }
                                     TradeAction::Pass => unreachable!(),
@@ -1521,6 +1561,12 @@ pub async fn run(
                     warn!("Parse error for {}: {}", pr.pair, e);
                 }
             }
+        }
+
+        // FID-046: Summary when no actionable setups found
+        if buy_sell_count == 0 && pass_count > 0 && !pass_confident {
+            log_phase!("CYCLE", "No actionable setups — 0/{} pairs ({} evaluated, {} dead)",
+                pass_count, total_results, dead_tokens.len());
         }
 
         // Check stops for all positions after processing all pairs

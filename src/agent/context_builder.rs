@@ -325,6 +325,21 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
         ctx.market_context.summary()
     ));
 
+    // FID-046: Fear & Greed context boost
+    if let Some(fg) = ctx.market_context.sentiment.fear_greed_index {
+        if fg < 15 {
+            msg.push_str(&format!(
+                "EXTREME FEAR ({}): Historically >70% win-rate for LONG entries within 7 days. Consider borderline setups.\n",
+                fg
+            ));
+        } else if fg > 80 {
+            msg.push_str(&format!(
+                "EXTREME GREED ({}): Historically favors SHORT entries within 14 days. Consider borderline setups.\n",
+                fg
+            ));
+        }
+    }
+
     // On-chain analytics
     let oc = &ctx.market_context.onchain;
     if oc.mvrv.is_some() || oc.sopr.is_some() || oc.nvt_signal.is_some() {

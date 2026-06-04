@@ -212,7 +212,7 @@ mod tests {
     fn might_have_requires_token_address() {
         let src = DexScreenerSource::new();
         // BTC has an address in the DB
-        assert!(src.might_have("BTC/USD"));
+        assert!(src.might_have("WBTC/USD"), "DexScreener should support WBTC (BTC→WBTC mapping)");
         // A fake token won't
         assert!(!src.might_have("FAKE/USD"));
     }

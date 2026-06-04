@@ -212,7 +212,7 @@ mod tests {
     fn might_have_requires_token_address() {
         let src = GeckoTerminalSource::new();
         // BTC has an address in the DB
-        assert!(src.might_have("BTC/USD"));
+        assert!(src.might_have("WBTC/USD"), "GeckoTerminal should support WBTC (BTC→WBTC mapping)");
         // A fake token won't
         assert!(!src.might_have("FAKE/USD"));
     }

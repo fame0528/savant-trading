@@ -194,9 +194,7 @@ pub const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
 
     // Core routing assets
     ("WETH", "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", 18),
-    ("ETH", "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", 18),
     ("WBTC", "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", 8),
-    ("BTC", "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", 8),
 
     // Top volume tokens (CoinGecko + Arbiscan verified)
     ("CELR", "0x3a8b787f78d775aecfeea15706d4221b40f345ab", 18),
@@ -497,6 +495,13 @@ pub fn resolve_pair_on_chain(
     }
 
     let base_sym = parts[0].to_uppercase();
+    let base_sym = if base_sym == "ETH" {
+        "WETH".to_string()
+    } else if base_sym == "BTC" {
+        "WBTC".to_string()
+    } else {
+        base_sym
+    };
     let quote_sym = if parts[1].to_uppercase() == "USD" {
         "USDC".to_string()
     } else {
@@ -565,9 +570,10 @@ mod tests {
 
     #[test]
     fn resolve_eth_usdc_long() {
+        // ETH → WETH mapping (FID-046): same address, no duplicate LLM evaluation
         let (src, dst) = resolve_pair("ETH/USDC", Side::Long).unwrap();
         assert_eq!(src.symbol, "USDC");
-        assert_eq!(dst.symbol, "ETH");
+        assert_eq!(dst.symbol, "WETH");
         assert!(dst.address.starts_with("0x82aF"));
         assert_eq!(dst.chain_id, 42161);
     }
@@ -575,7 +581,7 @@ mod tests {
     #[test]
     fn resolve_eth_usdc_short() {
         let (src, dst) = resolve_pair("ETH/USDC", Side::Short).unwrap();
-        assert_eq!(src.symbol, "ETH");
+        assert_eq!(src.symbol, "WETH");
         assert_eq!(dst.symbol, "USDC");
     }
 
@@ -715,11 +721,12 @@ mod tests {
 
     #[test]
     fn resolve_on_base_chain() {
+        // ETH → WETH on Base (WETH address is different from Arbitrum)
         let (src, dst) = resolve_pair_on_chain("ETH/USDC", Side::Long, 8453).unwrap();
         assert_eq!(src.symbol, "USDC");
         assert_eq!(src.chain_id, 8453);
         assert_eq!(src.address, "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913");
-        assert_eq!(dst.symbol, "ETH");
+        assert_eq!(dst.symbol, "WETH");
         assert_eq!(dst.chain_id, 8453);
     }
 
