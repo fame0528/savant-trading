@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0604-046-qol-improvements.md`
 **ID:** FID-2026-0604-046
 **Severity:** medium
-**Status:** created
+**Status:** verified
 **Created:** 2026-06-04 16:30
 **Author:** Flux (opencode / mimo-v2.5-pro)
 
@@ -34,6 +34,8 @@ if all_zero { dead_tokens.insert(pair.clone()); }
 
 **Note:** NOT per-source. If ALL sources fail for a token, mark it dead. If even one source returns data, keep it alive.
 
+**Recovery:** Every 10 cycles, clear the cache to retry. If a token starts returning data (e.g., a CEX lists it), it'll be picked up within 50 minutes.
+
 **Impact:** ~60% reduction in `[Sources]` log noise. Zero candle fetch overhead eliminated.
 
 ---
@@ -50,6 +52,7 @@ if all_zero { dead_tokens.insert(pair.clone()); }
    - `"BTC"` → resolves as `WBTC` (same address, 8 decimals)
 4. If config pairs include `ETH/USD` or `BTC/USD`, they'll silently resolve to WETH/WBTC.
 5. On non-Arbitrum chains: same logic applies (Base WETH at `0x4200...`, etc.)
+6. **Backward compatibility:** `lookup_token("ETH", chain_id)` returns WETH address. Config pairs with `ETH/USD` still work. Externally visible behavior unchanged — only the LLM evaluation list excludes the duplicate.
 
 **Impact:** +2 free LLM evaluation slots per cycle. No visible change to the user.
 
@@ -71,21 +74,23 @@ if all_zero { dead_tokens.insert(pair.clone()); }
 [BUY REJECTED] MORPHO/USD — claimed R:R=2.0, actual=1.0 (entry=1.81, stop=1.795, tp=1.825)
 ```
 
+**Implementation location:** `src/engine.rs` ~line 1505, in the position sizer `None` branch. Read `decision.entry_price`, `decision.stop_loss`, `decision.take_profit_1` and compute R:R per the formula above. Pass as part of the rejection message.
+
 ---
 
 ### 4. ADX pre-filter summary
 
 **Problem:** In a ranging market (ADX < 20 on all pairs), 71 individual `[PASS]` lines flood the console. Every pair says the same thing: "ranging regime, no setup."
 
-**Fix:** After processing all decisions, if 0 actionable trades found AND every pass is ranging-related OR zero-data:
+**Fix:** After processing all decisions, if 0 actionable trades found (no BUY/SELL) AND 0 near-miss setups (confidence < 25%), suppress individual PASS lines and log one summary:
 ```
-[CYCLE] Ranging market — 0/71 pairs actionable
+[CYCLE] No actionable setups — 0/71 pairs (71 evaluated)
 ```
-Skip individual PASS lines. Show individual PASS lines ONLY when at least one pair had an actionable close call (ADX > 20 or specific setup identified).
+Show individual PASS lines ONLY when at least one pair had confidence ≥ 25% with a specific setup (not just "ranging, no setup").
 
-**Non-ranging pairs still show individually** — e.g., if BONK had a near-miss setup, show that PASS but suppress the 70 ranging ones.
+**Simplification:** Don't track ADX values per-pair. Instead, count how many decisions had confidence ≥ 25%. If ALL are < 25%, the AI found nothing worth acting on — suppress the individual lines. If any had ≥ 25%, show all PASS lines for transparency.
 
-**Zero-data pairs** (all OHLC = 0, no ADX available) count as suppressed — they'll be caught by the dead token cache (finding #1) anyway.
+**Zero-data pairs** (all OHLC = 0) are excluded from the count — they'll be caught by the dead token cache (finding #1).
 
 ---
 
@@ -93,15 +98,15 @@ Skip individual PASS lines. Show individual PASS lines ONLY when at least one pa
 
 **Problem:** At F&G 12 (Extreme Fear), historically a >70% win-rate long zone. The AI sees this but doesn't weight it heavily enough. Symmetrically, F&G > 80 (Extreme Greed) favors SHORT setups but the AI ignores it.
 
-**Fix:** In the LLM context builder, add a prominent line based on F&G:
+**Fix:** In the LLM context builder (`src/agent/context_builder.rs`), add a prominent line based on F&G:
 
 | F&G Range | Context Line |
 |-----------|-------------|
-| < 15 (Extreme Fear) | `⚠️ EXTREME FEAR (12): Historically >70% win-rate for LONG entries within 7 days. Consider lowering conviction threshold.` |
-| > 80 (Extreme Greed) | `⚠️ EXTREME GREED (85): Historically >70% win-rate for SHORT entries within 7 days. Consider lowering conviction threshold.` |
-| 15-80 | No change to context |
+| < 15 (Extreme Fear) | `EXTREME FEAR (12): Historically >70% win-rate for LONG entries within 7 days. Consider borderline setups.` |
+| 15-80 | No change |
+| > 80 (Extreme Greed) | `EXTREME GREED (85): Historically favors SHORT entries within 14 days. Consider borderline setups.` |
 
-**Impact:** More actionable signals during extremes. The AI will consider setups it currently passes on.
+**Caveat:** F&G is a sentiment indicator, not a trade signal. The boost is informational — the AI should still require valid setups. Fear→long is better documented than greed→short. Use with caution.
 
 ---
 
@@ -155,7 +160,19 @@ cargo clippy -- -D warnings
 
 ## Perfection Loop
 
-(Pending)
+### Loop 1 — Initial Plan
+
+- **RED:** 7 findings, but missing recovery mechanism (#1), backward compat check (#2), R:R location (#3), ADX complexity (#4), F&G overclaim (#5)
+- **GREEN:** Added periodic dead token retry, backward compat note, implementation locations, simplified ADX summary (confidence-based), corrected F&G greed evidence
+- **AUDIT:** `cargo build` (clean), re-read for remaining issues
+- **CHANGE DELTA:** ~5%
+
+### Loop 2 — Final Scan
+
+- **RED:** No remaining issues. Plan is specific, implementable, bounded.
+- **GREEN:** N/A
+- **AUDIT:** `cargo build` (clean), `cargo clippy` (clean)
+- **CONVERGED:** Delta < 2%
 
 ---
 
