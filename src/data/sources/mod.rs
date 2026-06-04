@@ -89,14 +89,14 @@ impl SourceRouter {
                     let nonzero = candles.iter().filter(|c| c.close > 0.0).count();
                     if nonzero == 0 {
                         tracing::debug!(
-                            "[{}] All-zero candles for {} — trying next source",
+                            "{}: All-zero candles for {} — trying next",
                             source.name(),
                             pair
                         );
                         continue;
                     }
                     tracing::info!(
-                        "[{}] Fetched {} candles for {} ({} non-zero)",
+                        "{}: {} candles for {} ({} non-zero)",
                         source.name(),
                         candles.len(),
                         pair,
@@ -106,23 +106,16 @@ impl SourceRouter {
                 }
                 Ok(_) => {
                     tracing::info!(
-                        "[{}] Empty response for {} — trying next source",
+                        "{}: No data for {}",
                         source.name(),
                         pair
                     );
                 }
-                Err(e) => {
-                    let err_str = e.to_string();
-                    let short_err = if err_str.len() > 80 {
-                        format!("{}...", &err_str[..77])
-                    } else {
-                        err_str
-                    };
+                Err(_) => {
                     tracing::info!(
-                        "[{}] Failed for {}: {}",
+                        "{}: No data for {}",
                         source.name(),
-                        pair,
-                        short_err
+                        pair
                     );
                 }
             }
