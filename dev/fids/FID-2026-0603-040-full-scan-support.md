@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0603-040-full-scan-support.md`
 **ID:** FID-2026-0603-040
 **Severity:** critical
-**Status:** created
+**Status:** implemented
 **Created:** 2026-06-03 20:00
 **Author:** Agent
 
