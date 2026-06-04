@@ -22,7 +22,7 @@ pub const ORANGE_BOLD: &str = "\x1b[1;33m";
 pub const RED_BOLD: &str = "\x1b[1;31m";
 pub const WHITE_BOLD: &str = "\x1b[1;97m";
 
-pub const GREY_DIM: &str = "\x1b[90m";
+pub const GREY_DIM: &str = "\x1b[2;37m";
 pub const RESET: &str = "\x1b[0m";
 
 // Legacy aliases
@@ -73,9 +73,9 @@ pub enum LogLevel {
 /// Colors flow continuously — no RESET between segments.
 pub fn savant_log(level: LogLevel, action: &str, result: &str) {
     let (action_color, result_color) = match level {
-        LogLevel::Phase => (WHITE_BOLD, WHITE_FG),
+        LogLevel::Phase => (CYAN_BOLD, WHITE_FG),
         LogLevel::Llm => (CYAN_BOLD, WHITE_FG),
-        LogLevel::LlmDone => (GREEN_BOLD, GREEN_FG),
+        LogLevel::LlmDone => (GREEN_BOLD, WHITE_FG),
         LogLevel::Decision => (CYAN_BOLD, WHITE_FG),
         LogLevel::DecisionBuy => (GREEN_BOLD, GREEN_FG),
         LogLevel::DecisionSell => (RED_BOLD, RED_FG),
@@ -86,7 +86,7 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
         LogLevel::Swap => (CYAN_FG, WHITE_FG),
         LogLevel::SwapOk => (GREEN_BOLD, GREEN_FG),
         LogLevel::SwapFail => (RED_BOLD, RED_FG),
-        LogLevel::Vault => (GREY_FG, WHITE_FG),
+        LogLevel::Vault => ("\x1b[34m", GREY_FG),
         LogLevel::Circuit => (RED_BOLD, RED_FG),
         LogLevel::Warn => (ORANGE_BOLD, ORANGE_FG),
     };
