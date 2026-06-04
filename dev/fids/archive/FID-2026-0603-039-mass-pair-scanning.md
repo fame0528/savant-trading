@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0603-039-mass-pair-scanning.md`
 **ID:** FID-2026-0603-039
 **Severity:** critical
-**Status:** created
+**Status:** closed
 **Created:** 2026-06-03 19:45
 **Author:** Agent
 
