@@ -296,7 +296,6 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                 to_retry.push(swap);
             }
         }
-        // Put back entries that weren't drained
         self.retry_queue = kept;
         to_retry
     }
@@ -752,6 +751,80 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
     // ---- Stop monitoring ----
 
+    // ---- ERC-20 approve for Permit2 ----
+
+    /// Ensure a token is approved for the Permit2 contract.
+    /// This is REQUIRED before any Permit2 swap can succeed.
+    /// Checks current allowance and sends approve(max) if insufficient.
+    async fn ensure_permit2_approval(&self, token_address: &str, amount_wei: &str) -> Result<(), ExecutionError> {
+        const PERMIT2_ADDRESS: &str = "0x000000000022d473030f116ddee9f6b43ac78ba3";
+
+        let padded_owner = format!("{:0>64}", format!("{:x}", self.wallet_address).trim_start_matches("0x"));
+        let padded_spender = format!("{:0>64}", PERMIT2_ADDRESS.trim_start_matches("0x"));
+
+        // allowance(owner, spender) selector: 0xdd62ed3e
+        let call_data = format!("0xdd62ed3e{}{}", padded_owner, padded_spender);
+        let call_params = serde_json::json!([{
+            "to": token_address,
+            "data": call_data
+        }, "latest"]);
+
+        let current_allowance = match self.rpc_call("eth_call", call_params).await {
+            Ok(result) => {
+                let hex_str = result.as_str().unwrap_or("0x0");
+                U256::from_str_radix(hex_str.trim_start_matches("0x"), 16)
+                    .unwrap_or(U256::ZERO)
+            }
+            Err(e) => {
+                warn!("Failed to check {} allowance: {} — assuming zero", token_address, e);
+                U256::ZERO
+            }
+        };
+
+        let required = U256::from_str_radix(amount_wei, 10).unwrap_or(U256::ZERO);
+
+        if current_allowance >= required && current_allowance > U256::ZERO {
+            tracing::debug!("Token {} allowance sufficient: current={}, required={}", token_address, current_allowance, required);
+            return Ok(());
+        }
+
+        info!(
+            "Token {} allowance insufficient for Permit2 (current={}, required={}). \
+             Sending approve(max) transaction...",
+            token_address, current_allowance, required
+        );
+
+        // approve(spender, amount) selector: 0x095ea7b3
+        // max uint256 = 2^256 - 1
+        let max_approval = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+        let approve_data = format!(
+            "0x095ea7b3{}{}",
+            padded_spender,
+            max_approval
+        );
+
+        let token_addr: Address = token_address.parse()
+            .map_err(|_| ExecutionError::Other(format!("Invalid token address: {}", token_address)))?;
+
+        let approve_bytes = hex::decode(&approve_data[2..])
+            .map_err(|e| ExecutionError::Other(format!("Invalid approve calldata: {}", e)))?;
+
+        // Use a reasonable gas limit for approve (typically ~45K on Arbitrum)
+        let tx_hash = self.sign_and_send(token_addr, &approve_bytes, U256::ZERO, 100_000).await?;
+        info!("Token {} approve(max) for Permit2 sent: tx={}", token_address, tx_hash);
+
+        // Wait for confirmation
+        let receipt = self.wait_for_receipt(&tx_hash).await?;
+        if receipt.status != 1 {
+            return Err(ExecutionError::Other(
+                format!("Token {} approve(max) for Permit2 reverted on-chain", token_address)
+            ));
+        }
+        info!("Token {} approve(max) for Permit2 confirmed (gas={})", token_address, receipt.gas_used);
+
+        Ok(())
+    }
+
     // ---- State persistence (FID-018) ----
 
     /// Persist current positions, closed trades, and balance to disk.
@@ -904,8 +977,16 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
 
         let (src_token, dst_token) = resolve_pair(pair, side)?;
         let entry_price = price.unwrap_or(0.0);
-        let order_value = entry_price * quantity;
-        let amount_wei = amount_to_wei(order_value, src_token.decimals);
+        // LONG: src=USDC, amount = entry_price * quantity (USDC value)
+        // SHORT: src=base token, amount = quantity (token amount)
+        let order_value = match side {
+            Side::Long => entry_price * quantity,
+            Side::Short => entry_price * quantity, // USD value for balance tracking
+        };
+        let amount_wei = match side {
+            Side::Long => amount_to_wei(order_value, src_token.decimals),
+            Side::Short => amount_to_wei(quantity, src_token.decimals),
+        };
 
         info!(
             "DEX {} {} {} | src={} dst={} qty_wei={}",
@@ -916,6 +997,19 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
             dst_token.symbol,
             amount_wei
         );
+
+        // CRITICAL: Ensure source token is approved for the Permit2 contract before swapping.
+        // Without this, the Permit2 contract cannot transfer tokens on our behalf.
+        if src_token.address.is_empty() {
+            return Err(ExecutionError::Other(format!(
+                "Cannot approve token '{}' — no address in local DB. Use a token with a known address.",
+                src_token.symbol
+            )));
+        }
+        if let Err(e) = self.ensure_permit2_approval(&src_token.address, &amount_wei).await {
+            log_swap_fail!("APPROVE", "Permit2 approval failed: {}", e);
+            return Err(e);
+        }
 
         let tx_hash = self
             .execute_swap(&src_token, &dst_token, &amount_wei)
@@ -980,6 +1074,18 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         )?;
         let qty_wei = amount_to_wei(pos.quantity, src_token.decimals);
 
+        // CRITICAL: Ensure source token is approved for Permit2 before closing.
+        if src_token.address.is_empty() {
+            return Err(ExecutionError::Other(format!(
+                "Cannot approve token '{}' for close — no address in local DB.",
+                src_token.symbol
+            )));
+        }
+        if let Err(e) = self.ensure_permit2_approval(&src_token.address, &qty_wei).await {
+            log_swap_fail!("APPROVE", "Permit2 approval failed on close: {}", e);
+            return Err(e);
+        }
+
         let tx_hash = self.execute_swap(&src_token, &dst_token, &qty_wei).await?;
         info!("DEX closed: {} | tx={}", pos.pair, tx_hash);
 
@@ -990,8 +1096,8 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         };
         let fee_est = exit_price * pos.quantity * 0.001;
         let pnl = gross_pnl - fee_est;
-        // Return full proceeds: entry value + PnL
-        let proceeds = pos.entry_price * pos.quantity + gross_pnl;
+        // Return net proceeds: entry value + PnL - closing fee
+        let proceeds = pos.entry_price * pos.quantity + gross_pnl - fee_est;
         self.balance += proceeds;
 
         self.closed_trades.push(TradeRecord {

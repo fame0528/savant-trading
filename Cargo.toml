@@ -4,6 +4,7 @@ version = "0.8.0"
 edition = "2021"
 rust-version = "1.91"
 description = "AI-native autonomous crypto trading engine — Multi-chain DEX (Arbitrum, 0x API)"
+default-run = "savant"
 
 [dependencies]
 # Async runtime

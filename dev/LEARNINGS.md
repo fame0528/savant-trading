@@ -1,5 +1,15 @@
 # LEARNINGS
 
+## Session 2026-06-04 16:00: Production Audit + Nova Cross-Reference
+
+**Key Learnings:**
+
+- **ERC-20 approve() is required for Permit2.** The 0x Permit2 flow needs TWO authorizations: (1) ERC-20 approve(Permit2, max) so the Permit2 contract can transfer tokens, (2) EIP-712 Permit2 signature so the router can spend via Permit2. We had step 2 but not step 1. This was likely the #1 reason no swap ever succeeded.
+- **SHORT orders need different amount_wei calculation.** For LONG (buy base with USDC): `amount_to_wei(entry_price * quantity, 6)`. For SHORT (sell base for USDC): `amount_to_wei(quantity, base_decimals)`. Using `entry_price * quantity` for SHORT sends the USD value as token amount — off by a factor of `entry_price`.
+- **Nova audit found 17 findings.** 3 Critical, 6 High, 5 Medium, 3 Low. Cross-referencing against code confirmed 6 actionable fixes. The remaining findings (f64 precision, eth_call state mismatch, exchange proxy validation) are lower priority for a $50 account.
+- **Dead scaffolding is expensive.** The `dashboard/` Next.js scaffold was 397MB including `node_modules/`. Removing it cut the repo size significantly. Always gitignore `node_modules/` immediately.
+- **Version drift happens silently.** `protocol.config.yaml` was 0.7.1 while `Cargo.toml` was 0.8.0. The boot sequence checks for `CHANGE_ME` but not for version mismatches. Consider adding a version consistency check.
+
 ## Session 2026-06-04: Permit2 Signature Fix + Multi-Source Candle Architecture
 
 **Key Learnings:**

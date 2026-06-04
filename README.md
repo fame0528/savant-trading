@@ -80,7 +80,7 @@ Rule-Based Strategies ──→ Optional parallel signals (comparison only)
 - **Modular Prompts** — System prompt composed from 5 independent layers + 6th memory context layer
 - **Structured Decisions** — AI outputs JSON with entry, stop, 3 take-profit levels, confidence score, and reasoning
 - **Fallback Mode** — Rule-based strategies activate automatically if LLM is unavailable
-- **DEX Execution** — 0x API v2 on Arbitrum (no KYC). EIP-1559 signing, Permit2 EIP-712 approval (with 32-byte length prefix), eth_call dry-run, receipt verification, 3-retry logic, 50% gas buffer
+- **DEX Execution** — 0x API v2 on Arbitrum (no KYC). EIP-1559 signing, Permit2 EIP-712 approval (with 32-byte length prefix), ERC-20 approve(max) for Permit2, eth_call dry-run, receipt verification, 3-retry logic, 50% gas buffer
 - **Multi-Source Candles** — 8 sources: Kraken, OKX, KuCoin, Gate.io, CryptoCompare, CoinGecko, GeckoTerminal, Binance. Automatic fallback with all-zero rejection.
 - **198 Arbitrum Tokens** — Real addresses from CoinGecko API. Covers all high-volume tokens on Arbitrum One.
 - **Enterprise Console** — Structured output: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]`. Cyan brand, grey timestamps, color-coded results (BUY=green, SELL=red, PASS=grey)
@@ -299,17 +299,12 @@ savant-trading/
 ├── templates/
 │   ├── FID-TEMPLATE.md           # Finding ID template
 │   └── SESSION-SUMMARY.md        # Session summary template
-├── transcripts/                  # Curated trading knowledge (12 transcripts)
-├── docs/                         # Research documents
-│   ├── DEEP-RESEARCH-QUESTIONS.md
-│   ├── Crypto Trading Knowledge Expansion Roadmap.md
-│   └── KNOWLEDGE-EXPANSION-EXECUTION.md
+├── transcripts/                  # Curated trading knowledge (11 transcripts)
+├── docs/                         # Research documents (Nova audit in progress)
 ├── dev/
 │   ├── LEARNINGS.md              # Cross-session knowledge
-│   ├── MERGE-STRATEGY.md         # Merge strategy for parallel branches
-│   ├── HANDOFF-OTHER-DEV.md      # Instructions for other dev's agent
 │   ├── fids/                     # Active FIDs
-│   │   └── archive/              # Archived FIDs
+│   │   └── archive/              # 70 archived FIDs
 │   └── session-summaries/        # Session history
 ├── stats.ps1                     # Performance scoreboard
 ├── run-canary.ps1                # Canary mode launcher
@@ -404,14 +399,10 @@ ls dev/fids/archive/
 
 ### Current FID Status
 
-| FID | Description | Status |
-|-----|-------------|--------|
-| FID-029 | Port Kraken improvements from feat/kraken-execution-v2 | analyzed |
-
 | FIDs | Count | Location |
 |------|-------|----------|
-| Active (numbered) | 1 | `dev/fids/` |
-| Archived (files) | 50+ | `dev/fids/archive/` |
+| Active | 0 | `dev/fids/` (clean slate) |
+| Archived | 70 | `dev/fids/archive/` |
 
 ### ECHO Protocol
 

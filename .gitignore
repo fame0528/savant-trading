@@ -33,6 +33,8 @@ session-ses_*.md
 *.db-wal
 /logs/
 tick_candles_*.json
+dev/*.json
+dev/*.csv
 
 # === Knowledge source books and extracted (large, not code) ===
 knowledge/books/
@@ -46,6 +48,10 @@ trade-data/
 firebase-debug.log
 .firebaserc
 firebase.json
+
+# === Dead scaffold (Next.js, never used) ===
+dashboard/
+dashboard.html
 
 # === Vault ===
 savant-vault/

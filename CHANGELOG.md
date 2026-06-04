@@ -4,6 +4,48 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.8.0] — 2026-06-04
+
+### Added
+
+- **Permit2 signature fix** — Added 32-byte signature length prefix to calldata encoding. 0x API v2 expects `calldata || sig_length (32 bytes, big-endian) || signature (65 bytes)`. Also uses API-provided `permit2.hash` field instead of computing own EIP-712 hash.
+- **ERC-20 approve for Permit2** — `ensure_permit2_approval()` checks USDC/token allowance for Permit2 contract and sends approve(max) if insufficient. Called before every swap (place_order + close_position).
+- **Multi-source candle architecture** — 6 active sources: Kraken, OKX, KuCoin, Gate.io, CryptoCompare, CoinGecko. 8 total sources including Binance/Bybit (geo-blocked, unused).
+- **OKX candle source** — 40 req/2s, broad coverage, no API key required.
+- **KuCoin candle source** — 300 req/10s, massive altcoin selection.
+- **Gate.io candle source** — 300 req/s, obscure token coverage.
+- **CryptoCompare candle source** — 100K calls/month, US-accessible.
+- **198 Arbitrum tokens** — Real addresses from CoinGecko API `/coins/list?include_platform=true`.
+- **xStock filter** — SPYX, QQQX, GLDX, CRCLX filtered (require 0x opt-in we don't have).
+- **`eth_call` dry-run** — Verifies Permit2 calldata before broadcast.
+- **test_swap.rs binary** — Dry-run swap verification tool.
+
+### Fixed
+
+- **CRITICAL: ERC-20 approve for Permit2** — Missing token approval for Permit2 contract was the likely root cause of all swap failures. `ensure_permit2_approval()` now checks and sets allowance before every swap.
+- **APE token address** — Was `0x7f9FBf9bDd1F0e6E2c2c2c2c2c2c2c2c2c2c2c2c` (truncated placeholder). Fixed to CoinGecko-verified `0x7f9fbf9bdd3f4105c478b996b648fe6e828a1e98`.
+- **AUSDT decimals** — Was 18 (wrong). aUSDT on Aave Arbitrum uses 6 decimals (same as USDT). Fixed.
+- **SHORT order amount_wei** — Was computing `amount_to_wei(entry_price * quantity, decimals)` for SHORT orders, which sends the USD value instead of the token amount. Fixed: SHORT uses `amount_to_wei(quantity, src_decimals)`.
+- **drain_retry_queue** — `kept` was always empty, so retries were lost after drain. Fixed to properly track entries below max_retries.
+- **close_position fee accounting** — Closing fee (0.1%) was not deducted from balance on close. Now subtracts `fee_est` from proceeds.
+- **FallbackBackend priority** — Was trying secondary (1inch) first, now tries primary (0x) first.
+- **Quote failure aborts swap** — Previously "proceeding without spread check" on quote failure.
+- **Volume filter relaxed** — Kraken spot volume irrelevant for Arbitrum DEX tokens; filter skipped in DEX mode.
+- **Non-zero candle threshold** — Lowered from 50% to 30% for DEX mode.
+- **SourceRouter rejects all-zero candle responses** — Kraken returning zeros for unsupported tokens no longer blocks fallback.
+
+### Removed
+
+- **Dead files** — Removed 35+ dead files: dashboard/ scaffold (397MB), API caches (blockscout/cg JSONs), redundant text intermediates, old handoff docs, research prompts, `firebase-debug.log`, `nul` artifact.
+- **Version drift** — Fixed protocol.config.yaml version (was 0.7.1, now 0.8.0). Added default-run to Cargo.toml.
+
+### Archived
+
+- FID-041: Spread filter decimals
+- FID-042: Permit2 signature missing
+- FID-043: Trades reverting on-chain
+- FID-044: Scanning under 100 pairs
+
 ## [0.7.1] — 2026-06-03
 
 ### Added
