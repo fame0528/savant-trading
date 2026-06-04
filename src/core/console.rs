@@ -157,7 +157,7 @@ where
         let (action, action_color, msg_color) = match *level {
             tracing::Level::ERROR => ("ERROR", RED_BOLD, RED_FG),
             tracing::Level::WARN => ("WARN", ORANGE_BOLD, ORANGE_FG),
-            tracing::Level::INFO => ("INFO", CYAN_BOLD, GREY_FG),
+            tracing::Level::INFO => ("INFO", CYAN_BOLD, CYAN_FG),
             tracing::Level::DEBUG => ("DEBUG", GREY_FG, GREY_FG),
             tracing::Level::TRACE => ("TRACE", GREY_DIM, GREY_DIM),
         };
