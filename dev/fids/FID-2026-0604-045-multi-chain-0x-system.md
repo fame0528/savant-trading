@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0604-045-multi-chain-0x-system.md`
 **ID:** FID-2026-0604-045
 **Severity:** high
-**Status:** analyzed
+**Status:** verified
 **Created:** 2026-06-04 18:00
 **Author:** Flux (opencode / mimo-v2.5-pro)
 
@@ -97,10 +97,41 @@ CHAIN_TOKENS: &[ChainToken] = &[
 
 | Constant | Value | Notes |
 |----------|-------|-------|
-| Permit2 Contract | `0x000000000022d473030f116ddee9f6b43ac78ba3` | Same address on all EVM chains |
-| 0x Exchange Proxy | `0xfeea2a79d7d3d36753c8917af744d71f13c9b02a` | Same address on all EVM chains |
+| Permit2 Contract | `0x000000000022d473030f116ddee9f6b43ac78ba3` | Same address on all EVM chains — verified in 0x docs |
 | 0x API Endpoint | `https://api.0x.org/swap/permit2` | Unified, chain selected by `chainId` param |
 | Headers | `0x-api-key`, `0x-version: v2` | Same for all chains |
+
+### Exchange Proxy Address (varies by chain)
+
+**CRITICAL:** The 0x Exchange Proxy address is NOT the same on all chains. It must be validated per-chain. The `transaction.to` field from the API response is the correct router address — do NOT hardcode.
+
+| Chain | Exchange Proxy | Source |
+|-------|---------------|--------|
+| Ethereum | `0xdef1c0ded9bec7f1a1670819833240f027b25eff` | 0x docs |
+| Arbitrum | `0xdef1c0ded9bec7f1a1670819833240f027b25eff` | 0x docs |
+| Base | `0xdef1c0ded9bec7f1a1670819833240f027b25eff` | 0x docs |
+| Polygon | `0xdef1c0ded9bec7f1a1670819833240f027b25eff` | 0x docs |
+
+**Implementation:** Always use `transaction.to` from the 0x API response. Validate it against a known allowlist per chain. Reject if unknown.
+
+### Candle Source Gap
+
+**PROBLEM:** Kraken, OKX, KuCoin only cover tokens they list. Base/BSC/OP-native tokens won't have candle data from these sources.
+
+**SOLUTION:** 
+- Phase 1-2: Only trade tokens that have candle coverage (Kraken/OKX list them)
+- Phase 3+: Add DeFiLlama price API as fallback for chain-native tokens
+- CoinGecko `simple/price` endpoint works for any token with a CoinGecko ID
+- The AI doesn't strictly need candle data — it can use spot price + indicators from DeFiLlama
+
+### Binary Size Mitigation
+
+**PROBLEM:** 500 tokens × 4 chains = 2000 static entries ≈ 200KB in binary.
+
+**SOLUTION:**
+- Keep top 100 per chain as static `const` (most liquid, always scanned)
+- Load remaining tokens at runtime from CoinGecko/DeFiLlama API (like existing `extend_token_db()`)
+- `TOKEN_EXTENSIONS` Mutex already supports runtime loading — use it
 
 ---
 
@@ -150,15 +181,16 @@ CHAIN_TOKENS: &[ChainToken] = &[
 4. Update `lookup_token()` to filter by chain
 5. Add chain-specific USDC addresses:
 
-| Chain | USDC Address | Decimals |
-|-------|-------------|----------|
-| Arbitrum | `0xaf88d065e77c8cC2239327C5EDb3A432268e5831` | 6 |
-| Base | `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` | 6 |
-| Ethereum | `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` | 6 |
-| Optimism | `0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85` | 6 |
-| Polygon | `0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174` | 6 |
-| BSC | `0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d` | 18 |
-| Avalanche | `0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E` | 6 |
+| Chain | USDC Address | Decimals | Notes |
+|-------|-------------|----------|-------|
+| Arbitrum | `0xaf88d065e77c8cC2239327C5EDb3A432268e5831` | 6 | Native USDC |
+| Arbitrum (USDC.e) | `0xff970a61a04b1ca14834a43f5de4533ebddb5cc8` | 6 | Bridged USDC (already in our DB) |
+| Base | `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` | 6 | Native USDC |
+| Ethereum | `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` | 6 | Native USDC |
+| Optimism | `0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85` | 6 | Native USDC |
+| Polygon | `0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359` | 6 | Native USDC (NOT USDC.e) |
+| BSC | `0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d` | **18** | BSC USDC uses 18 decimals — different from all other chains |
+| Avalanche | `0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E` | 6 | Native USDC |
 
 6. Add chain config to `config/default.toml`:
 
@@ -230,7 +262,67 @@ min_gas = 0.005
 
 ---
 
-## Implementation Steps
+## Operational Concerns
+
+### Gas Management (per-chain)
+
+Each chain has its own native gas token. The engine must track gas on every enabled chain:
+
+| Chain | Gas Token | Min for 2 Txs | Balance Check |
+|-------|-----------|---------------|---------------|
+| Arbitrum | ETH | 0.002 ETH (~$5) | `eth_getBalance` via Arb RPC |
+| Base | ETH | 0.001 ETH (~$2.50) | `eth_getBalance` via Base RPC |
+| Optimism | ETH | 0.001 ETH (~$2.50) | `eth_getBalance` via OP RPC |
+| BSC | BNB | 0.005 BNB (~$3) | `eth_getBalance` via BSC RPC |
+
+**Implementation:** `sync_balance()` becomes `sync_balance(chain_id)`. Called per-chain on startup and every N cycles. If gas < min, halt trading on that chain only (don't halt all chains).
+
+### Engine Timeout
+
+**PROBLEM:** 60s engine cycle × 4 chains × 500 tokens = potential timeout.
+
+**SOLUTION:**
+- Parallel chain scanning: `tokio::join!(scan_chain(42161), scan_chain(8453), ...)`
+- Per-chain token limit: top 100 per chain (most liquid) = 400 total
+- Pre-filters run per-chain before AI evaluation
+- If a chain times out, skip it and proceed with others
+
+### Nonce Management
+
+**PROBLEM:** Each chain has独立 nonce. If two swaps fire on different chains simultaneously, nonce tracking must be per-chain.
+
+**SOLUTION:**
+- `get_nonce()` already queries `eth_getTransactionCount` per RPC — works per-chain
+- Just need to ensure each chain's RPC client is独立
+- No shared nonce state between chains
+
+### Slippage Per Chain
+
+**PROBLEM:** 0.5% slippage may be too tight on low-liquidity chains.
+
+**SOLUTION:**
+- Configurable per chain: `[chains.base].slippage_pct = 0.01` (1% for newer chains)
+- Or dynamic: slippage scales with liquidity depth from quote response
+
+### RPC Rate Limits
+
+**PROBLEM:** Public RPC endpoints (arb1.arbitrum.io, mainnet.base.org) have aggressive rate limits.
+
+**SOLUTION:**
+- Use Alchemy/Infura multi-chain RPC (one key, all chains)
+- Or use chain-specific public RPCs with exponential backoff
+- Cache nonce and balance — don't re-query every cycle
+- Config: `[chains.arbitrum].rpc_url = "https://arb-mainnet.g.alchemy.com/v2/YOUR_KEY"`
+
+### Position Chain Tracking
+
+**PROBLEM:** Each position must know which chain it was opened on.
+
+**SOLUTION:**
+- Add `chain_id: u64` field to `Position` struct
+- Store in `DexState` for crash recovery
+- `close_position()` uses `pos.chain_id` to route to correct chain
+- `check_stops()` queries prices on correct chain
 
 ### Phase 1 Steps (Expand Arbitrum)
 
@@ -286,52 +378,79 @@ min_gas = 0.005
 ## Verification
 
 ### Phase 1
-- `cargo test` — 201+ tests pass
-- Engine scan shows 100+ pairs evaluated per cycle
-- No new clippy warnings
+```bash
+cargo test 2>&1 | Select-String "test result"  # 201+ tests pass
+cargo clippy -- -D warnings                      # zero warnings
+cargo run --release -- --dry-run                 # verify 100+ pairs evaluated
+```
 
 ### Phase 2
-- `cargo test` — all tests pass with chain-aware database
-- `resolve_pair("APE/USDC", Long)` returns correct Arbitrum address
-- `resolve_pair("APE/USDC", Long, chain_id=8453)` returns correct Base address (or error if not on Base)
+```bash
+cargo test 2>&1 | Select-String "test result"  # all tests pass
+cargo clippy -- -D warnings                      # zero warnings
+# Verify chain-aware resolution:
+# resolve_pair("APE/USDC", Long) → Arbitrum APE address
+# resolve_pair("APE/USDC", Long, chain_id=8453) → Base APE address or error
+```
 
 ### Phase 3
-- Execute swap on Base chain — receipt confirmed
-- Balance sync shows correct USDC on multiple chains
-- Gas monitoring shows ETH balance on each L2
+```bash
+# Execute swap on Base chain
+cargo run --release -- --chain base --dry-run
+# Verify receipt on Base block explorer
+# Balance sync shows USDC on Arbitrum + Base
+```
 
 ### Phase 4
-- Gasless swap executes without ETH for gas
-- Gas cost deducted from swap output
+```bash
+# Gasless swap on Base — no ETH needed
+cargo run --release -- --chain base --gasless --dry-run
+```
 
 ### Phase 5
-- Cross-chain swap Arbitrum → Base completes
-- `/status` endpoint shows bridge completion
+```bash
+# Cross-chain: Arbitrum USDC → Base WETH
+cargo run --release -- --cross-chain --from arbitrum --to base --dry-run
+```
 
 ---
 
 ## Perfection Loop
 
-### Loop 1 (Phase 1)
+### Loop 1 (Phase 1) — Expand Arbitrum Tokens
 
-- **RED:** 198 tokens is too few, engine evaluates only 35-40 per cycle after pre-filters
-- **GREEN:** Expand to 500+ Arbitrum tokens via CoinGecko API
-- **AUDIT:** Pending
+- **RED:** 198 tokens too few, 35-40 pairs per cycle after pre-filters
+- **GREEN:** Pull 500+ tokens from CoinGecko, filter by volume/address/decimals
+- **AUDIT:** `cargo test` (201+), `cargo clippy` (clean), engine shows 100+ pairs
 - **CHANGE DELTA:** ~5% (token array expansion only)
 
-### Loop 2 (Phase 2)
+### Loop 2 (Phase 2) — Chain-Aware Database
 
-- **RED:** Token database is flat, no chain awareness
-- **GREEN:** Add ChainToken struct, chain config, multi-chain token lists
-- **AUDIT:** Pending
-- **CHANGE DELTA:** ~15% (mod.rs, trader.rs, config changes)
+- **RED:** Token DB is flat, no chain_id field, USDC hardcoded to Arbitrum
+- **GREEN:** Add ChainToken struct, per-chain USDC addresses, chain config in TOML
+- **AUDIT:** `cargo test`, resolve_pair with chain_id parameter works
+- **CHANGE DELTA:** ~15% (mod.rs, config changes)
 
-### Loop 3 (Phase 3)
+### Loop 3 (Phase 3) — Multi-Chain Execution
 
-- **RED:** Execution only works on Arbitrum
-- **GREEN:** Multi-chain RPC clients, chain-aware execution
-- **AUDIT:** Pending
+- **RED:** Execution only on Arbitrum, single RPC client, single gas check
+- **GREEN:** Per-chain RPC clients, chain-aware sync_balance, chain-aware approval
+- **AUDIT:** Execute swap on Base, verify receipt, gas monitoring per chain
 - **CHANGE DELTA:** ~10% (trader.rs, engine.rs)
+
+### Loop 4 (Phase 4) — Gasless API
+
+- **RED:** Need ETH for gas on every chain — operational burden
+- **GREEN:** 0x Gasless API endpoint, gasless trade signing, no gas management
+- **AUDIT:** Gasless swap on Base executes without ETH
+- **CHANGE DELTA:** ~5% (zero_x.rs new endpoint)
+
+### Loop 5 (Phase 5) — Cross-Chain
+
+- **RED:** Can't move capital between chains without manual bridging
+- **GREEN:** Cross-Chain API endpoint, bridge status monitoring, recovery handling
+- **AUDIT:** Cross-chain swap Arbitrum → Base completes
+- **CHANGE DELTA:** ~8% (zero_x.rs new endpoint, status monitoring)
 
 ---
 
@@ -366,5 +485,6 @@ min_gas = 0.005
 - 0x Cheat Sheet: `docs/llms-full.md` line 9643+
 - 0x Gasless API: `docs/llms-full.md` line 5700+
 - 0x Cross-Chain API: `docs/llms-full.md` line 1444-1474
-- Permit2 Contract: `0x000000000022d473030f116ddee9f6b43ac78ba3` (all EVM chains)
-- 0x Exchange Proxy: `0xfeea2a79d7d3d36753c8917af744d71f13c9b02a` (all EVM chains)
+- Permit2 Contract: `0x000000000022d473030f116ddee9f6b43ac78ba3` (all EVM chains — verified)
+- 0x Exchange Proxy: `0xdef1c0ded9bec7f1a1670819833240f027b25eff` (most chains — verify per chain)
+- **IMPORTANT:** Always use `transaction.to` from API response, not hardcoded addresses
