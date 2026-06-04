@@ -128,7 +128,7 @@ const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
 use std::collections::HashMap;
 use std::sync::OnceLock;
 
-fn token_map() -> &'static HashMap<&'static str, (&'static str, u8)> {
+pub fn token_map() -> &'static HashMap<&'static str, (&'static str, u8)> {
     static MAP: OnceLock<HashMap<&str, (&str, u8)>> = OnceLock::new();
     MAP.get_or_init(|| {
         let mut m = HashMap::new();

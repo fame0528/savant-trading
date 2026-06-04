@@ -269,6 +269,38 @@ pub async fn run(
     } else {
         config.trading.pairs.clone()
     };
+
+    // Token discovery (FID-039): Discover high-volume Arbitrum tokens
+    // and merge with config pairs. Only runs when backend is DEX.
+    let active_pairs = if !config.mode.paper_trading && config.exchange.backend != "kraken" {
+        match savant_trading::data::token_discovery::discover_tokens(
+            1_000_000.0,  // min $1M daily volume
+            500,           // min 500 holders
+            200,           // scan top 200 tokens
+        ).await {
+            Ok(discovered) => {
+                let discovered_pairs = savant_trading::data::token_discovery::tokens_to_pairs(&discovered);
+                info!("Token discovery: {} high-volume Arbitrum tokens found", discovered.len());
+
+                // Merge: config pairs + discovered pairs (deduplicate)
+                let mut merged = active_pairs;
+                for pair in discovered_pairs {
+                    if !merged.contains(&pair) {
+                        merged.push(pair);
+                    }
+                }
+                info!("Total pairs after discovery: {}", merged.len());
+                merged
+            }
+            Err(e) => {
+                warn!("Token discovery failed ({}), using config pairs only", e);
+                active_pairs
+            }
+        }
+    } else {
+        active_pairs
+    };
+
     info!("Active pairs ({}): {:?}", active_pairs.len(), active_pairs);
 
     let mut market_stores: HashMap<String, MarketDataStore> = HashMap::new();
