@@ -296,14 +296,16 @@ pub async fn run(
 
     // Token discovery (FID-039): Discover high-volume Arbitrum tokens
     // and merge with config pairs. Only runs when backend is DEX.
+    let mut cg_verified: std::collections::HashSet<String> = std::collections::HashSet::new();
     let active_pairs = if !config.mode.paper_trading && config.exchange.backend != "kraken" {
         // First: load ALL tokens from the static ARBITRUM_TOKENS database
         let mut all_token_entries: Vec<(String, String, u8)> = Vec::new();
         for &(sym, addr, dec) in savant_trading::execution::dex::ARBITRUM_TOKENS {
             all_token_entries.push((sym.to_string(), addr.to_string(), dec));
+            cg_verified.insert(sym.to_string());
         }
         savant_trading::execution::dex::extend_token_db(&all_token_entries);
-        info!("Token DB: {} static tokens loaded", all_token_entries.len());
+        info!("Token DB: {} static tokens loaded ({} CoinGecko-verified)", all_token_entries.len(), cg_verified.len());
 
         // Create pairs from all static tokens
         let mut merged: Vec<String> = active_pairs;
@@ -909,6 +911,14 @@ pub async fn run(
                     continue;
                 }
 
+                // Pre-filter: Skip tokens not verified on CoinGecko (DEX safety)
+                if !config.mode.paper_trading && config.exchange.backend != "kraken" {
+                    if !cg_verified.contains(base_symbol) {
+                        dead_tokens.insert(pair.to_string());
+                        continue;
+                    }
+                }
+
                 // Pre-filter: Skip pairs with mostly-zero candles (corrupted Kraken data)
                 // FID-044: Lowered from 50% to 30% — SourceRouter now rejects all-zero
                 // candles, so surviving data from Binance/CoinGecko should be mostly valid.
@@ -929,7 +939,7 @@ pub async fn run(
                 if avg_volume < 100.0 && (config.mode.paper_trading || config.exchange.backend == "kraken") {
                     continue;
                 }
-                // DEX safety: reject tokens with no price movement (all candles identical)
+                // DEX safety: reject tokens with near-zero price diversity
                 let all_dead = candle_data.iter().all(|c| c.open == c.close && c.high == c.low && c.volume <= 0.0);
                 if all_dead {
                     dead_tokens.insert(pair.to_string());
