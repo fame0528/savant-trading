@@ -74,8 +74,8 @@ pub enum LogLevel {
 pub fn savant_log(level: LogLevel, action: &str, result: &str) {
     let (action_color, result_color) = match level {
         LogLevel::Phase => (WHITE_BOLD, WHITE_FG),
-        LogLevel::Llm => (CYAN_FG, WHITE_FG),
-        LogLevel::LlmDone => (GREEN_FG, GREEN_FG),
+        LogLevel::Llm => (CYAN_BOLD, WHITE_FG),
+        LogLevel::LlmDone => (GREEN_BOLD, GREEN_FG),
         LogLevel::Decision => (CYAN_BOLD, WHITE_FG),
         LogLevel::DecisionBuy => (GREEN_BOLD, GREEN_FG),
         LogLevel::DecisionSell => (RED_BOLD, RED_FG),
