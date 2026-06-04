@@ -1212,7 +1212,7 @@ pub async fn run(
                             std::time::Duration::from_secs(2),
                             mem.capture_episode(&snapshot),
                         ).await {
-                            Ok(Ok(_)) => log_vault!("EPISODIC", "Saved {}", decision.pair),
+                            Ok(Ok(_)) => log_phase!("EPISODIC", "Saved {}", decision.pair),
                             Ok(Err(e)) => log_warn!("EPISODIC", "Failed {}: {}", decision.pair, e),
                             Err(_) => log_warn!("EPISODIC", "Timeout {}", decision.pair),
                         }

@@ -79,7 +79,7 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
         LogLevel::Decision => (CYAN_BOLD, WHITE_FG),
         LogLevel::DecisionBuy => (GREEN_BOLD, GREEN_FG),
         LogLevel::DecisionSell => (RED_BOLD, RED_FG),
-        LogLevel::DecisionPass => (WHITE_FG, WHITE_FG),
+        LogLevel::DecisionPass => (GREY_FG, GREY_FG),
         LogLevel::DecisionClose => (ORANGE_BOLD, ORANGE_FG),
         LogLevel::DecisionAdjust => (ORANGE_FG, ORANGE_FG),
         LogLevel::Trade => (ORANGE_BOLD, ORANGE_FG),
