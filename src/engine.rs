@@ -924,8 +924,17 @@ pub async fn run(
                 // Pre-filter: Skip pairs with negligible volume (< $100 average)
                 // FID-044: Skip this filter in DEX mode — Kraken spot volume is low for
                 // Arbitrum tokens, but real volume is on-chain. The LLM can evaluate them.
+                // FID-046 caveat: Still reject tokens with ZERO candle activity (dead tokens).
                 let avg_volume: f64 = candle_data.iter().map(|c| c.volume).sum::<f64>() / candle_data.len() as f64;
                 if avg_volume < 100.0 && (config.mode.paper_trading || config.exchange.backend == "kraken") {
+                    continue;
+                }
+                // DEX safety: reject tokens with no price movement (all candles identical)
+                let first_close = candle_data.first().map(|c| c.close).unwrap_or(0.0);
+                let last_close = candle_data.last().map(|c| c.close).unwrap_or(0.0);
+                let all_dead = candle_data.iter().all(|c| c.open == c.close && c.high == c.low && c.volume <= 0.0);
+                if all_dead {
+                    dead_tokens.insert(pair.to_string());
                     continue;
                 }
 
