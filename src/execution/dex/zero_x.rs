@@ -456,6 +456,331 @@ impl DexBackend for ZeroXBackend {
     }
 }
 
+impl ZeroXBackend {
+    /// Build a gasless swap via 0x Gasless API (FID-045 Phase 4).
+    ///
+    /// The Gasless API handles approvals and gas payment — no ERC-20 approve()
+    /// and no ETH for gas needed. Gas is deducted from the swap output.
+    ///
+    /// Flow: GET /gasless/quote → sign approval + trade EIP-712 → POST /gasless/submit
+    pub async fn build_gasless_swap_tx(&self, params: &SwapParams) -> Result<GaslessSwapResult, ExecutionError> {
+        // 1. Get gasless quote
+        let base_url = self.api_url(params.chain_id);
+        let slippage_bps = (params.slippage * 10000.0) as u64;
+        let gasless_url = base_url.replace("/swap/permit2", "/gasless");
+        let url = format!(
+            "{}/quote?chainId={}&sellToken={}&buyToken={}&sellAmount={}&taker={}&slippageBps={}",
+            gasless_url, params.chain_id, params.src_token, params.dst_token,
+            params.amount, params.from, slippage_bps,
+        );
+
+        let resp = self.client.get(&url)
+            .header("0x-api-key", &self.api_key)
+            .header("0x-version", "v2")
+            .send().await
+            .map_err(|e| ExecutionError::Other(format!("Gasless quote request failed: {}", e)))?;
+
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let body = resp.text().await.unwrap_or_default();
+            return Err(ExecutionError::Other(format!("Gasless quote returned {}: {}", status, body)));
+        }
+
+        let json: serde_json::Value = resp.json().await
+            .map_err(|e| ExecutionError::Other(format!("Gasless quote parse failed: {}", e)))?;
+
+        // 2. Sign approval EIP-712 (if present)
+        let approval_sig = if let Some(approval) = json.get("approval") {
+            if approval.get("type").and_then(|t| t.as_str()) == Some("permit") {
+                let hash = approval.get("hash").and_then(|h| h.as_str())
+                    .ok_or_else(|| ExecutionError::Other("Gasless approval missing hash".into()))?;
+                let hash_bytes = hex::decode(hash.trim_start_matches("0x"))
+                    .map_err(|e| ExecutionError::Other(format!("Invalid approval hash: {}", e)))?;
+                if hash_bytes.len() != 32 {
+                    return Err(ExecutionError::Other(format!("Approval hash must be 32 bytes, got {}", hash_bytes.len())));
+                }
+                let mut arr = [0u8; 32];
+                arr.copy_from_slice(&hash_bytes);
+                Some(self.sign_hash(arr)?)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        // 3. Sign trade EIP-712
+        let trade = json.get("trade").ok_or_else(|| ExecutionError::Other("Gasless response missing trade".into()))?;
+        let trade_hash = trade.get("hash").and_then(|h| h.as_str())
+            .ok_or_else(|| ExecutionError::Other("Gasless trade missing hash".into()))?;
+        let trade_hash_bytes = hex::decode(trade_hash.trim_start_matches("0x"))
+            .map_err(|e| ExecutionError::Other(format!("Invalid trade hash: {}", e)))?;
+        if trade_hash_bytes.len() != 32 {
+            return Err(ExecutionError::Other(format!("Trade hash must be 32 bytes, got {}", trade_hash_bytes.len())));
+        }
+        let mut trade_arr = [0u8; 32];
+        trade_arr.copy_from_slice(&trade_hash_bytes);
+        let trade_sig = self.sign_hash(trade_arr)?;
+
+        // 4. Build submit payload
+        let mut submit_body = serde_json::json!({
+            "trade": {
+                "type": trade["type"],
+                "eip712": trade["eip712"],
+                "signature": trade_sig,
+            }
+        });
+
+        if let (Some(approval), Some(sig)) = (json.get("approval"), approval_sig) {
+            submit_body["approval"] = serde_json::json!({
+                "type": approval["type"],
+                "eip712": approval["eip712"],
+                "signature": sig,
+            });
+        }
+
+        // 5. Submit
+        let submit_url = format!("{}/submit", gasless_url);
+        let submit_resp = self.client.post(&submit_url)
+            .header("0x-api-key", &self.api_key)
+            .header("0x-version", "v2")
+            .json(&submit_body)
+            .send().await
+            .map_err(|e| ExecutionError::Other(format!("Gasless submit failed: {}", e)))?;
+
+        if !submit_resp.status().is_success() {
+            let status = submit_resp.status();
+            let body = submit_resp.text().await.unwrap_or_default();
+            return Err(ExecutionError::Other(format!("Gasless submit returned {}: {}", status, body)));
+        }
+
+        let submit_json: serde_json::Value = submit_resp.json().await
+            .map_err(|e| ExecutionError::Other(format!("Gasless submit parse failed: {}", e)))?;
+
+        let trade_hash = submit_json["tradeHash"].as_str()
+            .ok_or_else(|| ExecutionError::Other("Gasless submit missing tradeHash".into()))?;
+
+        Ok(GaslessSwapResult {
+            trade_hash: trade_hash.to_string(),
+            buy_amount: json["buyAmount"].as_str().unwrap_or("0").to_string(),
+            min_buy_amount: json["minBuyAmount"].as_str().unwrap_or("0").to_string(),
+        })
+    }
+
+    /// Sign an EIP-712 hash and return split signature components.
+    fn sign_hash(&self, hash: [u8; 32]) -> Result<serde_json::Value, ExecutionError> {
+        use k256::ecdsa::{RecoveryId, Signature};
+
+        let (signature, recid): (Signature, RecoveryId) = self.signing_key
+            .sign_prehash_recoverable(&hash)
+            .map_err(|e| ExecutionError::Other(format!("Signing failed: {}", e)))?;
+
+        let r = hex::encode(signature.r().to_bytes());
+        let s = hex::encode(signature.s().to_bytes());
+        let v: u64 = if recid.is_y_odd() { 28 } else { 27 };
+
+        Ok(serde_json::json!({
+            "v": v,
+            "r": format!("0x{}", r),
+            "s": format!("0x{}", s),
+            "signatureType": 2
+        }))
+    }
+
+    /// Poll gasless trade status until confirmed or timeout.
+    pub async fn poll_gasless_status(&self, trade_hash: &str, chain_id: u64) -> Result<GaslessStatus, ExecutionError> {
+        let gasless_url = self.api_url(chain_id).replace("/swap/permit2", "/gasless");
+        let status_url = format!("{}/status/{}", gasless_url, trade_hash);
+        let max_attempts = 30;
+        let mut delay_ms = 1000u64;
+
+        for _ in 0..max_attempts {
+            let resp = self.client.get(&status_url)
+                .header("0x-api-key", &self.api_key)
+                .header("0x-version", "v2")
+                .send().await
+                .map_err(|e| ExecutionError::Other(format!("Gasless status poll failed: {}", e)))?;
+
+            if resp.status().is_success() {
+                let json: serde_json::Value = resp.json().await
+                    .map_err(|e| ExecutionError::Other(format!("Gasless status parse failed: {}", e)))?;
+
+                let status = json["status"].as_str().unwrap_or("pending");
+                match status {
+                    "succeeded" | "confirmed" => {
+                        let tx_hash = json["transactions"][0]["hash"].as_str().unwrap_or("");
+                        return Ok(GaslessStatus::Confirmed(tx_hash.to_string()));
+                    }
+                    "failed" => {
+                        return Ok(GaslessStatus::Failed(format!("Gasless trade failed: {}", json)));
+                    }
+                    _ => {
+                        tokio::time::sleep(std::time::Duration::from_millis(delay_ms)).await;
+                        delay_ms = (delay_ms * 2).min(5000);
+                    }
+                }
+            }
+        }
+
+        Err(ExecutionError::Other("Gasless status poll timeout".into()))
+    }
+
+    /// Build a cross-chain swap via 0x Cross-Chain API (FID-045 Phase 5).
+    ///
+    /// Swaps tokens across chains in one transaction. The API handles bridging
+    /// automatically using providers like Across, Relay, Bungee, CCIP, etc.
+    ///
+    /// Flow: GET /cross-chain/quotes → sign + broadcast → poll /cross-chain/status
+    pub async fn build_cross_chain_swap_tx(
+        &self,
+        params: &CrossChainParams,
+    ) -> Result<CrossChainSwapResult, ExecutionError> {
+        let url = format!(
+            "https://api.0x.org/cross-chain/quotes?originChain={}&destinationChain={}&sellToken={}&buyToken={}&sellAmount={}&originAddress={}&slippageBps={}&sortQuotesBy=price&maxNumQuotes=1",
+            params.origin_chain, params.destination_chain, params.src_token, params.dst_token,
+            params.amount, params.from, params.slippage_bps,
+        );
+
+        let resp = self.client.get(&url)
+            .header("0x-api-key", &self.api_key)
+            .send().await
+            .map_err(|e| ExecutionError::Other(format!("Cross-chain quote failed: {}", e)))?;
+
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let body = resp.text().await.unwrap_or_default();
+            return Err(ExecutionError::Other(format!("Cross-chain quote returned {}: {}", status, body)));
+        }
+
+        let json: serde_json::Value = resp.json().await
+            .map_err(|e| ExecutionError::Other(format!("Cross-chain quote parse failed: {}", e)))?;
+
+        if !json["liquidityAvailable"].as_bool().unwrap_or(false) {
+            return Err(ExecutionError::Other("Cross-chain: no liquidity available".into()));
+        }
+
+        let quote = json["quotes"][0].clone();
+        let tx = quote["transaction"]["details"].clone();
+
+        let to = tx["to"].as_str()
+            .ok_or_else(|| ExecutionError::Other("Cross-chain response missing 'to'".into()))?;
+        let data = tx["data"].as_str()
+            .ok_or_else(|| ExecutionError::Other("Cross-chain response missing 'data'".into()))?;
+        let value = tx["value"].as_str().unwrap_or("0");
+        let gas = tx["gas"].as_str().unwrap_or("300000").parse::<u64>().unwrap_or(300_000);
+
+        let buy_amount = quote["buyAmount"].as_str().unwrap_or("0").to_string();
+        let min_buy_amount = quote["minBuyAmount"].as_str().unwrap_or("0").to_string();
+        let estimated_time = quote["estimatedTimeSeconds"].as_u64().unwrap_or(60);
+
+        Ok(CrossChainSwapResult {
+            to: to.to_string(),
+            data: data.to_string(),
+            value: value.to_string(),
+            gas,
+            buy_amount,
+            min_buy_amount,
+            estimated_time_seconds: estimated_time,
+            origin_chain: params.origin_chain,
+            destination_chain: params.destination_chain,
+        })
+    }
+
+    /// Poll cross-chain swap status until bridge completes or timeout.
+    pub async fn poll_cross_chain_status(
+        &self,
+        origin_chain: u64,
+        origin_tx_hash: &str,
+    ) -> Result<CrossChainStatus, ExecutionError> {
+        let url = format!(
+            "https://api.0x.org/cross-chain/status?originChain={}&originTxHash={}",
+            origin_chain, origin_tx_hash,
+        );
+        let max_attempts = 60; // Bridges can take minutes
+        let mut delay_ms = 3000u64;
+
+        for _ in 0..max_attempts {
+            let resp = self.client.get(&url)
+                .header("0x-api-key", &self.api_key)
+                .send().await
+                .map_err(|e| ExecutionError::Other(format!("Cross-chain status poll failed: {}", e)))?;
+
+            if resp.status().is_success() {
+                let json: serde_json::Value = resp.json().await
+                    .map_err(|e| ExecutionError::Other(format!("Cross-chain status parse failed: {}", e)))?;
+
+                let status = json["status"].as_str().unwrap_or("pending");
+                match status {
+                    "bridge_filled" | "succeeded" | "confirmed" => {
+                        let dest_tx = json["transactions"].as_array()
+                            .and_then(|txs| txs.last())
+                            .and_then(|tx| tx["txHash"].as_str())
+                            .unwrap_or("");
+                        return Ok(CrossChainStatus::Completed(dest_tx.to_string()));
+                    }
+                    "bridge_failed" | "failed" => {
+                        return Ok(CrossChainStatus::Failed(format!("Bridge failed: {}", json["failure"])));
+                    }
+                    _ => {
+                        tokio::time::sleep(std::time::Duration::from_millis(delay_ms)).await;
+                        delay_ms = (delay_ms * 2).min(15000);
+                    }
+                }
+            }
+        }
+
+        Err(ExecutionError::Other("Cross-chain status poll timeout (3 min)".into()))
+    }
+}
+
+/// Result of a gasless swap submission.
+#[derive(Debug, Clone)]
+pub struct GaslessSwapResult {
+    pub trade_hash: String,
+    pub buy_amount: String,
+    pub min_buy_amount: String,
+}
+
+/// Status of a gasless trade.
+#[derive(Debug, Clone)]
+pub enum GaslessStatus {
+    Confirmed(String),  // tx hash
+    Failed(String),     // error
+}
+
+/// Parameters for a cross-chain swap quote.
+#[derive(Debug, Clone)]
+pub struct CrossChainParams {
+    pub src_token: String,
+    pub dst_token: String,
+    pub amount: String,
+    pub from: String,
+    pub origin_chain: u64,
+    pub destination_chain: u64,
+    pub slippage_bps: u64,
+}
+
+/// Result of a cross-chain swap quote.
+#[derive(Debug, Clone)]
+pub struct CrossChainSwapResult {
+    pub to: String,
+    pub data: String,
+    pub value: String,
+    pub gas: u64,
+    pub buy_amount: String,
+    pub min_buy_amount: String,
+    pub estimated_time_seconds: u64,
+    pub origin_chain: u64,
+    pub destination_chain: u64,
+}
+
+/// Status of a cross-chain swap.
+#[derive(Debug, Clone)]
+pub enum CrossChainStatus {
+    Completed(String),  // destination tx hash
+    Failed(String),     // error
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

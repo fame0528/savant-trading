@@ -181,7 +181,7 @@ impl GoPlusClient {
         }
 
         // Look up address from token DB (includes discovered tokens)
-        if let Some((address, _decimals)) = crate::execution::dex::lookup_token(&upper) {
+        if let Some((address, _decimals)) = crate::execution::dex::lookup_token(&upper, 42161) {
             self.check_token(&address, symbol).await
         } else {
             // Unknown address — don't block, just warn

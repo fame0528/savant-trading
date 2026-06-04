@@ -128,7 +128,7 @@ async fn create_executor(
                     .map_err(|e| anyhow::anyhow!("Invalid wallet key for signing: {}", e))?
             };
             let backend = ZeroXBackend::new(api_key, signing_key);
-            let trader = DexTrader::new(
+            let mut trader = DexTrader::new(
                 backend,
                 &wallet_key,
                 &config.exchange.dex.rpc_url,
@@ -139,9 +139,26 @@ async fn create_executor(
             .await
             .map_err(|e| anyhow::anyhow!("Failed to create DexTrader (0x): {}", e))?;
 
+            // Register additional chains from config (FID-045)
+            for chain_cfg in config.chains.values() {
+                if chain_cfg.enabled && chain_cfg.chain_id != config.exchange.dex.chain_id {
+                    info!("Registering chain: {} (id={})", chain_cfg.name, chain_cfg.chain_id);
+                    let chain_config = savant_trading::execution::dex::ChainConfig {
+                        chain_id: chain_cfg.chain_id,
+                        name: Box::leak(chain_cfg.name.clone().into_boxed_str()),
+                        rpc_url: chain_cfg.rpc_url.clone(),
+                        native_token: Box::leak(chain_cfg.native_token.clone().into_boxed_str()),
+                        min_gas_native: chain_cfg.min_gas_native,
+                        slippage_pct: chain_cfg.slippage_pct,
+                    };
+                    trader.add_chain(chain_config);
+                }
+            }
+
             info!(
-                "LIVE trading mode: DexTrader (0x) initialized on chain {}",
-                config.exchange.dex.chain_id
+                "LIVE trading mode: DexTrader (0x) initialized on chain {} ({} total chains)",
+                config.exchange.dex.chain_id,
+                trader.chain_ids().len()
             );
             Ok(Some(Box::new(trader)))
         }

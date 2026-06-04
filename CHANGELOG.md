@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- **Multi-chain 0x system (FID-045)** — Five phases: (1) 201 Arbitrum tokens, (2) Chain-aware database with `ChainConfig`, `ChainToken`, per-chain USDC addresses, (3) Multi-chain execution with `chain_clients` HashMap, per-chain gas monitoring, (4) Gasless API (`/gasless/quote`, `/gasless/submit`, `/gasless/status`), (5) Cross-Chain API (`/cross-chain/quotes`, `/cross-chain/status`)
 - **Permit2 signature fix** — Added 32-byte signature length prefix to calldata encoding. 0x API v2 expects `calldata || sig_length (32 bytes, big-endian) || signature (65 bytes)`. Also uses API-provided `permit2.hash` field instead of computing own EIP-712 hash.
 - **ERC-20 approve for Permit2** — `ensure_permit2_approval()` checks USDC/token allowance for Permit2 contract and sends approve(max) if insufficient. Called before every swap (place_order + close_position).
 - **Multi-source candle architecture** — 6 active sources: Kraken, OKX, KuCoin, Gate.io, CryptoCompare, CoinGecko. 8 total sources including Binance/Bybit (geo-blocked, unused).
@@ -45,6 +46,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - FID-042: Permit2 signature missing
 - FID-043: Trades reverting on-chain
 - FID-044: Scanning under 100 pairs
+- FID-045: Multi-chain 0x swap system (all 5 phases implemented)
 
 ## [0.7.1] — 2026-06-03
 

@@ -31,7 +31,7 @@ impl GeckoTerminalSource {
     /// Get the token address for a pair from our token database.
     fn token_address(&self, pair: &str) -> Option<String> {
         let base = pair.split('/').next()?;
-        let (addr, _dec) = crate::execution::dex::lookup_token(base)?;
+        let (addr, _dec) = crate::execution::dex::lookup_token(base, 42161)?;
         if addr.is_empty() {
             return None;
         }

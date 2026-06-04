@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use std::collections::HashMap;
 use std::path::Path;
 
 use crate::core::error::ConfigError;
@@ -14,6 +15,27 @@ pub struct AppConfig {
     pub insight: InsightConfig,
     #[serde(default)]
     pub training: TrainingConfig,
+    #[serde(default)]
+    pub chains: HashMap<String, ChainEntry>,
+}
+
+/// Per-chain configuration for multi-chain support (FID-045).
+#[derive(Debug, Clone, Deserialize)]
+pub struct ChainEntry {
+    pub chain_id: u64,
+    pub name: String,
+    pub rpc_url: String,
+    pub native_token: String,
+    #[serde(default = "default_min_gas")]
+    pub min_gas_native: f64,
+    #[serde(default = "default_dex_slippage")]
+    pub slippage_pct: f64,
+    #[serde(default)]
+    pub enabled: bool,
+}
+
+fn default_min_gas() -> f64 {
+    0.002
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -502,6 +524,7 @@ impl Default for AppConfig {
                 onchain_enabled: true,
             },
             training: TrainingConfig::default(),
+            chains: HashMap::new(),
         }
     }
 }

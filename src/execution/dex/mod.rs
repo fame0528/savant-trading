@@ -2,8 +2,8 @@
 //!
 //! Provides an abstract [`DexBackend`] trait that the 0x API and 1inch API
 //! both implement.  [`super::DexTrader`] uses this trait, making the trader
-//! backend-agnostic.  The target chain is **Arbitrum** (chain_id = 42_161)
-//! for low gas fees.  On-chain base currency = **USDC**.
+//! backend-agnostic.  Supports multiple EVM chains via 0x's unified API
+//! (chain selected by `chainId` parameter).  On-chain base currency = **USDC**.
 
 pub mod inch;
 pub mod trader;
@@ -34,7 +34,7 @@ pub struct SwapParams {
     pub slippage: f64,
     /// Taker wallet address.
     pub from: String,
-    /// EVM chain ID (e.g. 42_161 for Arbitrum).
+    /// EVM chain ID (e.g. 42_161 for Arbitrum, 8453 for Base).
     pub chain_id: u64,
 }
 
@@ -74,6 +74,40 @@ pub struct TokenInfo {
     pub symbol: String,
     pub address: String,
     pub decimals: u8,
+    pub chain_id: u64,
+}
+
+/// Chain-specific configuration for multi-chain support.
+#[derive(Debug, Clone)]
+pub struct ChainConfig {
+    pub chain_id: u64,
+    pub name: &'static str,
+    pub rpc_url: String,
+    pub native_token: &'static str,
+    pub min_gas_native: f64,
+    pub slippage_pct: f64,
+}
+
+/// USDC addresses per chain (native USDC, not bridged).
+pub fn usdc_address_for_chain(chain_id: u64) -> &'static str {
+    match chain_id {
+        42161 => "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",  // Arbitrum native USDC
+        8453 => "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",   // Base native USDC
+        10 => "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",     // Optimism native USDC
+        56 => "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",     // BSC USDC (18 decimals!)
+        137 => "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",    // Polygon native USDC
+        1 => "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",      // Ethereum native USDC
+        43114 => "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",  // Avalanche native USDC
+        _ => "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",       // Default: Arbitrum
+    }
+}
+
+/// USDC decimals per chain (BSC uses 18, all others use 6).
+pub fn usdc_decimals_for_chain(chain_id: u64) -> u8 {
+    match chain_id {
+        56 => 18,  // BSC USDC uses 18 decimals
+        _ => 6,    // All other chains use 6
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -151,8 +185,8 @@ impl DexBackend for FallbackBackend {
 // ---------------------------------------------------------------------------
 
 /// Arbitrum token addresses — keyed by uppercase symbol.
-/// Source: Arbiscan Top ERC-20 tokens, verified contract addresses.
-/// All tokens have >$1M daily volume.
+/// Source: CoinGecko API (arbitrum-one platform), verified contract addresses.
+/// Total: 201 tokens with >$1M daily volume.
 pub const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
     // Quote currency
     ("USDC", "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", 6),
@@ -164,7 +198,7 @@ pub const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
     ("WBTC", "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", 8),
     ("BTC", "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", 8),
 
-    // Top volume tokens (Arbiscan verified)
+    // Top volume tokens (CoinGecko + Arbiscan verified)
     ("CELR", "0x3a8b787f78d775aecfeea15706d4221b40f345ab", 18),
     ("HOT", "0x17e1e5c6bc9ebb11647c94e1c5e3ba619f2781ea", 18),
     ("CBBTC", "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf", 8),
@@ -224,8 +258,7 @@ pub const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
     ("RENDER", "0xC8a4EeA31E9B6b61c406DF013DD4FEc76f21E279", 18),
     ("FET", "0x8D2cD4BF7E2196d5204bb15264BdD5E789D00Bad", 8),
 
-    // Extended tokens from tokens_final_100.txt (>1M daily volume)
-    // Empty address = use symbol-based API lookup (0x/1inch resolve by symbol)
+    // Extended tokens (>1M daily volume, CoinGecko verified)
     ("USDT0", "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", 6),
     ("ANKR", "0xaeaeed23478c3a4b798e4ed40d8b7f41366ae861", 18),
     ("CRCLX", "0xfebded1b0986a8ee107f5ab1a1c5a813491deceb", 18),
@@ -360,6 +393,10 @@ pub const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
     ("ALETH", "0x17573150d67d820542efb24210371545a4868b03", 18),
     ("BOSON", "0x54b334d68cf5382fee7fbbe496fcf1e76d9ba000", 18),
     ("RIZ", "0x083fb956333f9c1568f66fc0d0be451f31f8c46c", 18),
+    ("AUSD", "0x00000000efe302beaa2b3e6e1b18d08d69a9012a", 18),
+    ("ETH+", "0x18c14c2d707b2212e17d1579789fc06010cfca23", 18),
+    ("FRAX", "0x17fc002b466eec40dae837fc4be5c67993ddbd6f", 18),
+    ("JONES", "0x10393c20975cf177a3513071bc110f7962cd67da", 18),
 ];
 
 use std::collections::HashMap;
@@ -390,19 +427,44 @@ pub fn extend_token_db(tokens: &[(String, String, u8)]) {
     }
 }
 
-/// Look up a token by symbol — checks extensions first, then static DB.
-pub fn lookup_token(symbol: &str) -> Option<(String, u8)> {
-    // Check runtime extensions first
+/// Look up a token by symbol and chain_id — checks extensions first, then static DB.
+pub fn lookup_token(symbol: &str, chain_id: u64) -> Option<(String, u8)> {
+    // Check runtime extensions first (chain-specific)
     let ext = TOKEN_EXTENSIONS.lock().unwrap();
     if let Some(ref map) = *ext {
+        let key = format!("{}:{}", chain_id, symbol);
+        if let Some(&(ref addr, dec)) = map.get(&key) {
+            return Some((addr.clone(), dec));
+        }
+        // Also check without chain prefix for backward compatibility
         if let Some(&(ref addr, dec)) = map.get(symbol) {
             return Some((addr.clone(), dec));
         }
     }
     drop(ext);
 
-    // Fall back to static DB
-    token_map().get(symbol).map(|&(addr, dec)| (addr.to_string(), dec))
+    // Fall back to static DB (Arbitrum only for now)
+    if chain_id == 42161 {
+        token_map().get(symbol).map(|&(addr, dec)| (addr.to_string(), dec))
+    } else {
+        // For other chains, check if we have chain-specific USDC
+        if symbol == "USDC" {
+            Some((usdc_address_for_chain(chain_id).to_string(), usdc_decimals_for_chain(chain_id)))
+        } else {
+            None
+        }
+    }
+}
+
+/// Add discovered tokens to the runtime extension database.
+/// Format: (chain_id, symbol, address, decimals)
+pub fn extend_token_db_multi(tokens: &[(u64, String, String, u8)]) {
+    let mut ext = TOKEN_EXTENSIONS.lock().unwrap();
+    let map = ext.get_or_insert_with(HashMap::new);
+    for (chain_id, symbol, address, decimals) in tokens {
+        let key = format!("{}:{}", chain_id, symbol);
+        map.insert(key, (address.clone(), *decimals));
+    }
 }
 
 /// Resolve a trading pair (e.g. `"ETH/USDC"`) into source + destination
@@ -413,24 +475,18 @@ pub fn lookup_token(symbol: &str) -> Option<(String, u8)> {
 ///
 /// `"USD"` is automatically mapped to `"USDC"` because there is no native
 /// USD token on EVM chains.
-///
-/// ## Enterprise token resolution
-///
-/// When a token is not found in the local database, we return a `TokenInfo`
-/// with an **empty address** and **18 decimals** (the standard for most
-/// wrapped tokens). The caller (see [`DexTrader::execute_swap`]) detects the
-/// empty address and passes the token **symbol** directly to the DEX
-/// aggregator API instead. Both the 0x and 1inch APIs accept token symbols
-/// natively and resolve the most liquid deployed address on the target
-/// chain. This means:
-///
-/// - No fragile, hardcoded address database for bridged tokens
-/// - The API always returns the current most liquid version
-/// - Works for ALL tokens without manual address research
-/// - Adapts automatically when bridges/liquidity shift
 pub fn resolve_pair(
     pair: &str,
     side: crate::core::types::Side,
+) -> Result<(TokenInfo, TokenInfo), ExecutionError> {
+    resolve_pair_on_chain(pair, side, 42161)
+}
+
+/// Resolve a trading pair on a specific chain.
+pub fn resolve_pair_on_chain(
+    pair: &str,
+    side: crate::core::types::Side,
+    chain_id: u64,
 ) -> Result<(TokenInfo, TokenInfo), ExecutionError> {
     let parts: Vec<&str> = pair.split('/').collect();
     if parts.len() != 2 {
@@ -448,42 +504,40 @@ pub fn resolve_pair(
     };
 
     // Resolve base token — check runtime extensions first, then static DB
-    let base = match lookup_token(&base_sym) {
+    let base = match lookup_token(&base_sym, chain_id) {
         Some((addr, dec)) => TokenInfo {
             symbol: base_sym,
             address: addr,
             decimals: dec,
+            chain_id,
         },
         None => TokenInfo {
             symbol: base_sym,
-            address: String::new(), // Empty = use symbol directly with API
-            decimals: 18,           // Standard for most bridged tokens
+            address: String::new(),
+            decimals: 18,
+            chain_id,
         },
     };
 
     // Resolve quote token — same pattern
-    let quote = match lookup_token(&quote_sym) {
+    let quote = match lookup_token(&quote_sym, chain_id) {
         Some((addr, dec)) => TokenInfo {
             symbol: quote_sym,
             address: addr,
             decimals: dec,
+            chain_id,
         },
         None => TokenInfo {
             symbol: quote_sym,
             address: String::new(),
             decimals: 18,
+            chain_id,
         },
     };
 
     match side {
-        crate::core::types::Side::Long => {
-            // Buy base → sell quote, receive base
-            Ok((quote, base))
-        }
-        crate::core::types::Side::Short => {
-            // Sell base → sell base, receive quote
-            Ok((base, quote))
-        }
+        crate::core::types::Side::Long => Ok((quote, base)),
+        crate::core::types::Side::Short => Ok((base, quote)),
     }
 }
 
@@ -515,6 +569,7 @@ mod tests {
         assert_eq!(src.symbol, "USDC");
         assert_eq!(dst.symbol, "ETH");
         assert!(dst.address.starts_with("0x82aF"));
+        assert_eq!(dst.chain_id, 42161);
     }
 
     #[test]
@@ -533,28 +588,20 @@ mod tests {
 
     #[test]
     fn resolve_unknown_token_falls_back_to_symbol() {
-        // Tokens not in the local DB should resolve via symbol (empty address = use symbol with API)
         let (src, dst) = resolve_pair("FAKE/USDC", Side::Long).unwrap();
         assert_eq!(src.symbol, "USDC");
         assert_eq!(dst.symbol, "FAKE");
-        assert!(
-            dst.address.is_empty(),
-            "unknown token should have empty address (symbol-based)"
-        );
-        assert_eq!(dst.decimals, 18, "unknown token defaults to 18 decimals");
+        assert!(dst.address.is_empty());
+        assert_eq!(dst.decimals, 18);
     }
 
     #[test]
     fn resolve_sol_usdc_long_symbol_fallback() {
-        // SOL is not in the local DB — should resolve by symbol
         let (src, dst) = resolve_pair("SOL/USDC", Side::Long).unwrap();
         assert_eq!(src.symbol, "USDC");
         assert_eq!(dst.symbol, "SOL");
-        assert!(src.address.starts_with("0x"), "USDC should have address");
-        assert!(
-            dst.address.is_empty(),
-            "SOL should have empty address (symbol-based)"
-        );
+        assert!(src.address.starts_with("0x"));
+        assert!(dst.address.is_empty());
     }
 
     #[test]
@@ -586,7 +633,7 @@ mod tests {
         let (src, dst) = resolve_pair("DOT/USDC", Side::Long).unwrap();
         assert_eq!(src.symbol, "USDC");
         assert_eq!(dst.symbol, "DOT");
-        assert!(dst.address.starts_with("0x8d01"), "DOT should have Arbitrum address");
+        assert!(dst.address.starts_with("0x8d01"));
     }
 
     #[test]
@@ -609,8 +656,6 @@ mod tests {
         assert_eq!(wei, "50000000");
     }
 
-    // ---- New token resolution tests ----
-
     #[test]
     fn resolve_aave_usdc_long() {
         let (src, dst) = resolve_pair("AAVE/USDC", Side::Long).unwrap();
@@ -632,7 +677,7 @@ mod tests {
         let (_src, dst) = resolve_pair("PENDLE/USDC", Side::Long).unwrap();
         assert_eq!(_src.symbol, "USDC");
         assert_eq!(dst.symbol, "PENDLE");
-        assert!(dst.address.starts_with("0x0c88"), "PENDLE should have Arbitrum address");
+        assert!(dst.address.starts_with("0x0c88"));
     }
 
     #[test]
@@ -640,7 +685,7 @@ mod tests {
         let (_src, dst) = resolve_pair("RENDER/USDC", Side::Long).unwrap();
         assert_eq!(_src.symbol, "USDC");
         assert_eq!(dst.symbol, "RENDER");
-        assert!(dst.address.starts_with("0xC8a4"), "RENDER (RNDR) should have Arbitrum address");
+        assert!(dst.address.starts_with("0xC8a4"));
     }
 
     #[test]
@@ -648,7 +693,7 @@ mod tests {
         let (_src, dst) = resolve_pair("FET/USDC", Side::Long).unwrap();
         assert_eq!(_src.symbol, "USDC");
         assert_eq!(dst.symbol, "FET");
-        assert!(dst.address.starts_with("0x8D2c"), "FET should have Arbitrum address");
+        assert!(dst.address.starts_with("0x8D2c"));
     }
 
     #[test]
@@ -661,9 +706,64 @@ mod tests {
 
     #[test]
     fn resolve_aave_usd_long() {
-        // USD maps to USDC
         let (src, dst) = resolve_pair("AAVE/USD", Side::Long).unwrap();
         assert_eq!(src.symbol, "USDC");
         assert_eq!(dst.symbol, "AAVE");
+    }
+
+    // Multi-chain tests
+
+    #[test]
+    fn resolve_on_base_chain() {
+        let (src, dst) = resolve_pair_on_chain("ETH/USDC", Side::Long, 8453).unwrap();
+        assert_eq!(src.symbol, "USDC");
+        assert_eq!(src.chain_id, 8453);
+        assert_eq!(src.address, "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913");
+        assert_eq!(dst.symbol, "ETH");
+        assert_eq!(dst.chain_id, 8453);
+    }
+
+    #[test]
+    fn resolve_usdc_on_bsc_18_decimals() {
+        let (src, _dst) = resolve_pair_on_chain("ETH/USDC", Side::Long, 56).unwrap();
+        assert_eq!(src.symbol, "USDC");
+        assert_eq!(src.chain_id, 56);
+        assert_eq!(src.decimals, 18, "BSC USDC should have 18 decimals");
+    }
+
+    #[test]
+    fn usdc_address_for_chain_arbitrum() {
+        assert_eq!(usdc_address_for_chain(42161), "0xaf88d065e77c8cC2239327C5EDb3A432268e5831");
+    }
+
+    #[test]
+    fn usdc_address_for_chain_base() {
+        assert_eq!(usdc_address_for_chain(8453), "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913");
+    }
+
+    #[test]
+    fn usdc_decimals_for_chain_bsc() {
+        assert_eq!(usdc_decimals_for_chain(56), 18);
+    }
+
+    #[test]
+    fn usdc_decimals_for_chain_arbitrum() {
+        assert_eq!(usdc_decimals_for_chain(42161), 6);
+    }
+
+    #[test]
+    fn resolve_new_tokens() {
+        // Verify newly added tokens resolve correctly
+        let (_src, dst) = resolve_pair("AUSD/USDC", Side::Long).unwrap();
+        assert_eq!(dst.symbol, "AUSD");
+        assert!(dst.address.starts_with("0x00000000"));
+
+        let (_src, dst) = resolve_pair("FRAX/USDC", Side::Long).unwrap();
+        assert_eq!(dst.symbol, "FRAX");
+        assert!(dst.address.starts_with("0x17fc"));
+
+        let (_src, dst) = resolve_pair("JONES/USDC", Side::Long).unwrap();
+        assert_eq!(dst.symbol, "JONES");
+        assert!(dst.address.starts_with("0x1039"));
     }
 }

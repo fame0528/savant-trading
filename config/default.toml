@@ -13,6 +13,46 @@ wallet_key_env = "WALLET_PRIVATE_KEY"
 api_key_env = "ZEROEX_API_KEY"
 slippage_pct = 0.005
 
+# Multi-chain configuration (FID-045)
+# Each chain has its own RPC, gas token, and slippage settings.
+# The engine scans enabled chains in parallel.
+# Add chain IDs to 'enabled' to activate them.
+[chains.arbitrum]
+chain_id = 42161
+name = "Arbitrum"
+rpc_url = "https://arb1.arbitrum.io/rpc"
+native_token = "ETH"
+min_gas_native = 0.002
+slippage_pct = 0.005
+enabled = true
+
+[chains.base]
+chain_id = 8453
+name = "Base"
+rpc_url = "https://mainnet.base.org"
+native_token = "ETH"
+min_gas_native = 0.001
+slippage_pct = 0.005
+enabled = false
+
+[chains.optimism]
+chain_id = 10
+name = "Optimism"
+rpc_url = "https://mainnet.optimism.io"
+native_token = "ETH"
+min_gas_native = 0.001
+slippage_pct = 0.0075
+enabled = false
+
+[chains.bsc]
+chain_id = 56
+name = "BNB Smart Chain"
+rpc_url = "https://bsc-dataseed.binance.org"
+native_token = "BNB"
+min_gas_native = 0.005
+slippage_pct = 0.01
+enabled = false
+
 [trading]
 # Core pairs — always tracked, highest liquidity
 # BTC & ETH are the foundation. Top 10 + meme coins are where the action is.

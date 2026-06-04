@@ -134,12 +134,21 @@ pub struct DexTrader<B: DexBackend> {
     signing_key: SigningKey,
     /// Derived wallet address.
     wallet_address: Address,
-    /// RPC URL.
+    /// Primary RPC URL.
     rpc_url: String,
-    /// HTTP client for JSON-RPC.
+    /// Primary HTTP client for JSON-RPC.
     client: reqwest::Client,
+    /// Primary chain ID.
     chain_id: u64,
     slippage_pct: f64,
+
+    // ---- Multi-chain support (FID-045) ----
+    /// Per-chain RPC clients for multi-chain execution.
+    chain_clients: HashMap<u64, reqwest::Client>,
+    /// Per-chain configs (gas, slippage).
+    chain_configs: HashMap<u64, super::ChainConfig>,
+    /// Per-chain gas halted flags.
+    chain_gas_halted: HashMap<u64, bool>,
 
     // ---- State ----
     positions: HashMap<String, Position>,
@@ -194,17 +203,35 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             .map_err(|_| ExecutionError::Other("Failed to derive address".into()))?;
         let wallet_address = Address::from(addr_bytes);
 
+        let primary_client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(30))
+            .build()
+            .unwrap_or_else(|_| reqwest::Client::new());
+
+        let mut chain_clients = HashMap::new();
+        chain_clients.insert(chain_id, primary_client.clone());
+
+        let mut chain_configs = HashMap::new();
+        chain_configs.insert(chain_id, super::ChainConfig {
+            chain_id,
+            name: "Primary",
+            rpc_url: rpc_url.to_string(),
+            native_token: "ETH",
+            min_gas_native: 0.002,
+            slippage_pct,
+        });
+
         let mut trader = Self {
             backend,
             signing_key,
             wallet_address,
             rpc_url: rpc_url.to_string(),
-            client: reqwest::Client::builder()
-                .timeout(std::time::Duration::from_secs(30))
-                .build()
-                .unwrap_or_else(|_| reqwest::Client::new()),
+            client: primary_client,
             chain_id,
             slippage_pct,
+            chain_clients,
+            chain_configs,
+            chain_gas_halted: HashMap::new(),
             positions: HashMap::new(),
             closed_trades: Vec::new(),
             balance: initial_balance,
@@ -269,6 +296,27 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         self.wallet_address
     }
 
+    /// Register an additional chain for multi-chain execution (FID-045).
+    /// Creates a new RPC client for the chain and stores its config.
+    pub fn add_chain(&mut self, config: super::ChainConfig) {
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(30))
+            .build()
+            .unwrap_or_else(|_| reqwest::Client::new());
+        self.chain_clients.insert(config.chain_id, client);
+        self.chain_configs.insert(config.chain_id, config);
+    }
+
+    /// Get the RPC client for a specific chain.
+    fn client_for_chain(&self, chain_id: u64) -> &reqwest::Client {
+        self.chain_clients.get(&chain_id).unwrap_or(&self.client)
+    }
+
+    /// Get all enabled chain IDs.
+    pub fn chain_ids(&self) -> Vec<u64> {
+        self.chain_clients.keys().copied().collect()
+    }
+
     // ---- Retry queue (FID-035) ----
 
     /// Add a failed swap to the retry queue.
@@ -307,11 +355,33 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
     // ---- JSON-RPC ----
 
+    /// Make an RPC call on the primary chain.
     async fn rpc_call(
         &self,
         method: &str,
         params: serde_json::Value,
     ) -> Result<serde_json::Value, ExecutionError> {
+        self.rpc_call_on_chain(self.chain_id, method, params).await
+    }
+
+    /// Make an RPC call on a specific chain (FID-045).
+    async fn rpc_call_on_chain(
+        &self,
+        chain_id: u64,
+        method: &str,
+        params: serde_json::Value,
+    ) -> Result<serde_json::Value, ExecutionError> {
+        let client = self.client_for_chain(chain_id);
+        let rpc_url = if chain_id == self.chain_id {
+            &self.rpc_url
+        } else if let Some(cfg) = self.chain_configs.get(&chain_id) {
+            &cfg.rpc_url
+        } else {
+            return Err(ExecutionError::Other(format!(
+                "No RPC config for chain {}", chain_id
+            )));
+        };
+
         let body = serde_json::json!({
             "jsonrpc": "2.0",
             "method": method,
@@ -319,29 +389,28 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             "id": 1u64,
         });
 
-        let resp = self
-            .client
-            .post(&self.rpc_url)
+        let resp = client
+            .post(rpc_url)
             .json(&body)
             .send()
             .await
-            .map_err(|e| ExecutionError::Other(format!("RPC {} failed: {}", method, e)))?;
+            .map_err(|e| ExecutionError::Other(format!("RPC {} on chain {} failed: {}", method, chain_id, e)))?;
 
         let json: serde_json::Value = resp
             .json()
             .await
-            .map_err(|e| ExecutionError::Other(format!("RPC {} parse: {}", method, e)))?;
+            .map_err(|e| ExecutionError::Other(format!("RPC {} on chain {} parse: {}", method, chain_id, e)))?;
 
         if let Some(err) = json.get("error") {
             return Err(ExecutionError::Other(format!(
-                "RPC {} error: {}",
-                method, err
+                "RPC {} on chain {} error: {}",
+                method, chain_id, err
             )));
         }
 
         json.get("result")
             .cloned()
-            .ok_or_else(|| ExecutionError::Other(format!("RPC {} missing result", method)))
+            .ok_or_else(|| ExecutionError::Other(format!("RPC {} on chain {} missing result", method, chain_id)))
     }
 
     async fn get_nonce(&self) -> Result<u64, ExecutionError> {
@@ -1155,44 +1224,54 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
     async fn sync_balance(&mut self) -> Result<(), ExecutionError> {
         let addr_hex = format!("{:#x}", self.wallet_address);
 
-        // 1. Query ETH balance for gas availability
-        let eth_res = self
-            .rpc_call("eth_getBalance", serde_json::json!([&addr_hex, "latest"]))
-            .await?;
-        let eth_hex = eth_res.as_str().ok_or_else(|| {
-            ExecutionError::Other("eth_getBalance returned non-string result".into())
-        })?;
-        let eth_wei = U256::from_str_radix(eth_hex.trim_start_matches("0x"), 16)
-            .map_err(|e| ExecutionError::Other(format!("Invalid ETH balance hex: {}", e)))?;
-        let eth_balance: f64 = eth_wei.to_string().parse().unwrap_or(0.0) / 1e18;
+        // Check gas on ALL registered chains (FID-045)
+        for &cid in self.chain_clients.keys() {
+            let min_gas = self.chain_configs.get(&cid)
+                .map(|c| c.min_gas_native)
+                .unwrap_or(0.002);
+            let chain_name = self.chain_configs.get(&cid)
+                .map(|c| c.name)
+                .unwrap_or("unknown");
 
-        // ETH gas check — need enough for 2 close transactions (~0.002 ETH on Arbitrum)
-        const ETH_MIN: f64 = 0.002;
-        if eth_balance < ETH_MIN {
-            self.gas_halted = true;
-            error!(
-                "CRITICAL: ETH gas balance too low ({:.6} ETH). \
-                 Need at least {:.4} ETH for 2 close txs. HALTING ALL TRADING.",
-                eth_balance, ETH_MIN
-            );
-        } else if self.gas_halted {
-            // Was halted, now OK — resume
-            self.gas_halted = false;
-            info!(
-                "ETH gas balance restored ({:.6} ETH) — resuming trading",
-                eth_balance
-            );
+            let gas_res = self.rpc_call_on_chain(cid, "eth_getBalance", serde_json::json!([&addr_hex, "latest"])).await;
+            match gas_res {
+                Ok(val) => {
+                    if let Some(hex) = val.as_str() {
+                        let wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
+                            .unwrap_or(U256::ZERO);
+                        let gas_balance: f64 = wei.to_string().parse().unwrap_or(0.0) / 1e18;
+
+                        if gas_balance < min_gas {
+                            self.chain_gas_halted.insert(cid, true);
+                            error!(
+                                "CRITICAL: {} ({}) gas balance too low ({:.6}). Need {:.4}. HALTING chain.",
+                                chain_name, cid, gas_balance, min_gas
+                            );
+                        } else {
+                            if self.chain_gas_halted.get(&cid) == Some(&true) {
+                                info!("{} ({}) gas restored ({:.6}) — resuming", chain_name, cid, gas_balance);
+                            }
+                            self.chain_gas_halted.insert(cid, false);
+                        }
+                    }
+                }
+                Err(e) => {
+                    warn!("Failed to check gas on chain {}: {}", cid, e);
+                }
+            }
         }
 
-        // 2. Query USDC balance via eth_call to balanceOf()
-        // USDC on Arbitrum: 0xaf88d065e77c8cC2239327C5EDb3A432268e5831
-        // balanceOf selector: 0x70a08231 (keccak256("balanceOf(address)")[..4])
-        const USDC_ADDRESS: &str = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831";
+        // Also update the primary gas_halted flag
+        self.gas_halted = self.chain_gas_halted.get(&self.chain_id) == Some(&true);
+
+        // Query USDC balance on primary chain
+        let usdc_addr = super::usdc_address_for_chain(self.chain_id);
+        let usdc_dec = super::usdc_decimals_for_chain(self.chain_id);
         let padded_addr = format!("{:0>64}", addr_hex.trim_start_matches("0x"));
         let call_data = format!("0x70a08231{}", padded_addr);
 
         let call_params = serde_json::json!([{
-            "to": USDC_ADDRESS,
+            "to": usdc_addr,
             "data": call_data
         }, "latest"]);
 
@@ -1201,13 +1280,13 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
                 if let Some(hex) = result.as_str() {
                     let usdc_wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
                         .unwrap_or(U256::ZERO);
-                    let usdc_balance: f64 =
-                        usdc_wei.to_string().parse::<f64>().unwrap_or(0.0) / 1e6;
+                    let divisor = 10f64.powi(usdc_dec as i32);
+                    let usdc_balance: f64 = usdc_wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
 
                     let drift = (usdc_balance - self.balance).abs();
                     if drift > 1.0 {
                         warn!(
-                            "USDC balance drift detected: tracked={:.2} actual={:.2} (diff=${:.2})",
+                            "USDC balance drift: tracked={:.2} actual={:.2} (diff=${:.2})",
                             self.balance, usdc_balance, drift
                         );
                     }
@@ -1217,13 +1296,10 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
             }
             Err(e) => {
                 warn!("Failed to sync USDC balance ({}), using tracked balance", e);
-                // Don't fail — use locally tracked balance as fallback
             }
         }
 
-        // Persist synced balance
         let _ = self.save_state();
-
         Ok(())
     }
 
