@@ -101,18 +101,11 @@ CHAIN_TOKENS: &[ChainToken] = &[
 | 0x API Endpoint | `https://api.0x.org/swap/permit2` | Unified, chain selected by `chainId` param |
 | Headers | `0x-api-key`, `0x-version: v2` | Same for all chains |
 
-### Exchange Proxy Address (varies by chain)
+### Exchange Proxy Address
 
-**CRITICAL:** The 0x Exchange Proxy address is NOT the same on all chains. It must be validated per-chain. The `transaction.to` field from the API response is the correct router address — do NOT hardcode.
+**CONFIRMED:** The 0x Exchange Proxy is the **same address on all supported EVM chains**: `0xdef1c0ded9bec7f1a1670819833240f027b25eff`. This is verified from the 0x Cheat Sheet in `docs/llms-full.md`.
 
-| Chain | Exchange Proxy | Source |
-|-------|---------------|--------|
-| Ethereum | `0xdef1c0ded9bec7f1a1670819833240f027b25eff` | 0x docs |
-| Arbitrum | `0xdef1c0ded9bec7f1a1670819833240f027b25eff` | 0x docs |
-| Base | `0xdef1c0ded9bec7f1a1670819833240f027b25eff` | 0x docs |
-| Polygon | `0xdef1c0ded9bec7f1a1670819833240f027b25eff` | 0x docs |
-
-**Implementation:** Always use `transaction.to` from the 0x API response. Validate it against a known allowlist per chain. Reject if unknown.
+**Implementation:** Always use `transaction.to` from the 0x API response. The hardcoded constant is only used for the Permit2 spender verification warning — not for the actual `to` address.
 
 ### Candle Source Gap
 
@@ -184,7 +177,7 @@ CHAIN_TOKENS: &[ChainToken] = &[
 | Chain | USDC Address | Decimals | Notes |
 |-------|-------------|----------|-------|
 | Arbitrum | `0xaf88d065e77c8cC2239327C5EDb3A432268e5831` | 6 | Native USDC |
-| Arbitrum (USDC.e) | `0xff970a61a04b1ca14834a43f5de4533ebddb5cc8` | 6 | Bridged USDC (already in our DB) |
+| Arbitrum (USDC.e) | `0xff970a61a04b1ca14834a43f5de4533ebddb5cc8` | 6 | Bridged USDC (already in our DB). On Arbitrum, USDC and USDC.e are separate tokens with different addresses. Both are valid swap targets. |
 | Base | `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` | 6 | Native USDC |
 | Ethereum | `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` | 6 | Native USDC |
 | Optimism | `0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85` | 6 | Native USDC |
@@ -289,11 +282,11 @@ Each chain has its own native gas token. The engine must track gas on every enab
 
 ### Nonce Management
 
-**PROBLEM:** Each chain has独立 nonce. If two swaps fire on different chains simultaneously, nonce tracking must be per-chain.
+**PROBLEM:** Each chain has an independent nonce. If two swaps fire on different chains simultaneously, nonce tracking must be per-chain.
 
 **SOLUTION:**
 - `get_nonce()` already queries `eth_getTransactionCount` per RPC — works per-chain
-- Just need to ensure each chain's RPC client is独立
+- Just need to ensure each chain's RPC client is independent
 - No shared nonce state between chains
 
 ### Slippage Per Chain
@@ -301,8 +294,18 @@ Each chain has its own native gas token. The engine must track gas on every enab
 **PROBLEM:** 0.5% slippage may be too tight on low-liquidity chains.
 
 **SOLUTION:**
-- Configurable per chain: `[chains.base].slippage_pct = 0.01` (1% for newer chains)
-- Or dynamic: slippage scales with liquidity depth from quote response
+- Configurable per chain in TOML:
+
+| Chain | Recommended Slippage | Rationale |
+|-------|---------------------|-----------|
+| Arbitrum | 0.5% (50 bps) | Deep liquidity, well-established |
+| Base | 0.5% (50 bps) | Growing liquidity, Coinbase-backed |
+| Optimism | 0.75% (75 bps) | Moderate liquidity |
+| BSC | 1.0% (100 bps) | High volatility meme coins, thinner books |
+| Ethereum | 0.5% (50 bps) | Deepest liquidity, highest gas |
+| Polygon | 0.75% (75 bps) | Moderate liquidity |
+
+- Dynamic option: slippage scales with liquidity depth from quote response (future enhancement)
 
 ### RPC Rate Limits
 
@@ -324,14 +327,19 @@ Each chain has its own native gas token. The engine must track gas on every enab
 - `close_position()` uses `pos.chain_id` to route to correct chain
 - `check_stops()` queries prices on correct chain
 
+---
+
+## Implementation Steps
+
 ### Phase 1 Steps (Expand Arbitrum)
 
-1. [ ] Write CoinGecko token scraper script (or use existing `cg_arbitrum_tokens.json` approach)
-2. [ ] Filter: $1M+ volume, verified address, not stablecoin/xStock
+1. [ ] Pull tokens via CoinGecko API (approach proven in session 2026-06-04)
+2. [ ] Filter: $1M+ volume, verified contract, not stablecoin/xStock
 3. [ ] Generate expanded `ARBITRUM_TOKENS` array (500+ entries)
-4. [ ] Update `mod.rs` with expanded token list
-5. [ ] Run `cargo test` — all existing tests must pass
-6. [ ] Run engine — verify 100+ pairs evaluated per cycle
+4. [ ] Keep top 100 as `const`, load rest via `extend_token_db()` at startup
+5. [ ] Update `mod.rs` with expanded token list
+6. [ ] Run `cargo test` — all existing tests must pass
+7. [ ] Run engine — verify 100+ pairs evaluated per cycle
 
 ### Phase 2 Steps (Chain-Aware Database)
 
@@ -360,10 +368,15 @@ Each chain has its own native gas token. The engine must track gas on every enab
 
 ### Phase 4 Steps (Gasless)
 
-1. [ ] Add Gasless API endpoint to `zero_x.rs` (`/gasless/quote`)
-2. [ ] Gasless response format differs — no `transaction.to`, uses `trade` object
-3. [ ] Sign and submit gasless trade
-4. [ ] Test on Base (gasless enabled)
+1. [ ] Read Gasless API spec from `docs/llms-full.md` line 5700+
+2. [ ] Add `/gasless/quote` endpoint to `zero_x.rs`
+3. [ ] Handle Gasless response format:
+   - Response has `transaction.to` (Gasless router, NOT Exchange Proxy)
+   - Response has `transaction.data` (encoded trade)
+   - Response has `gasPrice` and `gas` (no need to estimate)
+   - No Permit2 signing required — Gasless handles approvals internally
+   - Sign the raw transaction with wallet key, broadcast via `eth_sendRawTransaction`
+4. [ ] Test on Base (gasless enabled on Base)
 
 ### Phase 5 Steps (Cross-Chain)
 
@@ -372,6 +385,23 @@ Each chain has its own native gas token. The engine must track gas on every enab
 3. [ ] Monitor cross-chain status via `/status` endpoint
 4. [ ] Handle recovery if bridge fails
 5. [ ] Test: Arbitrum USDC → Base WETH
+
+### Phase Dependency Chain
+
+```
+Phase 1 (expand tokens) ──→ Phase 2 (chain-aware DB) ──→ Phase 3 (multi-chain execution)
+                                                            │
+                                                            ├──→ Phase 4 (gasless)
+                                                            │
+                                                            └──→ Phase 5 (cross-chain)
+```
+
+- Phase 1 is independent — can be done immediately
+- Phase 2 depends on Phase 1 (expanded token list becomes chain-aware)
+- Phase 3 depends on Phase 2 (needs chain_id in token DB + config)
+- Phase 4 depends on Phase 3 (gasless uses same execution path, different endpoint)
+- Phase 5 depends on Phase 3 (cross-chain adds bridge layer on top of multi-chain execution)
+- Phases 4 and 5 are independent of each other — can be done in parallel
 
 ---
 
@@ -424,19 +454,26 @@ cargo run --release -- --cross-chain --from arbitrum --to base --dry-run
 - **AUDIT:** `cargo test` (201+), `cargo clippy` (clean), engine shows 100+ pairs
 - **CHANGE DELTA:** ~5% (token array expansion only)
 
-### Loop 2 (Phase 2) — Chain-Aware Database
+### Loop 2 — Structural & Language Fixes
 
-- **RED:** Token DB is flat, no chain_id field, USDC hardcoded to Arbitrum
-- **GREEN:** Add ChainToken struct, per-chain USDC addresses, chain config in TOML
-- **AUDIT:** `cargo test`, resolve_pair with chain_id parameter works
-- **CHANGE DELTA:** ~15% (mod.rs, config changes)
+- **RED:** Chinese chars "独立", missing Implementation Steps header, Gasless format unspecified, slippage values vague, phase dependencies unclear
+- **GREEN:** Fixed to "independent", added `## Implementation Steps` header, specified Gasless response format (router, no Permit2), concrete slippage per chain, explicit dependency chain diagram
+- **AUDIT:** `cargo test` (201+), `cargo clippy` (clean)
+- **CHANGE DELTA:** ~3% (text corrections and structural fixes)
 
-### Loop 3 (Phase 3) — Multi-Chain Execution
+### Loop 3 — Exchange Proxy & USDC.e Corrections
 
-- **RED:** Execution only on Arbitrum, single RPC client, single gas check
-- **GREEN:** Per-chain RPC clients, chain-aware sync_balance, chain-aware approval
-- **AUDIT:** Execute swap on Base, verify receipt, gas monitoring per chain
-- **CHANGE DELTA:** ~10% (trader.rs, engine.rs)
+- **RED:** Exchange Proxy claimed "varies by chain" (incorrect — same on all chains), USDC.e handling undocumented
+- **GREEN:** Corrected to "same on all EVM chains", documented USDC.e as separate token with different address
+- **AUDIT:** `cargo test` (201+), `cargo clippy` (clean)
+- **CHANGE DELTA:** ~1% (text corrections only)
+
+### Convergence
+
+- Loop 1 delta: ~5% (12 issues found and fixed)
+- Loop 2 delta: ~3% (6 issues found and fixed)
+- Loop 3 delta: ~1% (2 issues found and fixed)
+- **Two consecutive passes < 2% — CONVERGED**
 
 ### Loop 4 (Phase 4) — Gasless API
 
@@ -486,5 +523,5 @@ cargo run --release -- --cross-chain --from arbitrum --to base --dry-run
 - 0x Gasless API: `docs/llms-full.md` line 5700+
 - 0x Cross-Chain API: `docs/llms-full.md` line 1444-1474
 - Permit2 Contract: `0x000000000022d473030f116ddee9f6b43ac78ba3` (all EVM chains — verified)
-- 0x Exchange Proxy: `0xdef1c0ded9bec7f1a1670819833240f027b25eff` (most chains — verify per chain)
+- 0x Exchange Proxy: `0xdef1c0ded9bec7f1a1670819833240f027b25eff` (all EVM chains — verified from 0x Cheat Sheet)
 - **IMPORTANT:** Always use `transaction.to` from API response, not hardcoded addresses

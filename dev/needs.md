@@ -214,6 +214,6 @@ These sources return **spot prices**, not chain-specific prices. A token on Arbi
 | Constant | Value |
 |----------|-------|
 | Permit2 | `0x000000000022d473030f116ddee9f6b43ac78ba3` |
-| Exchange Proxy | `0xdef1c0ded9bec7f1a1670819833240f027b25eff` (verify per chain) |
+| Exchange Proxy | `0xdef1c0ded9bec7f1a1670819833240f027b25eff` (same on all chains) |
 | 0x API Base | `https://api.0x.org` |
 | Headers | `0x-api-key`, `0x-version: v2` |
