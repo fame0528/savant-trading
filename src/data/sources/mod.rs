@@ -89,14 +89,14 @@ impl SourceRouter {
                     let nonzero = candles.iter().filter(|c| c.close > 0.0).count();
                     if nonzero == 0 {
                         tracing::debug!(
-                            "{}: All-zero candles for \x1b[90m[\x1b[96m{}\x1b[90m]\x1b[36m",
+                            "{}: All-zero candles for \x1b[90m[{}]\x1b[36m",
                             source.name(),
                             pair
                         );
                         continue;
                     }
                     tracing::info!(
-                        "{}: \x1b[90m[\x1b[96m{}\x1b[90m]\x1b[36m {} candles ({} non-zero)",
+                        "{}: \x1b[90m[{}]\x1b[36m {} candles ({} non-zero)",
                         source.name(),
                         pair,
                         candles.len(),
@@ -106,14 +106,14 @@ impl SourceRouter {
                 }
                 Ok(_) => {
                     tracing::info!(
-                        "{}: No data for \x1b[90m[\x1b[96m{}\x1b[90m]\x1b[36m",
+                        "{}: No data for \x1b[90m[{}]\x1b[36m",
                         source.name(),
                         pair
                     );
                 }
                 Err(_) => {
                     tracing::info!(
-                        "{}: No data for \x1b[90m[\x1b[96m{}\x1b[90m]\x1b[36m",
+                        "{}: No data for \x1b[90m[{}]\x1b[36m",
                         source.name(),
                         pair
                     );
