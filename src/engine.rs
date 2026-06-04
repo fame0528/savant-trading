@@ -930,8 +930,6 @@ pub async fn run(
                     continue;
                 }
                 // DEX safety: reject tokens with no price movement (all candles identical)
-                let first_close = candle_data.first().map(|c| c.close).unwrap_or(0.0);
-                let last_close = candle_data.last().map(|c| c.close).unwrap_or(0.0);
                 let all_dead = candle_data.iter().all(|c| c.open == c.close && c.high == c.low && c.volume <= 0.0);
                 if all_dead {
                     dead_tokens.insert(pair.to_string());
