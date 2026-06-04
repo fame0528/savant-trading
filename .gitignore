@@ -8,11 +8,10 @@ credentials.json
 # === Agent runtime state ===
 dev/session-summaries/
 dev/fids/archive/
-dev/fids/
 dev/plans/
 dev/baselines/
 
-# Keep FIDs and LEARNINGS.md tracked
+# Keep active FIDs and LEARNINGS.md tracked
 !dev/fids/*.md
 !dev/LEARNINGS.md
 
