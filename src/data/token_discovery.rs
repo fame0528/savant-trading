@@ -22,7 +22,7 @@ pub struct DiscoveredToken {
 /// Discover tradeable tokens from Blockscot API.
 ///
 /// Returns tokens sorted by 24h volume, filtered by minimum thresholds.
-/// Only high-action tokens — $100K+ volume, 500+ holders.
+/// Only high-action tokens — $1M+ volume, 500+ holders, verified contracts.
 pub async fn discover_tokens(
     min_volume: f64,
     min_holders: u64,

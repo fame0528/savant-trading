@@ -26,8 +26,9 @@ The engine currently evaluates 7-13 hardcoded pairs. The goal is **hundreds of p
 ### Phase 1: Token Discovery
 
 - Query Blockscot API: `GET /api/v2/tokens?type=ERC-20&sort=volume_24h&limit=200`
-- Filter: volume > $100K/day, holders > 500, **verified contracts only** (https://arbiscan.io/contractsVerified = 178K contracts)
-- Skip: dead charts, low volume, scam tokens, stablecoins, wrapped variants
+- Filter: volume > $1M/day, holders > 500, **verified contracts only** (https://arbiscan.io/contractsVerified = 178K contracts)
+- Skip: dead charts (< $1M volume = no action), stablecoins, wrapped variants, scam tokens
+- Source: https://arbiscan.io/tokens?sort=24h_volume_usd&order=desc (sorted by volume)
 - Auto-generate pair list: `{symbol}/USD`
 - Cache results, refresh every 4 hours
 
