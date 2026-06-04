@@ -8,6 +8,9 @@
 //!   - CoinGeckoSource — broader coverage, thousands of tokens
 //!   - DeFiLlamaSource — DEX-native, Arbitrum pairs
 
+pub mod coingecko;
+pub mod kraken;
+
 use async_trait::async_trait;
 use crate::core::types::Candle;
 use crate::core::error::ExecutionError;

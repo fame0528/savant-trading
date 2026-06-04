@@ -649,14 +649,20 @@ pub async fn run(
     );
 
     // Parallel candle fetch — all pairs simultaneously
+    // Uses SourceRouter: Kraken first, CoinGecko fallback for tokens Kraken doesn't have
+    let candle_router = std::sync::Arc::new(savant_trading::data::sources::SourceRouter::new(vec![
+        Box::new(savant_trading::data::sources::kraken::KrakenSource::new(&config.exchange.rest_url)),
+        Box::new(savant_trading::data::sources::coingecko::CoinGeckoSource::new()),
+    ]));
+
     let mut candle_futures = tokio::task::JoinSet::new();
     for pair in &active_pairs {
-        let kraken_clone = KrakenClient::new(&config.exchange.rest_url);
+        let router = candle_router.clone();
         let pair_clone = pair.clone();
         let tf = config.trading.timeframe.clone();
         candle_futures.spawn(async move {
-            let result = kraken_clone
-                .get_ohlc(&pair_clone, parse_timeframe_minutes(&tf), None)
+            let result = router
+                .fetch_candles(&pair_clone, parse_timeframe_minutes(&tf), 721)
                 .await;
             (pair_clone, result)
         });

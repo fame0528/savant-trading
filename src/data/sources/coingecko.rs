@@ -150,7 +150,9 @@ impl CandleSource for CoinGeckoSource {
             let close = chunk[group_size - 1][1].as_f64().unwrap_or(0.0);
             let high = chunk.iter().map(|p| p[1].as_f64().unwrap_or(0.0)).fold(f64::NEG_INFINITY, f64::max);
             let low = chunk.iter().map(|p| p[1].as_f64().unwrap_or(0.0)).fold(f64::INFINITY, f64::min);
-            let timestamp = chunk[group_size - 1][0].as_u64().unwrap_or(0);
+            let timestamp_ms = chunk[group_size - 1][0].as_u64().unwrap_or(0);
+            let timestamp = chrono::DateTime::from_timestamp_millis(timestamp_ms as i64)
+                .unwrap_or(chrono::Utc::now());
             let volume = vol_chunk.iter().map(|v| v[1].as_f64().unwrap_or(0.0)).sum::<f64>() / group_size as f64;
 
             candles.push(Candle {
