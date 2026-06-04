@@ -1503,7 +1503,7 @@ pub async fn run(
                                                 }
                                             }
                                         } else {
-                                            log_warn!("SIZING", "None for {} — stop/R:R invalid. entry={} stop={} tp1={}",
+                                            log_swap_fail!("BUY REJECTED", "{} — R:R invalid (claim:2.0, actual: entry={} stop={} tp1={})",
                                                 decision.pair, decision.entry_price, decision.stop_loss, decision.take_profit_1);
                                         }
                                     }
