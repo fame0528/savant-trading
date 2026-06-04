@@ -443,8 +443,10 @@ impl DexBackend for ZeroXBackend {
             data.to_string()
         };
 
-        // Gas buffer (FID-042): Add 20% to gas estimate to prevent out-of-gas failures
-        let gas_with_buffer = ((gas as f64) * 1.2) as u64;
+        // Gas buffer: Permit2 calldata with signature prefix can be very large (2000+ bytes).
+        // 0x API gas estimates are often low. Use 2x buffer with a hard floor of 500K.
+        let gas_with_buffer = ((gas as f64) * 2.0) as u64;
+        let gas_with_buffer = gas_with_buffer.max(500_000);
 
         Ok(SwapTx {
             to: to.to_string(),
@@ -950,7 +952,7 @@ mod tests {
         assert_eq!(swap_tx.to, "0xdef1c0ded9bec7f1a1670819833240f027b25eff");
         assert_eq!(swap_tx.data, "0xabc123");
         assert_eq!(swap_tx.value, "0");
-        assert_eq!(swap_tx.gas, 300000); // 250000 * 1.2 = 300000 (20% buffer)
+        assert_eq!(swap_tx.gas, 500000); // 250000 * 2.0 = 500000 (2x buffer)
         assert_eq!(swap_tx.gas_price, "100000000");
     }
 
