@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0603-029-port-kraken-improvements.md`
 **ID:** FID-2026-0603-029
 **Severity:** high
-**Status:** analyzed
+**Status:** deferred
 **Created:** 2026-06-03 22:00
 **Author:** Agent
 

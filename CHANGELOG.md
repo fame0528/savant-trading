@@ -4,6 +4,41 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.7.1] — 2026-06-03
+
+### Added
+
+- **Token discovery** — Blockscot API integration for dynamic Arbitrum token discovery. Top 200 tokens by volume, filtered by $1M+ volume and 500+ holders.
+- **Runtime token DB** — `TOKEN_EXTENSIONS` allows discovered addresses to be added at startup. `lookup_token()` checks extensions then static DB.
+- **CoinGecko candle fallback** — `market_chart` endpoint gives 5m candles for 1 day (288 candles). SourceRouter tries Kraken first, CoinGecko second.
+- **15s 0x API timeout** — `tokio::time::timeout(15s)` around `build_swap_tx()` prevents indefinite hangs.
+- **Panic hook** — Logs `[PANIC] message at file.rs:123:45` instead of silent exit code 0xffffffff.
+
+### Fixed
+
+- **Tracing ANSI bleeding** — Disabled tracing colors, only `savant_log()` controls colors.
+- **12h clock format** — EST timestamps now show `MM-DD-YYYY H:MM AM/PM`.
+- **Pair highlighting** — `highlight_pairs()` skips already-bracketed pairs to avoid `[[BTC/USD]]`.
+- **Module names** — `funding_rates` → `Funding Rates`, `onchain` → `On Chain`, `websocket` → `WebSocket`.
+- **GoPlus spam** — Core assets (BTC, ETH, etc.) skip security check.
+- **Vault verbosity** — Consolidated writing/done into single log line.
+- **Watcher spam** — Removed per-pattern logging, only logs unique patterns.
+
+### Archived
+
+- FID-001: Inherited clippy lints
+- FID-029: Port Kraken improvements (deferred to Preston)
+- FID-030: 0x API hang
+- FID-031: 0x API panic crash
+- FID-032: Console color inconsistency
+- FID-033: Uniform console output
+- FID-034: ANSI color placement
+- FID-035: Meme coin expansion
+- FID-037: Console production ready
+- FID-038: Arbitrum tokens + candle sources
+- FID-039: Mass pair scanning
+- FID-040: Full scan support
+
 ## [0.7.0] — 2026-06-03
 
 ### Added

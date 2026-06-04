@@ -1,5 +1,20 @@
 # LEARNINGS
 
+## Session 2026-06-03-1500: DEX Execution, Token Discovery, Console Logging
+
+**Key Learnings:**
+
+- **0x API intermittently hangs.** `reqwest` timeout doesn't cover DNS/TLS hangs. Fix: `tokio::time::timeout(15s)` around `build_swap_tx()`. The 60s engine timeout catches it but loses the trade opportunity.
+- **0x API rejects tokens without Arbitrum addresses.** "Invalid ethereum address" error for tokens like XRP, SOL, ADA. Fix: verify token addresses via Blockscot API before adding to config.
+- **CoinGecko free API gives 5m candles for 1 day.** `market_chart` endpoint returns 289 price points for `days=1`. Group into OHLC candles by batching 6 points per candle.
+- **Arbitrum has 700K+ token contracts.** Only ~178K are verified. Only ~100 have >$1M daily volume. Use Blockscot API to discover high-volume tokens dynamically.
+- **Token address database needs runtime extension.** `OnceLock<HashMap>` is immutable. Added `TOKEN_EXTENSIONS` `Mutex<HashMap>` for discovered addresses. `lookup_token()` checks extensions first.
+- **ANSI color codes from tracing bleed into custom output.** Fix: `with_ansi(false)` on tracing subscriber, or use custom `SavantLayer`.
+- **Console format must be uniform.** All output: `[Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]`. Single `savant_log()` function, 11 thin macros.
+- **Module names need human-readable formatting.** `funding_rates` → `Funding Rates`, `onchain` → `On Chain`. Added special-case mapping in `capitalize_module()`.
+- **GoPlus security check should skip core assets.** BTC, ETH, etc. don't need honeypot detection. Only check meme/new tokens.
+- **Phantom positions are a recurring problem.** PaperTrader can accumulate positions that don't exist on-chain. Fix: auto-reconcile on startup — if executor has no positions but PaperTrader does, clear PaperTrader.
+
 ## Session 2026-0601-1955: Protocol v0.1.0, Training Pipeline, Closed-Loop Workflow
 
 **Key Learnings:**
