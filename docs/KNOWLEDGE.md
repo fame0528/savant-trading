@@ -129,7 +129,7 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Japanese Candlestick & Chart Pattern Analysis
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Japanese Candlestick Charting Techniques (Nison) | 1991 | 4.5/236 | PDF |
 | Japanese Candlestick Charting Techniques 2nd ed. (Nison) | 2001 | 4.5/236 | PDF (×3) |
@@ -144,7 +144,7 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Technical Analysis
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Technical Analysis of the Financial Markets (Murphy) | 1999 | 4.6/227 | PDF |
 | Technical Analysis: The Complete Resource for Financial Market Technicians (Edwards/Magee) | 2006 | 4.4/39 | PDF |
@@ -167,13 +167,13 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Volume Price Analysis
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | A Complete Guide To Volume Price Analysis (Coulling) | 2013 | 4.5/383 | EPUB, PDF |
 
 #### Trading Psychology & Discipline
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Trading in the Zone (Douglas) | 2000 | 4.5/541 | PDF (×2), EPUB |
 | The Disciplined Trader (Douglas) | 1990 | 4.4/205 | PDF (×2, 1 annotated) |
@@ -183,7 +183,7 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Market Wizards & Trader Interviews
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Market Wizards (Schwager) | 2012 | 4.5/340 | PDF (×2) |
 | The New Market Wizards (Schwager) | 1992 | 4.5/162 | PDF |
@@ -196,7 +196,7 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Risk Management & Money Management
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Trade Your Way to Financial Freedom 2nd ed. (Van Tharp) | 2006 | 4.3/266 | EPUB, PDF (×2) |
 | Trading for a Living (Elder) | 1993 | 4.2/296 | PDF |
@@ -209,13 +209,13 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Position Sizing & Portfolio Theory
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | The Encyclopedia of Trading Strategies (Saluka) | 2000 | 3/33 | PDF |
 
 #### Trend Following
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Trend Following (Covel) | 2009 | 4.1/389 | PDF |
 | Trend Trading for a Living (Crabel) | 2007 | 4.2/71 | PDF |
@@ -226,7 +226,7 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Swing Trading
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Swing Trading For Dummies (Basset) | 2008 | 4.4/75 | PDF |
 | Dave Landry on Swing Trading | 2001 | 4.1/21 | PDF |
@@ -236,7 +236,7 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Day Trading
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Day Trading For Dummies (Logan) | 2008 | 3.9/28 | PDF |
 | Day Trading For Dummies 3rd ed. (Logan) | 2014 | 3.6/36 | PDF, EPUB |
@@ -246,7 +246,7 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Price Action & Order Flow
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Understanding Price Action (Lunden) | 2014 | 4.2/47 | PDF |
 | Naked Forex (Nekritin) | 2012 | 4.2/95 | PDF |
@@ -255,7 +255,7 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Algorithmic & Systematic Trading
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Algorithmic Trading (Chan) | 2013 | 4.1/37 | PDF (×2, 1 annotated) |
 | Intermarket Trading Strategies (Henderson) | 2009 | 4.6/15 | PDF |
@@ -263,7 +263,7 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Trading Systems & Methodologies
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Come Into My Trading Room (Elder) | 2002 | 4.5/170 | PDF |
 | Come Into My Trading Room (Study Guide) (Elder) | 2002 | — | PDF |
@@ -272,14 +272,14 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Harmonic Trading
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Harmonic Trading, Volume One (Carney) | 2010 | 3.6/43 | PDF |
 | Harmonic Trading, Volume Two (Carney) | 2010 | 4.2/12 | PDF |
 
 #### Options & Derivatives
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Option Volatility & Pricing (Natenberg) | 1994 | 4.3/155 | PDF |
 | Option Spread Strategies (Harley) | 2009 | 3.3/15 | PDF |
@@ -290,7 +290,7 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 These books teach market mechanics — session timing, price action, order flow, and multi-timeframe analysis — that transfer directly to crypto's 24/7 markets. Crypto lacks traditional session structure, but the concepts of liquidity, volatility cycles, institutional vs. retail behavior, and intermarket relationships apply.
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Day Trading and Swing Trading the Currency Market 2nd ed. (Lien) | 2008 | 4/29 | PDF |
 | Day Trading the Currency Market (Lien) | 2005 | 3.8/47 | PDF |
@@ -310,19 +310,19 @@ These books teach market mechanics — session timing, price action, order flow,
 
 #### Ichimoku
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Trading with Ichimoku Clouds (Patel) | 2010 | 3/33 | PDF |
 
 #### ETF Trading
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Trading ETFs 2nd ed. (Duguid) | 2012 | 4.2/3 | PDF |
 
 #### Fundamental Analysis & Value Investing
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | The Intelligent Investor (Graham) | 2003 | 4.5/1881 | PDF, MOBI |
 | Common Stocks and Uncommon Profits (Fisher) | 2003 | 4.3/206 | PDF, AZW |
@@ -336,7 +336,7 @@ These books teach market mechanics — session timing, price action, order flow,
 
 #### Warren Buffett & Charlie Munger
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | University of Berkshire Hathaway (Pecaut) | 2017 | 4.6/172 | EPUB, MOBI |
 | The Warren Buffett Way 2nd ed. (Hagstrom) | 2005 | 4/122 | PDF |
@@ -346,14 +346,14 @@ These books teach market mechanics — session timing, price action, order flow,
 
 #### Trading Classics (Pre-2000)
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Reminiscences of a Stock Operator (Lefèvre) | 2006 | 4.5/569 | PDF (×3), EPUB (×3) |
 | Jesse Livermore: World's Greatest Stock Trader (Smitten) | 2001 | 4.3/52 | PDF |
 
 #### Behavioral Finance & Market Psychology
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Irrational Exuberance (Shiller) | 2000 | 4.2/229 | PDF |
 | Irrational Exuberance 2nd ed. (Shiller) | 2006 | 4.2/229 | EPUB |
@@ -363,7 +363,7 @@ These books teach market mechanics — session timing, price action, order flow,
 
 #### Market History & Wall Street Narratives
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Liar's Poker (Lewis) | 2014 | 4.4/983 | EPUB |
 | Flash Boys (Lewis) | 2015 | 4.5/3359 | EPUB |
@@ -375,7 +375,7 @@ These books teach market mechanics — session timing, price action, order flow,
 
 #### Crypto-Specific
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Cryptoassets (Burniske/Tatar) | 2017 | 4.5/70 | PDF |
 | Cryptocurrency-Trading-101 | — | — | PDF |
@@ -385,14 +385,14 @@ These books teach market mechanics — session timing, price action, order flow,
 
 #### Business & Biography (Non-Trading)
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | The Blind Side (Lewis) | 2007 | 4.4/615 | MOBI |
 | The New New Thing (Lewis) | 2014 | 4.1/328 | EPUB |
 
 #### For Dummies Series (General)
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | Trading For Dummies 2nd ed. (Rochester) | 2009 | 4.3/65 | PDF |
 | Day Trading For Dummies (Logan) | 2008 | 3.9/28 | PDF |
@@ -404,7 +404,7 @@ These books teach market mechanics — session timing, price action, order flow,
 
 #### A Random Walk Down Wall Street
 
-| Title | Year | Rating | Formats |
+| Title | Year | Rating/Reviews | Formats |
 |-------|------|--------|---------|
 | A Random Walk Down Wall Street 10th ed. (Malkiel) | 2012 | 4.6/807 | EPUB, MOBI |
 | A Random Walk Down Wall Street 11th ed. (Malkiel) | 2015 | 4.6/807 | EPUB |
@@ -582,7 +582,7 @@ These sources were incorporated into knowledge units but don't have standalone t
 | IRS/Form 1099-DA | Crypto tax compliance | 5 |
 | QuantInsti | Walk-forward optimization methodology | 10 |
 | Jared Tintle | Tilt detection, psychology | 10 |
-| Michael Howell | Global liquidity cycle macro research | 10
+| Michael Howell | Global liquidity cycle macro research | 10 |
 
 ---
 
