@@ -21,6 +21,7 @@ struct TestArgs {
     sandbox: bool,
     full: bool,
     historical: bool,
+    model: Option<String>,
 }
 
 fn parse_test_args(args: &[String]) -> TestArgs {
@@ -47,6 +48,10 @@ fn parse_test_args(args: &[String]) -> TestArgs {
             }
             "--historical" => {
                 ta.historical = true;
+            }
+            "--model" | "-m" => {
+                i += 1;
+                ta.model = args.get(i).cloned();
             }
             _ => {}
         }
@@ -177,7 +182,7 @@ async fn main() -> anyhow::Result<()> {
             let ta = parse_test_args(&args);
             if ta.sandbox {
                 info!("=== SAVANT SANDBOX ===");
-                return engine::run_sandbox(config).await;
+                return engine::run_sandbox(config, ta.model).await;
             }
             // Check for --train flag
             if args.iter().any(|a| a == "--train") {
@@ -189,11 +194,12 @@ async fn main() -> anyhow::Result<()> {
                     ta.count,
                     ta.full,
                     ta.historical,
+                    ta.model,
                 )
                 .await;
             }
             info!("=== SAVANT ACTION TEST ===");
-            return engine::run_action_test(config, ta.category, ta.action_only, ta.count).await;
+            return engine::run_action_test(config, ta.category, ta.action_only, ta.count, ta.model).await;
         }
         Some("--tui") => {
             info!("=== SAVANT TRADING ENGINE (TUI MODE) ===");

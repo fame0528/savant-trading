@@ -3181,6 +3181,7 @@ pub async fn run_training(
     count_filter: Option<usize>,
     full: bool,
     historical: bool,
+    _model_override: Option<String>,
 ) -> anyhow::Result<()> {
     let _test_memory =
         savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/test_memory.db").await?;
@@ -3340,6 +3341,7 @@ pub async fn run_action_test(
     category_filter: Option<String>,
     action_only: bool,
     count_filter: Option<usize>,
+    model_override: Option<String>,
 ) -> anyhow::Result<()> {
     use savant_trading::sandbox::scenarios::load_all_scenarios;
 
@@ -3377,7 +3379,7 @@ pub async fn run_action_test(
 }
 
 /// Sandbox: run all 50 scenarios through the real AI brain and grade every decision.
-pub async fn run_sandbox(config: AppConfig) -> anyhow::Result<()> {
+pub async fn run_sandbox(config: AppConfig, model_override: Option<String>) -> anyhow::Result<()> {
     use savant_trading::sandbox::feedback::analyze_failures;
     use savant_trading::sandbox::generator::{self};
     use savant_trading::sandbox::grader;
@@ -3404,10 +3406,11 @@ pub async fn run_sandbox(config: AppConfig) -> anyhow::Result<()> {
     let providers: Vec<savant_trading::agent::provider::LlmProvider> = api_keys
         .iter()
         .map(|key| {
+            let model = model_override.as_ref().cloned().unwrap_or_else(|| config.ai.model.clone());
             savant_trading::agent::provider::LlmProvider::new(
                 savant_trading::agent::provider::LlmConfig {
                     endpoint: config.ai.endpoint.clone(),
-                    model: config.ai.model.clone(),
+                    model,
                     api_key: key.clone(),
                     max_tokens: config.ai.max_tokens,
                     temperature: config.ai.temperature,
