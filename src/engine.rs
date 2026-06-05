@@ -3219,6 +3219,7 @@ async fn run_training_batch(
 }
 
 /// Training mode: run scenarios in a loop until Brier score converges.
+#[allow(clippy::too_many_arguments)]
 pub async fn run_training(
     config: AppConfig,
     category_filter: Option<String>,

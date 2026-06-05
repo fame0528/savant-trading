@@ -1,4 +1,4 @@
-# SAVANT TRADING v0.8.0
+# SAVANT TRADING v0.9.0
 
 <!-- markdownlint-disable MD033 -->
 <div align="center">
@@ -7,11 +7,11 @@
 
 **AI-Native Autonomous DEX Trading Engine**
 
-No KYC. No CEX. Arbitrum on-chain swaps via 0x API — powered by 2,959 knowledge units across 10 enterprise-grade JSON files.
+No KYC. No CEX. Arbitrum on-chain swaps via 0x API — powered by 6,676+ knowledge units from 168 source books and 548 curated sources.
 
 **Model-agnostic:** Any OpenAI-compatible LLM via [OpenRouter](https://openrouter.ai/). Tested with MiMo v2.5 Pro (1M context, 131K output).
 
-[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![0x](https://img.shields.io/badge/0x-DEX-%23000000?style=flat-square&logo=ethereum&logoColor=%2300fbff)](https://0x.org/)[![Arbitrum](https://img.shields.io/badge/Arbitrum-L2-%23000000?style=flat-square&logo=arbitrum&logoColor=%2300fbff)](https://arbitrum.io/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-LLM-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/)[![Version](https://img.shields.io/badge/Version-0.8.0-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![0x](https://img.shields.io/badge/0x-DEX-%23000000?style=flat-square&logo=ethereum&logoColor=%2300fbff)](https://0x.org/)[![Arbitrum](https://img.shields.io/badge/Arbitrum-L2-%23000000?style=flat-square&logo=arbitrum&logoColor=%2300fbff)](https://arbitrum.io/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-LLM-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/)[![Version](https://img.shields.io/badge/Version-0.9.0-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
 
 </div>
 
@@ -109,20 +109,40 @@ Knowledge Base ────────┤                       │
 
 ## Knowledge Base
 
-2,959 tagged knowledge units across 10 JSON files, extracted from 150+ books and trader transcripts:
+**6,676+ structured knowledge units** from 168 source books (128 unique titles) and 548 curated sources. The knowledge base is the agent's brain — it contains everything from candlestick patterns to on-chain analytics, trading psychology to DeFi mechanics.
+
+### Architecture
+
+```
+Primary (active, loaded at runtime):  2,959 units across 10 JSON files
+Backup (supplementary):               3,717 units across 33 JSON files
+Source books (parsed into units):      168 files (PDF/EPUB/MOBI/TXT)
+```
+
+### Primary Knowledge (10 files, 2,959 units)
 
 | File | Units | Domain |
 |------|-------|--------|
 | `knowledge_technical_analysis.json` | 506 | RSI, EMA, ADX, MACD, Bollinger, Fibonacci, divergences |
 | `knowledge_psychology.json` | 319 | Cognitive biases, tilt, deliberate practice, emotional regulation |
-| `knowledge_crypto_native.json` | 319 | On-chain analytics, DeFi, funding rates, liquidation cascades |
-| `knowledge_risk_management.json` | 350 | Kelly Criterion, drawdown recovery, position sizing |
-| `knowledge_sentiment.json` | 291 | Fear & Greed, social sentiment, news analysis |
-| `knowledge_execution.json` | 282 | Order types, slippage, fill optimization, rate limits |
-| `knowledge_market_regimes.json` | 250 | Trending, ranging, volatile, capitulation detection |
-| `knowledge_trading_systems.json` | 226 | Backtesting, walk-forward, Monte Carlo, strategy design |
-| `knowledge_price_action.json` | 216 | Wyckoff, candle patterns, support/resistance, liquidity |
-| `knowledge_fundamentals.json` | 200 | Macro analysis, halving cycles, ETF flows, regulatory |
+| `knowledge_crypto_native.json` | 319 | MVRV, NUPL, SOPR, NVT, exchange flows, whale movements |
+| `knowledge_risk_management.json` | 350 | Kelly Criterion, drawdown recovery, position sizing, anti-martingale |
+| `knowledge_sentiment.json` | 291 | Fear & Greed, COT data, put/call ratios, VIX, sentiment extremes |
+| `knowledge_execution.json` | 282 | Order types, slippage, fill optimization, rate limits, session timing |
+| `knowledge_market_regimes.json` | 250 | Trending, ranging, volatile, capitulation detection, ADX thresholds |
+| `knowledge_trading_systems.json` | 226 | Turtle system, Donchian channels, trend following, system rules |
+| `knowledge_price_action.json` | 216 | Wyckoff phases, FVG, order blocks, candle patterns, liquidity |
+| `knowledge_fundamentals.json` | 200 | Macro analysis, halving cycles, ETF flows, Mr. Market, Fisher |
+
+### How It Works
+
+Knowledge units are tagged with `setup_type`, `regime_subtype`, `trigger`, `indicator`, and `risk_context` for MMR (Maximum Marginal Relevance) selection. The agent's context builder selects ~20 relevant units per decision based on current market conditions. A `utility_score` tracks empirical correlation with successful trades — units that help the agent win get promoted, units that correlate with losses get suppressed.
+
+### Source Material
+
+The 168 source books span candlestick analysis, technical analysis, trading psychology, risk management, forex (foundational market structure for crypto), algorithmic trading, and crypto-native knowledge. Forex and stock books provide the foundation — the agent's crypto-native edge comes from on-chain analytics (MVRV, NUPL, SOPR, NVT), DeFi mechanics, funding rates, and whale tracking.
+
+**Full inventory:** [`docs/KNOWLEDGE.md`](docs/KNOWLEDGE.md) — 710-line reference with every book, every topic, every knowledge unit ID range.
 
 ---
 
@@ -238,6 +258,13 @@ cargo run -- --dry-run
 # Action test — sandbox scenarios
 cargo run -- --test
 cargo run -- --test -c "Trend Bull" -a -n 20
+
+# Test with different models (any OpenRouter model)
+cargo run --release -- --test --model openrouter/owl-alpha -n 20
+cargo run --release -- --test --model deepseek/deepseek-v4-flash -n 20
+
+# Managed API keys ($1 limit per session)
+cargo run --release -- --test --managed-keys -n 20
 
 # Training mode — loop until Brier converges
 cargo run -- --test --train

@@ -4,6 +4,43 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.9.0] — 2026-06-04
+
+### Added
+
+- **First successful on-chain swap** — AAVE bought on Arbitrum for $9.54 (tx: 0x846d...b018e1). FLUID bought for $8.48 (tx: 0x85b0...29e9). Both confirmed on-chain.
+- **Trailing stop-loss** — Auto-trails SL as price moves in our favor. Only for Full-scale positions with risk > 0. After TP1 scale-out (break-even SL), stop stays fixed.
+- **CoinGecko verification gate** — DEX mode only trades tokens with CoinGecko-verified addresses. Blocks unknown/unverified tokens.
+- **Position concentration cap** — Max 33% of portfolio per position. Prevents overconcentration.
+- **Dead token cache** — Tokens with all-zero candle data are skipped after first failure. Retried every 10 cycles.
+- **CoinGecko token filter** — Tokens not in CoinGecko Arbitrum list rejected in DEX mode.
+- **Illiquid token filter** — Tokens with <5 unique close prices across 200 candles rejected.
+- **`--model` CLI flag** — `cargo run -- --test --model openrouter/owl-alpha -n 20` to test any model in sandbox. Wired through `run_action_test`, `run_training`, `run_sandbox` → `run_training_batch`.
+- **`--managed-keys` CLI flag** — Auto-creates temporary OpenRouter API key with $1 limit per test/training run. Uses existing `OpenRouterManagementClient`.
+- **Gas buffer increase** — Gas limit 2x multiplier + 500K floor (was 1.2x). Prevents "out of gas" on Permit2 calldata.
+- **Model comparison results** — Tested owl-alpha (free), DeepSeek V4 Flash, MiMo v2.5 Pro on 150 scenarios. MiMo best on Brier (0.47) and P&L (+$80.65). Owl free with 0 parse errors.
+
+### Fixed
+
+- **CRITICAL: Flawed SELL handling** — `TradeAction::Sell` was routed to close-only path. DEX can't SHORT without owning the asset. Now correctly skips with visible log.
+- **CRITICAL: Short order amount_wei** — For SHORT orders, was computing `amount_to_wei(entry_price * quantity)` (USD value). Fixed to `amount_to_wei(quantity, src_decimals)` (token amount).
+- **Console color system** — 12 distinct log types. LLM tags now CYAN_BOLD (was WHITE). INFO tags CYAN_BOLD (was invisible). PASS body WHITE (was dark grey). VAULT tag dim blue. WARN body matches tag.
+- **R:R hallucination logging** — `[BUY REJECTED]` now shows claimed vs actual R:R with per-side computation (LONG vs SHORT).
+- **SourceRouter log cleanup** — Error messages truncated to 80 chars. Pair names in dark grey brackets. Source name without redundant brackets.
+- **CoinGecko filter: collapsible if** — Fixed clippy warning.
+
+### Removed
+
+- **GeckoTerminal from SourceRouter** — 99% failed requests, 30 req/min rate limit, zero value.
+- **Dashboard scaffold** — 397MB Next.js dead weight (never used).
+
+### Archived
+
+- FID-045: Multi-chain 0x swap system
+- FID-046: QoL improvements (7 items)
+- FID-047: Sandbox model override
+- FID-048: OpenRouter management key system
+
 ## [0.8.0] — 2026-06-04
 
 ### Added
