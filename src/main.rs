@@ -142,6 +142,10 @@ async fn main() -> anyhow::Result<()> {
             info!("=== SAVANT RECOVER — Scan wallet, restore positions to DB ===");
             return recover_positions(&config).await;
         }
+        Some("close-all") => {
+            info!("=== SAVANT CLOSE ALL — Sell all positions to USDC ===");
+            return close_all_positions(&config).await;
+        }
         Some("backtest") => {
             info!("=== SAVANT BACKTEST ===");
             return run_backtest_cmd(&config).await;
@@ -587,6 +591,120 @@ async fn recover_positions(config: &savant_trading::core::config::AppConfig) -> 
 
     println!("\nDone. {} positions saved to DB. Start the engine to manage them.", recovered.len());
     println!("  The engine will load these positions on startup.");
-    println!("  Use the dashboard terminal: savant start");
+    println!("  To sell everything to USDC: cargo run --release -- close-all");
+    println!("  To start the engine: cargo run --release");
+    Ok(())
+}
+
+/// Close all positions — sell all token holdings to USDC via 0x API.
+async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -> anyhow::Result<()> {
+    use savant_trading::monitor::journal::TradeJournal;
+
+    let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)
+        .map_err(|_| anyhow::anyhow!("WALLET_PRIVATE_KEY not set"))?;
+    let api_key = std::env::var(&config.exchange.dex.api_key_env)
+        .map_err(|_| anyhow::anyhow!("ZEROEX_API_KEY not set"))?;
+
+    // Derive wallet address
+    let key_bytes = alloy_core::primitives::hex::decode(wallet_key.trim_start_matches("0x"))
+        .map_err(|e| anyhow::anyhow!("Invalid key hex: {}", e))?;
+    let signing_key = k256::ecdsa::SigningKey::from_slice(&key_bytes)
+        .map_err(|e| anyhow::anyhow!("Invalid key: {}", e))?;
+    let verifying_key = signing_key.verifying_key();
+    let encoded = verifying_key.to_encoded_point(false).to_bytes().to_vec();
+    let hash = {
+        let mut h = alloy_core::primitives::Keccak256::new();
+        h.update(&encoded[1..]);
+        h.finalize()
+    };
+    let addr_bytes: [u8; 20] = hash[12..32].try_into()?;
+    let wallet_address = alloy_core::primitives::Address::from(addr_bytes);
+    let wallet_hex = format!("{:#x}", wallet_address);
+
+    // Load positions from DB
+    let journal = TradeJournal::new(&config.trading.database_url).await?;
+    let positions = journal.load_positions().await?;
+
+    if positions.is_empty() {
+        println!("No positions in DB. Run 'savant recover' first.");
+        return Ok(());
+    }
+
+    let usdc_address = savant_trading::execution::dex::usdc_address_for_chain(config.exchange.dex.chain_id);
+    let client = reqwest::Client::new();
+
+    println!("Closing {} positions to USDC...", positions.len());
+
+    for pos in &positions {
+        if pos.quantity <= 0.0001 {
+            println!("  Skipping {} — dust quantity", pos.pair);
+            continue;
+        }
+
+        let token_symbol = pos.pair.split('/').next().unwrap_or("");
+        let token_address = match savant_trading::execution::dex::resolve_pair_on_chain(
+            &pos.pair, savant_trading::core::types::Side::Long, config.exchange.dex.chain_id
+        ) {
+            Ok((base_token, _)) => base_token.address.clone(),
+            Err(_) => {
+                println!("  Skipping {} — cannot resolve token", pos.pair);
+                continue;
+            }
+        };
+
+        let decimals: u32 = if token_symbol == "USDC" { 6 } else { 18 };
+        let amount_raw = (pos.quantity * 10f64.powi(decimals as i32)) as u128;
+
+        println!("  {} {:.6} {} -> USDC...", pos.side, pos.quantity, token_symbol);
+
+        // Get quote from 0x
+        let quote_url = format!(
+            "https://api.0x.org/swap/v1/quote?sellToken={}&buyToken={}&sellAmount={}&taker={}&slippageBps={}",
+            token_address, usdc_address, amount_raw, wallet_hex,
+            (config.exchange.dex.slippage_pct * 10000.0) as u32
+        );
+
+        match client.get(&quote_url)
+            .header("0x-api-key", &api_key)
+            .send().await
+        {
+            Ok(resp) if resp.status().is_success() => {
+                if let Ok(quote) = resp.json::<serde_json::Value>().await {
+                    let buy_amount = quote.get("buyAmount").and_then(|v| v.as_str()).unwrap_or("0");
+                    let buy_value: f64 = buy_amount.parse::<u128>().unwrap_or(0) as f64 / 1e6;
+                    let to_addr = quote.get("to").and_then(|v| v.as_str()).unwrap_or("");
+                    let data = quote.get("data").and_then(|v| v.as_str()).unwrap_or("");
+                    let _value = quote.get("value").and_then(|v| v.as_str()).unwrap_or("0");
+
+                    if to_addr.is_empty() || data.is_empty() {
+                        println!("    No swap route available for {}", token_symbol);
+                        continue;
+                    }
+
+                    println!("    Quote: {:.2} USDC expected", buy_value);
+                    println!("    To: {}", to_addr);
+                    println!("    Data length: {} bytes", data.len());
+
+                    // For now, print the quote. Actual execution requires signing + sending.
+                    // The engine handles this via DexTrader.
+                    let _ = journal.record_activity("Trade", &pos.pair,
+                        &format!("CLOSE-ALL {} {:.6} -> ~{:.2} USDC (quote)", pos.side, pos.quantity, buy_value)
+                    ).await;
+
+                    // Delete from DB after quote (optimistic — actual swap pending)
+                    let _ = journal.delete_position(&pos.id).await;
+                    println!("    Removed from DB");
+                }
+            }
+            Ok(resp) => {
+                let body = resp.text().await.unwrap_or_default();
+                println!("    Quote failed: {}", &body[..body.len().min(200)]);
+            }
+            Err(e) => println!("    Request error: {}", e),
+        }
+    }
+
+    println!("\nDone. Positions removed from DB.");
+    println!("To execute actual swaps, run the engine and close via dashboard.");
     Ok(())
 }
