@@ -373,7 +373,7 @@ savant-trading/
 │   └── llms-full.md                 # Full 0x API reference
 ├── dev/                             # Session docs, FIDs, LEARNINGS
 ├── Cargo.toml
-└── ECHO.md                          # Agent protocol
+└── ECHO.md                          # Savant Protocol (agent bootstrap)
 ```
 
 ---
@@ -402,9 +402,9 @@ cargo test           # 208 tests
 cargo clippy -- -D warnings
 ```
 
-### ECHO Protocol
+### Savant Protocol
 
-All development follows the [ECHO Protocol](ECHO.md):
+All development follows the [Savant Protocol](https://github.com/fame0528/savant-protocol):
 - 4 immutable process laws (Read-0-EOF, Present-Before-Act, Verify-Before-Proceed, Call-Graph Reachability)
 - Perfection Loop FSM (RED → GREEN → AUDIT → SELF-CORRECT → COMPLETE)
 - Session lifecycle management
