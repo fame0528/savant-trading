@@ -912,11 +912,12 @@ pub async fn run(
                 }
 
                 // Pre-filter: Skip tokens not verified on CoinGecko (DEX safety)
-                if !config.mode.paper_trading && config.exchange.backend != "kraken" {
-                    if !cg_verified.contains(base_symbol) {
-                        dead_tokens.insert(pair.to_string());
-                        continue;
-                    }
+                if !config.mode.paper_trading
+                    && config.exchange.backend != "kraken"
+                    && !cg_verified.contains(base_symbol)
+                {
+                    dead_tokens.insert(pair.to_string());
+                    continue;
                 }
 
                 // Pre-filter: Skip pairs with mostly-zero candles (corrupted Kraken data)
@@ -3182,9 +3183,8 @@ pub async fn run_training(
     count_filter: Option<usize>,
     full: bool,
     historical: bool,
-    _model_override: Option<String>,
+    model_override: Option<String>,
 ) -> anyhow::Result<()> {
-    let model_override = _model_override;
     let _test_memory =
         savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/test_memory.db").await?;
 
@@ -3277,7 +3277,7 @@ pub async fn run_training(
             break;
         }
 
-    let result = run_training_batch(&config, &scenarios, &test_memory, model_override.as_deref()).await?;
+        let result = run_training_batch(&config, &scenarios, &test_memory, model_override.as_deref()).await?;
         brier_history.push(result.brier_score);
 
         println!(
@@ -3365,6 +3365,18 @@ pub async fn run_action_test(
     }
 
     let result = run_training_batch(&config, &scenarios, &test_memory, model_override.as_deref()).await?;
+
+    let total_episodes = test_memory.total_trades().await.unwrap_or(0);
+    println!("Total episodes in test DB: {}", total_episodes);
+    println!(
+        "Brier: {:.4} | Actions: {} | Holds: {} | Lessons: {} | P&L ${:+.2}",
+        result.brier_score,
+        result.action_count,
+        result.hold_count,
+        result.lessons_generated,
+        result.metrics.total_pnl,
+    );
+
     Ok(())
 }
 
@@ -3396,11 +3408,10 @@ pub async fn run_sandbox(config: AppConfig, model_override: Option<String>) -> a
     let providers: Vec<savant_trading::agent::provider::LlmProvider> = api_keys
         .iter()
         .map(|key| {
-            let model = model_override.as_ref().cloned().unwrap_or_else(|| config.ai.model.clone());
             savant_trading::agent::provider::LlmProvider::new(
                 savant_trading::agent::provider::LlmConfig {
                     endpoint: config.ai.endpoint.clone(),
-                    model,
+                    model: model_override.clone().unwrap_or_else(|| config.ai.model.clone()),
                     api_key: key.clone(),
                     max_tokens: config.ai.max_tokens,
                     temperature: config.ai.temperature,
