@@ -604,7 +604,6 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
     use k256::ecdsa::SigningKey;
     use savant_trading::execution::dex::zero_x::ZeroXBackend;
     use savant_trading::execution::dex::DexTrader;
-    use savant_trading::execution::dex::resolve_pair_on_chain;
 
     let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)
         .map_err(|_| anyhow::anyhow!("WALLET_PRIVATE_KEY not set"))?;
@@ -643,7 +642,10 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
     let client = reqwest::Client::new();
     let permit2 = "0x000000000022d473030f116ddee9f6b43ac78ba3";
 
-    println!("Closing {} positions to USDC...\n", positions.len());
+    println!("Closing {} positions to USDC...", positions.len());
+    println!("USDC: {}", usdc_address);
+    println!();
+
     let mut total_received: f64 = 0.0;
 
     for pos in &positions {
@@ -653,20 +655,27 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
         }
 
         let token_symbol = pos.pair.split('/').next().unwrap_or("");
-        let (base_token, _quote_token) = match resolve_pair_on_chain(
-            &pos.pair, savant_trading::core::types::Side::Short, config.exchange.dex.chain_id
+
+        // Look up token address directly — no resolve_pair_on_chain ambiguity
+        let (token_address, decimals) = match savant_trading::execution::dex::lookup_token(
+            token_symbol, config.exchange.dex.chain_id
         ) {
-            Ok(pair) => pair,
-            Err(_) => {
-                println!("  Skipping {} — cannot resolve", pos.pair);
+            Some((addr, dec)) => (addr, dec as u32),
+            None => {
+                println!("  Skipping {} — token not in database", token_symbol);
                 continue;
             }
         };
-        let token_address = &base_token.address;
-        let decimals = base_token.decimals as u32;
+
+        // Verify sell and buy tokens are different
+        if token_address.to_lowercase() == usdc_address.to_lowercase() {
+            println!("  Skipping {} — sell token is USDC (nothing to swap)", token_symbol);
+            continue;
+        }
+
         let amount_raw = (pos.quantity * 10f64.powi(decimals as i32)) as u128;
 
-        println!("  Selling {:.6} {}...", pos.quantity, token_symbol);
+        println!("  Selling {:.6} {} ({})", pos.quantity, token_symbol, token_address);
 
         // Step 1: Approve token for Permit2
         let approve_data = format!(
@@ -679,16 +688,25 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
         println!("    Approving for Permit2...");
         match trader.sign_and_send(approve_to, &approve_bytes, U256::ZERO, 60000).await {
             Ok(hash) => println!("    Approve: {}", hash),
-            Err(e) => println!("    Approve skipped ({}): {}", if e.to_string().contains("already") { "already approved" } else { "error" }, e),
+            Err(e) => {
+                let err_str = e.to_string();
+                if err_str.contains("already") || err_str.contains("allowance") {
+                    println!("    Already approved");
+                } else {
+                    println!("    Approve error: {}", err_str);
+                }
+            }
         }
         tokio::time::sleep(std::time::Duration::from_secs(3)).await;
 
-        // Step 2: Get 0x swap quote
+        // Step 2: Get 0x swap quote (Permit2 endpoint, v2 API)
         let quote_url = format!(
             "https://api.0x.org/swap/permit2/quote?chainId={}&sellToken={}&buyToken={}&sellAmount={}&taker={}&slippageBps={}",
             config.exchange.dex.chain_id, token_address, usdc_address, amount_raw, wallet_hex,
             (config.exchange.dex.slippage_pct * 10000.0) as u32
         );
+
+        println!("    Quote: sell {} -> buy {}", token_address, usdc_address);
 
         match client.get(&quote_url)
             .header("0x-api-key", &api_key)
@@ -699,19 +717,27 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
                 let quote: serde_json::Value = resp.json().await?;
                 let buy_amount = quote.get("buyAmount").and_then(|v| v.as_str()).unwrap_or("0");
                 let buy_value: f64 = buy_amount.parse::<u128>().unwrap_or(0) as f64 / 1e6;
-                let to_addr = quote.get("to").and_then(|v| v.as_str()).unwrap_or("");
-                let data_hex = quote.get("transaction").and_then(|t| t.get("data")).and_then(|v| v.as_str())
+
+                // 0x v2 API: transaction data is nested under "transaction"
+                let tx = quote.get("transaction");
+                let to_addr = tx.and_then(|t| t.get("to")).and_then(|v| v.as_str())
+                    .or_else(|| quote.get("to").and_then(|v| v.as_str()))
+                    .unwrap_or("");
+                let data_hex = tx.and_then(|t| t.get("data")).and_then(|v| v.as_str())
                     .or_else(|| quote.get("data").and_then(|v| v.as_str()))
                     .unwrap_or("");
-                let value_str = quote.get("transaction").and_then(|t| t.get("value")).and_then(|v| v.as_str())
+                let value_str = tx.and_then(|t| t.get("value")).and_then(|v| v.as_str())
                     .or_else(|| quote.get("value").and_then(|v| v.as_str()))
                     .unwrap_or("0x0");
-                let gas_str = quote.get("transaction").and_then(|t| t.get("gas")).and_then(|v| v.as_str())
+                let gas_str = tx.and_then(|t| t.get("gas")).and_then(|v| v.as_str())
                     .or_else(|| quote.get("gas").and_then(|v| v.as_str()))
                     .unwrap_or("500000");
 
                 if to_addr.is_empty() || data_hex.is_empty() {
                     println!("    No route for {}", token_symbol);
+                    if let Some(reason) = quote.get("reason").and_then(|r| r.as_str()) {
+                        println!("    Reason: {}", reason);
+                    }
                     continue;
                 }
 
