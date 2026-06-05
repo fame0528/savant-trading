@@ -446,8 +446,23 @@ pub async fn run(
         match j.load_positions().await {
             Ok(db_positions) if !db_positions.is_empty() => {
                 info!("Restored {} open positions from DB", db_positions.len());
-                for pos in &db_positions {
-                    paper.positions_mut().insert(pos.id.clone(), pos.clone());
+                for mut pos in db_positions {
+                    // Validate stop-loss: if 0 or missing, set a 5% default
+                    if pos.stop_loss <= 0.0 {
+                        let sl_pct = 0.05;
+                        pos.stop_loss = match pos.side {
+                            Side::Long => pos.entry_price * (1.0 - sl_pct),
+                            Side::Short => pos.entry_price * (1.0 + sl_pct),
+                        };
+                        warn!("Position {} had no stop-loss — set to {:.4} (5% default)", pos.pair, pos.stop_loss);
+                        // Persist the fixed stop-loss back to DB
+                        if let Err(e) = j.save_position(&pos).await {
+                            warn!("Failed to persist fixed stop-loss: {}", e);
+                        }
+                    }
+                    info!("  {} {} | Entry: {:.4} SL: {:.4} TP1: {:.4} | Qty: {:.6}",
+                        pos.pair, pos.side, pos.entry_price, pos.stop_loss, pos.take_profit_1, pos.quantity);
+                    paper.positions_mut().insert(pos.id.clone(), pos);
                 }
                 paper.account_mut().open_positions = paper.positions().len();
             }

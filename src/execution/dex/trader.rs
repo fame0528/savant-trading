@@ -1309,23 +1309,13 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
     }
 
     async fn place_stop_loss(&mut self, position_id: &str) -> Result<(), ExecutionError> {
-        warn!(
-            "DEX stop-loss is CLIENT-SIDE only (position_id={}) — NOT exchange-guaranteed. \
-             Persisting SL target for crash recovery.",
-            position_id
-        );
-
-        // The stop_loss value is already set on the Position when created.
-        // Persist state to ensure SL target survives a crash/restart.
-        self.save_state().map_err(|e| {
-            warn!("Failed to persist stop-loss state: {}", e);
-            e
-        })?;
-
         info!(
-            "Stop-loss persisted for {} (client-side monitoring)",
+            "Stop-loss registered for {} (client-side, DB-persisted)",
             position_id
         );
+        // Stop-loss value is on the Position struct, which is persisted to SQLite
+        // by the engine on every open/close/trail event. No separate persistence needed.
+        // PaperTrader::check_stops() fires the stop every cycle.
         Ok(())
     }
 }
