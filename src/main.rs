@@ -597,13 +597,13 @@ async fn recover_positions(config: &savant_trading::core::config::AppConfig) -> 
 }
 
 /// Close all positions — sell all token holdings to USDC via 0x API.
-/// Actually signs and sends the transactions. One command, no restart needed.
+/// Uses ZeroXBackend::build_swap_tx for proper Permit2 signing.
 async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -> anyhow::Result<()> {
     use savant_trading::monitor::journal::TradeJournal;
     use alloy_core::primitives::{Address, U256};
     use k256::ecdsa::SigningKey;
     use savant_trading::execution::dex::zero_x::ZeroXBackend;
-    use savant_trading::execution::dex::DexTrader;
+    use savant_trading::execution::dex::{DexTrader, SwapParams};
 
     let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)
         .map_err(|_| anyhow::anyhow!("WALLET_PRIVATE_KEY not set"))?;
@@ -628,7 +628,7 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
     ).await?;
 
     let wallet_hex = format!("{:#x}", trader.wallet_address());
-    println!("Wallet: {}", wallet_hex);
+    let usdc_address = savant_trading::execution::dex::usdc_address_for_chain(config.exchange.dex.chain_id);
 
     let journal = TradeJournal::new(&config.trading.database_url).await?;
     let positions = journal.load_positions().await?;
@@ -638,14 +638,12 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
         return Ok(());
     }
 
-    let usdc_address = savant_trading::execution::dex::usdc_address_for_chain(config.exchange.dex.chain_id);
-    let client = reqwest::Client::new();
-    let permit2 = "0x000000000022d473030f116ddee9f6b43ac78ba3";
+    // Deduplicate by pair (recover may have created duplicates)
+    let mut seen = std::collections::HashSet::new();
+    let positions: Vec<_> = positions.into_iter().filter(|p| seen.insert(p.pair.clone())).collect();
 
-    println!("Closing {} positions to USDC...", positions.len());
-    println!("USDC: {}", usdc_address);
-    println!();
-
+    println!("Wallet: {}", wallet_hex);
+    println!("Closing {} unique positions to USDC...", positions.len());
     let mut total_received: f64 = 0.0;
 
     for pos in &positions {
@@ -656,104 +654,60 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
 
         let token_symbol = pos.pair.split('/').next().unwrap_or("");
 
-        // Look up token address directly — no resolve_pair_on_chain ambiguity
+        // Look up token address directly
         let (token_address, decimals) = match savant_trading::execution::dex::lookup_token(
             token_symbol, config.exchange.dex.chain_id
         ) {
             Some((addr, dec)) => (addr, dec as u32),
             None => {
-                println!("  Skipping {} — token not in database", token_symbol);
+                println!("  Skipping {} — not in token DB", token_symbol);
                 continue;
             }
         };
 
-        // Verify sell and buy tokens are different
         if token_address.to_lowercase() == usdc_address.to_lowercase() {
-            println!("  Skipping {} — sell token is USDC (nothing to swap)", token_symbol);
+            println!("  Skipping {} — already USDC", token_symbol);
             continue;
         }
 
-        let amount_raw = (pos.quantity * 10f64.powi(decimals as i32)) as u128;
+        let amount_wei = savant_trading::execution::dex::amount_to_wei(pos.quantity, decimals as u8);
+        let sell_usd = pos.quantity * pos.current_price;
 
-        println!("  Selling {:.6} {} ({})", pos.quantity, token_symbol, token_address);
+        println!("\n  {} {:.6} {} (~${:.2})", pos.side, pos.quantity, token_symbol, sell_usd);
+        println!("    sellToken: {}", token_address);
+        println!("    buyToken:  {}", usdc_address);
+        println!("    sellAmount: {}", amount_wei);
 
-        // Step 1: Approve token for Permit2
-        let approve_data = format!(
-            "0x095ea7b3{:0>64}{:0>64}",
-            permit2.trim_start_matches("0x"),
-            "f".repeat(64)
-        );
-        let approve_to: Address = token_address.parse().unwrap_or_default();
-        let approve_bytes = alloy_core::primitives::hex::decode(approve_data.trim_start_matches("0x")).unwrap_or_default();
-        println!("    Approving for Permit2...");
-        match trader.sign_and_send(approve_to, &approve_bytes, U256::ZERO, 60000).await {
-            Ok(hash) => println!("    Approve: {}", hash),
-            Err(e) => {
-                let err_str = e.to_string();
-                if err_str.contains("already") || err_str.contains("allowance") {
-                    println!("    Already approved");
-                } else {
-                    println!("    Approve error: {}", err_str);
-                }
-            }
-        }
-        tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+        // Use ZeroXBackend::build_swap_tx — handles Permit2 signing automatically
+        let swap_params = SwapParams {
+            src_token: token_address.clone(),
+            dst_token: usdc_address.to_string(),
+            amount: amount_wei.clone(),
+            slippage: config.exchange.dex.slippage_pct,
+            from: wallet_hex.clone(),
+            chain_id: config.exchange.dex.chain_id,
+        };
 
-        // Step 2: Get 0x swap quote (Permit2 endpoint, v2 API)
-        let quote_url = format!(
-            "https://api.0x.org/swap/permit2/quote?chainId={}&sellToken={}&buyToken={}&sellAmount={}&taker={}&slippageBps={}",
-            config.exchange.dex.chain_id, token_address, usdc_address, amount_raw, wallet_hex,
-            (config.exchange.dex.slippage_pct * 10000.0) as u32
-        );
+        match trader.build_swap_tx(&swap_params).await {
+            Ok(swap_tx) => {
+                println!("    Quote OK — expected output from 0x");
+                println!("    To: {}", swap_tx.to);
+                println!("    Gas: {}", swap_tx.gas);
 
-        println!("    Quote: sell {} -> buy {}", token_address, usdc_address);
+                let swap_to: Address = swap_tx.to.parse().unwrap_or_default();
+                let swap_data = alloy_core::primitives::hex::decode(
+                    swap_tx.data.trim_start_matches("0x")
+                ).unwrap_or_default();
+                let swap_value = U256::from_str_radix(
+                    swap_tx.value.trim_start_matches("0x"), 16
+                ).unwrap_or(U256::ZERO);
 
-        match client.get(&quote_url)
-            .header("0x-api-key", &api_key)
-            .header("0x-version", "v2")
-            .send().await
-        {
-            Ok(resp) if resp.status().is_success() => {
-                let quote: serde_json::Value = resp.json().await?;
-                let buy_amount = quote.get("buyAmount").and_then(|v| v.as_str()).unwrap_or("0");
-                let buy_value: f64 = buy_amount.parse::<u128>().unwrap_or(0) as f64 / 1e6;
-
-                // 0x v2 API: transaction data is nested under "transaction"
-                let tx = quote.get("transaction");
-                let to_addr = tx.and_then(|t| t.get("to")).and_then(|v| v.as_str())
-                    .or_else(|| quote.get("to").and_then(|v| v.as_str()))
-                    .unwrap_or("");
-                let data_hex = tx.and_then(|t| t.get("data")).and_then(|v| v.as_str())
-                    .or_else(|| quote.get("data").and_then(|v| v.as_str()))
-                    .unwrap_or("");
-                let value_str = tx.and_then(|t| t.get("value")).and_then(|v| v.as_str())
-                    .or_else(|| quote.get("value").and_then(|v| v.as_str()))
-                    .unwrap_or("0x0");
-                let gas_str = tx.and_then(|t| t.get("gas")).and_then(|v| v.as_str())
-                    .or_else(|| quote.get("gas").and_then(|v| v.as_str()))
-                    .unwrap_or("500000");
-
-                if to_addr.is_empty() || data_hex.is_empty() {
-                    println!("    No route for {}", token_symbol);
-                    if let Some(reason) = quote.get("reason").and_then(|r| r.as_str()) {
-                        println!("    Reason: {}", reason);
-                    }
-                    continue;
-                }
-
-                println!("    Quote: {:.2} USDC", buy_value);
-
-                // Step 3: Sign and send swap
-                let swap_to: Address = to_addr.parse().unwrap_or_default();
-                let swap_data = alloy_core::primitives::hex::decode(data_hex.trim_start_matches("0x")).unwrap_or_default();
-                let swap_value = U256::from_str_radix(value_str.trim_start_matches("0x"), 16).unwrap_or(U256::ZERO);
-                let gas_limit: u64 = gas_str.parse().unwrap_or(500000);
-
-                println!("    Sending swap...");
-                match trader.sign_and_send(swap_to, &swap_data, swap_value, gas_limit).await {
+                println!("    Sending swap tx...");
+                match trader.sign_and_send(swap_to, &swap_data, swap_value, swap_tx.gas).await {
                     Ok(tx_hash) => {
                         println!("    TX: {}", tx_hash);
-                        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                        // Wait for confirmation
+                        tokio::time::sleep(std::time::Duration::from_secs(15)).await;
 
                         // Check receipt
                         let receipt_body = serde_json::json!({
@@ -761,37 +715,40 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
                             "method": "eth_getTransactionReceipt",
                             "params": [tx_hash]
                         });
+                        let client = reqwest::Client::new();
                         if let Ok(resp) = client.post(&config.exchange.dex.rpc_url)
                             .header("User-Agent", "Mozilla/5.0")
                             .json(&receipt_body).send().await
                         {
                             if let Ok(json) = resp.json::<serde_json::Value>().await {
-                                let status = json.get("result").and_then(|r| r.get("status")).and_then(|s| s.as_str()).unwrap_or("0x0");
+                                let status = json.get("result")
+                                    .and_then(|r| r.get("status"))
+                                    .and_then(|s| s.as_str())
+                                    .unwrap_or("0x0");
                                 if status == "0x1" {
-                                    println!("    CONFIRMED — {:.2} USDC", buy_value);
-                                    total_received += buy_value;
+                                    println!("    CONFIRMED on-chain");
+                                    total_received += sell_usd;
                                     let _ = journal.delete_position(&pos.id).await;
                                     println!("    Removed from DB");
                                 } else {
-                                    println!("    REVERTED — status {}", status);
+                                    println!("    REVERTED (status={})", status);
                                 }
                             }
                         }
                     }
-                    Err(e) => println!("    Swap failed: {}", e),
+                    Err(e) => println!("    Send failed: {}", e),
                 }
             }
-            Ok(resp) => {
-                let body = resp.text().await.unwrap_or_default();
-                println!("    Quote failed: {}", &body[..body.len().min(200)]);
-            }
-            Err(e) => println!("    Request error: {}", e),
+            Err(e) => println!("    Quote failed: {}", e),
         }
-        println!();
     }
+
+    println!("\n=== DONE ===");
+    println!("Total sold: ~${:.2}", total_received);
 
     // Final USDC balance
     let usdc_data = format!("0x70a08231{:0>64}", wallet_hex.trim_start_matches("0x").to_lowercase());
+    let client = reqwest::Client::new();
     let usdc_body = serde_json::json!({
         "jsonrpc": "2.0", "id": 1,
         "method": "eth_call",
@@ -805,12 +762,11 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
             if let Some(hex_val) = json.get("result").and_then(|r| r.as_str()) {
                 let bal = U256::from_str_radix(hex_val.trim_start_matches("0x"), 16).unwrap_or(U256::ZERO);
                 let usdc_bal: f64 = bal.to_string().parse().unwrap_or(0.0) / 1e6;
-                println!("Final USDC balance: ${:.2}", usdc_bal);
+                println!("USDC balance: ${:.2}", usdc_bal);
             }
         }
     }
 
-    println!("\nDone. Total received: ~${:.2} USDC", total_received);
-    println!("Next: cargo run --release (clean start)");
+    println!("\nNext: cargo run --release (clean start)");
     Ok(())
 }

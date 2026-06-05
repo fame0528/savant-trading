@@ -18,7 +18,7 @@ use crate::{log_swap, log_swap_ok, log_swap_fail, log_warn};
 use crate::core::types::{Order, OrderStatus, OrderType, Position, ScaleLevel, Side, TradeRecord};
 use crate::execution::engine::ExecutionEngine;
 
-use super::{amount_to_wei, resolve_pair, DexBackend, TokenInfo};
+use super::{amount_to_wei, resolve_pair, DexBackend, SwapParams, SwapTx, TokenInfo};
 
 use alloy_core::primitives::hex;
 use alloy_core::primitives::{Address, U256};
@@ -294,6 +294,11 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
     pub fn wallet_address(&self) -> Address {
         self.wallet_address
+    }
+
+    /// Build a swap transaction via the backend (handles Permit2 signing).
+    pub async fn build_swap_tx(&self, params: &SwapParams) -> Result<SwapTx, ExecutionError> {
+        self.backend.build_swap_tx(params).await
     }
 
     /// Register an additional chain for multi-chain execution (FID-045).
