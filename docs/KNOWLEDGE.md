@@ -129,255 +129,255 @@ Below is the full inventory organized by category. Formats: `[PDF]`, `[EPUB]`, `
 
 #### Japanese Candlestick & Chart Pattern Analysis
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Japanese Candlestick Charting Techniques (Nison) | 1991 | 4.5/236 | PDF |
-| Japanese Candlestick Charting Techniques 2nd ed. (Nison) | 2001 | 4.5/236 | PDF (×3) |
-| Beyond Candlesticks: New Japanese Charting Techniques Revealed | 1994 | 4.2/30 | PDF (×3, 1 annotated) |
-| The Candlestick Course (Nison) | 2003 | 4.5/106 | PDF |
-| Candlestick Charting Explained 3rd ed. (Morris) | 2006 | 4.4/84 | PDF |
-| Candlestick Charting For Dummies (Linton) | 2008 | 4.3/80 | PDF |
-| Getting Started in Candlestick Charting (Wright) | 2008 | 4.4/36 | PDF |
-| Candlestick and Pivot Point Trading Triggers (Person) | 2006 | 4/33 | PDF |
-| Encyclopedia of Chart Patterns 2nd ed. (Bulkowski) | 2005 | 4.3/90 | PDF |
-| Visual Guide to Chart Patterns (Bulkowski) | 2012 | 4/29 | PDF |
+| Japanese Candlestick Charting Techniques (Nison) | 1991 | 4.5 | 236 | PDF |
+| Japanese Candlestick Charting Techniques 2nd ed. (Nison) | 2001 | 4.5 | 236 | PDF (×3) |
+| Beyond Candlesticks: New Japanese Charting Techniques Revealed | 1994 | 4.2 | 30 | PDF (×3, 1 annotated) |
+| The Candlestick Course (Nison) | 2003 | 4.5 | 106 | PDF |
+| Candlestick Charting Explained 3rd ed. (Morris) | 2006 | 4.4 | 84 | PDF |
+| Candlestick Charting For Dummies (Linton) | 2008 | 4.3 | 80 | PDF |
+| Getting Started in Candlestick Charting (Wright) | 2008 | 4.4 | 36 | PDF |
+| Candlestick and Pivot Point Trading Triggers (Person) | 2006 | 4 | 33 | PDF |
+| Encyclopedia of Chart Patterns 2nd ed. (Bulkowski) | 2005 | 4.3 | 90 | PDF |
+| Visual Guide to Chart Patterns (Bulkowski) | 2012 | 4 | 29 | PDF |
 
 #### Technical Analysis
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Technical Analysis of the Financial Markets (Murphy) | 1999 | 4.6/227 | PDF |
-| Technical Analysis: The Complete Resource for Financial Market Technicians (Edwards/Magee) | 2006 | 4.4/39 | PDF |
-| Technical Analysis: The Complete Resource 2nd ed. (Edwards/Magee) | 2010 | 4.1/55 | PDF (×2) |
-| Technical Analysis: The Complete Resource 2nd ed. (Edwards/Magee) | 2011 | 4.1/55 | PDF |
-| Technical Analysis Explained 4th ed. (Pring) | 2002 | 4.1/50 | PDF |
-| Technical Analysis and Stock Market Profits (Schabacker) | 2005 | 4.4/6 | PDF |
-| Technical Analysis of Stock Trends 9th ed. (Edwards/Magee) | 2007 | 4.1/102 | PDF |
-| Technical Analysis of Stock Trends Explained (Bulkowski) | 2013 | 3.6/6 | EPUB, MOBI |
-| Technical Analysis For Dummies 2nd ed. (Rockefeller) | 2011 | 4.1/95 | PDF |
-| A Complete Guide to Technical Trading Tactics (Person) | 2004 | 3.5/19 | PDF |
-| Chart Your Way To Profits 2nd ed. (Person) | 2010 | 4.2/8 | PDF |
-| The Visual Investor 2nd ed. (Murphy) | 2009 | 4.4/53 | PDF |
-| The Alchemy of Finance 2nd ed. (Soros) | 1994 | 4.3/6 | PDF |
-| Technical Analysis for the Trading Professional 2nd ed. (Brown) | 2012 | 3.6/74 | PDF |
-| New Frontiers in Technical Analysis (DeMark) | 2011 | 4/1 | PDF |
-| Evidence-Based Technical Analysis (Aronson) | 2007 | 4/69 | PDF |
-| The Handbook of Technical Analysis | 2016 | 5/5 | PDF |
-| The Art and Science of Technical Analysis (Grimes) | 2012 | 4.6/79 | PDF (×1, 1 annotated) |
+| Technical Analysis of the Financial Markets (Murphy) | 1999 | 4.6 | 227 | PDF |
+| Technical Analysis: The Complete Resource for Financial Market Technicians (Edwards/Magee) | 2006 | 4.4 | 39 | PDF |
+| Technical Analysis: The Complete Resource 2nd ed. (Edwards/Magee) | 2010 | 4.1 | 55 | PDF (×2) |
+| Technical Analysis: The Complete Resource 2nd ed. (Edwards/Magee) | 2011 | 4.1 | 55 | PDF |
+| Technical Analysis Explained 4th ed. (Pring) | 2002 | 4.1 | 50 | PDF |
+| Technical Analysis and Stock Market Profits (Schabacker) | 2005 | 4.4 | 6 | PDF |
+| Technical Analysis of Stock Trends 9th ed. (Edwards/Magee) | 2007 | 4.1 | 102 | PDF |
+| Technical Analysis of Stock Trends Explained (Bulkowski) | 2013 | 3.6 | 6 | EPUB, MOBI |
+| Technical Analysis For Dummies 2nd ed. (Rockefeller) | 2011 | 4.1 | 95 | PDF |
+| A Complete Guide to Technical Trading Tactics (Person) | 2004 | 3.5 | 19 | PDF |
+| Chart Your Way To Profits 2nd ed. (Person) | 2010 | 4.2 | 8 | PDF |
+| The Visual Investor 2nd ed. (Murphy) | 2009 | 4.4 | 53 | PDF |
+| The Alchemy of Finance 2nd ed. (Soros) | 1994 | 4.3 | 6 | PDF |
+| Technical Analysis for the Trading Professional 2nd ed. (Brown) | 2012 | 3.6 | 74 | PDF |
+| New Frontiers in Technical Analysis (DeMark) | 2011 | 4 | 1 | PDF |
+| Evidence-Based Technical Analysis (Aronson) | 2007 | 4 | 69 | PDF |
+| The Handbook of Technical Analysis | 2016 | 5 | 5 | PDF |
+| The Art and Science of Technical Analysis (Grimes) | 2012 | 4.6 | 79 | PDF (×1, 1 annotated) |
 
 #### Volume Price Analysis
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| A Complete Guide To Volume Price Analysis (Coulling) | 2013 | 4.5/383 | EPUB, PDF |
+| A Complete Guide To Volume Price Analysis (Coulling) | 2013 | 4.5 | 383 | EPUB, PDF |
 
 #### Trading Psychology & Discipline
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Trading in the Zone (Douglas) | 2000 | 4.5/541 | PDF (×2), EPUB |
-| The Disciplined Trader (Douglas) | 1990 | 4.4/205 | PDF (×2, 1 annotated) |
-| Fooled by Randomness (Taleb) | 2005 | 4.1/718 | PDF, EPUB |
-| How to Day Trade for a Living 4th ed. (Aaziz) | 2015 | 4.7/880 | EPUB |
-| Sentiment in the Forex Market (Saettele) | 2008 | 4/17 | PDF |
+| Trading in the Zone (Douglas) | 2000 | 4.5 | 541 | PDF (×2), EPUB |
+| The Disciplined Trader (Douglas) | 1990 | 4.4 | 205 | PDF (×2, 1 annotated) |
+| Fooled by Randomness (Taleb) | 2005 | 4.1 | 718 | PDF, EPUB |
+| How to Day Trade for a Living 4th ed. (Aaziz) | 2015 | 4.7 | 880 | EPUB |
+| Sentiment in the Forex Market (Saettele) | 2008 | 4 | 17 | PDF |
 
 #### Market Wizards & Trader Interviews
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Market Wizards (Schwager) | 2012 | 4.5/340 | PDF (×2) |
-| The New Market Wizards (Schwager) | 1992 | 4.5/162 | PDF |
-| Stock Market Wizards (Schwager) | 2001 | 4.2/68 | PDF (×2), EPUB |
+| Market Wizards (Schwager) | 2012 | 4.5 | 340 | PDF (×2) |
+| The New Market Wizards (Schwager) | 1992 | 4.5 | 162 | PDF |
+| Stock Market Wizards (Schwager) | 2001 | 4.2 | 68 | PDF (×2), EPUB |
 | 41775536-Market-Wizards (Schwager) | — | — | PDF |
 | Millionaire Traders (Schwager) | 2007 | — | PDF |
-| Adventures of a Currency Trader (Lein) | 2007 | 4/52 | PDF |
+| Adventures of a Currency Trader (Lein) | 2007 | 4 | 52 | PDF |
 | The Complete Turtle Trader (Faith) | 2007 | — | PDF |
-| Way of the Turtle (Faith) | 2007 | 4/165 | PDF |
+| Way of the Turtle (Faith) | 2007 | 4 | 165 | PDF |
 
 #### Risk Management & Money Management
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Trade Your Way to Financial Freedom 2nd ed. (Van Tharp) | 2006 | 4.3/266 | EPUB, PDF (×2) |
-| Trading for a Living (Elder) | 1993 | 4.2/296 | PDF |
-| The New Trading for a Living (Elder) | 2014 | 4.4/99 | PDF |
+| Trade Your Way to Financial Freedom 2nd ed. (Van Tharp) | 2006 | 4.3 | 266 | EPUB, PDF (×2) |
+| Trading for a Living (Elder) | 1993 | 4.2 | 296 | PDF |
+| The New Trading for a Living (Elder) | 2014 | 4.4 | 99 | PDF |
 | The New Trading for a Living (Study Guide) (Elder) | 2014 | — | PDF |
-| Building Reliable Trading Systems (Schutt) | 2013 | 4.2/29 | PDF |
-| High Probability Trading Strategies (Minervini) | 2008 | 4.1/147 | PDF |
-| Trade Like a Pro (Whistler) | 2009 | 4/1 | PDF |
-| The Commitments of Traders Bible (Briese) | 2008 | 4.6/15 | PDF |
+| Building Reliable Trading Systems (Schutt) | 2013 | 4.2 | 29 | PDF |
+| High Probability Trading Strategies (Minervini) | 2008 | 4.1 | 147 | PDF |
+| Trade Like a Pro (Whistler) | 2009 | 4 | 1 | PDF |
+| The Commitments of Traders Bible (Briese) | 2008 | 4.6 | 15 | PDF |
 
 #### Position Sizing & Portfolio Theory
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| The Encyclopedia of Trading Strategies (Saluka) | 2000 | 3/33 | PDF |
+| The Encyclopedia of Trading Strategies (Saluka) | 2000 | 3 | 33 | PDF |
 
 #### Trend Following
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Trend Following (Covel) | 2009 | 4.1/389 | PDF |
-| Trend Trading for a Living (Crabel) | 2007 | 4.2/71 | PDF |
-| Long-Term Secrets to Short-Term Trading (Williams) | 1999 | 3.4/47 | PDF |
-| Attacking Currency Trends (Dao) | 2011 | 4.6/61 | PDF |
-| The Trend Following Bible (Abraham) | 2012 | 3.5/33 | PDF |
-| Dual Momentum Investing (Antonacci) | 2015 | 4.7/340 | EPUB |
+| Trend Following (Covel) | 2009 | 4.1 | 389 | PDF |
+| Trend Trading for a Living (Crabel) | 2007 | 4.2 | 71 | PDF |
+| Long-Term Secrets to Short-Term Trading (Williams) | 1999 | 3.4 | 47 | PDF |
+| Attacking Currency Trends (Dao) | 2011 | 4.6 | 61 | PDF |
+| The Trend Following Bible (Abraham) | 2012 | 3.5 | 33 | PDF |
+| Dual Momentum Investing (Antonacci) | 2015 | 4.7 | 340 | EPUB |
 
 #### Swing Trading
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Swing Trading For Dummies (Basset) | 2008 | 4.4/75 | PDF |
-| Dave Landry on Swing Trading | 2001 | 4.1/21 | PDF |
-| The Master Swing Trader (Crabel) | 2001 | 3.2/248 | PDF |
-| The Master Swing Trader Toolkit (Crabel) | 2010 | 3.4/20 | PDF |
-| Timing Solutions for Swing Traders (Yates) | 2012 | 4.5/2 | PDF |
+| Swing Trading For Dummies (Basset) | 2008 | 4.4 | 75 | PDF |
+| Dave Landry on Swing Trading | 2001 | 4.1 | 21 | PDF |
+| The Master Swing Trader (Crabel) | 2001 | 3.2 | 248 | PDF |
+| The Master Swing Trader Toolkit (Crabel) | 2010 | 3.4 | 20 | PDF |
+| Timing Solutions for Swing Traders (Yates) | 2012 | 4.5 | 2 | PDF |
 
 #### Day Trading
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Day Trading For Dummies (Logan) | 2008 | 3.9/28 | PDF |
-| Day Trading For Dummies 3rd ed. (Logan) | 2014 | 3.6/36 | PDF, EPUB |
-| Mastering the Trade (Carter) | 2006 | 4.3/327 | PDF (×3) |
-| Mastering the Trade 2nd ed. (Carter) | 2012 | 4.3/327 | PDF (×3, 1 annotated) |
-| The Complete Trading Course (Carter) | 2011 | 4.1/24 | PDF |
+| Day Trading For Dummies (Logan) | 2008 | 3.9 | 28 | PDF |
+| Day Trading For Dummies 3rd ed. (Logan) | 2014 | 3.6 | 36 | PDF, EPUB |
+| Mastering the Trade (Carter) | 2006 | 4.3 | 327 | PDF (×3) |
+| Mastering the Trade 2nd ed. (Carter) | 2012 | 4.3 | 327 | PDF (×3, 1 annotated) |
+| The Complete Trading Course (Carter) | 2011 | 4.1 | 24 | PDF |
 
 #### Price Action & Order Flow
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Understanding Price Action (Lunden) | 2014 | 4.2/47 | PDF |
-| Naked Forex (Nekritin) | 2012 | 4.2/95 | PDF |
-| Trade What You See (Littleton) | 2007 | 4/46 | PDF |
-| Trading Price Action Trends (Brooks) | 2011 | 4.1/67 | PDF |
+| Understanding Price Action (Lunden) | 2014 | 4.2 | 47 | PDF |
+| Naked Forex (Nekritin) | 2012 | 4.2 | 95 | PDF |
+| Trade What You See (Littleton) | 2007 | 4 | 46 | PDF |
+| Trading Price Action Trends (Brooks) | 2011 | 4.1 | 67 | PDF |
 
 #### Algorithmic & Systematic Trading
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Algorithmic Trading (Chan) | 2013 | 4.1/37 | PDF (×2, 1 annotated) |
-| Intermarket Trading Strategies (Henderson) | 2009 | 4.6/15 | PDF |
+| Algorithmic Trading (Chan) | 2013 | 4.1 | 37 | PDF (×2, 1 annotated) |
+| Intermarket Trading Strategies (Henderson) | 2009 | 4.6 | 15 | PDF |
 | The Complete Guide to Price Action Trading (Brooks) | — | — | — |
 
 #### Trading Systems & Methodologies
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Come Into My Trading Room (Elder) | 2002 | 4.5/170 | PDF |
+| Come Into My Trading Room (Elder) | 2002 | 4.5 | 170 | PDF |
 | Come Into My Trading Room (Study Guide) (Elder) | 2002 | — | PDF |
-| The 10 Essentials of Forex Trading (Norris) | 2007 | 3.9/44 | PDF |
-| The Market Guys' Five Points for Trading Success | 2007 | 4.4/52 | PDF |
+| The 10 Essentials of Forex Trading (Norris) | 2007 | 3.9 | 44 | PDF |
+| The Market Guys' Five Points for Trading Success | 2007 | 4.4 | 52 | PDF |
 
 #### Harmonic Trading
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Harmonic Trading, Volume One (Carney) | 2010 | 3.6/43 | PDF |
-| Harmonic Trading, Volume Two (Carney) | 2010 | 4.2/12 | PDF |
+| Harmonic Trading, Volume One (Carney) | 2010 | 3.6 | 43 | PDF |
+| Harmonic Trading, Volume Two (Carney) | 2010 | 4.2 | 12 | PDF |
 
 #### Options & Derivatives
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Option Volatility & Pricing (Natenberg) | 1994 | 4.3/155 | PDF |
-| Option Spread Strategies (Harley) | 2009 | 3.3/15 | PDF |
-| Trading Binary Options (2nd ed.) | 2016 | 3/2 | PDF |
+| Option Volatility & Pricing (Natenberg) | 1994 | 4.3 | 155 | PDF |
+| Option Spread Strategies (Harley) | 2009 | 3.3 | 15 | PDF |
+| Trading Binary Options (2nd ed.) | 2016 | 3 | 2 | PDF |
 | Top Binary Options Trading Strategies | — | — | PDF |
 
 #### Forex & Currency Trading (Foundational Market Structure)
 
 These books teach market mechanics — session timing, price action, order flow, and multi-timeframe analysis — that transfer directly to crypto's 24/7 markets. Crypto lacks traditional session structure, but the concepts of liquidity, volatility cycles, institutional vs. retail behavior, and intermarket relationships apply.
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Day Trading and Swing Trading the Currency Market 2nd ed. (Lien) | 2008 | 4/29 | PDF |
-| Day Trading the Currency Market (Lien) | 2005 | 3.8/47 | PDF |
-| Currency Trading and Intermarket Analysis (Lien) | 2008 | 4/26 | PDF |
-| Inside the Currency Market (Dunbar) | 2011 | 4/2 | PDF |
-| Currency Strategy (Callan) | 2002 | 3.5/7 | PDF |
-| Essentials of Foreign Exchange Trading (Haskill) | 2009 | 4.1/26 | PDF |
-| Currency Trading For Dummies 2nd ed. (Dolan) | 2011 | 4.1/66 | PDF |
-| The Little Book of Currency Trading (Lien) | 2010 | 3.8/42 | PDF |
-| How to Make a Living Trading Foreign Exchange (Cook) | 2010 | 3.6/29 | PDF |
-| Forex Patterns and Probabilities (Edwards) | 2007 | 4.1/62 | PDF |
-| Forex Trading Secrets (McGee) | 2010 | 3.3/9 | PDF |
-| Forex for Beginners (Dolan) | 2012 | 4/10 | PDF |
-| The Sensible Guide to Forex (Loyd) | 2012 | 3.8/20 | PDF |
-| 17 Proven Currency Trading Strategies (Lien) | 2013 | 2.4/10 | PDF |
+| Day Trading and Swing Trading the Currency Market 2nd ed. (Lien) | 2008 | 4 | 29 | PDF |
+| Day Trading the Currency Market (Lien) | 2005 | 3.8 | 47 | PDF |
+| Currency Trading and Intermarket Analysis (Lien) | 2008 | 4 | 26 | PDF |
+| Inside the Currency Market (Dunbar) | 2011 | 4 | 2 | PDF |
+| Currency Strategy (Callan) | 2002 | 3.5 | 7 | PDF |
+| Essentials of Foreign Exchange Trading (Haskill) | 2009 | 4.1 | 26 | PDF |
+| Currency Trading For Dummies 2nd ed. (Dolan) | 2011 | 4.1 | 66 | PDF |
+| The Little Book of Currency Trading (Lien) | 2010 | 3.8 | 42 | PDF |
+| How to Make a Living Trading Foreign Exchange (Cook) | 2010 | 3.6 | 29 | PDF |
+| Forex Patterns and Probabilities (Edwards) | 2007 | 4.1 | 62 | PDF |
+| Forex Trading Secrets (McGee) | 2010 | 3.3 | 9 | PDF |
+| Forex for Beginners (Dolan) | 2012 | 4 | 10 | PDF |
+| The Sensible Guide to Forex (Loyd) | 2012 | 3.8 | 20 | PDF |
+| 17 Proven Currency Trading Strategies (Lien) | 2013 | 2.4 | 10 | PDF |
 | Forex Trading Basics & Secrets Vol 3.0 | — | — | PDF |
 
 #### Ichimoku
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Trading with Ichimoku Clouds (Patel) | 2010 | 3/33 | PDF |
+| Trading with Ichimoku Clouds (Patel) | 2010 | 3 | 33 | PDF |
 
 #### ETF Trading
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Trading ETFs 2nd ed. (Duguid) | 2012 | 4.2/3 | PDF |
+| Trading ETFs 2nd ed. (Duguid) | 2012 | 4.2 | 3 | PDF |
 
 #### Fundamental Analysis & Value Investing
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| The Intelligent Investor (Graham) | 2003 | 4.5/1881 | PDF, MOBI |
-| Common Stocks and Uncommon Profits (Fisher) | 2003 | 4.3/206 | PDF, AZW |
-| One Up On Wall Street (Lynch) | 2000 | 4.5/673 | EPUB |
-| How to Make Money in Stocks 4th ed. (O'Neil) | 2009 | 4.3/577 | PDF, EPUB, MOBI |
-| The Five Rules for Successful Stock Investing (Dorsey) | 2004 | 4.6/131 | PDF |
-| The Little Book of Common Sense Investing (Bogle) | 2007 | 4.6/681 | PDF, EPUB |
-| The Little Book That Beats the Market (Greenblatt) | 2006 | 4.1/466 | PDF |
-| Fundamental Analysis For Dummies (Krantz) | 2009 | 4.3/52 | PDF |
-| The Essays of Warren Buffett (Buffett/Cunningham) | 2015 | 4.7/260 | PDF |
+| The Intelligent Investor (Graham) | 2003 | 4.5 | 1881 | PDF, MOBI |
+| Common Stocks and Uncommon Profits (Fisher) | 2003 | 4.3 | 206 | PDF, AZW |
+| One Up On Wall Street (Lynch) | 2000 | 4.5 | 673 | EPUB |
+| How to Make Money in Stocks 4th ed. (O'Neil) | 2009 | 4.3 | 577 | PDF, EPUB, MOBI |
+| The Five Rules for Successful Stock Investing (Dorsey) | 2004 | 4.6 | 131 | PDF |
+| The Little Book of Common Sense Investing (Bogle) | 2007 | 4.6 | 681 | PDF, EPUB |
+| The Little Book That Beats the Market (Greenblatt) | 2006 | 4.1 | 466 | PDF |
+| Fundamental Analysis For Dummies (Krantz) | 2009 | 4.3 | 52 | PDF |
+| The Essays of Warren Buffett (Buffett/Cunningham) | 2015 | 4.7 | 260 | PDF |
 
 #### Warren Buffett & Charlie Munger
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| University of Berkshire Hathaway (Pecaut) | 2017 | 4.6/172 | EPUB, MOBI |
-| The Warren Buffett Way 2nd ed. (Hagstrom) | 2005 | 4/122 | PDF |
-| Buffett: The Making of an American Capitalist (Lowenstein) | 2008 | 4.7/244 | PDF |
-| The Snowball (Schroeder) | 2009 | 4.4/522 | PDF |
-| The Essays of Warren Buffett (Buffett/Cunningham) | 2015 | 4.7/260 | PDF |
+| University of Berkshire Hathaway (Pecaut) | 2017 | 4.6 | 172 | EPUB, MOBI |
+| The Warren Buffett Way 2nd ed. (Hagstrom) | 2005 | 4 | 122 | PDF |
+| Buffett: The Making of an American Capitalist (Lowenstein) | 2008 | 4.7 | 244 | PDF |
+| The Snowball (Schroeder) | 2009 | 4.4 | 522 | PDF |
+| The Essays of Warren Buffett (Buffett/Cunningham) | 2015 | 4.7 | 260 | PDF |
 
 #### Trading Classics (Pre-2000)
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Reminiscences of a Stock Operator (Lefèvre) | 2006 | 4.5/569 | PDF (×3), EPUB (×3) |
-| Jesse Livermore: World's Greatest Stock Trader (Smitten) | 2001 | 4.3/52 | PDF |
+| Reminiscences of a Stock Operator (Lefèvre) | 2006 | 4.5 | 569 | PDF (×3), EPUB (×3) |
+| Jesse Livermore: World's Greatest Stock Trader (Smitten) | 2001 | 4.3 | 52 | PDF |
 
 #### Behavioral Finance & Market Psychology
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Irrational Exuberance (Shiller) | 2000 | 4.2/229 | PDF |
-| Irrational Exuberance 2nd ed. (Shiller) | 2006 | 4.2/229 | EPUB |
-| Irrational Exuberance 3rd ed. (Shiller) | 2016 | 4.2/229 | PDF |
-| Extraordinary Popular Delusions and The Madness of Crowds (Mackay) | 2001 | 3.9/313 | PDF |
-| Principles - Life and Work (Dalio) | 2017 | 4.4/604 | EPUB |
+| Irrational Exuberance (Shiller) | 2000 | 4.2 | 229 | PDF |
+| Irrational Exuberance 2nd ed. (Shiller) | 2006 | 4.2 | 229 | EPUB |
+| Irrational Exuberance 3rd ed. (Shiller) | 2016 | 4.2 | 229 | PDF |
+| Extraordinary Popular Delusions and The Madness of Crowds (Mackay) | 2001 | 3.9 | 313 | PDF |
+| Principles - Life and Work (Dalio) | 2017 | 4.4 | 604 | EPUB |
 
 #### Market History & Wall Street Narratives
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Liar's Poker (Lewis) | 2014 | 4.4/983 | EPUB |
-| Flash Boys (Lewis) | 2015 | 4.5/3359 | EPUB |
-| The Big Short (Lewis) | 2011 | 4.6/2442 | EPUB |
-| When Genius Failed (Lowenstein) | 2001 | 4.6/404 | PDF, EPUB |
-| Boomerang (Lewis) | 2012 | 4.3/1154 | PDF |
-| The Broker (Raghavan) | 2005 | 4.1/1310 | PDF |
-| Moneyball (Lewis) | 2004 | 4.6/1323 | MOBI |
+| Liar's Poker (Lewis) | 2014 | 4.4 | 983 | EPUB |
+| Flash Boys (Lewis) | 2015 | 4.5 | 3359 | EPUB |
+| The Big Short (Lewis) | 2011 | 4.6 | 2442 | EPUB |
+| When Genius Failed (Lowenstein) | 2001 | 4.6 | 404 | PDF, EPUB |
+| Boomerang (Lewis) | 2012 | 4.3 | 1154 | PDF |
+| The Broker (Raghavan) | 2005 | 4.1 | 1310 | PDF |
+| Moneyball (Lewis) | 2004 | 4.6 | 1323 | MOBI |
 
 #### Crypto-Specific
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Cryptoassets (Burniske/Tatar) | 2017 | 4.5/70 | PDF |
+| Cryptoassets (Burniske/Tatar) | 2017 | 4.5 | 70 | PDF |
 | Cryptocurrency-Trading-101 | — | — | PDF |
 | Crypto Full Course Beginners | — | — | (via backup) |
 | GoodCrypto Patterns Presentation | — | — | PDF |
@@ -385,29 +385,29 @@ These books teach market mechanics — session timing, price action, order flow,
 
 #### Business & Biography (Non-Trading)
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| The Blind Side (Lewis) | 2007 | 4.4/615 | MOBI |
-| The New New Thing (Lewis) | 2014 | 4.1/328 | EPUB |
+| The Blind Side (Lewis) | 2007 | 4.4 | 615 | MOBI |
+| The New New Thing (Lewis) | 2014 | 4.1 | 328 | EPUB |
 
 #### For Dummies Series (General)
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| Trading For Dummies 2nd ed. (Rochester) | 2009 | 4.3/65 | PDF |
-| Day Trading For Dummies (Logan) | 2008 | 3.9/28 | PDF |
-| Day Trading For Dummies 3rd ed. (Logan) | 2014 | 3.6/36 | PDF, EPUB |
-| Swing Trading For Dummies (Basset) | 2008 | 4.4/75 | PDF |
-| Currency Trading For Dummies 2nd ed. (Dolan) | 2011 | 4.1/66 | PDF |
-| Technical Analysis For Dummies 2nd ed. (Rockefeller) | 2011 | 4.1/95 | PDF |
-| Fundamental Analysis For Dummies (Krantz) | 2009 | 4.3/52 | PDF |
+| Trading For Dummies 2nd ed. (Rochester) | 2009 | 4.3 | 65 | PDF |
+| Day Trading For Dummies (Logan) | 2008 | 3.9 | 28 | PDF |
+| Day Trading For Dummies 3rd ed. (Logan) | 2014 | 3.6 | 36 | PDF, EPUB |
+| Swing Trading For Dummies (Basset) | 2008 | 4.4 | 75 | PDF |
+| Currency Trading For Dummies 2nd ed. (Dolan) | 2011 | 4.1 | 66 | PDF |
+| Technical Analysis For Dummies 2nd ed. (Rockefeller) | 2011 | 4.1 | 95 | PDF |
+| Fundamental Analysis For Dummies (Krantz) | 2009 | 4.3 | 52 | PDF |
 
 #### A Random Walk Down Wall Street
 
-| Title | Year | Rating/Reviews | Formats |
+| Title | Year | Rating | Reviews | Formats |
 |-------|------|--------|---------|
-| A Random Walk Down Wall Street 10th ed. (Malkiel) | 2012 | 4.6/807 | EPUB, MOBI |
-| A Random Walk Down Wall Street 11th ed. (Malkiel) | 2015 | 4.6/807 | EPUB |
+| A Random Walk Down Wall Street 10th ed. (Malkiel) | 2012 | 4.6 | 807 | EPUB, MOBI |
+| A Random Walk Down Wall Street 11th ed. (Malkiel) | 2015 | 4.6 | 807 | EPUB |
 
 ---
 
