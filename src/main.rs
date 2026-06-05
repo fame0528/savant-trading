@@ -685,8 +685,8 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
 
         // Step 2: Get 0x swap quote
         let quote_url = format!(
-            "https://api.0x.org/swap/permit2/quote?sellToken={}&buyToken={}&sellAmount={}&taker={}&slippageBps={}",
-            token_address, usdc_address, amount_raw, wallet_hex,
+            "https://api.0x.org/swap/permit2/quote?chainId={}&sellToken={}&buyToken={}&sellAmount={}&taker={}&slippageBps={}",
+            config.exchange.dex.chain_id, token_address, usdc_address, amount_raw, wallet_hex,
             (config.exchange.dex.slippage_pct * 10000.0) as u32
         );
 
