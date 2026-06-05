@@ -460,7 +460,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
     // ---- Transaction signing & broadcasting ----
 
     /// Sign and broadcast an EIP-1559 transaction. Returns the tx hash.
-    async fn sign_and_send(
+    pub async fn sign_and_send(
         &self,
         to: Address,
         data: &[u8],
