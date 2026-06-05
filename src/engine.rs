@@ -366,14 +366,8 @@ pub async fn run(
         config.trading.slippage_pct,
     );
 
-    // PROD-3: Load saved state if exists
-    let state_path = "data/paper_state.json";
-    if std::path::Path::new(state_path).exists() {
-        match paper.load_state(state_path) {
-            Ok(()) => info!("Restored state from {}", state_path),
-            Err(e) => warn!("Failed to load state ({}), starting fresh", e),
-        }
-    }
+    // NOTE: paper_state.json removed — DB + on-chain sync are source of truth.
+    // Old state files can contain stale data from crashed runs.
 
     // Create execution engine based on backend config
     // engine.rs uses the ExecutionEngine trait, which now includes default no-op
@@ -394,6 +388,17 @@ pub async fn run(
             Err(e) => {
                 error!("Failed to initialize live executor: {}", e);
                 warn!("Falling back to PaperTrader for safety");
+            }
+        }
+    }
+
+    // Sync on-chain balance on startup — dashboard reads from PaperTrader
+    if let Some(ref mut ex) = executor {
+        if ex.sync_balance().await.is_ok() {
+            let on_chain_balance = ex.balance();
+            if on_chain_balance > 0.0 {
+                paper.set_balance(on_chain_balance);
+                info!("Synced on-chain balance: ${:.2}", on_chain_balance);
             }
         }
     }
