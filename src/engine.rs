@@ -2260,6 +2260,7 @@ async fn run_training_batch(
     config: &AppConfig,
     scenarios: &[savant_trading::sandbox::scenarios::Scenario],
     test_memory: &savant_trading::memory::episodic::EpisodicMemory,
+    model_override: Option<&str>,
 ) -> anyhow::Result<TrainingRunResult> {
     use savant_trading::sandbox::generator;
 
@@ -2536,7 +2537,7 @@ async fn run_training_batch(
     for (idx, ps) in prepared.into_iter().enumerate() {
         let key = api_keys[idx % api_keys.len()].clone();
         let endpoint = config.ai.endpoint.clone();
-        let model = config.ai.model.clone();
+        let model = model_override.map(|m| m.to_string()).unwrap_or_else(|| config.ai.model.clone());
         let sys = ps.system_prompt;
         let usr = ps.user_message;
         let sem = semaphore.clone();
@@ -3183,6 +3184,7 @@ pub async fn run_training(
     historical: bool,
     _model_override: Option<String>,
 ) -> anyhow::Result<()> {
+    let model_override = _model_override;
     let _test_memory =
         savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/test_memory.db").await?;
 
@@ -3275,7 +3277,7 @@ pub async fn run_training(
             break;
         }
 
-        let result = run_training_batch(&config, &scenarios, &test_memory).await?;
+    let result = run_training_batch(&config, &scenarios, &test_memory, model_override.as_deref()).await?;
         brier_history.push(result.brier_score);
 
         println!(
@@ -3362,19 +3364,7 @@ pub async fn run_action_test(
         scenarios.truncate(n);
     }
 
-    let result = run_training_batch(&config, &scenarios, &test_memory).await?;
-
-    let total_episodes = test_memory.total_trades().await.unwrap_or(0);
-    println!("Total episodes in test DB: {}", total_episodes);
-    println!(
-        "Brier: {:.4} | Actions: {} | Holds: {} | Lessons: {} | P&L ${:+.2}",
-        result.brier_score,
-        result.action_count,
-        result.hold_count,
-        result.lessons_generated,
-        result.metrics.total_pnl,
-    );
-
+    let result = run_training_batch(&config, &scenarios, &test_memory, model_override.as_deref()).await?;
     Ok(())
 }
 
