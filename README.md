@@ -101,9 +101,19 @@ Knowledge Base ────────┤                       │
 - **Paper trading** — Full simulation for testing strategies
 - **Backtesting** — Historical validation with walk-forward optimization
 - **REST API** — 16 endpoints at `http://localhost:8080/api/`
-- **HTML Dashboard** — Single-file vanilla JS at `/dashboard.html`
+- **Next.js Dashboard** — Real-time dashboard at `http://localhost:3000`
 - **Enterprise console** — Color-coded output: `[Savant Trading] [TIME] [ACTION] [RESULT]`
 - **Kraken CEX** — REST + WebSocket integration (secondary, available as fallback)
+
+### Sandbox & Model Testing
+- **60 curated scenarios** — 11 categories: Trend Bull/Bear, Range, Volatility, Catalyst, Microstructure, Session, Correlation, Sentiment, On-Chain, Edge Cases
+- **3-tier grading rubric** — Binary compliance, R:R scoring, reasoning quality
+- **GARCH(1,1) OHLCV generator** — Synthetic candle data with configurable trend, volatility regime, market events
+- **Order book simulator** — Bid/ask depth, imbalance calculation, slippage simulation
+- **GEPA feedback loop** — Failure analysis, SOUL.md mutation proposals
+- **Model comparison** — `run-model-tests.ps1` runs multiple models against sandbox with timeout, generates comparison table
+- **Training pipeline** — `--test --train` loops until Brier score converges, captures episodes, generates lessons
+- **Historical training** — `--historical` trains on real Kraken candle data
 
 ---
 
@@ -298,8 +308,14 @@ cargo run --release -- --test --managed-keys -n 20
 # Training mode — loop until Brier converges
 cargo run -- --test --train
 
+# Sandbox — full 60-scenario stress test
+cargo run --release -- --test --sandbox
+
 # Historical data training
 cargo run -- --historical
+
+# Model comparison — run multiple models against sandbox
+.\run-model-tests.ps1
 
 # API server only (no engine)
 cargo run -- --api-only
@@ -307,6 +323,23 @@ cargo run -- --api-only
 # Backtest
 cargo run -- backtest
 ```
+
+### Model Testing
+
+`run-model-tests.ps1` runs each model against the 60-scenario sandbox with a 180s timeout per model. It outputs a comparison table with:
+
+| Metric | Description |
+|--------|-------------|
+| **Score** | Average 3-tier grading score (0-10) |
+| **Passed** | Scenarios passed / total |
+| **Compliance** | Binary rule compliance % |
+| **T2 (R:R)** | Risk/reward scoring (0-10) |
+| **T3 (Reason)** | Reasoning quality (0-10) |
+| **Parse Errors** | JSON parse failures |
+| **LLM Errors** | API errors |
+| **Retried** | Rate-limited retries |
+
+Models tested: Nemotron Nano, Nemotron Super, Gemma 4 31B, Gemma 4 26B, Kimi K2.6 (all free tiers via OpenRouter). Add models by editing the `$models` array in `run-model-tests.ps1`.
 
 ---
 
