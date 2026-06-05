@@ -9,6 +9,23 @@ use crate::core::types::{
 };
 use crate::execution::engine::ExecutionEngine;
 
+/// A trailing stop-loss event — fired when SL moves in our favor.
+#[derive(Debug, Clone)]
+pub struct TrailingEvent {
+    pub pair: String,
+    pub side: Side,
+    pub old_sl: f64,
+    pub new_sl: f64,
+    pub current_price: f64,
+}
+
+/// Result of check_stops: closed trades + trailing stop events.
+#[derive(Debug, Clone)]
+pub struct StopCheckResult {
+    pub closed: Vec<TradeRecord>,
+    pub trails: Vec<TrailingEvent>,
+}
+
 pub struct PaperTrader {
     positions: HashMap<String, Position>,
     closed_trades: Vec<TradeRecord>,
@@ -139,7 +156,9 @@ impl PaperTrader {
         self.account.update_equity(total_unrealized);
     }
 
-    pub fn check_stops(&mut self, prices: &HashMap<String, f64>) -> Vec<TradeRecord> {
+    pub fn check_stops(&mut self, prices: &HashMap<String, f64>) -> StopCheckResult {
+        let mut trails = Vec::new();
+
         // Pass 1: Trail stop-losses as prices move in our favor.
         // Only for Full-scale positions (not yet scaled out at TP1).
         for pos in self.positions.values_mut() {
@@ -163,6 +182,13 @@ impl PaperTrader {
                     Side::Short => trail_level < pos.stop_loss,
                 };
                 if should_trail {
+                    trails.push(TrailingEvent {
+                        pair: pos.pair.clone(),
+                        side: pos.side,
+                        old_sl: pos.stop_loss,
+                        new_sl: trail_level,
+                        current_price: price,
+                    });
                     pos.stop_loss = trail_level;
                 }
             }
@@ -384,7 +410,7 @@ impl PaperTrader {
             self.account.open_positions = self.positions.len();
         }
 
-        closed
+        StopCheckResult { closed, trails }
     }
 
     pub fn account(&self) -> &AccountState {
@@ -663,9 +689,9 @@ mod tests {
         let mut prices = HashMap::new();
         prices.insert("BTC/USD".to_string(), 94.0);
 
-        let closed = trader.check_stops(&prices);
-        assert_eq!(closed.len(), 1);
-        assert!(closed[0].notes.contains("Stop loss"));
+        let result = trader.check_stops(&prices);
+        assert_eq!(result.closed.len(), 1);
+        assert!(result.closed[0].notes.contains("Stop loss"));
         assert!(trader.positions.is_empty());
     }
 
@@ -678,10 +704,10 @@ mod tests {
         let mut prices = HashMap::new();
         prices.insert("BTC/USD".to_string(), 106.0);
 
-        let closed = trader.check_stops(&prices);
-        assert_eq!(closed.len(), 1);
-        assert_eq!(closed[0].quantity, 0.5);
-        assert!(closed[0].notes.contains("TP1"));
+        let result = trader.check_stops(&prices);
+        assert_eq!(result.closed.len(), 1);
+        assert_eq!(result.closed[0].quantity, 0.5);
+        assert!(result.closed[0].notes.contains("TP1"));
 
         // Remaining position should be at Scaled50 with SL moved to break-even
         let remaining = trader.positions.get("p1").unwrap();
@@ -701,10 +727,10 @@ mod tests {
         let mut prices = HashMap::new();
         prices.insert("BTC/USD".to_string(), 111.0);
 
-        let closed = trader.check_stops(&prices);
-        assert_eq!(closed.len(), 1);
-        assert_eq!(closed[0].quantity, 0.6); // 60% of remaining
-        assert!(closed[0].notes.contains("TP2"));
+        let result = trader.check_stops(&prices);
+        assert_eq!(result.closed.len(), 1);
+        assert_eq!(result.closed[0].quantity, 0.6); // 60% of remaining
+        assert!(result.closed[0].notes.contains("TP2"));
 
         let remaining = trader.positions.get("p1").unwrap();
         assert_eq!(remaining.scale_level, ScaleLevel::Scaled80);
@@ -721,10 +747,10 @@ mod tests {
         let mut prices = HashMap::new();
         prices.insert("BTC/USD".to_string(), 116.0);
 
-        let closed = trader.check_stops(&prices);
-        assert_eq!(closed.len(), 1);
-        assert_eq!(closed[0].quantity, 1.0);
-        assert!(closed[0].notes.contains("TP3"));
+        let result = trader.check_stops(&prices);
+        assert_eq!(result.closed.len(), 1);
+        assert_eq!(result.closed[0].quantity, 1.0);
+        assert!(result.closed[0].notes.contains("TP3"));
         assert!(trader.positions.is_empty());
     }
 
@@ -739,9 +765,9 @@ mod tests {
         let mut prices = HashMap::new();
         prices.insert("BTC/USD".to_string(), 99.0);
 
-        let closed = trader.check_stops(&prices);
-        assert_eq!(closed.len(), 1);
-        assert!(closed[0].notes.contains("Stop loss"));
+        let result = trader.check_stops(&prices);
+        assert_eq!(result.closed.len(), 1);
+        assert!(result.closed[0].notes.contains("Stop loss"));
         assert!(trader.positions.is_empty());
     }
 
@@ -754,5 +780,47 @@ mod tests {
             assert_eq!(part.len(), 8);
             assert!(u32::from_str_radix(part, 16).is_ok());
         }
+    }
+
+    #[test]
+    fn trailing_stop_fires_event() {
+        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let pos = make_position("p1", 100.0, 95.0, 120.0, 130.0, 140.0);
+        trader.positions.insert(pos.id.clone(), pos);
+
+        // Price moves up — trail_level = 108 - 5 = 103, which is > 95 (current SL)
+        // TP1=120 not hit, so no scale-out
+        let mut prices = HashMap::new();
+        prices.insert("BTC/USD".to_string(), 108.0);
+
+        let result = trader.check_stops(&prices);
+        assert_eq!(result.trails.len(), 1);
+        assert_eq!(result.trails[0].pair, "BTC/USD");
+        assert_eq!(result.trails[0].old_sl, 95.0);
+        assert_eq!(result.trails[0].new_sl, 103.0); // 108 - (100 - 95)
+        assert_eq!(result.closed.len(), 0);
+
+        // SL should have been updated
+        let pos = trader.positions.get("p1").unwrap();
+        assert_eq!(pos.stop_loss, 103.0);
+    }
+
+    #[test]
+    fn no_trail_when_price_drops() {
+        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let pos = make_position("p1", 100.0, 95.0, 105.0, 110.0, 115.0);
+        trader.positions.insert(pos.id.clone(), pos);
+
+        // Price drops — trail_level = 97 - 5 = 92, which is < 95 (current SL)
+        let mut prices = HashMap::new();
+        prices.insert("BTC/USD".to_string(), 97.0);
+
+        let result = trader.check_stops(&prices);
+        assert_eq!(result.trails.len(), 0);
+        assert_eq!(result.closed.len(), 0);
+
+        // SL unchanged
+        let pos = trader.positions.get("p1").unwrap();
+        assert_eq!(pos.stop_loss, 95.0);
     }
 }

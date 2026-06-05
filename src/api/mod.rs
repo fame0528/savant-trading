@@ -7,7 +7,7 @@ use axum::{
     extract::{Path, State},
     http::header,
     middleware,
-    response::{Html, Json},
+    response::Json,
     routing::{get, post},
     Router,
 };
@@ -15,7 +15,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, LazyLock, Mutex};
 use std::time::Instant;
 use tokio::sync::RwLock;
-use tracing::info;
+use tracing::{info, warn};
 
 use savant_trading::core::config::AppConfig;
 use savant_trading::core::shared::{DecisionRecord, SharedEngineData};
@@ -28,6 +28,8 @@ pub struct AppState {
     pub engine_status: Arc<RwLock<EngineStatus>>,
     pub shared: SharedEngineData,
     pub engine_running: Arc<AtomicBool>,
+    pub engine_child: Arc<Mutex<Option<tokio::process::Child>>>,
+    pub engine_started_at: Arc<Mutex<Option<Instant>>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -79,10 +81,18 @@ pub async fn start_server(
         })),
         shared,
         engine_running,
+        engine_child: Arc::new(Mutex::new(None)),
+        engine_started_at: Arc::new(Mutex::new(None)),
     };
 
+    // CORS: allow dashboard origin + localhost fallbacks
     let cors = tower_http::cors::CorsLayer::new()
-        .allow_origin(tower_http::cors::Any)
+        .allow_origin([
+            "http://localhost:3000".parse::<axum::http::HeaderValue>().unwrap(),
+            "http://127.0.0.1:3000".parse::<axum::http::HeaderValue>().unwrap(),
+            "http://localhost:8080".parse::<axum::http::HeaderValue>().unwrap(),
+            "http://127.0.0.1:8080".parse::<axum::http::HeaderValue>().unwrap(),
+        ])
         .allow_methods(tower_http::cors::Any)
         .allow_headers(vec![
             header::CONTENT_TYPE,
@@ -91,6 +101,7 @@ pub async fn start_server(
         ]);
 
     let app = Router::new()
+        .route("/api/health", get(health))
         .route("/api/status", get(get_status))
         .route("/api/config", get(get_config))
         .route("/api/portfolio", get(get_portfolio))
@@ -105,23 +116,39 @@ pub async fn start_server(
         .route("/api/activity", get(get_activity))
         .route("/api/memory", get(get_memory))
         .route("/api/training", get(get_training))
+        .route("/api/wallet", get(get_wallet))
         .route("/api/engine/start", post(start_engine))
         .route("/api/engine/stop", post(stop_engine))
-        .route("/dashboard.html", get(dashboard))
-        .route("/", get(dashboard))
+        .route("/api/terminal", get(terminal_ws))
         .with_state(state)
         .layer(cors)
+        .layer(middleware::from_fn(auth_middleware))
         .layer(middleware::from_fn(rate_limit_middleware));
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:8080").await?;
     info!("API server listening on http://127.0.0.1:8080");
-    axum::serve(listener, app).await?;
+
+    // Graceful shutdown on Ctrl+C
+    tokio::select! {
+        result = axum::serve(listener, app) => result?,
+        _ = tokio::signal::ctrl_c() => {
+            info!("API server shutting down gracefully");
+        }
+    }
     Ok(())
 }
 
 async fn get_status(State(state): State<AppState>) -> Json<ApiResponse<EngineStatus>> {
     let mut status = state.engine_status.read().await.clone();
     status.running = state.engine_running.load(Ordering::Relaxed);
+
+    // Compute uptime from engine_started_at
+    if let Ok(started) = state.engine_started_at.lock() {
+        if let Some(instant) = *started {
+            status.uptime_seconds = instant.elapsed().as_secs();
+        }
+    }
+
     Json(ApiResponse::ok(status))
 }
 
@@ -367,21 +394,236 @@ async fn get_memory(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
 }
 
 async fn start_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
-    let mut status = state.engine_status.write().await;
-    status.running = true;
-    status.ai_status = "active".to_string();
-    Json(ApiResponse::ok(
-        serde_json::json!({"message": "Engine started"}),
-    ))
+    // Check if already running
+    {
+        let child_lock = state.engine_child.lock().unwrap();
+        if child_lock.is_some() {
+            return Json(ApiResponse::ok(
+                serde_json::json!({"message": "Engine already running"}),
+            ));
+        }
+    }
+
+    // Find the savant binary, fallback to cargo run
+    let exe_path = std::env::current_exe()
+        .ok()
+        .and_then(|p| p.parent().map(|d| d.join("savant")))
+        .filter(|p| p.exists());
+
+    let (result, cmd_name) = if let Some(path) = exe_path {
+        (
+            tokio::process::Command::new(&path)
+                .kill_on_drop(true)
+                .spawn(),
+            path.display().to_string(),
+        )
+    } else {
+        let root = std::env::var("SAVANT_ROOT").unwrap_or_else(|_| ".".to_string());
+        (
+            tokio::process::Command::new("cargo")
+                .args(["run", "--release"])
+                .current_dir(&root)
+                .kill_on_drop(true)
+                .spawn(),
+            "cargo run --release".to_string(),
+        )
+    };
+
+    match result {
+        Ok(child) => {
+            state.engine_running.store(true, Ordering::Relaxed);
+            *state.engine_child.lock().unwrap() = Some(child);
+            *state.engine_started_at.lock().unwrap() = Some(Instant::now());
+
+            let mut status = state.engine_status.write().await;
+            status.running = true;
+            status.ai_status = "active".to_string();
+
+            info!("Engine started: {}", cmd_name);
+            Json(ApiResponse::ok(
+                serde_json::json!({"message": format!("Engine started: {}", cmd_name)}),
+            ))
+        }
+        Err(e) => {
+            warn!("Failed to start engine: {}", e);
+            Json(ApiResponse {
+                data: serde_json::json!({"message": "Failed to start"}),
+                error: Some(e.to_string()),
+                timestamp: chrono::Utc::now().to_rfc3339(),
+            })
+        }
+    }
 }
 
 async fn stop_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
+    let child = state.engine_child.lock().unwrap().take();
+    if let Some(mut child) = child {
+        let _ = child.start_kill();
+    }
+    state.engine_running.store(false, Ordering::Relaxed);
+    *state.engine_started_at.lock().unwrap() = None;
+
     let mut status = state.engine_status.write().await;
     status.running = false;
     status.ai_status = "stopped".to_string();
+
+    info!("Engine stopped");
     Json(ApiResponse::ok(
         serde_json::json!({"message": "Engine stopped"}),
     ))
+}
+
+/// Health check endpoint for load balancers / Docker.
+async fn health(State(state): State<AppState>) -> Json<serde_json::Value> {
+    let running = state.engine_running.load(Ordering::Relaxed);
+    let uptime = state.engine_started_at.lock().unwrap()
+        .map(|i| i.elapsed().as_secs())
+        .unwrap_or(0);
+
+    Json(serde_json::json!({
+        "status": "ok",
+        "version": env!("CARGO_PKG_VERSION"),
+        "uptime_seconds": uptime,
+        "engine_running": running,
+    }))
+}
+
+/// Wallet endpoint — returns address + on-chain balances.
+async fn get_wallet(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
+    let private_key = std::env::var(&state.config.exchange.dex.wallet_key_env).unwrap_or_default();
+    if private_key.is_empty() {
+        return Json(ApiResponse {
+            data: serde_json::json!({"address": null, "error": "WALLET_PRIVATE_KEY not set"}),
+            error: None,
+            timestamp: chrono::Utc::now().to_rfc3339(),
+        });
+    }
+
+    let address = match derive_wallet_address(&private_key) {
+        Ok(addr) => addr,
+        Err(e) => {
+            return Json(ApiResponse {
+                data: serde_json::json!({"address": null, "error": e}),
+                error: None,
+                timestamp: chrono::Utc::now().to_rfc3339(),
+            });
+        }
+    };
+
+    // Query on-chain ETH balance via RPC
+    let rpc_url = &state.config.exchange.dex.rpc_url;
+    let eth_balance = query_eth_balance(rpc_url, &address).await.unwrap_or(0.0);
+
+    // Query USDC balance
+    let usdc_contract = savant_trading::execution::dex::usdc_address_for_chain(
+        state.config.exchange.dex.chain_id,
+    );
+    let usdc_balance = query_erc20_balance(rpc_url, usdc_contract, &address)
+        .await
+        .unwrap_or(0.0);
+
+    Json(ApiResponse::ok(serde_json::json!({
+        "address": address,
+        "eth_balance": eth_balance,
+        "usdc_balance": usdc_balance,
+        "chain_id": state.config.exchange.dex.chain_id,
+        "rpc_url": rpc_url,
+    })))
+}
+
+/// Derive wallet address from private key hex.
+fn derive_wallet_address(private_key_hex: &str) -> Result<String, String> {
+    use alloy_core::primitives::{Address, Keccak256, hex};
+    use k256::ecdsa::SigningKey;
+
+    let hex_key = private_key_hex.trim_start_matches("0x");
+    let key_bytes = hex::decode(hex_key).map_err(|e| format!("Invalid hex: {}", e))?;
+    let signing_key = SigningKey::from_slice(&key_bytes).map_err(|e| format!("Invalid key: {}", e))?;
+    let verifying_key = signing_key.verifying_key();
+    let encoded = verifying_key.to_encoded_point(false).to_bytes().to_vec();
+    let mut hasher = Keccak256::new();
+    hasher.update(&encoded[1..]);
+    let hash = hasher.finalize();
+    let addr_bytes: [u8; 20] = hash[12..32].try_into().map_err(|_| "Failed to derive address".to_string())?;
+    let address = Address::from(addr_bytes);
+    Ok(format!("{:#x}", address))
+}
+
+/// Query native ETH balance via eth_getBalance RPC.
+async fn query_eth_balance(rpc_url: &str, address: &str) -> Result<f64, String> {
+    let client = reqwest::Client::new();
+    let body = serde_json::json!({
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "eth_getBalance",
+        "params": [address, "latest"]
+    });
+    let resp: serde_json::Value = client.post(rpc_url)
+        .json(&body)
+        .send().await.map_err(|e| e.to_string())?
+        .json().await.map_err(|e| e.to_string())?;
+
+    if let Some(hex) = resp.get("result").and_then(|r| r.as_str()) {
+        let wei = alloy_core::primitives::U256::from_str_radix(hex.trim_start_matches("0x"), 16)
+            .unwrap_or(alloy_core::primitives::U256::ZERO);
+        let eth: f64 = wei.to_string().parse().unwrap_or(0.0) / 1e18;
+        Ok(eth)
+    } else {
+        Err("No result in RPC response".to_string())
+    }
+}
+
+/// Query ERC-20 token balance via balanceOf(address).
+async fn query_erc20_balance(rpc_url: &str, token_address: &str, wallet: &str) -> Result<f64, String> {
+    let client = reqwest::Client::new();
+    // balanceOf(address) selector: 0x70a08231
+    let addr_clean = wallet.trim_start_matches("0x");
+    let padded = format!("0x70a08231{:0>64}", addr_clean);
+    let body = serde_json::json!({
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "eth_call",
+        "params": [{"to": token_address, "data": padded}, "latest"]
+    });
+    let resp: serde_json::Value = client.post(rpc_url)
+        .json(&body)
+        .send().await.map_err(|e| e.to_string())?
+        .json().await.map_err(|e| e.to_string())?;
+
+    if let Some(hex) = resp.get("result").and_then(|r| r.as_str()) {
+        let raw = alloy_core::primitives::U256::from_str_radix(hex.trim_start_matches("0x"), 16)
+            .unwrap_or(alloy_core::primitives::U256::ZERO);
+        let balance: f64 = raw.to_string().parse().unwrap_or(0.0) / 1e6; // USDC = 6 decimals
+        Ok(balance)
+    } else {
+        Err("No result in RPC response".to_string())
+    }
+}
+
+/// Auth middleware — checks Bearer token if SAVANT_API_TOKEN is set.
+async fn auth_middleware(
+    req: axum::extract::Request,
+    next: middleware::Next,
+) -> axum::response::Response {
+    let token = std::env::var("SAVANT_API_TOKEN").unwrap_or_default();
+    if token.is_empty() {
+        // No token configured — open access (dev mode)
+        return next.run(req).await;
+    }
+
+    let auth = req.headers()
+        .get(header::AUTHORIZATION)
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("");
+
+    if auth != format!("Bearer {}", token) {
+        return axum::response::Response::builder()
+            .status(401)
+            .body(axum::body::Body::from("Unauthorized"))
+            .expect("response builder");
+    }
+
+    next.run(req).await
 }
 
 struct RateLimiter {
@@ -483,11 +725,220 @@ async fn get_training(State(state): State<AppState>) -> Json<ApiResponse<serde_j
     })
 }
 
-async fn dashboard() -> Html<String> {
-    match std::fs::read_to_string("dashboard.html") {
-        Ok(content) => Html(content),
-        Err(_) => Html("<h1>Dashboard not found</h1><p>Place dashboard.html in the project root.</p>".to_string()),
+/// WebSocket terminal — streams engine process stdout/stderr to the dashboard.
+/// Supports "savant" commands: "savant start" = cargo run --release, "savant stop" = kill.
+async fn terminal_ws(
+    ws: axum::extract::WebSocketUpgrade,
+    State(state): State<AppState>,
+) -> axum::response::Response {
+    ws.on_upgrade(move |socket| handle_terminal(socket, state))
+}
+
+async fn handle_terminal(
+    socket: axum::extract::ws::WebSocket,
+    state: AppState,
+) {
+    use axum::extract::ws::Message;
+    use futures_util::{SinkExt, StreamExt};
+    use tokio::io::{AsyncBufReadExt, BufReader};
+    use tokio::process::Command;
+    use std::process::Stdio;
+
+    let (mut sender, mut receiver) = socket.split();
+
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<String>(256);
+
+    // Sender task: channel → WebSocket
+    let send_task = tokio::spawn(async move {
+        while let Some(msg) = rx.recv().await {
+            if sender.send(Message::Text(msg.into())).await.is_err() {
+                break;
+            }
+        }
+    });
+
+    let _ = tx.send(concat!(
+        "\x1b[36m╔══════════════════════════════════════════╗\x1b[0m\r\n",
+        "\x1b[36m║\x1b[0m  \x1b[1;37mSAVANT\x1b[0m \x1b[90mTerminal v0.9.0\x1b[0m               \x1b[36m║\x1b[0m\r\n",
+        "\x1b[36m║\x1b[0m  \x1b[90mCommands:\x1b[0m                               \x1b[36m║\x1b[0m\r\n",
+        "\x1b[36m║\x1b[0m    \x1b[33msavant start\x1b[0m  — start engine          \x1b[36m║\x1b[0m\r\n",
+        "\x1b[36m║\x1b[0m    \x1b[33msavant stop\x1b[0m   — stop engine           \x1b[36m║\x1b[0m\r\n",
+        "\x1b[36m║\x1b[0m    \x1b[33msavant status\x1b[0m — engine status          \x1b[36m║\x1b[0m\r\n",
+        "\x1b[36m║\x1b[0m    \x1b[33msavant help\x1b[0m   — show this help         \x1b[36m║\x1b[0m\r\n",
+        "\x1b[36m║\x1b[0m    \x1b[33mCtrl+C\x1b[0m        — stop running process    \x1b[36m║\x1b[0m\r\n",
+        "\x1b[36m╚══════════════════════════════════════════╝\x1b[0m\r\n",
+        "\r\n",
+    ).to_string()).await;
+
+    let mut child_handle: Option<tokio::process::Child> = None;
+    let engine_running = state.engine_running.clone();
+
+    while let Some(msg) = receiver.next().await {
+        let text = match msg {
+            Ok(Message::Text(t)) => t,
+            Ok(Message::Close(_)) => break,
+            _ => continue,
+        };
+
+        let trimmed = text.trim();
+
+        if text.contains('\u{0003}') {
+            if let Some(ref mut child) = child_handle {
+                let _ = child.start_kill();
+                let _ = tx.send("\r\n\x1b[33m[SAVANT]\x1b[0m Process killed\r\n".into()).await;
+                child_handle = None;
+                engine_running.store(false, Ordering::Relaxed);
+                *state.engine_child.lock().unwrap() = None;
+                *state.engine_started_at.lock().unwrap() = None;
+            }
+            continue;
+        }
+
+        let parts: Vec<&str> = trimmed.split_whitespace().collect();
+        if parts.first() == Some(&"savant") {
+            match parts.get(1).copied() {
+                Some("start") => {
+                    if child_handle.is_some() {
+                        let _ = tx.send(
+                            "\x1b[33m[SAVANT]\x1b[0m Already running. Use \x1b[33msavant stop\x1b[0m first.\r\n".into()
+                        ).await;
+                        continue;
+                    }
+
+                    let _ = tx.send(
+                        "\x1b[36m[SAVANT]\x1b[0m Starting engine…\r\n".into()
+                    ).await;
+
+                    // Try compiled binary first, fallback to cargo run
+                    let exe_path = std::env::current_exe()
+                        .ok()
+                        .and_then(|p| p.parent().map(|d| d.join("savant")))
+                        .filter(|p| p.exists());
+
+                    let (spawn_result, _cmd_name) = if let Some(path) = exe_path {
+                        let name = path.display().to_string();
+                        (
+                            Command::new(&path)
+                                .stdout(Stdio::piped())
+                                .stderr(Stdio::piped())
+                                .stdin(Stdio::null())
+                                .kill_on_drop(true)
+                                .spawn(),
+                            name,
+                        )
+                    } else {
+                        let root = std::env::var("SAVANT_ROOT").unwrap_or_else(|_| ".".to_string());
+                        (
+                            Command::new("cargo")
+                                .args(["run", "--release"])
+                                .current_dir(&root)
+                                .stdout(Stdio::piped())
+                                .stderr(Stdio::piped())
+                                .stdin(Stdio::null())
+                                .kill_on_drop(true)
+                                .spawn(),
+                            "cargo run --release".to_string(),
+                        )
+                    };
+
+                    match spawn_result {
+                        Ok(mut child) => {
+                            engine_running.store(true, Ordering::Relaxed);
+
+                            // Take stdout/stderr before moving child into AppState
+                            if let Some(stdout) = child.stdout.take() {
+                                let tx_out = tx.clone();
+                                let running = engine_running.clone();
+                                tokio::spawn(async move {
+                                    let reader = BufReader::new(stdout);
+                                    let mut lines = reader.lines();
+                                    while let Ok(Some(line)) = lines.next_line().await {
+                                        if tx_out.send(format!("{}\r\n", line)).await.is_err() {
+                                            break;
+                                        }
+                                    }
+                                    running.store(false, Ordering::Relaxed);
+                                });
+                            }
+
+                            if let Some(stderr) = child.stderr.take() {
+                                let tx_err = tx.clone();
+                                tokio::spawn(async move {
+                                    let reader = BufReader::new(stderr);
+                                    let mut lines = reader.lines();
+                                    while let Ok(Some(line)) = lines.next_line().await {
+                                        if tx_err.send(format!("{}\r\n", line)).await.is_err() {
+                                            break;
+                                        }
+                                    }
+                                });
+                            }
+
+                            *state.engine_child.lock().unwrap() = Some(child);
+                            *state.engine_started_at.lock().unwrap() = Some(Instant::now());
+
+                            let _ = tx.send(
+                                "\x1b[32m[SAVANT]\x1b[0m Engine started\r\n".to_string()
+                            ).await;
+                        }
+                        Err(e) => {
+                            let _ = tx.send(
+                                format!("\x1b[31m[SAVANT]\x1b[0m Failed to start: {}\r\n", e)
+                            ).await;
+                        }
+                    }
+                }
+                Some("stop") => {
+                    if let Some(ref mut child) = child_handle {
+                        let _ = child.start_kill();
+                        let _ = tx.send("\x1b[33m[SAVANT]\x1b[0m Engine stopped\r\n".into()).await;
+                        child_handle = None;
+                        engine_running.store(false, Ordering::Relaxed);
+                        *state.engine_child.lock().unwrap() = None;
+                        *state.engine_started_at.lock().unwrap() = None;
+                    } else {
+                        let _ = tx.send("\x1b[90m[SAVANT]\x1b[0m No engine running\r\n".into()).await;
+                    }
+                }
+                Some("status") => {
+                    let running = engine_running.load(Ordering::Relaxed);
+                    let status = if running { "\x1b[32mRUNNING\x1b[0m" } else { "\x1b[31mSTOPPED\x1b[0m" };
+                    let _ = tx.send(
+                        format!("\x1b[36m[SAVANT]\x1b[0m Engine: {}\r\n", status)
+                    ).await;
+                }
+                Some("help") => {
+                    let _ = tx.send(concat!(
+                        "\x1b[36m[SAVANT]\x1b[0m Commands:\r\n",
+                        "  \x1b[33msavant start\x1b[0m   — start engine (cargo run --release)\r\n",
+                        "  \x1b[33msavant stop\x1b[0m    — stop engine\r\n",
+                        "  \x1b[33msavant status\x1b[0m  — check engine status\r\n",
+                        "  \x1b[33msavant help\x1b[0m    — show this help\r\n",
+                        "  \x1b[33mCtrl+C\x1b[0m         — stop running process\r\n",
+                    ).into()).await;
+                }
+                _ => {
+                    let _ = tx.send(
+                        format!("\x1b[90m[SAVANT]\x1b[0m Unknown: savant {}. Type \x1b[33msavant help\x1b[0m\r\n",
+                            parts.get(1).unwrap_or(&""))
+                    ).await;
+                }
+            }
+        } else if !trimmed.is_empty() {
+            let _ = tx.send(
+                "\x1b[90m[SAVANT]\x1b[0m Use \x1b[33msavant start|stop|status|help\x1b[0m\r\n".into()
+            ).await;
+        }
     }
+
+    if let Some(ref mut child) = child_handle {
+        let _ = child.start_kill();
+    }
+    engine_running.store(false, Ordering::Relaxed);
+    *state.engine_child.lock().unwrap() = None;
+    *state.engine_started_at.lock().unwrap() = None;
+    drop(tx);
+    let _ = send_task.await;
 }
 
 #[cfg(test)]

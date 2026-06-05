@@ -39,6 +39,8 @@ pub struct DecisionRecord {
     pub entry_price: f64,
     pub stop_loss: f64,
     pub take_profit_1: f64,
+    pub take_profit_2: f64,
+    pub take_profit_3: f64,
     pub confidence: f64,
     pub reasoning: String,
 }

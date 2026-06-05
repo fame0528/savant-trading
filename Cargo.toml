@@ -37,7 +37,7 @@ thiserror = "2"
 anyhow = "1"
 
 # REST API
-axum = "0.8"
+axum = { version = "0.8", features = ["ws"] }
 tower-http = { version = "0.6", features = ["cors"] }
 
 # Time
@@ -75,6 +75,9 @@ rlp = "0.5"
 
 [dev-dependencies]
 wiremock = "0.6"
+
+[build-dependencies]
+winres = "0.1"
 
 [[bin]]
 name = "savant"

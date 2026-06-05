@@ -2,7 +2,7 @@ use sqlx::Row;
 use sqlx::SqlitePool;
 use tracing::info;
 
-use crate::core::types::TradeRecord;
+use crate::core::types::{Position, ScaleLevel, Side, TradeRecord};
 
 pub struct TradeJournal {
     pool: SqlitePool,
@@ -49,9 +49,179 @@ impl TradeJournal {
         .execute(&pool)
         .await?;
 
+        sqlx::query(
+            r#"
+            CREATE TABLE IF NOT EXISTS positions (
+                id TEXT PRIMARY KEY,
+                pair TEXT NOT NULL,
+                side TEXT NOT NULL,
+                entry_price REAL NOT NULL,
+                current_price REAL NOT NULL,
+                quantity REAL NOT NULL,
+                stop_loss REAL NOT NULL,
+                take_profit_1 REAL NOT NULL,
+                take_profit_2 REAL NOT NULL,
+                take_profit_3 REAL NOT NULL,
+                unrealized_pnl REAL NOT NULL,
+                risk_amount REAL NOT NULL,
+                strategy_name TEXT NOT NULL,
+                scale_level TEXT NOT NULL,
+                opened_at TEXT NOT NULL
+            )
+            "#,
+        )
+        .execute(&pool)
+        .await?;
+
+        sqlx::query(
+            r#"
+            CREATE TABLE IF NOT EXISTS activity_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT NOT NULL,
+                level TEXT NOT NULL,
+                pair TEXT NOT NULL,
+                message TEXT NOT NULL
+            )
+            "#,
+        )
+        .execute(&pool)
+        .await?;
+
         info!("Trade journal initialized");
         Ok(Self { pool })
     }
+
+    // ── Positions (instant persistence) ────────────────────────────────
+
+    pub async fn save_position(&self, pos: &Position) -> Result<(), sqlx::Error> {
+        sqlx::query(
+            r#"
+            INSERT OR REPLACE INTO positions
+                (id, pair, side, entry_price, current_price, quantity, stop_loss,
+                 take_profit_1, take_profit_2, take_profit_3, unrealized_pnl,
+                 risk_amount, strategy_name, scale_level, opened_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            "#,
+        )
+        .bind(&pos.id)
+        .bind(&pos.pair)
+        .bind(format!("{}", pos.side))
+        .bind(pos.entry_price)
+        .bind(pos.current_price)
+        .bind(pos.quantity)
+        .bind(pos.stop_loss)
+        .bind(pos.take_profit_1)
+        .bind(pos.take_profit_2)
+        .bind(pos.take_profit_3)
+        .bind(pos.unrealized_pnl)
+        .bind(pos.risk_amount)
+        .bind(&pos.strategy_name)
+        .bind(format!("{:?}", pos.scale_level))
+        .bind(pos.opened_at.to_rfc3339())
+        .execute(&self.pool)
+        .await?;
+        Ok(())
+    }
+
+    pub async fn delete_position(&self, id: &str) -> Result<(), sqlx::Error> {
+        sqlx::query("DELETE FROM positions WHERE id = ?")
+            .bind(id)
+            .execute(&self.pool)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn load_positions(&self) -> Result<Vec<Position>, sqlx::Error> {
+        let rows = sqlx::query(
+            "SELECT id, pair, side, entry_price, current_price, quantity, stop_loss, \
+             take_profit_1, take_profit_2, take_profit_3, unrealized_pnl, risk_amount, \
+             strategy_name, scale_level, opened_at FROM positions",
+        )
+        .fetch_all(&self.pool)
+        .await?;
+
+        let mut positions = Vec::with_capacity(rows.len());
+        for row in rows {
+            let side_str: String = row.get("side");
+            let scale_str: String = row.get("scale_level");
+            let opened_at_str: String = row.get("opened_at");
+
+            let opened_at = chrono::DateTime::parse_from_rfc3339(&opened_at_str)
+                .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
+                .with_timezone(&chrono::Utc);
+
+            positions.push(Position {
+                id: row.get("id"),
+                pair: row.get("pair"),
+                side: if side_str == "Long" { Side::Long } else { Side::Short },
+                entry_price: row.get("entry_price"),
+                current_price: row.get("current_price"),
+                quantity: row.get("quantity"),
+                stop_loss: row.get("stop_loss"),
+                take_profit_1: row.get("take_profit_1"),
+                take_profit_2: row.get("take_profit_2"),
+                take_profit_3: row.get("take_profit_3"),
+                unrealized_pnl: row.get("unrealized_pnl"),
+                risk_amount: row.get("risk_amount"),
+                strategy_name: row.get("strategy_name"),
+                scale_level: match scale_str.as_str() {
+                    "Scaled50" => ScaleLevel::Scaled50,
+                    "Scaled80" => ScaleLevel::Scaled80,
+                    "Closed" => ScaleLevel::Closed,
+                    _ => ScaleLevel::Full,
+                },
+                opened_at,
+            });
+        }
+
+        Ok(positions)
+    }
+
+    // ── Activity Log ───────────────────────────────────────────────────
+
+    pub async fn record_activity(
+        &self,
+        level: &str,
+        pair: &str,
+        message: &str,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query(
+            "INSERT INTO activity_log (timestamp, level, pair, message) VALUES (?, ?, ?, ?)",
+        )
+        .bind(chrono::Utc::now().to_rfc3339())
+        .bind(level)
+        .bind(pair)
+        .bind(message)
+        .execute(&self.pool)
+        .await?;
+        Ok(())
+    }
+
+    pub async fn load_activity(
+        &self,
+        limit: i64,
+    ) -> Result<Vec<(String, String, String, String)>, sqlx::Error> {
+        let rows = sqlx::query(
+            "SELECT timestamp, level, pair, message FROM activity_log ORDER BY id DESC LIMIT ?",
+        )
+        .bind(limit)
+        .fetch_all(&self.pool)
+        .await?;
+
+        Ok(rows
+            .into_iter()
+            .map(|r| {
+                (
+                    r.get::<String, _>("timestamp"),
+                    r.get::<String, _>("level"),
+                    r.get::<String, _>("pair"),
+                    r.get::<String, _>("message"),
+                )
+            })
+            .collect())
+    }
+
+    // ── Trades ─────────────────────────────────────────────────────────
 
     pub async fn record_trade(&self, trade: &TradeRecord) -> Result<(), sqlx::Error> {
         sqlx::query(
@@ -129,9 +299,9 @@ impl TradeJournal {
                 id: row.get("id"),
                 pair: row.get("pair"),
                 side: if side_str == "Long" {
-                    crate::core::types::Side::Long
+                    Side::Long
                 } else {
-                    crate::core::types::Side::Short
+                    Side::Short
                 },
                 entry_price: row.get("entry_price"),
                 exit_price: row.get("exit_price"),

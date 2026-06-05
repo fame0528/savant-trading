@@ -803,6 +803,7 @@ mod tests {
         }
     }
 
+    #[allow(dead_code)]
     fn price_response_json() -> serde_json::Value {
         serde_json::json!({
             "buyAmount": "10000000000000000",

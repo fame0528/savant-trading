@@ -104,6 +104,9 @@ async fn main() -> anyhow::Result<()> {
         )
         .init();
 
+    // Set console window title + icon
+    savant_trading::core::console::init_console(env!("CARGO_PKG_VERSION"));
+
     let args: Vec<String> = std::env::args().collect();
 
     let config = AppConfig::load(Path::new("config/default.toml")).unwrap_or_else(|e| {
@@ -134,6 +137,10 @@ async fn main() -> anyhow::Result<()> {
         }
         Some("--liquidate") => {
             return emergency_liquidate().await;
+        }
+        Some("recover") => {
+            info!("=== SAVANT RECOVER — Scan wallet, restore positions to DB ===");
+            return recover_positions(&config).await;
         }
         Some("backtest") => {
             info!("=== SAVANT BACKTEST ===");
@@ -430,5 +437,156 @@ async fn emergency_liquidate() -> anyhow::Result<()> {
     }
 
     println!("Liquidation complete. Final balance: ${:.2}", trader.balance());
+    Ok(())
+}
+
+/// Recover on-chain positions into the engine's SQLite DB.
+/// Scans wallet for non-zero token balances and creates Position records
+/// so the engine can see and manage them on startup.
+async fn recover_positions(config: &savant_trading::core::config::AppConfig) -> anyhow::Result<()> {
+    use savant_trading::core::types::{Position, ScaleLevel, Side};
+    use savant_trading::monitor::journal::TradeJournal;
+    use alloy_core::primitives::{Address, U256, Keccak256, hex};
+    use k256::ecdsa::SigningKey;
+
+    // Derive wallet address from private key
+    let private_key = std::env::var(&config.exchange.dex.wallet_key_env)
+        .map_err(|_| anyhow::anyhow!("WALLET_PRIVATE_KEY not set"))?;
+
+    let key_bytes = hex::decode(private_key.trim_start_matches("0x"))
+        .map_err(|e| anyhow::anyhow!("Invalid key hex: {}", e))?;
+    let signing_key = SigningKey::from_slice(&key_bytes)
+        .map_err(|e| anyhow::anyhow!("Invalid key: {}", e))?;
+    let verifying_key = signing_key.verifying_key();
+    let encoded = verifying_key.to_encoded_point(false).to_bytes().to_vec();
+    let hash = {
+        let mut h = Keccak256::new();
+        h.update(&encoded[1..]);
+        h.finalize()
+    };
+    let addr_bytes: [u8; 20] = hash[12..32].try_into()?;
+    let wallet_address = Address::from(addr_bytes);
+    let wallet_hex = format!("{:#x}", wallet_address);
+    println!("Wallet: {}", wallet_hex);
+
+    // Known Arbitrum token holdings to check
+    struct TokenInfo {
+        symbol: &'static str,
+        address: &'static str,
+        decimals: u64,
+    }
+
+    let tokens = vec![
+        TokenInfo { symbol: "AAVE", address: "0xba5ddd1f9d7f570dc94a51479a000e3bce967196", decimals: 18 },
+        TokenInfo { symbol: "FLUID", address: "0x61E030A56D33e8260FdD81f03B162A79Fe3449Cd", decimals: 18 },
+        TokenInfo { symbol: "VANA", address: "0x7FF7Fa94b8b66Ef313f7970d4EEbd2CB3103a2C0", decimals: 18 },
+        TokenInfo { symbol: "WETH", address: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", decimals: 18 },
+        TokenInfo { symbol: "ARB", address: "0x912CE59144191C1204E64559FE8253a0e49E6548", decimals: 18 },
+    ];
+
+    let rpc_url = &config.exchange.dex.rpc_url;
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(15))
+        .build()?;
+
+    let wallet_addr_clean = wallet_hex.trim_start_matches("0x");
+    let balance_of_data = format!("0x70a08231{:0>64}", wallet_addr_clean);
+
+    let mut recovered = Vec::new();
+
+    for token in &tokens {
+        let body = serde_json::json!({
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "eth_call",
+            "params": [{"to": token.address, "data": &balance_of_data}, "latest"]
+        });
+
+        let resp: serde_json::Value = client.post(rpc_url)
+            .header("User-Agent", "Mozilla/5.0")
+            .json(&body)
+            .send().await?
+            .json().await?;
+
+        if let Some(hex_val) = resp.get("result").and_then(|r| r.as_str()) {
+            let raw = U256::from_str_radix(hex_val.trim_start_matches("0x"), 16)
+                .unwrap_or(U256::ZERO);
+            if raw.is_zero() {
+                continue;
+            }
+            let divisor = 10f64.powi(token.decimals as i32);
+            let amount: f64 = raw.to_string().parse().unwrap_or(0.0) / divisor;
+            if amount < 0.0001 {
+                continue;
+            }
+
+            // Get price from CoinGecko
+            let cg_id = match token.symbol {
+                "AAVE" => "aave",
+                "FLUID" => "instadapp",
+                "VANA" => "vana",
+                "WETH" => "weth",
+                "ARB" => "arbitrum",
+                _ => continue,
+            };
+            let price = match client.get(format!(
+                "https://api.coingecko.com/api/v3/simple/price?ids={}&vs_currencies=usd", cg_id
+            )).header("User-Agent", "Mozilla/5.0").send().await {
+                Ok(r) => r.json::<serde_json::Value>().await.ok()
+                    .and_then(|d| d.get(cg_id)?.get("usd")?.as_f64())
+                    .unwrap_or(0.0),
+                Err(_) => 0.0,
+            };
+
+            let value = amount * price;
+            println!("  {} {}: {:.6} @ ${:.4} = ${:.2}", token.symbol, token.address, amount, price, value);
+
+            if value < 0.01 {
+                println!("    Skipping — dust value");
+                continue;
+            }
+
+            let pos = Position {
+                id: format!("recover-{}-{}", token.symbol.to_lowercase(), chrono::Utc::now().timestamp()),
+                pair: format!("{}/USD", token.symbol),
+                side: Side::Long,
+                entry_price: price, // Use current price as entry (conservative)
+                current_price: price,
+                quantity: amount,
+                stop_loss: 0.0, // No stop — user needs to set manually or engine will set
+                take_profit_1: 0.0,
+                take_profit_2: 0.0,
+                take_profit_3: 0.0,
+                unrealized_pnl: 0.0,
+                risk_amount: 0.0,
+                strategy_name: "recovered".to_string(),
+                opened_at: chrono::Utc::now(),
+                scale_level: ScaleLevel::Full,
+            };
+            recovered.push((pos, value));
+        }
+    }
+
+    if recovered.is_empty() {
+        println!("No token holdings found to recover.");
+        return Ok(());
+    }
+
+    // Save to DB
+    let journal = TradeJournal::new(&config.trading.database_url).await?;
+    let total: f64 = recovered.iter().map(|(_, v)| *v).sum();
+
+    println!("\nRecovering {} positions (${:.2} total) to DB...", recovered.len(), total);
+    for (pos, value) in &recovered {
+        journal.save_position(pos).await?;
+        let _ = journal.record_activity("Trade", &pos.pair,
+            &format!("RECOVERED {} {:.6} @ ${:.4} = ${:.2}", pos.side, pos.quantity, pos.current_price, value)
+        ).await;
+        println!("  Saved: {} {} {:.6}", pos.pair, pos.side, pos.quantity);
+    }
+
+    println!("\nDone. {} positions saved to DB. Start the engine to manage them.", recovered.len());
+    println!("  The engine will load these positions on startup.");
+    println!("  Use the dashboard terminal: savant start");
     Ok(())
 }

@@ -46,6 +46,31 @@ pub fn est_now() -> String {
     format!("{} {}:{} {}", est.format("%m-%d-%Y"), hour, minute, ampm)
 }
 
+/// Set the console window title using Windows API (more reliable than ANSI).
+pub fn set_console_title(title: &str) {
+    #[cfg(target_os = "windows")]
+    {
+        use std::ffi::OsStr;
+        use std::os::windows::ffi::OsStrExt;
+        let wide: Vec<u16> = OsStr::new(title).encode_wide().chain(std::iter::once(0)).collect();
+        unsafe {
+            extern "system" {
+                fn SetConsoleTitleW(lpConsoleTitle: *const u16) -> i32;
+            }
+            SetConsoleTitleW(wide.as_ptr());
+        }
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        eprint!("\x1b]0;{}\x07", title);
+    }
+}
+
+/// Set the console window title to SAVANT branding.
+pub fn init_console(version: &str) {
+    set_console_title(&format!("SAVANT [Autonomous Trading] v{}", version));
+}
+
 // ── savant_log — direct styled logging ───────────────────────────────────
 
 pub enum LogLevel {
@@ -59,6 +84,7 @@ pub enum LogLevel {
     DecisionClose,
     DecisionAdjust,
     Trade,
+    Position,
     Swap,
     SwapOk,
     SwapFail,
@@ -83,6 +109,7 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
         LogLevel::DecisionClose => (ORANGE_BOLD, ORANGE_FG),
         LogLevel::DecisionAdjust => (ORANGE_FG, ORANGE_FG),
         LogLevel::Trade => (ORANGE_BOLD, ORANGE_FG),
+        LogLevel::Position => (WHITE_BOLD, WHITE_FG),
         LogLevel::Swap => (CYAN_FG, WHITE_FG),
         LogLevel::SwapOk => (GREEN_BOLD, GREEN_FG),
         LogLevel::SwapFail => (RED_BOLD, RED_FG),
@@ -297,5 +324,12 @@ macro_rules! log_circuit {
 macro_rules! log_warn {
     ($action:expr, $($arg:tt)*) => {{
         $crate::core::console::savant_log($crate::core::console::LogLevel::Warn, $action, &format!($($arg)*));
+    }};
+}
+
+#[macro_export]
+macro_rules! log_position {
+    ($action:expr, $($arg:tt)*) => {{
+        $crate::core::console::savant_log($crate::core::console::LogLevel::Position, $action, &format!($($arg)*));
     }};
 }

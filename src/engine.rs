@@ -6,7 +6,7 @@ use tracing::{debug, error, info, warn};
 
 use savant_trading::agent::context_builder::FullContext;
 use savant_trading::agent::knowledge::KnowledgeBase;
-use savant_trading::{log_phase, log_llm, log_llm_done, log_decision, log_vault, log_swap, log_swap_fail, log_trade, log_circuit, log_warn};
+use savant_trading::{log_phase, log_llm, log_llm_done, log_decision, log_vault, log_swap, log_swap_fail, log_trade, log_position, log_circuit, log_warn};
 use savant_trading::agent::openrouter_management::OpenRouterManagementClient;
 use savant_trading::agent::orchestrator::{AgentConfig, AgentOrchestrator, AutonomyLevel};
 use savant_trading::agent::prompts::{self, PromptComposer};
@@ -441,7 +441,68 @@ pub async fn run(
             );
             paper.set_balance(restored_balance);
         }
+
+        // Load persisted positions from DB — source of truth
+        match j.load_positions().await {
+            Ok(db_positions) if !db_positions.is_empty() => {
+                info!("Restored {} open positions from DB", db_positions.len());
+                for pos in &db_positions {
+                    paper.positions_mut().insert(pos.id.clone(), pos.clone());
+                }
+                paper.account_mut().open_positions = paper.positions().len();
+            }
+            Ok(_) => info!("No persisted positions in DB"),
+            Err(e) => warn!("Failed to load positions from DB: {}", e),
+        }
+
+        // Load closed trades into shared state
+        match j.get_trades(500).await {
+            Ok(closed) if !closed.is_empty() => {
+                info!("Loaded {} closed trades from journal", closed.len());
+                let mut shared_trades = shared.closed_trades.write().await;
+                *shared_trades = closed;
+            }
+            _ => {}
+        }
+
+        // Load activity log into shared state
+        match j.load_activity(200).await {
+            Ok(entries) if !entries.is_empty() => {
+                let mut shared_activity = shared.activity_log.write().await;
+                for (ts, level, pair, msg) in entries {
+                    let lvl = match level.as_str() {
+                        "Trade" => savant_trading::core::shared::ActivityLevel::Trade,
+                        "Decision" => savant_trading::core::shared::ActivityLevel::Decision,
+                        "Warning" => savant_trading::core::shared::ActivityLevel::Warning,
+                        "Error" => savant_trading::core::shared::ActivityLevel::Error,
+                        "Thinking" => savant_trading::core::shared::ActivityLevel::Thinking,
+                        _ => savant_trading::core::shared::ActivityLevel::Info,
+                    };
+                    shared_activity.push(savant_trading::core::shared::ActivityEntry {
+                        timestamp: ts,
+                        level: lvl,
+                        pair,
+                        message: msg,
+                    });
+                }
+            }
+            _ => {}
+        }
     }
+
+    // Seed shared state IMMEDIATELY — don't wait for tick 10
+    {
+        let mut shared_account = shared.account.write().await;
+        *shared_account = paper.account().clone();
+        let mut shared_positions = shared.positions.write().await;
+        *shared_positions = paper.positions().values().cloned().collect();
+    }
+    info!(
+        "Shared state seeded: balance=${:.2}, {} positions, {} trades",
+        paper.account().balance,
+        paper.positions().len(),
+        shared.closed_trades.read().await.len()
+    );
 
     // === AI AGENT SETUP ===
     let knowledge_base = load_knowledge_base();
@@ -1202,10 +1263,29 @@ pub async fn run(
                         entry_price: decision.entry_price,
                         stop_loss: decision.stop_loss,
                         take_profit_1: decision.take_profit_1,
+                        take_profit_2: decision.take_profit_2,
+                        take_profit_3: decision.take_profit_3,
                         confidence: decision.confidence,
                         reasoning: decision.reasoning.clone(),
                     };
                     shared.push_decision(decision_record);
+
+                    // Activity feed: mirror terminal decisions (not PASS — too noisy)
+                    if action_label != "PASS" {
+                        shared.log_activity(
+                            savant_trading::core::shared::ActivityLevel::Decision,
+                            &decision.pair,
+                            &format!("{} [{}] | {:.0}% | R:{:.1} | {}",
+                                action_label, decision.side, decision.confidence * 100.0,
+                                decision.risk_reward, reasoning_short),
+                        ).await;
+                        if let Some(ref j) = journal {
+                            let _ = j.record_activity("Decision", &decision.pair,
+                                &format!("{} [{}] | {:.0}% | R:{:.1} | {}",
+                                    action_label, decision.side, decision.confidence * 100.0,
+                                    decision.risk_reward, reasoning_short)).await;
+                        }
+                    }
 
                     // Log to vault
                     if vault_config.enabled {
@@ -1392,6 +1472,30 @@ pub async fn run(
                                                             decision.action, decision.pair, pos_id,
                                                             exit_price, pnl, pnl_pct);
 
+                                                        // DB: delete position, record trade, log activity — instant
+                                                        if let Some(ref j) = journal {
+                                                            let _ = j.delete_position(pos_id).await;
+                                                            let _ = j.record_trade(&trade).await;
+                                                            let _ = j.record_activity("Trade", &trade.pair,
+                                                                &format!("CLOSED {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
+                                                                    trade.side, exit_price, pnl, pnl_pct)).await;
+                                                        }
+                                                        shared.log_activity(
+                                                            savant_trading::core::shared::ActivityLevel::Trade,
+                                                            &trade.pair,
+                                                            &format!("CLOSED {} | PnL: ${:.2} ({:.2}%)", trade.side, pnl, pnl_pct),
+                                                        ).await;
+
+                                                        // Update shared state immediately
+                                                        {
+                                                            let mut sp = shared.positions.write().await;
+                                                            *sp = paper.positions().values().cloned().collect();
+                                                            let mut sa = shared.account.write().await;
+                                                            *sa = paper.account().clone();
+                                                            let mut st = shared.closed_trades.write().await;
+                                                            *st = paper.closed_trades().to_vec();
+                                                        }
+
                                                         event_bus.publish(TradingEvent::PositionClosed(trade));
                                                     }
                                                     Err(e) => {
@@ -1567,9 +1671,28 @@ pub async fn run(
                                                                 f.write_all(alert_line.as_bytes())
                                                             });
 
-                                                        log_trade!("OPENED", "{} {:?} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4} | Risk: ${:.2}",
+                                                        log_trade!("OPENED", "{} {:?} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4} TP2: {:.4} TP3: {:.4} | Risk: ${:.2} | Scale: 50%→TP1, 30%→TP2, 20%→TP3",
                                                             decision.side, decision.action, decision.entry_price,
-                                                            ps.quantity, decision.stop_loss, decision.take_profit_1, ps.risk_amount);
+                                                            ps.quantity, decision.stop_loss, decision.take_profit_1, decision.take_profit_2, decision.take_profit_3, ps.risk_amount);
+
+                                                        // Persist to DB instantly
+                                                        if let Some(ref j) = journal {
+                                                            if let Err(e) = j.save_position(&pos).await {
+                                                                warn!("Failed to persist position to DB: {}", e);
+                                                            }
+                                                            let _ = j.record_activity("Trade", &pos.pair,
+                                                                &format!("OPENED {} {} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4}",
+                                                                    decision.side, decision.pair, decision.entry_price,
+                                                                    ps.quantity, decision.stop_loss, decision.take_profit_1)).await;
+                                                        }
+
+                                                        // Update shared state immediately
+                                                        {
+                                                            let mut sp = shared.positions.write().await;
+                                                            *sp = paper.positions().values().cloned().collect();
+                                                            let mut sa = shared.account.write().await;
+                                                            *sa = paper.account().clone();
+                                                        }
 
                                                         event_bus.publish(TradingEvent::PositionOpened(pos));
                                                     }
@@ -1630,10 +1753,32 @@ pub async fn run(
             .map(|(id, pos)| (id.clone(), pos.pair.clone(), pos.side, pos.entry_price))
             .collect();
 
-        let closed = paper.check_stops(&all_prices);
+        let stop_result = paper.check_stops(&all_prices);
+
+        // Log trailing stop events
+        for trail in &stop_result.trails {
+            log_trade!("TRAIL", "{} {} | SL {:.4} → {:.4} (price {:.4}, risk ${:.2})",
+                trail.pair, trail.side, trail.old_sl, trail.new_sl, trail.current_price,
+                (trail.new_sl - trail.current_price).abs());
+
+            // DB: update trailed position + log activity
+            if let Some(ref j) = journal {
+                if let Some((_, pos)) = paper.positions().iter().find(|(_, p)| p.pair == trail.pair && p.side == trail.side) {
+                    let _ = j.save_position(pos).await;
+                }
+                let _ = j.record_activity("Trade", &trail.pair,
+                    &format!("TRAIL {} | SL {:.4} → {:.4} (price {:.4})",
+                        trail.side, trail.old_sl, trail.new_sl, trail.current_price)).await;
+            }
+            shared.log_activity(
+                savant_trading::core::shared::ActivityLevel::Trade,
+                &trail.pair,
+                &format!("TRAIL {} | SL {:.4} → {:.4}", trail.side, trail.old_sl, trail.new_sl),
+            ).await;
+        }
 
         // In live mode, close positions on executor that PaperTrader closed via stops
-        for trade in &closed {
+        for trade in &stop_result.closed {
             if let Some(ref mut ex) = executor {
                 // Match closed trade to paper position by pair + side + entry_price
                 let paper_id = paper_positions_before
@@ -1677,11 +1822,35 @@ pub async fn run(
             }
         }
 
-        for trade in closed {
-            info!(
-                "CLOSED: {} {} | PnL: ${:.2} ({:.2}%) | {}",
-                trade.pair, trade.side, trade.pnl, trade.pnl_pct, trade.notes,
-            );
+        let has_stop_activity = !stop_result.closed.is_empty() || !stop_result.trails.is_empty();
+        for trade in stop_result.closed {
+            let tp_label = if trade.notes.contains("TP1") {
+                "TP1"
+            } else if trade.notes.contains("TP2") {
+                "TP2"
+            } else if trade.notes.contains("TP3") {
+                "TP3"
+            } else {
+                "SL"
+            };
+            log_trade!(tp_label, "{} {} | Entry: {:.4} → Exit: {:.4} | Qty: {:.4} | PnL: ${:.2} ({:.2}%) | {}",
+                trade.pair, trade.side, trade.entry_price, trade.exit_price,
+                trade.quantity, trade.pnl, trade.pnl_pct, trade.notes);
+
+            // DB: delete position, record trade, log activity — all instant
+            if let Some(ref j) = journal {
+                // Find and delete the closed position from DB
+                for (id, pair, _side, _entry) in paper_positions_before.iter() {
+                    if *pair == trade.pair {
+                        let _ = j.delete_position(id).await;
+                        break;
+                    }
+                }
+                let _ = j.record_trade(&trade).await;
+                let _ = j.record_activity("Trade", &trade.pair,
+                    &format!("{} {} | PnL: ${:.2} ({:.2}%) | {}",
+                        tp_label, trade.side, trade.pnl, trade.pnl_pct, trade.notes)).await;
+            }
 
             // Write close alert to file for external monitoring
             let close_alert = serde_json::json!({
@@ -1710,8 +1879,8 @@ pub async fn run(
                     savant_trading::core::shared::ActivityLevel::Trade,
                     &trade.pair,
                     &format!(
-                        "CLOSED {} | PnL: ${:.2} ({:.2}%) | {}",
-                        trade.side, trade.pnl, trade.pnl_pct, trade.notes,
+                        "{} {} | PnL: ${:.2} ({:.2}%) | {}",
+                        tp_label, trade.side, trade.pnl, trade.pnl_pct, trade.notes,
                     ),
                 )
                 .await;
@@ -1720,11 +1889,6 @@ pub async fn run(
             if vault_config.enabled {
                 if let Err(e) = vault_writer.project_trade(&trade) {
                     warn!("Vault trade projection failed: {}", e);
-                }
-            }
-            if let Some(ref j) = journal {
-                if let Err(e) = j.record_trade(&trade).await {
-                    warn!("Failed to record trade: {}", e);
                 }
             }
 
@@ -1775,6 +1939,23 @@ pub async fn run(
             }
         }
 
+        // Sync shared state after stop checks (positions may have closed or scaled)
+        if has_stop_activity {
+            let mut sp = shared.positions.write().await;
+            *sp = paper.positions().values().cloned().collect();
+            let mut sa = shared.account.write().await;
+            *sa = paper.account().clone();
+            let mut st = shared.closed_trades.write().await;
+            *st = paper.closed_trades().to_vec();
+
+            // DB: persist scale-out position updates
+            if let Some(ref j) = journal {
+                for pos in paper.positions().values() {
+                    let _ = j.save_position(pos).await;
+                }
+            }
+        }
+
         // Update equity from all position prices (C1 fix)
         // SPRINT-2: Merge WS real-time prices with REST candle prices
         let mut all_prices: HashMap<String, f64> = market_stores
@@ -1819,6 +2000,56 @@ pub async fn run(
                 },
                 metrics,
             );
+
+            // Position dashboard — show all open positions with targets & PnL
+            let positions: Vec<_> = paper.positions().values().collect();
+            if !positions.is_empty() {
+                log_position!("POSITIONS", "{} open position{}", positions.len(),
+                    if positions.len() == 1 { "" } else { "s" });
+                for pos in &positions {
+                    let held = chrono::Utc::now().signed_duration_since(pos.opened_at);
+                    let held_str = if held.num_hours() > 0 {
+                        format!("{}h{}m", held.num_hours(), held.num_minutes() % 60)
+                    } else {
+                        format!("{}m", held.num_minutes())
+                    };
+                    let pnl_pct = if pos.entry_price > 0.0 {
+                        pos.unrealized_pnl / (pos.entry_price * pos.quantity) * 100.0
+                    } else {
+                        0.0
+                    };
+                    let scale_str = match pos.scale_level {
+                        savant_trading::core::types::ScaleLevel::Full => "Full",
+                        savant_trading::core::types::ScaleLevel::Scaled50 => "50%out",
+                        savant_trading::core::types::ScaleLevel::Scaled80 => "80%out",
+                        savant_trading::core::types::ScaleLevel::Closed => "Closed",
+                    };
+                    let sl_dist = match pos.side {
+                        savant_trading::core::types::Side::Long => {
+                            if pos.current_price > 0.0 {
+                                (pos.current_price - pos.stop_loss) / pos.current_price * 100.0
+                            } else {
+                                0.0
+                            }
+                        }
+                        savant_trading::core::types::Side::Short => {
+                            if pos.current_price > 0.0 {
+                                (pos.stop_loss - pos.current_price) / pos.current_price * 100.0
+                            } else {
+                                0.0
+                            }
+                        }
+                    };
+                    log_position!("  {}", "{} {} | Entry:{:.4} Cur:{:.4} | PnL:${:.2}({:+.1}%) | SL:{:.4}({:.1}%away) | TP1:{:.4} TP2:{:.4} TP3:{:.4} | Scale:{} | {}",
+                        pos.pair, pos.side, pos.entry_price, pos.current_price,
+                        pos.unrealized_pnl, pnl_pct,
+                        pos.stop_loss, sl_dist,
+                        pos.take_profit_1, pos.take_profit_2, pos.take_profit_3,
+                        scale_str, held_str);
+                }
+            } else {
+                log_position!("POSITIONS", "No open positions");
+            }
 
             // Update shared state for API
             {
@@ -1920,12 +2151,13 @@ pub async fn run(
         tokio::select! {
             _ = time::sleep(Duration::from_secs(interval_seconds)) => {}
             _ = tokio::signal::ctrl_c() => {
-                info!("Shutdown signal received. Saving state...");
-                // PROD-3: Save state before exit
-                if let Err(e) = paper.save_state("data/paper_state.json") {
-                    warn!("Failed to save state: {}", e);
-                } else {
-                    info!("State saved to data/paper_state.json");
+                info!("Shutdown signal received.");
+                // Final position sync to shared state before exit
+                {
+                    let mut sp = shared.positions.write().await;
+                    *sp = paper.positions().values().cloned().collect();
+                    let mut sa = shared.account.write().await;
+                    *sa = paper.account().clone();
                 }
                 info!("Savant engine shut down cleanly.");
                 return Ok(());
