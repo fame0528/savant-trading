@@ -654,7 +654,7 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
 
         let token_symbol = pos.pair.split('/').next().unwrap_or("");
         let (base_token, _quote_token) = match resolve_pair_on_chain(
-            &pos.pair, savant_trading::core::types::Side::Long, config.exchange.dex.chain_id
+            &pos.pair, savant_trading::core::types::Side::Short, config.exchange.dex.chain_id
         ) {
             Ok(pair) => pair,
             Err(_) => {
