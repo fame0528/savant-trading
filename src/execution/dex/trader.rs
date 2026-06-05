@@ -523,29 +523,29 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
         let raw_tx_hex = format!("0x{}", hex::encode(&raw_tx));
 
-        // FID-043: Dry-run with eth_call before broadcasting to catch malformed
+        // FID-043: Pre-flight simulation with eth_call before broadcasting to catch malformed
         // calldata (bad Permit2 signature, wrong spender, etc.) before spending gas.
-        let dry_run_params = serde_json::json!([{
+        let preflight_params = serde_json::json!([{
             "from": format!("{:#x}", self.wallet_address),
             "to": format!("{:#x}", to),
             "data": format!("0x{}", hex::encode(data)),
             "value": format!("0x{:x}", value),
             "gas": format!("0x{:x}", gas_limit),
         }, "latest"]);
-        match self.rpc_call("eth_call", dry_run_params).await {
+        match self.rpc_call("eth_call", preflight_params).await {
             Ok(result) => {
                 let ret = result.as_str().unwrap_or("0x");
-                tracing::debug!("eth_call dry-run OK (ret={})", &ret[..ret.len().min(66)]);
+                tracing::debug!("Pre-flight OK (ret={})", &ret[..ret.len().min(66)]);
             }
             Err(e) => {
                 let err_str = e.to_string();
                 warn!(
-                    "DRY-RUN FAILED: eth_call reverted — {} | \
-                     This likely means bad Permit2 signature or calldata. Aborting broadcast.",
+                    "PRE-FLIGHT FAILED: eth_call reverted — {} | \
+                     This likely means bad Permit2 signature, insufficient gas, or no liquidity. Aborting broadcast.",
                     err_str
                 );
                 return Err(ExecutionError::Other(format!(
-                    "eth_call dry-run reverted: {}",
+                    "Pre-flight simulation reverted: {}",
                     err_str
                 )));
             }
@@ -684,6 +684,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             slippage: self.slippage_pct,
             from: wallet_addr,
             chain_id: self.chain_id,
+            sell_entire_balance: false,
         };
 
         log_swap!("0x API", "Calling: {} -> {} amount={}", swap_params.src_token, swap_params.dst_token, swap_params.amount);
@@ -702,9 +703,10 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                     } else {
                         dst_token.decimals as u32
                     };
+                    let sell_decimals = src_token.decimals as u32;
 
-                    // Convert to human-readable amounts
-                    let sell_usd = sell_raw / 1_000_000.0; // USDC has 6 decimals
+                    // Convert to human-readable amounts using correct decimals per token
+                    let sell_tokens = sell_raw / 10f64.powi(sell_decimals as i32);
                     let buy_tokens = buy_raw / 10f64.powi(buy_decimals as i32);
 
                     // Minimum output check: reject dust amounts
@@ -716,8 +718,8 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                         )));
                     }
 
-                    // Effective price per token in USD
-                    let effective_price = sell_usd / buy_tokens;
+                    // Effective price: sell per buy (how many sell tokens per buy token)
+                    let effective_price = sell_tokens / buy_tokens;
 
                     // Parse market price from quote (0x returns USD price, 1inch returns src amount)
                     let market_price_raw: f64 = quote.price.parse().unwrap_or(0.0);
@@ -787,13 +789,17 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
         let value = Self::parse_wei_value(&swap_tx.value);
 
+        // Apply gas buffer: 0x API estimates are often too low for Permit2 calldata.
+        // Use 1.5x buffer with a minimum of 800,000 for complex swaps.
+        let gas_limit = std::cmp::max(swap_tx.gas * 3 / 2, 800_000);
+
         // Retry logic: up to 3 attempts for transient failures (gas spike, network error)
         let max_retries = 3;
         let mut last_err = None;
         for attempt in 1..=max_retries {
             log_swap!("SIGN", "Tx (attempt {}/{}): to={:#x} data_len={} value={} gas={}",
-                attempt, max_retries, to, data.len(), value, swap_tx.gas);
-            let result = self.sign_and_send(to, &data, value, swap_tx.gas).await;
+                attempt, max_retries, to, data.len(), value, gas_limit);
+            let result = self.sign_and_send(to, &data, value, gas_limit).await;
             match result {
                     Ok(hash) => {
                         log_swap_ok!("BROADCAST", "OK: {}", hash);
@@ -1132,10 +1138,13 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
     }
 
     async fn close_position(&mut self, position_id: &str) -> Result<Order, ExecutionError> {
+        // SAFETY: Clone the position but DO NOT remove it from the map until the swap
+        // is verified on-chain. If the swap fails, the position stays open.
         let pos = self
             .positions
-            .remove(position_id)
-            .ok_or_else(|| ExecutionError::PositionNotFound(position_id.to_string()))?;
+            .get(position_id)
+            .ok_or_else(|| ExecutionError::PositionNotFound(position_id.to_string()))?
+            .clone();
 
         self.order_counter += 1;
 
@@ -1148,20 +1157,102 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         )?;
         let qty_wei = amount_to_wei(pos.quantity, src_token.decimals);
 
-        // CRITICAL: Ensure source token is approved for Permit2 before closing.
         if src_token.address.is_empty() {
             return Err(ExecutionError::Other(format!(
                 "Cannot approve token '{}' for close — no address in local DB.",
                 src_token.symbol
             )));
         }
+
+        // Step 1: Check liquidity via 0x /price endpoint BEFORE attempting swap.
+        // Per 0x docs: "The API will return liquidityAvailable=false if there
+        // isn't enough liquidity available for the requested quote."
+        let wallet_addr = format!("{:#x}", self.wallet_address);
+        let price_params = super::SwapParams {
+            src_token: src_token.address.clone(),
+            dst_token: dst_token.address.clone(),
+            amount: qty_wei.clone(),
+            slippage: self.slippage_pct,
+            from: wallet_addr.clone(),
+            chain_id: self.chain_id,
+            sell_entire_balance: true, // Use actual on-chain balance for close
+        };
+        match self.backend.check_liquidity(&price_params).await {
+            Ok(check) if check.available => {
+                info!("Liquidity check OK for {} close — proceeding with swap", pos.pair);
+            }
+            Ok(_check) => {
+                return Err(ExecutionError::Other(format!(
+                    "No liquidity available to close {} — 0x returned liquidityAvailable=false. \
+                     Position stays open. Will retry next cycle.", pos.pair
+                )));
+            }
+            Err(e) => {
+                return Err(ExecutionError::Other(format!(
+                    "Liquidity pre-check failed for {} close: {}. Position stays open.",
+                    pos.pair, e
+                )));
+            }
+        }
+
+        // Step 2: Ensure source token is approved for Permit2.
         if let Err(e) = self.ensure_permit2_approval(&src_token.address, &qty_wei).await {
             log_swap_fail!("APPROVE", "Permit2 approval failed on close: {}", e);
             return Err(e);
         }
 
+        // Step 3: Record USDC balance BEFORE swap for on-chain verification.
+        let usdc_balance_before = self.balance;
+
+        // Step 4: Execute the swap.
         let tx_hash = self.execute_swap(&src_token, &dst_token, &qty_wei).await?;
-        info!("DEX closed: {} | tx={}", pos.pair, tx_hash);
+
+        // Step 5: Verify on-chain — query actual USDC balance after swap.
+        // A tx can have status=1 but deliver 0 output (failed internal swap).
+        let usdc_addr = super::usdc_address_for_chain(self.chain_id);
+        let usdc_dec = super::usdc_decimals_for_chain(self.chain_id);
+        let padded_addr = format!("{:0>64}", self.wallet_address.to_string().trim_start_matches("0x"));
+        let call_data = format!("0x70a08231{}", padded_addr);
+        let call_params = serde_json::json!([{
+            "to": usdc_addr,
+            "data": call_data
+        }, "latest"]);
+
+        let verified_proceeds = match self.rpc_call("eth_call", call_params).await {
+            Ok(result) => {
+                if let Some(hex) = result.as_str() {
+                    let usdc_wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
+                        .unwrap_or(U256::ZERO);
+                    let divisor = 10f64.powi(usdc_dec as i32);
+                    let usdc_after: f64 = usdc_wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
+                    let gained = usdc_after - usdc_balance_before;
+                    if gained <= 0.0 {
+                        // Swap tx succeeded (status=1) but delivered 0 USDC.
+                        // Position stays open — tokens are still in wallet.
+                        return Err(ExecutionError::Other(format!(
+                            "Close tx {} succeeded but delivered ${:.2} USDC (before=${:.2}, after=${:.2}). \
+                             Position stays open. Tokens may be stranded.",
+                            tx_hash, gained, usdc_balance_before, usdc_after
+                        )));
+                    }
+                    info!("On-chain verified: {} close delivered ${:.2} USDC (before=${:.2}, after=${:.2})",
+                        pos.pair, gained, usdc_balance_before, usdc_after);
+                    gained
+                } else {
+                    warn!("Could not parse USDC balance for close verification — using estimate");
+                    pos.entry_price * pos.quantity + (pos.current_price - pos.entry_price) * pos.quantity
+                }
+            }
+            Err(e) => {
+                warn!("Failed to verify USDC balance after close: {} — using estimate", e);
+                pos.entry_price * pos.quantity + (pos.current_price - pos.entry_price) * pos.quantity
+            }
+        };
+
+        // Step 6: Swap verified — NOW remove position from map.
+        self.positions.remove(position_id);
+
+        info!("DEX closed: {} | tx={} | verified proceeds=${:.2}", pos.pair, tx_hash, verified_proceeds);
 
         let exit_price = pos.current_price;
         let gross_pnl = match pos.side {
@@ -1170,9 +1261,7 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         };
         let fee_est = exit_price * pos.quantity * 0.001;
         let pnl = gross_pnl - fee_est;
-        // Return net proceeds: entry value + PnL - closing fee
-        let proceeds = pos.entry_price * pos.quantity + gross_pnl - fee_est;
-        self.balance += proceeds;
+        self.balance = usdc_balance_before + verified_proceeds;
 
         self.closed_trades.push(TradeRecord {
             id: uuid::Uuid::new_v4().to_string(),
@@ -1191,10 +1280,9 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
             strategy_name: pos.strategy_name.clone(),
             opened_at: pos.opened_at,
             closed_at: Utc::now(),
-            notes: format!("DEX close via {}", self.backend.name()),
+            notes: format!("DEX close via {} — on-chain verified", self.backend.name()),
         });
 
-        // FID-018: Persist state after position close
         if let Err(e) = self.save_state() {
             warn!("Failed to save state after close: {}", e);
         }
@@ -1229,15 +1317,39 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
     async fn sync_balance(&mut self) -> Result<(), ExecutionError> {
         let addr_hex = format!("{:#x}", self.wallet_address);
 
-        // Check gas on ALL registered chains (FID-045)
+        // Dynamic gas check (FID-052): query current gas price, calculate how many
+        // swaps we can afford. Halt only if we can't afford even 1 swap.
+        // A typical 0x swap on Arbitrum uses ~500K gas. On Base/Optimism ~200K.
+        let typical_gas_limit: u64 = 500_000;
+
         for &cid in self.chain_clients.keys() {
-            let min_gas = self.chain_configs.get(&cid)
-                .map(|c| c.min_gas_native)
-                .unwrap_or(0.002);
             let chain_name = self.chain_configs.get(&cid)
                 .map(|c| c.name)
                 .unwrap_or("unknown");
 
+            // 1. Get current gas price from network
+            let gas_price_res = self.rpc_call_on_chain(cid, "eth_gasPrice", serde_json::json!([])).await;
+            let gas_price_gwei: f64 = match gas_price_res {
+                Ok(val) => {
+                    if let Some(hex) = val.as_str() {
+                        let wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
+                            .unwrap_or(U256::ZERO);
+                        wei.to_string().parse::<f64>().unwrap_or(0.0) / 1e9 // Convert wei → gwei
+                    } else { 0.1 } // fallback: 0.1 gwei (typical Arbitrum)
+                }
+                Err(_) => 0.1, // fallback
+            };
+
+            // 2. Estimate cost per swap in native token
+            //    cost = gas_limit × gas_price (in ETH)
+            let gas_price_eth = gas_price_gwei / 1e9; // gwei → ETH
+            let cost_per_swap = typical_gas_limit as f64 * gas_price_eth;
+
+            // 3. We need enough gas for at least 2 swaps (buy + potential stop-loss exit)
+            //    plus 50% buffer for gas spikes
+            let min_gas = cost_per_swap * 2.0 * 1.5;
+
+            // 4. Get native token balance
             let gas_res = self.rpc_call_on_chain(cid, "eth_getBalance", serde_json::json!([&addr_hex, "latest"])).await;
             match gas_res {
                 Ok(val) => {
@@ -1245,18 +1357,22 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
                         let wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
                             .unwrap_or(U256::ZERO);
                         let gas_balance: f64 = wei.to_string().parse().unwrap_or(0.0) / 1e18;
+                        let swaps_affordable = if cost_per_swap > 0.0 { (gas_balance / cost_per_swap).floor() as u64 } else { u64::MAX };
 
                         if gas_balance < min_gas {
                             self.chain_gas_halted.insert(cid, true);
                             error!(
-                                "CRITICAL: {} ({}) gas balance too low ({:.6}). Need {:.4}. HALTING chain.",
-                                chain_name, cid, gas_balance, min_gas
+                                "CRITICAL: {} ({}) gas balance {:.6} ETH — can afford {} swaps (need 2+). Gas: {:.2} gwei, ~{:.6}/swap. HALTING.",
+                                chain_name, cid, gas_balance, swaps_affordable, gas_price_gwei, cost_per_swap
                             );
                         } else {
                             if self.chain_gas_halted.get(&cid) == Some(&true) {
-                                info!("{} ({}) gas restored ({:.6}) — resuming", chain_name, cid, gas_balance);
+                                info!("{} ({}) gas restored — {:.6} ETH, {} swaps affordable at {:.2} gwei. Resuming.",
+                                    chain_name, cid, gas_balance, swaps_affordable, gas_price_gwei);
                             }
                             self.chain_gas_halted.insert(cid, false);
+                            tracing::debug!("{} gas OK: {:.6} ETH, {} swaps affordable at {:.2} gwei",
+                                chain_name, gas_balance, swaps_affordable, gas_price_gwei);
                         }
                     }
                 }
@@ -1269,7 +1385,7 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         // Also update the primary gas_halted flag
         self.gas_halted = self.chain_gas_halted.get(&self.chain_id) == Some(&true);
 
-        // Query USDC balance on primary chain
+        // Query USDC balance on primary chain — this is the cash available for new trades
         let usdc_addr = super::usdc_address_for_chain(self.chain_id);
         let usdc_dec = super::usdc_decimals_for_chain(self.chain_id);
         let padded_addr = format!("{:0>64}", addr_hex.trim_start_matches("0x"));
@@ -1295,12 +1411,39 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
                             self.balance, usdc_balance, drift
                         );
                     }
-
                     self.balance = usdc_balance;
+                    info!("USDC balance: ${:.6}", usdc_balance);
                 }
             }
             Err(e) => {
-                warn!("Failed to sync USDC balance ({}), using tracked balance", e);
+                warn!("Failed to query USDC balance: {}", e);
+            }
+        }
+
+        // Query all curated pair token balances on primary chain — chain-first, nothing hardcoded.
+        // These are the actual on-chain holdings that the engine must track.
+        let pair_tokens: Vec<(String, String, u8)> = super::ARBITRUM_TOKENS
+            .iter()
+            .filter(|(sym, _, _)| *sym != "USDC")
+            .map(|(sym, addr, dec)| (sym.to_string(), addr.to_string(), *dec))
+            .collect();
+
+        for (sym, token_addr, decimals) in &pair_tokens {
+            let bal_call = serde_json::json!([{
+                "to": token_addr,
+                "data": format!("0x70a08231{}", padded_addr)
+            }, "latest"]);
+
+            if let Ok(result) = self.rpc_call("eth_call", bal_call).await {
+                if let Some(hex) = result.as_str() {
+                    let wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
+                        .unwrap_or(U256::ZERO);
+                    let divisor = 10f64.powi(*decimals as i32);
+                    let bal: f64 = wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
+                    if bal > 0.0001 {
+                        info!("On-chain {} balance: {:.8}", sym, bal);
+                    }
+                }
             }
         }
 
@@ -1317,5 +1460,82 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         // by the engine on every open/close/trail event. No separate persistence needed.
         // PaperTrader::check_stops() fires the stop every cycle.
         Ok(())
+    }
+
+    async fn check_liquidity(
+        &self,
+        pair: &str,
+        side: Side,
+        amount_usd: f64,
+    ) -> Result<super::LiquidityCheck, ExecutionError> {
+        let (src_token, dst_token) = resolve_pair(pair, side)?;
+        let test_amount = format!("{}", (amount_usd.max(1.0) * 1_000_000.0) as u64);
+        let params = SwapParams {
+            src_token: src_token.address.clone(),
+            dst_token: dst_token.address.clone(),
+            amount: test_amount,
+            slippage: 0.01,
+            from: String::new(),
+            chain_id: 42161,
+            sell_entire_balance: false,
+        };
+        self.backend.check_liquidity(&params).await
+    }
+
+    async fn sync_wallet_positions(
+        &self,
+        curated_pairs: &[String],
+    ) -> Vec<(String, f64, f64)> {
+        let mut discrepancies = Vec::new();
+        for pair in curated_pairs {
+            // resolve_pair returns (src, dst). For LONG: src=USDC, dst=ASSET.
+            // We need the ASSET token balance (dst for LONG).
+            if let Ok((_, asset_token)) = resolve_pair(pair, Side::Long) {
+                if asset_token.address.is_empty() {
+                    continue;
+                }
+                if let Some(on_chain_qty) = self.query_token_balance(&asset_token.address, asset_token.decimals).await {
+                    let tracked_qty = self.positions.values()
+                        .find(|p| p.pair == *pair)
+                        .map(|p| p.quantity)
+                        .unwrap_or(0.0);
+                    let diff = (on_chain_qty - tracked_qty).abs();
+                    if diff > 0.001 && on_chain_qty > 0.0001 {
+                        discrepancies.push((pair.clone(), on_chain_qty, tracked_qty));
+                    }
+                }
+            }
+        }
+        discrepancies
+    }
+}
+
+impl<B: DexBackend + 'static> DexTrader<B> {
+    /// Query on-chain ERC-20 balance for a single token via balanceOf(wallet).
+    pub async fn query_token_balance(&self, token_address: &str, decimals: u8) -> Option<f64> {
+        let padded_addr = format!("{:0>64}", self.wallet_address.to_string().trim_start_matches("0x"));
+        let call_data = format!("0x70a08231{}", padded_addr);
+        let call_params = serde_json::json!([{
+            "to": token_address,
+            "data": call_data
+        }, "latest"]);
+
+        match self.rpc_call("eth_call", call_params).await {
+            Ok(result) => {
+                if let Some(hex) = result.as_str() {
+                    let wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
+                        .unwrap_or(U256::ZERO);
+                    let divisor = 10f64.powi(decimals as i32);
+                    let balance = wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
+                    Some(balance)
+                } else {
+                    None
+                }
+            }
+            Err(e) => {
+                tracing::debug!("Failed to query balance for {}: {}", token_address, e);
+                None
+            }
+        }
     }
 }

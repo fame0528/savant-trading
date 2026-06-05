@@ -150,5 +150,14 @@ export const api = {
   getRisk: () => get<RiskData>("/risk"),
   getSession: () => get<SessionData>("/session"),
   getMemory: () => get<MemoryData>("/memory"),
+  getEquity: () => get<EquitySnapshot[]>("/equity"),
   getConfig: () => get<ConfigData>("/config"),
 };
+
+export interface EquitySnapshot {
+  timestamp: string;
+  balance: number;
+  equity: number;
+  drawdown_pct: number;
+  open_positions: number;
+}

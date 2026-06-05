@@ -142,7 +142,6 @@ impl PaperTrader {
             self.last_reset_date = today;
         }
 
-        let mut total_unrealized = 0.0;
         for pos in self.positions.values_mut() {
             if let Some(&price) = prices.get(&pos.pair) {
                 pos.current_price = price;
@@ -150,10 +149,13 @@ impl PaperTrader {
                     Side::Long => (price - pos.entry_price) * pos.quantity,
                     Side::Short => (pos.entry_price - price) * pos.quantity,
                 };
-                total_unrealized += pos.unrealized_pnl;
             }
         }
-        self.account.update_equity(total_unrealized);
+        // Equity = USDC + sum(position market values), NOT just P&L
+        let position_values: f64 = self.positions.values()
+            .map(|p| p.current_price * p.quantity)
+            .sum();
+        self.account.equity = self.account.balance + position_values;
     }
 
     pub fn check_stops(&mut self, prices: &HashMap<String, f64>) -> StopCheckResult {

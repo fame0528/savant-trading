@@ -43,4 +43,34 @@ pub trait ExecutionEngine: Send + Sync {
     ) -> Result<(), crate::core::error::ExecutionError> {
         Ok(())
     }
+
+    /// Check if liquidity is available for a pair (read-only, no gas).
+    /// Returns rich data: availability, tax, balance issues.
+    /// Default: always available (paper trading).
+    async fn check_liquidity(
+        &self,
+        _pair: &str,
+        _side: Side,
+        _amount_usd: f64,
+    ) -> Result<crate::execution::dex::LiquidityCheck, crate::core::error::ExecutionError> {
+        Ok(crate::execution::dex::LiquidityCheck {
+            available: true,
+            buy_tax_bps: 0,
+            sell_tax_bps: 0,
+            buy_amount: "0".to_string(),
+            balance_ok: true,
+            allowance_ok: true,
+            price: "0".to_string(),
+        })
+    }
+
+    /// Reconcile on-chain token balances with tracked positions.
+    /// Returns list of (pair, on_chain_qty, tracked_qty) for discrepancies.
+    /// Default: empty list (paper trading has no on-chain state).
+    async fn sync_wallet_positions(
+        &self,
+        _curated_pairs: &[String],
+    ) -> Vec<(String, f64, f64)> {
+        Vec::new()
+    }
 }

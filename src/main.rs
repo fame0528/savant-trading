@@ -94,6 +94,10 @@ async fn main() -> anyhow::Result<()> {
         );
     }));
 
+    // Initialize log broadcast channel for dashboard terminal streaming.
+    // Must happen BEFORE tracing subscriber so first log lines are captured.
+    savant_trading::core::console::init_log_broadcast();
+
     // Uniform console output — both tracing and savant_log use the same format:
     // [Savant Trading] [MM-DD-YYYY HH:mm AM/PM] [ACTION] [RESULT]
     tracing_subscriber::registry()
@@ -258,6 +262,77 @@ async fn main() -> anyhow::Result<()> {
             print_help();
             return Ok(());
         }
+        Some("serve") => {
+            // Clear circuit breaker block file on fresh start
+            if std::path::Path::new("savant.blocked").exists() {
+                let _ = std::fs::remove_file("savant.blocked");
+                info!("Cleared savant.blocked from previous session");
+            }
+            info!("=== SAVANT — Engine + Dashboard ===");
+            let shared = SharedEngineData::new();
+            let engine_running = Arc::new(AtomicBool::new(true));
+
+            // On Windows, npm is a .ps1 script — use cmd /c to invoke it
+            #[cfg(target_os = "windows")]
+            fn npm_cmd() -> std::process::Command {
+                let mut cmd = std::process::Command::new("cmd");
+                cmd.arg("/c").arg("npm");
+                cmd
+            }
+            #[cfg(not(target_os = "windows"))]
+            fn npm_cmd() -> std::process::Command {
+                std::process::Command::new("npm")
+            }
+
+            // 1. Build dashboard if needed (blocking, before engine starts)
+            let dashboard_dir = std::path::Path::new("dashboard");
+            if !dashboard_dir.join(".next").exists() {
+                info!("Dashboard not built — running npm run build...");
+                match npm_cmd().args(["run", "build"]).current_dir(dashboard_dir).status() {
+                    Ok(s) if s.success() => info!("Dashboard built successfully"),
+                    Ok(s) => warn!("Dashboard build exited with: {}", s),
+                    Err(e) => warn!("Failed to build dashboard: {} (is Node.js installed?)", e),
+                }
+            }
+
+            // 2. Start dashboard in background (fire-and-forget child process)
+            info!("Starting dashboard on http://localhost:3000");
+            #[allow(clippy::zombie_processes)]
+            let _dashboard = npm_cmd()
+                .args(["start"])
+                .current_dir(dashboard_dir)
+                .spawn()
+                .unwrap_or_else(|e| {
+                    warn!("Failed to start dashboard: {} — trying `npm run dev`", e);
+                    npm_cmd()
+                        .args(["run", "dev"])
+                        .current_dir(dashboard_dir)
+                        .spawn()
+                        .expect("Failed to start dashboard — is Node.js installed?")
+                });
+
+            // 3. Start API server in background
+            let api_config = config.clone();
+            let api_shared = shared.clone();
+            let api_running = engine_running.clone();
+            tokio::spawn(async move {
+                if let Err(e) = api::start_server(api_config, api_shared, api_running).await {
+                    warn!("API server error: {}", e);
+                }
+            });
+
+            info!("API server on http://localhost:8080");
+            info!("Press Ctrl+C to stop everything");
+
+            // 4. Run engine in FOREGROUND — panics are visible, not swallowed
+            let engine_config = config.clone();
+            let engine_shared = shared.clone();
+            let engine_flag = engine_running.clone();
+            engine::run(engine_config, engine_shared, engine_flag).await?;
+
+            info!("SAVANT stopped.");
+            return Ok(());
+        }
         _ => {}
     }
 
@@ -344,31 +419,19 @@ async fn run_backtest_cmd(config: &AppConfig) -> anyhow::Result<()> {
 }
 
 fn print_help() {
-    println!("SAVANT TRADING ENGINE v0.5.0");
+    println!("SAVANT TRADING ENGINE v0.9.1");
     println!();
     println!("USAGE:");
     println!("  savant                    Start trading engine + API server");
+    println!("  savant serve              Start engine + API + dashboard (single command)");
     println!("  savant --tui              Start with full-screen multi-tab TUI");
     println!("  savant --dry-run          One AI decision cycle, full pipeline");
     println!("  savant --api-only         REST API server only");
     println!("  savant backtest           Backtest on historical data");
     println!("  savant report             Performance report");
     println!();
-    println!("TESTING:");
-    println!("  savant --test                         Run all scenarios (action test)");
-    println!("  savant --test -c \"Trend Bull\"        Filter by category");
-    println!("  savant --test -a                      Only scenarios expecting Buy/Sell");
-    println!("  savant --test -n 20                   Run first N scenarios");
-    println!("  savant --test -c \"Crash\" -a -n 10    Combine filters");
-    println!("  savant --test --train                 Training mode (5 runs by default)");
-    println!("  savant --test --train --full           Full training mode (20 runs)");
-    println!("  savant --test --train -a -n 20        Training with filters");
-    println!("  savant --test --train --historical     Train on real Kraken historical data");
-    println!("  savant --test --sandbox               Legacy sandbox with grading");
-    println!("  savant --test --managed-keys          Auto-create/delete API keys with $1 limit");
-    println!("  savant --test -m openrouter/owl-alpha Test with specific model");
-    println!();
-    println!("API: http://localhost:8080/api/");
+    println!("DASHBOARD: http://localhost:3000  (requires `savant serve`)");
+    println!("API:       http://localhost:8080/api/");
     println!("  /status /portfolio /positions /trades /decisions");
     println!("  /insight /knowledge /risk /session /activity /memory");
 }
@@ -777,6 +840,7 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
                 slippage: config.exchange.dex.slippage_pct,
                 from: wallet_hex.clone(),
                 chain_id: config.exchange.dex.chain_id,
+                sell_entire_balance: false,
             };
 
             match trader.build_swap_tx(&swap_params).await {

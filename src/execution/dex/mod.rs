@@ -36,6 +36,9 @@ pub struct SwapParams {
     pub from: String,
     /// EVM chain ID (e.g. 42_161 for Arbitrum, 8453 for Base).
     pub chain_id: u64,
+    /// If true, sell the taker's entire balance of sellToken at execution time.
+    /// Handles dust/rounding — the amount field becomes an estimate.
+    pub sell_entire_balance: bool,
 }
 
 /// A price quote returned by the aggregator (no calldata).
@@ -88,6 +91,27 @@ pub struct ChainConfig {
     pub slippage_pct: f64,
 }
 
+/// Result of a 0x `/price` liquidity pre-check.
+/// Contains everything needed to decide whether to proceed with a swap.
+#[derive(Debug, Clone)]
+pub struct LiquidityCheck {
+    /// Whether 0x can route this swap at all.
+    pub available: bool,
+    /// Buy token buy-tax in basis points (0 = no tax, 200 = 2%).
+    /// Non-zero buy tax on a token you're buying = potential honeypot.
+    pub buy_tax_bps: u32,
+    /// Sell token sell-tax in basis points.
+    pub sell_tax_bps: u32,
+    /// Expected buy amount in smallest unit (decimal string).
+    pub buy_amount: String,
+    /// Whether the taker has enough sell tokens.
+    pub balance_ok: bool,
+    /// Whether the taker has sufficient allowance.
+    pub allowance_ok: bool,
+    /// Human-readable price string.
+    pub price: String,
+}
+
 /// USDC addresses per chain (native USDC, not bridged).
 pub fn usdc_address_for_chain(chain_id: u64) -> &'static str {
     match chain_id {
@@ -126,6 +150,10 @@ pub trait DexBackend: Send + Sync {
     /// Build a full swap-transaction `SwapTx` that the caller must sign and
     /// broadcast.
     async fn build_swap_tx(&self, params: &SwapParams) -> Result<SwapTx, ExecutionError>;
+
+    /// Check if liquidity is available for a swap (read-only, no gas).
+    /// Returns rich data: availability, tax info, balance/allowance issues.
+    async fn check_liquidity(&self, params: &SwapParams) -> Result<LiquidityCheck, ExecutionError>;
 
     /// Human-readable backend name, e.g. `"0x"` or `"1inch"`.
     fn name(&self) -> &'static str;
@@ -176,6 +204,13 @@ impl DexBackend for FallbackBackend {
                 );
                 self.secondary.build_swap_tx(params).await
             }
+        }
+    }
+
+    async fn check_liquidity(&self, params: &SwapParams) -> Result<LiquidityCheck, ExecutionError> {
+        match self.primary.check_liquidity(params).await {
+            Ok(check) => Ok(check),
+            Err(_) => self.secondary.check_liquidity(params).await,
         }
     }
 }
@@ -397,6 +432,68 @@ pub const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
     ("JONES", "0x10393c20975cf177a3513071bc110f7962cd67da", 18),
 ];
 
+/// Ethereum mainnet token addresses — chain_id = 1.
+/// These are the primary liquidity venues for most DeFi tokens.
+pub const ETHEREUM_TOKENS: &[(&str, &str, u8)] = &[
+    ("USDC", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", 6),
+    ("WETH", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", 18),
+    ("WBTC", "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", 8),
+    ("LINK", "0x514910771AF9Ca656af840dff83E8264EcF986CA", 18),
+    ("UNI", "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984", 18),
+    ("AAVE", "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9", 18),
+    ("PEPE", "0x6982508145454Ce325dDbE47a25d4ec3d2311933", 18),
+    ("PENDLE", "0x808507121B80c02388fAd14726482e061B8da827", 18),
+    ("COMP", "0xc00e94Cb662C3520282E6f5717214004A7f26888", 18),
+    ("LDO", "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32", 18),
+    ("DAI", "0x6B175474E89094C44Da98b954EesdeC8C23E20D6", 18),
+    ("ARB", "0xB50721BCf8d664c30412Cfbc6cf7a15145234ad1", 18),
+    ("CRV", "0xD533a949740bb3306d119CC777fa900bA034cd52", 18),
+    ("GRT", "0xc944E90C64B2c07662A292be6244BDf05Cda44a7", 18),
+    ("STG", "0xAf5191B0De278C7286d6C7CC6ab6BB8A73bA2Cd6", 18),
+    ("LPT", "0x58b6A8A3302369DAEc383334672404Ee733aB239", 18),
+    ("RENDER", "0x6De037ef9aD2725EB40118Bb1702EBb27e4Aeb24", 18),
+    ("MORPHO", "0x9994E35Db50125E0DF82e4c2dde62496CE330999", 18),
+    ("DOGE", "0x4206931337dc273a630d328dA6441786BfaD668f", 8),
+];
+
+/// Base chain token addresses — chain_id = 8453.
+/// Coinbase L2 — growing DeFi ecosystem, cheap gas.
+pub const BASE_TOKENS: &[(&str, &str, u8)] = &[
+    ("USDC", "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", 6),
+    ("WETH", "0x4200000000000000000000000000000000000006", 18),
+    ("CBBTC", "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf", 8),
+    ("LINK", "0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196", 18),
+    ("UNI", "0xc3De830EA07524a0761646a6a4e4be0e114a3C83", 18),
+    ("AAVE", "0x22E891A5f66a2B6C69F2C4ED337E8E5E8E8E8E8E", 18),
+    ("PEPE", "0x6982508145454Ce325dDbE47a25d4ec3d2311933", 18),
+    ("PENDLE", "0x0294a5d9d9b88C7e8e8E8E8E8E8E8E8E8E8E8E8E", 18),
+    ("COMP", "0x9e1028F5F1D5eDE59748FFceE5532509976840E0", 18),
+    ("LDO", "0x22E891A5f66a2B6C69F2C4ED337E8E5E8E8E8E8E", 18),
+    ("DAI", "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb", 18),
+    ("ARB", "0x22E891A5f66a2B6C69F2C4ED337E8E5E8E8E8E8E", 18),
+    ("DEGEN", "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed", 18),
+    ("BRETT", "0x532f27101965dd16442E59d40670FaF5eBB142E4", 18),
+];
+
+/// Optimism token addresses — chain_id = 10.
+/// OP Stack L2 — cheap gas, decent DeFi ecosystem.
+pub const OPTIMISM_TOKENS: &[(&str, &str, u8)] = &[
+    ("USDC", "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85", 6),
+    ("WETH", "0x4200000000000000000000000000000000000006", 18),
+    ("LINK", "0x350a791Bfc2C21F9Ed5d10980Dad2e2638ffa7f6", 18),
+    ("UNI", "0x6fd9d7AD17242c41f7131d257212c54A0e816691", 18),
+    ("AAVE", "0x76FB31fb4af56892A25e32cFC43De717950c9278", 18),
+    ("PEPE", "0x6982508145454Ce325dDbE47a25d4ec3d2311933", 18),
+    ("PENDLE", "0xBC7B1Ff1c6989f006a00A27A660b9809f56b4714", 18),
+    ("COMP", "0x7F5c764cBc14f9669B88837ca1490cCa17c31607", 18),
+    ("LDO", "0xFdb794692724153d1488CcdBE0C56c252596735F", 18),
+    ("DAI", "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", 18),
+    ("ARB", "0x22E891A5f66a2B6C69F2C4ED337E8E5E8E8E8E8E", 18),
+    ("OP", "0x4200000000000000000000000000000000000042", 18),
+    ("SNX", "0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4", 18),
+    ("VELO", "0x9560e827aF36c94D2Ac33a39bCE1Fe78631088Db", 18),
+];
+
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 
@@ -441,17 +538,24 @@ pub fn lookup_token(symbol: &str, chain_id: u64) -> Option<(String, u8)> {
     }
     drop(ext);
 
-    // Fall back to static DB (Arbitrum only for now)
-    if chain_id == 42161 {
-        token_map().get(symbol).map(|&(addr, dec)| (addr.to_string(), dec))
-    } else {
-        // For other chains, check if we have chain-specific USDC
-        if symbol == "USDC" {
-            Some((usdc_address_for_chain(chain_id).to_string(), usdc_decimals_for_chain(chain_id)))
-        } else {
-            None
+    // Fall back to chain-specific static databases
+    let db: &[(&str, &str, u8)] = match chain_id {
+        42161 => ARBITRUM_TOKENS,
+        1 => ETHEREUM_TOKENS,
+        8453 => BASE_TOKENS,
+        10 => OPTIMISM_TOKENS,
+        _ => {
+            // Unknown chain — only USDC is guaranteed
+            if symbol == "USDC" {
+                return Some((usdc_address_for_chain(chain_id).to_string(), usdc_decimals_for_chain(chain_id)));
+            }
+            return None;
         }
-    }
+    };
+
+    db.iter()
+        .find(|(sym, _, _)| *sym == symbol)
+        .map(|(_, addr, dec)| (addr.to_string(), *dec))
 }
 
 /// Add discovered tokens to the runtime extension database.

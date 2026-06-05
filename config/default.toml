@@ -17,6 +17,15 @@ slippage_pct = 0.005
 # Each chain has its own RPC, gas token, and slippage settings.
 # The engine scans enabled chains in parallel.
 # Add chain IDs to 'enabled' to activate them.
+[chains.ethereum]
+chain_id = 1
+name = "Ethereum"
+rpc_url = "https://eth.llamarpc.com"
+native_token = "ETH"
+min_gas_native = 0.005
+slippage_pct = 0.005
+enabled = true
+
 [chains.arbitrum]
 chain_id = 42161
 name = "Arbitrum"
@@ -33,7 +42,7 @@ rpc_url = "https://mainnet.base.org"
 native_token = "ETH"
 min_gas_native = 0.001
 slippage_pct = 0.005
-enabled = false
+enabled = true
 
 [chains.optimism]
 chain_id = 10
@@ -42,7 +51,7 @@ rpc_url = "https://mainnet.optimism.io"
 native_token = "ETH"
 min_gas_native = 0.001
 slippage_pct = 0.0075
-enabled = false
+enabled = true
 
 [chains.bsc]
 chain_id = 56
@@ -57,13 +66,17 @@ enabled = false
 # Core pairs — always tracked, highest liquidity
 # BTC & ETH are the foundation. Top 10 + meme coins are where the action is.
 pairs = [
-    # Core — verified Arbitrum token addresses, high liquidity
-    "BTC/USD", "ETH/USD", "LINK/USD", "DOGE/USD",
-    # DeFi — Arbitrum-native tokens
-    "ARB/USD", "UNI/USD", "AAVE/USD",
-    # Meme — verified Arbitrum addresses
-    "PEPE/USD", "BONK/USD",
+    # Tier 1: GUARANTEED deep liquidity on Arbitrum (>$100M daily DEX volume)
+    "ETH/USD", "BTC/USD", "ARB/USD",
+    # Tier 2: Major DeFi tokens — verified Arbitrum addresses, deep 0x routes
+    "LINK/USD", "UNI/USD", "AAVE/USD", "PEPE/USD",
+    # Tier 3: DeFi with good Arbitrum presence
+    "PENDLE/USD", "COMP/USD", "LDO/USD",
 ]
+# Full deploy mode: concentrate all capital into single best-conviction trade.
+# When balance is low, spreading across pairs wastes capital on gas friction.
+# The AI picks the highest-confidence setup and deploys everything.
+full_deploy = true
 # NOTE: SOL, XRP, ADA, AVAX, SHIB, FLOKI, TURBO, MOG are NOT swappable
 # on Arbitrum via 0x API — they don't have Arbitrum token addresses.
 # Set to true to scan all Kraken USD pairs for opportunity
@@ -86,19 +99,23 @@ max_risk_per_trade = 0.20
 # The bot should be FULLY DEPLOYED, not sitting on cash
 # Safety comes from stop losses + daily loss + drawdown limits, not from shrinking positions
 dynamic_risk_tiers = [
-    { balance = 500.0, risk_pct = 0.20 },    # 5 positions × 20% = 100% deployed
+    { balance = 500.0, risk_pct = 1.00 },    # Full deploy at low balance — 100% of capital into best trade
     { balance = 5000.0, risk_pct = 0.10 },    # 5 positions × 10% = 50% deployed
     { balance = 50000.0, risk_pct = 0.05 },   # 5 positions × 5% = 25% deployed
     { balance = 999999.0, risk_pct = 0.02 },  # 5 positions × 2% = 10% deployed
 ]
-# Tightened safety nets (FID-015):
-# At $50: daily_loss=$5, drawdown=$10. Survivable.
+# Dynamic safety nets — scale to balance, never too tight to trade
+# At $25: daily_loss=$5 min, drawdown=$10 min. Survivable but allows trading.
 # At $500: daily_loss=$50, drawdown=$100. Meaningful protection.
 max_daily_loss = 0.05
 max_drawdown = 0.10
+min_daily_loss_usd = 5.0    # Floor: don't halt on $0.50 loss at tiny balances
+min_drawdown_usd = 10.0     # Floor: don't halt on $1 drawdown at tiny balances
 max_positions = 3
-# Higher R:R compensates for full deployment risk at small balances
+# Dynamic R:R — relax slightly at very low balances to allow first trade
 min_rr_ratio = 1.5
+min_rr_ratio_low_balance = 1.2  # When balance < $50, accept tighter R:R
+low_balance_threshold = 50.0    # Below this, use relaxed R:R
 # Spread filter — reject trades where spread > 30bps (FID-035)
 # At $11 positions, 30bps = $0.033 friction. Round-trip gas = $0.06.
 # Total friction = $0.093. With 3% stop ($0.33), friction = 28% of margin.

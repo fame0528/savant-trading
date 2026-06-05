@@ -46,9 +46,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         src_token: usdc_address.to_string(),
         dst_token: weth_address.to_string(),
         amount: amount_wei.to_string(),
-        slippage: 0.005, // 0.5%
+        slippage: 0.005,
         from: format!("{:#x}", wallet_address),
         chain_id: 42161,
+        sell_entire_balance: false,
     };
 
     println!("\n=== STEP 1: Quote ===");

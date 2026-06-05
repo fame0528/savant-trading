@@ -82,7 +82,7 @@ impl ZeroXBackend {
     ) -> Result<serde_json::Value, ExecutionError> {
         let base_url = self.api_url(params.chain_id);
         let slippage_bps = (params.slippage * 10000.0) as u64;
-        let url = format!(
+        let mut url = format!(
             "{base_url}/{endpoint}?chainId={chain_id}&sellToken={sell_token}&buyToken={buy_token}&sellAmount={sell_amount}&taker={taker}&slippageBps={slippage_bps}",
             base_url = base_url,
             endpoint = endpoint,
@@ -93,6 +93,12 @@ impl ZeroXBackend {
             taker = params.from,
             slippage_bps = slippage_bps,
         );
+
+        // Per 0x docs: sellEntireBalance=true uses actual on-chain balance at execution time.
+        // Handles dust/rounding issues that cause close swaps to fail with 0 output.
+        if params.sell_entire_balance {
+            url.push_str("&sellEntireBalance=true");
+        }
 
         let resp = self
             .client
@@ -378,6 +384,50 @@ impl DexBackend for ZeroXBackend {
             estimated_gas: json["transaction"]["gas"].as_u64().unwrap_or(200_000),
             buy_decimals,
         })
+    }
+
+    async fn check_liquidity(&self, params: &SwapParams) -> Result<super::LiquidityCheck, ExecutionError> {
+        match self.lookup(params, "price").await {
+            Ok(json) => {
+                let available = json["liquidityAvailable"].as_bool().unwrap_or(false);
+                let buy_amount = json["buyAmount"].as_str().unwrap_or("0").to_string();
+                let price = json["price"].as_str().unwrap_or("0").to_string();
+
+                // Extract token metadata — tax info for honeypot detection
+                let buy_tax = json["tokenMetadata"]["buyToken"]["buyTaxBps"]
+                    .as_str().unwrap_or("0")
+                    .parse::<u32>().unwrap_or(0);
+                let sell_tax = json["tokenMetadata"]["sellToken"]["sellTaxBps"]
+                    .as_str().unwrap_or("0")
+                    .parse::<u32>().unwrap_or(0);
+
+                // Check issues — balance and allowance
+                let balance_ok = json["issues"]["balance"].as_object().is_none_or(|b| b.is_empty());
+                let allowance_ok = json["issues"]["allowance"].as_object().is_none_or(|a| a.is_empty());
+
+                Ok(super::LiquidityCheck {
+                    available: available && buy_amount != "0",
+                    buy_tax_bps: buy_tax,
+                    sell_tax_bps: sell_tax,
+                    buy_amount,
+                    balance_ok,
+                    allowance_ok,
+                    price,
+                })
+            }
+            Err(e) => {
+                tracing::debug!("Liquidity check failed for {}: {}", params.dst_token, e);
+                Ok(super::LiquidityCheck {
+                    available: false,
+                    buy_tax_bps: 0,
+                    sell_tax_bps: 0,
+                    buy_amount: "0".to_string(),
+                    balance_ok: false,
+                    allowance_ok: false,
+                    price: "0".to_string(),
+                })
+            }
+        }
     }
 
     async fn build_swap_tx(&self, params: &SwapParams) -> Result<SwapTx, ExecutionError> {
@@ -800,6 +850,7 @@ mod tests {
             slippage: 0.005,
             from: "0x1111111111111111111111111111111111111111".into(),
             chain_id: 42161,
+            sell_entire_balance: false,
         }
     }
 

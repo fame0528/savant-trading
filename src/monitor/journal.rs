@@ -1,16 +1,24 @@
 use sqlx::Row;
-use sqlx::SqlitePool;
+use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions};
+use std::str::FromStr;
 use tracing::info;
 
 use crate::core::types::{Position, ScaleLevel, Side, TradeRecord};
 
 pub struct TradeJournal {
-    pool: SqlitePool,
+    pool: sqlx::SqlitePool,
 }
 
 impl TradeJournal {
     pub async fn new(database_url: &str) -> Result<Self, sqlx::Error> {
-        let pool = SqlitePool::connect(database_url).await?;
+        let options = SqliteConnectOptions::from_str(database_url)?
+            .journal_mode(SqliteJournalMode::Wal)
+            .busy_timeout(std::time::Duration::from_secs(5))
+            .create_if_missing(true);
+        let pool = SqlitePoolOptions::new()
+            .max_connections(4)
+            .connect_with(options)
+            .await?;
 
         sqlx::query(
             r#"
@@ -271,6 +279,27 @@ impl TradeJournal {
         .await?;
 
         Ok(())
+    }
+
+    pub async fn get_snapshots(&self, limit: i64) -> Result<Vec<serde_json::Value>, sqlx::Error> {
+        let rows = sqlx::query(
+            "SELECT timestamp, balance, equity, drawdown_pct, open_positions FROM equity_snapshots ORDER BY timestamp DESC LIMIT ?"
+        )
+        .bind(limit)
+        .fetch_all(&self.pool)
+        .await?;
+
+        let mut snapshots = Vec::with_capacity(rows.len());
+        for row in rows {
+            snapshots.push(serde_json::json!({
+                "timestamp": row.get::<String, _>(0),
+                "balance": row.get::<f64, _>(1),
+                "equity": row.get::<f64, _>(2),
+                "drawdown_pct": row.get::<f64, _>(3),
+                "open_positions": row.get::<i32, _>(4),
+            }));
+        }
+        Ok(snapshots)
     }
 
     pub async fn get_trades(&self, limit: i64) -> Result<Vec<TradeRecord>, sqlx::Error> {

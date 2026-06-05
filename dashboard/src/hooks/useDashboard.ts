@@ -14,6 +14,7 @@ import type {
   MemoryData,
   ActivityEntry,
   ConfigData,
+  EquitySnapshot,
 } from "@/lib/api";
 
 export interface DashboardState {
@@ -28,6 +29,7 @@ export interface DashboardState {
   session: SessionData | null;
   memory: MemoryData | null;
   config: ConfigData | null;
+  equity: EquitySnapshot[];
   online: boolean;
   lastUpdate: Date | null;
 }
@@ -44,6 +46,7 @@ const EMPTY: DashboardState = {
   session: null,
   memory: null,
   config: null,
+  equity: [],
   online: false,
   lastUpdate: null,
 };
@@ -52,7 +55,7 @@ export function useDashboard(pollMs = 4000) {
   const [state, setState] = useState<DashboardState>(EMPTY);
 
   const refresh = useCallback(async () => {
-    const [status, portfolio, positions, trades, decisions, activity, insight, risk, session, memory, config] =
+    const [status, portfolio, positions, trades, decisions, activity, insight, risk, session, memory, config, equity] =
       await Promise.all([
         api.getStatus(),
         api.getPortfolio(),
@@ -65,6 +68,7 @@ export function useDashboard(pollMs = 4000) {
         api.getSession(),
         api.getMemory(),
         api.getConfig(),
+        api.getEquity(),
       ]);
 
     setState({
@@ -79,6 +83,7 @@ export function useDashboard(pollMs = 4000) {
       session,
       memory,
       config,
+      equity: equity ?? [],
       online: !!status,
       lastUpdate: new Date(),
     });

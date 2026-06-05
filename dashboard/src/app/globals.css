@@ -28,3 +28,31 @@ body {
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Scrollbar — thin, dark, matches design system */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 140, 200, 0.15) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(120, 140, 200, 0.15);
+  border-radius: 2px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 140, 200, 0.3);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}

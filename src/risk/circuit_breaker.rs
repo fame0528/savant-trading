@@ -8,10 +8,12 @@ pub struct CircuitBreaker {
     max_drawdown_pct: f64,
     max_positions: usize,
     max_portfolio_heat: f64,
-    /// Maximum bid-ask spread in basis points before halting.
-    /// Market makers pull liquidity during volatility — executing in
-    /// an illiquidity void causes 5%+ slippage.
     max_spread_bps: f64,
+    /// Dollar floor for daily loss — don't halt if loss is below this amount.
+    /// Prevents circuit breaker from firing on $0.50 loss at $10 balance.
+    daily_loss_floor_usd: f64,
+    /// Dollar floor for drawdown — don't halt if drawdown is below this amount.
+    drawdown_floor_usd: f64,
 }
 
 impl CircuitBreaker {
@@ -21,8 +23,20 @@ impl CircuitBreaker {
             max_drawdown_pct,
             max_positions,
             max_portfolio_heat: 0.40,
-            max_spread_bps: 50.0, // 50bps = 0.5% — halt if spread exceeds this
+            max_spread_bps: 50.0,
+            daily_loss_floor_usd: 5.0,
+            drawdown_floor_usd: 10.0,
         }
+    }
+
+    pub fn with_daily_loss_floor(mut self, floor: f64) -> Self {
+        self.daily_loss_floor_usd = floor;
+        self
+    }
+
+    pub fn with_drawdown_floor(mut self, floor: f64) -> Self {
+        self.drawdown_floor_usd = floor;
+        self
     }
 
     pub fn check(&self, account: &AccountState) -> CircuitBreakerResult {
@@ -56,27 +70,37 @@ impl CircuitBreaker {
             0.0
         };
 
-        if daily_loss_pct >= self.max_daily_loss_pct {
+        // Dynamic daily loss check: respect both % and $ floor.
+        // At $25 balance with 5% limit = $1.25. Floor of $5 means we don't
+        // halt until loss exceeds $5 (20% of $25). This allows trading.
+        let daily_loss_dollars = -account.daily_pnl;
+        if daily_loss_pct >= self.max_daily_loss_pct && daily_loss_dollars >= self.daily_loss_floor_usd {
             warn!(
-                "Circuit breaker: daily loss {:.2}% exceeds limit {:.2}%",
-                daily_loss_pct * 100.0,
-                self.max_daily_loss_pct * 100.0
+                "Circuit breaker: daily loss ${:.2} ({:.2}%) exceeds ${:.2} floor and {:.2}% limit",
+                daily_loss_dollars, daily_loss_pct * 100.0,
+                self.daily_loss_floor_usd, self.max_daily_loss_pct * 100.0
             );
             return CircuitBreakerResult::Triggered(format!(
-                "Daily loss limit reached: {:.2}%",
-                daily_loss_pct * 100.0
+                "Daily loss limit: ${:.2} ({:.2}%)",
+                daily_loss_dollars, daily_loss_pct * 100.0
             ));
         }
 
-        if account.drawdown_pct >= self.max_drawdown_pct {
+        // Dynamic drawdown check: same pattern.
+        let drawdown_dollars = if account.peak_equity > 0.0 {
+            account.peak_equity - account.equity
+        } else {
+            0.0
+        };
+        if account.drawdown_pct >= self.max_drawdown_pct && drawdown_dollars >= self.drawdown_floor_usd {
             warn!(
-                "Circuit breaker: drawdown {:.2}% exceeds limit {:.2}%",
-                account.drawdown_pct * 100.0,
-                self.max_drawdown_pct * 100.0
+                "Circuit breaker: drawdown ${:.2} ({:.2}%) exceeds ${:.2} floor and {:.2}% limit",
+                drawdown_dollars, account.drawdown_pct * 100.0,
+                self.drawdown_floor_usd, self.max_drawdown_pct * 100.0
             );
             return CircuitBreakerResult::Triggered(format!(
-                "Max drawdown reached: {:.2}%",
-                account.drawdown_pct * 100.0
+                "Max drawdown: ${:.2} ({:.2}%)",
+                drawdown_dollars, account.drawdown_pct * 100.0
             ));
         }
 

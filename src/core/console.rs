@@ -7,7 +7,37 @@
 //   - `savant_log()` — direct styled logging for engine events
 //   - `SavantLayer` — custom tracing Layer for library/framework events
 //   - ANSI color constants
+//   - `LOG_TX` — broadcast channel for streaming logs to dashboard terminal
 // ── ANSI codes ──────────────────────────────────────────────────────────
+
+use std::sync::OnceLock;
+use tokio::sync::broadcast;
+
+/// Global broadcast sender for log lines. Initialized once at startup.
+/// Terminal WebSocket handlers subscribe via `log_subscribe()`.
+static LOG_TX: OnceLock<broadcast::Sender<String>> = OnceLock::new();
+
+/// Initialize the log broadcast channel. Call once at startup.
+pub fn init_log_broadcast() {
+    let (tx, _rx) = broadcast::channel::<String>(2000);
+    LOG_TX.set(tx).ok();
+}
+
+/// Subscribe to the log broadcast. Returns a receiver that gets all future log lines.
+pub fn log_subscribe() -> broadcast::Receiver<String> {
+    LOG_TX
+        .get()
+        .expect("log_broadcast not initialized — call init_log_broadcast() first")
+        .subscribe()
+}
+
+/// Send a log line to all connected dashboard terminals.
+fn broadcast_log_line(line: &str) {
+    if let Some(tx) = LOG_TX.get() {
+        // Ignore errors (no subscribers is fine)
+        let _ = tx.send(line.to_string());
+    }
+}
 
 pub const CYAN_FG: &str = "\x1b[36m";
 pub const GREEN_FG: &str = "\x1b[32m";
@@ -121,10 +151,12 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
     let ts = est_now();
 
     // Colors flow continuously — RESET only before result to apply result_color
-    eprintln!(
+    let line = format!(
         "\x1b[1;36m[Savant Trading] \x1b[90m[{}] {}[{}]\x1b[0m {}{}",
         ts, action_color, action, result_color, result
     );
+    eprintln!("{}", line);
+    broadcast_log_line(&format!("{}\r\n", line));
 }
 
 // ── SavantLayer — custom tracing Layer ───────────────────────────────────
@@ -209,7 +241,10 @@ where
             "\x1b[1;36m[Savant Trading] \x1b[90m[{}] {}[{}] \x1b[90m[{}]\x1b[0m {}{}",
             ts, action_color, action, formatted_target, msg_color, message
         );
+        // Write to stderr (console)
         eprintln!("{}", line);
+        // Broadcast to dashboard terminal WebSocket clients
+        broadcast_log_line(&format!("{}\r\n", line));
     }
 }
 

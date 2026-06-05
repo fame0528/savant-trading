@@ -16,6 +16,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
 const TerminalPanel = dynamic(() => import("@/components/Terminal"), { ssr: false });
+const EquityChart = dynamic(() => import("@/components/EquityChart"), { ssr: false });
 
 const fmt = {
   usd: (v: number) =>
@@ -168,9 +169,7 @@ export default function Dashboard() {
         {/* Row 1: Equity | Performance | Market Insight */}
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-chart-area" title="Equity Curve" tag="live" />
-          <div className="flex-1 flex items-center justify-center text-[var(--dimmer)] text-xs px-3 pb-2">
-            <Icon name="fa-spinner fa-spin" className="mr-2" /> Collecting equity data…
-          </div>
+          <EquityChart data={state.equity} />
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
@@ -305,7 +304,7 @@ export default function Dashboard() {
                 <Icon name="fa-spinner fa-spin" />Waiting for first AI cycle…
               </p>
             ) : (
-              decisions.slice(0, 6).map((d, i) => {
+              decisions.slice(0, 10).map((d, i) => {
                 const a = d.action.toUpperCase();
                 const conf = d.confidence * 100;
                 return (
@@ -349,7 +348,27 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-timeline" title="Activity" tag={`${activity.length}`} />
+          <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-[var(--line)]">
+            <Icon name="fa-timeline" className="text-[var(--dim)] text-[10px]" />
+            <span className="text-[10px] tracking-[2px] uppercase font-semibold text-[var(--dim)]">Activity</span>
+            <span className="ml-auto text-[9px] font-bold text-[var(--cyan)]">{activity.length}</span>
+            <button
+              onClick={() => {
+                const text = [...activity].reverse().map(e => {
+                  const raw = e.timestamp.replace("T", " ").slice(11, 19);
+                  const [h, m, s] = raw.split(":").map(Number);
+                  const period = h >= 12 ? "PM" : "AM";
+                  const h12 = h % 12 || 12;
+                  return `${h12}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")} ${period} [${e.pair}] ${e.message}`;
+                }).join("\n");
+                navigator.clipboard.writeText(text);
+              }}
+              className="text-[var(--dim)] hover:text-[var(--cyan)] transition-colors cursor-pointer"
+              title="Copy activity log"
+            >
+              <Icon name="fa-copy" className="text-[9px]" />
+            </button>
+          </div>
           <div className="flex-1 px-3 pb-2 overflow-y-auto font-mono text-[10px]">
             {activity.length === 0 ? (
               <p className="text-[var(--dimmer)] text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No activity yet.</p>
@@ -358,7 +377,13 @@ export default function Dashboard() {
                 <div key={i} className={`flex gap-2 py-px border-b border-white/[0.02] whitespace-nowrap ${
                   e.level === "Trade" ? "text-[var(--green)]" : e.level === "Decision" ? "text-[var(--violet)]" : e.level === "Warning" || e.level === "Error" ? "text-[var(--red)]" : e.level === "Thinking" ? "text-[var(--amber)]" : "text-[var(--txt)]"
                 }`}>
-                  <span className="text-[var(--dimmer)] shrink-0">{e.timestamp.replace("T", " ").slice(11, 19)}</span>
+                  <span className="text-[var(--dimmer)] shrink-0">{(() => {
+                    const raw = e.timestamp.replace("T", " ").slice(11, 19);
+                    const [h, m, s] = raw.split(":").map(Number);
+                    const period = h >= 12 ? "PM" : "AM";
+                    const h12 = h % 12 || 12;
+                    return `${h12}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")} ${period}`;
+                  })()}</span>
                   <span className="text-[var(--cyan)] shrink-0 w-[60px] overflow-hidden text-ellipsis">{e.pair}</span>
                   <span className="overflow-hidden text-ellipsis">{e.message}</span>
                 </div>

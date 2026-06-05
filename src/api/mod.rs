@@ -65,6 +65,8 @@ pub async fn start_server(
     shared: SharedEngineData,
     engine_running: Arc<AtomicBool>,
 ) -> anyhow::Result<()> {
+    let already_running = engine_running.load(Ordering::Relaxed);
+
     let state = AppState {
         config: config.clone(),
         engine_status: Arc::new(RwLock::new(EngineStatus {
@@ -82,7 +84,10 @@ pub async fn start_server(
         shared,
         engine_running,
         engine_child: Arc::new(Mutex::new(None)),
-        engine_started_at: Arc::new(Mutex::new(None)),
+        // Start timer immediately when engine is already running (e.g. `serve` command).
+        engine_started_at: Arc::new(Mutex::new(
+            if already_running { Some(Instant::now()) } else { None }
+        )),
     };
 
     // CORS: allow dashboard origin + localhost fallbacks
@@ -115,6 +120,7 @@ pub async fn start_server(
         .route("/api/session", get(get_session))
         .route("/api/activity", get(get_activity))
         .route("/api/memory", get(get_memory))
+        .route("/api/equity", get(get_equity_curve))
         .route("/api/training", get(get_training))
         .route("/api/wallet", get(get_wallet))
         .route("/api/engine/start", post(start_engine))
@@ -391,6 +397,11 @@ async fn get_memory(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
         "cusum_status": mem.cusum_status,
         "replay_lesson_count": mem.replay_lesson_count,
     })))
+}
+
+async fn get_equity_curve(State(state): State<AppState>) -> Json<ApiResponse<Vec<serde_json::Value>>> {
+    let curve = state.shared.equity_curve.read().await;
+    Json(ApiResponse::ok(curve.clone()))
 }
 
 async fn start_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
@@ -736,209 +747,59 @@ async fn terminal_ws(
 
 async fn handle_terminal(
     socket: axum::extract::ws::WebSocket,
-    state: AppState,
+    _state: AppState,
 ) {
     use axum::extract::ws::Message;
     use futures_util::{SinkExt, StreamExt};
-    use tokio::io::{AsyncBufReadExt, BufReader};
-    use tokio::process::Command;
-    use std::process::Stdio;
 
     let (mut sender, mut receiver) = socket.split();
 
-    let (tx, mut rx) = tokio::sync::mpsc::channel::<String>(256);
+    // Subscribe to the engine's log broadcast channel.
+    // This streams every tracing/log line to the dashboard terminal in real-time.
+    let mut log_rx = savant_trading::core::console::log_subscribe();
 
-    // Sender task: channel → WebSocket
+    // Send connection banner
+    let banner = "\x1b[32m[connected]\x1b[0m — streaming engine output in real-time\r\n";
+    if sender.send(Message::Text(banner.into())).await.is_err() {
+        return;
+    }
+
+    // Spawn task: forward broadcast log lines → WebSocket
     let send_task = tokio::spawn(async move {
-        while let Some(msg) = rx.recv().await {
-            if sender.send(Message::Text(msg.into())).await.is_err() {
-                break;
+        loop {
+            match log_rx.recv().await {
+                Ok(line) => {
+                    if sender.send(Message::Text(line.into())).await.is_err() {
+                        break;
+                    }
+                }
+                Err(tokio::sync::broadcast::error::RecvError::Lagged(n)) => {
+                    let msg = format!("\x1b[33m[...skipped {} messages...]\x1b[0m\r\n", n);
+                    let _ = sender.send(Message::Text(msg.into())).await;
+                }
+                Err(tokio::sync::broadcast::error::RecvError::Closed) => break,
             }
         }
     });
 
-    let _ = tx.send(concat!(
-        "\x1b[36m╔══════════════════════════════════════════╗\x1b[0m\r\n",
-        "\x1b[36m║\x1b[0m  \x1b[1;37mSAVANT\x1b[0m \x1b[90mTerminal v0.9.0\x1b[0m               \x1b[36m║\x1b[0m\r\n",
-        "\x1b[36m║\x1b[0m  \x1b[90mCommands:\x1b[0m                               \x1b[36m║\x1b[0m\r\n",
-        "\x1b[36m║\x1b[0m    \x1b[33msavant start\x1b[0m  — start engine          \x1b[36m║\x1b[0m\r\n",
-        "\x1b[36m║\x1b[0m    \x1b[33msavant stop\x1b[0m   — stop engine           \x1b[36m║\x1b[0m\r\n",
-        "\x1b[36m║\x1b[0m    \x1b[33msavant status\x1b[0m — engine status          \x1b[36m║\x1b[0m\r\n",
-        "\x1b[36m║\x1b[0m    \x1b[33msavant help\x1b[0m   — show this help         \x1b[36m║\x1b[0m\r\n",
-        "\x1b[36m║\x1b[0m    \x1b[33mCtrl+C\x1b[0m        — stop running process    \x1b[36m║\x1b[0m\r\n",
-        "\x1b[36m╚══════════════════════════════════════════╝\x1b[0m\r\n",
-        "\r\n",
-    ).to_string()).await;
-
-    let mut child_handle: Option<tokio::process::Child> = None;
-    let engine_running = state.engine_running.clone();
-
+    // Handle incoming messages from the dashboard (user input)
     while let Some(msg) = receiver.next().await {
-        let text = match msg {
-            Ok(Message::Text(t)) => t,
+        match msg {
+            Ok(Message::Text(text)) => {
+                let trimmed = text.trim();
+                if trimmed == "savant status" || trimmed == "status" {
+                    // Status is shown in the dashboard header — no action needed
+                    continue;
+                }
+                // All other input is acknowledged but not executed
+                // (engine runs autonomously via `savant serve`)
+            }
             Ok(Message::Close(_)) => break,
             _ => continue,
-        };
-
-        let trimmed = text.trim();
-
-        if text.contains('\u{0003}') {
-            if let Some(ref mut child) = child_handle {
-                let _ = child.start_kill();
-                let _ = tx.send("\r\n\x1b[33m[SAVANT]\x1b[0m Process killed\r\n".into()).await;
-                child_handle = None;
-                engine_running.store(false, Ordering::Relaxed);
-                *state.engine_child.lock().unwrap() = None;
-                *state.engine_started_at.lock().unwrap() = None;
-            }
-            continue;
-        }
-
-        let parts: Vec<&str> = trimmed.split_whitespace().collect();
-        if parts.first() == Some(&"savant") {
-            match parts.get(1).copied() {
-                Some("start") => {
-                    if child_handle.is_some() {
-                        let _ = tx.send(
-                            "\x1b[33m[SAVANT]\x1b[0m Already running. Use \x1b[33msavant stop\x1b[0m first.\r\n".into()
-                        ).await;
-                        continue;
-                    }
-
-                    let _ = tx.send(
-                        "\x1b[36m[SAVANT]\x1b[0m Starting engine…\r\n".into()
-                    ).await;
-
-                    // Try compiled binary first, fallback to cargo run
-                    let exe_path = std::env::current_exe()
-                        .ok()
-                        .and_then(|p| p.parent().map(|d| d.join("savant")))
-                        .filter(|p| p.exists());
-
-                    let (spawn_result, _cmd_name) = if let Some(path) = exe_path {
-                        let name = path.display().to_string();
-                        (
-                            Command::new(&path)
-                                .stdout(Stdio::piped())
-                                .stderr(Stdio::piped())
-                                .stdin(Stdio::null())
-                                .kill_on_drop(true)
-                                .spawn(),
-                            name,
-                        )
-                    } else {
-                        let root = std::env::var("SAVANT_ROOT").unwrap_or_else(|_| ".".to_string());
-                        (
-                            Command::new("cargo")
-                                .args(["run", "--release"])
-                                .current_dir(&root)
-                                .stdout(Stdio::piped())
-                                .stderr(Stdio::piped())
-                                .stdin(Stdio::null())
-                                .kill_on_drop(true)
-                                .spawn(),
-                            "cargo run --release".to_string(),
-                        )
-                    };
-
-                    match spawn_result {
-                        Ok(mut child) => {
-                            engine_running.store(true, Ordering::Relaxed);
-
-                            // Take stdout/stderr before moving child into AppState
-                            if let Some(stdout) = child.stdout.take() {
-                                let tx_out = tx.clone();
-                                let running = engine_running.clone();
-                                tokio::spawn(async move {
-                                    let reader = BufReader::new(stdout);
-                                    let mut lines = reader.lines();
-                                    while let Ok(Some(line)) = lines.next_line().await {
-                                        if tx_out.send(format!("{}\r\n", line)).await.is_err() {
-                                            break;
-                                        }
-                                    }
-                                    running.store(false, Ordering::Relaxed);
-                                });
-                            }
-
-                            if let Some(stderr) = child.stderr.take() {
-                                let tx_err = tx.clone();
-                                tokio::spawn(async move {
-                                    let reader = BufReader::new(stderr);
-                                    let mut lines = reader.lines();
-                                    while let Ok(Some(line)) = lines.next_line().await {
-                                        if tx_err.send(format!("{}\r\n", line)).await.is_err() {
-                                            break;
-                                        }
-                                    }
-                                });
-                            }
-
-                            *state.engine_child.lock().unwrap() = Some(child);
-                            *state.engine_started_at.lock().unwrap() = Some(Instant::now());
-
-                            let _ = tx.send(
-                                "\x1b[32m[SAVANT]\x1b[0m Engine started\r\n".to_string()
-                            ).await;
-                        }
-                        Err(e) => {
-                            let _ = tx.send(
-                                format!("\x1b[31m[SAVANT]\x1b[0m Failed to start: {}\r\n", e)
-                            ).await;
-                        }
-                    }
-                }
-                Some("stop") => {
-                    if let Some(ref mut child) = child_handle {
-                        let _ = child.start_kill();
-                        let _ = tx.send("\x1b[33m[SAVANT]\x1b[0m Engine stopped\r\n".into()).await;
-                        child_handle = None;
-                        engine_running.store(false, Ordering::Relaxed);
-                        *state.engine_child.lock().unwrap() = None;
-                        *state.engine_started_at.lock().unwrap() = None;
-                    } else {
-                        let _ = tx.send("\x1b[90m[SAVANT]\x1b[0m No engine running\r\n".into()).await;
-                    }
-                }
-                Some("status") => {
-                    let running = engine_running.load(Ordering::Relaxed);
-                    let status = if running { "\x1b[32mRUNNING\x1b[0m" } else { "\x1b[31mSTOPPED\x1b[0m" };
-                    let _ = tx.send(
-                        format!("\x1b[36m[SAVANT]\x1b[0m Engine: {}\r\n", status)
-                    ).await;
-                }
-                Some("help") => {
-                    let _ = tx.send(concat!(
-                        "\x1b[36m[SAVANT]\x1b[0m Commands:\r\n",
-                        "  \x1b[33msavant start\x1b[0m   — start engine (cargo run --release)\r\n",
-                        "  \x1b[33msavant stop\x1b[0m    — stop engine\r\n",
-                        "  \x1b[33msavant status\x1b[0m  — check engine status\r\n",
-                        "  \x1b[33msavant help\x1b[0m    — show this help\r\n",
-                        "  \x1b[33mCtrl+C\x1b[0m         — stop running process\r\n",
-                    ).into()).await;
-                }
-                _ => {
-                    let _ = tx.send(
-                        format!("\x1b[90m[SAVANT]\x1b[0m Unknown: savant {}. Type \x1b[33msavant help\x1b[0m\r\n",
-                            parts.get(1).unwrap_or(&""))
-                    ).await;
-                }
-            }
-        } else if !trimmed.is_empty() {
-            let _ = tx.send(
-                "\x1b[90m[SAVANT]\x1b[0m Use \x1b[33msavant start|stop|status|help\x1b[0m\r\n".into()
-            ).await;
         }
     }
 
-    if let Some(ref mut child) = child_handle {
-        let _ = child.start_kill();
-    }
-    engine_running.store(false, Ordering::Relaxed);
-    *state.engine_child.lock().unwrap() = None;
-    *state.engine_started_at.lock().unwrap() = None;
-    drop(tx);
-    let _ = send_task.await;
+    send_task.abort();
 }
 
 #[cfg(test)]

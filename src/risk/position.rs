@@ -14,6 +14,9 @@ pub struct PositionSizer {
     min_order_value: f64,
     dynamic_risk_tiers: Vec<RiskTier>,
     max_position_pct: f64,
+    full_deploy: bool,
+    min_rr_ratio_low_balance: f64,
+    low_balance_threshold: f64,
 }
 
 impl PositionSizer {
@@ -23,12 +26,13 @@ impl PositionSizer {
             min_rr_ratio,
             min_order_value: MIN_ORDER_VALUE,
             max_position_pct: 0.30,
-            // Fallback tiers (monotonic by balance) — only used if config
-            // provides none. Config's dynamic_risk_tiers normally override these.
+            full_deploy: false,
+            min_rr_ratio_low_balance: 1.2,
+            low_balance_threshold: 50.0,
             dynamic_risk_tiers: vec![
                 RiskTier {
                     balance: 500.0,
-                    risk_pct: 0.20,
+                    risk_pct: 1.00,
                 },
                 RiskTier {
                     balance: 5000.0,
@@ -51,15 +55,40 @@ impl PositionSizer {
         self
     }
 
+    pub fn with_full_deploy(mut self, full_deploy: bool) -> Self {
+        self.full_deploy = full_deploy;
+        self
+    }
+
+    pub fn with_low_balance_rr(mut self, min_rr: f64, threshold: f64) -> Self {
+        self.min_rr_ratio_low_balance = min_rr;
+        self.low_balance_threshold = threshold;
+        self
+    }
+
     /// Get the effective risk % for the current balance.
     /// At small balances, uses higher risk to overcome fee friction.
     pub fn effective_risk_pct(&self, balance: f64) -> f64 {
+        // In full_deploy mode at low balance, use 100% of capital
+        if self.full_deploy && balance < self.low_balance_threshold {
+            return 1.00;
+        }
         for tier in &self.dynamic_risk_tiers {
             if balance <= tier.balance {
                 return tier.risk_pct;
             }
         }
         self.max_risk_per_trade
+    }
+
+    /// Get the effective min R:R for the current balance.
+    /// At very low balances, relax slightly to allow first trade.
+    fn effective_min_rr(&self, balance: f64) -> f64 {
+        if balance < self.low_balance_threshold {
+            self.min_rr_ratio_low_balance
+        } else {
+            self.min_rr_ratio
+        }
     }
 
     pub fn calculate(
@@ -88,6 +117,14 @@ impl PositionSizer {
     ) -> Option<PositionSize> {
         let risk_pct = self.effective_risk_pct(account.balance);
         let risk_amount = account.balance * risk_pct;
+        let min_rr = self.effective_min_rr(account.balance);
+
+        // Dynamic max_position_pct: in full deploy at low balance, use 100%
+        let max_pct = if self.full_deploy && account.balance < self.low_balance_threshold {
+            1.00
+        } else {
+            self.max_position_pct
+        };
 
         let risk_per_unit = match side {
             Side::Long => entry - stop_loss,
@@ -109,10 +146,11 @@ impl PositionSizer {
 
         let rr_ratio = reward_per_unit / risk_per_unit;
         tracing::debug!(
-            "PositionSizer: entry={:.6} stop={:.6} tp={:.6} risk={:.6} reward={:.6} rr={:.4} min={:.4}",
-            entry, stop_loss, take_profit, risk_per_unit, reward_per_unit, rr_ratio, self.min_rr_ratio
+            "PositionSizer: entry={:.6} stop={:.6} tp={:.6} risk={:.6} reward={:.6} rr={:.4} min={:.4} balance=${:.2} risk_pct={:.2}%",
+            entry, stop_loss, take_profit, risk_per_unit, reward_per_unit, rr_ratio, min_rr,
+            account.balance, risk_pct * 100.0
         );
-        if rr_ratio < self.min_rr_ratio - 0.001 {
+        if rr_ratio < min_rr - 0.001 {
             return None;
         }
 
@@ -127,7 +165,7 @@ impl PositionSizer {
             }
         }
 
-        let max_qty = (account.balance * self.max_position_pct) / entry;
+        let max_qty = (account.balance * max_pct) / entry;
         if quantity > max_qty {
             quantity = max_qty;
         }
@@ -170,20 +208,19 @@ mod tests {
     #[test]
     fn position_sizer_basic() {
         let sizer = PositionSizer::new(0.20, 1.5);
-        let account = make_account(50.0);
+        let account = make_account(5000.0);
         let result = sizer.calculate(&account, 100.0, 95.0, 110.0, Side::Long);
         assert!(result.is_some());
         let ps = result.unwrap();
-        assert_eq!(ps.risk_amount, 10.0); // 20% of 50
-        // Risk-based size would be 10/5 = 2.0 units ($200 notional), but the
-        // max_position_pct cap (30% of $50 = $15 notional) limits it to 0.15.
-        assert_eq!(ps.quantity, 0.15);
+        assert_eq!(ps.risk_amount, 500.0); // 10% of 5000
+        // Risk-based size = 500/5 = 100 units, but max_position_pct (30% of $5000=$1500) caps at 15
+        assert_eq!(ps.quantity, 15.0);
     }
 
     #[test]
     fn position_sizer_rr_too_low() {
         let sizer = PositionSizer::new(0.20, 1.5);
-        let account = make_account(50.0);
+        let account = make_account(5000.0);
         let result = sizer.calculate(&account, 100.0, 95.0, 102.0, Side::Long);
         assert!(result.is_none());
     }
@@ -191,11 +228,11 @@ mod tests {
     #[test]
     fn position_sizer_short() {
         let sizer = PositionSizer::new(0.20, 1.5);
-        let account = make_account(50.0);
+        let account = make_account(5000.0);
         let result = sizer.calculate(&account, 100.0, 105.0, 90.0, Side::Short);
         assert!(result.is_some());
         let ps = result.unwrap();
-        assert_eq!(ps.risk_amount, 10.0); // 20% of 50
+        assert_eq!(ps.risk_amount, 500.0); // 10% of 5000
     }
 
     #[test]

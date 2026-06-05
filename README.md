@@ -1,9 +1,9 @@
-# SAVANT TRADING v0.9.0
+# SAVANT TRADING v0.9.1
 
 <!-- markdownlint-disable MD033 -->
 <div align="center">
 
-<img src="img/savant.png" alt="Savant Logo" width="180" />
+<img src="img/banner.png" alt="Savant Trading — AI-Native Autonomous DEX Trading Engine" width="2752" height="1536" />
 
 **AI-Native Autonomous DEX Trading Engine**
 
@@ -11,7 +11,7 @@ No KYC. No CEX. Arbitrum on-chain swaps via 0x API — powered by 6,676+ knowled
 
 **Model-agnostic:** Any OpenAI-compatible LLM via [OpenRouter](https://openrouter.ai/). Tested with MiMo v2.5 Pro (1M context, 131K output).
 
-[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![0x](https://img.shields.io/badge/0x-DEX-%23000000?style=flat-square&logo=ethereum&logoColor=%2300fbff)](https://0x.org/)[![Arbitrum](https://img.shields.io/badge/Arbitrum-L2-%23000000?style=flat-square&logo=arbitrum&logoColor=%2300fbff)](https://arbitrum.io/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-LLM-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/)[![Version](https://img.shields.io/badge/Version-0.9.0-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![0x](https://img.shields.io/badge/0x-DEX-%23000000?style=flat-square&logo=ethereum&logoColor=%2300fbff)](https://0x.org/)[![Arbitrum](https://img.shields.io/badge/Arbitrum-L2-%23000000?style=flat-square&logo=arbitrum&logoColor=%2300fbff)](https://arbitrum.io/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-LLM-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/)[![Version](https://img.shields.io/badge/Version-0.9.1-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
 
 </div>
 
@@ -208,19 +208,30 @@ slippage_pct = 0.005
 
 [trading]
 pairs = [
-    "BTC/USD", "ETH/USD", "LINK/USD", "DOGE/USD",
-    "ARB/USD", "UNI/USD", "AAVE/USD", "PEPE/USD", "BONK/USD",
+    "ETH/USD", "BTC/USD", "ARB/USD",
+    "LINK/USD", "UNI/USD", "AAVE/USD", "PEPE/USD",
+    "PENDLE/USD", "COMP/USD", "LDO/USD",
 ]
+full_deploy = true
 timeframe = "5m"
 timeframes = ["5m", "1h", "4h", "1d"]
 starting_balance = 50.0
 
 [risk]
-max_risk_per_trade = 0.20          # 20% per trade
+max_risk_per_trade = 0.20          # 20% per trade (dynamic tiers scale up at low balance)
+dynamic_risk_tiers = [
+    { balance = 500.0, risk_pct = 1.00 },    # <$500: 100% deploy
+    { balance = 5000.0, risk_pct = 0.10 },
+    { balance = 50000.0, risk_pct = 0.05 },
+    { balance = 999999.0, risk_pct = 0.02 },
+]
 max_daily_loss = 0.05              # 5% daily halt
 max_drawdown = 0.10                # 10% kill switch
+min_daily_loss_usd = 5.0           # Dollar floor — prevents false halts at tiny balances
+min_drawdown_usd = 10.0
 max_positions = 3
-min_rr_ratio = 2.0
+min_rr_ratio = 1.5
+min_rr_ratio_low_balance = 1.2     # Relaxed R:R at <$50 balance
 
 [ai]
 provider = "openrouter"
@@ -238,10 +249,25 @@ chain_id = 42161
 rpc_url = "https://arb1.arbitrum.io/rpc"
 enabled = true
 
+[chains.ethereum]
+chain_id = 1
+rpc_url = "https://eth.llamarpc.com"
+enabled = true
+
+[chains.arbitrum]
+chain_id = 42161
+rpc_url = "https://arb1.arbitrum.io/rpc"
+enabled = true
+
 [chains.base]
 chain_id = 8453
 rpc_url = "https://mainnet.base.org"
-enabled = false                     # Enable when wallet is funded on Base
+enabled = true
+
+[chains.optimism]
+chain_id = 10
+rpc_url = "https://mainnet.optimism.io"
+enabled = true
 ```
 
 ---
@@ -249,8 +275,11 @@ enabled = false                     # Enable when wallet is funded on Base
 ## CLI Commands
 
 ```bash
-# DEX trading on Arbitrum (default)
-cargo run
+# Engine + API + Dashboard (single command — recommended)
+cargo run --release serve
+
+# Engine + API only (no dashboard)
+cargo run --release
 
 # Dry run — one cycle, no execution
 cargo run -- --dry-run

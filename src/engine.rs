@@ -294,62 +294,18 @@ pub async fn run(
         config.trading.pairs.clone()
     };
 
-    // Token discovery (FID-039): Discover high-volume Arbitrum tokens
-    // and merge with config pairs. Only runs when backend is DEX.
-    let mut cg_verified: std::collections::HashSet<String> = std::collections::HashSet::new();
-    let active_pairs = if !config.mode.paper_trading && config.exchange.backend != "kraken" {
-        // First: load ALL tokens from the static ARBITRUM_TOKENS database
+    // Token DB: load ALL static Arbitrum addresses for resolution (needed by 0x API)
+    // but ONLY create pairs from the curated config list (FID-052: Arbitrum trap fix)
+    let curated_pairs: std::collections::HashSet<String> =
+        config.trading.pairs.iter().cloned().collect();
+    if !config.mode.paper_trading && config.exchange.backend != "kraken" {
         let mut all_token_entries: Vec<(String, String, u8)> = Vec::new();
         for &(sym, addr, dec) in savant_trading::execution::dex::ARBITRUM_TOKENS {
             all_token_entries.push((sym.to_string(), addr.to_string(), dec));
-            cg_verified.insert(sym.to_string());
         }
         savant_trading::execution::dex::extend_token_db(&all_token_entries);
-        info!("Token DB: {} static tokens loaded ({} CoinGecko-verified)", all_token_entries.len(), cg_verified.len());
-
-        // Create pairs from all static tokens
-        let mut merged: Vec<String> = active_pairs;
-        for &(sym, _, _) in savant_trading::execution::dex::ARBITRUM_TOKENS {
-            let pair = format!("{}/USD", sym);
-            if !merged.contains(&pair) {
-                merged.push(pair);
-            }
-        }
-
-        // Then: discover additional tokens from Blockscot API
-        match savant_trading::data::token_discovery::discover_tokens(
-            1_000_000.0,   // min $1M daily volume — no dead coins
-            5_000,          // min 5000 holders — no honeypots
-            500,            // scan top 500 tokens
-        ).await {
-            Ok(discovered) => {
-                let discovered_pairs = savant_trading::data::token_discovery::tokens_to_pairs(&discovered);
-                info!("Token discovery: {} additional Arbitrum tokens found", discovered.len());
-
-                // Feed discovered addresses into the token DB
-                let token_entries: Vec<(String, String, u8)> = discovered.iter()
-                    .map(|t| (t.symbol.clone(), t.address.clone(), t.decimals))
-                    .collect();
-                savant_trading::execution::dex::extend_token_db(&token_entries);
-
-                // Merge discovered pairs
-                for pair in discovered_pairs {
-                    if !merged.contains(&pair) {
-                        merged.push(pair);
-                    }
-                }
-            }
-            Err(e) => {
-                warn!("Token discovery failed ({}), using static tokens only", e);
-            }
-        }
-
-        info!("Total pairs after merge: {}", merged.len());
-        merged
-    } else {
-        active_pairs
-    };
-
+        info!("Token DB: {} Arbitrum addresses loaded for resolution", all_token_entries.len());
+    }
     info!("Active pairs ({}): {:?}", active_pairs.len(), active_pairs);
 
     let mut market_stores: HashMap<String, MarketDataStore> = HashMap::new();
@@ -436,15 +392,24 @@ pub async fn run(
         let trades = j.get_trades(10000).await.unwrap_or_default();
         if !trades.is_empty() {
             let total_pnl: f64 = trades.iter().map(|t| t.pnl).sum();
-            let restored_balance = config.trading.starting_balance + total_pnl;
-            info!(
-                "Restored balance: ${:.2} (starting: ${:.2}, total PnL: ${:.2}, trades: {})",
-                restored_balance,
-                config.trading.starting_balance,
-                total_pnl,
-                trades.len()
-            );
-            paper.set_balance(restored_balance);
+            // Only restore balance from DB trades in paper mode.
+            // In live mode, the on-chain sync (above) is the source of truth.
+            if executor.is_none() {
+                let restored_balance = config.trading.starting_balance + total_pnl;
+                info!(
+                    "Restored balance: ${:.2} (starting: ${:.2}, total PnL: ${:.2}, trades: {})",
+                    restored_balance,
+                    config.trading.starting_balance,
+                    total_pnl,
+                    trades.len()
+                );
+                paper.set_balance(restored_balance);
+            } else {
+                info!(
+                    "Loaded {} closed trades from journal (PnL: ${:.2}) — balance from on-chain: ${:.2}",
+                    trades.len(), total_pnl, paper.account().balance
+                );
+            }
         }
 
         // Load persisted positions from DB — source of truth
@@ -470,6 +435,7 @@ pub async fn run(
                     paper.positions_mut().insert(pos.id.clone(), pos);
                 }
                 paper.account_mut().open_positions = paper.positions().len();
+                info!("Loaded {} positions from DB", paper.positions().len());
             }
             Ok(_) => info!("No persisted positions in DB"),
             Err(e) => warn!("Failed to load positions from DB: {}", e),
@@ -505,6 +471,16 @@ pub async fn run(
                         message: msg,
                     });
                 }
+            }
+            _ => {}
+        }
+
+        // Load equity curve snapshots into shared state
+        match j.get_snapshots(500).await {
+            Ok(snapshots) if !snapshots.is_empty() => {
+                info!("Loaded {} equity snapshots from journal", snapshots.len());
+                let mut shared_curve = shared.equity_curve.write().await;
+                *shared_curve = snapshots;
             }
             _ => {}
         }
@@ -760,13 +736,17 @@ pub async fn run(
     );
 
     let position_sizer =
-        PositionSizer::new(config.risk.max_risk_per_trade, config.risk.min_rr_ratio);
+        PositionSizer::new(config.risk.max_risk_per_trade, config.risk.min_rr_ratio)
+            .with_full_deploy(config.trading.full_deploy)
+            .with_low_balance_rr(config.risk.min_rr_ratio_low_balance, config.risk.low_balance_threshold);
 
     let circuit_breaker = CircuitBreaker::new(
         config.risk.max_daily_loss,
         config.risk.max_drawdown,
         config.risk.max_positions,
-    );
+    )
+    .with_daily_loss_floor(config.risk.min_daily_loss_usd)
+    .with_drawdown_floor(config.risk.min_drawdown_usd);
 
     // GoPlus security client (FID-035): honeypot/tax detection for meme coins
     let goplus_client = Some(savant_trading::security::goplus::GoPlusClient::new());
@@ -828,6 +808,126 @@ pub async fn run(
         active_pairs.len()
     );
     insight.refresh_multi(&active_pairs).await;
+    // Seed shared insight immediately so dashboard doesn't show placeholder
+    {
+        let mut shared_insight = shared.insight.write().await;
+        *shared_insight = insight.cached().clone();
+    }
+    info!("Initial market insight seeded to dashboard");
+
+    // WALLET SYNC: Reconcile on-chain balances with DB positions.
+    // Runs AFTER candle data loads so market prices are available for recovery.
+    if let Some(ref ex) = executor {
+        info!("Wallet sync: checking on-chain balances for {} pairs...", config.trading.pairs.len());
+        let discrepancies = match tokio::time::timeout(
+            std::time::Duration::from_secs(30),
+            ex.sync_wallet_positions(&config.trading.pairs),
+        ).await {
+            Ok(d) => d,
+            Err(_) => {
+                error!("Wallet sync timed out after 30s — continuing without sync");
+                Vec::new()
+            }
+        };
+        for (pair, on_chain_qty, tracked_qty) in &discrepancies {
+            if *tracked_qty < 0.001 && *on_chain_qty > 0.001 {
+                // On-chain has tokens but no tracked position — create recovery
+                // Priority 1: entry price from trade history
+                let trade_entry = if let Some(ref j) = journal {
+                    j.get_trades(1000).await.unwrap_or_default()
+                        .iter()
+                        .rfind(|t| t.pair == *pair)
+                        .map(|t| t.entry_price)
+                        .unwrap_or(0.0)
+                } else {
+                    0.0
+                };
+                // Priority 2: current market price from candle data
+                let market_price = market_stores
+                    .get(pair)
+                    .and_then(|s| s.last().map(|c| c.close))
+                    .unwrap_or(0.0);
+                let entry_price = if trade_entry > 0.0 { trade_entry } else { market_price };
+
+                // HARD GUARD: never create a position with entry_price <= 0
+                if entry_price <= 0.0 {
+                    error!("WALLET SYNC: Cannot recover {} — no valid entry price (trade_history={:.4}, market={:.4}). Skipping.",
+                        pair, trade_entry, market_price);
+                    shared.log_activity(
+                        savant_trading::core::shared::ActivityLevel::Error,
+                        pair,
+                        "WALLET SYNC FAILED: Cannot recover — no valid entry price",
+                    ).await;
+                    continue;
+                }
+
+                let recovery_pos = savant_trading::core::types::Position {
+                    id: format!("wallet-recovery-{}", pair.replace('/', "_").to_lowercase()),
+                    pair: pair.clone(),
+                    side: savant_trading::core::types::Side::Long,
+                    entry_price,
+                    current_price: market_price.max(entry_price),
+                    quantity: *on_chain_qty,
+                    stop_loss: entry_price * 0.85,
+                    take_profit_1: entry_price * 1.10,
+                    take_profit_2: entry_price * 1.20,
+                    take_profit_3: entry_price * 1.30,
+                    unrealized_pnl: 0.0,
+                    risk_amount: entry_price * on_chain_qty,
+                    strategy_name: "wallet_recovery".to_string(),
+                    scale_level: savant_trading::core::types::ScaleLevel::Full,
+                    opened_at: chrono::Utc::now(),
+                };
+                paper.positions_mut().insert(recovery_pos.id.clone(), recovery_pos.clone());
+                if let Some(ref j) = journal {
+                    let _ = j.save_position(&recovery_pos).await;
+                }
+                warn!("WALLET SYNC: Recovered {} — {:.6} tokens @ ${:.4} (source: {})",
+                    pair, on_chain_qty, entry_price,
+                    if trade_entry > 0.0 { "trade_history" } else { "market_price" });
+                shared.log_activity(
+                    savant_trading::core::shared::ActivityLevel::Warning,
+                    pair,
+                    &format!("WALLET SYNC: Recovered {:.6} tokens @ ${:.4}", on_chain_qty, entry_price),
+                ).await;
+            } else if *on_chain_qty < 0.001 && *tracked_qty > 0.001 {
+                // Tracked position but no on-chain tokens — ghost, remove
+                if let Some(pos_id) = paper.positions().iter()
+                    .find(|(_, p)| p.pair == *pair)
+                    .map(|(id, _)| id.clone())
+                {
+                    paper.positions_mut().remove(&pos_id);
+                    if let Some(ref j) = journal {
+                        let _ = j.delete_position(&pos_id).await;
+                    }
+                    warn!("WALLET SYNC: {} position gone from chain — removed ghost", pair);
+                    shared.log_activity(
+                        savant_trading::core::shared::ActivityLevel::Warning,
+                        pair,
+                        "WALLET SYNC: Position gone from chain — removed ghost",
+                    ).await;
+                }
+            }
+        }
+        if discrepancies.is_empty() {
+            info!("Wallet sync: all positions reconciled with on-chain balances");
+        }
+        paper.account_mut().open_positions = paper.positions().len();
+        // Recalculate equity after reconciliation: USDC + position values
+        let position_values: f64 = paper.positions().values()
+            .map(|p| p.current_price * p.quantity)
+            .sum();
+        paper.account_mut().equity = paper.account_mut().balance + position_values;
+        // Sync to shared state so dashboard and AI see correct balance/equity
+        {
+            let mut shared_account = shared.account.write().await;
+            *shared_account = paper.account().clone();
+            let mut shared_positions = shared.positions.write().await;
+            *shared_positions = paper.positions().values().cloned().collect();
+        }
+        info!("Wallet sync complete: {} positions, balance=${:.2}, equity=${:.2}",
+            paper.positions().len(), paper.account().balance, paper.account().equity);
+    }
 
     info!(
         "Starting main loop (interval: {}s, autonomy: {:?})...",
@@ -919,6 +1019,11 @@ pub async fn run(
         // Refresh insight every 5 ticks (all pairs, single funding API call)
         if tick.is_multiple_of(5) {
             insight.refresh_multi(&active_pairs).await;
+            // Sync insight to shared state on every refresh so dashboard stays current
+            {
+                let mut shared_insight = shared.insight.write().await;
+                *shared_insight = insight.cached().clone();
+            }
 
             // Project insight to vault
             if vault_config.enabled {
@@ -992,10 +1097,10 @@ pub async fn run(
                     continue;
                 }
 
-                // Pre-filter: Skip tokens not verified on CoinGecko (DEX safety)
+                // Pre-filter: Skip tokens not in curated pairs (FID-052)
                 if !config.mode.paper_trading
                     && config.exchange.backend != "kraken"
-                    && !cg_verified.contains(base_symbol)
+                    && !curated_pairs.contains(pair)
                 {
                     dead_tokens.insert(pair.to_string());
                     continue;
@@ -1540,31 +1645,79 @@ pub async fn run(
                                             .unwrap_or(decision.entry_price);
                                         let drift = ((current_price - decision.entry_price) / decision.entry_price).abs() * 100.0;
                                         if drift > config.ai.price_tolerance_pct {
-                                            log_warn!("TOLERANCE", "Price drifted {:.1}% for {} (entry={:.4} current={:.4}) — skipping",
-                                                drift, decision.pair, decision.entry_price, current_price);
+                                            let reason = format!("Price drifted {:.1}% (entry={:.4} current={:.4})", drift, decision.entry_price, current_price);
+                                            log_warn!("TOLERANCE", "{} — {}", decision.pair, reason);
+                                            shared.log_activity(
+                                                savant_trading::core::shared::ActivityLevel::Warning,
+                                                &decision.pair,
+                                                &format!("REJECTED: {}", reason),
+                                            ).await;
                                             continue;
                                         }
 
-                                        // Volume + holder verification gate — reject dead coins and honeypots
+                                        // Token safety verification (FID-052):
+                                        // - Curated config pairs: SKIP check entirely (known-good tokens)
+                                        // - Other pairs: check but DON'T reject on failure (0x quote is the real gate)
                                         let token_symbol = decision.pair.split('/').next().unwrap_or("");
-                                        if let Some((token_addr, _)) = savant_trading::execution::dex::lookup_token(token_symbol, config.exchange.dex.chain_id) {
-                                            if !token_addr.is_empty() {
-                                                match verify_token_safety(&token_addr).await {
-                                                    Ok((vol, holders)) => {
-                                                        if vol < 1_000_000.0 {
-                                                            log_warn!("VOLUME", "{} rejected — 24h volume ${:.0} < $1M minimum", decision.pair, vol);
-                                                            continue;
+                                        let is_curated = curated_pairs.contains(&decision.pair);
+                                        if !is_curated {
+                                            if let Some((token_addr, _)) = savant_trading::execution::dex::lookup_token(token_symbol, config.exchange.dex.chain_id) {
+                                                if !token_addr.is_empty() {
+                                                    match verify_token_safety(&token_addr).await {
+                                                        Ok((vol, holders)) => {
+                                                            if vol < 1_000_000.0 {
+                                                                log_warn!("VOLUME", "{} — 24h volume ${:.0} < $1M (proceeding anyway, 0x will fail if no liquidity)", decision.pair, vol);
+                                                            }
+                                                            if holders < 5_000 {
+                                                                log_warn!("HOLDERS", "{} — {} holders < 5000 (proceeding anyway, 0x will fail if no liquidity)", decision.pair, holders);
+                                                            }
                                                         }
-                                                        if holders < 5_000 {
-                                                            log_warn!("HOLDERS", "{} rejected — {} holders < 5000 minimum", decision.pair, holders);
-                                                            continue;
+                                                        Err(e) => {
+                                                            log_warn!("VERIFY", "{} — Blockscout unavailable ({}), proceeding (0x quote is the real gate)", decision.pair, e);
                                                         }
-                                                        info!("Token safety OK: {} vol=${:.0} holders={}", decision.pair, vol, holders);
                                                     }
-                                                    Err(e) => {
-                                                        log_warn!("VERIFY", "{} — cannot verify token safety ({}), rejecting", decision.pair, e);
+                                                }
+                                            }
+                                        } else {
+                                            info!("Token safety: {} is curated — skipping Blockscout check", decision.pair);
+                                        }
+
+                                        // Liquidity pre-check (FID-052): call 0x /price endpoint
+                                        // to confirm DEX routing is available before committing.
+                                        // This is read-only, no gas, fast (~200ms).
+                                        // Returns rich data: tax info (honeypot detection), balance issues.
+                                        if let Some(ref ex) = executor {
+                                            let check_amount = 5.0_f64; // $5 test amount
+                                            match ex.check_liquidity(&decision.pair, decision.side, check_amount).await {
+                                                Ok(check) => {
+                                                    if !check.available {
+                                                        let reason = "No DEX liquidity available (0x /price returned false)".to_string();
+                                                        log_warn!("LIQUIDITY", "{} — {}", decision.pair, reason);
+                                                        shared.log_activity(
+                                                            savant_trading::core::shared::ActivityLevel::Warning,
+                                                            &decision.pair,
+                                                            &format!("REJECTED: {}", reason),
+                                                        ).await;
                                                         continue;
                                                     }
+                                                    // Honeypot detection: buy tax > 1% = suspicious
+                                                    if check.buy_tax_bps > 100 {
+                                                        let reason = format!("Buy tax {:.1}% — potential honeypot", check.buy_tax_bps as f64 / 100.0);
+                                                        log_warn!("TAX", "{} — {}", decision.pair, reason);
+                                                        shared.log_activity(
+                                                            savant_trading::core::shared::ActivityLevel::Warning,
+                                                            &decision.pair,
+                                                            &format!("REJECTED: {}", reason),
+                                                        ).await;
+                                                        continue;
+                                                    }
+                                                    if !check.balance_ok {
+                                                        log_warn!("BALANCE", "{} — insufficient sell token balance (0x issues.balance)", decision.pair);
+                                                    }
+                                                    info!("Liquidity OK: {} on {} (buy_tax={}bps, price={})", decision.pair, "0x", check.buy_tax_bps, check.price);
+                                                }
+                                                Err(e) => {
+                                                    log_warn!("LIQUIDITY", "{} — pre-check error ({}), proceeding anyway", decision.pair, e);
                                                 }
                                             }
                                         }
@@ -1594,21 +1747,34 @@ pub async fn run(
                                                 };
                                                 positions.iter().any(|p| p.pair == decision.pair && p.side == decision.side)
                                             };
-                                            // Concentration cap: no single position >33% of total portfolio
+                                            // Concentration cap: full_deploy allows 100%, normal mode 33%
                                             let total_portfolio = if let Some(ref ex) = executor {
                                                 ex.balance()
                                             } else {
                                                 paper.account().balance
                                             };
+                                            let max_concentration = if config.trading.full_deploy && total_portfolio < config.risk.low_balance_threshold {
+                                                1.00
+                                            } else {
+                                                0.33
+                                            };
                                             let order_value = decision.entry_price * ps.quantity;
-                                            if order_value > total_portfolio * 0.33 {
-                                                log_swap_fail!("BUY REJECTED", "{} — pos ${:.2} exceeds 33% of portfolio (${:.2})",
-                                                    decision.pair, order_value, total_portfolio);
+                                            if order_value > total_portfolio * max_concentration {
+                                                let reason = format!("Position ${:.2} exceeds 33% of portfolio (${:.2})", order_value, total_portfolio);
+                                                log_swap_fail!("BUY REJECTED", "{} — {}", decision.pair, reason);
+                                                shared.log_activity(
+                                                    savant_trading::core::shared::ActivityLevel::Warning,
+                                                    &decision.pair,
+                                                    &format!("REJECTED: {}", reason),
+                                                ).await;
                                             } else if already_open {
-                                                info!(
-                                                    "AI BUY {} {:?} — already have open position, skipping duplicate",
-                                                    decision.pair, decision.side,
-                                                );
+                                                let reason = "Already have open position on this pair+side".to_string();
+                                                info!("AI BUY {} {:?} — {}", decision.pair, decision.side, reason);
+                                                shared.log_activity(
+                                                    savant_trading::core::shared::ActivityLevel::Warning,
+                                                    &decision.pair,
+                                                    &format!("SKIPPED: {}", reason),
+                                                ).await;
                                             } else {
                                                 log_swap!("ORDER", "Placing for {} via executor...", decision.pair);
                                                 let order = if let Some(ref mut ex) = executor {
@@ -1666,7 +1832,16 @@ pub async fn run(
                                                         paper.account_mut().open_positions =
                                                             paper.positions().len();
                                                         paper.account_mut().trades_today += 1;
-                                                        info!("AI position opened: {}", decision.pair);
+                                                        // Balance is synced from on-chain USDC via sync_balance.
+                                                        // Do NOT deduct here — the DexTrader already spent the USDC.
+                                                        // Update equity: USDC + position values
+                                                        let position_values: f64 = paper.positions().values()
+                                                            .map(|p| p.current_price * p.quantity)
+                                                            .sum();
+                                                        paper.account_mut().equity = paper.account_mut().balance + position_values;
+                                                        let acc = paper.account();
+                                                        info!("AI position opened: {} — balance ${:.2}, equity ${:.2}",
+                                                            decision.pair, acc.balance, acc.equity);
 
                                                         // Place stop-loss on executor for live mode
                                                         if let Some(ref mut ex) = executor {
@@ -1756,8 +1931,13 @@ pub async fn run(
                                                     } else { 0.0 }
                                                 }
                                             };
-                                            log_swap_fail!("BUY REJECTED", "{} — claimed R:R={:.1}, actual={:.1} (entry={} stop={} tp={})",
-                                                decision.pair, decision.risk_reward, actual_rr, decision.entry_price, decision.stop_loss, decision.take_profit_1);
+                                            let reason = format!("Position sizer rejected — claimed R:R={:.1}, actual={:.1} (entry={} stop={} tp={})", decision.risk_reward, actual_rr, decision.entry_price, decision.stop_loss, decision.take_profit_1);
+                                            log_swap_fail!("BUY REJECTED", "{} — {}", decision.pair, reason);
+                                            shared.log_activity(
+                                                savant_trading::core::shared::ActivityLevel::Warning,
+                                                &decision.pair,
+                                                &format!("REJECTED: {}", reason),
+                                            ).await;
                                         }
                                     }
                                     TradeAction::Pass => unreachable!(),
@@ -1790,20 +1970,28 @@ pub async fn run(
         for (pair, price) in &ws_ticker_prices {
             all_prices.insert(pair.clone(), *price);
         }
-        // Capture paper position IDs and details BEFORE check_stops removes them from the map
+        // Capture paper position IDs and full details BEFORE check_stops removes them from the map
         let paper_positions_before: Vec<(String, String, Side, f64)> = paper
             .positions()
             .iter()
             .map(|(id, pos)| (id.clone(), pos.pair.clone(), pos.side, pos.entry_price))
             .collect();
+        // Full position clones for restoration if executor close fails
+        let paper_positions_full: std::collections::HashMap<String, savant_trading::core::types::Position> =
+            paper.positions().iter().map(|(id, pos)| (id.clone(), pos.clone())).collect();
 
         let stop_result = paper.check_stops(&all_prices);
 
         // Log trailing stop events
         for trail in &stop_result.trails {
+            // Calculate actual dollar risk: distance per unit × quantity held
+            let qty = paper.positions().values()
+                .find(|p| p.pair == trail.pair && p.side == trail.side)
+                .map(|p| p.quantity)
+                .unwrap_or(0.0);
+            let dollar_risk = (trail.new_sl - trail.current_price).abs() * qty;
             log_trade!("TRAIL", "{} {} | SL {:.4} → {:.4} (price {:.4}, risk ${:.2})",
-                trail.pair, trail.side, trail.old_sl, trail.new_sl, trail.current_price,
-                (trail.new_sl - trail.current_price).abs());
+                trail.pair, trail.side, trail.old_sl, trail.new_sl, trail.current_price, dollar_risk);
 
             // DB: update trailed position + log activity
             if let Some(ref j) = journal {
@@ -1842,7 +2030,20 @@ pub async fn run(
 
                 if let Some(ref eid) = exec_id {
                     if let Err(e) = ex.close_position(eid).await {
-                        warn!("Failed to close executor position {}: {}", eid, e);
+                        warn!("Failed to close executor position {}: {} — position stays open", eid, e);
+                        // Restore position to PaperTrader so it stays tracked
+                        if let Some(ref pid) = paper_id {
+                            if let Some(pos) = paper_positions_full.get(pid) {
+                                paper.positions_mut().insert(pid.clone(), pos.clone());
+                                paper.account_mut().open_positions = paper.positions().len();
+                                warn!("Restored position {} to PaperTrader — will retry close next cycle", pid);
+                                shared.log_activity(
+                                    savant_trading::core::shared::ActivityLevel::Warning,
+                                    &trade.pair,
+                                    &format!("CLOSE FAILED: {} — position stays open, will retry. Error: {}", trade.pair, e),
+                                ).await;
+                            }
+                        }
                     } else {
                         // Clean up the mapping entry after successful close
                         if let Some(ref pid) = paper_id {
@@ -1859,7 +2060,20 @@ pub async fn run(
                         .map(|p| p.id.clone());
                     if let Some(fid) = fallback_id {
                         if let Err(e) = ex.close_position(&fid).await {
-                            warn!("Failed to close fallback position {}: {}", fid, e);
+                            warn!("Failed to close fallback position {}: {} — position stays open", fid, e);
+                            // Restore position to PaperTrader
+                            if let Some(ref pid) = paper_id {
+                                if let Some(pos) = paper_positions_full.get(pid) {
+                                    paper.positions_mut().insert(pid.clone(), pos.clone());
+                                    paper.account_mut().open_positions = paper.positions().len();
+                                    warn!("Restored position {} to PaperTrader — will retry close next cycle", pid);
+                                    shared.log_activity(
+                                        savant_trading::core::shared::ActivityLevel::Warning,
+                                        &trade.pair,
+                                        &format!("CLOSE FAILED: {} — position stays open, will retry. Error: {}", trade.pair, e),
+                                    ).await;
+                                }
+                            }
                         }
                     }
                 }
@@ -2011,6 +2225,13 @@ pub async fn run(
         }
         paper.update_prices(&all_prices);
 
+        // Recalculate equity EVERY tick: USDC + sum(position market values).
+        // NOT balance + unrealized_pnl (that only counts profit, not the position itself).
+        let position_values: f64 = paper.positions().values()
+            .map(|p| p.current_price * p.quantity)
+            .sum();
+        paper.account_mut().equity = paper.account_mut().balance + position_values;
+
         // Sync balance from Kraken for live mode and propagate to PaperTrader
         // PaperTrader's balance is used for circuit breaker checks, position sizing, and display
         if let Some(ref mut ex) = executor {
@@ -2018,12 +2239,10 @@ pub async fn run(
                 let kraken_balance = ex.balance();
                 // Only update balance and equity, not peak_equity (preserves drawdown tracking)
                 paper.account_mut().balance = kraken_balance;
-                paper.account_mut().equity = kraken_balance
-                    + paper
-                        .positions()
-                        .values()
-                        .map(|p| p.unrealized_pnl)
-                        .sum::<f64>();
+                let pos_vals: f64 = paper.positions().values()
+                    .map(|p| p.current_price * p.quantity)
+                    .sum();
+                paper.account_mut().equity = kraken_balance + pos_vals;
                 debug!("Balance synced from Kraken: ${:.2}", kraken_balance);
             }
         }
@@ -2183,6 +2402,22 @@ pub async fn run(
                     .await
                 {
                     warn!("Failed to record equity snapshot: {}", e);
+                }
+                // Push to shared state for dashboard equity curve
+                {
+                    let mut curve = shared.equity_curve.write().await;
+                    curve.push(serde_json::json!({
+                        "timestamp": chrono::Utc::now().to_rfc3339(),
+                        "balance": account.balance,
+                        "equity": account.equity,
+                        "drawdown_pct": account.drawdown_pct,
+                        "open_positions": account.open_positions,
+                    }));
+                    // Keep last 500 points
+                    if curve.len() > 500 {
+                        let drain_count = curve.len() - 500;
+                        curve.drain(0..drain_count);
+                    }
                 }
             }
         }
@@ -3728,19 +3963,28 @@ pub async fn run_sandbox(config: AppConfig, model_override: Option<String>, _man
             config.ai.api_key_env
         );
     }
+    let resolved_model = model_override.clone().unwrap_or_else(|| config.ai.model.clone());
+    let mut byok_headers: Vec<(String, String)> = Vec::new();
+    if resolved_model.starts_with("google/") {
+        if let Ok(google_key) = std::env::var("GOOGLE_API_KEY") {
+            if !google_key.is_empty() {
+                byok_headers.push(("X-Provider-Api-Key".to_string(), google_key));
+            }
+        }
+    }
     let providers: Vec<savant_trading::agent::provider::LlmProvider> = api_keys
         .iter()
         .map(|key| {
             savant_trading::agent::provider::LlmProvider::new(
                 savant_trading::agent::provider::LlmConfig {
                     endpoint: config.ai.endpoint.clone(),
-                    model: model_override.clone().unwrap_or_else(|| config.ai.model.clone()),
+                    model: resolved_model.clone(),
                     api_key: key.clone(),
                     max_tokens: config.ai.max_tokens,
                     temperature: config.ai.temperature,
                     top_p: config.ai.top_p,
                     timeout_secs: config.ai.timeout_secs,
-                    extra_headers: vec![],
+                    extra_headers: byok_headers.clone(),
                 },
             )
         })
@@ -3949,13 +4193,18 @@ pub async fn run_sandbox(config: AppConfig, model_override: Option<String>, _man
         });
     }
 
-    // ── Phase 2: Fire LLM calls in parallel (capped at 10) ─────
+    // ── Phase 2: Fire LLM calls in parallel ──────────────────────
+    let max_concurrent = std::env::var("SANDBOX_CONCURRENCY")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .unwrap_or(10);
     println!(
-        "Sending {} scenarios to AI brain (max 10 concurrent)...",
-        prepared.len()
+        "Sending {} scenarios to AI brain (max {} concurrent)...",
+        prepared.len(),
+        max_concurrent
     );
 
-    let semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(10));
+    let semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(max_concurrent));
 
     struct ScenarioResponse {
         scenario_id: String,
@@ -3966,6 +4215,22 @@ pub async fn run_sandbox(config: AppConfig, model_override: Option<String>, _man
         response: Result<String, savant_trading::agent::provider::LlmError>,
         current_price: f64,
     }
+
+    struct RetryData {
+        scenario_id: String,
+        system_prompt: String,
+        user_message: String,
+        current_price: f64,
+    }
+    let prepared_for_retry: Vec<RetryData> = prepared
+        .iter()
+        .map(|ps| RetryData {
+            scenario_id: ps.scenario_id.clone(),
+            system_prompt: ps.system_prompt.clone(),
+            user_message: ps.user_message.clone(),
+            current_price: ps.current_price,
+        })
+        .collect();
 
     let mut join_set = tokio::task::JoinSet::new();
     for (idx, ps) in prepared.into_iter().enumerate() {
@@ -4027,6 +4292,68 @@ pub async fn run_sandbox(config: AppConfig, model_override: Option<String>, _man
                 all_responses.push(sr);
             }
             Err(e) => warn!("Scenario task panicked: {}", e),
+        }
+    }
+
+    // ── Phase 2b: Retry rate-limited and transient failures ─────
+    let retryable = std::mem::take(&mut all_responses);
+    let (ok_responses, failed): (Vec<_>, Vec<_>) = retryable
+        .into_iter()
+        .partition(|sr| sr.response.is_ok());
+    let rate_limited: Vec<ScenarioResponse> = failed
+        .into_iter()
+        .filter(|sr| {
+            matches!(&sr.response, Err(savant_trading::agent::provider::LlmError::RateLimited(_)))
+                || matches!(&sr.response, Err(savant_trading::agent::provider::LlmError::Http(e)) 
+                    if e.contains("429") || e.contains("502") || e.contains("503") || e.contains("transient"))
+        })
+        .collect();
+
+    all_responses = ok_responses;
+
+    if !rate_limited.is_empty() {
+        println!(
+            "\n── Retrying {} rate-limited scenarios (concurrency=1, 5s delay) ──",
+            rate_limited.len()
+        );
+        let retry_provider = providers[0].config_clone();
+        for (i, sr) in rate_limited.into_iter().enumerate() {
+            if i > 0 {
+                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            }
+            let local_provider = savant_trading::agent::provider::LlmProvider::new(retry_provider.clone());
+            // Find the matching prepared scenario to get system/user prompts
+            let matching = prepared_for_retry.iter().find(|p| p.scenario_id == sr.scenario_id);
+            let (retry_response, retry_price) = if let Some(ps) = matching {
+                let messages = vec![savant_trading::agent::provider::Message {
+                    role: "user".to_string(),
+                    content: ps.user_message.clone(),
+                }];
+                let resp = local_provider.chat(&ps.system_prompt, &messages).await;
+                (resp, ps.current_price)
+            } else {
+                (Err(savant_trading::agent::provider::LlmError::Http("Scenario data not found for retry".into())), sr.current_price)
+            };
+            let retry_status = match &retry_response {
+                Ok(_) => "OK (retry)".to_string(),
+                Err(e) => format!("ERR (retry): {}", e),
+            };
+            println!(
+                "  [retry {}/{}] {} — {}",
+                i + 1,
+                scenarios.len(),
+                sr.scenario_name,
+                retry_status
+            );
+            all_responses.push(ScenarioResponse {
+                scenario_id: sr.scenario_id,
+                scenario_name: sr.scenario_name,
+                category: sr.category,
+                difficulty: sr.difficulty,
+                expected_action: sr.expected_action,
+                response: retry_response,
+                current_price: retry_price,
+            });
         }
     }
 

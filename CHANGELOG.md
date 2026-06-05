@@ -4,6 +4,58 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.9.1] — 2026-06-05
+
+### Added
+
+- **`savant serve` command** — Single command starts engine + API (port 8080) + Next.js dashboard (port 3000). Dashboard auto-builds if not built. `cmd /c npm` for Windows compatibility.
+- **0x `/price` liquidity pre-check** — `LiquidityCheck` struct with `available`, `buy_tax_bps`, `sell_tax_bps`, `buy_amount`, `balance_ok`, `allowance_ok`. Called before every BUY and close. Honeypot detection via buy tax > 1%.
+- **`sellEntireBalance` parameter** — 0x API uses actual on-chain balance at execution time. Prevents dust/rounding failures on close swaps.
+- **Multi-chain token databases** — Ethereum (19 tokens), Base (14), Optimism (14). `lookup_token()` now chain-aware for 4 chains. All chains enabled in config.
+- **Wallet sync (chain-first reconciliation)** — Queries on-chain ERC-20 balances for all curated pairs on startup. Creates recovery positions for untracked tokens (entry price from trade history). Removes ghost positions for tokens no longer in wallet. `entry_price > 0` guard prevents corrupted positions.
+- **Equity chart** — Recharts area chart in dashboard showing equity curve over time. API endpoint `/api/equity` querying `equity_snapshots` table.
+- **Activity log copy button** — Click to copy full activity log to clipboard.
+- **Scrollbar styling** — Custom scrollbar matching dark design system (thin, dark track, subtle thumb).
+- **12h AM/PM timestamps** — Activity log uses 12-hour format instead of 24h.
+- **Rejection logging to dashboard** — Every BUY rejection (price drift, liquidity, position sizer, concentration cap) logged to activity feed with reason.
+- **Log broadcast channel** — `tokio::sync::broadcast` channel captures all tracing/savant_log output. Terminal WebSocket streams to dashboard in real-time.
+- **SQLite busy_timeout** — `SqlitePool::connect_with` with `busy_timeout(5s)` + WAL mode. Prevents hanging on stale locks from crashed processes.
+- **Dynamic gas management** — Queries `eth_gasPrice` from network, calculates cost per swap, requires enough for 2 swaps + 50% buffer. No hardcoded gas thresholds.
+- **Circuit breaker dollar floors** — `min_daily_loss_usd = $5`, `min_drawdown_usd = $10`. Prevents false halts at tiny balances.
+- **Full deploy mode** — `full_deploy = true` in config. At <$500 balance, 100% of capital into best-conviction trade.
+- **Dynamic R:R** — `min_rr_ratio_low_balance = 1.2` at <$50 balance (was fixed 1.5).
+- **Dynamic position sizing** — Risk tiers: <$500 = 100%, <$5000 = 10%, <$50000 = 5%, above = 2%. No hardcoded percentages.
+- **Gas buffer increase** — 1.5x multiplier with 800,000 minimum (was raw 0x estimate). Fixes "out of gas" on Permit2 calldata.
+
+### Fixed
+
+- **CRITICAL: Close trade failure** — `close_position()` removed position from map BEFORE swap executed. If swap failed (dust, no liquidity), tokens stranded in wallet with no tracking. Now: position stays in map until on-chain USDC balance verified.
+- **CRITICAL: Equity calculation wrong** — Used `balance + unrealized_pnl` (only counts profit, not position value). Now uses `balance + sum(position_values)` (includes deployed capital). All 5 callers fixed.
+- **CRITICAL: Balance double-counting** — DB position restore deducted `entry_price * quantity` from balance. But balance was already reduced when trade executed on-chain. Removed deduction.
+- **CRITICAL: Wallet desync (3 incidents)** — Engine crashed before saving positions to DB. Wallet sync created ghost positions with `entry_price=0`. Fixed: chain-first reconciliation after candle data loads, `entry_price > 0` guard.
+- **CRITICAL: `sell_usd` decimal bug** — Was hardcoding USDC 6-decimal math for ALL tokens (including 18-decimal UNI). Now uses correct decimals per token.
+- **Pre-flight "out of gas"** — 0x API returns `gas=600000` but Permit2 needs more. Added 1.5x buffer with 800,000 minimum.
+- **Timer 0m** — `engine_started_at` initialized to `Some(Instant::now())` when engine running at API startup.
+- **Market insight "No data"** — Shared state not seeded after first `refresh_multi()`. Now seeds immediately and syncs every 5 ticks.
+- **DB balance overwrites on-chain** — In live mode, balance comes from on-chain USDC only. DB trades loaded for history but don't override balance.
+- **SQLite connection hangs** — URL parameters don't work with sqlx. Switched to `SqliteConnectOptions` with `busy_timeout`.
+- **Circuit breaker block file** — Auto-deleted on `savant serve` so stale blocks don't prevent startup.
+- **Windows npm not found** — `std::process::Command::new("npm")` fails on Windows. Uses `cmd /c npm` via `#[cfg(target_os = "windows")]`.
+- **Terminology: "DRY-RUN" → "PRE-FLIGHT"** — eth_call simulation renamed. "Paper Trading" removed from vault writer. Correct terms for live trading.
+- **Dead code: `total_unrealized`** — Unused variable in paper.rs after equity calculation rewrite.
+- **Clippy: `map_or` → `is_none_or`** — 0x liquidity check simplified per clippy suggestion.
+- **Clippy: `single_match` → `if let`** — Token balance loop in trader.rs.
+- **`prepared_for_retry` scope** — Brace fix broke sandbox function scope. Restored correct closing braces.
+
+### Changed
+
+- **10 curated high-liquidity pairs** — ETH, BTC, ARB, LINK, UNI, AAVE, PEPE, PENDLE, COMP, LDO (was 9 pairs including DOGE/BONK with uncertain Arbitrum liquidity).
+- **Blockscout non-blocking** — For curated pairs, Blockscout check skipped entirely. For other pairs, logs warning instead of rejecting. 0x quote is the real liquidity gate.
+- **`DexBackend::check_liquidity`** — Returns `LiquidityCheck` struct instead of `bool`. All backends updated (0x, 1inch, fallback).
+- **`SwapParams` struct** — Added `sell_entire_balance: bool` field. All 8 construction sites updated.
+- **`ExecutionEngine::check_liquidity`** — Returns `LiquidityCheck` with `available`, `buy_tax_bps`, etc.
+- **Version** — 0.9.0 → 0.9.1
+
 ## [0.9.0] — 2026-06-04
 
 ### Added

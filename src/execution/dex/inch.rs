@@ -130,6 +130,29 @@ impl DexBackend for InchBackend {
         })
     }
 
+    async fn check_liquidity(&self, params: &SwapParams) -> Result<super::LiquidityCheck, ExecutionError> {
+        match self.quote(params).await {
+            Ok(q) => Ok(super::LiquidityCheck {
+                available: q.to_amount != "0" && !q.to_amount.is_empty(),
+                buy_tax_bps: 0,
+                sell_tax_bps: 0,
+                buy_amount: q.to_amount,
+                balance_ok: true,
+                allowance_ok: true,
+                price: q.price,
+            }),
+            Err(_) => Ok(super::LiquidityCheck {
+                available: false,
+                buy_tax_bps: 0,
+                sell_tax_bps: 0,
+                buy_amount: "0".to_string(),
+                balance_ok: false,
+                allowance_ok: false,
+                price: "0".to_string(),
+            }),
+        }
+    }
+
     async fn build_swap_tx(&self, params: &SwapParams) -> Result<SwapTx, ExecutionError> {
         let slippage_pct = params.slippage * 100.0;
         let url = format!(
@@ -225,6 +248,7 @@ mod tests {
             slippage: 0.005,
             from: "0x1111111111111111111111111111111111111111".into(),
             chain_id: 42161,
+            sell_entire_balance: false,
         }
     }
 

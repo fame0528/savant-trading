@@ -1,5 +1,57 @@
 # LEARNINGS
 
+## Session 2026-06-05: Full Engine Overhaul (v0.9.1)
+
+**Critical Bugs:**
+- `close_position()` removed position from map BEFORE swap — tokens stranded on failure
+- Equity used `balance + unrealized_pnl` instead of `balance + position_values` — showed $0.97 instead of $26
+- DB restore deducted `entry_price * qty` from balance — double-counted deployed capital
+- Wallet sync created ghost positions with `entry_price=0` when run before candle data
+- `SwapParams` struct change broke 6 construction sites — must grep all usages when adding fields
+
+**Architecture:**
+- `LiquidityCheck` struct replaces `bool` for check_liquidity — enables honeypot detection, balance/allowance checking
+- `sellEntireBalance=true` parameter handles dust/rounding on close trades (per 0x docs)
+- Chain-first reconciliation must run AFTER candle data loads (market prices needed for recovery positions)
+- SQLite needs `busy_timeout` via `SqliteConnectOptions` — URL params don't work with sqlx
+
+**0x API:**
+- `/price` endpoint is read-only, returns `tokenMetadata` with buy/sell tax (honeypot detection)
+- `issues.balance` and `issues.allowance` tell exactly why a swap would fail
+- `sellEntireBalance` parameter uses actual on-chain balance at execution time
+- Gas buffer: 0x returns `gas=600000` but Permit2 swaps need 1.5x with minimum 800,000
+
+**Dashboard:**
+- `engine_started_at` must be initialized when engine runs via `serve` command (not just API)
+- Shared state must be seeded after data loads, not just synced periodically
+- Next.js rewrites proxy `/api/*` to Rust backend on port 8080
+
+**Version Bumping:**
+- Only bump `0.0.x` (patch) per session — user specified 9 patches before minor bump
+- Current: 0.9.0 → 0.9.1
+
+## Session 2026-06-05 13:14: Zero-Trade Diagnosis + Emergency Fix (FID-052)
+
+**Key Learnings:**
+
+- **Silent rejection is the most dangerous bug pattern.** The token safety gate at engine.rs:1548-1570 used `continue` to silently skip trades. No log output, no alerts, no visible indication. The engine appeared to be running normally while rejecting 100% of trades. Every `continue` in a trade execution path should be loud.
+- **Config flags must cover all expansion paths.** `scan_all_pairs = false` only controlled Kraken pair discovery. The DEX mode initialization at engine.rs:300-317 unconditionally loaded ALL 157 static Arbitrum tokens as pairs. Config intent was silently overridden.
+- **Chain-native liquidity matters more than token existence.** Checking Arbitrum Blockscout for Ethereum-native tokens (LDO, COMP, RENDER, LPT) is checking the wrong chain. The tokens exist on Arbitrum as wrapped bridges but have negligible volume. Real liquidity is on Ethereum mainnet.
+- **The 0x API is the real safety net.** If a token has no liquidity on the target chain, the 0x quote will fail with a clear error. The Blockscout pre-check was more conservative than the actual exchange, creating false negatives.
+- **LLM API budget is the scarcest resource.** 4,124 evaluations of dead Arbitrum tokens at ~$0.01 each = $41 wasted. With $15 remaining budget, this was fatal. Every LLM call must be on a token with real trading potential.
+- **`cg_verified` was a false confidence signal.** The CoinGecko verification flag was set for ALL 157 static tokens regardless of their actual Arbitrum liquidity. Being "verified" on CoinGecko doesn't mean the Arbitrum deployment has volume.
+- **Multi-chain infrastructure is now 90% built.** Token databases for Ethereum (19 tokens), Base (14), Optimism (14), Arbitrum (201). `lookup_token()` is chain-aware. `check_liquidity()` uses 0x `/price` endpoint. Config has all 4 chains enabled. The missing piece: dynamic chain selection in `resolve_pair()`.
+- **0x `/price` endpoint is the correct liquidity gate.** Read-only, no gas, ~200ms. Returns `liquidityAvailable: true/false`. Use this instead of Blockscout for confirming DEX routing exists.
+- **Dashboard must show rejections.** Adding `shared.log_activity(Warning, "REJECTED: reason")` for every `continue` in the BUY path gives the user visibility into why trades aren't happening. Critical for debugging.
+
+**Technical Insights:**
+
+- `engine.rs` is 4,269 lines after fix (was 4,309). The pair expansion and token safety sections are the two most critical gates between AI decision and trade execution.
+- The `curated_pairs` HashSet pattern (config-driven, not code-driven) is the correct approach. Adding a new pair to config automatically makes it curated.
+- Blockscout API has a 10-second timeout. During volatile markets, this adds latency to every BUY decision. Skipping it for curated pairs saves 10s per evaluation.
+
+---
+
 ## Session 2026-06-04 16:00: Production Audit + Nova Cross-Reference
 
 **Key Learnings:**

@@ -16,6 +16,7 @@ pub struct SharedEngineData {
     pub decisions: Arc<RwLock<Vec<DecisionRecord>>>,
     pub activity_log: Arc<RwLock<Vec<ActivityEntry>>>,
     pub memory_snapshot: Arc<RwLock<MemorySnapshot>>,
+    pub equity_curve: Arc<RwLock<Vec<serde_json::Value>>>,
 }
 
 /// Memory system state for TUI display.
@@ -88,6 +89,7 @@ impl SharedEngineData {
                 cusum_status: Vec::new(),
                 replay_lesson_count: 0,
             })),
+            equity_curve: Arc::new(RwLock::new(Vec::new())),
         }
     }
 

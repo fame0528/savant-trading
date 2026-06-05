@@ -319,6 +319,8 @@ pub struct TradingConfig {
     pub database_url: String,
     pub fee_rate: f64,
     pub slippage_pct: f64,
+    #[serde(default)]
+    pub full_deploy: bool,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -336,7 +338,20 @@ pub struct RiskConfig {
     pub max_drawdown: f64,
     pub max_positions: usize,
     pub min_rr_ratio: f64,
+    #[serde(default = "default_min_rr_low_balance")]
+    pub min_rr_ratio_low_balance: f64,
+    #[serde(default = "default_low_balance_threshold")]
+    pub low_balance_threshold: f64,
+    #[serde(default = "default_min_daily_loss_usd")]
+    pub min_daily_loss_usd: f64,
+    #[serde(default = "default_min_drawdown_usd")]
+    pub min_drawdown_usd: f64,
 }
+
+fn default_min_rr_low_balance() -> f64 { 1.2 }
+fn default_low_balance_threshold() -> f64 { 50.0 }
+fn default_min_daily_loss_usd() -> f64 { 5.0 }
+fn default_min_drawdown_usd() -> f64 { 10.0 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct StrategyConfig {
@@ -447,13 +462,14 @@ impl Default for AppConfig {
                 database_url: "sqlite:data/savant.db".into(),
                 fee_rate: 0.0026,
                 slippage_pct: 0.0005,
+                full_deploy: false,
             },
             risk: RiskConfig {
                 max_risk_per_trade: 0.20,
                 dynamic_risk_tiers: vec![
                     RiskTier {
                         balance: 500.0,
-                        risk_pct: 0.20,
+                        risk_pct: 1.00,
                     },
                     RiskTier {
                         balance: 5000.0,
@@ -472,6 +488,10 @@ impl Default for AppConfig {
                 max_drawdown: 0.40,
                 max_positions: 5,
                 min_rr_ratio: 1.5,
+                min_rr_ratio_low_balance: 1.2,
+                low_balance_threshold: 50.0,
+                min_daily_loss_usd: 5.0,
+                min_drawdown_usd: 10.0,
             },
             strategy: StrategyConfig {
                 momentum: MomentumConfig {
