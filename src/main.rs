@@ -596,6 +596,52 @@ async fn recover_positions(config: &savant_trading::core::config::AppConfig) -> 
     Ok(())
 }
 
+const PERMIT2: &str = "0x000000000022d473030f116ddee9f6b43ac78ba3";
+
+/// Check ERC-20 allowance to Permit2 for a given token and owner.
+/// Returns U256 to handle max approvals correctly.
+async fn check_allowance(rpc_url: &str, token: &alloy_core::primitives::Address, owner: &alloy_core::primitives::Address) -> alloy_core::primitives::U256 {
+    let owner_hex = format!("{:x}", owner);
+    let spender_hex = PERMIT2.trim_start_matches("0x");
+    let data = format!("0xdd62ed3e{:0>64}{:0>64}", owner_hex, spender_hex);
+    let body = serde_json::json!({
+        "jsonrpc": "2.0", "id": 1,
+        "method": "eth_call",
+        "params": [{"to": format!("{:x}", token), "data": data}, "latest"]
+    });
+    let client = reqwest::Client::new();
+    if let Ok(resp) = client.post(rpc_url)
+        .header("User-Agent", "Mozilla/5.0")
+        .json(&body).send().await
+    {
+        if let Ok(json) = resp.json::<serde_json::Value>().await {
+            if let Some(hex) = json.get("result").and_then(|r| r.as_str()) {
+                return alloy_core::primitives::U256::from_str_radix(hex.trim_start_matches("0x"), 16)
+                    .unwrap_or(alloy_core::primitives::U256::ZERO);
+            }
+        }
+    }
+    alloy_core::primitives::U256::ZERO
+}
+
+/// Check transaction receipt status. Returns Some("0x1") if confirmed, Some("0x0") if reverted.
+async fn check_tx_status(rpc_url: &str, tx_hash: &str) -> Option<String> {
+    let body = serde_json::json!({
+        "jsonrpc": "2.0", "id": 1,
+        "method": "eth_getTransactionReceipt",
+        "params": [tx_hash]
+    });
+    let client = reqwest::Client::new();
+    let resp = client.post(rpc_url)
+        .header("User-Agent", "Mozilla/5.0")
+        .json(&body).send().await.ok()?;
+    let json: serde_json::Value = resp.json().await.ok()?;
+    json.get("result")
+        .and_then(|r| r.get("status"))
+        .and_then(|s| s.as_str())
+        .map(|s| s.to_string())
+}
+
 /// Close all positions — sell all token holdings to USDC via 0x API.
 /// Uses ZeroXBackend::build_swap_tx for proper Permit2 signing.
 async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -> anyhow::Result<()> {
@@ -670,77 +716,152 @@ async fn close_all_positions(config: &savant_trading::core::config::AppConfig) -
             continue;
         }
 
-        let amount_wei = savant_trading::execution::dex::amount_to_wei(pos.quantity, decimals as u8);
         let sell_usd = pos.quantity * pos.current_price;
 
         println!("\n  {} {:.6} {} (~${:.2})", pos.side, pos.quantity, token_symbol, sell_usd);
         println!("    sellToken: {}", token_address);
         println!("    buyToken:  {}", usdc_address);
-        println!("    sellAmount: {}", amount_wei);
 
-        // Use ZeroXBackend::build_swap_tx — handles Permit2 signing automatically
-        let swap_params = SwapParams {
-            src_token: token_address.clone(),
-            dst_token: usdc_address.to_string(),
-            amount: amount_wei.clone(),
-            slippage: config.exchange.dex.slippage_pct,
-            from: wallet_hex.clone(),
-            chain_id: config.exchange.dex.chain_id,
+        // Split large sells into chunks of max 5 tokens
+        let max_chunk = 5.0f64;
+        let chunks = if pos.quantity > max_chunk {
+            let mut c = Vec::new();
+            let mut remaining = pos.quantity;
+            while remaining > 0.001 {
+                let chunk = remaining.min(max_chunk);
+                c.push(chunk);
+                remaining -= chunk;
+            }
+            c
+        } else {
+            vec![pos.quantity]
         };
 
-        match trader.build_swap_tx(&swap_params).await {
-            Ok(swap_tx) => {
-                println!("    Quote OK — expected output from 0x");
-                println!("    To: {}", swap_tx.to);
-                println!("    Gas: {}", swap_tx.gas);
+        for (i, chunk_qty) in chunks.iter().enumerate() {
+            let chunk_wei = savant_trading::execution::dex::amount_to_wei(*chunk_qty, decimals as u8);
+            let chunk_label = if chunks.len() > 1 {
+                format!(" ({}/{})", i + 1, chunks.len())
+            } else {
+                String::new()
+            };
 
-                let swap_to: Address = swap_tx.to.parse().unwrap_or_default();
-                let swap_data = alloy_core::primitives::hex::decode(
-                    swap_tx.data.trim_start_matches("0x")
-                ).unwrap_or_default();
-                let swap_value = U256::from_str_radix(
-                    swap_tx.value.trim_start_matches("0x"), 16
-                ).unwrap_or(U256::ZERO);
+            println!("    Chunk{}: {:.6} {} (wei={})", chunk_label, chunk_qty, token_symbol, chunk_wei);
 
-                println!("    Sending swap tx...");
-                match trader.sign_and_send(swap_to, &swap_data, swap_value, swap_tx.gas).await {
-                    Ok(tx_hash) => {
-                        println!("    TX: {}", tx_hash);
-                        // Wait for confirmation
-                        tokio::time::sleep(std::time::Duration::from_secs(15)).await;
+            // Ensure Permit2 approval is valid before each swap attempt
+            let token_addr: Address = token_address.parse().unwrap_or_default();
+            let allowance = check_allowance(&config.exchange.dex.rpc_url, &token_addr, &trader.wallet_address()).await;
+            let needed = alloy_core::primitives::U256::from_str_radix(&chunk_wei, 10).unwrap_or(alloy_core::primitives::U256::ZERO);
+            if allowance < needed {
+                println!("    Approving for Permit2 (allowance < needed)...");
+                let approve_data = format!(
+                    "0x095ea7b3{:0>64}{:0>64}",
+                    PERMIT2.trim_start_matches("0x"),
+                    "f".repeat(64)
+                );
+                let approve_bytes = alloy_core::primitives::hex::decode(approve_data.trim_start_matches("0x")).unwrap_or_default();
+                match trader.sign_and_send(token_addr, &approve_bytes, U256::ZERO, 60000).await {
+                    Ok(hash) => {
+                        println!("    Approve TX: {}", hash);
+                        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                    }
+                    Err(e) => println!("    Approve error (may be OK): {}", e),
+                }
+            } else {
+                println!("    Permit2 allowance OK");
+            }
 
-                        // Check receipt
-                        let receipt_body = serde_json::json!({
-                            "jsonrpc": "2.0", "id": 1,
-                            "method": "eth_getTransactionReceipt",
-                            "params": [tx_hash]
-                        });
-                        let client = reqwest::Client::new();
-                        if let Ok(resp) = client.post(&config.exchange.dex.rpc_url)
-                            .header("User-Agent", "Mozilla/5.0")
-                            .json(&receipt_body).send().await
-                        {
-                            if let Ok(json) = resp.json::<serde_json::Value>().await {
-                                let status = json.get("result")
-                                    .and_then(|r| r.get("status"))
-                                    .and_then(|s| s.as_str())
-                                    .unwrap_or("0x0");
+            let swap_params = SwapParams {
+                src_token: token_address.clone(),
+                dst_token: usdc_address.to_string(),
+                amount: chunk_wei.clone(),
+                slippage: config.exchange.dex.slippage_pct,
+                from: wallet_hex.clone(),
+                chain_id: config.exchange.dex.chain_id,
+            };
+
+            match trader.build_swap_tx(&swap_params).await {
+                Ok(swap_tx) => {
+                    println!("    Quote OK — gas={}", swap_tx.gas);
+
+                    let swap_to: Address = swap_tx.to.parse().unwrap_or_default();
+                    let swap_data = alloy_core::primitives::hex::decode(
+                        swap_tx.data.trim_start_matches("0x")
+                    ).unwrap_or_default();
+                    let swap_value = U256::from_str_radix(
+                        swap_tx.value.trim_start_matches("0x"), 16
+                    ).unwrap_or(U256::ZERO);
+
+                    println!("    Sending swap...");
+                    match trader.sign_and_send(swap_to, &swap_data, swap_value, swap_tx.gas).await {
+                        Ok(tx_hash) => {
+                            println!("    TX: {}", tx_hash);
+                            tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+
+                            if let Some(status) = check_tx_status(&config.exchange.dex.rpc_url, &tx_hash).await {
                                 if status == "0x1" {
-                                    println!("    CONFIRMED on-chain");
-                                    total_received += sell_usd;
-                                    let _ = journal.delete_position(&pos.id).await;
-                                    println!("    Removed from DB");
+                                    println!("    CONFIRMED");
+                                    total_received += sell_usd * (*chunk_qty / pos.quantity);
                                 } else {
                                     println!("    REVERTED (status={})", status);
                                 }
                             }
                         }
+                        Err(e) => {
+                            let err_str = e.to_string();
+                            if err_str.contains("TRANSFER_FROM_FAILED") || err_str.contains("reverted") {
+                                println!("    Swap reverted — re-approving and retrying...");
+                                // Force re-approval
+                                let approve_data = format!(
+                                    "0x095ea7b3{:0>64}{:0>64}",
+                                    PERMIT2.trim_start_matches("0x"),
+                                    "f".repeat(64)
+                                );
+                                let approve_bytes = alloy_core::primitives::hex::decode(approve_data.trim_start_matches("0x")).unwrap_or_default();
+                                if let Ok(hash) = trader.sign_and_send(token_addr, &approve_bytes, U256::ZERO, 60000).await {
+                                    println!("    Re-approve TX: {}", hash);
+                                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                                    // Retry swap
+                                    match trader.build_swap_tx(&swap_params).await {
+                                        Ok(retry_tx) => {
+                                            let retry_to: Address = retry_tx.to.parse().unwrap_or_default();
+                                            let retry_data = alloy_core::primitives::hex::decode(retry_tx.data.trim_start_matches("0x")).unwrap_or_default();
+                                            let retry_value = U256::from_str_radix(retry_tx.value.trim_start_matches("0x"), 16).unwrap_or(U256::ZERO);
+                                            match trader.sign_and_send(retry_to, &retry_data, retry_value, retry_tx.gas).await {
+                                                Ok(retry_hash) => {
+                                                    println!("    Retry TX: {}", retry_hash);
+                                                    tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                                                    if let Some(s) = check_tx_status(&config.exchange.dex.rpc_url, &retry_hash).await {
+                                                        if s == "0x1" {
+                                                            println!("    CONFIRMED (retry)");
+                                                            total_received += sell_usd * (*chunk_qty / pos.quantity);
+                                                        } else {
+                                                            println!("    REVERTED (retry, status={})", s);
+                                                        }
+                                                    }
+                                                }
+                                                Err(e2) => println!("    Retry failed: {}", e2),
+                                            }
+                                        }
+                                        Err(e2) => println!("    Retry quote failed: {}", e2),
+                                    }
+                                }
+                            } else {
+                                println!("    Send failed: {}", e);
+                            }
+                        }
                     }
-                    Err(e) => println!("    Send failed: {}", e),
                 }
+                Err(e) => println!("    Quote failed: {}", e),
             }
-            Err(e) => println!("    Quote failed: {}", e),
+
+            // Brief pause between chunks
+            if i < chunks.len() - 1 {
+                tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+            }
         }
+
+        // Delete from DB after all chunks complete
+        let _ = journal.delete_position(&pos.id).await;
     }
 
     println!("\n=== DONE ===");

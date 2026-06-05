@@ -318,9 +318,9 @@ pub async fn run(
 
         // Then: discover additional tokens from Blockscot API
         match savant_trading::data::token_discovery::discover_tokens(
-            100_000.0,   // min $100K daily volume
-            100,           // min 100 holders
-            500,           // scan top 500 tokens
+            1_000_000.0,   // min $1M daily volume — no dead coins
+            5_000,          // min 5000 holders — no honeypots
+            500,            // scan top 500 tokens
         ).await {
             Ok(discovered) => {
                 let discovered_pairs = savant_trading::data::token_discovery::tokens_to_pairs(&discovered);
@@ -1523,6 +1523,30 @@ pub async fn run(
                                             log_warn!("TOLERANCE", "Price drifted {:.1}% for {} (entry={:.4} current={:.4}) — skipping",
                                                 drift, decision.pair, decision.entry_price, current_price);
                                             continue;
+                                        }
+
+                                        // Volume + holder verification gate — reject dead coins and honeypots
+                                        let token_symbol = decision.pair.split('/').next().unwrap_or("");
+                                        if let Some((token_addr, _)) = savant_trading::execution::dex::lookup_token(token_symbol, config.exchange.dex.chain_id) {
+                                            if !token_addr.is_empty() {
+                                                match verify_token_safety(&token_addr).await {
+                                                    Ok((vol, holders)) => {
+                                                        if vol < 1_000_000.0 {
+                                                            log_warn!("VOLUME", "{} rejected — 24h volume ${:.0} < $1M minimum", decision.pair, vol);
+                                                            continue;
+                                                        }
+                                                        if holders < 5_000 {
+                                                            log_warn!("HOLDERS", "{} rejected — {} holders < 5000 minimum", decision.pair, holders);
+                                                            continue;
+                                                        }
+                                                        info!("Token safety OK: {} vol=${:.0} holders={}", decision.pair, vol, holders);
+                                                    }
+                                                    Err(e) => {
+                                                        log_warn!("VERIFY", "{} — cannot verify token safety ({}), rejecting", decision.pair, e);
+                                                        continue;
+                                                    }
+                                                }
+                                            }
                                         }
 
                                         let ps = position_sizer.calculate(
@@ -4220,4 +4244,46 @@ fn has_actionable_signal(
     }
 
     false
+}
+
+/// Verify token safety before buying — checks 24h volume and holder count
+/// via Blockscout API. Rejects dead coins (< $1M volume) and honeypots (< 5000 holders).
+async fn verify_token_safety(token_address: &str) -> Result<(f64, u64), String> {
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(10))
+        .build()
+        .map_err(|e| format!("HTTP client: {}", e))?;
+
+    let url = format!(
+        "https://arbitrum.blockscout.com/api/v2/tokens/{}",
+        token_address
+    );
+
+    let resp = client
+        .get(&url)
+        .send()
+        .await
+        .map_err(|e| format!("Blockscout error: {}", e))?;
+
+    if !resp.status().is_success() {
+        return Err(format!("Blockscout returned {}", resp.status()));
+    }
+
+    let json: serde_json::Value = resp
+        .json()
+        .await
+        .map_err(|e| format!("Blockscout parse error: {}", e))?;
+
+    let volume = json["volume_24h"]
+        .as_str()
+        .unwrap_or("0")
+        .parse::<f64>()
+        .unwrap_or(0.0);
+    let holders = json["holders_count"]
+        .as_str()
+        .unwrap_or("0")
+        .parse::<u64>()
+        .unwrap_or(0);
+
+    Ok((volume, holders))
 }
