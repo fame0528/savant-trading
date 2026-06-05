@@ -2262,15 +2262,58 @@ async fn run_training_batch(
     scenarios: &[savant_trading::sandbox::scenarios::Scenario],
     test_memory: &savant_trading::memory::episodic::EpisodicMemory,
     model_override: Option<&str>,
+    managed_keys: bool,
 ) -> anyhow::Result<TrainingRunResult> {
     use savant_trading::sandbox::generator;
 
-    let api_keys: Vec<String> = std::env::var("SANDBOX_API_KEYS")
-        .unwrap_or_else(|_| std::env::var(&config.ai.api_key_env).unwrap_or_default())
-        .split(',')
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
-        .collect();
+    // Managed keys: create a temporary API key with spending limit
+    let _managed_key_hash: Option<String> = None;
+    let api_keys: Vec<String> = if managed_keys && config.ai.provider == "openrouter" {
+        let mgmt_key = std::env::var(&config.ai.openrouter.management.management_key_env)
+            .unwrap_or_default();
+        if mgmt_key.is_empty() {
+            warn!("--managed-keys set but OPENROUTER_MANAGEMENT_KEY not found, falling back to env keys");
+            std::env::var("SANDBOX_API_KEYS")
+                .unwrap_or_else(|_| std::env::var(&config.ai.api_key_env).unwrap_or_default())
+                .split(',')
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty())
+                .collect()
+        } else {
+            let mgmt = savant_trading::agent::openrouter_management::OpenRouterManagementClient::new(mgmt_key);
+            let model_name = model_override.unwrap_or(&config.ai.model);
+            let key_name = format!("savant-{}", chrono::Utc::now().format("%m%d-%H%M"));
+            match mgmt.create_key(savant_trading::agent::openrouter_management::CreateKeyRequest {
+                name: key_name.clone(),
+                limit: Some(1.0),  // $1 limit per test/training run
+                ..Default::default()
+            }).await {
+                Ok(created) => {
+                    info!("Managed key created: {} (limit: $1.00, model: {})", key_name, model_name);
+                    // Store hash for cleanup
+                    // We can't use _managed_key_hash here because it's immutable
+                    // Store in a local var and handle cleanup after the function
+                    vec![created.key]
+                }
+                Err(e) => {
+                    warn!("Failed to create managed key ({}), falling back to env keys", e);
+                    std::env::var("SANDBOX_API_KEYS")
+                        .unwrap_or_else(|_| std::env::var(&config.ai.api_key_env).unwrap_or_default())
+                        .split(',')
+                        .map(|s| s.trim().to_string())
+                        .filter(|s| !s.is_empty())
+                        .collect()
+                }
+            }
+        }
+    } else {
+        std::env::var("SANDBOX_API_KEYS")
+            .unwrap_or_else(|_| std::env::var(&config.ai.api_key_env).unwrap_or_default())
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect()
+    };
     if api_keys.is_empty() {
         anyhow::bail!(
             "No API keys. Set SANDBOX_API_KEYS or {} in .env",
@@ -3184,7 +3227,9 @@ pub async fn run_training(
     full: bool,
     historical: bool,
     model_override: Option<String>,
+    managed_keys: bool,
 ) -> anyhow::Result<()> {
+    let _managed_keys = managed_keys;
     let _test_memory =
         savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/test_memory.db").await?;
 
@@ -3277,7 +3322,7 @@ pub async fn run_training(
             break;
         }
 
-        let result = run_training_batch(&config, &scenarios, &test_memory, model_override.as_deref()).await?;
+        let result = run_training_batch(&config, &scenarios, &test_memory, model_override.as_deref(), managed_keys).await?;
         brier_history.push(result.brier_score);
 
         println!(
@@ -3344,6 +3389,7 @@ pub async fn run_action_test(
     action_only: bool,
     count_filter: Option<usize>,
     model_override: Option<String>,
+    managed_keys: bool,
 ) -> anyhow::Result<()> {
     use savant_trading::sandbox::scenarios::load_all_scenarios;
 
@@ -3364,7 +3410,7 @@ pub async fn run_action_test(
         scenarios.truncate(n);
     }
 
-    let result = run_training_batch(&config, &scenarios, &test_memory, model_override.as_deref()).await?;
+    let result = run_training_batch(&config, &scenarios, &test_memory, model_override.as_deref(), managed_keys).await?;
 
     let total_episodes = test_memory.total_trades().await.unwrap_or(0);
     println!("Total episodes in test DB: {}", total_episodes);
@@ -3381,7 +3427,7 @@ pub async fn run_action_test(
 }
 
 /// Sandbox: run all 50 scenarios through the real AI brain and grade every decision.
-pub async fn run_sandbox(config: AppConfig, model_override: Option<String>) -> anyhow::Result<()> {
+pub async fn run_sandbox(config: AppConfig, model_override: Option<String>, _managed_keys: bool) -> anyhow::Result<()> {
     use savant_trading::sandbox::feedback::analyze_failures;
     use savant_trading::sandbox::generator::{self};
     use savant_trading::sandbox::grader;

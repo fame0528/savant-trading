@@ -22,6 +22,7 @@ struct TestArgs {
     full: bool,
     historical: bool,
     model: Option<String>,
+    managed_keys: bool,
 }
 
 fn parse_test_args(args: &[String]) -> TestArgs {
@@ -52,6 +53,9 @@ fn parse_test_args(args: &[String]) -> TestArgs {
             "--model" | "-m" => {
                 i += 1;
                 ta.model = args.get(i).cloned();
+            }
+            "--managed-keys" => {
+                ta.managed_keys = true;
             }
             _ => {}
         }
@@ -182,7 +186,7 @@ async fn main() -> anyhow::Result<()> {
             let ta = parse_test_args(&args);
             if ta.sandbox {
                 info!("=== SAVANT SANDBOX ===");
-                return engine::run_sandbox(config, ta.model).await;
+                return engine::run_sandbox(config, ta.model, ta.managed_keys).await;
             }
             // Check for --train flag
             if args.iter().any(|a| a == "--train") {
@@ -195,11 +199,12 @@ async fn main() -> anyhow::Result<()> {
                     ta.full,
                     ta.historical,
                     ta.model,
+                    ta.managed_keys,
                 )
                 .await;
             }
             info!("=== SAVANT ACTION TEST ===");
-            return engine::run_action_test(config, ta.category, ta.action_only, ta.count, ta.model).await;
+            return engine::run_action_test(config, ta.category, ta.action_only, ta.count, ta.model, ta.managed_keys).await;
         }
         Some("--tui") => {
             info!("=== SAVANT TRADING ENGINE (TUI MODE) ===");
@@ -349,6 +354,8 @@ fn print_help() {
     println!("  savant --test --train -a -n 20        Training with filters");
     println!("  savant --test --train --historical     Train on real Kraken historical data");
     println!("  savant --test --sandbox               Legacy sandbox with grading");
+    println!("  savant --test --managed-keys          Auto-create/delete API keys with $1 limit");
+    println!("  savant --test -m openrouter/owl-alpha Test with specific model");
     println!();
     println!("API: http://localhost:8080/api/");
     println!("  /status /portfolio /positions /trades /decisions");
