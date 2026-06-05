@@ -48,8 +48,12 @@ firebase-debug.log
 .firebaserc
 firebase.json
 
-# === Dead scaffold (Next.js, never used) ===
-dashboard/
+# === Dashboard (Next.js) ===
+dashboard/node_modules/
+dashboard/.next/
+dashboard/out/
+
+# === Dead files ===
 dashboard.html
 
 # === Vault ===

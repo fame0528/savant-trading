@@ -1,0 +1,30 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+:root {
+  --bg: #07080d;
+  --bg2: #0b0d16;
+  --panel: rgba(20, 23, 38, 0.55);
+  --panel-solid: #0e1120;
+  --line: rgba(120, 140, 200, 0.12);
+  --line2: rgba(120, 140, 200, 0.22);
+  --txt: #d7def0;
+  --dim: #6b7494;
+  --dimmer: #444c66;
+  --cyan: #00fbff;
+  --green: #2bf59a;
+  --red: #ff5470;
+  --amber: #ffb347;
+  --violet: #a98cff;
+  --radius: 4px;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(0,251,255,0.07), transparent 60%),
+    radial-gradient(900px 500px at 0% 110%, rgba(169,140,255,0.06), transparent 55%),
+    var(--bg);
+  color: var(--txt);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
