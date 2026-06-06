@@ -4,6 +4,7 @@
 *.key
 *.pem
 credentials.json
+API-KEYS.md
 
 # === Agent runtime state ===
 dev/session-summaries/
@@ -35,6 +36,12 @@ tick_candles_*.json
 dev/*.json
 dev/*.csv
 
+# === Sandbox test artifacts ===
+data/sandbox_*
+data/sandbox_reports/
+data/model-comparison-*.md
+data/test_memory.db*
+
 # === Knowledge source books and extracted (large, not code) ===
 knowledge/books/
 knowledge/_backup/
@@ -42,6 +49,12 @@ knowledge/extracted/
 
 # === Raw trade data (100+ CSV files, not code) ===
 trade-data/
+
+# === Research & prompt outputs (not code) ===
+prompt-results/
+DEEP-RESEARCH-PROMPT.md
+MODEL-TRAINING-RESEARCH.md
+LLM Crypto Trading Growth Strategy.md
 
 # === Firebase ===
 firebase-debug.log

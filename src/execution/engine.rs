@@ -67,10 +67,12 @@ pub trait ExecutionEngine: Send + Sync {
     /// Reconcile on-chain token balances with tracked positions.
     /// Returns list of (pair, on_chain_qty, tracked_qty) for discrepancies.
     /// Default: empty list (paper trading has no on-chain state).
-    async fn sync_wallet_positions(
-        &self,
-        _curated_pairs: &[String],
-    ) -> Vec<(String, f64, f64)> {
+    async fn sync_wallet_positions(&self, _curated_pairs: &[String]) -> Vec<(String, f64, f64)> {
         Vec::new()
     }
+
+    /// Register a wallet-recovered position so close_position() can find it.
+    /// Called during wallet sync for positions discovered on-chain but not in the executor.
+    /// Default: no-op (paper trading and Kraken don't need this).
+    fn register_position(&mut self, _id: String, _pos: Position) {}
 }

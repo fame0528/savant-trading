@@ -5,10 +5,10 @@
 //!
 //! Set CMC_API_KEY environment variable to enable.
 
-use async_trait::async_trait;
 use super::CandleSource;
-use crate::core::types::Candle;
 use crate::core::error::ExecutionError;
+use crate::core::types::Candle;
+use async_trait::async_trait;
 
 pub struct CmcSource {
     client: reqwest::Client,
@@ -65,13 +65,14 @@ impl CandleSource for CmcSource {
         _timeframe_minutes: u32,
         _count: u32,
     ) -> Result<Vec<Candle>, ExecutionError> {
-        let _api_key = self.api_key.as_ref().ok_or_else(|| {
-            ExecutionError::Other("CMC_API_KEY not set".into())
-        })?;
+        let _api_key = self
+            .api_key
+            .as_ref()
+            .ok_or_else(|| ExecutionError::Other("CMC_API_KEY not set".into()))?;
 
-        let symbol = self.cmc_symbol(pair).ok_or_else(|| {
-            ExecutionError::Other(format!("No CMC pair mapping for {}", pair))
-        })?;
+        let symbol = self
+            .cmc_symbol(pair)
+            .ok_or_else(|| ExecutionError::Other(format!("No CMC pair mapping for {}", pair)))?;
 
         // CMC v2 OHLCV endpoint
         // Note: The free tier only returns the latest OHLCV snapshot, not historical candles.
@@ -105,12 +106,18 @@ impl CandleSource for CmcSource {
             .map_err(|e| ExecutionError::Other(format!("CMC parse error: {}", e)))?;
 
         // CMC v2 returns data keyed by symbol
-        let data = json["data"].get(&symbol).and_then(|d| d.as_array()).ok_or_else(|| {
-            ExecutionError::Other(format!("CMC response missing data for {}", symbol))
-        })?;
+        let data = json["data"]
+            .get(&symbol)
+            .and_then(|d| d.as_array())
+            .ok_or_else(|| {
+                ExecutionError::Other(format!("CMC response missing data for {}", symbol))
+            })?;
 
         if data.is_empty() {
-            return Err(ExecutionError::Other(format!("CMC: no data for {}", symbol)));
+            return Err(ExecutionError::Other(format!(
+                "CMC: no data for {}",
+                symbol
+            )));
         }
 
         // Use the first entry's latest OHLCV
@@ -120,11 +127,16 @@ impl CandleSource for CmcSource {
         let open = quote["open"].as_f64().unwrap_or(0.0);
         let high = quote["high"].as_f64().unwrap_or(0.0);
         let low = quote["low"].as_f64().unwrap_or(0.0);
-        let close = quote["close"].as_f64().unwrap_or(quote["price"].as_f64().unwrap_or(0.0));
+        let close = quote["close"]
+            .as_f64()
+            .unwrap_or(quote["price"].as_f64().unwrap_or(0.0));
         let volume = quote["volume_24h"].as_f64().unwrap_or(0.0);
 
         if close == 0.0 {
-            return Err(ExecutionError::Other(format!("CMC: zero price for {}", symbol)));
+            return Err(ExecutionError::Other(format!(
+                "CMC: zero price for {}",
+                symbol
+            )));
         }
 
         // CMC only returns a single snapshot candle

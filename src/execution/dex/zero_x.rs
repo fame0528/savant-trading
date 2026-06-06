@@ -8,8 +8,8 @@
 use async_trait::async_trait;
 
 use super::{DexBackend, Quote, SwapParams, SwapTx};
-use alloy_core::primitives::hex;
 use crate::core::error::ExecutionError;
+use alloy_core::primitives::hex;
 
 /// 0x Swap API client (v2).
 pub struct ZeroXBackend {
@@ -39,7 +39,11 @@ impl ZeroXBackend {
     ///
     /// This variant allows injecting a mock HTTP client in tests via
     /// `wiremock`.  Production code should use [`Self::new`].
-    pub fn with_client(api_key: String, client: reqwest::Client, signing_key: k256::ecdsa::SigningKey) -> Self {
+    pub fn with_client(
+        api_key: String,
+        client: reqwest::Client,
+        signing_key: k256::ecdsa::SigningKey,
+    ) -> Self {
         Self {
             api_key,
             client,
@@ -51,7 +55,12 @@ impl ZeroXBackend {
     /// Create a new 0x backend with custom client and base URL.
     ///
     /// Used by tests to route requests to a wiremock server.
-    pub fn with_client_and_url(api_key: String, client: reqwest::Client, base_url: String, signing_key: k256::ecdsa::SigningKey) -> Self {
+    pub fn with_client_and_url(
+        api_key: String,
+        client: reqwest::Client,
+        base_url: String,
+        signing_key: k256::ecdsa::SigningKey,
+    ) -> Self {
         Self {
             api_key,
             client,
@@ -150,11 +159,9 @@ impl ZeroXBackend {
     fn parse_u256(value: &str) -> alloy_core::primitives::U256 {
         let trimmed = value.trim();
         if trimmed.starts_with("0x") || trimmed.starts_with("0X") {
-            alloy_core::primitives::U256::from_str_radix(trimmed, 16)
-                .unwrap_or_default()
+            alloy_core::primitives::U256::from_str_radix(trimmed, 16).unwrap_or_default()
         } else {
-            alloy_core::primitives::U256::from_str_radix(trimmed, 10)
-                .unwrap_or_default()
+            alloy_core::primitives::U256::from_str_radix(trimmed, 10).unwrap_or_default()
         }
     }
 
@@ -171,9 +178,9 @@ impl ZeroXBackend {
         );
 
         // Parse the EIP-712 typed data from the permit2 object
-        let eip712 = permit2.get("eip712").ok_or_else(|| {
-            ExecutionError::Other("0x permit2 missing 'eip712' field".into())
-        })?;
+        let eip712 = permit2
+            .get("eip712")
+            .ok_or_else(|| ExecutionError::Other("0x permit2 missing 'eip712' field".into()))?;
 
         // Parse domain separator
         let domain = eip712.get("domain").ok_or_else(|| {
@@ -186,7 +193,10 @@ impl ZeroXBackend {
         })?;
 
         // Verify spender is the 0x Exchange Proxy
-        let spender = message.get("spender").and_then(|v| v.as_str()).unwrap_or("");
+        let spender = message
+            .get("spender")
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
         const EXCHANGE_PROXY: &str = "0xfeea2a79d7d3d36753c8917af744d71f13c9b02a";
         if !spender.eq_ignore_ascii_case(EXCHANGE_PROXY) {
             tracing::warn!(
@@ -199,7 +209,9 @@ impl ZeroXBackend {
         // Use the pre-computed hash from the 0x API response if available.
         // The API returns permit2.hash which is the EIP-712 hash — sign it directly.
         // If not available, compute it from the EIP-712 typed data.
-        let hash_bytes: [u8; 32] = if let Some(hash_str) = permit2.get("hash").and_then(|h| h.as_str()) {
+        let hash_bytes: [u8; 32] = if let Some(hash_str) =
+            permit2.get("hash").and_then(|h| h.as_str())
+        {
             // API provides pre-computed hash — use it directly
             let hash_hex = hash_str.trim_start_matches("0x");
             let hash_vec = hex::decode(hash_hex)
@@ -212,10 +224,7 @@ impl ZeroXBackend {
             }
             let mut arr = [0u8; 32];
             arr.copy_from_slice(&hash_vec);
-            tracing::debug!(
-                "Permit2: using API-provided hash: 0x{}",
-                hex::encode(arr)
-            );
+            tracing::debug!("Permit2: using API-provided hash: 0x{}", hex::encode(arr));
             arr
         } else {
             // No hash in response — compute from EIP-712 typed data
@@ -266,15 +275,21 @@ impl ZeroXBackend {
     }
 
     /// Compute the EIP-712 domain separator hash.
-    fn compute_domain_separator(&self, domain: &serde_json::Value) -> Result<[u8; 32], ExecutionError> {
+    fn compute_domain_separator(
+        &self,
+        domain: &serde_json::Value,
+    ) -> Result<[u8; 32], ExecutionError> {
         // Parse domain fields
         let name = domain.get("name").and_then(|v| v.as_str()).unwrap_or("");
         let chain_id = domain.get("chainId").and_then(|v| v.as_u64()).unwrap_or(0);
-        let verifying_contract = domain.get("verifyingContract").and_then(|v| v.as_str()).unwrap_or("");
+        let verifying_contract = domain
+            .get("verifyingContract")
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
 
         // Compute domain type hash
         let domain_type_hash = alloy_core::primitives::keccak256(
-            b"EIP712Domain(string name,uint256 chainId,address verifyingContract)"
+            b"EIP712Domain(string name,uint256 chainId,address verifyingContract)",
         );
 
         // Encode domain fields
@@ -282,8 +297,9 @@ impl ZeroXBackend {
         let chain_id_bytes = alloy_core::primitives::U256::from(chain_id).to_be_bytes::<32>();
 
         // Parse address and pad to 32 bytes (left-padded with zeros)
-        let contract_addr = alloy_core::primitives::Address::parse_checksummed(verifying_contract, None)
-            .unwrap_or_default();
+        let contract_addr =
+            alloy_core::primitives::Address::parse_checksummed(verifying_contract, None)
+                .unwrap_or_default();
         let mut contract_bytes = [0u8; 32];
         contract_bytes[12..32].copy_from_slice(contract_addr.as_slice());
 
@@ -303,30 +319,45 @@ impl ZeroXBackend {
         let permitted = message.get("permitted").ok_or_else(|| {
             ExecutionError::Other("Permit2 message missing 'permitted' field".into())
         })?;
-        let token = permitted.get("token").and_then(|v| v.as_str()).unwrap_or("");
-        let amount = permitted.get("amount").and_then(|v| v.as_str()).unwrap_or("0");
+        let token = permitted
+            .get("token")
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
+        let amount = permitted
+            .get("amount")
+            .and_then(|v| v.as_str())
+            .unwrap_or("0");
 
         // Parse nonce and deadline
         let nonce = message.get("nonce").and_then(|v| v.as_str()).unwrap_or("0");
-        let deadline = message.get("deadline").and_then(|v| v.as_str()).unwrap_or("0");
-        let spender = message.get("spender").and_then(|v| v.as_str()).unwrap_or("");
+        let deadline = message
+            .get("deadline")
+            .and_then(|v| v.as_str())
+            .unwrap_or("0");
+        let spender = message
+            .get("spender")
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
 
         tracing::debug!(
             "Permit2 struct: token={}, amount={}, nonce={}, deadline={}, spender={}",
-            token, amount, nonce, deadline, spender
+            token,
+            amount,
+            nonce,
+            deadline,
+            spender
         );
 
         // Compute type hashes
         let permit_type_hash = alloy_core::primitives::keccak256(
             b"PermitTransferFrom(TokenPermissions permitted,address spender,uint256 nonce,uint256 deadline)TokenPermissions(address token,uint256 amount)"
         );
-        let token_permissions_type_hash = alloy_core::primitives::keccak256(
-            b"TokenPermissions(address token,uint256 amount)"
-        );
+        let token_permissions_type_hash =
+            alloy_core::primitives::keccak256(b"TokenPermissions(address token,uint256 amount)");
 
         // Encode token permissions
-        let token_addr = alloy_core::primitives::Address::parse_checksummed(token, None)
-            .unwrap_or_default();
+        let token_addr =
+            alloy_core::primitives::Address::parse_checksummed(token, None).unwrap_or_default();
         let mut token_bytes = [0u8; 32];
         token_bytes[12..32].copy_from_slice(token_addr.as_slice());
 
@@ -339,9 +370,12 @@ impl ZeroXBackend {
         let permitted_hash = alloy_core::primitives::keccak256(&permitted_encoded);
 
         // Parse spender (the 0x Exchange Proxy)
-        let spender = message.get("spender").and_then(|v| v.as_str()).unwrap_or("");
-        let spender_addr = alloy_core::primitives::Address::parse_checksummed(spender, None)
-            .unwrap_or_default();
+        let spender = message
+            .get("spender")
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
+        let spender_addr =
+            alloy_core::primitives::Address::parse_checksummed(spender, None).unwrap_or_default();
         let mut spender_bytes = [0u8; 32];
         spender_bytes[12..32].copy_from_slice(spender_addr.as_slice());
 
@@ -386,7 +420,10 @@ impl DexBackend for ZeroXBackend {
         })
     }
 
-    async fn check_liquidity(&self, params: &SwapParams) -> Result<super::LiquidityCheck, ExecutionError> {
+    async fn check_liquidity(
+        &self,
+        params: &SwapParams,
+    ) -> Result<super::LiquidityCheck, ExecutionError> {
         match self.lookup(params, "price").await {
             Ok(json) => {
                 let available = json["liquidityAvailable"].as_bool().unwrap_or(false);
@@ -395,15 +432,23 @@ impl DexBackend for ZeroXBackend {
 
                 // Extract token metadata — tax info for honeypot detection
                 let buy_tax = json["tokenMetadata"]["buyToken"]["buyTaxBps"]
-                    .as_str().unwrap_or("0")
-                    .parse::<u32>().unwrap_or(0);
+                    .as_str()
+                    .unwrap_or("0")
+                    .parse::<u32>()
+                    .unwrap_or(0);
                 let sell_tax = json["tokenMetadata"]["sellToken"]["sellTaxBps"]
-                    .as_str().unwrap_or("0")
-                    .parse::<u32>().unwrap_or(0);
+                    .as_str()
+                    .unwrap_or("0")
+                    .parse::<u32>()
+                    .unwrap_or(0);
 
                 // Check issues — balance and allowance
-                let balance_ok = json["issues"]["balance"].as_object().is_none_or(|b| b.is_empty());
-                let allowance_ok = json["issues"]["allowance"].as_object().is_none_or(|a| a.is_empty());
+                let balance_ok = json["issues"]["balance"]
+                    .as_object()
+                    .is_none_or(|b| b.is_empty());
+                let allowance_ok = json["issues"]["allowance"]
+                    .as_object()
+                    .is_none_or(|a| a.is_empty());
 
                 Ok(super::LiquidityCheck {
                     available: available && buy_amount != "0",
@@ -506,6 +551,21 @@ impl DexBackend for ZeroXBackend {
             gas_price,
         })
     }
+
+    async fn build_gasless_swap_tx(
+        &self,
+        params: &SwapParams,
+    ) -> Result<super::GaslessSwapResult, ExecutionError> {
+        self.build_gasless_swap_tx_impl(params).await
+    }
+
+    async fn poll_gasless_status(
+        &self,
+        trade_hash: &str,
+        chain_id: u64,
+    ) -> Result<super::GaslessStatus, ExecutionError> {
+        self.poll_gasless_status_impl(trade_hash, chain_id).await
+    }
 }
 
 impl ZeroXBackend {
@@ -515,41 +575,58 @@ impl ZeroXBackend {
     /// and no ETH for gas needed. Gas is deducted from the swap output.
     ///
     /// Flow: GET /gasless/quote → sign approval + trade EIP-712 → POST /gasless/submit
-    pub async fn build_gasless_swap_tx(&self, params: &SwapParams) -> Result<GaslessSwapResult, ExecutionError> {
+    pub async fn build_gasless_swap_tx_impl(
+        &self,
+        params: &SwapParams,
+    ) -> Result<GaslessSwapResult, ExecutionError> {
         // 1. Get gasless quote
         let base_url = self.api_url(params.chain_id);
         let slippage_bps = (params.slippage * 10000.0) as u64;
         let gasless_url = base_url.replace("/swap/permit2", "/gasless");
-        let url = format!(
+        let url =
+            format!(
             "{}/quote?chainId={}&sellToken={}&buyToken={}&sellAmount={}&taker={}&slippageBps={}",
             gasless_url, params.chain_id, params.src_token, params.dst_token,
             params.amount, params.from, slippage_bps,
         );
 
-        let resp = self.client.get(&url)
+        let resp = self
+            .client
+            .get(&url)
             .header("0x-api-key", &self.api_key)
             .header("0x-version", "v2")
-            .send().await
+            .send()
+            .await
             .map_err(|e| ExecutionError::Other(format!("Gasless quote request failed: {}", e)))?;
 
         if !resp.status().is_success() {
             let status = resp.status();
             let body = resp.text().await.unwrap_or_default();
-            return Err(ExecutionError::Other(format!("Gasless quote returned {}: {}", status, body)));
+            return Err(ExecutionError::Other(format!(
+                "Gasless quote returned {}: {}",
+                status, body
+            )));
         }
 
-        let json: serde_json::Value = resp.json().await
+        let json: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| ExecutionError::Other(format!("Gasless quote parse failed: {}", e)))?;
 
         // 2. Sign approval EIP-712 (if present)
         let approval_sig = if let Some(approval) = json.get("approval") {
             if approval.get("type").and_then(|t| t.as_str()) == Some("permit") {
-                let hash = approval.get("hash").and_then(|h| h.as_str())
+                let hash = approval
+                    .get("hash")
+                    .and_then(|h| h.as_str())
                     .ok_or_else(|| ExecutionError::Other("Gasless approval missing hash".into()))?;
                 let hash_bytes = hex::decode(hash.trim_start_matches("0x"))
                     .map_err(|e| ExecutionError::Other(format!("Invalid approval hash: {}", e)))?;
                 if hash_bytes.len() != 32 {
-                    return Err(ExecutionError::Other(format!("Approval hash must be 32 bytes, got {}", hash_bytes.len())));
+                    return Err(ExecutionError::Other(format!(
+                        "Approval hash must be 32 bytes, got {}",
+                        hash_bytes.len()
+                    )));
                 }
                 let mut arr = [0u8; 32];
                 arr.copy_from_slice(&hash_bytes);
@@ -562,13 +639,20 @@ impl ZeroXBackend {
         };
 
         // 3. Sign trade EIP-712
-        let trade = json.get("trade").ok_or_else(|| ExecutionError::Other("Gasless response missing trade".into()))?;
-        let trade_hash = trade.get("hash").and_then(|h| h.as_str())
+        let trade = json
+            .get("trade")
+            .ok_or_else(|| ExecutionError::Other("Gasless response missing trade".into()))?;
+        let trade_hash = trade
+            .get("hash")
+            .and_then(|h| h.as_str())
             .ok_or_else(|| ExecutionError::Other("Gasless trade missing hash".into()))?;
         let trade_hash_bytes = hex::decode(trade_hash.trim_start_matches("0x"))
             .map_err(|e| ExecutionError::Other(format!("Invalid trade hash: {}", e)))?;
         if trade_hash_bytes.len() != 32 {
-            return Err(ExecutionError::Other(format!("Trade hash must be 32 bytes, got {}", trade_hash_bytes.len())));
+            return Err(ExecutionError::Other(format!(
+                "Trade hash must be 32 bytes, got {}",
+                trade_hash_bytes.len()
+            )));
         }
         let mut trade_arr = [0u8; 32];
         trade_arr.copy_from_slice(&trade_hash_bytes);
@@ -593,23 +677,32 @@ impl ZeroXBackend {
 
         // 5. Submit
         let submit_url = format!("{}/submit", gasless_url);
-        let submit_resp = self.client.post(&submit_url)
+        let submit_resp = self
+            .client
+            .post(&submit_url)
             .header("0x-api-key", &self.api_key)
             .header("0x-version", "v2")
             .json(&submit_body)
-            .send().await
+            .send()
+            .await
             .map_err(|e| ExecutionError::Other(format!("Gasless submit failed: {}", e)))?;
 
         if !submit_resp.status().is_success() {
             let status = submit_resp.status();
             let body = submit_resp.text().await.unwrap_or_default();
-            return Err(ExecutionError::Other(format!("Gasless submit returned {}: {}", status, body)));
+            return Err(ExecutionError::Other(format!(
+                "Gasless submit returned {}: {}",
+                status, body
+            )));
         }
 
-        let submit_json: serde_json::Value = submit_resp.json().await
+        let submit_json: serde_json::Value = submit_resp
+            .json()
+            .await
             .map_err(|e| ExecutionError::Other(format!("Gasless submit parse failed: {}", e)))?;
 
-        let trade_hash = submit_json["tradeHash"].as_str()
+        let trade_hash = submit_json["tradeHash"]
+            .as_str()
             .ok_or_else(|| ExecutionError::Other("Gasless submit missing tradeHash".into()))?;
 
         Ok(GaslessSwapResult {
@@ -623,7 +716,8 @@ impl ZeroXBackend {
     fn sign_hash(&self, hash: [u8; 32]) -> Result<serde_json::Value, ExecutionError> {
         use k256::ecdsa::{RecoveryId, Signature};
 
-        let (signature, recid): (Signature, RecoveryId) = self.signing_key
+        let (signature, recid): (Signature, RecoveryId) = self
+            .signing_key
             .sign_prehash_recoverable(&hash)
             .map_err(|e| ExecutionError::Other(format!("Signing failed: {}", e)))?;
 
@@ -640,22 +734,30 @@ impl ZeroXBackend {
     }
 
     /// Poll gasless trade status until confirmed or timeout.
-    pub async fn poll_gasless_status(&self, trade_hash: &str, chain_id: u64) -> Result<GaslessStatus, ExecutionError> {
+    pub async fn poll_gasless_status_impl(
+        &self,
+        trade_hash: &str,
+        chain_id: u64,
+    ) -> Result<GaslessStatus, ExecutionError> {
         let gasless_url = self.api_url(chain_id).replace("/swap/permit2", "/gasless");
         let status_url = format!("{}/status/{}", gasless_url, trade_hash);
         let max_attempts = 30;
         let mut delay_ms = 1000u64;
 
         for _ in 0..max_attempts {
-            let resp = self.client.get(&status_url)
+            let resp = self
+                .client
+                .get(&status_url)
                 .header("0x-api-key", &self.api_key)
                 .header("0x-version", "v2")
-                .send().await
+                .send()
+                .await
                 .map_err(|e| ExecutionError::Other(format!("Gasless status poll failed: {}", e)))?;
 
             if resp.status().is_success() {
-                let json: serde_json::Value = resp.json().await
-                    .map_err(|e| ExecutionError::Other(format!("Gasless status parse failed: {}", e)))?;
+                let json: serde_json::Value = resp.json().await.map_err(|e| {
+                    ExecutionError::Other(format!("Gasless status parse failed: {}", e))
+                })?;
 
                 let status = json["status"].as_str().unwrap_or("pending");
                 match status {
@@ -664,7 +766,10 @@ impl ZeroXBackend {
                         return Ok(GaslessStatus::Confirmed(tx_hash.to_string()));
                     }
                     "failed" => {
-                        return Ok(GaslessStatus::Failed(format!("Gasless trade failed: {}", json)));
+                        return Ok(GaslessStatus::Failed(format!(
+                            "Gasless trade failed: {}",
+                            json
+                        )));
                     }
                     _ => {
                         tokio::time::sleep(std::time::Duration::from_millis(delay_ms)).await;
@@ -693,33 +798,49 @@ impl ZeroXBackend {
             params.amount, params.from, params.slippage_bps,
         );
 
-        let resp = self.client.get(&url)
+        let resp = self
+            .client
+            .get(&url)
             .header("0x-api-key", &self.api_key)
-            .send().await
+            .send()
+            .await
             .map_err(|e| ExecutionError::Other(format!("Cross-chain quote failed: {}", e)))?;
 
         if !resp.status().is_success() {
             let status = resp.status();
             let body = resp.text().await.unwrap_or_default();
-            return Err(ExecutionError::Other(format!("Cross-chain quote returned {}: {}", status, body)));
+            return Err(ExecutionError::Other(format!(
+                "Cross-chain quote returned {}: {}",
+                status, body
+            )));
         }
 
-        let json: serde_json::Value = resp.json().await
+        let json: serde_json::Value = resp
+            .json()
+            .await
             .map_err(|e| ExecutionError::Other(format!("Cross-chain quote parse failed: {}", e)))?;
 
         if !json["liquidityAvailable"].as_bool().unwrap_or(false) {
-            return Err(ExecutionError::Other("Cross-chain: no liquidity available".into()));
+            return Err(ExecutionError::Other(
+                "Cross-chain: no liquidity available".into(),
+            ));
         }
 
         let quote = json["quotes"][0].clone();
         let tx = quote["transaction"]["details"].clone();
 
-        let to = tx["to"].as_str()
+        let to = tx["to"]
+            .as_str()
             .ok_or_else(|| ExecutionError::Other("Cross-chain response missing 'to'".into()))?;
-        let data = tx["data"].as_str()
+        let data = tx["data"]
+            .as_str()
             .ok_or_else(|| ExecutionError::Other("Cross-chain response missing 'data'".into()))?;
         let value = tx["value"].as_str().unwrap_or("0");
-        let gas = tx["gas"].as_str().unwrap_or("300000").parse::<u64>().unwrap_or(300_000);
+        let gas = tx["gas"]
+            .as_str()
+            .unwrap_or("300000")
+            .parse::<u64>()
+            .unwrap_or(300_000);
 
         let buy_amount = quote["buyAmount"].as_str().unwrap_or("0").to_string();
         let min_buy_amount = quote["minBuyAmount"].as_str().unwrap_or("0").to_string();
@@ -752,26 +873,36 @@ impl ZeroXBackend {
         let mut delay_ms = 3000u64;
 
         for _ in 0..max_attempts {
-            let resp = self.client.get(&url)
+            let resp = self
+                .client
+                .get(&url)
                 .header("0x-api-key", &self.api_key)
-                .send().await
-                .map_err(|e| ExecutionError::Other(format!("Cross-chain status poll failed: {}", e)))?;
+                .send()
+                .await
+                .map_err(|e| {
+                    ExecutionError::Other(format!("Cross-chain status poll failed: {}", e))
+                })?;
 
             if resp.status().is_success() {
-                let json: serde_json::Value = resp.json().await
-                    .map_err(|e| ExecutionError::Other(format!("Cross-chain status parse failed: {}", e)))?;
+                let json: serde_json::Value = resp.json().await.map_err(|e| {
+                    ExecutionError::Other(format!("Cross-chain status parse failed: {}", e))
+                })?;
 
                 let status = json["status"].as_str().unwrap_or("pending");
                 match status {
                     "bridge_filled" | "succeeded" | "confirmed" => {
-                        let dest_tx = json["transactions"].as_array()
+                        let dest_tx = json["transactions"]
+                            .as_array()
                             .and_then(|txs| txs.last())
                             .and_then(|tx| tx["txHash"].as_str())
                             .unwrap_or("");
                         return Ok(CrossChainStatus::Completed(dest_tx.to_string()));
                     }
                     "bridge_failed" | "failed" => {
-                        return Ok(CrossChainStatus::Failed(format!("Bridge failed: {}", json["failure"])));
+                        return Ok(CrossChainStatus::Failed(format!(
+                            "Bridge failed: {}",
+                            json["failure"]
+                        )));
                     }
                     _ => {
                         tokio::time::sleep(std::time::Duration::from_millis(delay_ms)).await;
@@ -781,24 +912,18 @@ impl ZeroXBackend {
             }
         }
 
-        Err(ExecutionError::Other("Cross-chain status poll timeout (3 min)".into()))
+        Err(ExecutionError::Other(
+            "Cross-chain status poll timeout (3 min)".into(),
+        ))
     }
 }
 
 /// Result of a gasless swap submission.
-#[derive(Debug, Clone)]
-pub struct GaslessSwapResult {
-    pub trade_hash: String,
-    pub buy_amount: String,
-    pub min_buy_amount: String,
-}
+/// Result of a gasless swap submission (re-exported from mod.rs).
+pub use super::GaslessSwapResult;
 
-/// Status of a gasless trade.
-#[derive(Debug, Clone)]
-pub enum GaslessStatus {
-    Confirmed(String),  // tx hash
-    Failed(String),     // error
-}
+/// Status of a gasless trade (re-exported from mod.rs).
+pub use super::GaslessStatus;
 
 /// Parameters for a cross-chain swap quote.
 #[derive(Debug, Clone)]
@@ -829,8 +954,8 @@ pub struct CrossChainSwapResult {
 /// Status of a cross-chain swap.
 #[derive(Debug, Clone)]
 pub enum CrossChainStatus {
-    Completed(String),  // destination tx hash
-    Failed(String),     // error
+    Completed(String), // destination tx hash
+    Failed(String),    // error
 }
 
 #[cfg(test)]

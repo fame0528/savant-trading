@@ -8,7 +8,7 @@ use axum::{
     http::header,
     middleware,
     response::Json,
-    routing::{get, post},
+    routing::{get, patch, post},
     Router,
 };
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -85,18 +85,28 @@ pub async fn start_server(
         engine_running,
         engine_child: Arc::new(Mutex::new(None)),
         // Start timer immediately when engine is already running (e.g. `serve` command).
-        engine_started_at: Arc::new(Mutex::new(
-            if already_running { Some(Instant::now()) } else { None }
-        )),
+        engine_started_at: Arc::new(Mutex::new(if already_running {
+            Some(Instant::now())
+        } else {
+            None
+        })),
     };
 
     // CORS: allow dashboard origin + localhost fallbacks
     let cors = tower_http::cors::CorsLayer::new()
         .allow_origin([
-            "http://localhost:3000".parse::<axum::http::HeaderValue>().unwrap(),
-            "http://127.0.0.1:3000".parse::<axum::http::HeaderValue>().unwrap(),
-            "http://localhost:8080".parse::<axum::http::HeaderValue>().unwrap(),
-            "http://127.0.0.1:8080".parse::<axum::http::HeaderValue>().unwrap(),
+            "http://localhost:3000"
+                .parse::<axum::http::HeaderValue>()
+                .unwrap(),
+            "http://127.0.0.1:3000"
+                .parse::<axum::http::HeaderValue>()
+                .unwrap(),
+            "http://localhost:8080"
+                .parse::<axum::http::HeaderValue>()
+                .unwrap(),
+            "http://127.0.0.1:8080"
+                .parse::<axum::http::HeaderValue>()
+                .unwrap(),
         ])
         .allow_methods(tower_http::cors::Any)
         .allow_headers(vec![
@@ -126,6 +136,7 @@ pub async fn start_server(
         .route("/api/engine/start", post(start_engine))
         .route("/api/engine/stop", post(stop_engine))
         .route("/api/engine/restart", post(restart_engine))
+        .route("/api/positions/{pair}/stop", patch(update_stop))
         .route("/api/terminal", get(terminal_ws))
         .with_state(state)
         .layer(cors)
@@ -400,7 +411,9 @@ async fn get_memory(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
     })))
 }
 
-async fn get_equity_curve(State(state): State<AppState>) -> Json<ApiResponse<Vec<serde_json::Value>>> {
+async fn get_equity_curve(
+    State(state): State<AppState>,
+) -> Json<ApiResponse<Vec<serde_json::Value>>> {
     let curve = state.shared.equity_curve.read().await;
     Json(ApiResponse::ok(curve.clone()))
 }
@@ -460,11 +473,7 @@ async fn start_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_j
                     Err(e) => format!("error ({})", e),
                 };
                 if let Some(pid) = watchdog_child_id {
-                    tracing::warn!(
-                        "Engine process {} exited: {:?}",
-                        pid,
-                        exit_code
-                    );
+                    tracing::warn!("Engine process {} exited: {:?}", pid, exit_code);
                 }
             });
 
@@ -525,10 +534,65 @@ async fn restart_engine(State(state): State<AppState>) -> Json<ApiResponse<serde
     start_engine(State(state)).await
 }
 
+#[derive(Debug, Deserialize)]
+struct UpdateStopRequest {
+    stop_loss: f64,
+}
+
+/// PATCH /api/positions/:pair/stop — update stop-loss on a running position.
+/// Writes to shared stop_overrides; engine applies on next cycle.
+async fn update_stop(
+    State(state): State<AppState>,
+    Path(pair): Path<String>,
+    Json(body): Json<UpdateStopRequest>,
+) -> Json<ApiResponse<serde_json::Value>> {
+    if body.stop_loss <= 0.0 {
+        return Json(ApiResponse {
+            data: serde_json::json!(null),
+            error: Some("stop_loss must be > 0".to_string()),
+            timestamp: chrono::Utc::now().to_rfc3339(),
+        });
+    }
+
+    // Normalize pair: accept "LINK/USD" or "LINK_USD"
+    let normalized = pair.replace('_', "/").to_uppercase();
+
+    // Validate position exists
+    let positions = state.shared.positions.read().await;
+    let found = positions.iter().any(|p| p.pair == normalized);
+    drop(positions);
+
+    if !found {
+        return Json(ApiResponse {
+            data: serde_json::json!(null),
+            error: Some(format!("No open position for {}", normalized)),
+            timestamp: chrono::Utc::now().to_rfc3339(),
+        });
+    }
+
+    // Write override — engine picks it up next cycle
+    let mut overrides = state.shared.stop_overrides.write().await;
+    overrides.insert(normalized.clone(), body.stop_loss);
+
+    info!(
+        "Stop override queued: {} → ${:.4}",
+        normalized, body.stop_loss
+    );
+    Json(ApiResponse::ok(serde_json::json!({
+        "pair": normalized,
+        "new_stop_loss": body.stop_loss,
+        "status": "queued",
+        "message": "Engine will apply on next cycle"
+    })))
+}
+
 /// Health check endpoint for load balancers / Docker.
 async fn health(State(state): State<AppState>) -> Json<serde_json::Value> {
     let running = state.engine_running.load(Ordering::Relaxed);
-    let uptime = state.engine_started_at.lock().unwrap()
+    let uptime = state
+        .engine_started_at
+        .lock()
+        .unwrap()
         .map(|i| i.elapsed().as_secs())
         .unwrap_or(0);
 
@@ -567,9 +631,8 @@ async fn get_wallet(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
     let eth_balance = query_eth_balance(rpc_url, &address).await.unwrap_or(0.0);
 
     // Query USDC balance
-    let usdc_contract = savant_trading::execution::dex::usdc_address_for_chain(
-        state.config.exchange.dex.chain_id,
-    );
+    let usdc_contract =
+        savant_trading::execution::dex::usdc_address_for_chain(state.config.exchange.dex.chain_id);
     let usdc_balance = query_erc20_balance(rpc_url, usdc_contract, &address)
         .await
         .unwrap_or(0.0);
@@ -585,18 +648,21 @@ async fn get_wallet(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
 
 /// Derive wallet address from private key hex.
 fn derive_wallet_address(private_key_hex: &str) -> Result<String, String> {
-    use alloy_core::primitives::{Address, Keccak256, hex};
+    use alloy_core::primitives::{hex, Address, Keccak256};
     use k256::ecdsa::SigningKey;
 
     let hex_key = private_key_hex.trim_start_matches("0x");
     let key_bytes = hex::decode(hex_key).map_err(|e| format!("Invalid hex: {}", e))?;
-    let signing_key = SigningKey::from_slice(&key_bytes).map_err(|e| format!("Invalid key: {}", e))?;
+    let signing_key =
+        SigningKey::from_slice(&key_bytes).map_err(|e| format!("Invalid key: {}", e))?;
     let verifying_key = signing_key.verifying_key();
     let encoded = verifying_key.to_encoded_point(false).to_bytes().to_vec();
     let mut hasher = Keccak256::new();
     hasher.update(&encoded[1..]);
     let hash = hasher.finalize();
-    let addr_bytes: [u8; 20] = hash[12..32].try_into().map_err(|_| "Failed to derive address".to_string())?;
+    let addr_bytes: [u8; 20] = hash[12..32]
+        .try_into()
+        .map_err(|_| "Failed to derive address".to_string())?;
     let address = Address::from(addr_bytes);
     Ok(format!("{:#x}", address))
 }
@@ -610,10 +676,15 @@ async fn query_eth_balance(rpc_url: &str, address: &str) -> Result<f64, String> 
         "method": "eth_getBalance",
         "params": [address, "latest"]
     });
-    let resp: serde_json::Value = client.post(rpc_url)
+    let resp: serde_json::Value = client
+        .post(rpc_url)
         .json(&body)
-        .send().await.map_err(|e| e.to_string())?
-        .json().await.map_err(|e| e.to_string())?;
+        .send()
+        .await
+        .map_err(|e| e.to_string())?
+        .json()
+        .await
+        .map_err(|e| e.to_string())?;
 
     if let Some(hex) = resp.get("result").and_then(|r| r.as_str()) {
         let wei = alloy_core::primitives::U256::from_str_radix(hex.trim_start_matches("0x"), 16)
@@ -626,7 +697,11 @@ async fn query_eth_balance(rpc_url: &str, address: &str) -> Result<f64, String> 
 }
 
 /// Query ERC-20 token balance via balanceOf(address).
-async fn query_erc20_balance(rpc_url: &str, token_address: &str, wallet: &str) -> Result<f64, String> {
+async fn query_erc20_balance(
+    rpc_url: &str,
+    token_address: &str,
+    wallet: &str,
+) -> Result<f64, String> {
     let client = reqwest::Client::new();
     // balanceOf(address) selector: 0x70a08231
     let addr_clean = wallet.trim_start_matches("0x");
@@ -637,10 +712,15 @@ async fn query_erc20_balance(rpc_url: &str, token_address: &str, wallet: &str) -
         "method": "eth_call",
         "params": [{"to": token_address, "data": padded}, "latest"]
     });
-    let resp: serde_json::Value = client.post(rpc_url)
+    let resp: serde_json::Value = client
+        .post(rpc_url)
         .json(&body)
-        .send().await.map_err(|e| e.to_string())?
-        .json().await.map_err(|e| e.to_string())?;
+        .send()
+        .await
+        .map_err(|e| e.to_string())?
+        .json()
+        .await
+        .map_err(|e| e.to_string())?;
 
     if let Some(hex) = resp.get("result").and_then(|r| r.as_str()) {
         let raw = alloy_core::primitives::U256::from_str_radix(hex.trim_start_matches("0x"), 16)
@@ -663,7 +743,8 @@ async fn auth_middleware(
         return next.run(req).await;
     }
 
-    let auth = req.headers()
+    let auth = req
+        .headers()
         .get(header::AUTHORIZATION)
         .and_then(|v| v.to_str().ok())
         .unwrap_or("");
@@ -786,10 +867,7 @@ async fn terminal_ws(
     ws.on_upgrade(move |socket| handle_terminal(socket, state))
 }
 
-async fn handle_terminal(
-    socket: axum::extract::ws::WebSocket,
-    _state: AppState,
-) {
+async fn handle_terminal(socket: axum::extract::ws::WebSocket, _state: AppState) {
     use axum::extract::ws::Message;
     use futures_util::{SinkExt, StreamExt};
 

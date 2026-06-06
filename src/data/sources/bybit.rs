@@ -5,10 +5,10 @@
 //!
 //! API: GET https://api.bybit.com/v5/market/kline
 
-use async_trait::async_trait;
 use super::CandleSource;
-use crate::core::types::Candle;
 use crate::core::error::ExecutionError;
+use crate::core::types::Candle;
+use async_trait::async_trait;
 
 pub struct BybitSource {
     client: reqwest::Client,
@@ -85,9 +85,9 @@ impl CandleSource for BybitSource {
         timeframe_minutes: u32,
         count: u32,
     ) -> Result<Vec<Candle>, ExecutionError> {
-        let symbol = self.bybit_pair(pair).ok_or_else(|| {
-            ExecutionError::Other(format!("No Bybit pair mapping for {}", pair))
-        })?;
+        let symbol = self
+            .bybit_pair(pair)
+            .ok_or_else(|| ExecutionError::Other(format!("No Bybit pair mapping for {}", pair)))?;
 
         let interval = self.bybit_interval(timeframe_minutes);
         let limit = count.min(1000);
@@ -150,8 +150,8 @@ impl CandleSource for BybitSource {
             let close = arr[4].as_str().unwrap_or("0").parse::<f64>().unwrap_or(0.0);
             let volume = arr[5].as_str().unwrap_or("0").parse::<f64>().unwrap_or(0.0);
 
-            let timestamp = chrono::DateTime::from_timestamp_millis(timestamp_ms)
-                .unwrap_or(chrono::Utc::now());
+            let timestamp =
+                chrono::DateTime::from_timestamp_millis(timestamp_ms).unwrap_or(chrono::Utc::now());
 
             if close == 0.0 && volume == 0.0 {
                 continue;

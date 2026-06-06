@@ -213,7 +213,7 @@ mod tests {
         assert!(result.is_some());
         let ps = result.unwrap();
         assert_eq!(ps.risk_amount, 500.0); // 10% of 5000
-        // Risk-based size = 500/5 = 100 units, but max_position_pct (30% of $5000=$1500) caps at 15
+                                           // Risk-based size = 500/5 = 100 units, but max_position_pct (30% of $5000=$1500) caps at 15
         assert_eq!(ps.quantity, 15.0);
     }
 

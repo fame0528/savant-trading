@@ -87,6 +87,7 @@ export default function Dashboard() {
   const { status, portfolio, positions, trades, decisions, activity, insight, risk, session, memory, config, online } = state;
   const prevTradeCount = useRef(trades.length);
   const prevPosCount = useRef(positions.length);
+  const prevStops = useRef<Record<string, number>>({});
 
   const live = (status?.mode ?? "").toUpperCase() === "LIVE";
   const eq = portfolio?.equity ?? portfolio?.balance ?? 0;
@@ -118,6 +119,21 @@ export default function Dashboard() {
       if (latest) toast.success(`Opened: ${latest.side} ${latest.pair} @ ${fmt.price(latest.entry_price)}`, { icon: "🚀" });
     }
     prevPosCount.current = positions.length;
+  }, [positions]);
+
+  // Detect stop-loss changes on existing positions (manual override or trailing)
+  useEffect(() => {
+    for (const p of positions) {
+      const prev = prevStops.current[p.pair];
+      if (prev !== undefined && Math.abs(prev - p.stop_loss) > 0.0001) {
+        const direction = p.stop_loss > prev ? "Trailed up" : "Tightened";
+        toast(`🛡️ ${direction}: ${p.pair} SL ${fmt.price(prev)} → ${fmt.price(p.stop_loss)}`, {
+          duration: 5000,
+          icon: "🛡️",
+        });
+      }
+      prevStops.current[p.pair] = p.stop_loss;
+    }
   }, [positions]);
 
   useEffect(() => {

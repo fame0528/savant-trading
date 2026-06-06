@@ -1,6 +1,6 @@
-use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Side {
@@ -222,6 +222,8 @@ pub struct Order {
     pub created_at: DateTime<Utc>,
     pub filled_at: Option<DateTime<Utc>>,
     pub filled_price: Option<f64>,
+    /// On-chain transaction hash (DEX swaps only). None for paper/Kraken.
+    pub tx_hash: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -272,12 +274,11 @@ impl AccountState {
     /// equity = cash balance + sum(position market values)
     /// unrealized_pnl = sum(per-position unrealized P&L)
     pub fn refresh_from_positions(&mut self, positions: &HashMap<String, Position>) {
-        let position_values: f64 = positions.values()
+        let position_values: f64 = positions
+            .values()
             .map(|p| p.current_price * p.quantity)
             .sum();
-        self.unrealized_pnl = positions.values()
-            .map(|p| p.unrealized_pnl)
-            .sum();
+        self.unrealized_pnl = positions.values().map(|p| p.unrealized_pnl).sum();
         self.equity = self.balance + position_values;
         self.open_positions = positions.len();
         if self.equity > self.peak_equity {
@@ -370,7 +371,10 @@ mod tests {
     fn refresh_with_long_position_in_profit() {
         let mut acct = AccountState::new(50.0);
         let mut positions = HashMap::new();
-        positions.insert("ETH/USD".into(), make_position("ETH/USD", Side::Long, 100.0, 1.0, 110.0));
+        positions.insert(
+            "ETH/USD".into(),
+            make_position("ETH/USD", Side::Long, 100.0, 1.0, 110.0),
+        );
         acct.refresh_from_positions(&positions);
         // equity = balance + position_market_value = 50 + (110 * 1) = 160
         assert_eq!(acct.equity, 160.0);
@@ -385,12 +389,18 @@ mod tests {
         acct.refresh_from_positions(&positions);
         assert_eq!(acct.peak_equity, 100.0);
 
-        positions.insert("ETH/USD".into(), make_position("ETH/USD", Side::Long, 100.0, 1.0, 120.0));
+        positions.insert(
+            "ETH/USD".into(),
+            make_position("ETH/USD", Side::Long, 100.0, 1.0, 120.0),
+        );
         acct.refresh_from_positions(&positions);
         assert_eq!(acct.peak_equity, 220.0); // 100 + 120
 
         // Price drops — peak should NOT decrease
-        positions.insert("ETH/USD".into(), make_position("ETH/USD", Side::Long, 100.0, 1.0, 105.0));
+        positions.insert(
+            "ETH/USD".into(),
+            make_position("ETH/USD", Side::Long, 100.0, 1.0, 105.0),
+        );
         acct.refresh_from_positions(&positions);
         assert_eq!(acct.peak_equity, 220.0); // unchanged
         assert!(acct.drawdown_pct > 0.0);
@@ -400,12 +410,18 @@ mod tests {
     fn refresh_drawdown_calculation() {
         let mut acct = AccountState::new(100.0);
         let mut positions = HashMap::new();
-        positions.insert("ETH/USD".into(), make_position("ETH/USD", Side::Long, 100.0, 1.0, 200.0));
+        positions.insert(
+            "ETH/USD".into(),
+            make_position("ETH/USD", Side::Long, 100.0, 1.0, 200.0),
+        );
         acct.refresh_from_positions(&positions);
         assert_eq!(acct.peak_equity, 300.0); // 100 + 200
 
         // Price drops 50%: equity = 100 + 100 = 200, DD = (300-200)/300 = 33.3%
-        positions.insert("ETH/USD".into(), make_position("ETH/USD", Side::Long, 100.0, 1.0, 100.0));
+        positions.insert(
+            "ETH/USD".into(),
+            make_position("ETH/USD", Side::Long, 100.0, 1.0, 100.0),
+        );
         acct.refresh_from_positions(&positions);
         assert!((acct.drawdown_pct - 0.333).abs() < 0.01);
     }
@@ -414,7 +430,10 @@ mod tests {
     fn refresh_short_position_pnl() {
         let mut acct = AccountState::new(50.0);
         let mut positions = HashMap::new();
-        positions.insert("BTC/USD".into(), make_position("BTC/USD", Side::Short, 1000.0, 0.01, 900.0));
+        positions.insert(
+            "BTC/USD".into(),
+            make_position("BTC/USD", Side::Short, 1000.0, 0.01, 900.0),
+        );
         acct.refresh_from_positions(&positions);
         // Short profit: (1000 - 900) * 0.01 = 1.0
         assert_eq!(acct.unrealized_pnl, 1.0);

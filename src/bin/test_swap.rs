@@ -2,11 +2,11 @@
 //!
 //! Usage: cargo run --bin test_swap
 
-use savant_trading::execution::dex::zero_x::ZeroXBackend;
-use savant_trading::execution::dex::{SwapParams, DexBackend};
-use alloy_core::primitives::Address;
 use alloy_core::hex;
+use alloy_core::primitives::Address;
 use k256::ecdsa::SigningKey;
+use savant_trading::execution::dex::zero_x::ZeroXBackend;
+use savant_trading::execution::dex::{DexBackend, SwapParams};
 use sha3::{Digest, Keccak256};
 
 #[tokio::main]
@@ -82,13 +82,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let data_bytes = hex::decode(data)?;
             println!("  calldata_bytes: {} bytes", data_bytes.len());
             println!("  calldata_first_4: {}", hex::encode(&data_bytes[..4]));
-            
+
             // Last 65 bytes should be the signature
             if data_bytes.len() > 65 {
                 let sig_start = data_bytes.len() - 65;
-                let r = &data_bytes[sig_start..sig_start+32];
-                let s = &data_bytes[sig_start+32..sig_start+64];
-                let v = data_bytes[sig_start+64];
+                let r = &data_bytes[sig_start..sig_start + 32];
+                let s = &data_bytes[sig_start + 32..sig_start + 64];
+                let v = data_bytes[sig_start + 64];
                 println!("  signature_r: 0x{}", hex::encode(r));
                 println!("  signature_s: 0x{}", hex::encode(s));
                 println!("  signature_v: {}", v);
@@ -115,7 +115,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Also try without the last 65 bytes (Permit2 signature)
     let data_bytes = hex::decode(swap_tx.data.trim_start_matches("0x"))?;
     let data_without_sig = if data_bytes.len() > 65 {
-        hex::encode(&data_bytes[..data_bytes.len()-65])
+        hex::encode(&data_bytes[..data_bytes.len() - 65])
     } else {
         hex::encode(&data_bytes)
     };
@@ -143,10 +143,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "id": 1
     });
 
-    let resp = client.post(&rpc_url)
-        .json(&call_body)
-        .send()
-        .await?;
+    let resp = client.post(&rpc_url).json(&call_body).send().await?;
 
     let json: serde_json::Value = resp.json().await?;
 
@@ -172,10 +169,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "id": 2
     });
 
-    let resp2 = client.post(&rpc_url)
-        .json(&call_body2)
-        .send()
-        .await?;
+    let resp2 = client.post(&rpc_url).json(&call_body2).send().await?;
 
     let json2: serde_json::Value = resp2.json().await?;
 

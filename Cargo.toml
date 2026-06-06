@@ -1,6 +1,6 @@
 [package]
 name = "savant-trading"
-version = "0.9.1"
+version = "0.10.0"
 edition = "2021"
 rust-version = "1.91"
 description = "AI-native autonomous crypto trading engine — Multi-chain DEX (Arbitrum, 0x API)"
@@ -72,6 +72,9 @@ k256 = { version = "0.13", features = ["ecdsa", "std"] }
 sha3 = "0.10"
 # RLP — Ethereum transaction encoding
 rlp = "0.5"
+
+# Regex — universal parser for freeform LLM output
+regex = "1"
 
 [dev-dependencies]
 wiremock = "0.6"

@@ -5,10 +5,10 @@
 //!
 //! API: GET https://min-api.cryptocompare.com/data/v2/histominute
 
-use async_trait::async_trait;
 use super::CandleSource;
-use crate::core::types::Candle;
 use crate::core::error::ExecutionError;
+use crate::core::types::Candle;
+use async_trait::async_trait;
 
 pub struct CryptoCompareSource {
     client: reqwest::Client,
@@ -128,8 +128,8 @@ impl CandleSource for CryptoCompareSource {
             let volume = entry["volumefrom"].as_f64().unwrap_or(0.0);
             let timestamp_secs = entry["time"].as_i64().unwrap_or(0);
 
-            let timestamp = chrono::DateTime::from_timestamp(timestamp_secs, 0)
-                .unwrap_or(chrono::Utc::now());
+            let timestamp =
+                chrono::DateTime::from_timestamp(timestamp_secs, 0).unwrap_or(chrono::Utc::now());
 
             // Skip zero candles
             if close == 0.0 && volume == 0.0 {

@@ -581,6 +581,7 @@ impl ExecutionEngine for PortfolioManager {
             created_at: Utc::now(),
             filled_at: Some(Utc::now()),
             filled_price: Some(fill_price),
+            tx_hash: None,
         };
 
         info!(
@@ -637,6 +638,7 @@ impl ExecutionEngine for PortfolioManager {
             created_at: Utc::now(),
             filled_at: Some(Utc::now()),
             filled_price: Some(pos.current_price),
+            tx_hash: None,
         })
     }
 
@@ -831,5 +833,41 @@ mod tests {
         // SL unchanged
         let pos = trader.positions.get("p1").unwrap();
         assert_eq!(pos.stop_loss, 95.0);
+    }
+
+    #[test]
+    fn stop_close_bridge_data_sufficient() {
+        // FID-061: Verify check_stops() returns data needed for close bridge routing.
+        // The engine uses (pair, side, entry_price) from closed trades to match
+        // positions in executor_position_map. If any field is wrong, the bridge fails.
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
+        let pos = make_position("wallet-recovery-btc_usd", 100.0, 85.0, 110.0, 120.0, 130.0);
+        trader.positions.insert(pos.id.clone(), pos);
+
+        let mut prices = HashMap::new();
+        prices.insert("BTC/USD".to_string(), 84.0);
+
+        let result = trader.check_stops(&prices);
+        assert_eq!(result.closed.len(), 1);
+
+        let closed = &result.closed[0];
+        assert_eq!(closed.pair, "BTC/USD");
+        assert_eq!(closed.side, Side::Long);
+        assert!((closed.entry_price - 100.0).abs() < 0.001);
+        // These three fields are what the engine uses for bridge routing
+    }
+
+    #[test]
+    fn register_position_adds_to_map() {
+        // FID-061: Verify register_position() adds a position that open_positions() returns.
+        use crate::execution::engine::ExecutionEngine;
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
+        let pos = make_position("wallet-recovery-link_usd", 7.19, 6.11, 7.91, 8.63, 9.35);
+
+        // PortfolioManager uses default no-op — register_position should be a no-op
+        trader.register_position("exec-wallet-recovery-link_usd".to_string(), pos.clone());
+
+        // PortfolioManager positions should NOT be affected (default no-op)
+        assert_eq!(trader.open_positions().len(), 0);
     }
 }

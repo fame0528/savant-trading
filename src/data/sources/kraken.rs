@@ -2,11 +2,11 @@
 //!
 //! Wraps the existing KrakenClient to implement the CandleSource trait.
 
-use async_trait::async_trait;
 use super::CandleSource;
-use crate::core::types::Candle;
 use crate::core::error::ExecutionError;
+use crate::core::types::Candle;
 use crate::data::kraken::KrakenClient;
+use async_trait::async_trait;
 
 pub struct KrakenSource {
     client: KrakenClient,
@@ -36,7 +36,8 @@ impl CandleSource for KrakenSource {
         timeframe_minutes: u32,
         count: u32,
     ) -> Result<Vec<Candle>, ExecutionError> {
-        let mut candles = self.client
+        let mut candles = self
+            .client
             .get_ohlc(pair, timeframe_minutes, None)
             .await
             .map_err(|e| ExecutionError::Other(format!("Kraken OHLC error: {}", e)))?;

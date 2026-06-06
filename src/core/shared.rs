@@ -1,5 +1,6 @@
 //! Shared engine state for cross-module access (API, TUI, engine).
 
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -17,6 +18,9 @@ pub struct SharedEngineData {
     pub activity_log: Arc<RwLock<Vec<ActivityEntry>>>,
     pub memory_snapshot: Arc<RwLock<MemorySnapshot>>,
     pub equity_curve: Arc<RwLock<Vec<serde_json::Value>>>,
+    /// Stop-loss overrides from API — pair → new stop price.
+    /// Engine reads and applies these each cycle, then clears them.
+    pub stop_overrides: Arc<RwLock<HashMap<String, f64>>>,
 }
 
 /// Memory system state for TUI display.
@@ -90,6 +94,7 @@ impl SharedEngineData {
                 replay_lesson_count: 0,
             })),
             equity_curve: Arc::new(RwLock::new(Vec::new())),
+            stop_overrides: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 

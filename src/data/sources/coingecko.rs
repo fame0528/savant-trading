@@ -8,10 +8,10 @@
 //!   - 2-90 days: hourly candles
 //!   - 90+ days: daily candles
 
-use async_trait::async_trait;
 use super::CandleSource;
-use crate::core::types::Candle;
 use crate::core::error::ExecutionError;
+use crate::core::types::Candle;
+use async_trait::async_trait;
 
 pub struct CoinGeckoSource {
     client: reqwest::Client,
@@ -143,14 +143,14 @@ impl CandleSource for CoinGeckoSource {
         timeframe_minutes: u32,
         count: u32,
     ) -> Result<Vec<Candle>, ExecutionError> {
-        let coin_id = self.coin_id(pair).ok_or_else(|| {
-            ExecutionError::Other(format!("No CoinGecko ID for {}", pair))
-        })?;
+        let coin_id = self
+            .coin_id(pair)
+            .ok_or_else(|| ExecutionError::Other(format!("No CoinGecko ID for {}", pair)))?;
 
         // Use market_chart endpoint — gives 5m candles for 1 day
         let days = match timeframe_minutes {
-            1..=5 => 1,    // 5m candles (288 for 1 day)
-            6..=60 => 7,   // hourly candles (168 for 7 days)
+            1..=5 => 1,  // 5m candles (288 for 1 day)
+            6..=60 => 7, // hourly candles (168 for 7 days)
             _ => 1,
         };
 
@@ -203,12 +203,22 @@ impl CandleSource for CoinGeckoSource {
 
             let open = chunk[0][1].as_f64().unwrap_or(0.0);
             let close = chunk[group_size - 1][1].as_f64().unwrap_or(0.0);
-            let high = chunk.iter().map(|p| p[1].as_f64().unwrap_or(0.0)).fold(f64::NEG_INFINITY, f64::max);
-            let low = chunk.iter().map(|p| p[1].as_f64().unwrap_or(0.0)).fold(f64::INFINITY, f64::min);
+            let high = chunk
+                .iter()
+                .map(|p| p[1].as_f64().unwrap_or(0.0))
+                .fold(f64::NEG_INFINITY, f64::max);
+            let low = chunk
+                .iter()
+                .map(|p| p[1].as_f64().unwrap_or(0.0))
+                .fold(f64::INFINITY, f64::min);
             let timestamp_ms = chunk[group_size - 1][0].as_u64().unwrap_or(0);
             let timestamp = chrono::DateTime::from_timestamp_millis(timestamp_ms as i64)
                 .unwrap_or(chrono::Utc::now());
-            let volume = vol_chunk.iter().map(|v| v[1].as_f64().unwrap_or(0.0)).sum::<f64>() / group_size as f64;
+            let volume = vol_chunk
+                .iter()
+                .map(|v| v[1].as_f64().unwrap_or(0.0))
+                .sum::<f64>()
+                / group_size as f64;
 
             candles.push(Candle {
                 pair: pair.to_string(),

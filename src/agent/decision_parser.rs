@@ -12,11 +12,23 @@ pub enum TradeAction {
     Buy,
     #[serde(alias = "SELL", alias = "sell")]
     Sell,
-    #[serde(alias = "HOLD", alias = "hold", alias = "PASS", alias = "pass", alias = "SKIP", alias = "skip")]
+    #[serde(
+        alias = "HOLD",
+        alias = "hold",
+        alias = "PASS",
+        alias = "pass",
+        alias = "SKIP",
+        alias = "skip"
+    )]
     Pass,
     #[serde(alias = "CLOSE", alias = "close")]
     Close,
-    #[serde(alias = "ADJUST_STOP", alias = "adjust_stop", alias = "ADJUSTSTOP", alias = "Adjust_Stop")]
+    #[serde(
+        alias = "ADJUST_STOP",
+        alias = "adjust_stop",
+        alias = "ADJUSTSTOP",
+        alias = "Adjust_Stop"
+    )]
     AdjustStop,
 }
 
@@ -104,13 +116,16 @@ pub fn parse_decision(
     current_price: f64,
     price_tolerance_pct: f64,
 ) -> Result<TradeDecision, ParseError> {
+    // Strip thinking/reasoning tags that local models (Qwen, DeepSeek, etc.) produce
+    let stripped = strip_thinking_tags(response);
+
     // Extract JSON from response (may be wrapped in markdown code blocks)
-    let json_str = extract_json(response);
+    let json_str = extract_json(&stripped);
 
     // Normalize action field — LLMs sometimes return UPPERCASE
     let normalized = normalize_llm_json(json_str);
 
-    // Try strict parse first, then repair, then partial extraction
+    // Try strict parse first, then repair, then partial extraction, then freeform NLP
     let decision = match serde_json::from_str::<TradeDecision>(&normalized) {
         Ok(d) => d,
         Err(strict_err) => {
@@ -124,12 +139,19 @@ pub fn parse_decision(
                     match partial_extract(&repaired).or_else(|| partial_extract(&normalized)) {
                         Some(d) => d,
                         None => {
-                            tracing::debug!(
-                                "JSON parse failed after all passes. strict={}, repair={}",
-                                strict_err,
-                                repair_err
-                            );
-                            return Err(ParseError::InvalidJson(strict_err));
+                            // Pass 4: freeform NLP extraction — for local models that
+                            // produce natural language instead of JSON
+                            match extract_from_freeform(&stripped) {
+                                Some(d) => d,
+                                None => {
+                                    tracing::debug!(
+                                        "JSON parse failed after all passes. strict={}, repair={}",
+                                        strict_err,
+                                        repair_err
+                                    );
+                                    return Err(ParseError::InvalidJson(strict_err));
+                                }
+                            }
                         }
                     }
                 }
@@ -221,6 +243,186 @@ pub fn parse_decision(
     }
 
     Ok(decision)
+}
+
+/// Strip thinking/reasoning tags that some local models produce.
+/// Removes `<think>...</think>`, `</think>` tags that local models (Qwen, DeepSeek, etc.) produce.
+/// Extracts any JSON block that appears after the thinking tags.
+fn strip_thinking_tags(response: &str) -> String {
+    let mut result = response.to_string();
+
+    // Remove <think>...</think> blocks (Qwen, DeepSeek)
+    while let Some(start) = result.find("<think>") {
+        let end = result[start..]
+            .find("</think>")
+            .map(|i| start + i + 8)
+            .unwrap_or(result.len());
+        result = format!("{}{}", &result[..start], &result[end..]);
+    }
+
+    // Remove <tool_call>...</think> blocks (Qwen tool-calling)
+    while let Some(start) = result.find("<tool_call>") {
+        let end = result[start..]
+            .find("</think>")
+            .map(|i| start + i + 8)
+            .unwrap_or(result.len());
+        result = format!("{}{}", &result[..start], &result[end..]);
+    }
+
+    result.trim().to_string()
+}
+
+/// Extract a trading decision from freeform natural language text.
+/// Handles models that don't produce structured JSON output.
+/// Returns a TradeDecision if enough fields can be extracted, None otherwise.
+fn extract_from_freeform(text: &str) -> Option<TradeDecision> {
+    let lower = text.to_lowercase();
+
+    // Extract action
+    let action = if lower.contains("buy")
+        || lower.contains("go long")
+        || lower.contains("enter long")
+    {
+        TradeAction::Buy
+    } else if lower.contains("sell") || lower.contains("go short") || lower.contains("enter short")
+    {
+        TradeAction::Sell
+    } else if lower.contains("close") || lower.contains("exit") {
+        TradeAction::Close
+    } else if lower.contains("hold")
+        || lower.contains("pass")
+        || lower.contains("skip")
+        || lower.contains("no trade")
+    {
+        TradeAction::Pass
+    } else {
+        return None; // Can't determine action
+    };
+
+    // If it's a Pass/Hold, return early with minimal fields
+    if matches!(action, TradeAction::Pass) {
+        return Some(TradeDecision {
+            action,
+            pair: extract_pair(text).unwrap_or_else(|| "BTC/USD".to_string()),
+            side: Side::Long,
+            entry_price: 0.0,
+            stop_loss: 0.0,
+            take_profit_1: 0.0,
+            take_profit_2: 0.0,
+            take_profit_3: 0.0,
+            position_size_pct: 0.0,
+            confidence: 0.5,
+            reasoning: text.chars().take(500).collect(),
+            order_type: "market".to_string(),
+            knowledge_sources: vec![],
+            risk_reward: 0.0,
+        });
+    }
+
+    // For Buy/Sell, we need at least a pair and some price info
+    let pair = extract_pair(text).unwrap_or_else(|| "BTC/USD".to_string());
+    let prices = extract_prices(text);
+    let entry = prices.first().copied().unwrap_or(0.0);
+    let stop = prices.get(1).copied().unwrap_or(0.0);
+    let tp1 = prices.get(2).copied().unwrap_or(0.0);
+
+    // Need at least an entry price to be useful
+    if entry <= 0.0 {
+        return None;
+    }
+
+    let side = if matches!(action, TradeAction::Buy) {
+        Side::Long
+    } else {
+        Side::Short
+    };
+    let confidence = extract_confidence(text).unwrap_or(0.5);
+
+    // Calculate R:R if we have all three prices
+    let rr = if entry > 0.0 && stop > 0.0 && tp1 > 0.0 {
+        let risk = (entry - stop).abs();
+        let reward = (tp1 - entry).abs();
+        if risk > 0.0 {
+            reward / risk
+        } else {
+            0.0
+        }
+    } else {
+        0.0
+    };
+
+    Some(TradeDecision {
+        action,
+        pair,
+        side,
+        entry_price: entry,
+        stop_loss: stop,
+        take_profit_1: tp1,
+        take_profit_2: 0.0,
+        take_profit_3: 0.0,
+        position_size_pct: 0.0,
+        confidence,
+        reasoning: text.chars().take(500).collect(),
+        order_type: "market".to_string(),
+        knowledge_sources: vec![],
+        risk_reward: rr,
+    })
+}
+
+/// Extract a trading pair from text. Looks for common patterns like "ETH/USD", "BTC/USDC", "ETH-USD".
+fn extract_pair(text: &str) -> Option<String> {
+    // Pattern: SYMBOL/QUOTE or SYMBOL-QUOTE or SYMBOLUSD
+    let pair_re = regex::Regex::new(r"(?i)\b([A-Z]{2,6})\s*/\s*([A-Z]{3,4})\b").ok()?;
+    if let Some(caps) = pair_re.captures(text) {
+        let base = caps.get(1)?.as_str().to_uppercase();
+        let quote = caps.get(2)?.as_str().to_uppercase();
+        // Normalize common quote currencies
+        let quote_norm = match quote.as_str() {
+            "USD" | "USDT" | "USDC" => "USD",
+            _ => return None,
+        };
+        return Some(format!("{}/{}", base, quote_norm));
+    }
+    None
+}
+
+/// Extract numeric prices from text. Returns them in order of appearance.
+fn extract_prices(text: &str) -> Vec<f64> {
+    // Match numbers that look like prices (with optional $ prefix, commas, decimals)
+    let price_re = regex::Regex::new(r"(?i)\$?\s*(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\b").ok();
+    let re = match price_re {
+        Some(r) => r,
+        None => return vec![],
+    };
+    re.captures_iter(text)
+        .filter_map(|caps| {
+            let s = caps.get(1)?.as_str().replace(',', "");
+            s.parse::<f64>().ok()
+        })
+        .filter(|&p| p > 0.001) // Filter out tiny numbers
+        .collect()
+}
+
+/// Extract a confidence value from text. Looks for patterns like "confidence: 0.7" or "70%".
+fn extract_confidence(text: &str) -> Option<f64> {
+    // Pattern: confidence: 0.XX or confidence: XX%
+    let conf_re = regex::Regex::new(r"(?i)confidence[:\s]+(\d*\.?\d+)").ok()?;
+    if let Some(caps) = conf_re.captures(text) {
+        let val: f64 = caps.get(1)?.as_str().parse().ok()?;
+        if val > 1.0 {
+            return Some(val / 100.0);
+        } // Handle percentage format
+        if (0.0..=1.0).contains(&val) {
+            return Some(val);
+        }
+    }
+    // Pattern: XX% confidence
+    let pct_re = regex::Regex::new(r"(\d{1,3})%\s*(?:confident|confidence)").ok()?;
+    if let Some(caps) = pct_re.captures(text) {
+        let val: f64 = caps.get(1)?.as_str().parse().ok()?;
+        return Some(val / 100.0);
+    }
+    None
 }
 
 /// Extract JSON from a response that may contain markdown code blocks.
@@ -383,7 +585,9 @@ fn partial_extract(json: &str) -> Option<TradeDecision> {
     let action = match action_str {
         "Buy" | "BUY" | "buy" => TradeAction::Buy,
         "Sell" | "SELL" | "sell" => TradeAction::Sell,
-        "Hold" | "HOLD" | "hold" | "Pass" | "PASS" | "pass" | "Skip" | "SKIP" | "skip" => TradeAction::Pass,
+        "Hold" | "HOLD" | "hold" | "Pass" | "PASS" | "pass" | "Skip" | "SKIP" | "skip" => {
+            TradeAction::Pass
+        }
         "Close" | "CLOSE" | "close" => TradeAction::Close,
         _ => return None,
     };

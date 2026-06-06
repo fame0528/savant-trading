@@ -401,6 +401,7 @@ impl ExecutionEngine for KrakenTrader {
             created_at: Utc::now(),
             filled_at: Some(Utc::now()),
             filled_price: Some(fill_price),
+            tx_hash: None,
         };
 
         // Create position and track it (C1 fix)
@@ -539,6 +540,7 @@ impl ExecutionEngine for KrakenTrader {
             created_at: Utc::now(),
             filled_at: Some(Utc::now()),
             filled_price: Some(pos.current_price),
+            tx_hash: None,
         })
     }
 

@@ -92,8 +92,7 @@ async fn fetch_coingecko_trending(client: &reqwest::Client, data: &mut NewsData)
     if let Ok(key) = std::env::var("COINGECKO_API_KEY") {
         req = req.header("x-cg-demo-api-key", key);
     }
-    match req.send().await
-    {
+    match req.send().await {
         Ok(resp) => {
             if !resp.status().is_success() {
                 warn!("CoinGecko trending API returned HTTP {}", resp.status());

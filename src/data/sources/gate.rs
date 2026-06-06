@@ -5,10 +5,10 @@
 //!
 //! API: GET https://api.gateio.ws/api/v4/spot/candlesticks
 
-use async_trait::async_trait;
 use super::CandleSource;
-use crate::core::types::Candle;
 use crate::core::error::ExecutionError;
+use crate::core::types::Candle;
+use async_trait::async_trait;
 
 pub struct GateSource {
     client: reqwest::Client,
@@ -138,8 +138,8 @@ impl CandleSource for GateSource {
             let open = arr[5].as_str().unwrap_or("0").parse::<f64>().unwrap_or(0.0);
             let volume = arr[6].as_str().unwrap_or("0").parse::<f64>().unwrap_or(0.0);
 
-            let timestamp = chrono::DateTime::from_timestamp(timestamp_secs, 0)
-                .unwrap_or(chrono::Utc::now());
+            let timestamp =
+                chrono::DateTime::from_timestamp(timestamp_secs, 0).unwrap_or(chrono::Utc::now());
 
             if close == 0.0 && volume == 0.0 {
                 continue;

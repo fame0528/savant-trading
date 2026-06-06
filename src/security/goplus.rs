@@ -98,7 +98,10 @@ impl GoPlusClient {
         let result = match result {
             Some(r) => r,
             None => {
-                debug!("GoPlus: no result for {} ({})", token_symbol, contract_address);
+                debug!(
+                    "GoPlus: no result for {} ({})",
+                    token_symbol, contract_address
+                );
                 return Ok(true); // Don't reject if no data
             }
         };
@@ -171,8 +174,8 @@ impl GoPlusClient {
     pub async fn check_by_symbol(&self, symbol: &str) -> Result<bool, ExecutionError> {
         // Core assets — skip security check (they're established, not meme coins)
         const CORE_ASSETS: &[&str] = &[
-            "BTC", "ETH", "LINK", "DOGE", "ARB", "UNI", "AAVE", "LDO", "PENDLE",
-            "GRT", "BONK", "DOT",
+            "BTC", "ETH", "LINK", "DOGE", "ARB", "UNI", "AAVE", "LDO", "PENDLE", "GRT", "BONK",
+            "DOT",
         ];
 
         let upper = symbol.to_uppercase();
@@ -185,7 +188,10 @@ impl GoPlusClient {
             self.check_token(&address, symbol).await
         } else {
             // Unknown address — don't block, just warn
-            warn!("GoPlus: no known address for {} — skipping security check", symbol);
+            warn!(
+                "GoPlus: no known address for {} — skipping security check",
+                symbol
+            );
             Ok(true)
         }
     }

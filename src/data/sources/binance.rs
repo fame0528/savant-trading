@@ -6,10 +6,10 @@
 //! API: GET https://api.binance.com/api/v3/klines
 //! Rate limit: 1200 requests/min (no key)
 
-use async_trait::async_trait;
 use super::CandleSource;
-use crate::core::types::Candle;
 use crate::core::error::ExecutionError;
+use crate::core::types::Candle;
+use async_trait::async_trait;
 
 pub struct BinanceSource {
     client: reqwest::Client,
@@ -34,7 +34,7 @@ impl BinanceSource {
         }
         let base = parts[0].to_uppercase();
         let quote = parts[1].to_uppercase();
-        
+
         // Map common quote currencies to Binance format
         let quote_binance = match quote.as_str() {
             "USD" | "USDT" => "USDT",
@@ -43,7 +43,7 @@ impl BinanceSource {
             "ETH" => "ETH",
             _ => return None,
         };
-        
+
         Some(format!("{}{}", base, quote_binance))
     }
 }
@@ -116,15 +116,15 @@ impl CandleSource for BinanceSource {
             .await
             .map_err(|e| ExecutionError::Other(format!("Binance parse error: {}", e)))?;
 
-        let klines = json.as_array().ok_or_else(|| {
-            ExecutionError::Other("Binance response is not an array".into())
-        })?;
+        let klines = json
+            .as_array()
+            .ok_or_else(|| ExecutionError::Other("Binance response is not an array".into()))?;
 
         let mut candles = Vec::with_capacity(klines.len());
         for kline in klines {
-            let arr = kline.as_array().ok_or_else(|| {
-                ExecutionError::Other("Binance kline is not an array".into())
-            })?;
+            let arr = kline
+                .as_array()
+                .ok_or_else(|| ExecutionError::Other("Binance kline is not an array".into()))?;
 
             if arr.len() < 6 {
                 continue;

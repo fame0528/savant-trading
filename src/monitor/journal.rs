@@ -1,5 +1,5 @@
-use sqlx::Row;
 use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions};
+use sqlx::Row;
 use std::str::FromStr;
 use tracing::info;
 
@@ -14,7 +14,9 @@ impl TradeJournal {
         // Resolve to absolute path for logging — relative paths can create
         // new empty DBs if working directory differs.
         let abs_path = std::path::Path::new(database_url.trim_start_matches("sqlite:"));
-        let abs_display = abs_path.canonicalize().unwrap_or_else(|_| abs_path.to_path_buf());
+        let abs_display = abs_path
+            .canonicalize()
+            .unwrap_or_else(|_| abs_path.to_path_buf());
         info!("Trade journal connecting to: {}", abs_display.display());
 
         let options = SqliteConnectOptions::from_str(database_url)?
@@ -167,7 +169,11 @@ impl TradeJournal {
             positions.push(Position {
                 id: row.get("id"),
                 pair: row.get("pair"),
-                side: if side_str == "Long" { Side::Long } else { Side::Short },
+                side: if side_str == "Long" {
+                    Side::Long
+                } else {
+                    Side::Short
+                },
                 entry_price: row.get("entry_price"),
                 current_price: row.get("current_price"),
                 quantity: row.get("quantity"),

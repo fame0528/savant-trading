@@ -5,10 +5,10 @@
 //!
 //! API: GET https://www.okx.com/api/v5/market/candles
 
-use async_trait::async_trait;
 use super::CandleSource;
-use crate::core::types::Candle;
 use crate::core::error::ExecutionError;
+use crate::core::types::Candle;
+use async_trait::async_trait;
 
 pub struct OkxSource {
     client: reqwest::Client,
@@ -85,9 +85,9 @@ impl CandleSource for OkxSource {
         timeframe_minutes: u32,
         count: u32,
     ) -> Result<Vec<Candle>, ExecutionError> {
-        let inst_id = self.okx_pair(pair).ok_or_else(|| {
-            ExecutionError::Other(format!("No OKX pair mapping for {}", pair))
-        })?;
+        let inst_id = self
+            .okx_pair(pair)
+            .ok_or_else(|| ExecutionError::Other(format!("No OKX pair mapping for {}", pair)))?;
 
         let bar = self.okx_bar(timeframe_minutes);
         let limit = count.min(300);
@@ -121,20 +121,23 @@ impl CandleSource for OkxSource {
         let code = json["code"].as_str().unwrap_or("1");
         if code != "0" {
             let msg = json["msg"].as_str().unwrap_or("unknown error");
-            return Err(ExecutionError::Other(format!("OKX error {}: {}", code, msg)));
+            return Err(ExecutionError::Other(format!(
+                "OKX error {}: {}",
+                code, msg
+            )));
         }
 
-        let data = json["data"].as_array().ok_or_else(|| {
-            ExecutionError::Other("OKX response missing data array".into())
-        })?;
+        let data = json["data"]
+            .as_array()
+            .ok_or_else(|| ExecutionError::Other("OKX response missing data array".into()))?;
 
         // OKX returns arrays: [ts, open, high, low, close, vol, volCcy, volCcyQuote, confirm]
         // Timestamps are in milliseconds
         let mut candles = Vec::with_capacity(data.len());
         for entry in data {
-            let arr = entry.as_array().ok_or_else(|| {
-                ExecutionError::Other("OKX candle entry is not an array".into())
-            })?;
+            let arr = entry
+                .as_array()
+                .ok_or_else(|| ExecutionError::Other("OKX candle entry is not an array".into()))?;
 
             if arr.len() < 6 {
                 continue;
@@ -147,8 +150,8 @@ impl CandleSource for OkxSource {
             let close = arr[4].as_str().unwrap_or("0").parse::<f64>().unwrap_or(0.0);
             let volume = arr[5].as_str().unwrap_or("0").parse::<f64>().unwrap_or(0.0);
 
-            let timestamp = chrono::DateTime::from_timestamp_millis(timestamp_ms)
-                .unwrap_or(chrono::Utc::now());
+            let timestamp =
+                chrono::DateTime::from_timestamp_millis(timestamp_ms).unwrap_or(chrono::Utc::now());
 
             // Skip zero candles
             if close == 0.0 && volume == 0.0 {

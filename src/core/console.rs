@@ -82,7 +82,10 @@ pub fn set_console_title(title: &str) {
     {
         use std::ffi::OsStr;
         use std::os::windows::ffi::OsStrExt;
-        let wide: Vec<u16> = OsStr::new(title).encode_wide().chain(std::iter::once(0)).collect();
+        let wide: Vec<u16> = OsStr::new(title)
+            .encode_wide()
+            .chain(std::iter::once(0))
+            .collect();
         unsafe {
             extern "system" {
                 fn SetConsoleTitleW(lpConsoleTitle: *const u16) -> i32;
@@ -161,8 +164,8 @@ pub fn savant_log(level: LogLevel, action: &str, result: &str) {
 
 // ── SavantLayer — custom tracing Layer ───────────────────────────────────
 
-use tracing_subscriber::Layer;
 use std::fmt::Write as FmtWrite;
+use tracing_subscriber::Layer;
 
 pub struct SavantLayer;
 
@@ -228,10 +231,7 @@ where
 
         // Extract target (module path) as a short, capitalized label
         let target = metadata.target();
-        let short_target = target
-            .rsplit("::")
-            .next()
-            .unwrap_or(target);
+        let short_target = target.rsplit("::").next().unwrap_or(target);
         let formatted_target = capitalize_module(short_target);
 
         let ts = est_now();
@@ -257,7 +257,7 @@ impl tracing::field::Visit for MessageVisitor<'_> {
             // Remove surrounding quotes from Debug format
             let debug_str = format!("{:?}", value);
             if debug_str.starts_with('"') && debug_str.ends_with('"') {
-                self.0.push_str(&debug_str[1..debug_str.len()-1]);
+                self.0.push_str(&debug_str[1..debug_str.len() - 1]);
             } else {
                 self.0.push_str(&debug_str);
             }

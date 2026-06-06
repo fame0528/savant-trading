@@ -115,22 +115,22 @@ pub struct LiquidityCheck {
 /// USDC addresses per chain (native USDC, not bridged).
 pub fn usdc_address_for_chain(chain_id: u64) -> &'static str {
     match chain_id {
-        42161 => "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",  // Arbitrum native USDC
-        8453 => "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",   // Base native USDC
-        10 => "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",     // Optimism native USDC
-        56 => "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",     // BSC USDC (18 decimals!)
-        137 => "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",    // Polygon native USDC
-        1 => "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",      // Ethereum native USDC
-        43114 => "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",  // Avalanche native USDC
-        _ => "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",       // Default: Arbitrum
+        42161 => "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", // Arbitrum native USDC
+        8453 => "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",  // Base native USDC
+        10 => "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",    // Optimism native USDC
+        56 => "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",    // BSC USDC (18 decimals!)
+        137 => "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",   // Polygon native USDC
+        1 => "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",     // Ethereum native USDC
+        43114 => "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E", // Avalanche native USDC
+        _ => "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",     // Default: Arbitrum
     }
 }
 
 /// USDC decimals per chain (BSC uses 18, all others use 6).
 pub fn usdc_decimals_for_chain(chain_id: u64) -> u8 {
     match chain_id {
-        56 => 18,  // BSC USDC uses 18 decimals
-        _ => 6,    // All other chains use 6
+        56 => 18, // BSC USDC uses 18 decimals
+        _ => 6,   // All other chains use 6
     }
 }
 
@@ -155,8 +155,47 @@ pub trait DexBackend: Send + Sync {
     /// Returns rich data: availability, tax info, balance/allowance issues.
     async fn check_liquidity(&self, params: &SwapParams) -> Result<LiquidityCheck, ExecutionError>;
 
+    /// Build and submit a gasless swap via the 0x Gasless API.
+    /// Returns a trade hash that can be polled for confirmation.
+    /// Default: returns "not supported" for backends without gasless support.
+    async fn build_gasless_swap_tx(
+        &self,
+        _params: &SwapParams,
+    ) -> Result<GaslessSwapResult, ExecutionError> {
+        Err(ExecutionError::Other(
+            "Gasless swaps not supported by this backend".into(),
+        ))
+    }
+
+    /// Poll gasless trade status until confirmed or timeout.
+    /// Default: returns "not supported" for backends without gasless support.
+    async fn poll_gasless_status(
+        &self,
+        _trade_hash: &str,
+        _chain_id: u64,
+    ) -> Result<GaslessStatus, ExecutionError> {
+        Err(ExecutionError::Other(
+            "Gasless status polling not supported by this backend".into(),
+        ))
+    }
+
     /// Human-readable backend name, e.g. `"0x"` or `"1inch"`.
     fn name(&self) -> &'static str;
+}
+
+/// Result of a gasless swap submission.
+#[derive(Debug, Clone)]
+pub struct GaslessSwapResult {
+    pub trade_hash: String,
+    pub buy_amount: String,
+    pub min_buy_amount: String,
+}
+
+/// Status of a gasless trade.
+#[derive(Debug, Clone)]
+pub enum GaslessStatus {
+    Confirmed(String), // tx hash
+    Failed(String),    // error
 }
 
 /// Fallback backend — tries primary first, falls back to secondary on failure.
@@ -213,6 +252,32 @@ impl DexBackend for FallbackBackend {
             Err(_) => self.secondary.check_liquidity(params).await,
         }
     }
+
+    async fn build_gasless_swap_tx(
+        &self,
+        params: &SwapParams,
+    ) -> Result<GaslessSwapResult, ExecutionError> {
+        match self.primary.build_gasless_swap_tx(params).await {
+            Ok(result) => Ok(result),
+            Err(primary_err) => {
+                tracing::warn!(
+                    "Primary backend ({}) gasless failed: {} — trying fallback ({})",
+                    self.primary.name(),
+                    primary_err,
+                    self.secondary.name()
+                );
+                self.secondary.build_gasless_swap_tx(params).await
+            }
+        }
+    }
+
+    async fn poll_gasless_status(
+        &self,
+        trade_hash: &str,
+        chain_id: u64,
+    ) -> Result<GaslessStatus, ExecutionError> {
+        self.primary.poll_gasless_status(trade_hash, chain_id).await
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -226,11 +291,9 @@ pub const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
     // Quote currency
     ("USDC", "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", 6),
     ("USDC.E", "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8", 6),
-
     // Core routing assets
     ("WETH", "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", 18),
     ("WBTC", "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", 8),
-
     // Top volume tokens (CoinGecko + Arbiscan verified)
     ("CELR", "0x3a8b787f78d775aecfeea15706d4221b40f345ab", 18),
     ("HOT", "0x17e1e5c6bc9ebb11647c94e1c5e3ba619f2781ea", 18),
@@ -290,7 +353,6 @@ pub const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
     ("BONK", "0x09199d9A5F4448D0848e4395D065e1ad9c4a1F74", 5),
     ("RENDER", "0xC8a4EeA31E9B6b61c406DF013DD4FEc76f21E279", 18),
     ("FET", "0x8D2cD4BF7E2196d5204bb15264BdD5E789D00Bad", 8),
-
     // Extended tokens (>1M daily volume, CoinGecko verified)
     ("USDT0", "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", 6),
     ("ANKR", "0xaeaeed23478c3a4b798e4ed40d8b7f41366ae861", 18),
@@ -357,13 +419,21 @@ pub const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
     ("RETH", "0xEC70Dcb4A1EFa46b8F2D97C310C9c4790ba5ffA8", 18),
     ("RSETH", "0x4186BFC76E2E237523CBC30FD220FE055156b41F", 18),
     ("REUSD", "0x76ce01f0ef25aa66cc5f1e546a005e4a63b25609", 18),
-    ("WAARBUSDCN", "0x7f6501d3b98ee91f9b9535e4b0ac710fb0f9e0bc", 18),
+    (
+        "WAARBUSDCN",
+        "0x7f6501d3b98ee91f9b9535e4b0ac710fb0f9e0bc",
+        18,
+    ),
     ("TLOS", "0x193f4a4a6ea24102f49b931deeeb931f6e32405d", 18),
     ("ORBS", "0xf3c091ed43de9c270593445163a41a876a0bb3dd", 18),
     ("AXLUSDC", "0xeb466342c4d449bc9f53a865d5cb90586f405215", 18),
     ("IDOS", "0x68731d6f14b827bbcffbebb62b19daa18de1d79c", 18),
     ("GRANT", "0x7ce42e8a5a42eb15f0c9a08ee9a079d99b1d83cf", 18),
-    ("WAARBUSDT", "0xa6d12574efb239fc1d2099732bd8b5dc6306897f", 18),
+    (
+        "WAARBUSDT",
+        "0xa6d12574efb239fc1d2099732bd8b5dc6306897f",
+        18,
+    ),
     ("RDNT", "0x3082cc23568eA640225c2467653dB90e9250AaA0", 18),
     ("ANON", "0x79bbf4508b1391af3a0f4b30bb5fc4aa9ab0e07c", 18),
     ("BAL", "0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8", 18),
@@ -394,7 +464,11 @@ pub const ARBITRUM_TOKENS: &[(&str, &str, u8)] = &[
     ("DOC", "0x2ad62eb9744c720364f6ac856360a43e8a2229b5", 18),
     ("USDAI", "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF", 18),
     ("FRXETH", "0x178412e79c25968a32e89b11f63b33f733770c2a", 18),
-    ("WAARBWETH", "0x4ce13a79f45c1be00bdabd38b764ac28c082704e", 18),
+    (
+        "WAARBWETH",
+        "0x4ce13a79f45c1be00bdabd38b764ac28c082704e",
+        18,
+    ),
     ("NUT", "0x8697841b82c71fcbd9e58c15f6de68cd1c63fd02", 18),
     ("GRND", "0x3b58a4c865b568a2f6a957c264f6b50cba35d8ce", 18),
     ("FUSE", "0x6b021b3f68491974be6d4009fee61a4e3c708fd6", 18),
@@ -547,7 +621,10 @@ pub fn lookup_token(symbol: &str, chain_id: u64) -> Option<(String, u8)> {
         _ => {
             // Unknown chain — only USDC is guaranteed
             if symbol == "USDC" {
-                return Some((usdc_address_for_chain(chain_id).to_string(), usdc_decimals_for_chain(chain_id)));
+                return Some((
+                    usdc_address_for_chain(chain_id).to_string(),
+                    usdc_decimals_for_chain(chain_id),
+                ));
             }
             return None;
         }
@@ -844,12 +921,18 @@ mod tests {
 
     #[test]
     fn usdc_address_for_chain_arbitrum() {
-        assert_eq!(usdc_address_for_chain(42161), "0xaf88d065e77c8cC2239327C5EDb3A432268e5831");
+        assert_eq!(
+            usdc_address_for_chain(42161),
+            "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+        );
     }
 
     #[test]
     fn usdc_address_for_chain_base() {
-        assert_eq!(usdc_address_for_chain(8453), "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913");
+        assert_eq!(
+            usdc_address_for_chain(8453),
+            "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+        );
     }
 
     #[test]

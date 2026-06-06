@@ -5,10 +5,10 @@
 //!
 //! API: GET https://api.kucoin.com/api/v1/market/candles
 
-use async_trait::async_trait;
 use super::CandleSource;
-use crate::core::types::Candle;
 use crate::core::error::ExecutionError;
+use crate::core::types::Candle;
+use async_trait::async_trait;
 
 pub struct KuCoinSource {
     client: reqwest::Client,
@@ -85,9 +85,9 @@ impl CandleSource for KuCoinSource {
         timeframe_minutes: u32,
         count: u32,
     ) -> Result<Vec<Candle>, ExecutionError> {
-        let symbol = self.kucoin_pair(pair).ok_or_else(|| {
-            ExecutionError::Other(format!("No KuCoin pair mapping for {}", pair))
-        })?;
+        let symbol = self
+            .kucoin_pair(pair)
+            .ok_or_else(|| ExecutionError::Other(format!("No KuCoin pair mapping for {}", pair)))?;
 
         let ktype = self.kucoin_type(timeframe_minutes);
 
@@ -120,12 +120,15 @@ impl CandleSource for KuCoinSource {
         let code = json["code"].as_str().unwrap_or("1");
         if code != "200000" {
             let msg = json["msg"].as_str().unwrap_or("unknown error");
-            return Err(ExecutionError::Other(format!("KuCoin error {}: {}", code, msg)));
+            return Err(ExecutionError::Other(format!(
+                "KuCoin error {}: {}",
+                code, msg
+            )));
         }
 
-        let data = json["data"].as_array().ok_or_else(|| {
-            ExecutionError::Other("KuCoin response missing data array".into())
-        })?;
+        let data = json["data"]
+            .as_array()
+            .ok_or_else(|| ExecutionError::Other("KuCoin response missing data array".into()))?;
 
         // KuCoin returns arrays: [time, open, close, high, low, volume, turnover]
         // Timestamps are in SECONDS (not milliseconds!)
@@ -146,8 +149,8 @@ impl CandleSource for KuCoinSource {
             let low = arr[4].as_str().unwrap_or("0").parse::<f64>().unwrap_or(0.0);
             let volume = arr[5].as_str().unwrap_or("0").parse::<f64>().unwrap_or(0.0);
 
-            let timestamp = chrono::DateTime::from_timestamp(timestamp_secs, 0)
-                .unwrap_or(chrono::Utc::now());
+            let timestamp =
+                chrono::DateTime::from_timestamp(timestamp_secs, 0).unwrap_or(chrono::Utc::now());
 
             if close == 0.0 && volume == 0.0 {
                 continue;

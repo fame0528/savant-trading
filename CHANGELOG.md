@@ -4,6 +4,35 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.10.0] — 2026-06-06
+
+### Added
+
+- **Ollama local model support** — `"ollama"` added as a valid AI provider. Points to `localhost:11434/v1` with no API key required. Enables testing local models (Gemma, Qwen, DeepSeek, frankenstein merges like Qwopus) through the existing sandbox harness.
+- **Universal output parser (4-pass)** — `decision_parser.rs` now handles any LLM output format:
+  - Pass 0: Strip ``/`` tags (Qwen, DeepSeek reasoning models)
+  - Pass 1: Strict JSON parse
+  - Pass 2: Manual JSON repair (truncated strings, unclosed brackets)
+  - Pass 3: Partial extraction (salvage whatever fields are available)
+  - Pass 4: Regex-based freeform NLP extraction — extracts pair, prices, confidence, R:R from natural language text when JSON parsing fails entirely
+- **Gasless swap fallback in close path** — When `close_position()` detects a dust output error from the standard 0x Permit2 swap (0x can't route micro-amounts), it automatically retries via the 0x Gasless API. Gasless handles approvals and gas costs internally — no ETH needed, no Permit2 approval tx. Solves the live issue where stop-losses on small positions ($20-30) couldn't execute.
+- **`DexBackend` trait: gasless methods** — `build_gasless_swap_tx()` and `poll_gasless_status()` added to the `DexBackend` trait with default "not supported" implementations. `ZeroXBackend` delegates to existing gasless code. `FallbackBackend` tries primary then secondary.
+- **`run-ollama-tests.ps1`** — PowerShell script for benchmarking local Ollama models against the 60-scenario sandbox. Auto-detects available models, runs each with configurable timeout, generates comparison report.
+- **`regex` crate** — Added as dependency for the universal parser's freeform text extraction.
+
+### Fixed
+
+- **CRITICAL: Stop-loss execution failure on micro-amounts** — Live incident where 0.01485 WETH (~$23) stop-loss couldn't close via standard 0x swap. API returned 0 output tokens (dust). System retried every cycle for 30+ minutes without success. Gasless fallback now handles this automatically.
+- **Trailing whitespace in engine.rs:5087** — `cargo fmt` internal error caused by trailing space on a `matches!()` line. Fixed manually.
+- **Phantom ETH position in journal DB** — After manual WETH→USDC swap, the SQLite journal still contained the old ETH position record. Engine re-registered it on startup as a wallet-recovered position, inflating portfolio value by ~$23. Cleaned via direct DB deletion. (Wallet recovery side=SHORT bug noted for future fix.)
+
+### Changed
+
+- **`cargo fmt` applied project-wide** — All 43 source files reformatted to consistent style. No logic changes.
+- **`.gitignore` expanded** — Added entries for: `prompt-results/`, `DEEP-RESEARCH-PROMPT.md`, `MODEL-TRAINING-RESEARCH.md`, `API-KEYS.md`, `data/sandbox_*`, `data/sandbox_reports/`, `data/model-comparison-*.md`, `data/test_memory.db*`, `LLM Crypto Trading Growth Strategy.md`.
+- **Sandbox test artifacts cleaned** — Removed 15+ temp files from `data/` (sandbox stdout/stderr/output/report files, model comparison reports, test databases).
+- **Version** — 0.9.1 → 0.10.0
+
 ## [0.9.1] — 2026-06-05
 
 ### Added

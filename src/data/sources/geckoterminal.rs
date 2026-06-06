@@ -9,10 +9,10 @@
 //! 1. Get pool address from token: GET /api/v2/networks/arbitrum/tokens/{address}/pools
 //! 2. Get OHLCV from pool: GET /api/v2/networks/arbitrum/pools/{pool_address}/ohlcv/5m
 
-use async_trait::async_trait;
 use super::CandleSource;
-use crate::core::types::Candle;
 use crate::core::error::ExecutionError;
+use crate::core::types::Candle;
+use async_trait::async_trait;
 
 pub struct GeckoTerminalSource {
     client: reqwest::Client,
@@ -61,9 +61,9 @@ impl CandleSource for GeckoTerminalSource {
         timeframe_minutes: u32,
         count: u32,
     ) -> Result<Vec<Candle>, ExecutionError> {
-        let token_addr = self.token_address(pair).ok_or_else(|| {
-            ExecutionError::Other(format!("No token address for {} in DB", pair))
-        })?;
+        let token_addr = self
+            .token_address(pair)
+            .ok_or_else(|| ExecutionError::Other(format!("No token address for {} in DB", pair)))?;
 
         // Step 1: Get pool address from token
         let pools_url = format!(
@@ -71,12 +71,9 @@ impl CandleSource for GeckoTerminalSource {
             token_addr
         );
 
-        let pools_resp = self
-            .client
-            .get(&pools_url)
-            .send()
-            .await
-            .map_err(|e| ExecutionError::Other(format!("GeckoTerminal pools request failed: {}", e)))?;
+        let pools_resp = self.client.get(&pools_url).send().await.map_err(|e| {
+            ExecutionError::Other(format!("GeckoTerminal pools request failed: {}", e))
+        })?;
 
         if !pools_resp.status().is_success() {
             let status = pools_resp.status();
@@ -86,10 +83,9 @@ impl CandleSource for GeckoTerminalSource {
             )));
         }
 
-        let pools_json: serde_json::Value = pools_resp
-            .json()
-            .await
-            .map_err(|e| ExecutionError::Other(format!("GeckoTerminal pools parse error: {}", e)))?;
+        let pools_json: serde_json::Value = pools_resp.json().await.map_err(|e| {
+            ExecutionError::Other(format!("GeckoTerminal pools parse error: {}", e))
+        })?;
 
         let pools = pools_json["data"].as_array().ok_or_else(|| {
             ExecutionError::Other(format!("GeckoTerminal: no pools found for {}", token_addr))
@@ -103,9 +99,9 @@ impl CandleSource for GeckoTerminalSource {
         }
 
         // Use the first (highest volume) pool
-        let pool_address = pools[0]["id"].as_str().ok_or_else(|| {
-            ExecutionError::Other("GeckoTerminal: pool id missing".into())
-        })?;
+        let pool_address = pools[0]["id"]
+            .as_str()
+            .ok_or_else(|| ExecutionError::Other("GeckoTerminal: pool id missing".into()))?;
 
         // Step 2: Get OHLCV from pool
         let tf_str = match timeframe_minutes {
@@ -123,12 +119,9 @@ impl CandleSource for GeckoTerminalSource {
             pool_address, tf_str, timeframe_minutes, count.min(1000)
         );
 
-        let ohlcv_resp = self
-            .client
-            .get(&ohlcv_url)
-            .send()
-            .await
-            .map_err(|e| ExecutionError::Other(format!("GeckoTerminal OHLCV request failed: {}", e)))?;
+        let ohlcv_resp = self.client.get(&ohlcv_url).send().await.map_err(|e| {
+            ExecutionError::Other(format!("GeckoTerminal OHLCV request failed: {}", e))
+        })?;
 
         if !ohlcv_resp.status().is_success() {
             let status = ohlcv_resp.status();
@@ -138,14 +131,17 @@ impl CandleSource for GeckoTerminalSource {
             )));
         }
 
-        let ohlcv_json: serde_json::Value = ohlcv_resp
-            .json()
-            .await
-            .map_err(|e| ExecutionError::Other(format!("GeckoTerminal OHLCV parse error: {}", e)))?;
-
-        let candles_data = ohlcv_json["data"]["attributes"]["ohlcv_list"].as_array().ok_or_else(|| {
-            ExecutionError::Other("GeckoTerminal OHLCV missing data.attributes.ohlcv_list".into())
+        let ohlcv_json: serde_json::Value = ohlcv_resp.json().await.map_err(|e| {
+            ExecutionError::Other(format!("GeckoTerminal OHLCV parse error: {}", e))
         })?;
+
+        let candles_data = ohlcv_json["data"]["attributes"]["ohlcv_list"]
+            .as_array()
+            .ok_or_else(|| {
+                ExecutionError::Other(
+                    "GeckoTerminal OHLCV missing data.attributes.ohlcv_list".into(),
+                )
+            })?;
 
         // GeckoTerminal returns: [[timestamp, open, high, low, close, volume], ...]
         // Timestamps are in seconds, newest first
@@ -166,8 +162,8 @@ impl CandleSource for GeckoTerminalSource {
             let close = arr[4].as_str().unwrap_or("0").parse::<f64>().unwrap_or(0.0);
             let volume = arr[5].as_str().unwrap_or("0").parse::<f64>().unwrap_or(0.0);
 
-            let timestamp = chrono::DateTime::from_timestamp(timestamp_secs, 0)
-                .unwrap_or(chrono::Utc::now());
+            let timestamp =
+                chrono::DateTime::from_timestamp(timestamp_secs, 0).unwrap_or(chrono::Utc::now());
 
             if close == 0.0 && volume == 0.0 {
                 continue;
@@ -212,7 +208,10 @@ mod tests {
     fn might_have_requires_token_address() {
         let src = GeckoTerminalSource::new();
         // BTC has an address in the DB
-        assert!(src.might_have("WBTC/USD"), "GeckoTerminal should support WBTC (BTC→WBTC mapping)");
+        assert!(
+            src.might_have("WBTC/USD"),
+            "GeckoTerminal should support WBTC (BTC→WBTC mapping)"
+        );
         // A fake token won't
         assert!(!src.might_have("FAKE/USD"));
     }

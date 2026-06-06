@@ -1,7 +1,7 @@
 # AUDIT REPORT — Savant Trading v0.8.0
 
 **Auditor:** Nova (read-only)
-**Date:** 2026-06-04 (Updated: 2026-06-04 after re-scan)
+**Date:** 2026-06-04 (Updated: 2026-06-06)
 **Scope:** Full codebase review — README, DEX execution, engine loop, AI agent pipeline, error handling, token database, multi-chain infrastructure
 **Method:** Static analysis of all .rs source files in `src/execution/dex/`, `src/engine.rs`, `src/agent/`, `src/core/`. Two-pass audit: initial scan + re-scan after Kilo Code patches.
 
@@ -137,6 +137,8 @@ pub fn drain_retry_queue(&mut self) -> Vec<RetrySwap> {
 
 Same bug as original audit. `kept` is always empty. Return value is never used by caller. Failed swaps are silently dropped.
 
+**Dependency:** FID-061 close-position flow must not assume this queue provides recovery. If a close swap fails, the position will stay open with no automatic retry.
+
 **Recommendation:** Fix `kept` to retain non-drained entries. Wire return value into main loop. Or remove if unused.
 
 ---
@@ -171,6 +173,10 @@ String replacement handles `"action": "BUY"` and `"action":"BUY"` but not `"acti
 
 Defaults: `entry_price=0.0`, `side=Side::Long`, `confidence=0.5`, `pair="BTC/USD"`. Malformed AI responses parse successfully with dangerous defaults.
 
+**Stop-loss impact:** Malformed responses can parse with `stop_loss: 0.0`. The stop-loss behavior doc states the engine patches this, but there is no guarantee that patch fires before the next stop check. This can create a transient naked position.
+
+**Recommendation:** Consider stricter parsing or require explicit `stop_loss` presence for actionable BUY/SELL responses.
+
 ---
 
 ### FINDING-12: No On-Chain Balance Check Before Trade — ⚠️ OPEN
@@ -197,6 +203,10 @@ Circuit breaker uses paper account, not on-chain state. `sync_balance()` is peri
 **Location:** `src/engine.rs` lines 751-795, 1232-1325
 
 Circuit breaker blind to real positions. Phantom position detection at startup mitigates but doesn't prevent during-session drift.
+
+**Stop-loss linkage:** This desync is the same family as the stop-loss root cause in FID-061. If the paper/engine state disagrees on position state, stop-loss placement and trailing updates can diverge.
+
+**Recommendation:** Treat state reconciliation as a shared invariant. Don't rely only on startup checks; add periodic sync guards layered with the existing retry/stop-fallback behavior.
 
 ---
 
@@ -342,11 +352,36 @@ The multi-chain infrastructure is **impressive and well-structured**:
 | F-15 | LOW | Duplicate spender extraction | ℹ️ Open |
 | F-16 | LOW | Duplicate timeframe parsers | ℹ️ Open |
 | F-17 | LOW | APE address | ✅ FIXED (F-04) |
-| NF-01 | HIGH | `usdc_address_for_chain` defaults to Arbitrum | 🆕 Open |
-| NF-02 | MEDIUM | `resolve_pair()` hardcoded to Arbitrum | 🆕 Open |
-| NF-03 | INFO | Gasless + cross-chain built but not called | 🆕 Future |
-| NF-04 | LOW | No programmatic token verification | 🆕 Open |
-| NF-05 | HIGH | Retry queue (same as F-07) | 🔴 NOT FIXED |
+|| NF-01 | HIGH | `usdc_address_for_chain` defaults to Arbitrum | 🆕 Open |
+|| NF-02 | MEDIUM | `resolve_pair()` hardcoded to Arbitrum | 🆕 Open |
+|| NF-03 | INFO | Gasless + cross-chain built but not called | 🆕 Future |
+|| NF-04 | LOW | No programmatic token verification | 🆕 Open |
+|| NF-05 | HIGH | Retry queue same as F-07 | 🔴 NOT FIXED |
+|| NF-06 | MEDIUM | Hardcoded Permit2 approval conflicts with AllowanceHolder quotes | 🆕 Open |
+|| NF-07 | MEDIUM | Quote response fields not checked before signing | 🆕 Open |
+|| NF-08 | LOW | `transaction.to` not validated against known Settler/AllowanceHolder addresses | 🆕 Open |
+|| NF-09 | INFO | Gasless and cross-chain implementations dead code | 🆕 Future |
+|| NF-10 | LOW | 0x fee fields present but unused by trader | 🆕 Open |
+|| NF-11 | LOW | `TradeAction::Pass => unreachable!()` in engine | 🆕 Open |
+|| NF-12 | LOW | `TradeAction::AdjustStop` logged but not implemented | 🆕 Open |
+
+---
+
+### NF-11: `TradeAction::Pass => unreachable!()` in Engine Loop
+
+**Severity:** LOW
+**Location:** `src/engine.rs:2134`
+
+The engine match on `TradeAction` treats `Pass` as unreachable, but `decision_parser` and `orchestrator` both explicitly allow `Pass` outputs. If a pass decision ever reaches this branch, the process panics.
+
+---
+
+### NF-12: `TradeAction::AdjustStop` Logged But Not Implemented
+
+**Severity:** LOW
+**Location:** `src/engine.rs:2135-2138`
+
+`AdjustStop` is parsed from LLM output and logged, but no stop-update logic exists. This creates caller-visible behavior where an action is accepted yet silently dropped.
 
 ---
 
@@ -373,4 +408,4 @@ The multi-chain infrastructure is **impressive and well-structured**:
 
 ---
 
-*End of audit. 22 total findings (17 original + 5 new). 5 fixed. 1 still-critical (retry queue). Multi-chain ready to activate.*
+*End of audit. 29 total findings (17 original + 12 new). 5 fixed. 1 still-critical (retry queue). Multi-chain ready to activate.*

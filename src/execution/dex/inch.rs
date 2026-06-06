@@ -130,7 +130,10 @@ impl DexBackend for InchBackend {
         })
     }
 
-    async fn check_liquidity(&self, params: &SwapParams) -> Result<super::LiquidityCheck, ExecutionError> {
+    async fn check_liquidity(
+        &self,
+        params: &SwapParams,
+    ) -> Result<super::LiquidityCheck, ExecutionError> {
         match self.quote(params).await {
             Ok(q) => Ok(super::LiquidityCheck {
                 available: q.to_amount != "0" && !q.to_amount.is_empty(),

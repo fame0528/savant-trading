@@ -123,7 +123,11 @@ async fn fetch_bgeometrics(client: &reqwest::Client, data: &mut OnchainData) {
         }
 
         if !resp.status().is_success() {
-            warn!("BGeometrics {} returned HTTP {}", metric_name, resp.status());
+            warn!(
+                "BGeometrics {} returned HTTP {}",
+                metric_name,
+                resp.status()
+            );
             continue;
         }
 

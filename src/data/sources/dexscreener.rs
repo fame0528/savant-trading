@@ -9,10 +9,10 @@
 //! 1. Get pool address from token address: GET /latest/dex/tokens/{address}
 //! 2. Get OHLCV from pool: GET /latest/dex/pairs/{chainId}/{address}/ohlcv/5m
 
-use async_trait::async_trait;
 use super::CandleSource;
-use crate::core::types::Candle;
 use crate::core::error::ExecutionError;
+use crate::core::types::Candle;
+use async_trait::async_trait;
 
 pub struct DexScreenerSource {
     client: reqwest::Client,
@@ -61,9 +61,9 @@ impl CandleSource for DexScreenerSource {
         timeframe_minutes: u32,
         count: u32,
     ) -> Result<Vec<Candle>, ExecutionError> {
-        let token_addr = self.token_address(pair).ok_or_else(|| {
-            ExecutionError::Other(format!("No token address for {} in DB", pair))
-        })?;
+        let token_addr = self
+            .token_address(pair)
+            .ok_or_else(|| ExecutionError::Other(format!("No token address for {} in DB", pair)))?;
 
         // Step 1: Get pool address from token address
         let url = format!(
@@ -71,12 +71,9 @@ impl CandleSource for DexScreenerSource {
             token_addr
         );
 
-        let resp = self
-            .client
-            .get(&url)
-            .send()
-            .await
-            .map_err(|e| ExecutionError::Other(format!("DexScreener tokens request failed: {}", e)))?;
+        let resp = self.client.get(&url).send().await.map_err(|e| {
+            ExecutionError::Other(format!("DexScreener tokens request failed: {}", e))
+        })?;
 
         if !resp.status().is_success() {
             let status = resp.status();
@@ -110,15 +107,17 @@ impl CandleSource for DexScreenerSource {
             .max_by(|a, b| {
                 let liq_a = a["liquidity"]["usd"].as_f64().unwrap_or(0.0);
                 let liq_b = b["liquidity"]["usd"].as_f64().unwrap_or(0.0);
-                liq_a.partial_cmp(&liq_b).unwrap_or(std::cmp::Ordering::Equal)
+                liq_a
+                    .partial_cmp(&liq_b)
+                    .unwrap_or(std::cmp::Ordering::Equal)
             })
             .ok_or_else(|| {
                 ExecutionError::Other(format!("DexScreener: no Arbitrum pairs for {}", pair))
             })?;
 
-        let pair_address = best_pair["pairAddress"].as_str().ok_or_else(|| {
-            ExecutionError::Other("DexScreener: pairAddress missing".into())
-        })?;
+        let pair_address = best_pair["pairAddress"]
+            .as_str()
+            .ok_or_else(|| ExecutionError::Other("DexScreener: pairAddress missing".into()))?;
 
         // Step 2: Get OHLCV from the pair
         let tf_str = match timeframe_minutes {
@@ -136,12 +135,9 @@ impl CandleSource for DexScreenerSource {
             pair_address, tf_str
         );
 
-        let ohlcv_resp = self
-            .client
-            .get(&ohlcv_url)
-            .send()
-            .await
-            .map_err(|e| ExecutionError::Other(format!("DexScreener OHLCV request failed: {}", e)))?;
+        let ohlcv_resp = self.client.get(&ohlcv_url).send().await.map_err(|e| {
+            ExecutionError::Other(format!("DexScreener OHLCV request failed: {}", e))
+        })?;
 
         if !ohlcv_resp.status().is_success() {
             let status = ohlcv_resp.status();
@@ -169,8 +165,8 @@ impl CandleSource for DexScreenerSource {
             let close = entry["close"].as_f64().unwrap_or(0.0);
             let volume = entry["volume"].as_f64().unwrap_or(0.0);
 
-            let timestamp = chrono::DateTime::from_timestamp_millis(timestamp_ms)
-                .unwrap_or(chrono::Utc::now());
+            let timestamp =
+                chrono::DateTime::from_timestamp_millis(timestamp_ms).unwrap_or(chrono::Utc::now());
 
             if close == 0.0 && volume == 0.0 {
                 continue;
@@ -212,7 +208,10 @@ mod tests {
     fn might_have_requires_token_address() {
         let src = DexScreenerSource::new();
         // BTC has an address in the DB
-        assert!(src.might_have("WBTC/USD"), "DexScreener should support WBTC (BTC→WBTC mapping)");
+        assert!(
+            src.might_have("WBTC/USD"),
+            "DexScreener should support WBTC (BTC→WBTC mapping)"
+        );
         // A fake token won't
         assert!(!src.might_have("FAKE/USD"));
     }

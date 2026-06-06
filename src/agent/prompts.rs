@@ -63,8 +63,7 @@ impl PromptComposer {
 
         // Add dynamic knowledge layer
         if !knowledge_units.is_empty() {
-            let mut knowledge_section =
-                String::from("## Relevant Trading Knowledge\n\n");
+            let mut knowledge_section = String::from("## Relevant Trading Knowledge\n\n");
             for unit in knowledge_units {
                 knowledge_section.push_str(&format!(
                     "### [{}] {}\n{}\n\n",

@@ -83,6 +83,19 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                 ],
             )
         }
+        "ollama" => (
+            LlmConfig {
+                endpoint: "http://localhost:11434/v1".to_string(),
+                model: ai_cfg.model.clone(),
+                api_key: String::new(),
+                max_tokens: ai_cfg.max_tokens,
+                temperature: ai_cfg.temperature,
+                top_p: ai_cfg.top_p,
+                timeout_secs: ai_cfg.timeout_secs.max(300),
+                extra_headers: vec![],
+            },
+            vec![],
+        ),
         "nvidia" => {
             let nv = &ai_cfg.nvidia;
             (
@@ -155,7 +168,10 @@ impl LlmProvider {
                         let wait = 2u64.pow(attempt as u32 + 1);
                         tracing::warn!(
                             "chat() parse-retry (attempt {}/{}): {}. Retrying in {}s...",
-                            attempt + 1, max_attempts, last_err, wait
+                            attempt + 1,
+                            max_attempts,
+                            last_err,
+                            wait
                         );
                         tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
                         continue;
@@ -172,7 +188,10 @@ impl LlmProvider {
                         let wait = 2u64.pow(attempt as u32 + 1);
                         tracing::warn!(
                             "chat() parse failed (attempt {}/{}): {}. Retrying in {}s...",
-                            attempt + 1, max_attempts, last_err, wait
+                            attempt + 1,
+                            max_attempts,
+                            last_err,
+                            wait
                         );
                         tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
                         continue;
@@ -214,7 +233,10 @@ impl LlmProvider {
                         let wait = 2u64.pow(attempt as u32 + 1);
                         tracing::warn!(
                             "Stream parse failed (attempt {}/{}): {}. Retrying in {}s...",
-                            attempt + 1, max_retries, last_err, wait
+                            attempt + 1,
+                            max_retries,
+                            last_err,
+                            wait
                         );
                         tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
                         continue;
@@ -226,7 +248,8 @@ impl LlmProvider {
 
         tracing::warn!(
             "All {} streaming attempts failed ({}). Falling back to non-streaming.",
-            max_retries, last_err
+            max_retries,
+            last_err
         );
         let body = self.build_body(system, messages, false);
         let resp = self.send_with_retry(&body, 1, "Fallback").await?;
@@ -299,7 +322,11 @@ impl LlmProvider {
                         let wait = 2u64.pow(attempt + 1);
                         tracing::warn!(
                             "{} request failed (attempt {}/{}): {}. Retrying in {}s...",
-                            label, attempt + 1, max_attempts, last_err, wait
+                            label,
+                            attempt + 1,
+                            max_attempts,
+                            last_err,
+                            wait
                         );
                         tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
                         continue;
@@ -318,7 +345,10 @@ impl LlmProvider {
                     .unwrap_or(60);
                 tracing::warn!(
                     "{} rate limited (attempt {}/{}). Waiting {}s...",
-                    label, attempt + 1, max_attempts, retry_after
+                    label,
+                    attempt + 1,
+                    max_attempts,
+                    retry_after
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(retry_after)).await;
                 last_err = format!("Rate limited (429), waited {}s", retry_after);
@@ -330,7 +360,11 @@ impl LlmProvider {
                     let wait = 2u64.pow(attempt + 1);
                     tracing::warn!(
                         "{} HTTP {} (attempt {}/{}). Retrying in {}s...",
-                        label, status, attempt + 1, max_attempts, wait
+                        label,
+                        status,
+                        attempt + 1,
+                        max_attempts,
+                        wait
                     );
                     tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
                     continue;

@@ -74,15 +74,20 @@ impl CircuitBreaker {
         // At $25 balance with 5% limit = $1.25. Floor of $5 means we don't
         // halt until loss exceeds $5 (20% of $25). This allows trading.
         let daily_loss_dollars = -account.daily_pnl;
-        if daily_loss_pct >= self.max_daily_loss_pct && daily_loss_dollars >= self.daily_loss_floor_usd {
+        if daily_loss_pct >= self.max_daily_loss_pct
+            && daily_loss_dollars >= self.daily_loss_floor_usd
+        {
             warn!(
                 "Circuit breaker: daily loss ${:.2} ({:.2}%) exceeds ${:.2} floor and {:.2}% limit",
-                daily_loss_dollars, daily_loss_pct * 100.0,
-                self.daily_loss_floor_usd, self.max_daily_loss_pct * 100.0
+                daily_loss_dollars,
+                daily_loss_pct * 100.0,
+                self.daily_loss_floor_usd,
+                self.max_daily_loss_pct * 100.0
             );
             return CircuitBreakerResult::Triggered(format!(
                 "Daily loss limit: ${:.2} ({:.2}%)",
-                daily_loss_dollars, daily_loss_pct * 100.0
+                daily_loss_dollars,
+                daily_loss_pct * 100.0
             ));
         }
 
@@ -92,15 +97,20 @@ impl CircuitBreaker {
         } else {
             0.0
         };
-        if account.drawdown_pct >= self.max_drawdown_pct && drawdown_dollars >= self.drawdown_floor_usd {
+        if account.drawdown_pct >= self.max_drawdown_pct
+            && drawdown_dollars >= self.drawdown_floor_usd
+        {
             warn!(
                 "Circuit breaker: drawdown ${:.2} ({:.2}%) exceeds ${:.2} floor and {:.2}% limit",
-                drawdown_dollars, account.drawdown_pct * 100.0,
-                self.drawdown_floor_usd, self.max_drawdown_pct * 100.0
+                drawdown_dollars,
+                account.drawdown_pct * 100.0,
+                self.drawdown_floor_usd,
+                self.max_drawdown_pct * 100.0
             );
             return CircuitBreakerResult::Triggered(format!(
                 "Max drawdown: ${:.2} ({:.2}%)",
-                drawdown_dollars, account.drawdown_pct * 100.0
+                drawdown_dollars,
+                account.drawdown_pct * 100.0
             ));
         }
 

@@ -65,9 +65,21 @@ pub async fn discover_tokens(
     for item in items {
         let symbol = item["symbol"].as_str().unwrap_or("").to_string();
         let address = item["address_hash"].as_str().unwrap_or("").to_string();
-        let decimals = item["decimals"].as_str().unwrap_or("18").parse::<u8>().unwrap_or(18);
-        let volume = item["volume_24h"].as_str().unwrap_or("0").parse::<f64>().unwrap_or(0.0);
-        let holders = item["holders_count"].as_str().unwrap_or("0").parse::<u64>().unwrap_or(0);
+        let decimals = item["decimals"]
+            .as_str()
+            .unwrap_or("18")
+            .parse::<u8>()
+            .unwrap_or(18);
+        let volume = item["volume_24h"]
+            .as_str()
+            .unwrap_or("0")
+            .parse::<f64>()
+            .unwrap_or(0.0);
+        let holders = item["holders_count"]
+            .as_str()
+            .unwrap_or("0")
+            .parse::<u64>()
+            .unwrap_or(0);
         let name = item["name"].as_str().unwrap_or("").to_string();
 
         // Filter: must have symbol, address, minimum volume and holders
@@ -79,7 +91,21 @@ pub async fn discover_tokens(
         }
 
         // Skip stablecoins (we trade against them, not with them)
-        if matches!(symbol.as_str(), "USDC" | "USDT" | "DAI" | "USDS" | "USDE" | "FRAX" | "GHO" | "LUSD" | "PYUSD" | "FDUSD" | "USD0" | "USDAI") {
+        if matches!(
+            symbol.as_str(),
+            "USDC"
+                | "USDT"
+                | "DAI"
+                | "USDS"
+                | "USDE"
+                | "FRAX"
+                | "GHO"
+                | "LUSD"
+                | "PYUSD"
+                | "FDUSD"
+                | "USD0"
+                | "USDAI"
+        ) {
             continue;
         }
 
@@ -99,11 +125,17 @@ pub async fn discover_tokens(
     }
 
     // Sort by volume descending
-    tokens.sort_by(|a, b| b.volume_24h.partial_cmp(&a.volume_24h).unwrap_or(std::cmp::Ordering::Equal));
+    tokens.sort_by(|a, b| {
+        b.volume_24h
+            .partial_cmp(&a.volume_24h)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
 
     info!(
         "Token discovery: {} tokens found (min_volume=${}, min_holders={})",
-        tokens.len(), min_volume, min_holders
+        tokens.len(),
+        min_volume,
+        min_holders
     );
 
     Ok(tokens)
@@ -111,10 +143,7 @@ pub async fn discover_tokens(
 
 /// Convert discovered tokens to pair names (e.g., "ETH/USD").
 pub fn tokens_to_pairs(tokens: &[DiscoveredToken]) -> Vec<String> {
-    tokens
-        .iter()
-        .map(|t| format!("{}/USD", t.symbol))
-        .collect()
+    tokens.iter().map(|t| format!("{}/USD", t.symbol)).collect()
 }
 
 /// Update the Arbitrum token database with discovered tokens.
@@ -126,10 +155,17 @@ pub fn update_token_database(
     let mut added = 0;
     for token in tokens {
         if !existing.contains_key(token.symbol.as_str()) {
-            existing.insert(token.symbol.clone(), (token.address.clone(), token.decimals));
+            existing.insert(
+                token.symbol.clone(),
+                (token.address.clone(), token.decimals),
+            );
             added += 1;
         }
     }
-    info!("Token database: {} new tokens added (total: {})", added, existing.len());
+    info!(
+        "Token database: {} new tokens added (total: {})",
+        added,
+        existing.len()
+    );
     added
 }

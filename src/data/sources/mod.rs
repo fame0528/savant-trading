@@ -20,9 +20,9 @@ pub mod kraken;
 pub mod kucoin;
 pub mod okx;
 
-use async_trait::async_trait;
-use crate::core::types::Candle;
 use crate::core::error::ExecutionError;
+use crate::core::types::Candle;
+use async_trait::async_trait;
 
 /// Abstract candle data source.
 ///
@@ -105,18 +105,10 @@ impl SourceRouter {
                     return Ok(candles);
                 }
                 Ok(_) => {
-                    tracing::info!(
-                        "{}: No data for \x1b[90m[{}]\x1b[36m",
-                        source.name(),
-                        pair
-                    );
+                    tracing::info!("{}: No data for \x1b[90m[{}]\x1b[36m", source.name(), pair);
                 }
                 Err(_) => {
-                    tracing::info!(
-                        "{}: No data for \x1b[90m[{}]\x1b[36m",
-                        source.name(),
-                        pair
-                    );
+                    tracing::info!("{}: No data for \x1b[90m[{}]\x1b[36m", source.name(), pair);
                 }
             }
         }

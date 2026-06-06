@@ -348,10 +348,18 @@ pub struct RiskConfig {
     pub min_drawdown_usd: f64,
 }
 
-fn default_min_rr_low_balance() -> f64 { 1.2 }
-fn default_low_balance_threshold() -> f64 { 50.0 }
-fn default_min_daily_loss_usd() -> f64 { 5.0 }
-fn default_min_drawdown_usd() -> f64 { 10.0 }
+fn default_min_rr_low_balance() -> f64 {
+    1.2
+}
+fn default_low_balance_threshold() -> f64 {
+    50.0
+}
+fn default_min_daily_loss_usd() -> f64 {
+    5.0
+}
+fn default_min_drawdown_usd() -> f64 {
+    10.0
+}
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct StrategyConfig {
@@ -430,10 +438,10 @@ impl AppConfig {
         }
         // Validate AI provider
         match self.ai.provider.as_str() {
-            "opengateway" | "openrouter" | "nvidia" => {}
+            "opengateway" | "openrouter" | "nvidia" | "ollama" => {}
             other => {
                 return Err(ConfigError::ValidationError(format!(
-                    "Invalid ai.provider '{}': must be 'opengateway', 'openrouter', or 'nvidia'",
+                    "Invalid ai.provider '{}': must be 'opengateway', 'openrouter', 'nvidia', or 'ollama'",
                     other
                 )));
             }

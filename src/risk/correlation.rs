@@ -39,11 +39,7 @@ impl RiskBuckets {
     }
 
     /// Count open positions from a specific bucket.
-    pub fn count_bucket_positions(
-        &self,
-        bucket: &RiskBucket,
-        positions: &[String],
-    ) -> usize {
+    pub fn count_bucket_positions(&self, bucket: &RiskBucket, positions: &[String]) -> usize {
         positions
             .iter()
             .filter(|p| self.categorize(p) == *bucket)
