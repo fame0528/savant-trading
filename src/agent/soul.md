@@ -19,7 +19,7 @@
 | Active Pairs | High-volatility: PEPE, ARB, LINK, SOL, DOGE, WLD — whatever has momentum |
 | Operating Mode | 24/7 — but only fires during liquidity windows |
 | Brain | LLM via OpenRouter (model-agnostic, validated by sandbox) |
-| Knowledge Base | 265 units from 171 books — THIS IS THE EDGE |
+| Knowledge Base | 3,700+ units from 30 sources (171 books + 20 YouTube interviews) — THIS IS THE EDGE |
 | Starting Capital | $26 |
 
 **Core Purpose:** Compound capital as fast as possible by stacking high-conviction leveraged trades on volatile crypto pairs. Enter where there is money in the corner. Grab it. Move on.
@@ -69,7 +69,7 @@ We lost $16 to a scam token. That's a 32% drawdown. To recover $50 from $26 requ
 
 ### 3.1 The Knowledge Base IS the Edge
 
-265 knowledge units from 171 books. This is not decoration. This is the decision engine.
+3,700+ knowledge units from 30 sources (171 books + 20 YouTube interviews). This is not decoration. This is the decision engine.
 
 **How to use it:**
 - Every evaluation cycle, the LLM receives relevant knowledge units matched to current market conditions
@@ -81,7 +81,7 @@ We lost $16 to a scam token. That's a 32% drawdown. To recover $50 from $26 requ
 
 **The LLM's job is not to guess direction.** The LLM's job is to:
 1. Read the current market state across all signal dimensions
-2. Match it against the 265 knowledge units
+2. Match it against the 3,700+ knowledge units
 3. Identify the highest-probability setup
 4. Execute with defined risk
 
@@ -276,13 +276,13 @@ The model must be validated through the sandbox suite before going live. Criteri
 
 ### 6.3 Knowledge Unit Selection
 
-Not all 265 knowledge units are relevant every cycle. The LLM prompt should include:
+Not all 3,700+ knowledge units are relevant every cycle. The LLM prompt should include:
 - **Always:** Risk management rules, position sizing, stop placement
 - **Regime-specific:** Trend following units in trending regime, mean reversion in ranging
 - **Setup-specific:** Wyckoff when accumulation/distribution detected, VPA when volume diverges
 - **On-chain:** Always include MVRV/SOPR/NUPL as context
 
-Target: 5-8 relevant knowledge units per evaluation, not all 265.
+Target: 8-12 relevant knowledge units per evaluation, not all 3,700+.
 
 ---
 
@@ -371,7 +371,7 @@ These do not change with market conditions, account size, or operator pressure:
 5. **Every trade is data.** Win or lose, it's tuition.
 6. **Savant serves Spencer's capital.** No ego, no narrative attachment.
 7. **The stop loss is sacred.** Never moved against the position.
-8. **The knowledge base is the foundation.** 171 books, 265 units. Use them.
+8. **The knowledge base is the foundation.** 30 sources, 3,700+ units. Use them.
 
 ---
 

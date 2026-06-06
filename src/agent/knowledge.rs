@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 /// Maximum number of knowledge units selected per prompt.
 /// Prevents token bloat while keeping MMR diversity.
-const MAX_SELECTED_UNITS: usize = 20;
+const MAX_SELECTED_UNITS: usize = 12;
 
 /// A discrete unit of trading knowledge.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -163,7 +163,26 @@ impl KnowledgeBase {
                 // Apply utility_score: units that correlate with wins get promoted,
                 // units that correlate with losses get suppressed.
                 let utility_mult = 1.0 + self.units[idx].utility_score.max(0.01).log2();
-                (base_score * utility_mult, idx)
+
+                // FID-059: Source-based tier multiplier.
+                // YouTube interview knowledge (crypto-native, fast execution) gets 2.0x.
+                // Institutional book knowledge (hedge fund, conservative) gets 0.8x.
+                // This ensures the prompt is dominated by aggressive crypto knowledge.
+                let source = self.units[idx].source.to_lowercase();
+                let tier_mult = if source.starts_with("youtube") || source.starts_with("yt_") {
+                    2.0
+                } else if source.contains("wyckoff")
+                    || source.contains("elder")
+                    || source.contains("turtle")
+                    || source.contains("bulkowski")
+                    || source.contains("vpa")
+                {
+                    0.8
+                } else {
+                    1.0
+                };
+
+                (base_score * utility_mult * tier_mult, idx)
             })
             .collect();
 
