@@ -151,14 +151,8 @@ impl PaperTrader {
                 };
             }
         }
-        // Equity = USDC + sum(position market values), NOT just P&L
-        let position_values: f64 = self.positions.values()
-            .map(|p| p.current_price * p.quantity)
-            .sum();
-        self.account.equity = self.account.balance + position_values;
-        self.account.unrealized_pnl = self.positions.values()
-            .map(|p| p.unrealized_pnl)
-            .sum();
+        // Single source of truth for account metrics
+        self.account.refresh_from_positions(&self.positions);
     }
 
     pub fn check_stops(&mut self, prices: &HashMap<String, f64>) -> StopCheckResult {
@@ -412,8 +406,8 @@ impl PaperTrader {
 
         for id in to_remove {
             self.positions.remove(&id);
-            self.account.open_positions = self.positions.len();
         }
+        self.account.refresh_from_positions(&self.positions);
 
         StopCheckResult { closed, trails }
     }
@@ -426,12 +420,22 @@ impl PaperTrader {
         &self.closed_trades
     }
 
+    pub fn set_closed_trades(&mut self, trades: Vec<TradeRecord>) {
+        self.closed_trades = trades;
+    }
+
     pub fn positions(&self) -> &HashMap<String, Position> {
         &self.positions
     }
 
     pub fn positions_mut(&mut self) -> &mut HashMap<String, Position> {
         &mut self.positions
+    }
+
+    /// Recompute equity, unrealized P&L, and drawdown from current positions.
+    /// Single source of truth — call after any price or position change.
+    pub fn refresh_equity(&mut self) {
+        self.account.refresh_from_positions(&self.positions);
     }
 
     pub fn account_mut(&mut self) -> &mut AccountState {
@@ -616,7 +620,7 @@ impl ExecutionEngine for PaperTrader {
         }
         self.account.balance += pnl;
         self.account.daily_pnl += pnl;
-        self.account.open_positions = self.positions.len();
+        self.account.refresh_from_positions(&self.positions);
 
         self.order_counter += 1;
         Ok(Order {

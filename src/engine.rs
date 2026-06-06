@@ -441,10 +441,12 @@ pub async fn run(
             Err(e) => warn!("Failed to load positions from DB: {}", e),
         }
 
-        // Load closed trades into shared state
+        // Load closed trades into BOTH PaperTrader and shared state
+        // (paper is the source of truth — shared syncs from it every tick)
         match j.get_trades(500).await {
             Ok(closed) if !closed.is_empty() => {
                 info!("Loaded {} closed trades from journal", closed.len());
+                paper.set_closed_trades(closed.clone());
                 let mut shared_trades = shared.closed_trades.write().await;
                 *shared_trades = closed;
             }
@@ -921,15 +923,7 @@ pub async fn run(
         if discrepancies.is_empty() {
             info!("Wallet sync: all positions reconciled with on-chain balances");
         }
-        paper.account_mut().open_positions = paper.positions().len();
-        // Recalculate equity after reconciliation: USDC + position values
-        let position_values: f64 = paper.positions().values()
-            .map(|p| p.current_price * p.quantity)
-            .sum();
-        paper.account_mut().equity = paper.account_mut().balance + position_values;
-        paper.account_mut().unrealized_pnl = paper.positions().values()
-            .map(|p| p.unrealized_pnl)
-            .sum();
+        paper.refresh_equity();
         // Sync to shared state so dashboard and AI see correct balance/equity
         {
             let mut shared_account = shared.account.write().await;
@@ -1844,19 +1838,7 @@ pub async fn run(
                                                         paper.account_mut().open_positions =
                                                             paper.positions().len();
                                                         paper.account_mut().trades_today += 1;
-                                                        // Balance is synced from on-chain USDC via sync_balance.
-                                                        // Do NOT deduct here — the DexTrader already spent the USDC.
-                                                        // Update equity: USDC + position values
-        let position_values: f64 = paper.positions().values()
-            .map(|p| p.current_price * p.quantity)
-            .sum();
-        paper.account_mut().equity = paper.account_mut().balance + position_values;
-        paper.account_mut().unrealized_pnl = paper.positions().values()
-            .map(|p| p.unrealized_pnl)
-            .sum();
-                                                        paper.account_mut().unrealized_pnl = paper.positions().values()
-                                                            .map(|p| p.unrealized_pnl)
-                                                            .sum();
+                                                        paper.refresh_equity();
                                                         let acc = paper.account();
                                                         info!("AI position opened: {} — balance ${:.2}, equity ${:.2}",
                                                             decision.pair, acc.balance, acc.equity);
@@ -2243,14 +2225,6 @@ pub async fn run(
         }
         paper.update_prices(&all_prices);
 
-        let position_values: f64 = paper.positions().values()
-            .map(|p| p.current_price * p.quantity)
-            .sum();
-        paper.account_mut().equity = paper.account_mut().balance + position_values;
-        paper.account_mut().unrealized_pnl = paper.positions().values()
-            .map(|p| p.unrealized_pnl)
-            .sum();
-
         // Sync ALL shared state every tick so dashboard is always live
         {
             let mut sp = shared.positions.write().await;
@@ -2262,16 +2236,11 @@ pub async fn run(
         }
 
         // Sync balance from Kraken for live mode and propagate to PaperTrader
-        // PaperTrader's balance is used for circuit breaker checks, position sizing, and display
         if let Some(ref mut ex) = executor {
             if tick.is_multiple_of(10) && ex.sync_balance().await.is_ok() {
                 let kraken_balance = ex.balance();
-                // Only update balance and equity, not peak_equity (preserves drawdown tracking)
                 paper.account_mut().balance = kraken_balance;
-                let pos_vals: f64 = paper.positions().values()
-                    .map(|p| p.current_price * p.quantity)
-                    .sum();
-                paper.account_mut().equity = kraken_balance + pos_vals;
+                paper.refresh_equity();
                 debug!("Balance synced from Kraken: ${:.2}", kraken_balance);
             }
         }
