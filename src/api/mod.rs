@@ -71,7 +71,7 @@ pub async fn start_server(
         config: config.clone(),
         engine_status: Arc::new(RwLock::new(EngineStatus {
             running: false,
-            mode: if config.mode.paper_trading {
+            mode: if !config.mode.live_execution {
                 "PAPER".to_string()
             } else {
                 "LIVE".to_string()
@@ -125,6 +125,7 @@ pub async fn start_server(
         .route("/api/wallet", get(get_wallet))
         .route("/api/engine/start", post(start_engine))
         .route("/api/engine/stop", post(stop_engine))
+        .route("/api/engine/restart", post(restart_engine))
         .route("/api/terminal", get(terminal_ws))
         .with_state(state)
         .layer(cors)
@@ -164,7 +165,7 @@ async fn get_config(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
         "exchange": config.exchange.name,
         "pairs": config.trading.pairs,
         "timeframe": config.trading.timeframe,
-        "paper_trading": config.mode.paper_trading,
+        "live_execution": config.mode.live_execution,
         "starting_balance": config.trading.starting_balance,
         "autonomy_level": config.ai.autonomy_level,
         "model": config.ai.model,
@@ -441,9 +442,33 @@ async fn start_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_j
     };
 
     match result {
-        Ok(child) => {
+        Ok(mut child) => {
             state.engine_running.store(true, Ordering::Relaxed);
-            *state.engine_child.lock().unwrap() = Some(child);
+
+            // Spawn crash detection watchdog
+            let watchdog_running = state.engine_running.clone();
+            let watchdog_status = state.engine_status.clone();
+            let watchdog_child_id = child.id();
+            tokio::spawn(async move {
+                let exit_code = child.wait().await;
+                watchdog_running.store(false, Ordering::Relaxed);
+                let mut status = watchdog_status.write().await;
+                status.running = false;
+                status.ai_status = match &exit_code {
+                    Ok(s) if s.success() => "stopped".to_string(),
+                    Ok(s) => format!("crashed (exit code {})", s.code().unwrap_or(-1)),
+                    Err(e) => format!("error ({})", e),
+                };
+                if let Some(pid) = watchdog_child_id {
+                    tracing::warn!(
+                        "Engine process {} exited: {:?}",
+                        pid,
+                        exit_code
+                    );
+                }
+            });
+
+            *state.engine_child.lock().unwrap() = None;
             *state.engine_started_at.lock().unwrap() = Some(Instant::now());
 
             let mut status = state.engine_status.write().await;
@@ -482,6 +507,22 @@ async fn stop_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_js
     Json(ApiResponse::ok(
         serde_json::json!({"message": "Engine stopped"}),
     ))
+}
+
+async fn restart_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
+    // Stop
+    {
+        let child = state.engine_child.lock().unwrap().take();
+        if let Some(mut child) = child {
+            let _ = child.start_kill();
+        }
+        state.engine_running.store(false, Ordering::Relaxed);
+        *state.engine_started_at.lock().unwrap() = None;
+    }
+    tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+
+    // Start (reuse start_engine logic by calling it directly)
+    start_engine(State(state)).await
 }
 
 /// Health check endpoint for load balancers / Docker.

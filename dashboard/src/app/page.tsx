@@ -13,6 +13,7 @@ import { useEffect, useRef } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 dayjs.extend(relativeTime);
 
@@ -170,7 +171,9 @@ export default function Dashboard() {
         {/* Row 1: Equity | Performance | Market Insight */}
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-chart-area" title="Equity Curve" tag="live" />
-          <EquityChart data={state.equity} />
+          <ErrorBoundary label="Equity Curve">
+            <EquityChart data={state.equity} />
+          </ErrorBoundary>
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
@@ -344,7 +347,9 @@ export default function Dashboard() {
             <span className="w-2.5 h-2.5 rounded-full bg-[var(--red)]/80"></span>
           </div>
           <div className="flex-1 min-h-0">
-            <TerminalPanel className="h-full" />
+            <ErrorBoundary label="Terminal">
+              <TerminalPanel className="h-full" />
+            </ErrorBoundary>
           </div>
         </div>
 

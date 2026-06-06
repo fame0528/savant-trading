@@ -142,19 +142,19 @@ impl LlmProvider {
     }
 
     pub async fn chat(&self, system: &str, messages: &[Message]) -> Result<String, LlmError> {
+        let body = self.build_body(system, messages, false);
         let max_attempts = 3;
         let mut last_err = String::new();
 
         for attempt in 0..max_attempts {
-            let body = self.build_body(system, messages, false);
-            let resp = match self.send_request(&body).await {
+            let resp = match self.send_with_retry(&body, 3, "chat()").await {
                 Ok(r) => r,
                 Err(e) => {
                     last_err = format!("{}", e);
                     if attempt < max_attempts - 1 {
                         let wait = 2u64.pow(attempt as u32 + 1);
                         tracing::warn!(
-                            "chat() request failed (attempt {}/{}): {}. Retrying in {}s...",
+                            "chat() parse-retry (attempt {}/{}): {}. Retrying in {}s...",
                             attempt + 1, max_attempts, last_err, wait
                         );
                         tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
@@ -163,41 +163,6 @@ impl LlmProvider {
                     return Err(e);
                 }
             };
-
-            let status = resp.status();
-            if status == 429 {
-                let retry_after = resp
-                    .headers()
-                    .get("retry-after")
-                    .and_then(|v| v.to_str().ok())
-                    .and_then(|v| v.parse::<u64>().ok())
-                    .unwrap_or(60);
-                tracing::warn!(
-                    "chat() rate limited (attempt {}/{}). Waiting {}s...",
-                    attempt + 1, max_attempts, retry_after
-                );
-                tokio::time::sleep(std::time::Duration::from_secs(retry_after)).await;
-                last_err = format!("Rate limited (429), waited {}s", retry_after);
-                continue;
-            }
-            if status == 502 || status == 503 || status == 529 {
-                last_err = format!("HTTP {} (transient)", status);
-                if attempt < max_attempts - 1 {
-                    let wait = 2u64.pow(attempt as u32 + 1);
-                    tracing::warn!(
-                        "chat() HTTP {} (attempt {}/{}). Retrying in {}s...",
-                        status, attempt + 1, max_attempts, wait
-                    );
-                    tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
-                    continue;
-                }
-                let text = resp.text().await.unwrap_or_default();
-                return Err(LlmError::Http(format!("HTTP {}: {}", status, text)));
-            }
-            if !status.is_success() {
-                let text = resp.text().await.unwrap_or_default();
-                return Err(LlmError::Http(format!("HTTP {}: {}", status, text)));
-            }
 
             match Self::parse_non_streaming(resp).await {
                 Ok(content) => return Ok(content),
@@ -228,51 +193,18 @@ impl LlmProvider {
         system: &str,
         messages: &[Message],
     ) -> Result<String, LlmError> {
+        let stream_body = self.build_body(system, messages, true);
         let max_retries = 2;
         let mut last_err = String::new();
 
         for attempt in 0..max_retries {
-            let body = self.build_body(system, messages, true);
-            let resp = match self.send_request(&body).await {
+            let resp = match self.send_with_retry(&stream_body, 2, "Stream").await {
                 Ok(r) => r,
                 Err(e) => {
                     last_err = format!("{}", e);
-                    if attempt < max_retries - 1 {
-                        let wait = 2u64.pow(attempt as u32 + 1);
-                        tracing::warn!(
-                            "Stream request failed (attempt {}/{}): {}. Retrying in {}s...",
-                            attempt + 1,
-                            max_retries,
-                            last_err,
-                            wait
-                        );
-                        tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
-                        continue;
-                    }
                     break;
                 }
             };
-
-            let status = resp.status();
-            if status == 429 {
-                let retry_after = resp
-                    .headers()
-                    .get("retry-after")
-                    .and_then(|v| v.to_str().ok())
-                    .and_then(|v| v.parse::<u64>().ok())
-                    .unwrap_or(60);
-                tracing::warn!(
-                    "Stream rate limited (attempt {}/{}). Waiting {}s...",
-                    attempt + 1, max_retries, retry_after
-                );
-                tokio::time::sleep(std::time::Duration::from_secs(retry_after)).await;
-                last_err = format!("Rate limited (429), waited {}s", retry_after);
-                continue;
-            }
-            if !status.is_success() {
-                let text = resp.text().await.unwrap_or_default();
-                return Err(LlmError::Http(format!("HTTP {}: {}", status, text)));
-            }
 
             match Self::parse_streaming(resp).await {
                 Ok(content) => return Ok(content),
@@ -282,10 +214,7 @@ impl LlmProvider {
                         let wait = 2u64.pow(attempt as u32 + 1);
                         tracing::warn!(
                             "Stream parse failed (attempt {}/{}): {}. Retrying in {}s...",
-                            attempt + 1,
-                            max_retries,
-                            last_err,
-                            wait
+                            attempt + 1, max_retries, last_err, wait
                         );
                         tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
                         continue;
@@ -295,25 +224,12 @@ impl LlmProvider {
             }
         }
 
-        // Streaming failed all retries — fall back to non-streaming.
-        // Non-streaming reads the full response body at once, avoiding
-        // chunked transfer encoding issues that cause "error decoding
-        // response body" on large prompts.
         tracing::warn!(
             "All {} streaming attempts failed ({}). Falling back to non-streaming.",
-            max_retries,
-            last_err
+            max_retries, last_err
         );
         let body = self.build_body(system, messages, false);
-        let resp = self.send_request(&body).await?;
-        let status = resp.status();
-        if status == 429 {
-            return Err(LlmError::RateLimited(60));
-        }
-        if !status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            return Err(LlmError::Http(format!("HTTP {}: {}", status, text)));
-        }
+        let resp = self.send_with_retry(&body, 1, "Fallback").await?;
         Self::parse_non_streaming(resp).await
     }
 
@@ -361,6 +277,79 @@ impl LlmProvider {
             .send()
             .await
             .map_err(|e| LlmError::Http(format!("{}", e)))
+    }
+
+    /// Shared retry logic for HTTP requests. Handles 429 (with retry-after),
+    /// 502/503/529 (transient), and connection errors with exponential backoff.
+    /// Returns the successful response for the caller to parse.
+    async fn send_with_retry(
+        &self,
+        body: &serde_json::Value,
+        max_attempts: u32,
+        label: &str,
+    ) -> Result<reqwest::Response, LlmError> {
+        let mut last_err = String::new();
+
+        for attempt in 0..max_attempts {
+            let resp = match self.send_request(body).await {
+                Ok(r) => r,
+                Err(e) => {
+                    last_err = format!("{}", e);
+                    if attempt < max_attempts - 1 {
+                        let wait = 2u64.pow(attempt + 1);
+                        tracing::warn!(
+                            "{} request failed (attempt {}/{}): {}. Retrying in {}s...",
+                            label, attempt + 1, max_attempts, last_err, wait
+                        );
+                        tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
+                        continue;
+                    }
+                    return Err(e);
+                }
+            };
+
+            let status = resp.status();
+            if status == 429 {
+                let retry_after = resp
+                    .headers()
+                    .get("retry-after")
+                    .and_then(|v| v.to_str().ok())
+                    .and_then(|v| v.parse::<u64>().ok())
+                    .unwrap_or(60);
+                tracing::warn!(
+                    "{} rate limited (attempt {}/{}). Waiting {}s...",
+                    label, attempt + 1, max_attempts, retry_after
+                );
+                tokio::time::sleep(std::time::Duration::from_secs(retry_after)).await;
+                last_err = format!("Rate limited (429), waited {}s", retry_after);
+                continue;
+            }
+            if status == 502 || status == 503 || status == 529 {
+                last_err = format!("HTTP {} (transient)", status);
+                if attempt < max_attempts - 1 {
+                    let wait = 2u64.pow(attempt + 1);
+                    tracing::warn!(
+                        "{} HTTP {} (attempt {}/{}). Retrying in {}s...",
+                        label, status, attempt + 1, max_attempts, wait
+                    );
+                    tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
+                    continue;
+                }
+                let text = resp.text().await.unwrap_or_default();
+                return Err(LlmError::Http(format!("HTTP {}: {}", status, text)));
+            }
+            if !status.is_success() {
+                let text = resp.text().await.unwrap_or_default();
+                return Err(LlmError::Http(format!("HTTP {}: {}", status, text)));
+            }
+
+            return Ok(resp);
+        }
+
+        Err(LlmError::Http(format!(
+            "All {} attempts failed: {}",
+            max_attempts, last_err
+        )))
     }
 
     async fn parse_non_streaming(resp: reqwest::Response) -> Result<String, LlmError> {

@@ -177,7 +177,7 @@ fn capitalize_module(name: &str) -> String {
         "goplus" => return "GoPlus".to_string(),
         "kraken" => return "Kraken Data".to_string(),
         "trader" => return "DEX Trader".to_string(),
-        "paper" => return "Balance".to_string(),
+        "portfolio" => return "Balance".to_string(),
         "episodic" => return "Episodic Memory".to_string(),
         "aggregator" => return "Insight".to_string(),
         "liquidation" => return "Liquidation".to_string(),

@@ -384,7 +384,7 @@ pub struct RegimeConfig {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct ModeConfig {
-    pub paper_trading: bool,
+    pub live_execution: bool,
 }
 
 impl AppConfig {
@@ -512,7 +512,7 @@ impl Default for AppConfig {
                 },
             },
             mode: ModeConfig {
-                paper_trading: true,
+                live_execution: false,
             },
             ai: AiConfig {
                 provider: "nvidia".into(),

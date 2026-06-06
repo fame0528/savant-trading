@@ -98,8 +98,8 @@ impl TuiSnapshot {
             "1inch" => "1inch DEX",
             _ => &config.exchange.backend,
         };
-        let mode_label = if config.mode.paper_trading {
-            "Paper Trading"
+        let mode_label = if !config.mode.live_execution {
+            "Simulated"
         } else {
             "LIVE"
         };

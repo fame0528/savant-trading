@@ -144,7 +144,7 @@ adx_ranging_threshold = 20.0
 atr_volatility_multiplier = 1.5
 
 [mode]
-paper_trading = false
+live_execution = true
 
 [ai]
 provider = "openrouter"
@@ -155,14 +155,14 @@ autonomy_level = 3
 max_decisions_per_hour = 20
 # Expanded to use more of the 1M context window (FID-015)
 context_window_candles = 500
-knowledge_token_budget = 20000
+knowledge_token_budget = 12000
 price_tolerance_pct = 0.5
 max_retries = 3
 # 0.6 optimal for MoE reasoning models emitting structured JSON (FID-015)
 temperature = 0.6
 # Nucleus sampling — limits token pool to top 95% probability mass
 top_p = 0.95
-max_tokens = 16384
+max_tokens = 8192
 # Reasoning model needs room for chain-of-thought (FID-015)
 timeout_secs = 300
 

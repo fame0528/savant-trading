@@ -26,7 +26,7 @@ pub struct StopCheckResult {
     pub trails: Vec<TrailingEvent>,
 }
 
-pub struct PaperTrader {
+pub struct PortfolioManager {
     positions: HashMap<String, Position>,
     closed_trades: Vec<TradeRecord>,
     account: AccountState,
@@ -48,7 +48,7 @@ pub struct PaperTrader {
     best_ask: HashMap<String, f64>,
 }
 
-impl PaperTrader {
+impl PortfolioManager {
     pub fn new(starting_balance: f64, fee_rate: f64, slippage_pct: f64) -> Self {
         Self {
             positions: HashMap::new(),
@@ -515,7 +515,7 @@ impl PaperTrader {
 }
 
 #[async_trait]
-impl ExecutionEngine for PaperTrader {
+impl ExecutionEngine for PortfolioManager {
     async fn place_order(
         &mut self,
         pair: &str,
@@ -567,7 +567,7 @@ impl ExecutionEngine for PaperTrader {
 
         self.order_counter += 1;
         let order = Order {
-            id: format!("paper-{}", self.order_counter),
+            id: format!("order-{}", self.order_counter),
             pair: pair.to_string(),
             side,
             order_type: if price.is_some() {
@@ -624,7 +624,7 @@ impl ExecutionEngine for PaperTrader {
 
         self.order_counter += 1;
         Ok(Order {
-            id: format!("paper-close-{}", self.order_counter),
+            id: format!("close-{}", self.order_counter),
             pair: pos.pair.clone(),
             side: match pos.side {
                 Side::Long => Side::Short,
@@ -691,7 +691,7 @@ mod tests {
 
     #[test]
     fn stop_loss_full_close() {
-        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
         let pos = make_position("p1", 100.0, 95.0, 105.0, 110.0, 115.0);
         trader.positions.insert(pos.id.clone(), pos);
 
@@ -706,7 +706,7 @@ mod tests {
 
     #[test]
     fn tp1_scales_out_50_percent() {
-        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
         let pos = make_position("p1", 100.0, 95.0, 105.0, 110.0, 115.0);
         trader.positions.insert(pos.id.clone(), pos);
 
@@ -727,7 +727,7 @@ mod tests {
 
     #[test]
     fn tp2_scales_out_after_tp1() {
-        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
         let mut pos = make_position("p1", 100.0, 95.0, 105.0, 110.0, 115.0);
         pos.scale_level = ScaleLevel::Scaled50;
         pos.stop_loss = 100.0; // already at break-even
@@ -747,7 +747,7 @@ mod tests {
 
     #[test]
     fn tp3_full_close_after_scale_out() {
-        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
         let mut pos = make_position("p1", 100.0, 95.0, 105.0, 110.0, 115.0);
         pos.scale_level = ScaleLevel::Scaled80;
         pos.stop_loss = 100.0;
@@ -765,7 +765,7 @@ mod tests {
 
     #[test]
     fn stop_at_break_even_after_tp1() {
-        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
         let mut pos = make_position("p1", 100.0, 95.0, 105.0, 110.0, 115.0);
         pos.scale_level = ScaleLevel::Scaled50;
         pos.stop_loss = 100.0; // break-even
@@ -793,7 +793,7 @@ mod tests {
 
     #[test]
     fn trailing_stop_fires_event() {
-        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
         let pos = make_position("p1", 100.0, 95.0, 120.0, 130.0, 140.0);
         trader.positions.insert(pos.id.clone(), pos);
 
@@ -816,7 +816,7 @@ mod tests {
 
     #[test]
     fn no_trail_when_price_drops() {
-        let mut trader = PaperTrader::new(1000.0, 0.001, 0.0005);
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
         let pos = make_position("p1", 100.0, 95.0, 105.0, 110.0, 115.0);
         trader.positions.insert(pos.id.clone(), pos);
 

@@ -23,7 +23,7 @@ use savant_trading::execution::dex::zero_x::ZeroXBackend;
 use savant_trading::execution::dex::DexTrader;
 use savant_trading::execution::engine::ExecutionEngine;
 use savant_trading::execution::kraken::{KrakenTrader, KrakenTraderConfig};
-use savant_trading::execution::paper::PaperTrader;
+use savant_trading::execution::portfolio::PortfolioManager;
 use savant_trading::insight::aggregator::{InsightAggregator, InsightConfig};
 use savant_trading::monitor::journal::TradeJournal;
 use savant_trading::monitor::metrics::{Metrics, PerformanceMetrics};
@@ -62,7 +62,7 @@ pub fn parse_timeframe_minutes(tf: &str) -> u32 {
 
 /// Create a live execution engine based on config mode + backend.
 ///
-/// Returns `None` for paper trading (`paper_trading: true`).
+/// Returns `None` for simulated mode (`live_execution: false`).
 /// Otherwise creates the appropriate backend:
 ///   - `"kraken"` → [`KrakenTrader`] (requires KRAKEN_API_KEY/Secret env vars)
 ///   - `"0x"`     → [`DexTrader<ZeroXBackend>`] (requires WALLET_PRIVATE_KEY + ZEROEX_API_KEY)
@@ -70,8 +70,8 @@ pub fn parse_timeframe_minutes(tf: &str) -> u32 {
 async fn create_executor(
     config: &AppConfig,
 ) -> Result<Option<Box<dyn ExecutionEngine>>, anyhow::Error> {
-    if config.mode.paper_trading {
-        info!("Paper trading mode: using PaperTrader");
+    if !config.mode.live_execution {
+        info!("portfolio trading mode: using PortfolioManager");
         return Ok(None);
     }
 
@@ -298,7 +298,7 @@ pub async fn run(
     // but ONLY create pairs from the curated config list (FID-052: Arbitrum trap fix)
     let curated_pairs: std::collections::HashSet<String> =
         config.trading.pairs.iter().cloned().collect();
-    if !config.mode.paper_trading && config.exchange.backend != "kraken" {
+    if config.mode.live_execution && config.exchange.backend != "kraken" {
         let mut all_token_entries: Vec<(String, String, u8)> = Vec::new();
         for &(sym, addr, dec) in savant_trading::execution::dex::ARBITRUM_TOKENS {
             all_token_entries.push((sym.to_string(), addr.to_string(), dec));
@@ -316,7 +316,7 @@ pub async fn run(
         );
     }
 
-    let mut paper = PaperTrader::new(
+    let mut portfolio = PortfolioManager::new(
         config.trading.starting_balance,
         config.trading.fee_rate,
         config.trading.slippage_pct,
@@ -331,7 +331,7 @@ pub async fn run(
     // KrakenTrader, DexTrader, and future engines all work through the same
     // Box<dyn ExecutionEngine> handle.
     let mut executor: Option<Box<dyn ExecutionEngine>> = None;
-    if !config.mode.paper_trading {
+    if config.mode.live_execution {
         match create_executor(&config).await {
             Ok(Some(trader)) => {
                 info!(
@@ -343,34 +343,34 @@ pub async fn run(
             Ok(None) => {}
             Err(e) => {
                 error!("Failed to initialize live executor: {}", e);
-                warn!("Falling back to PaperTrader for safety");
+                warn!("Falling back to PortfolioManager for safety");
             }
         }
     }
 
-    // Sync on-chain balance on startup — dashboard reads from PaperTrader
+    // Sync on-chain balance on startup — dashboard reads from PortfolioManager
     if let Some(ref mut ex) = executor {
         if ex.sync_balance().await.is_ok() {
             let on_chain_balance = ex.balance();
             if on_chain_balance > 0.0 {
-                paper.set_balance(on_chain_balance);
+                portfolio.set_balance(on_chain_balance);
                 info!("Synced on-chain balance: ${:.2}", on_chain_balance);
             }
         }
     }
 
     // Reconcile: if the executor has no positions (e.g., phantom positions were
-    // cleared during DexTrader init), clear PaperTrader positions too.
+    // cleared during DexTrader init), clear PortfolioManager positions too.
     // This prevents the engine from managing phantom positions that don't exist on-chain.
     if let Some(ref ex) = executor {
-        if ex.open_positions().is_empty() && !paper.positions().is_empty() {
+        if ex.open_positions().is_empty() && !portfolio.positions().is_empty() {
             warn!(
-                "PHANTOM POSITIONS: executor has 0 positions but PaperTrader has {}. Clearing PaperTrader.",
-                paper.positions().len()
+                "PHANTOM POSITIONS: executor has 0 positions but PortfolioManager has {}. Clearing PortfolioManager.",
+                portfolio.positions().len()
             );
-            paper.positions_mut().clear();
-            paper.account_mut().open_positions = 0;
-            paper.account_mut().unrealized_pnl = 0.0;
+            portfolio.positions_mut().clear();
+            portfolio.account_mut().open_positions = 0;
+            portfolio.account_mut().unrealized_pnl = 0.0;
         }
     }
 
@@ -392,7 +392,7 @@ pub async fn run(
         let trades = j.get_trades(10000).await.unwrap_or_default();
         if !trades.is_empty() {
             let total_pnl: f64 = trades.iter().map(|t| t.pnl).sum();
-            // Only restore balance from DB trades in paper mode.
+            // Only restore balance from DB trades in portfolio mode.
             // In live mode, the on-chain sync (above) is the source of truth.
             if executor.is_none() {
                 let restored_balance = config.trading.starting_balance + total_pnl;
@@ -403,11 +403,11 @@ pub async fn run(
                     total_pnl,
                     trades.len()
                 );
-                paper.set_balance(restored_balance);
+                portfolio.set_balance(restored_balance);
             } else {
                 info!(
                     "Loaded {} closed trades from journal (PnL: ${:.2}) — balance from on-chain: ${:.2}",
-                    trades.len(), total_pnl, paper.account().balance
+                    trades.len(), total_pnl, portfolio.account().balance
                 );
             }
         }
@@ -432,21 +432,21 @@ pub async fn run(
                     }
                     info!("  {} {} | Entry: {:.4} SL: {:.4} TP1: {:.4} | Qty: {:.6}",
                         pos.pair, pos.side, pos.entry_price, pos.stop_loss, pos.take_profit_1, pos.quantity);
-                    paper.positions_mut().insert(pos.id.clone(), pos);
+                    portfolio.positions_mut().insert(pos.id.clone(), pos);
                 }
-                paper.account_mut().open_positions = paper.positions().len();
-                info!("Loaded {} positions from DB", paper.positions().len());
+                portfolio.account_mut().open_positions = portfolio.positions().len();
+                info!("Loaded {} positions from DB", portfolio.positions().len());
             }
             Ok(_) => info!("No persisted positions in DB"),
             Err(e) => warn!("Failed to load positions from DB: {}", e),
         }
 
-        // Load closed trades into BOTH PaperTrader and shared state
-        // (paper is the source of truth — shared syncs from it every tick)
+        // Load closed trades into BOTH PortfolioManager and shared state
+        // (portfolio is the source of truth — shared syncs from it every tick)
         match j.get_trades(500).await {
             Ok(closed) if !closed.is_empty() => {
                 info!("Loaded {} closed trades from journal", closed.len());
-                paper.set_closed_trades(closed.clone());
+                portfolio.set_closed_trades(closed.clone());
                 let mut shared_trades = shared.closed_trades.write().await;
                 *shared_trades = closed;
             }
@@ -500,14 +500,14 @@ pub async fn run(
     // Seed shared state IMMEDIATELY — don't wait for tick 10
     {
         let mut shared_account = shared.account.write().await;
-        *shared_account = paper.account().clone();
+        *shared_account = portfolio.account().clone();
         let mut shared_positions = shared.positions.write().await;
-        *shared_positions = paper.positions().values().cloned().collect();
+        *shared_positions = portfolio.positions().values().cloned().collect();
     }
     info!(
         "Shared state seeded: balance=${:.2}, {} positions, {} trades",
-        paper.account().balance,
-        paper.positions().len(),
+        portfolio.account().balance,
+        portfolio.positions().len(),
         shared.closed_trades.read().await.len()
     );
 
@@ -889,7 +889,7 @@ pub async fn run(
                     scale_level: savant_trading::core::types::ScaleLevel::Full,
                     opened_at: chrono::Utc::now(),
                 };
-                paper.positions_mut().insert(recovery_pos.id.clone(), recovery_pos.clone());
+                portfolio.positions_mut().insert(recovery_pos.id.clone(), recovery_pos.clone());
                 if let Some(ref j) = journal {
                     let _ = j.save_position(&recovery_pos).await;
                 }
@@ -903,11 +903,11 @@ pub async fn run(
                 ).await;
             } else if *on_chain_qty < 0.001 && *tracked_qty > 0.001 {
                 // Tracked position but no on-chain tokens — ghost, remove
-                if let Some(pos_id) = paper.positions().iter()
+                if let Some(pos_id) = portfolio.positions().iter()
                     .find(|(_, p)| p.pair == *pair)
                     .map(|(id, _)| id.clone())
                 {
-                    paper.positions_mut().remove(&pos_id);
+                    portfolio.positions_mut().remove(&pos_id);
                     if let Some(ref j) = journal {
                         let _ = j.delete_position(&pos_id).await;
                     }
@@ -923,16 +923,16 @@ pub async fn run(
         if discrepancies.is_empty() {
             info!("Wallet sync: all positions reconciled with on-chain balances");
         }
-        paper.refresh_equity();
+        portfolio.refresh_equity();
         // Sync to shared state so dashboard and AI see correct balance/equity
         {
             let mut shared_account = shared.account.write().await;
-            *shared_account = paper.account().clone();
+            *shared_account = portfolio.account().clone();
             let mut shared_positions = shared.positions.write().await;
-            *shared_positions = paper.positions().values().cloned().collect();
+            *shared_positions = portfolio.positions().values().cloned().collect();
         }
         info!("Wallet sync complete: {} positions, balance=${:.2}, equity=${:.2}",
-            paper.positions().len(), paper.account().balance, paper.account().equity);
+            portfolio.positions().len(), portfolio.account().balance, portfolio.account().equity);
     }
 
     info!(
@@ -952,12 +952,16 @@ pub async fn run(
     // Track latest WS ticker prices
     let mut ws_ticker_prices: HashMap<String, f64> = HashMap::new();
 
-    // Track PaperTrader position ID → ExecutionEngine position ID mapping
+    // Track PortfolioManager position ID → ExecutionEngine position ID mapping
     // Used for stop-loss placement and position close routing across the two systems
     let mut executor_position_map: HashMap<String, String> = HashMap::new();
 
     // FID-046: Dead token cache — skip pairs that returned all-zero candles
     let mut dead_tokens: std::collections::HashSet<String> = std::collections::HashSet::new();
+
+    // FID-056 #2+#6: Candle hash cache — skip LLM eval if candle data unchanged since last cycle.
+    // Uses a simple hash of the last 5 close prices + volume to detect data staleness.
+    let mut candle_hash_cache: std::collections::HashMap<String, u64> = std::collections::HashMap::new();
 
     let mut tick = 0u64;
 
@@ -983,7 +987,7 @@ pub async fn run(
                 savant_trading::data::websocket::WsMessage::CancelAllOrders { reason } => {
                     warn!("WS CANCEL-ALL TRIGGERED: {}", reason);
                     // Log emergency close warnings BEFORE clearing so output is not lost
-                    let emergency_pairs: Vec<(Side, f64, String, f64)> = paper
+                    let emergency_pairs: Vec<(Side, f64, String, f64)> = portfolio
                         .positions()
                         .values()
                         .map(|pos| (pos.side, pos.quantity, pos.pair.clone(), pos.current_price))
@@ -999,10 +1003,10 @@ pub async fn run(
                         // Clear position mapping since executor cancelled everything
                         executor_position_map.clear();
                     }
-                    // Clear PaperTrader positions to match executor state (AFTER logging)
-                    let cleared_count = paper.positions().len();
-                    paper.positions_mut().clear();
-                    paper.account_mut().open_positions = 0;
+                    // Clear PortfolioManager positions to match executor state (AFTER logging)
+                    let cleared_count = portfolio.positions().len();
+                    portfolio.positions_mut().clear();
+                    portfolio.account_mut().open_positions = 0;
                     info!(
                         "Cleared {} local positions to match executor cancel-all",
                         cleared_count
@@ -1065,8 +1069,8 @@ pub async fn run(
         }
         let mut pair_data_vec: Vec<PairData> = Vec::new();
         let market_ctx = insight.cached().clone();
-        let positions: Vec<Position> = paper.positions().values().cloned().collect();
-        let recent_trades = paper.closed_trades().to_vec();
+        let positions: Vec<Position> = portfolio.positions().values().cloned().collect();
+        let recent_trades = portfolio.closed_trades().to_vec();
         let current_session = savant_trading::core::session::current_session();
 
         // FID-046: Retry dead tokens every 10 cycles
@@ -1074,7 +1078,24 @@ pub async fn run(
             dead_tokens.clear();
         }
 
+        // FID-056 #1: Skip LLM evaluation when no deployable capital.
+        // No reason to burn API calls if there's no USDC to open new positions.
+        // Continue to position monitoring (stops/trailing/TP) below.
+        let available_balance = if let Some(ref ex) = executor {
+            ex.balance()
+        } else {
+            portfolio.account().balance
+        };
+        let min_order_value = 1.0_f64;
+        let fully_deployed = available_balance < min_order_value;
+        if fully_deployed {
+            log_phase!("PHASE2", "SKIPPED — fully deployed (${:.2} < ${:.2} min). Monitoring positions only.", available_balance, min_order_value);
+        }
+
         for pair in &active_pairs {
+            if fully_deployed {
+                break;
+            }
             if dead_tokens.contains(pair.as_str()) {
                 continue;
             }
@@ -1104,7 +1125,7 @@ pub async fn run(
                 }
 
                 // Pre-filter: Skip tokens not in curated pairs (FID-052)
-                if !config.mode.paper_trading
+                if config.mode.live_execution
                     && config.exchange.backend != "kraken"
                     && !curated_pairs.contains(pair)
                 {
@@ -1129,7 +1150,7 @@ pub async fn run(
                 // Arbitrum tokens, but real volume is on-chain. The LLM can evaluate them.
                 // FID-046 caveat: Still reject tokens with ZERO candle activity (dead tokens).
                 let avg_volume: f64 = candle_data.iter().map(|c| c.volume).sum::<f64>() / candle_data.len() as f64;
-                if avg_volume < 100.0 && (config.mode.paper_trading || config.exchange.backend == "kraken") {
+                if avg_volume < 100.0 && (!config.mode.live_execution || config.exchange.backend == "kraken") {
                     continue;
                 }
                 // DEX safety: reject tokens with near-zero price diversity
@@ -1157,6 +1178,25 @@ pub async fn run(
                     continue;
                 }
 
+                // FID-056 #2+#6: Skip LLM eval if candle data unchanged since last cycle.
+                // Hash last 5 closes + last volume to detect data staleness.
+                {
+                    use std::hash::{Hash, Hasher};
+                    let mut hasher = std::hash::DefaultHasher::new();
+                    let tail = candle_data.iter().rev().take(5);
+                    for c in tail {
+                        c.close.to_bits().hash(&mut hasher);
+                        c.volume.to_bits().hash(&mut hasher);
+                    }
+                    let hash = hasher.finish();
+                    if let Some(&prev) = candle_hash_cache.get(pair.as_str()) {
+                        if prev == hash {
+                            continue;
+                        }
+                    }
+                    candle_hash_cache.insert(pair.to_string(), hash);
+                }
+
                 // GoPlus security check (FID-035): reject honeypots/taxed tokens
                 // before LLM evaluation. Meme coins can have hidden taxes or be
                 // un-sellable. This check prevents wasting LLM cycles on bad tokens.
@@ -1182,6 +1222,26 @@ pub async fn run(
                 ));
                 let ob_imbalance = order_books.get(pair.as_str()).map(|ob| ob.imbalance(5));
                 let current_price = candle_data.last().map(|c| c.close).unwrap_or(0.0);
+
+                // FID-056 #5: Smart pre-scoring — skip pairs with no plausible setup.
+                // Only send to LLM if at least one signal fires: RSI extreme, strong trend, or EMA cross.
+                // This avoids burning API calls on 90% of pairs that are clearly "no trade" at this moment.
+                {
+                    let rsi = indicators.rsi.unwrap_or(50.0);
+                    let adx = indicators.adx.unwrap_or(0.0);
+                    let ema_fast = indicators.ema_fast.unwrap_or(0.0);
+                    let ema_slow = indicators.ema_slow.unwrap_or(0.0);
+
+                    let rsi_signal = !(30.0..=70.0).contains(&rsi);
+                    let trend_signal = adx > 25.0;
+                    let ema_cross = (ema_fast > 0.0 && ema_slow > 0.0)
+                        && ((ema_fast > ema_slow && candle_data.last().map(|c| c.close).unwrap_or(0.0) > ema_fast)
+                            || (ema_fast < ema_slow && candle_data.last().map(|c| c.close).unwrap_or(0.0) < ema_fast));
+
+                    if !rsi_signal && !trend_signal && !ema_cross {
+                        continue;
+                    }
+                }
 
                 // Query memory context with timeout to prevent SQLite deadlocks
                 let memory_ctx_str = if let Some(ref mem) = memory {
@@ -1241,7 +1301,7 @@ pub async fn run(
                     volume_profile: profile.as_ref(),
                     market_context: &market_ctx,
                     positions: &positions,
-                    account: paper.account(),
+                    account: portfolio.account(),
                     pair,
                     recent_trades: if recent_trades.is_empty() {
                         None
@@ -1509,7 +1569,7 @@ pub async fn run(
                     // Execute if autonomous
                     log_phase!("EXECUTION", "Checking {} (action={:?})", decision.pair, decision.action);
                     if matches!(autonomy, AutonomyLevel::Autonomous) {
-                        match circuit_breaker.check(paper.account()) {
+                        match circuit_breaker.check(portfolio.account()) {
                             CircuitBreakerResult::Triggered(reason) => {
                                 log_circuit!("CIRCUIT BREAKER", "{} — {}", decision.pair, reason);
                                 let _ = std::fs::write(
@@ -1529,7 +1589,7 @@ pub async fn run(
                                             let positions = if let Some(ref ex) = executor {
                                                 ex.open_positions()
                                             } else {
-                                                paper.positions().values().collect()
+                                                portfolio.positions().values().collect()
                                             };
                                             positions.into_iter()
                                                 .filter(|p| p.pair == decision.pair)
@@ -1558,7 +1618,7 @@ pub async fn run(
                                                         }
                                                     }
                                                 } else {
-                                                    paper.close_position(pos_id).await
+                                                    portfolio.close_position(pos_id).await
                                                 };
 
                                                 match close_result {
@@ -1581,7 +1641,7 @@ pub async fn run(
                                                             decision.action, decision.pair, pos_id,
                                                             exit_price, pnl, pnl_pct,
                                                         );
-                                                        paper.account_mut().trades_today += 1;
+                                                        portfolio.account_mut().trades_today += 1;
 
                                                         let trade = TradeRecord {
                                                             id: format!("ai-close-{}", tick),
@@ -1620,11 +1680,11 @@ pub async fn run(
                                                         // Update shared state immediately
                                                         {
                                                             let mut sp = shared.positions.write().await;
-                                                            *sp = paper.positions().values().cloned().collect();
+                                                            *sp = portfolio.positions().values().cloned().collect();
                                                             let mut sa = shared.account.write().await;
-                                                            *sa = paper.account().clone();
+                                                            *sa = portfolio.account().clone();
                                                             let mut st = shared.closed_trades.write().await;
-                                                            *st = paper.closed_trades().to_vec();
+                                                            *st = portfolio.closed_trades().to_vec();
                                                         }
 
                                                         event_bus.publish(TradingEvent::PositionClosed(trade));
@@ -1729,7 +1789,7 @@ pub async fn run(
                                         }
 
                                         let ps = position_sizer.calculate(
-                                            paper.account(),
+                                            portfolio.account(),
                                             decision.entry_price,
                                             decision.stop_loss,
                                             decision.take_profit_1,
@@ -1749,7 +1809,7 @@ pub async fn run(
                                                 let positions = if let Some(ref ex) = executor {
                                                     ex.open_positions()
                                                 } else {
-                                                    paper.positions().values().collect()
+                                                    portfolio.positions().values().collect()
                                                 };
                                                 positions.iter().any(|p| p.pair == decision.pair && p.side == decision.side)
                                             };
@@ -1757,7 +1817,7 @@ pub async fn run(
                                             let total_portfolio = if let Some(ref ex) = executor {
                                                 ex.balance()
                                             } else {
-                                                paper.account().balance
+                                                portfolio.account().balance
                                             };
                                             let max_concentration = if config.trading.full_deploy && total_portfolio < config.risk.low_balance_threshold {
                                                 1.00
@@ -1802,7 +1862,7 @@ pub async fn run(
                                                         }
                                                     }
                                                 } else {
-                                                    paper
+                                                    portfolio
                                                         .place_order(
                                                             &decision.pair,
                                                             decision.side,
@@ -1831,15 +1891,15 @@ pub async fn run(
                                                             opened_at: chrono::Utc::now(),
                                                             scale_level: ScaleLevel::Full,
                                                         };
-                                                        // Track position in PaperTrader for state/reporting
-                                                        paper
+                                                        // Track position in PortfolioManager for state/reporting
+                                                        portfolio
                                                             .positions_mut()
                                                             .insert(pos.id.clone(), pos.clone());
-                                                        paper.account_mut().open_positions =
-                                                            paper.positions().len();
-                                                        paper.account_mut().trades_today += 1;
-                                                        paper.refresh_equity();
-                                                        let acc = paper.account();
+                                                        portfolio.account_mut().open_positions =
+                                                            portfolio.positions().len();
+                                                        portfolio.account_mut().trades_today += 1;
+                                                        portfolio.refresh_equity();
+                                                        let acc = portfolio.account();
                                                         info!("AI position opened: {} — balance ${:.2}, equity ${:.2}",
                                                             decision.pair, acc.balance, acc.equity);
 
@@ -1908,9 +1968,9 @@ pub async fn run(
                                                         // Update shared state immediately
                                                         {
                                                             let mut sp = shared.positions.write().await;
-                                                            *sp = paper.positions().values().cloned().collect();
+                                                            *sp = portfolio.positions().values().cloned().collect();
                                                             let mut sa = shared.account.write().await;
-                                                            *sa = paper.account().clone();
+                                                            *sa = portfolio.account().clone();
                                                         }
 
                                                         event_bus.publish(TradingEvent::PositionOpened(pos));
@@ -1970,22 +2030,22 @@ pub async fn run(
         for (pair, price) in &ws_ticker_prices {
             all_prices.insert(pair.clone(), *price);
         }
-        // Capture paper position IDs and full details BEFORE check_stops removes them from the map
-        let paper_positions_before: Vec<(String, String, Side, f64)> = paper
+        // Capture portfolio position IDs and full details BEFORE check_stops removes them from the map
+        let paper_positions_before: Vec<(String, String, Side, f64)> = portfolio
             .positions()
             .iter()
             .map(|(id, pos)| (id.clone(), pos.pair.clone(), pos.side, pos.entry_price))
             .collect();
         // Full position clones for restoration if executor close fails
         let paper_positions_full: std::collections::HashMap<String, savant_trading::core::types::Position> =
-            paper.positions().iter().map(|(id, pos)| (id.clone(), pos.clone())).collect();
+            portfolio.positions().iter().map(|(id, pos)| (id.clone(), pos.clone())).collect();
 
-        let stop_result = paper.check_stops(&all_prices);
+        let stop_result = portfolio.check_stops(&all_prices);
 
         // Log trailing stop events
         for trail in &stop_result.trails {
             // Calculate actual dollar risk: distance per unit × quantity held
-            let qty = paper.positions().values()
+            let qty = portfolio.positions().values()
                 .find(|p| p.pair == trail.pair && p.side == trail.side)
                 .map(|p| p.quantity)
                 .unwrap_or(0.0);
@@ -1995,7 +2055,7 @@ pub async fn run(
 
             // DB: update trailed position + log activity
             if let Some(ref j) = journal {
-                if let Some((_, pos)) = paper.positions().iter().find(|(_, p)| p.pair == trail.pair && p.side == trail.side) {
+                if let Some((_, pos)) = portfolio.positions().iter().find(|(_, p)| p.pair == trail.pair && p.side == trail.side) {
                     let _ = j.save_position(pos).await;
                 }
                 let _ = j.record_activity("Trade", &trail.pair,
@@ -2009,10 +2069,10 @@ pub async fn run(
             ).await;
         }
 
-        // In live mode, close positions on executor that PaperTrader closed via stops
+        // In live mode, close positions on executor that PortfolioManager closed via stops
         for trade in &stop_result.closed {
             if let Some(ref mut ex) = executor {
-                // Match closed trade to paper position by pair + side + entry_price
+                // Match closed trade to portfolio position by pair + side + entry_price
                 let paper_id = paper_positions_before
                     .iter()
                     .find(|(_, pair, side, entry)| {
@@ -2031,12 +2091,12 @@ pub async fn run(
                 if let Some(ref eid) = exec_id {
                     if let Err(e) = ex.close_position(eid).await {
                         warn!("Failed to close executor position {}: {} — position stays open", eid, e);
-                        // Restore position to PaperTrader so it stays tracked
+                        // Restore position to PortfolioManager so it stays tracked
                         if let Some(ref pid) = paper_id {
                             if let Some(pos) = paper_positions_full.get(pid) {
-                                paper.positions_mut().insert(pid.clone(), pos.clone());
-                                paper.account_mut().open_positions = paper.positions().len();
-                                warn!("Restored position {} to PaperTrader — will retry close next cycle", pid);
+                                portfolio.positions_mut().insert(pid.clone(), pos.clone());
+                                portfolio.account_mut().open_positions = portfolio.positions().len();
+                                warn!("Restored position {} to PortfolioManager — will retry close next cycle", pid);
                                 shared.log_activity(
                                     savant_trading::core::shared::ActivityLevel::Warning,
                                     &trade.pair,
@@ -2061,12 +2121,12 @@ pub async fn run(
                     if let Some(fid) = fallback_id {
                         if let Err(e) = ex.close_position(&fid).await {
                             warn!("Failed to close fallback position {}: {} — position stays open", fid, e);
-                            // Restore position to PaperTrader
+                            // Restore position to PortfolioManager
                             if let Some(ref pid) = paper_id {
                                 if let Some(pos) = paper_positions_full.get(pid) {
-                                    paper.positions_mut().insert(pid.clone(), pos.clone());
-                                    paper.account_mut().open_positions = paper.positions().len();
-                                    warn!("Restored position {} to PaperTrader — will retry close next cycle", pid);
+                                    portfolio.positions_mut().insert(pid.clone(), pos.clone());
+                                    portfolio.account_mut().open_positions = portfolio.positions().len();
+                                    warn!("Restored position {} to PortfolioManager — will retry close next cycle", pid);
                                     shared.log_activity(
                                         savant_trading::core::shared::ActivityLevel::Warning,
                                         &trade.pair,
@@ -2200,15 +2260,15 @@ pub async fn run(
         // Sync shared state after stop checks (positions may have closed or scaled)
         if has_stop_activity {
             let mut sp = shared.positions.write().await;
-            *sp = paper.positions().values().cloned().collect();
+            *sp = portfolio.positions().values().cloned().collect();
             let mut sa = shared.account.write().await;
-            *sa = paper.account().clone();
+            *sa = portfolio.account().clone();
             let mut st = shared.closed_trades.write().await;
-            *st = paper.closed_trades().to_vec();
+            *st = portfolio.closed_trades().to_vec();
 
             // DB: persist scale-out position updates
             if let Some(ref j) = journal {
-                for pos in paper.positions().values() {
+                for pos in portfolio.positions().values() {
                     let _ = j.save_position(pos).await;
                 }
             }
@@ -2223,31 +2283,31 @@ pub async fn run(
         for (pair, price) in &ws_ticker_prices {
             all_prices.insert(pair.clone(), *price);
         }
-        paper.update_prices(&all_prices);
+        portfolio.update_prices(&all_prices);
 
         // Sync ALL shared state every tick so dashboard is always live
         {
             let mut sp = shared.positions.write().await;
-            *sp = paper.positions().values().cloned().collect();
+            *sp = portfolio.positions().values().cloned().collect();
         }
         {
             let mut sa = shared.account.write().await;
-            *sa = paper.account().clone();
+            *sa = portfolio.account().clone();
         }
 
-        // Sync balance from Kraken for live mode and propagate to PaperTrader
+        // Sync balance from Kraken for live mode and propagate to PortfolioManager
         if let Some(ref mut ex) = executor {
             if tick.is_multiple_of(10) && ex.sync_balance().await.is_ok() {
                 let kraken_balance = ex.balance();
-                paper.account_mut().balance = kraken_balance;
-                paper.refresh_equity();
+                portfolio.account_mut().balance = kraken_balance;
+                portfolio.refresh_equity();
                 debug!("Balance synced from Kraken: ${:.2}", kraken_balance);
             }
         }
 
         if tick.is_multiple_of(10) {
-            let account = paper.account();
-            let trades = paper.closed_trades();
+            let account = portfolio.account();
+            let trades = portfolio.closed_trades();
             let metrics = PerformanceMetrics::calculate(trades);
             info!(
                 "[STATUS] Balance: ${:.2} | Equity: ${:.2} | DD: {:.1}% | AI: {} | {}",
@@ -2263,7 +2323,7 @@ pub async fn run(
             );
 
             // Position dashboard — show all open positions with targets & PnL
-            let positions: Vec<_> = paper.positions().values().collect();
+            let positions: Vec<_> = portfolio.positions().values().collect();
             if !positions.is_empty() {
                 log_position!("POSITIONS", "{} open position{}", positions.len(),
                     if positions.len() == 1 { "" } else { "s" });
@@ -2317,7 +2377,7 @@ pub async fn run(
                 let mut shared_account = shared.account.write().await;
                 *shared_account = account.clone();
                 let mut shared_positions = shared.positions.write().await;
-                *shared_positions = paper.positions().values().cloned().collect();
+                *shared_positions = portfolio.positions().values().cloned().collect();
                 let mut shared_trades = shared.closed_trades.write().await;
                 *shared_trades = trades.to_vec();
                 let mut shared_insight = shared.insight.write().await;
@@ -2432,9 +2492,9 @@ pub async fn run(
                 // Final position sync to shared state before exit
                 {
                     let mut sp = shared.positions.write().await;
-                    *sp = paper.positions().values().cloned().collect();
+                    *sp = portfolio.positions().values().cloned().collect();
                     let mut sa = shared.account.write().await;
-                    *sa = paper.account().clone();
+                    *sa = portfolio.account().clone();
                 }
                 info!("Savant engine shut down cleanly.");
                 return Ok(());
@@ -2553,7 +2613,7 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
         &prompts::default_output_format(),
     );
 
-    let paper = PaperTrader::new(
+    let portfolio = PortfolioManager::new(
         config.trading.starting_balance,
         config.trading.fee_rate,
         config.trading.slippage_pct,
@@ -2565,7 +2625,7 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
         volume_profile: Some(&profile),
         market_context: &market_ctx,
         positions: &[],
-        account: paper.account(),
+        account: portfolio.account(),
         pair: &pair,
         recent_trades: None,
         order_book_imbalance: None,
@@ -3028,7 +3088,7 @@ async fn run_training_batch(
             savant_trading::core::session::current_session()
         };
 
-        let paper = PaperTrader::new(
+        let portfolio = PortfolioManager::new(
             config.trading.starting_balance,
             config.trading.fee_rate,
             config.trading.slippage_pct,
@@ -3040,7 +3100,7 @@ async fn run_training_batch(
             volume_profile: Some(&profile),
             market_context: &market_ctx,
             positions: &[],
-            account: paper.account(),
+            account: portfolio.account(),
             pair: "BTC/USD",
             recent_trades: None,
             order_book_imbalance: Some(0.1),
@@ -4148,7 +4208,7 @@ pub async fn run_sandbox(config: AppConfig, model_override: Option<String>, _man
             savant_trading::core::session::current_session()
         };
 
-        let paper = PaperTrader::new(
+        let portfolio = PortfolioManager::new(
             config.trading.starting_balance,
             config.trading.fee_rate,
             config.trading.slippage_pct,
@@ -4160,7 +4220,7 @@ pub async fn run_sandbox(config: AppConfig, model_override: Option<String>, _man
             volume_profile: Some(&profile),
             market_context: &market_ctx,
             positions: &[],
-            account: paper.account(),
+            account: portfolio.account(),
             pair: "BTC/USD",
             recent_trades: None,
             order_book_imbalance: Some(0.2),
@@ -4490,7 +4550,7 @@ pub async fn run_sandbox(config: AppConfig, model_override: Option<String>, _man
             pairs: config.trading.pairs.clone(),
             timeframe: config.trading.timeframe.clone(),
             model: config.ai.model.clone(),
-            concurrency: 10,
+            concurrency: max_concurrent,
             starting_balance: config.trading.starting_balance,
         },
         savant_trading::sandbox::run_report::KnowledgeStats {

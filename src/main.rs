@@ -339,8 +339,8 @@ async fn main() -> anyhow::Result<()> {
     info!("=== SAVANT TRADING ENGINE v0.5.0 ===");
     info!(
         "Mode: {}",
-        if config.mode.paper_trading {
-            "PAPER"
+        if !config.mode.live_execution {
+            "SIMULATED"
         } else {
             "LIVE"
         }

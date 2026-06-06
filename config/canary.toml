@@ -10,7 +10,7 @@
 #            full-deployment config.
 #
 # Safety notes:
-#   - paper_trading = false  -> THIS TRADES REAL MONEY on the live account.
+#   - live_execution = true  -> THIS TRADES REAL MONEY on the live account.
 #   - Long-only: shorts are skipped automatically (spot account).
 #   - Start the engine, watch data/alerts.jsonl and the API /status for a few
 #     fills, confirm stops/TPs behave, THEN widen pairs / raise positions.
@@ -108,7 +108,7 @@ adx_ranging_threshold = 20.0
 atr_volatility_multiplier = 1.5
 
 [mode]
-paper_trading = false
+live_execution = true
 
 [ai]
 provider = "openrouter"

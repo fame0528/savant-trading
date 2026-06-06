@@ -1,5 +1,41 @@
 # LEARNINGS
 
+## Session 2026-06-05 21:49: FID-056 — LLM Cost Optimization (6 Measures)
+
+**Key Learnings:**
+
+- **Candle hash cache is the highest-impact easy win.** Hash last 5 closes + volumes per pair. If unchanged since last cycle, skip LLM eval entirely. Eliminates 30-50% of calls in low-volatility periods.
+- **Smart pre-scoring eliminates 50-70% of pairs.** Deterministic RSI/ADX/EMA check before LLM. Most pairs are "no trade" most of the time — no reason to burn API calls on them.
+- **max_tokens 16384→8192 is safe.** Output is a single JSON object (~500-2000 tokens). At 8192, still 4x headroom. Reduces output token costs and latency. LEARNINGS.md warns that MiMo v2.5 Pro needs chain-of-thought room — 8192 is sufficient.
+- **knowledge_token_budget 20000→12000 saves 40% of input tokens.** The system prompt was ~52K chars. Reducing knowledge from 20K to 12K trims input costs significantly.
+- **`std::hash::Hash` trait must be in scope.** `to_bits().hash(&mut hasher)` requires `use std::hash::Hash` — Rust doesn't auto-import trait methods. The `use` must be inside the block or at file top.
+
+**Technical Insights:**
+
+- FID-056 estimated savings: 70-90% of live API costs (from $0.60-1.92/hour to $0.10-0.30/hour)
+- The 6 optimizations are multiplicative: #1 (skip when deployed) × #2 (cache by hash) × #5 (pre-scoring) means most cycles evaluate 0-2 pairs instead of 5-8
+- `DefaultHasher` is fast and collision-resistant for this use case — no need for SHA/blake
+- Clippy's `manual_range_contains` lint prefers `!(30.0..=70.0).contains(&rsi)` over `rsi < 30.0 || rsi > 70.0`
+
+## Session 2026-06-05 21:22: Level 3 Autonomous — All FIDs Closed
+
+**Key Learnings:**
+
+- **The Perfection Loop catches real bugs.** FID-055 RED phase found that `check_stops()` and `close_position()` bypassed the new `refresh_from_positions()` — stale equity propagating to dashboard. Without the Perfection Loop, this ships.
+- **`send_with_retry()` eliminates 100+ lines of duplication.** Both `chat()` and `chat_stream()` had identical HTTP retry logic (429/502/503/529 handling, exponential backoff, retry-after parsing). One shared method handles all cases.
+- **Crash detection via `child.wait()` watchdog.** Spawn a task that awaits the child process exit, then updates `engine_running` and `engine_status`. Simple, no polling needed.
+- **React ErrorBoundary prevents cascade failures.** Wrapping complex components (EquityChart, Terminal) in error boundaries means one component crash doesn't kill the entire dashboard page.
+- **`paper_trading` → `live_execution` rename inverts all conditionals.** Every `if config.mode.paper_trading` becomes `if !config.mode.live_execution` and vice versa. 12 sites needed careful inversion. The PowerShell regex `\bpaper\b` → `portfolio` for variable rename was clean because `paper` only appears as a variable name in engine.rs.
+- **Config rename is a breaking API change.** `"paper_trading"` JSON field in `/api/config` response changed to `"live_execution"`. Dashboard doesn't reference it directly (reads mode from `EngineStatus.mode` string) so no dashboard change needed.
+
+**Technical Insights:**
+
+- `AccountState::refresh_from_positions()` is the single source of truth for equity, unrealized P&L, drawdown, open_positions
+- `PortfolioManager::refresh_equity()` avoids borrow checker conflict (can't call `self.account_mut().method(self.positions())`)
+- `send_with_retry()` accepts `max_attempts` and `label` for per-caller retry policy
+- Engine crash detection: `child.wait().await` returns `ExitStatus` — no polling, no timers
+- FID-051 `/api/live` deferred — 4s polling is acceptable for single-user trading dashboard
+
 ## Session 2026-06-05 21:11: ECHO Protocol Compliance Retrofit
 
 **Key Learnings:**

@@ -1458,7 +1458,7 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         );
         // Stop-loss value is on the Position struct, which is persisted to SQLite
         // by the engine on every open/close/trail event. No separate persistence needed.
-        // PaperTrader::check_stops() fires the stop every cycle.
+        // PortfolioManager::check_stops() fires the stop every cycle.
         Ok(())
     }
 
