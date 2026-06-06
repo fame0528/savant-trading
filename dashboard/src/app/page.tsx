@@ -159,8 +159,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-6 gap-1.5 shrink-0">
         <KPI icon="fa-wallet" label="Equity" value={fmt.usd(eq)} color="text-[var(--cyan)]" />
         <KPI icon="fa-bank" label="Cash Balance" value={fmt.usd(portfolio?.balance ?? 0)} sub="USD available" />
-        <KPI icon="fa-chart-line" label="Unrealized P&L" value={fmt.usd(portfolio?.unrealized_pnl ?? 0)} sub={`${positions.length} open`} color={pnlClass(portfolio?.unrealized_pnl ?? 0)} />
-        <KPI icon="fa-flag-checkered" label="Realized P&L" value={fmt.usd(session?.total_pnl ?? 0)} sub={`${session?.total_trades ?? 0} trades`} color={pnlClass(session?.total_pnl ?? 0)} />
+        <KPI icon="fa-sack-dollar" label="Profit" value={fmt.usd((portfolio?.unrealized_pnl ?? 0) + (session?.total_pnl ?? 0))} sub={`${fmt.usd(session?.total_pnl ?? 0)} locked · ${fmt.usd(portfolio?.unrealized_pnl ?? 0)} open`} color={pnlClass((portfolio?.unrealized_pnl ?? 0) + (session?.total_pnl ?? 0))} />
         <KPI icon="fa-bullseye" label="Win Rate" value={`${((session?.win_rate ?? 0) * 100).toFixed(0)}%`} sub={`${session?.wins ?? 0}W / ${session?.losses ?? 0}L`} color="text-[var(--green)]" />
         <KPI icon="fa-arrow-trend-down" label="Drawdown" value={`${((portfolio?.drawdown_pct ?? 0) * 100).toFixed(1)}%`} sub={risk?.circuit_breaker ?? "—"} color="text-[var(--red)]" />
       </div>
@@ -263,7 +262,8 @@ export default function Dashboard() {
                     <div className="grid grid-cols-4 gap-1 mt-1 text-[9px]">
                       <div><span className="block text-[7px] text-[var(--dimmer)] uppercase flex items-center gap-0.5"><Icon name="fa-eye" className="text-[5px]" />Now</span>{fmt.price(p.current_price)}</div>
                       <div><span className="block text-[7px] text-[var(--dimmer)] uppercase flex items-center gap-0.5"><Icon name="fa-coins" className="text-[5px]" />Qty</span>{p.quantity.toPrecision(3)}</div>
-                      <div><span className="block text-[7px] text-[var(--dimmer)] uppercase flex items-center gap-0.5"><Icon name="fa-bomb" className="text-[5px]" />Risk</span>{fmt.usd(p.risk_amount)}</div>
+                      <div><span className="block text-[7px] text-[var(--dimmer)] uppercase flex items-center gap-0.5"><Icon name="fa-coins" className="text-[5px]" />Size</span>{fmt.usd(p.entry_price * p.quantity)}</div>
+                      <div><span className="block text-[7px] text-[var(--dimmer)] uppercase flex items-center gap-0.5"><Icon name="fa-shield" className="text-[5px]" />Risk</span>{fmt.usd(Math.abs(p.entry_price - p.stop_loss) * p.quantity)}</div>
                       <div><span className="block text-[7px] text-[var(--dimmer)] uppercase flex items-center gap-0.5"><Icon name="fa-hourglass-half" className="text-[5px]" />Age</span>{dayjs(p.opened_at).fromNow(true)}</div>
                     </div>
                   </div>

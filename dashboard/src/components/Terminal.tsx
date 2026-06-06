@@ -32,7 +32,10 @@ export default function TerminalPanel({ className }: TerminalPanelProps) {
     socket.onmessage = (event) => {
       const text = event.data as string;
       const now = new Date();
-      const ts = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+      const h = now.getHours();
+      const ampm = h >= 12 ? "PM" : "AM";
+      const h12 = h % 12 || 12;
+      const ts = `${h12}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")} ${ampm}`;
       const prefixed = text.split("\r\n").map((line: string) => {
         if (!line.trim()) return line;
         if (/^\x1b\[[\d;]*m?\[/.test(line) || /^\[/.test(line)) return `\x1b[90m${ts}\x1b[0m ${line}`;

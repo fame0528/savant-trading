@@ -497,6 +497,16 @@ pub async fn run(
         }
     }
 
+    // Seed equity curve with current equity so dashboard doesn't show stale $22-23
+    {
+        let mut curve = shared.equity_curve.write().await;
+        curve.push(serde_json::json!({
+            "timestamp": chrono::Utc::now().to_rfc3339(),
+            "equity": portfolio.account().equity,
+            "balance": portfolio.account().balance,
+        }));
+    }
+
     // Seed shared state IMMEDIATELY — don't wait for tick 10
     {
         let mut shared_account = shared.account.write().await;
