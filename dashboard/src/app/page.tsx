@@ -162,6 +162,7 @@ export default function Dashboard() {
         <KPI icon="fa-sack-dollar" label="Profit" value={fmt.usd((portfolio?.unrealized_pnl ?? 0) + (session?.total_pnl ?? 0))} sub={`${fmt.usd(session?.total_pnl ?? 0)} locked · ${fmt.usd(portfolio?.unrealized_pnl ?? 0)} open`} color={pnlClass((portfolio?.unrealized_pnl ?? 0) + (session?.total_pnl ?? 0))} />
         <KPI icon="fa-bullseye" label="Win Rate" value={`${((session?.win_rate ?? 0) * 100).toFixed(0)}%`} sub={`${session?.wins ?? 0}W / ${session?.losses ?? 0}L`} color="text-[var(--green)]" />
         <KPI icon="fa-arrow-trend-down" label="Drawdown" value={`${((portfolio?.drawdown_pct ?? 0) * 100).toFixed(1)}%`} sub={risk?.circuit_breaker ?? "—"} color="text-[var(--red)]" />
+        <KPI icon="fa-layer-group" label="Positions" value={`${positions.length} / ${risk?.max_positions ?? 3}`} sub={positions.length > 0 ? positions.map(p => p.pair.split("/")[0]).join(", ") : "none open"} />
       </div>
 
       {/* ── Bento Grid ── */}
