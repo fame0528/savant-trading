@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0605-053-sandbox-robustness.md`
 **ID:** FID-2026-0605-053
 **Severity:** critical
-**Status:** created
+**Status:** in_progress
 **Created:** 2026-06-05 17:29
 **Author:** Kilo (mimo-v2.5-pro)
 
@@ -159,6 +159,21 @@ cargo clippy -- -D warnings
 - **Verified By:** —
 - **Commit/PR:** —
 - **Archived:** —
+
+---
+
+## Audit Status (2026-06-05)
+
+| # | Fix | Status |
+|---|-----|--------|
+| 1 | Retry loop in `chat()` (3 attempts, exp backoff) | ✅ Done — `provider.rs:144-224` |
+| 2 | Shared `send_request_with_retry()` | ❌ Missing — retry logic duplicated |
+| 3 | Configurable `SANDBOX_CONCURRENCY` | ✅ Done — `engine.rs:4226` (minor: report hardcodes 10) |
+| 4 | Rate limit detection with global backoff | ✅ Done — `engine.rs:4330-4387` |
+| 5 | Scenario retry queue | ✅ Done — `engine.rs:4332-4387` |
+| 6 | Catch panics in scenario tasks | ✅ Done — via `JoinSet` error propagation |
+
+**Remaining gaps:** Factor retry logic into shared `send_request_with_retry()`. Fix hardcoded concurrency in RunReport.
 
 ---
 

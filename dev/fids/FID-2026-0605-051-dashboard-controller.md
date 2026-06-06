@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0605-051-dashboard-controller.md`
 **ID:** FID-2026-0605-051
 **Severity:** critical
-**Status:** verified
+**Status:** in_progress
 **Created:** 2026-06-05 01:30
 **Author:** Flux (opencode / mimo-v2.5-pro)
 
@@ -457,3 +457,18 @@ Show shimmer placeholders while first data fetch is in flight.
 - **Verified By:** —
 - **Commit/PR:** —
 - **Archived:** —
+
+---
+
+## Audit Status (2026-06-05)
+
+| Phase | Tasks | Done | Remaining |
+|-------|-------|------|-----------|
+| 1. Process Management | 5 | 4 | Crash detection watchdog, restart endpoint |
+| 2. Wallet | 4 | 4 | — |
+| 3. Real-time | 4 | 3 | `/api/live` real-time push |
+| 4. Security | 3 | 3 | — |
+| 5. Operations | 3 | 3 | — |
+| 8. Dashboard | 3 | 2 | React error boundaries |
+
+**Remaining gaps:** Crash detection (child process death goes undetected), `restart_engine` endpoint, `/api/live` SSE/WebSocket for live portfolio push, error boundaries in dashboard.
