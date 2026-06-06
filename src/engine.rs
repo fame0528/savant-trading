@@ -2301,6 +2301,9 @@ pub async fn run(
                 let kraken_balance = ex.balance();
                 portfolio.account_mut().balance = kraken_balance;
                 portfolio.refresh_equity();
+                // Re-sync shared state after balance change so dashboard is live
+                let mut sa = shared.account.write().await;
+                *sa = portfolio.account().clone();
                 debug!("Balance synced from Kraken: ${:.2}", kraken_balance);
             }
         }
