@@ -1,7 +1,7 @@
 # HANDOFF.md — Session Compaction Document
 
 **Generated:** 2026-06-06 04:05 EST
-**Version:** 0.9.1
+**Version:** 0.10.0
 **Branch:** main (latest commit: ed0a002)
 
 ---
