@@ -156,6 +156,9 @@ impl PaperTrader {
             .map(|p| p.current_price * p.quantity)
             .sum();
         self.account.equity = self.account.balance + position_values;
+        self.account.unrealized_pnl = self.positions.values()
+            .map(|p| p.unrealized_pnl)
+            .sum();
     }
 
     pub fn check_stops(&mut self, prices: &HashMap<String, f64>) -> StopCheckResult {

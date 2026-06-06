@@ -71,3 +71,9 @@ nul
 *.swp
 *.swo
 *~
+
+.crush/
+
+# LLM dumps (too large for repo)
+docs/*llms-full.md
+docs/hero-llms-full.md

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { formatTime12h, formatTimeShort } from "@/lib/time";
 import {
   ProgressBarRoot,
   ProgressBarFill,
@@ -354,13 +355,9 @@ export default function Dashboard() {
             <span className="ml-auto text-[9px] font-bold text-[var(--cyan)]">{activity.length}</span>
             <button
               onClick={() => {
-                const text = [...activity].reverse().map(e => {
-                  const raw = e.timestamp.replace("T", " ").slice(11, 19);
-                  const [h, m, s] = raw.split(":").map(Number);
-                  const period = h >= 12 ? "PM" : "AM";
-                  const h12 = h % 12 || 12;
-                  return `${h12}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")} ${period} [${e.pair}] ${e.message}`;
-                }).join("\n");
+                const text = [...activity].reverse().map(e =>
+                  `${formatTime12h(e.timestamp)} [${e.pair}] ${e.message}`
+                ).join("\n");
                 navigator.clipboard.writeText(text);
               }}
               className="text-[var(--dim)] hover:text-[var(--cyan)] transition-colors cursor-pointer"
@@ -377,13 +374,7 @@ export default function Dashboard() {
                 <div key={i} className={`flex gap-2 py-px border-b border-white/[0.02] whitespace-nowrap ${
                   e.level === "Trade" ? "text-[var(--green)]" : e.level === "Decision" ? "text-[var(--violet)]" : e.level === "Warning" || e.level === "Error" ? "text-[var(--red)]" : e.level === "Thinking" ? "text-[var(--amber)]" : "text-[var(--txt)]"
                 }`}>
-                  <span className="text-[var(--dimmer)] shrink-0">{(() => {
-                    const raw = e.timestamp.replace("T", " ").slice(11, 19);
-                    const [h, m, s] = raw.split(":").map(Number);
-                    const period = h >= 12 ? "PM" : "AM";
-                    const h12 = h % 12 || 12;
-                    return `${h12}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")} ${period}`;
-                  })()}</span>
+                  <span className="text-[var(--dimmer)] shrink-0">{formatTime12h(e.timestamp)}</span>
                   <span className="text-[var(--cyan)] shrink-0 w-[60px] overflow-hidden text-ellipsis">{e.pair}</span>
                   <span className="overflow-hidden text-ellipsis">{e.message}</span>
                 </div>

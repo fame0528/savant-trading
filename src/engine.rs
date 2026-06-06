@@ -448,7 +448,12 @@ pub async fn run(
                 let mut shared_trades = shared.closed_trades.write().await;
                 *shared_trades = closed;
             }
-            _ => {}
+            Ok(_) => {
+                info!("No closed trades in journal");
+            }
+            Err(e) => {
+                warn!("Failed to load closed trades from journal: {}", e);
+            }
         }
 
         // Load activity log into shared state
@@ -472,7 +477,9 @@ pub async fn run(
                     });
                 }
             }
-            _ => {}
+            _ => {
+                info!("No activity entries in journal");
+            }
         }
 
         // Load equity curve snapshots into shared state
@@ -482,7 +489,9 @@ pub async fn run(
                 let mut shared_curve = shared.equity_curve.write().await;
                 *shared_curve = snapshots;
             }
-            _ => {}
+            _ => {
+                info!("No equity snapshots in journal");
+            }
         }
     }
 
@@ -918,6 +927,9 @@ pub async fn run(
             .map(|p| p.current_price * p.quantity)
             .sum();
         paper.account_mut().equity = paper.account_mut().balance + position_values;
+        paper.account_mut().unrealized_pnl = paper.positions().values()
+            .map(|p| p.unrealized_pnl)
+            .sum();
         // Sync to shared state so dashboard and AI see correct balance/equity
         {
             let mut shared_account = shared.account.write().await;
@@ -1835,10 +1847,16 @@ pub async fn run(
                                                         // Balance is synced from on-chain USDC via sync_balance.
                                                         // Do NOT deduct here — the DexTrader already spent the USDC.
                                                         // Update equity: USDC + position values
-                                                        let position_values: f64 = paper.positions().values()
-                                                            .map(|p| p.current_price * p.quantity)
+        let position_values: f64 = paper.positions().values()
+            .map(|p| p.current_price * p.quantity)
+            .sum();
+        paper.account_mut().equity = paper.account_mut().balance + position_values;
+        paper.account_mut().unrealized_pnl = paper.positions().values()
+            .map(|p| p.unrealized_pnl)
+            .sum();
+                                                        paper.account_mut().unrealized_pnl = paper.positions().values()
+                                                            .map(|p| p.unrealized_pnl)
                                                             .sum();
-                                                        paper.account_mut().equity = paper.account_mut().balance + position_values;
                                                         let acc = paper.account();
                                                         info!("AI position opened: {} — balance ${:.2}, equity ${:.2}",
                                                             decision.pair, acc.balance, acc.equity);
@@ -2225,12 +2243,23 @@ pub async fn run(
         }
         paper.update_prices(&all_prices);
 
-        // Recalculate equity EVERY tick: USDC + sum(position market values).
-        // NOT balance + unrealized_pnl (that only counts profit, not the position itself).
         let position_values: f64 = paper.positions().values()
             .map(|p| p.current_price * p.quantity)
             .sum();
         paper.account_mut().equity = paper.account_mut().balance + position_values;
+        paper.account_mut().unrealized_pnl = paper.positions().values()
+            .map(|p| p.unrealized_pnl)
+            .sum();
+
+        // Sync ALL shared state every tick so dashboard is always live
+        {
+            let mut sp = shared.positions.write().await;
+            *sp = paper.positions().values().cloned().collect();
+        }
+        {
+            let mut sa = shared.account.write().await;
+            *sa = paper.account().clone();
+        }
 
         // Sync balance from Kraken for live mode and propagate to PaperTrader
         // PaperTrader's balance is used for circuit breaker checks, position sizing, and display

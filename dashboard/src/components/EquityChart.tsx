@@ -2,14 +2,11 @@
 
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import type { EquitySnapshot } from "@/lib/api";
+import { formatTimeShort } from "@/lib/time";
 
 const fmt = {
   usd: (v: number) =>
     (v < 0 ? "-$" : "$") + Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-  time: (ts: string) => {
-    const d = new Date(ts);
-    return `${d.getHours() % 12 || 12}:${String(d.getMinutes()).padStart(2, "0")} ${d.getHours() >= 12 ? "PM" : "AM"}`;
-  },
 };
 
 export default function EquityChart({ data }: { data: EquitySnapshot[] }) {
@@ -22,7 +19,7 @@ export default function EquityChart({ data }: { data: EquitySnapshot[] }) {
   }
 
   const chartData = data.map((d) => ({
-    time: fmt.time(d.timestamp),
+    time: formatTimeShort(d.timestamp),
     equity: d.equity,
     balance: d.balance,
   }));

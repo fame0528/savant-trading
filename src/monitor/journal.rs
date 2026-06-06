@@ -11,6 +11,12 @@ pub struct TradeJournal {
 
 impl TradeJournal {
     pub async fn new(database_url: &str) -> Result<Self, sqlx::Error> {
+        // Resolve to absolute path for logging — relative paths can create
+        // new empty DBs if working directory differs.
+        let abs_path = std::path::Path::new(database_url.trim_start_matches("sqlite:"));
+        let abs_display = abs_path.canonicalize().unwrap_or_else(|_| abs_path.to_path_buf());
+        info!("Trade journal connecting to: {}", abs_display.display());
+
         let options = SqliteConnectOptions::from_str(database_url)?
             .journal_mode(SqliteJournalMode::Wal)
             .busy_timeout(std::time::Duration::from_secs(5))
