@@ -1275,8 +1275,11 @@ pub async fn run(
                 }
 
                 // FID-056 #2+#6: Skip LLM eval if candle data unchanged since last cycle.
-                // Hash last 5 closes + last volume to detect data staleness.
-                {
+                // EXCEPTION: Always re-evaluate pairs with open positions — the LLM needs
+                // to see current price + position state for stop adjustments, even if
+                // candle data hasn't changed yet.
+                let has_position = positions.iter().any(|p| p.pair == *pair);
+                if !has_position {
                     use std::hash::{Hash, Hasher};
                     let mut hasher = std::hash::DefaultHasher::new();
                     let tail = candle_data.iter().rev().take(5);
@@ -1326,8 +1329,9 @@ pub async fn run(
 
                 // FID-056 #5: Smart pre-scoring — skip pairs with no plausible setup.
                 // Only send to LLM if at least one signal fires: RSI extreme, strong trend, or EMA cross.
-                // This avoids burning API calls on 90% of pairs that are clearly "no trade" at this moment.
-                {
+                // EXCEPTION: Always evaluate pairs with open positions — the LLM may need to
+                // adjust stops based on price action even without technical signals.
+                if !has_position {
                     let rsi = indicators.rsi.unwrap_or(50.0);
                     let adx = indicators.adx.unwrap_or(0.0);
                     let ema_fast = indicators.ema_fast.unwrap_or(0.0);
