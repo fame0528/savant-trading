@@ -222,7 +222,7 @@ pub struct Order {
     pub created_at: DateTime<Utc>,
     pub filled_at: Option<DateTime<Utc>>,
     pub filled_price: Option<f64>,
-    /// On-chain transaction hash (DEX swaps only). None for paper/Kraken.
+    /// On-chain transaction hash (DEX swaps only). None for paper trading.
     pub tx_hash: Option<String>,
 }
 

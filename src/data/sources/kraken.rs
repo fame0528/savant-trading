@@ -1,33 +1,33 @@
-//! Kraken candle source — highest quality, 5m candles, ~20 pairs.
+//! Kraken candle feed — highest quality, 5m candles, ~20 pairs.
 //!
-//! Wraps the existing KrakenClient to implement the CandleSource trait.
+//! Wraps the CandleClient to implement the CandleSource trait.
 
 use super::CandleSource;
 use crate::core::error::ExecutionError;
 use crate::core::types::Candle;
-use crate::data::kraken::KrakenClient;
+use crate::data::candle_client::CandleClient;
 use async_trait::async_trait;
 
-pub struct KrakenSource {
-    client: KrakenClient,
+pub struct KrakenFeed {
+    client: CandleClient,
 }
 
-impl KrakenSource {
+impl KrakenFeed {
     pub fn new(rest_url: &str) -> Self {
         Self {
-            client: KrakenClient::new(rest_url),
+            client: CandleClient::new(rest_url),
         }
     }
 }
 
 #[async_trait]
-impl CandleSource for KrakenSource {
+impl CandleSource for KrakenFeed {
     fn name(&self) -> &str {
         "Kraken"
     }
 
     fn might_have(&self, _pair: &str) -> bool {
-        true // Kraken might have any pair — let the API decide
+        true
     }
 
     async fn fetch_candles(
@@ -40,24 +40,19 @@ impl CandleSource for KrakenSource {
             .client
             .get_ohlc(pair, timeframe_minutes, None)
             .await
-            .map_err(|e| ExecutionError::Other(format!("Kraken OHLC error: {}", e)))?;
+            .map_err(|e| ExecutionError::Other(format!("OHLC error: {}", e)))?;
 
-        // Remove the last (forming) candle
         if candles.len() > 1 {
             candles.pop();
         }
 
-        // Limit to requested count
         if candles.len() > count as usize {
             let start = candles.len() - count as usize;
             candles = candles[start..].to_vec();
         }
 
         if candles.is_empty() {
-            return Err(ExecutionError::Other(format!(
-                "Kraken: no candles for {}",
-                pair
-            )));
+            return Err(ExecutionError::Other(format!("No candles for {}", pair)));
         }
 
         Ok(candles)

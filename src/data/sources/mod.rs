@@ -4,7 +4,7 @@
 //! Multiple sources can be tried in priority order via `SourceRouter`.
 //!
 //! Sources:
-//!   - KrakenSource — highest quality, 5m candles, ~20 pairs
+//!   - KrakenFeed — highest quality, 5m candles, ~20 pairs
 //!   - CoinGeckoSource — broader coverage, thousands of tokens
 //!   - DeFiLlamaSource — DEX-native, Arbitrum pairs
 

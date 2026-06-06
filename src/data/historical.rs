@@ -92,7 +92,7 @@ fn cache_path(pair: &str, interval_minutes: u32) -> String {
 ///
 /// Rate limit: 1 request per second for public endpoints.
 pub async fn fetch_historical(
-    client: &crate::data::kraken::KrakenClient,
+    client: &crate::data::candle_client::CandleClient,
     pair: &str,
     interval_minutes: u32,
     days: u32,
@@ -190,7 +190,7 @@ pub async fn fetch_historical(
 /// Cache is considered fresh if it's less than 24 hours old and covers
 /// the requested time range.
 pub async fn get_historical(
-    client: &crate::data::kraken::KrakenClient,
+    client: &crate::data::candle_client::CandleClient,
     pair: &str,
     interval_minutes: u32,
     days: u32,
@@ -223,7 +223,7 @@ pub async fn get_historical(
 ///
 /// This function is the single entry point for training data.
 pub async fn get_best_historical(
-    client: &crate::data::kraken::KrakenClient,
+    client: &crate::data::candle_client::CandleClient,
     pair: &str,
     interval_minutes: u32,
 ) -> Result<HistoricalDataset, String> {

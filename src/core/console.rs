@@ -169,7 +169,7 @@ use tracing_subscriber::Layer;
 
 pub struct SavantLayer;
 
-/// Capitalize module name: `funding_rates` → `FundingRates`, `kraken` → `Kraken`
+/// Capitalize module name: `funding_rates` → `FundingRates`
 fn capitalize_module(name: &str) -> String {
     // Special cases for well-known module names
     match name {
@@ -178,7 +178,7 @@ fn capitalize_module(name: &str) -> String {
         "funding_rates" => return "Funding Rates".to_string(),
         "coinmarketcap" => return "CoinMarketCap".to_string(),
         "goplus" => return "GoPlus".to_string(),
-        "kraken" => return "Kraken Data".to_string(),
+        "candle_feed" | "kraken" => return "Market Data".to_string(),
         "trader" => return "DEX Trader".to_string(),
         "portfolio" => return "Balance".to_string(),
         "episodic" => return "Episodic Memory".to_string(),

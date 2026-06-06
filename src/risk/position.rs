@@ -1,6 +1,6 @@
 use crate::core::types::{AccountState, Side};
 
-/// Minimum notional value for a Kraken order (config/default.toml syncs to this)
+/// Minimum notional value for an order (config/default.toml syncs to this)
 const MIN_ORDER_VALUE: f64 = 1.0;
 
 pub struct RiskTier {

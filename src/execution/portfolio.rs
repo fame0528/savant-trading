@@ -40,7 +40,7 @@ pub struct PortfolioManager {
     avg_atr: f64,
     /// Top-of-book depth (sum of top 5 bid/ask volumes) per pair
     book_depth: HashMap<String, f64>,
-    /// Kraken maker fee rate (0.16% vs 0.26% taker)
+    /// Maker fee rate
     maker_fee_rate: f64,
     /// Current best bid per pair (for maker routing)
     best_bid: HashMap<String, f64>,
@@ -61,7 +61,7 @@ impl PortfolioManager {
             current_atr: 0.0,
             avg_atr: 0.0,
             book_depth: HashMap::new(),
-            maker_fee_rate: 0.0025, // Kraken maker fee: 0.25%
+            maker_fee_rate: 0.0025, // 0.25%
             best_bid: HashMap::new(),
             best_ask: HashMap::new(),
         }

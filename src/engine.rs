@@ -13,15 +13,14 @@ use savant_trading::agent::provider::create_provider;
 use savant_trading::core::config::AppConfig;
 use savant_trading::core::events::EventBus;
 use savant_trading::core::types::{Candle, Position, ScaleLevel, Side, TradeRecord, TradingEvent};
+use savant_trading::data::candle_client::CandleClient;
 use savant_trading::data::indicators::IndicatorEngine;
-use savant_trading::data::kraken::KrakenClient;
 use savant_trading::data::market_data::MarketDataStore;
 use savant_trading::data::orderbook::OrderBookManager;
 use savant_trading::execution::dex::inch::InchBackend;
 use savant_trading::execution::dex::zero_x::ZeroXBackend;
 use savant_trading::execution::dex::DexTrader;
 use savant_trading::execution::engine::ExecutionEngine;
-use savant_trading::execution::kraken::{KrakenTrader, KrakenTraderConfig};
 use savant_trading::execution::portfolio::PortfolioManager;
 use savant_trading::insight::aggregator::{InsightAggregator, InsightConfig};
 use savant_trading::monitor::journal::TradeJournal;
@@ -67,7 +66,6 @@ pub fn parse_timeframe_minutes(tf: &str) -> u32 {
 ///
 /// Returns `None` for simulated mode (`live_execution: false`).
 /// Otherwise creates the appropriate backend:
-///   - `"kraken"` → [`KrakenTrader`] (requires KRAKEN_API_KEY/Secret env vars)
 ///   - `"0x"`     → [`DexTrader<ZeroXBackend>`] (requires WALLET_PRIVATE_KEY + ZEROEX_API_KEY)
 ///   - `"1inch"`  → [`DexTrader<InchBackend>`] (requires WALLET_PRIVATE_KEY + 1INCH_API_KEY)
 async fn create_executor(
@@ -79,36 +77,6 @@ async fn create_executor(
     }
 
     match config.exchange.backend.as_str() {
-        "kraken" => {
-            let api_key = std::env::var("KRAKEN_API_KEY").map_err(|_| {
-                anyhow::anyhow!("KRAKEN_API_KEY not set — required for Kraken live trading")
-            })?;
-            let api_secret = std::env::var("KRAKEN_API_SECRET").map_err(|_| {
-                anyhow::anyhow!("KRAKEN_API_SECRET not set — required for Kraken live trading")
-            })?;
-
-            let kraken_config = KrakenTraderConfig {
-                starting_balance: config.trading.starting_balance,
-                fee_rate: config.trading.fee_rate,
-                maker_fee_rate: (config.trading.fee_rate - 0.0015).max(0.001),
-                max_order_pct: config.risk.max_risk_per_trade,
-                max_daily_loss_pct: config.risk.max_daily_loss,
-                slippage_alert_pct: config.trading.slippage_pct * 10.0,
-                webhook_url: None,
-            };
-
-            let trader = KrakenTrader::new(
-                &config.exchange.rest_url,
-                &api_key,
-                &api_secret,
-                kraken_config,
-            )
-            .await
-            .map_err(|e| anyhow::anyhow!("Failed to create KrakenTrader: {}", e))?;
-
-            info!("LIVE trading mode: KrakenTrader initialized");
-            Ok(Some(Box::new(trader)))
-        }
         "0x" => {
             let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env).map_err(|_| {
                 anyhow::anyhow!(
@@ -279,11 +247,11 @@ pub async fn run(
         ));
     }
 
-    let kraken = KrakenClient::new(&config.exchange.rest_url);
+    let candle_api = CandleClient::new(&config.exchange.rest_url);
 
-    // SPRINT-3: Scan all pairs — discover USD pairs from Kraken API
+    // SPRINT-3: Scan all pairs — discover USD pairs from API
     let active_pairs = if config.trading.scan_all_pairs {
-        match kraken.discover_usd_pairs().await {
+        match candle_api.discover_usd_pairs().await {
             Ok(discovered) => {
                 info!("Scan mode: discovered {} pairs", discovered.len());
                 discovered
@@ -304,7 +272,7 @@ pub async fn run(
     // but ONLY create pairs from the curated config list (FID-052: Arbitrum trap fix)
     let curated_pairs: std::collections::HashSet<String> =
         config.trading.pairs.iter().cloned().collect();
-    if config.mode.live_execution && config.exchange.backend != "kraken" {
+    if config.mode.live_execution {
         let mut all_token_entries: Vec<(String, String, u8)> = Vec::new();
         for &(sym, addr, dec) in savant_trading::execution::dex::ARBITRUM_TOKENS {
             all_token_entries.push((sym.to_string(), addr.to_string(), dec));
@@ -337,7 +305,7 @@ pub async fn run(
     // Create execution engine based on backend config
     // engine.rs uses the ExecutionEngine trait, which now includes default no-op
     // implementations for kill(), sync_balance(), and place_stop_loss() — so
-    // KrakenTrader, DexTrader, and future engines all work through the same
+    // DexTrader and future engines all work through the same
     // Box<dyn ExecutionEngine> handle.
     let mut executor: Option<Box<dyn ExecutionEngine>> = None;
     if config.mode.live_execution {
@@ -802,14 +770,14 @@ pub async fn run(
     );
 
     // Parallel candle fetch — all pairs simultaneously
-    // Source rotation: Kraken → OKX → KuCoin → Gate.io → CryptoCompare → CoinGecko
+    // Source rotation: MarketData → OKX → KuCoin → Gate.io → CryptoCompare → CoinGecko
     // All free, no API keys required (except CoinGecko which has a demo key).
     // Binance/Bybit excluded: geo-blocked in US (HTTP 451/403).
     // CMC excluded: free tier doesn't support OHLCV endpoint.
     // GeckoTerminal excluded (FID-046): 99% failed requests, 30 req/min rate limit.
     let candle_router =
         std::sync::Arc::new(savant_trading::data::sources::SourceRouter::new(vec![
-            Box::new(savant_trading::data::sources::kraken::KrakenSource::new(
+            Box::new(savant_trading::data::sources::kraken::KrakenFeed::new(
                 &config.exchange.rest_url,
             )),
             Box::new(savant_trading::data::sources::okx::OkxSource::new()),
@@ -1061,7 +1029,7 @@ pub async fn run(
     );
 
     // SPRINT-2: Spawn WebSocket connection for real-time data
-    // Only subscribe to Kraken-supported pairs (config pairs), not discovered tokens
+    // Only subscribe to supported pairs (config pairs), not discovered tokens
     let (ws_tx, mut ws_rx) = savant_trading::data::websocket::create_channel();
     let ws_pairs: Vec<String> = config.trading.pairs.clone();
     let ws_url = config.exchange.ws_url.clone();
@@ -1250,15 +1218,12 @@ pub async fn run(
                 }
 
                 // Pre-filter: Skip tokens not in curated pairs (FID-052)
-                if config.mode.live_execution
-                    && config.exchange.backend != "kraken"
-                    && !curated_pairs.contains(pair)
-                {
+                if config.mode.live_execution && !curated_pairs.contains(pair) {
                     dead_tokens.insert(pair.to_string());
                     continue;
                 }
 
-                // Pre-filter: Skip pairs with mostly-zero candles (corrupted Kraken data)
+                // Pre-filter: Skip pairs with mostly-zero candles (corrupted data)
                 // FID-044: Lowered from 50% to 30% — SourceRouter now rejects all-zero
                 // candles, so surviving data from Binance/CoinGecko should be mostly valid.
                 let nonzero_count = candle_data
@@ -1274,14 +1239,12 @@ pub async fn run(
                 }
 
                 // Pre-filter: Skip pairs with negligible volume (< $100 average)
-                // FID-044: Skip this filter in DEX mode — Kraken spot volume is low for
+                // FID-044: Skip this filter in DEX mode — spot volume is low for
                 // Arbitrum tokens, but real volume is on-chain. The LLM can evaluate them.
                 // FID-046 caveat: Still reject tokens with ZERO candle activity (dead tokens).
                 let avg_volume: f64 =
                     candle_data.iter().map(|c| c.volume).sum::<f64>() / candle_data.len() as f64;
-                if avg_volume < 100.0
-                    && (!config.mode.live_execution || config.exchange.backend == "kraken")
-                {
+                if avg_volume < 100.0 && !config.mode.live_execution {
                     continue;
                 }
                 // DEX safety: reject tokens with near-zero price diversity
@@ -2964,16 +2927,16 @@ pub async fn run(
             *sa = portfolio.account().clone();
         }
 
-        // Sync balance from Kraken for live mode and propagate to PortfolioManager
+        // Sync balance from executor for live mode and propagate to PortfolioManager
         if let Some(ref mut ex) = executor {
             if tick.is_multiple_of(10) && ex.sync_balance().await.is_ok() {
-                let kraken_balance = ex.balance();
-                portfolio.account_mut().balance = kraken_balance;
+                let executor_balance = ex.balance();
+                portfolio.account_mut().balance = executor_balance;
                 portfolio.refresh_equity();
                 // Re-sync shared state after balance change so dashboard is live
                 let mut sa = shared.account.write().await;
                 *sa = portfolio.account().clone();
-                debug!("Balance synced from Kraken: ${:.2}", kraken_balance);
+                debug!("Balance synced from executor: ${:.2}", executor_balance);
             }
         }
 
@@ -3190,7 +3153,7 @@ pub async fn run(
 
 /// Dry-run: make ONE AI call and print the full pipeline output.
 pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
-    let kraken = KrakenClient::new(&config.exchange.rest_url);
+    let candle_api = CandleClient::new(&config.exchange.rest_url);
     let pair = config
         .trading
         .pairs
@@ -3207,7 +3170,7 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
     );
 
     println!("\n--- MARKET DATA ---");
-    let mut candles = kraken
+    let mut candles = candle_api
         .get_ohlc(
             &pair,
             parse_timeframe_minutes(&config.trading.timeframe),
@@ -3392,13 +3355,13 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn fetch_and_cache(kraken: &KrakenClient, cache_path: &str) -> Vec<Candle> {
-    match kraken.get_ohlc("BTC/USD", 5, None).await {
+async fn fetch_and_cache(candle_api: &CandleClient, cache_path: &str) -> Vec<Candle> {
+    match candle_api.get_ohlc("BTC/USD", 5, None).await {
         Ok(mut c) => {
             if c.len() > 1 {
                 c.pop();
             }
-            println!("Fetched {} real candles from Kraken", c.len());
+            println!("Fetched {} real candles", c.len());
             if let Ok(json) = serde_json::to_string(&c) {
                 let _ = std::fs::create_dir_all("data");
                 let _ = std::fs::write(cache_path, &json);
@@ -3407,7 +3370,7 @@ async fn fetch_and_cache(kraken: &KrakenClient, cache_path: &str) -> Vec<Candle>
             c
         }
         Err(e) => {
-            warn!("Kraken fetch failed ({}), using synthetic fallback", e);
+            warn!("Candle fetch failed ({}), using synthetic fallback", e);
             let gen_config = savant_trading::sandbox::generator::GeneratorConfig {
                 num_candles: 721,
                 interval_minutes: 5,
@@ -3617,14 +3580,14 @@ async fn run_training_batch(
     );
 
     let cache_path = "data/sandbox_candles.json";
-    let kraken = KrakenClient::new(&config.exchange.rest_url);
+    let candle_api = CandleClient::new(&config.exchange.rest_url);
     let real_candles = if std::path::Path::new(cache_path).exists() {
         match std::fs::read_to_string(cache_path) {
             Ok(json) => serde_json::from_str::<Vec<Candle>>(&json).unwrap_or_default(),
-            Err(_) => fetch_and_cache(&kraken, cache_path).await,
+            Err(_) => fetch_and_cache(&candle_api, cache_path).await,
         }
     } else {
-        fetch_and_cache(&kraken, cache_path).await
+        fetch_and_cache(&candle_api, cache_path).await
     };
     if real_candles.is_empty() {
         anyhow::bail!("No candle data available");
@@ -4520,9 +4483,11 @@ pub async fn run_training(
 
     // If historical mode, pre-fetch and cache real market data
     let historical_dataset = if historical {
-        info!("Historical training mode — fetching real Kraken data...");
-        let kraken = savant_trading::data::kraken::KrakenClient::new(&config.exchange.rest_url);
-        match savant_trading::data::historical::get_historical(&kraken, "BTC/USD", 5, 30).await {
+        info!("Historical training mode — fetching real market data...");
+        let candle_api =
+            savant_trading::data::candle_client::CandleClient::new(&config.exchange.rest_url);
+        match savant_trading::data::historical::get_historical(&candle_api, "BTC/USD", 5, 30).await
+        {
             Ok(dataset) => {
                 info!(
                     "Historical data ready: {} candles ({} days)",
@@ -4798,9 +4763,9 @@ pub async fn run_sandbox(
         config.strategy.regime.atr_volatility_multiplier,
     );
 
-    // ── Phase 1: Load candles (cache-first, then Kraken) ───────
+    // ── Phase 1: Load candles (cache-first, then API) ───────
     let cache_path = "data/sandbox_candles.json";
-    let kraken_sandbox = KrakenClient::new(&config.exchange.rest_url);
+    let candle_api_sandbox = CandleClient::new(&config.exchange.rest_url);
     let real_candles = if std::path::Path::new(cache_path).exists() {
         match std::fs::read_to_string(cache_path) {
             Ok(json) => match serde_json::from_str::<Vec<Candle>>(&json) {
@@ -4813,18 +4778,18 @@ pub async fn run_sandbox(
                     cached
                 }
                 Err(e) => {
-                    warn!("Cache parse failed ({}), fetching from Kraken", e);
-                    fetch_and_cache(&kraken_sandbox, cache_path).await
+                    warn!("Cache parse failed ({}), fetching from API", e);
+                    fetch_and_cache(&candle_api_sandbox, cache_path).await
                 }
             },
             Err(e) => {
-                warn!("Cache read failed ({}), fetching from Kraken", e);
-                fetch_and_cache(&kraken_sandbox, cache_path).await
+                warn!("Cache read failed ({}), fetching from API", e);
+                fetch_and_cache(&candle_api_sandbox, cache_path).await
             }
         }
     } else {
-        println!("No cache found, fetching from Kraken...");
-        fetch_and_cache(&kraken_sandbox, cache_path).await
+        println!("No cache found, fetching from API...");
+        fetch_and_cache(&candle_api_sandbox, cache_path).await
     };
 
     println!("Building prompts for {} scenarios...", scenarios.len());

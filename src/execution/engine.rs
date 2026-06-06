@@ -73,6 +73,6 @@ pub trait ExecutionEngine: Send + Sync {
 
     /// Register a wallet-recovered position so close_position() can find it.
     /// Called during wallet sync for positions discovered on-chain but not in the executor.
-    /// Default: no-op (paper trading and Kraken don't need this).
+    /// Default: no-op (paper trading doesn't need this).
     fn register_position(&mut self, _id: String, _pos: Position) {}
 }

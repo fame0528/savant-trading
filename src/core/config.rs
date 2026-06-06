@@ -263,7 +263,7 @@ pub struct ExchangeConfig {
 }
 
 fn default_backend() -> String {
-    "kraken".to_string()
+    "0x".to_string()
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -428,10 +428,10 @@ impl AppConfig {
         }
         // Validate exchange backend
         match self.exchange.backend.as_str() {
-            "kraken" | "0x" | "1inch" => {}
+            "0x" | "1inch" => {}
             other => {
                 return Err(ConfigError::ValidationError(format!(
-                    "Invalid exchange.backend '{}': must be 'kraken', '0x', or '1inch'",
+                    "Invalid exchange.backend '{}': must be '0x' or '1inch'",
                     other
                 )));
             }
@@ -454,7 +454,7 @@ impl Default for AppConfig {
     fn default() -> Self {
         Self {
             exchange: ExchangeConfig {
-                name: "kraken".into(),
+                name: "candle_feed".into(),
                 backend: default_backend(),
                 ws_url: "wss://ws.kraken.com/v2".into(),
                 rest_url: "https://api.kraken.com".into(),

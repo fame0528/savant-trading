@@ -31,6 +31,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **`cargo fmt` applied project-wide** — All 43 source files reformatted to consistent style. No logic changes.
 - **`.gitignore` expanded** — Added entries for: `prompt-results/`, `DEEP-RESEARCH-PROMPT.md`, `MODEL-TRAINING-RESEARCH.md`, `API-KEYS.md`, `data/sandbox_*`, `data/sandbox_reports/`, `data/model-comparison-*.md`, `data/test_memory.db*`, `LLM Crypto Trading Growth Strategy.md`.
 - **Sandbox test artifacts cleaned** — Removed 15+ temp files from `data/` (sandbox stdout/stderr/output/report files, model comparison reports, test databases).
+- **FID-062: Removed Kraken execution backend** — Deleted `src/execution/kraken.rs` (569 lines of dead code). `KrakenTrader` was never used for live execution. Removed Kraken match arm from engine, removed `KrakenTraderConfig`, removed Kraken balance sync. `exchange.backend = "kraken"` no longer valid — only `"0x"` and `"1inch"` accepted.
+- **FID-062: Renamed data pipeline** — `KrakenClient` → `CandleClient` (`src/data/candle_client.rs`), `KrakenSource` → `KrakenFeed` (`src/data/sources/kraken.rs`). Removed 400+ lines of dead private API code (signing, order placement, balance queries). Console label "Kraken Data" → "Market Data". All variable names updated.
 - **Version** — 0.9.1 → 0.10.0
 
 ## [0.9.1] — 2026-06-05

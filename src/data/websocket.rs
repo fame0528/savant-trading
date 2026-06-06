@@ -9,7 +9,7 @@ use tokio::sync::mpsc;
 use tracing::{debug, error, info, warn};
 
 use crate::core::types::{Candle, OrderBook, OrderBookLevel};
-use crate::data::kraken::TickerData;
+use crate::data::candle_client::TickerData;
 
 /// WebSocket connection state.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

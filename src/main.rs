@@ -7,7 +7,7 @@ use tracing_subscriber::prelude::*;
 use savant_trading::backtest::engine::{run_backtest, BacktestConfig};
 use savant_trading::core::config::AppConfig;
 use savant_trading::core::shared::SharedEngineData;
-use savant_trading::data::kraken::KrakenClient;
+use savant_trading::data::candle_client::CandleClient;
 use savant_trading::tui::TuiApp;
 
 mod api;
@@ -377,13 +377,13 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn run_backtest_cmd(config: &AppConfig) -> anyhow::Result<()> {
-    let kraken = KrakenClient::new(&config.exchange.rest_url);
+    let candle_api = CandleClient::new(&config.exchange.rest_url);
     let default_pair = "BTC/USD".to_string();
     let pair = config.trading.pairs.first().unwrap_or(&default_pair);
 
     info!("Fetching historical candles for {}...", pair);
     let interval = engine::parse_timeframe_minutes(&config.trading.timeframe);
-    let candles = kraken
+    let candles = candle_api
         .get_ohlc(pair, interval, None)
         .await
         .map_err(|e| anyhow::anyhow!("Failed to fetch candles: {}", e))?;
