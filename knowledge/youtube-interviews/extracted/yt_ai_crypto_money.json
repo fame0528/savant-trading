@@ -1,0 +1,245 @@
+[
+  {
+    "id": "yt-ai-crypto-money-001",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Misi Kolaja grew up in Venezuela in the 1980s-90s experiencing every macro event imaginable before age 15: hyperinflation, devaluation, capital controls, banking system collapse. This gave him a framework where 3% annual inflation is trivial compared to experiencing 10% daily inflation. This background is foundational to why he understood Bitcoin's value proposition so early (2010) — he lived through the failure of sovereign money. Investors who understand macro instability from lived experience have an edge in recognizing store-of-value assets early.",
+    "priority": 4,
+    "tags": ["macro", "hyperinflation", "venezuela", "bitcoin-value-proposition", "fiat-failure"]
+  },
+  {
+    "id": "yt-ai-crypto-money-002",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Ribbit Capital's investment thesis: identify 20-30 fintech/crypto compounders and concentrate regardless of public/private status, stage, or cycle. These companies have brand, people, money control, and will take market share from incumbents over a full decade. The regulatory tide is now in their favor. Three of their portfolio companies (Coinbase, Robinhood, Block/North Square) are already in the S&P 500. The strategy is to back founder-led companies that are still building tech and growing into the biggest financial services companies in the world.",
+    "priority": 5,
+    "tags": ["concentration-strategy", "fintech-winners", "SP500", "founder-led", "decade-thesis"]
+  },
+  {
+    "id": "yt-ai-crypto-money-003",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending", "HalvingProximity"],
+    "content": "Bitcoin is decoupling from the rest of crypto as a separate asset class. In the last 6 months (as of recording), Bitcoin and altcoins have shown different price actions. Bitcoin is becoming digital gold/store of value while Ethereum, Solana, and Layer 1s are becoming 'networks' — infrastructure for tokenized everything. The distinction between 'crypto tokens' and 'equity tokens' will collapse as all stocks get tokenized and trade 24/7. Ethereum and Solana tokens will be functionally equivalent to holding tokenized Robin Hood stock.",
+    "priority": 5,
+    "tags": ["bitcoin-decoupling", "tokenization", "layer-1s-as-networks", "24-7-trading", "equity-token-collapse"]
+  },
+  {
+    "id": "yt-ai-crypto-money-004",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending", "ExtremeGreed"],
+    "content": "Memecoins are instant capital formation stress tests and speed tests of the network. Before ICOs (which failed but provided learnings), there was no mechanism for global coalescence of capital in seconds. Now Solana enables this at scale. A 22-23 year old generation that is cryptonative AND AI-native will take this to a new level. The velocity of capital formation and attention capture via tokens has never been faster. This is as disruptive to the VC industry as the app store was to distribution.",
+    "priority": 3,
+    "tags": ["memecoins", "capital-formation", "ico-lessons", "solana", "disruption"]
+  },
+  {
+    "id": "yt-ai-crypto-money-005",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Ribbit Capital declared 'fintech is dead 2011-2022' to their LPs in 2022. The macro opportunity windows that enabled the last decade of fintech (app store launch, financial crisis destroying incumbent brand trust, unstructured data availability) have been normalized and closed. No new mega-opportunities exist to repeat that window with mobile apps or crypto wallets from scratch. The winners of the next decade are already built — the focus should be on the 20-30 existing compounders scaling market share from incumbents.",
+    "priority": 4,
+    "tags": ["fintech-saturation", "macro-windows", "app-store-era-ended", "winners-already-built"]
+  },
+  {
+    "id": "yt-ai-crypto-money-006",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Ribbit Capital's core 10-year investment thesis: 'Money without knowledge is not valuable anymore.' In the next decade, money without context, smart contracts, rules, or decision trees attached to it loses value compared to money with knowledge. The entire financial infrastructure grid was NOT designed to carry information packets with knowledge alongside money — these have been completely separate. As AI agents and machines do more decision-making, the knowledge component and money component MUST combine. Companies solving this interoperability are the next mega-opportunity.",
+    "priority": 5,
+    "tags": ["money-plus-knowledge", "agentic-ai", "smart-money", "interoperability", "infrastructure"]
+  },
+  {
+    "id": "yt-ai-crypto-money-007",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Ribbit's tokenization thesis categorizes all tokens into four buckets: (1) Identity tokens — personal data only you know (driver's license, bank credentials, healthcare records). (2) Knowledge/Expert tokens — advice from experts like wealth advisors, tax planners, travel planners. (3) Asset tokens — machine-readable exchange of goods (stablecoins, future equities). (4) Real-world tokens — for the first time in history, energy, money, AND power/knowledge are tied together. No energy = no money = no knowledge. All are interdependent. Every company is a 'token factory' with token inputs and outputs.",
+    "priority": 5,
+    "tags": ["four-token-types", "identity-tokens", "expert-tokens", "asset-tokens", "real-world-tokens", "token-factory"]
+  },
+  {
+    "id": "yt-ai-crypto-money-008",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Every pair of industries in tokenization faces the same three problems: (1) Interoperability — tokens must work across systems. (2) Distribution — tokens must reach the right agents/users. (3) Value transfer — systems to buy, sell, and store tokens at scale. Once solved, the future of the internet is essentially a gigantic marketplace. OpenAI is already a marketplace of tokens — you input tokens, receive tokens, pay per API call or subscription. Everything is moving in this direction.",
+    "priority": 4,
+    "tags": ["interoperability", "distribution", "value-transfer", "marketplace-future", "openai-token-marketplace"]
+  },
+  {
+    "id": "yt-ai-crypto-money-009",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Every individual's personal data (photos, conversations, attention, personal information) is tokenizable and releasable as capital. AI companies have scraped the public web; the next training data must come from private hands, meaning they'll have to pay for it. This creates a marketplace where people trade personal data tokens for capital or free services (mirroring the attention-for-free-content internet model). Your personal data is as valuable as any other data for token factories.",
+    "priority": 3,
+    "tags": ["data-tokenization", "personal-data-value", "data-marketplace", "attention-economy"]
+  },
+  {
+    "id": "yt-ai-crypto-money-010",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "AI agents will enter the economy by hiring young people for tasks — fundamentally different from companies hiring them. Entry-level workforce may work FOR agents. Agents today are buggy, interfaces aren't great, and phones are the wrong hardware. Users interact more with AI on laptops (access to hard drive, voice, notes, video) than phones. A new interface is needed — possibly glasses. Until the hardware interface solves this, agent adoption remains limited but the trajectory is set.",
+    "priority": 3,
+    "tags": ["ai-agents", "labor-market-disruption", "agent-economy", "hardware-interface"]
+  },
+  {
+    "id": "yt-ai-crypto-money-011",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "Sentiment",
+    "conditions": ["ExtremeFear", "Trending"],
+    "content": "Fiverr cut 30% of its workforce because of AI. The innovator's dilemma means incumbents will be displaced by AI-native agents. If Fiverr doesn't become an agent platform, a 21-22 year old will build one. Two to three full grades of college students have had ChatGPT available since they applied to college — they write essays on AI engines, do homework on AI, take notes on AI. This generation builds agentic experiences natively. The cryptonative + AI-native cohort of 22-23 year olds will create the next wave of companies that make current VCs look obsolete.",
+    "priority": 3,
+    "tags": ["ai-disruption", "innovators-dilemma", "ai-native-generation", "workforce-transformation"]
+  },
+  {
+    "id": "yt-ai-crypto-money-012",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Historical parallel to 1995-1998 internet adoption: just as kids who grew up building on TCP/IP understood packet compression, voice, and video as possible BEFORE they existed, the current generation of AI-native kids understands foundational models and the application layer natively. They can envision what AI makes possible in ways older generations cannot. They are the builders of the next infrastructure wave. This is the same generational internet-native pattern that produced the most successful tech companies of the 2000s.",
+    "priority": 3,
+    "tags": ["generational-shift", "internet-parallel", "ai-native", "1990s-analogy"]
+  },
+  {
+    "id": "yt-ai-crypto-money-013",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "The shift from founders owning 80% of companies (100 years ago) to founders owning 20% (modern VC model) is reversing. AI and agentic experiences enable companies with fewer employees, higher capital efficiency, and less dilution. Founders will own more of their companies. This means a proliferation of new AI-powered companies where the founder retains equity and the company scales through agents rather than headcount.",
+    "priority": 3,
+    "tags": ["founder-ownership", "capital-efficiency", "agentic-scaling", "dilution-reversal"]
+  },
+  {
+    "id": "yt-ai-crypto-money-014",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Crypto tried to force-founder distribution too broadly and lost alignment of interest. The lesson: giving away too much equity/concentration fractures the builder's incentive. Attention can substitute for money as a battle for engagement — 'if they sold the attention, the money is not needed.' The new model of instant capital formation via tokens eliminates the traditional seed/VC/friends-and-family fundraising grind, preserving founder equity while still accessing global capital.",
+    "priority": 3,
+    "tags": ["alignment-of-interest", "token-fundraising", "attention-economy", "founder-equity"]
+  },
+  {
+    "id": "yt-ai-crypto-money-015",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending"],
+    "content": "Misi Kolaja's personal portfolio advice: put 1% of net worth in Bitcoin, buy one, put it away, forget about it. Also: everyone should own one CryptoPunk, forget about it, as it will be one of the most rare collectible objects in the next 20-30 years. This is the same 'save in hard assets' mentality from someone who lived through hyperinflation — a small allocation to provably scarce digital assets as insurance against monetary debasement.",
+    "priority": 3,
+    "tags": ["portfolio-allocation", "bitcoin-1-percent", "cryptopunks", "digital-scarcity", "hyperinflation-hedge"]
+  },
+  {
+    "id": "yt-ai-crypto-money-016",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "Sentiment",
+    "conditions": ["Trending"],
+    "content": "Digital art/NFT space has transitioned from speculation to serious curation and collector base building. At a family office event in LA, people dismissed NFTs as 'awful' — but they don't understand that serious collections are being built, serious artist relationships formed, and it's now about traditional art curation rather than financialization. This mirrors how early Bitcoin was dismissed by traditional finance before institutional adoption.",
+    "priority": 2,
+    "tags": ["nft-curation", "collector-base", "digital-art", "financialization-shift", "institutional-dismissal"]
+  },
+  {
+    "id": "yt-ai-crypto-money-017",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "The digital art market should grow by building cryptonative/internet-native collector bases, NOT by courting traditional art investors at Art Basel or traditional museums. Old guard museums are like bank branches — irrelevant to the new generation. Young artists have zero excitement about museums, just as fintech entrepreneurs saw bank branches as pointless. The disruption strategy is to build new venues and attract the young technology builders who created the digital world but don't yet own digital art.",
+    "priority": 2,
+    "tags": ["disruption-strategy", "cryptonative-audience", "museums-obsolete", "art-as-tech"]
+  },
+  {
+    "id": "yt-ai-crypto-money-018",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "CryptoNative",
+    "conditions": ["ExtremeGreed", "Trending"],
+    "content": "CryptoPunks IP was acquired by Misi Kolaja's Node foundation for permanent stewardship. Corporations think short-term and have different agendas — the CryptoPunks IP needs a home thinking in decades, not days. The Node foundation philosophy mirrors Ribbit Capital's: if this is a genuine cultural moment, the best assets need homes with the single interest of telling the story forever. Kolaja's KPI: grow CryptoPunks unique holders to 10,000 over the next 10 years through a decentralized node network. Network effect: 10,000 nodes is far more powerful than 5,000.",
+    "priority": 3,
+    "tags": ["cryptopunks-ip", "long-term-stewardship", "node-network", "10k-holders", "cultural-moment"]
+  },
+  {
+    "id": "yt-ai-crypto-money-019",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Node is being built as a decentralized network for displaying digital art, not a single destination. The Palo Alto location is symbolic — where computers got started, where Steve Jobs built and iterated the first Apple store. The Node team is engineers and AI people, NOT art curators or museum people — a fundamentally different approach. Soft opening December, public opening January. First exhibition will be CryptoPunks. Artists will curate their own exhibitions, disrupting the middle layer of traditional art organizations.",
+    "priority": 2,
+    "tags": ["node-foundation", "palo-alto", "artist-curation", "crypto-punks-exhibition", "decentralized-venue"]
+  },
+  {
+    "id": "yt-ai-crypto-money-020",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "CryptoNative",
+    "conditions": ["HalvingProximity", "BtcDominant"],
+    "content": "The overarching macro thesis: the internet is eating everything — money, art, everything — and creating new AI populations. All information must be tokenized to feed the 'beast' of the internet that is morphing into AI. Every company is a token factory with token inputs and token outputs. David Bowie's vision of the internet as an alien creature was prescient. Money, knowledge, and power are becoming tokens on networks. This is the biggest change humanity will ever go through, and we are at the nexus of macro, crypto, and the exponential age of technology simultaneously.",
+    "priority": 5,
+    "tags": ["internet-eating-everything", "token-factory", "tokenization-thesis", "ai-populations", "exponential-age", "money-knowledge-power"]
+  },
+  {
+    "id": "yt-ai-crypto-money-021",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "Sentiment",
+    "conditions": ["Trending"],
+    "content": "Bitwise manages over $10B across 30+ crypto strategies since 2017. Notably, they donate part of profits from Bitcoin and Ethereum investments to open-source developers building and maintaining the networks. This creates an investment thesis where capital allocation directly funds the infrastructure being invested in — a reflexive loop that strengthens the ecosystem and the investment simultaneously.",
+    "priority": 2,
+    "tags": ["bitwise", "10b-aum", "open-source-funding", "reflexive-investment", "crypto-infrastructure"]
+  },
+  {
+    "id": "yt-ai-crypto-money-022",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Investment insight from Ribbit's early crypto approach: invest by solving your own pain points. Ribbit started buying Bitcoin in 2010 but couldn't figure out custody, so they built SAPO (custody business). They needed bridges into fiat money, so they backed companies solving that. Every portfolio company addressed a pain point Ribbit themselves experienced. This is a superior investment framework vs. surface-level 'that looks interesting' — deep personal understanding of problems generates better theses.",
+    "priority": 4,
+    "tags": ["pain-point-investing", "self-custody-bridges", "ribbit-thesis", "first-principles", "investment-framework"]
+  },
+  {
+    "id": "yt-ai-crypto-money-023",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "Sentiment",
+    "conditions": ["ExtremeFear"],
+    "content": "Misi Kolaja's early Bitcoin framework (2010): he compared Bitcoin to American Express travel checks from the 1970s-80s — they had serial numbers (hash codes), if you lost them they were like cash, you physically held them. He didn't initially grasp that the blockchain was an open-ended ledger capable of holding much more than just token value. It took until approximately 2018-2019 for him and Ribbit to convict fully on the convergence thesis: 'You're not going to talk about crypto or fintech separately — they're all going to be infrastructure powering this.' The lesson: even the smartest investors take years to fully internalize paradigm shifts. Conviction builds gradually.",
+    "priority": 3,
+    "tags": ["bitcoin-travel-checks", "gradual-conviction", "convergence-thesis", "fintech-crypto-merge"]
+  },
+  {
+    "id": "yt-ai-crypto-money-024",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Robin Hood founders were 26-27 years old, had witnessed Occupy Wall Street, worked in high-frequency trading software, understood how to reverse-engineer fund flows, and had exceptional design taste. They converted 70% of their 100,000-person pre-launch waiting list into customers (vs. the predicted 2-60%). Before COVID, millennials hadn't been financialized — they didn't trade stocks. Robin Hood financialized an entire generation in approximately one year. The Occupy Wall Street → democratize finance → GameStop backlash arc shows how quickly sentiment cycles around financial access can reverse. The current generation thinks 'it's MY money' — fundamentally different from how banks thought.",
+    "priority": 3,
+    "tags": ["robinhood-founding", "millennial-financialization", "occurpy-wall-street", "sentiment-reversal", "generational-money-attitudes"]
+  },
+  {
+    "id": "yt-ai-crypto-money-025",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "New administration (post-2024) regulatory stance has given a 'stamp of approval' to Layer 1 blockchains (Ethereum, Solana, Sui) building true infrastructure. They are now regulated as networks, not securities. This regulatory clarity is why crypto tokens and equity tokens will converge — when stocks are tokenized 24/7, buying an Ethereum token is functionally identical to buying tokenized Robin Hood stock. The SEC's previous binary token/equity distinction is collapsing under tokenization of all assets.",
+    "priority": 4,
+    "tags": ["regulatory-clarity", "layer-1-approval", "sec-tokenization", "ethereum-securities", "stock-tokenization"]
+  },
+  {
+    "id": "yt-ai-crypto-money-026",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending", "ExtremeGreed"],
+    "content": "Robinhood had a 100,000-person waiting list 6-7 months before launching their app and subsequently converted 70% to paying customers. This demonstrates the power of latent demand combined with solving real UX pain points. The online trading price point of $19.99 (circa E*Trade era) destroyed traditional broker commissions. Zero-commission trading unlocked massive new retail demand. Parallel: removing friction from crypto onboarding will similarly unlock new waves of adoption in each cycle.",
+    "priority": 2,
+    "tags": ["latent-demand", "zero-commission", "onboarding-friction", "waiting-list-product-market-fit", "retail-adoption"]
+  },
+  {
+    "id": "yt-ai-crypto-money-027",
+    "source": "youtube-interviews/AI + Crypto Building the New Internet of Money.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "The Brady bond restructuring era (early 1990s in Venezuela) created a fixed income world where Misi Kolaja learned bonds, issuing, and privatization. Understanding flow of funds from childhood (oil prices → patient visits → revenue) gave him an intuitive grasp of macro flows. Venezuela had 40 million unbanked out of 160 million people when Ribbit-backed companies were building tech to serve them. Macro conditions (oil-dependent economies, unbanked populations) identify where financial technology adoption will be most disruptive.",
+    "priority": 2,
+    "tags": ["brady-bonds", "flow-of-funds", "unbanked-populations", "venezuela-oil", "emerging-market-fintech"]
+  }
+]

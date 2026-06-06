@@ -1,0 +1,404 @@
+[
+  {
+    "id": "yt-altcoins-001",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "ExtremeFear",
+      "HalvingProximity",
+      "Trending"
+    ],
+    "content": "Core bear market accumulation strategy: Monitor Bitcoin first. Once Bitcoin bottoms, monitor the alts you want to buy and accumulate during the bear market. The two categories of altcoins to target: (1) coins that have survived multiple cycles where you buy very low when they capitulate faster than Bitcoin, amplifying returns in the next bull run; and (2) coins that have already outperformed Bitcoin and started running in the bear market (e.g., Hyperliquid, Zcash). There will NOT be an industry-wide altcoin season due to too many coins in existence. Focus on specific altcoins, not broad altcoin season plays.",
+    "priority": 5,
+    "tags": [
+      "bear-market-accumulation",
+      "altcoin-selection",
+      "strategy",
+      "capitulation",
+      "multi-cycle"
+    ]
+  },
+  {
+    "id": "yt-altcoins-002",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "BtcDominant"
+    ],
+    "content": "Primary analysis methodology for all altcoins: Use the Bitcoin ratio chart (alt/BTC pair) rather than dollar charts. Calculate the altcoin drawdown multiplier: (altcoin's previous bear market drawdown %) / (Bitcoin's previous bear market drawdown of 50%). Then multiply the current Bitcoin drawdown % by this ratio to get the expected altcoin drawdown %. Apply that drawdown to the altcoin's recent bear market rally high to find the target entry price. If Bitcoin drops further, recalculate using the new lower Bitcoin target, adding extra percentage to the drawdown.",
+    "priority": 5,
+    "tags": [
+      "btc-ratio-analysis",
+      "drawdown-calculation",
+      "methodology",
+      "entry-targets"
+    ]
+  },
+  {
+    "id": "yt-altcoins-003",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "BtcDominant",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Altcoins that outperform Bitcoin in bear market are risky. If Bitcoin chops sideways for six months, essentially no altcoins will survive. Maybe 1 out of 100 might, but do not count on it. When an altcoin rallies hard against Bitcoin in a bear market, this is something to fade, not chase. Even if it appears inversely correlated (Bitcoin down, alt up) in the short term, the correction will still come. These bear market rallies in alts create poor risk/reward entries.",
+    "priority": 4,
+    "tags": [
+      "risk-management",
+      "bear-market-rally",
+      "chasing",
+      "mean-reversion"
+    ]
+  },
+  {
+    "id": "yt-altcoins-004",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "content": "Entry timing principle: Any altcoin making a lower low on Bitcoin should not trade higher than its February price level. Bitcoin just made a lower low below the February low, meaning all altcoins should not be trading above their February lows. Use February dollar lows as the absolute floor reference for basket 1 coins. Only below February prices is a buy for rallied coins.",
+    "priority": 4,
+    "tags": [
+      "entry-timing",
+      "february-low",
+      "bitcoin-structure",
+      "lower-lows"
+    ]
+  },
+  {
+    "id": "yt-altcoins-005",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Hyperliquid (HYPE): Best decentralized perpetual exchange (per DEX), main settlement layer for all onchain perps. Original analysis entry target was $35. Not a buy anywhere close to $60. February low at $28-29 is the target — representing ~50% drawdown from $60. Drawdown ratio analysis: HYPE previously drew down 65% from bull high to bear low (ratio of 1.3x vs Bitcoin's 50%). With Bitcoin down 28%, HYPE should draw down 36.4% from its recent $75 high = $47.80, but that is still too expensive since it was at $43 just 2.5 weeks prior while Bitcoin went down. HYPER fans argue it is fundamentally too strong to drop that far, but by market standards it is too expensive. Need a return to February levels (~$29) to be a buyer.",
+    "priority": 4,
+    "tags": [
+      "hyperliquid",
+      "HYPE",
+      "perpetual-dex",
+      "defi",
+      "too-expensive",
+      "drawdown-analysis"
+    ]
+  },
+  {
+    "id": "yt-altcoins-006",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Venice (VVV): One of only two actually useful AI products in crypto used in traditional AI. OpenClaw officially recommends Venice as the private router for accessing top-tier AI models from Anthropic and OpenAI. Users get steep discounts on cutting-edge AI models through Venice. This is the strongest AI coin by far. February low at $180; current price ~$14.9. Need an 88% drawdown from current levels to reach $180 before becoming a buyer. No safe entry unless it drops to February levels — a double bottom pattern might provide an alternative entry if it forms halfway down.",
+    "priority": 3,
+    "tags": [
+      "venice",
+      "VVV",
+      "AI",
+      "too-expensive",
+      "openclaw",
+      "ai-routing"
+    ]
+  },
+  {
+    "id": "yt-altcoins-007",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Ranging",
+      "ExtremeFear"
+    ],
+    "content": "Zcash (ZEC): Clear winner in the privacy narrative, which is getting very hot. Need another 37% drawdown to reach February low of $197 (just below $200 target). Not too bad compared to other basket 1 coins — more accessible entry point. Entry target: sub-$200.",
+    "priority": 3,
+    "tags": [
+      "zcash",
+      "ZEC",
+      "privacy",
+      "entry-target",
+      "february-low"
+    ]
+  },
+  {
+    "id": "yt-altcoins-008",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "content": "Near Protocol (NEAR): Under-the-radar AI play with a long history in AI research. Was quite cheap in the early bear market stages, but the recent rally has made it too expensive. Need another 48% drawdown from current levels. February low was under a dollar. Chart shows repeated pattern of strong short-term rallies followed by crashes back down — this has happened three times already. Very difficult to time an entry. Technically stronger fundamentally than many AI plays.",
+    "priority": 3,
+    "tags": [
+      "near-protocol",
+      "NEAR",
+      "AI",
+      "too-expensive",
+      "rally-crash-pattern"
+    ]
+  },
+  {
+    "id": "yt-altcoins-009",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Canton (CNT): Layer 1 blockchain where all major Wall Street institutions are onboarded as validators. Designed as a clearing layer for all tokenized onchain stocks and RWA (Real World Asset) trading — think of it as the Wall Street chain. If Wall Street institutions pick something other than Ethereum, it is likely Canton. Launched last year during the bear market and has rallied against Bitcoin since with no clear entry point. Current floor at ~14 cents; if this breaks, target is 11 cents (22% further down). Needs to form a double/triple bottom or higher low pattern to enter. Risky because of Bitcoin's current trajectory.",
+    "priority": 3,
+    "tags": [
+      "canton",
+      "CNT",
+      "wall-street",
+      "rwa",
+      "tokenized-stocks",
+      "institutional",
+      "too-expensive"
+    ]
+  },
+  {
+    "id": "yt-altcoins-010",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Tron (TRX): Out of the top 100 coins, Tron is the ONLY one that outperformed Bitcoin since the last bear market (November 2022 post-FTX) without any major drawdown against Bitcoin. The BTC ratio chart shows a consistent uptrend from November 2022 through the entire cycle. Underperformed briefly in early 2023 bull until summer 2024, then kept going up against Bitcoin. Also kept outpacing Bitcoin for the first 8 months of the current bear market conflicted view: purely by data it is the strongest altcoin, but it is also risky because it should have had a bear market like everything else. Possibility of a big trap. If it keeps going up — strongest performer. If it suddenly crashes — massive risk. Best performer but too confidently held.",
+    "priority": 4,
+    "tags": [
+      "tron",
+      "TRX",
+      "outperformer",
+      "risky",
+      "wall-street",
+      "data-driven"
+    ]
+  },
+  {
+    "id": "yt-altcoins-011",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "Fetch AI (FET) and Render (RENDER): Both are S-tier coins that outperformed Bitcoin over the past 5 years without making new lows against the last bear market low. Both survived three crypto cycles and maintained AI narrative. Not the most revolutionary AI coins (Venice and Bit Tensor are fundamentally stronger), but chart performance is superior. For Fetch AI: BTC ratio floor formed after Oct 10 crash, targeting another 30% down against Bitcoin. At $59K Bitcoin, dollar target is $0.13 (13 cents) — a new low below Feb/March levels. For Render: December low against Bitcoin, targeting 29% down on BTC ratio = $1.11 at $59K Bitcoin. Both are reasonable value targets and could be hit soon. If Bitcoin drops further (e.g., to $55K), targets need to be adjusted ~7% lower.",
+    "priority": 4,
+    "tags": [
+      "fetch-ai",
+      "FET",
+      "render",
+      "RENDER",
+      "AI",
+      "s-tier",
+      "entry-targets",
+      "outperformer"
+    ]
+  },
+  {
+    "id": "yt-altcoins-012",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "Ethereum (ETH): Already at value. February low was $1,800, current price ~$1,500 (already taken out the Feb low). Drawdown analysis: ETH dropped 65% from Aug to Feb while Bitcoin dropped 50% (ratio 1.3x). Current Bitcoin drawdown 28% × 1.3 = 36.4% ETH drawdown from rally high. Actual drawdown from reference to current is 36.78% — tracking the model almost exactly. If Bitcoin bottoms at $59K, ETH is bottoming now. If Bitcoin goes to $55K, additional 7% BTC drop × 1.3 = 9.1% more for ETH = $1,400 target. Ethereum is a good buy already at $1,500 because Bitcoin at $59K is already cheap (below 200 EMA) and ETH is tracking expected drawdown precisely. This is an easier call than basket 1 coins.",
+    "priority": 5,
+    "tags": [
+      "ethereum",
+      "ETH",
+      "value",
+      "entry-target",
+      "good-buy",
+      "drawdown-model"
+    ]
+  },
+  {
+    "id": "yt-altcoins-013",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "BNB: From October high to February low, BNB drew down 57.6%. Ratio: 57.6/50 = 1.152. Current Bitcoin drawdown 29% × 1.152 = 33.4% expected BNB drawdown. From the May 4th rally high, 33.4% drawdown = $450 target. Not there yet — needs another ~20% down. Possible but requires patience. $450 is the number for good value on BNB.",
+    "priority": 3,
+    "tags": [
+      "bnb",
+      "binance",
+      "entry-target",
+      "drawdown-analysis",
+      "a-tier"
+    ]
+  },
+  {
+    "id": "yt-altcoins-014",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "XRP: From Aug/Sep high (pre-Oct 10 crash) to February low, XRP drew down 63%. Ratio: 63/50 = 1.26. Current Bitcoin drawdown 29% × 1.26 = 36.5% expected XRP drawdown. Target: $0.98 (just below $1). Almost there — needs to drop just below $1 to be a buyer. XRP is one of the longest-running coins that consistently held the floor against Bitcoin in bear markets and outperformed Bitcoin in the last bull run. It oscillates without making new lows. Sub-$1 prices are all good for XRP.",
+    "priority": 4,
+    "tags": [
+      "xrp",
+      "ripple",
+      "entry-target",
+      "near-value",
+      "oscillator",
+      "a-tier"
+    ]
+  },
+  {
+    "id": "yt-altcoins-015",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "Solana (SOL): From September high to February low, Solana drew down 72.7%. Ratio: 72.7/50 = 1.454. Current Bitcoin drawdown 29% × 1.454 = 42.16% expected SOL drawdown. From recent rally high, 42.5% drawdown = $56 per SOL. About 10% away from current price (assuming Bitcoin holds at $59K). If Bitcoin drops to $55K, recalculate. Solana is getting very close to value range. Already cheap enough.",
+    "priority": 4,
+    "tags": [
+      "solana",
+      "SOL",
+      "entry-target",
+      "near-value",
+      "a-tier"
+    ]
+  },
+  {
+    "id": "yt-altcoins-016",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "content": "Bit Tensor (TAO): The AI coin to buy in this cycle. Was as strong as Venice before Venice became too expensive. Not a legacy AI coin like Fetch AI and Render — its technology is newer and not as old. Fundamentally stronger than Near Protocol, though Near's price action is weaker (three rally-crash cycles already). Bit Tensor has a clear floor holding at ~$180 — whenever it drops below $180 it gets bought up. From October high to February low: 72.6% drawdown. Ratio: 72.6/50 = 1.452. Current Bitcoin drawdown 29% × 1.452 = 42.1%. From May high, 42.1% drawdown shows Bit Tensor is ALREADY at expected drawdown value right now. Entry range: $145 (February low) to $190. Average entry target of $165 is good. This floor has held for 3 years. If you want an AI coin to buy right now, Bit Tensor is the pick — cheaper than Fetch AI and Render, much better value than Venice. Time is now from $190 down to $145.",
+    "priority": 5,
+    "tags": [
+      "bit-tensor",
+      "TAO",
+      "AI",
+      "best-ai-coin",
+      "entry-target",
+      "value-range",
+      "floor"
+    ]
+  },
+  {
+    "id": "yt-altcoins-017",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "content": "FLOKI: The only memecoin in the top 100 that did NOT make a new low against Bitcoin. Compared to Doge, SHIB, Pepe, and other top 100 memes, FLOKI is the sole one that held. It oscillated against Bitcoin, touching the all-time high against BTC. If you bought FLOKI in the last bear market, you outperformed Bitcoin in the bull market. If you bought decently cheap in this bear market, you did not lose money against Bitcoin. Currently a falling knife — about to make a new low. No clear floor unless you reference the last bear market low. Would not set a target right now; instead wait for a bottoming pattern (double bottom, triple bottom, higher low) on the weekly timeframe before buying. If you absolutely need a memecoin in your portfolio for the next bull run out of the top 100, FLOKI is the only one that did not make a new low. Based purely on data, not personal preference.",
+    "priority": 2,
+    "tags": [
+      "floki",
+      "memecoin",
+      "falling-knife",
+      "bottoming-pattern",
+      "data-driven",
+      "a-tier"
+    ]
+  },
+  {
+    "id": "yt-altcoins-018",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "ExtremeFear",
+      "Trending"
+    ],
+    "content": "Toncoin (TON): Unique layer one with Telegram integration. Launched in 2021. Dollar chart showed a new all-time high but erased majority of bull market gains in the bear market. BTC ratio chart looks bad — barely held all-time low against Bitcoin. Fundamentally compelling: Telegram founder Pavel Durov now publicly tweeting about Toncoin and laying out the roadmap. The Ton Foundation has been rebranded — Telegram the company now owns and is responsible for the coin. It is being rebranded as 'Gram' — literally Telegram coin, not 'The Open Network'. Transaction cost and speed being improved 10x. Every crypto user has a Ton wallet/Ton address due to native Telegram integration. This is the most crypto-native platform with chat functionality and a coin. If Bitcoin holds at $59K, Toncoin needs to draw down 32% to reach value. Needs to form a floor against Bitcoin from October lows. Not giving a specific target yet — too early. Will want to hold in the next bull run based on fundamentals, not price action.",
+    "priority": 3,
+    "tags": [
+      "toncoin",
+      "TON",
+      "telegram",
+      "pavel-durov",
+      "rebrand",
+      "fundamentals",
+      "layer-1"
+    ]
+  },
+  {
+    "id": "yt-altcoins-019",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "Bitcoin at $59K is below the 200 EMA SMA. Every time Bitcoin breaks below the 200 EMA in previous bull runs, altcoins capitulate left and right. Altcoins are not dead — there will still be an altcoin bull run in the next cycle. This always happens. The right mindset during panic: do research, find coins you like, set entry targets, monitor Bitcoin. Once Bitcoin bottoms, buy the altcoins. Do not ask 'is Bitcoin dead?' — this is the time to start buying.",
+    "priority": 4,
+    "tags": [
+      "sentiment",
+      "200-ema",
+      "capitulation",
+      "mindset",
+      "accumulation"
+    ]
+  },
+  {
+    "id": "yt-altcoins-020",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "S-tier vs A-tier classification from 5-year altcoin performance study: S-tier coins outperformed Bitcoin over the past 5 years (Zcash, Tron, Render, Fetch AI). A-tier coins outperformed Bitcoin in bear markets, underperformed in bull markets, but did not make new all-time lows against Bitcoin — they oscillate (Ethereum, Solana, XRP, BNB). The 'big four' blue chip A-tier coins are proven oscillators against Bitcoin. Worth having in a bull run if you can get a good bear market entry.",
+    "priority": 4,
+    "tags": [
+      "tier-classification",
+      "s-tier",
+      "a-tier",
+      "5-year-study",
+      "oscillators",
+      "blue-chip"
+    ]
+  },
+  {
+    "id": "yt-altcoins-021",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "Do not catch falling knives. When a coin is about to make a new low with no visible floor (like FLOKI), wait for a confirmed bottoming pattern on the weekly timeframe before entering. Patterns to watch: double bottom, triple bottom, higher low structure. Until clear bottoming confirmation, no position.",
+    "priority": 3,
+    "tags": [
+      "falling-knife",
+      "bottoming-pattern",
+      "weekly-timeframe",
+      "risk-management"
+    ]
+  },
+  {
+    "id": "yt-altcoins-022",
+    "source": "youtube-interviews/Top Altcoins to Buy at the Bottom of This Bear Market.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Summary of all 14 coins and their status: Already at value — Ethereum ($1,500), Bit Tensor ($145-190 range). Close to value — XRP (sub-$1), BNB ($450), Solana ($56), Fetch AI ($0.13), Render ($1.11). Too expensive, need major correction — Hyperliquid (~$29), Venice (~$180), Zcash (sub-$200), Near Protocol (under $1), Canton (11-14 cents). Risky/conflicted — Tron (best performer but could be a trap). Watch for pattern — FLOKI (wait for bottoming pattern). Fundamentals play, no target yet — Toncoin (32% more drawdown needed).",
+    "priority": 5,
+    "tags": [
+      "summary",
+      "all-coins",
+      "status",
+      "entry-targets",
+      "quick-reference"
+    ]
+  }
+]

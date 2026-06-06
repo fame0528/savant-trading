@@ -1,0 +1,128 @@
+[
+  {
+    "id": "yt-hindi-mrhow-001",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Why Learn Crypto Now: When world superpowers (USA, China, etc.) are adopting Bitcoin and crypto, why shouldn't you? If your father/grandfather had bought Microsoft or Google stock early, your life would be different. Your children will ask you: 'Did you buy Bitcoin? Did you teach us?' This is the future. Start learning NOW. Even ₹10 can buy crypto. Minimum investment = $1 on Binance (you can buy fractional Bitcoin).",
+    "priority": 3,
+    "tags": ["motivation", "adoption", "future", "beginner"]
+  },
+  {
+    "id": "yt-hindi-mrhow-002",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "CoinMarketCap - Primary Research Tool: CoinMarketCap.com = Wikipedia of crypto. Shows: 1) Top coins by market cap (BTC #1, ETH #2, USDT #3). 2) Current price, 24h volume, total market cap. 3) All altcoins ranked. Use it to: Research any coin before buying. Check market cap (not just price). Compare coins. Track your portfolio. This is the FIRST website every crypto trader should know.",
+    "priority": 3,
+    "tags": ["coinmarketcap", "research", "market-cap", "tool"]
+  },
+  {
+    "id": "yt-hindi-mrhow-003",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "Execution",
+    "conditions": ["Trending"],
+    "content": "Binance Account Setup: 1) Go to Binance.com or download app. 2) Sign up with email. 3) Verify email with code. 4) Create strong password (8+ chars, 1 number, 1 uppercase, 1 special char like @#$_). 5) Complete KYC: Select country → Choose ID type (National ID card) → Take photo of front and back → Face verification (open mouth, blink eyes as instructed). 6) Wait 5-30 min for approval. 7) Download Binance app from official Play Store. Login and start trading.",
+    "priority": 2,
+    "tags": ["binance", "setup", "KYC", "verification"]
+  },
+  {
+    "id": "yt-hindi-mrhow-004",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "Execution",
+    "conditions": ["Trending"],
+    "content": "P2P Buying USDT (Pakistan Example): 1) Open Binance app → Assets → Funding → Add Funds → P2P. 2) Select 'Buy' USDT. 3) Filter by payment method (EasyPaisa/Bank Transfer). 4) Choose seller with good rate (e.g., 288 PKR) and high completion rate (95%+). 5) Enter PKR amount (e.g., 15,000 PKR). 6) System shows USDT you'll receive (e.g., 51.77 USDT). 7) Click 'Place Order'. 8) Send 15,000 PKR to seller's EasyPaisa number. 9) Click 'I have paid'. 10) Seller confirms → USDT in your Funding wallet. Transfer to Spot wallet to start trading.",
+    "priority": 3,
+    "tags": ["P2P", "buying", "PKR", "EasyPaisa", "USDT"]
+  },
+  {
+    "id": "yt-hindi-mrhow-005",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Spot Trading Basics: In Spot, you buy and own actual coins. Example: Buy BTC at $88,000. You own that BTC. If price drops to $74,000, you still own the BTC - it's not gone, just worth less temporarily. If price goes to $111,000, you profit. Key difference from futures: NO liquidation risk in spot. You can hold forever. Minimum trade: $1 on Binance (fractional coins). Trading pairs: BTC/USDT means buy BTC with USDT. Always keep some USDT as base currency.",
+    "priority": 4,
+    "tags": ["spot-trading", "basics", "no-liquidation", "beginner"]
+  },
+  {
+    "id": "yt-hindi-mrhow-006",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Day Trading Example (Live): BNB at $640. Buy at $640 with $100 → get 0.156 BNB. Price goes to $650 → sell. Profit: ~$1.50. Simple. Every coin has daily volatility range. BNB moves $10-25/day typically. You can make $1-5 per trade with small capital. Do this 2-3 times daily = $3-15/day = ₹800-4000/day. Not life-changing but good practice. Key: Don't be greedy. Take small profits. Don't hold losing positions hoping for recovery.",
+    "priority": 3,
+    "tags": ["day-trading", "example", "BNB", "small-profits"]
+  },
+  {
+    "id": "yt-hindi-mrhow-007",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Mid-Term Trading with Scaled Entry: Example: BNB at $677. First buy: 30% of capital at $677. Price drops to $640 → buy 20% more. Drops to $620 → buy 20% more. Drops to $580 → buy 20% more. Now your average price is better than $677. Hold for 5-6 months or 1 year. When BNB goes to $800+ (bull market), sell everything. This is how smart money accumulates. They don't buy all at once - they scale in on dips.",
+    "priority": 4,
+    "tags": ["mid-term", "scale-in", "DCA", "accumulation"]
+  },
+  {
+    "id": "yt-hindi-mrhow-008",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Long-Term Investment Strategy: Best coins for long-term: 1) Bitcoin (BTC) - #1, safest, governments buying. 2) Ethereum (ETH) - #2, massive ecosystem. 3) BNB - Exchange token, consistent performer. 4) SOL - Fast blockchain, growing. Strategy: Buy BTC at ANY price. Hold for 2-5 years. Historical pattern: BTC has NEVER lost money for anyone who held 4+ years. From $3K (2015) → $69K (2021) → $110K (2024). ETH similar pattern. Buy, hold in hardware wallet, forget.",
+    "priority": 5,
+    "tags": ["long-term", "BTC", "ETH", "HODL", "hardware-wallet"]
+  },
+  {
+    "id": "yt-hindi-mrhow-009",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Market Cap Math for Price Targets: Example: SOL market cap = $78 billion. BTC market cap = $2.19 trillion. For SOL to match BTC's market cap: $2.19T / $78B = 28x increase. If SOL is at $150, matching BTC cap = $150 × 28 = $4,200. But this is unrealistic short-term. More realistic: SOL reaches half of ETH's cap = maybe 5-10x from current levels. Always calculate: (Target market cap / Current market cap) × Current price = Future price. This gives realistic targets, not hype numbers.",
+    "priority": 4,
+    "tags": ["market-cap", "price-target", "SOL", "valuation"]
+  },
+  {
+    "id": "yt-hindi-mrhow-010",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Hardware Wallet (Ledger) for Security: If you hold crypto on Binance and Binance gets hacked/banned, you can lose everything. Solution: Hardware wallet (Ledger). It's a physical device that stores crypto offline. Nobody can hack it remotely. Even governments can't access it without physically having it + your PIN. For long-term BTC/ETH: Buy from Ledger.com or authorized resellers in Pakistan. Transfer coins from Binance to Ledger. Now your crypto is truly yours. 'Not your keys, not your crypto.'",
+    "priority": 4,
+    "tags": ["hardware-wallet", "Ledger", "security", "cold-storage"]
+  },
+  {
+    "id": "yt-hindi-mrhow-011",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Binance Earn - Staking: Two types: 1) Flexible: Withdraw anytime. Lower APY (~7.4% for USDT). Risk: If staking volatile coin, price can drop while earning. 2) Fixed: Lock for 14/30/60 days. Higher APY (3% for 30 days, 3.6% for 60 days). Capital locked. Best for stablecoins (USDT/USDC) where price doesn't change. For volatile coins: Only stake what you were going to hold anyway. Staking rewards won't save you if coin drops 50%.",
+    "priority": 3,
+    "tags": ["staking", "earn", "flexible", "fixed", "APY"]
+  },
+  {
+    "id": "yt-hindi-mrhow-012",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Futures Trading = Dangerous: Speaker's view: Futures trading is like gambling. With 20x leverage: $100 controls $2,000. 5% move against you = $100 loss = 100% of your capital gone. With 100x: 1% move = liquidation. In futures, you can lose EVERYTHING in seconds. The speaker explicitly warns beginners: 'Don't touch futures until you've mastered spot trading.' If you must: Use 5-10x max leverage. Always use stop loss. Only risk money you can afford to lose completely.",
+    "priority": 5,
+    "tags": ["futures", "warning", "leverage", "liquidation", "gambling"]
+  },
+  {
+    "id": "yt-hindi-mrhow-013",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "Psychology",
+    "conditions": ["Trending", "ExtremeFear"],
+    "content": "Don't Panic Sell: BTC dropped from $69K to $15K (78% crash). People who sold at $15K = massive loss. People who held = BTC went to $110K+ = massive profit. Lesson: Temporary dips are NORMAL in crypto. If you believe in BTC/ETH long-term, dips are BUYING opportunities, not selling signals. The speaker's own students: Some make $8-100/day from day trading with small capital. Consistency + skill = results. Don't give up after losses.",
+    "priority": 5,
+    "tags": ["panic-selling", "HODL", "psychology", "crash"]
+  },
+  {
+    "id": "yt-hindi-mrhow-014",
+    "source": "youtube-interviews/Master Crypto Trading Full Course for Beginners by Mr HowComplete Binance Trading for Beginners.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Coin Selection Framework: Before buying any coin, check: 1) Market cap rank (top 20 = safer). 2) Trading volume (higher = more liquid). 3) News and updates (is the project active?). 4) Blockchain fundamentals (what problem does it solve?). 5) Team and community. For beginners: Stick to top 5 (BTC, ETH, BNB, SOL, DOGE). Don't buy random coins from YouTube recommendations. Do your own research (DYOR). Most 'hot tips' = scams or pump-and-dumps.",
+    "priority": 4,
+    "tags": ["coin-selection", "research", "DYOR", "top-5"]
+  }
+]

@@ -1,0 +1,356 @@
+[
+  {
+    "id": "yt-mistry-001",
+    "source": "youtube-interviews/Mistry tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "The LTP Calculator is presented as the world's only crypto tool that analyzes cryptocurrencies, specifically based on the option chain. No other tool provides reversal prices for cryptocurrencies. The AI LTP (AILTP) features provide an additional edge. Key reversal price levels include: Max Pain, S Risky, S Moderate, S Max Gain. These levels are described as 'universal' — reversal prices always appear on the tool. The AILTP analysis for the next day starts being reliable after 5:30 PM when the new expiry opens.",
+    "priority": 5,
+    "tags": [
+      "LTP-calculator",
+      "reversal-prices",
+      "AILTP",
+      "option-chain",
+      "crypto-analysis",
+      "max-pain"
+    ]
+  },
+  {
+    "id": "yt-mistry-002",
+    "source": "youtube-interviews/Mistry tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Core strategy: Buy one futures contract + buy one ATM Call + buy one ATM Put simultaneously. This creates a hedged directional position with defined maximum loss and unlimited profit potential. The presenter used this strategy to catch a massive BTC move where price fell from around $14,800 to $14,000. He bought both sides so whichever way the market moved, he would profit. If it had gone up, he could have made even more. Maximum loss on this trade was $17 USD with unlimited profit potential.",
+    "priority": 5,
+    "tags": [
+      "futures-plus-options",
+      "strangle-with-future",
+      "hedged-position",
+      "defined-risk",
+      "ATM-options",
+      "BTC"
+    ]
+  },
+  {
+    "id": "yt-mistry-003",
+    "source": "youtube-interviews/Mistry tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Delta Neutral / D3 Strangle selling strategy for crypto: Sell one D3 (3 delta) Call and one D3 Put as an out-of-the-money strangle. Premium received is approximately $150 per strangle, sold around 6:30-7:00 PM after the market stabilizes and new expiry opens. Market does NOT stay in the middle for 24 hours — adjustments must be made actively. When a premium gains 30% (e.g., $150 option becomes $195-200), the opposite-side premium drops to around $90. Book profit on the profitable side by buying back that premium, then sell the new ATM (at-the-money) strangle that has moved closer. Adjustment is continuous — close losing legs at 30% profit threshold and resell at new strikes.",
+    "priority": 5,
+    "tags": [
+      "delta-neutral",
+      "strangle",
+      "D3-options",
+      "option-selling",
+      "premium-trading",
+      "adjustment-strategy",
+      "30-percent-rule"
+    ]
+  },
+  {
+    "id": "yt-mistry-004",
+    "source": "youtube-interviews/Mistry tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Maximum loss calculation method: When buying futures + ATM call + ATM put, use the Strategy Builder to analyze payoff. Default position of 0.025 BTC yields $29-30 max loss. Position sizing controls max loss: 0.02 BTC yields $24 max loss, 0.015 BTC yields ~$18 max loss, 0.01 BTC yields $12 loss (12 * 85 = ~₹1,020), 0.005 BTC yields $6 loss. Lot size must be kept identical across all three legs (future, call, put). The presenter personally traded at 0.02 BTC with $34 max loss ($35 with brokerage = ~₹3,200 at ₹85/$). Reduce lot size further to lower risk. The more you reduce lot size, the more loss gets controlled. You cannot suffer more loss than the maximum displayed.",
+    "priority": 5,
+    "tags": [
+      "max-loss",
+      "position-sizing",
+      "BTC-lot-size",
+      "strategy-builder",
+      "payoff-analysis",
+      "risk-control"
+    ]
+  },
+  {
+    "id": "yt-mistry-005",
+    "source": "youtube-interviews/Mistry tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Breakeven analysis for futures + ATM strangle setup: With entry at BTC price ~$12,174, breakeven is approximately $11,392 (about 300-600 points below entry). The market must move approximately 500 points above entry before the position reaches breakeven or profitability. Premium decay reduces over time — as expiry approaches, both call and put premiums decay toward zero, and the future profit becomes the primary profitability driver. If the move happens before expiry (even tonight), the profit will come faster. The payable screen shows where max loss occurs and where profit starts. Max profit is unlimited on one side.",
+    "priority": 4,
+    "tags": [
+      "breakeven",
+      "premium-decay",
+      "expiry-timing",
+      "profit-calculation",
+      "BTC-price-levels"
+    ]
+  },
+  {
+    "id": "yt-mistry-006",
+    "source": "youtube-interviews/Mistry tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Adjusting the put side of the futures + ATM strangle: If you lower the put from ATM to OTM (out-of-the-money), your premium paid decreases (good) but the breakeven point shifts lower (bad). Example: ATM put buy shifts breakeven from ~$13,500 down to ~$13,200, but max loss increases from $11 to $15. OTM put buy further increases loss from $15 to $19.6 and shifts breakeven from ~$1,390 to ~$2,480. Removing the put entirely creates a naked directional call position with breakeven at $1,380 and max loss still at $1 but with more downside risk. Tradeoff: OTM adjustments reduce premium but extend breakeven distance.",
+    "priority": 4,
+    "tags": [
+      "OTM-adjustment",
+      "put-side",
+      "breakeven-shift",
+      "premium-reduction",
+      "strategy-optimization"
+    ]
+  },
+  {
+    "id": "yt-mistry-007",
+    "source": "youtube-interviews/Mistry tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Adjusting the call side of the futures + ATM strangle: If bullish and wanting to reduce premium on the call side, move the call OTM (e.g., $13,000 or $13,200 strike). Taking OTM call at limit price of $488 (vs ATM call at higher price), the loss reaches $15, breakeven shifts from ~$1,390 down slightly to ~$1,370. The backed off call decreases premium spent. If very bullish, reduce premium on the put side instead. If bearish, reduce premium on the call side. Personal preference stated: ATM call is preferred over ATM put for better risk-reward ratio. Max loss with ATM call preference shows ~$18 loss at breakeven ~$13,138.",
+    "priority": 4,
+    "tags": [
+      "call-side",
+      "OTM-call",
+      "bullish-bias",
+      "bearish-bias",
+      "risk-reward",
+      "strike-selection"
+    ]
+  },
+  {
+    "id": "yt-mistry-008",
+    "source": "youtube-interviews/MISTRY tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Liquidation mechanics on Delta Exchange: When using futures + options hedged position, if the market moves against you, the futures contract gets liquidated first (not the options). At liquidation, the futures is squared off automatically. The put option liquidation price reached around $18 on the downside. After liquidation, if the market continues falling, the put option continues gaining value. If the market reverses up after futures liquidation, the call option remains intact and benefits from the upside. This is exactly WHY the call is bought alongside the futures. Only the future gets liquidated — the options remain alive. This insurance mechanism protects against extreme moves in either direction.",
+    "priority": 5,
+    "tags": [
+      "liquidation",
+      "futures-liquidation",
+      "option-insurance",
+      "Delta-Exchange",
+      "automatic-square-off",
+      "hedging-mechanism"
+    ]
+  },
+  {
+    "id": "yt-mistry-009",
+    "source": "youtube-interviews/MISTRY tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Margin requirements and account sizing: The strategy requires $44 margin (position of 0.02 BTC). Rule: if investing $33 in margin, should have at least $300 in the crypto account to handle liquidation scenarios safely. Delta Exchange offers a liquidation option that prevents account blowup — when using cross-margin mode, if liquidation is triggered, losses stay contained. Without cross-margin (isolate mode), liquidation can empty the entire account if set wrong. Never remove liquidation protection. Liquidation price on current position was visible at 14.59% loss, meaning if account drops below this, it starts withdrawing from main account balance. Always use liquidation protection.",
+    "priority": 5,
+    "tags": [
+      "margin",
+      "account-sizing",
+      "liquidation-protection",
+      "cross-margin",
+      "isolate-mode",
+      "Delta-Exchange-margin"
+    ]
+  },
+  {
+    "id": "yt-mistry-010",
+    "source": "youtube-interviews/MISTRY tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Complete execution workflow in Delta Exchange Strategy Builder: 1) Open Options chain. 2) Turn on Strategy Builder. 3) Add Future to the strategy (click 'Add Future' next to BTC contract). 4) Convert to BTC lot size by clicking M (margin mode) and changing to L (lot). 5) Place limit order for future. 6) Click Buy on both ATM Call and ATM Put at limit price. 7) Set identical BTC quantity on all 3 legs (future, call, put). 8) Click 'Analyze Pay Off' to see max loss. 9) Adjust lot size if max loss exceeds comfort level. 10) Submit all three orders simultaneously as a basket. All orders show in open orders; monitor fills and correct limits if market has moved.",
+    "priority": 5,
+    "tags": [
+      "execution",
+      "strategy-builder",
+      "Delta-Exchange",
+      "step-by-step",
+      "basket-order",
+      "limit-order",
+      "BTC-contract"
+    ]
+  },
+  {
+    "id": "yt-mistry-011",
+    "source": "youtube-interviews/MISTRY tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Profit booking and exit strategy: When S Max Gain shows $14,960 (for example), book profits there. Alternatively, book wherever a decent profit is seen — $50 profit is considered acceptable. If the situation doesn't look favorable on the calculator, book early. Minimum trade size is 0.01 lot. Minimum investment is ₹1,000. With 0.01 lot, profit/loss per tick is correspondingly small. The profit target should align with the S Max Gain level from AILTP analysis. S Max Pen value from Profit Book Epic order can also be used as a target reference.",
+    "priority": 4,
+    "tags": [
+      "profit-booking",
+      "exit-strategy",
+      "S-Max-Gain",
+      "minimum-investment",
+      "lot-size",
+      "target-levels"
+    ]
+  },
+  {
+    "id": "yt-mistry-012",
+    "source": "youtube-interviews/MISTRY tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Crypto-specific tax and regulatory information: Crypto is not regulated in India. Trading is not prohibited, but unregulated. For crypto futures trading on Delta Exchange, profits can be declared as business income and are NOT subject to the 30% flat tax rate. The 30% tax applies only to crypto options profits, not futures. Crypto futures are perpetual (no expiry) and never come into your physical account. Keep both tax treatments in mind. Open Delta Exchange account through provided link for 10% brokerage discount.",
+    "priority": 3,
+    "tags": [
+      "tax",
+      "India",
+      "business-income",
+      "30-percent-tax",
+      "crypto-regulation",
+      "Delta-Exchange",
+      "perpetual-futures"
+    ]
+  },
+  {
+    "id": "yt-mistry-013",
+    "source": "youtube-interviews/MISTRY tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Critical warning about leveraged crypto trading: If using 200x leverage on naked futures, MUST use strict stop loss. Without stop loss, any significant move can empty the entire account. Never isolate margin at extreme leverage — use cross-margin instead so other account funds can absorb losses. Crypto is described as 'the most heavy risky' and 'playing with fire.' We are playing with volatility. All risk management must be considered when playing with fire. Only trade with money you can afford to lose. Start with small amounts to understand the mechanics.",
+    "priority": 5,
+    "tags": [
+      "200x-leverage",
+      "naked-futures",
+      "stop-loss",
+      "account-blowup",
+      "extreme-risk",
+      "volatility"
+    ]
+  },
+  {
+    "id": "yt-mistry-014",
+    "source": "youtube-interviews/MISTRY tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Consolidation vs trending: You will ALWAYS incur losses in a consolidation/ranging market when buying options. The futures + ATM strangle strategy only works when expecting a big directional move. After a large fall (e.g., 4,000 point drop), consolidation at the bottom precedes either a reversal or continuation. The key is identifying when a big move is expected — looking at AILTP for reversal signals. After a 4,000-point fall, expecting a 1,000-point recovery. The bottom is identified by Max Pain standing at the bottom, indicating potential reversal. Analyse the next day's expiry after 5:30 PM for clearer direction.",
+    "priority": 4,
+    "tags": [
+      "consolidation",
+      "trending",
+      "reversal-signals",
+      "bottom-fishing",
+      "AILTP-analysis",
+      "expiry-timing"
+    ]
+  },
+  {
+    "id": "yt-mistry-015",
+    "source": "youtube-interviews/MISTRY tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Understanding the strategy as a combination of hedged views: This strategy is fundamentally a bullish (or bearish) position disguised as a risk-managed structure. For a bullish position: buy future + buy ATM call + buy ATM put. For a bearish position: sell future + buy ATM call + buy ATM put. The difference is simply the direction of the futures contract. All other elements remain the same. The strategy reduces leverage and lags compared to naked positions. Mixing permutations of futures, calls, and puts creates different risk profiles. Analyze whether market is bullish or bearish FIRST, then construct the appropriate combination.",
+    "priority": 4,
+    "tags": [
+      "bullish",
+      "bearish",
+      "position-construction",
+      "leverage-reduction",
+      "strategy-variants",
+      "futures-direction"
+    ]
+  },
+  {
+    "id": "yt-mistry-016",
+    "source": "youtube-interviews/MISTRY tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Mistake of selling options without future hedge: Someone asked about selling 1 lot of call and 1-2 lots of put. This is NOT a hedging strategy — it's a naked options selling approach. If purely bullish, this might work but doesn't protect against adverse moves. In a hedged position with future, if the market goes against you, the future gets squared off but the options protect the position. Always keep positions safe. Since you're doing the riskiest work (crypto options), find the safest way. There are always many ways to create bearish and bullish positions — figure out which method suits your risk tolerance.",
+    "priority": 3,
+    "tags": [
+      "option-selling-without-hedge",
+      "risk-comparison",
+      "position-safety",
+      "strategy-selection",
+      "bearish-bullish-alternatives"
+    ]
+  },
+  {
+    "id": "yt-mistry-017",
+    "source": "youtube-interviews/MISTRY tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Delta Exchange specifics: Prices displayed in USD, calculated at standard rate of ₹85 per dollar. Brokerage is charged for different quantities (varies). Using standard calculation of 85, $34 max loss = approximately ₹2,890 in pure loss, roughly ₹3,200-3,300 total including brokerage (₹1,500-2,000 brokerage for strategy trades taking all three trades simultaneously within strategy builder). Open Interest and Volume at specific strike prices help determine where the market is likely to go. Check where OI is being created — this signals potential target or resistance levels. Minimum lot: 0.01 BTC considered small.",
+    "priority": 3,
+    "tags": [
+      "Delta-Exchange",
+      "USD-INR",
+      "brokerage",
+      "open-interest",
+      "volume",
+      "strike-price-analysis",
+      "standard-calculation"
+    ]
+  },
+  {
+    "id": "yt-mistry-018",
+    "source": "youtube-interviews/MISTRY tool for Crypto Trading! Calculate reversal Prices for Bitcoin (BTC) & Ethereum (ETH).md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Money safety at Delta Exchange: Exchange is registered with FIU (Financial Intelligence Unit). Cannot guarantee fund safety. Advice: do not deposit huge amounts. Start with small capital. The LTP Calculator tool offers D1, D2, D3 strategies as well as Live AI LTP strategy. These can be mixed and matched. D1/D2/D3 represent options at 1-delta, 2-delta, 3-delta respectively (deep out-of-the-money). The deeper the delta (D3 closer to ATM), the higher the premium received but higher probability of being hit. Strategy mixing for optimal trades requires understanding each component separately before combining.",
+    "priority": 3,
+    "tags": [
+      "Delta-Exchange-safety",
+      "FIU",
+      "D1-D2-D3",
+      "option-delta",
+      "deep-OTM",
+      "strategy-mixing",
+      "risk-probability"
+    ]
+  }
+]

@@ -1,0 +1,466 @@
+[
+  {
+    "id": "yt-claude-code-001",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Claude Code can autonomously build and refine trading strategies overnight using a single prompt. In one 8-hour session, Claude iteratively built multiple strategy versions: starting with a Keltner EMA system (73% drawdown, failed), then an MFI regime indicator, then progressively improved versions. The final version achieved a momentum squeeze strategy with 19% max drawdown out-of-sample and 0.66 Sharpe ratio. Claude requires no additional prompting during the overnight run - it builds, tests, refines, and iterates independently.",
+    "priority": 5,
+    "tags": [
+      "claude-code",
+      "ai-assisted-development",
+      "overnight-optimization",
+      "strategy-iteration",
+      "momentum-squeeze"
+    ]
+  },
+  {
+    "id": "yt-claude-code-002",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "The AI trading system uses a momentum squeeze indicator as the backbone strategy, combined with trade filters that activate during volatile market periods and disable during sideways/choppy markets. The system filters identified flat market periods (shown as yellow on the Wolf Pack indicator) where the bot should sleep. It only activates when volume picks up or during capitulation events where market direction becomes clear. The system had no exit rules even in the final version - only entry refinement - suggesting exits are an area for future improvement.",
+    "priority": 5,
+    "tags": [
+      "momentum-squeeze",
+      "trade-filters",
+      "market-regime",
+      "volatility-filter",
+      "wolf-pack-indicator"
+    ]
+  },
+  {
+    "id": "yt-claude-code-003",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Vector BT is used as the local backtesting engine. It can flash all candlesticks at once locally, achieving thousands of backtests per second. This is dramatically faster than TradingView, where a single deep backtest on a 30-minute chart can take 10-20 seconds. The local approach eliminates network latency, exchange API calls, and shared processing limitations. Data is downloaded from the exchange, processed locally, and sliced into in-sample and out-of-sample sets.",
+    "priority": 5,
+    "tags": [
+      "vector-bt",
+      "local-backtesting",
+      "high-speed",
+      "python",
+      "thousands-per-second"
+    ]
+  },
+  {
+    "id": "yt-claude-code-004",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Core performance metrics for evaluating trading systems: Sharpe ratio (risk-adjusted return), Sortino ratio (downside-risk-adjusted return), max drawdown (largest peak-to-trough decline), win rate (percentage of profitable trades), and net profit. The key insight is that net profit matters less than Sharpe ratio and max drawdown. Designers who chase net profit tend to fail in real trading. A 45% win rate is sufficient for profitability - analogous to blackjack where 51% win rate eventually produces profits over time.",
+    "priority": 5,
+    "tags": [
+      "sharpe-ratio",
+      "sortino-ratio",
+      "max-drawdown",
+      "win-rate",
+      "performance-metrics"
+    ]
+  },
+  {
+    "id": "yt-claude-code-005",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Mandatory robustness test criteria for any trading bot to pass: must have a high enough Sharpe ratio and low enough maximum drawdown. These are hard filter thresholds that every strategy must pass. A strategy failing these metrics is discarded regardless of net profit.",
+    "priority": 5,
+    "tags": [
+      "strategy-validation",
+      "minimum-thresholds",
+      "sharpe-requirement",
+      "drawdown-limit"
+    ]
+  },
+  {
+    "id": "yt-claude-code-006",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "The Wolf Pack indicator is the primary signal backbone. It generates clear buy/sell signals (bearish diamonds for sell signals). It includes a teal RSI component for oversold detection. The indicator also provides flat market visualization (yellow zones) to help the bot identify low-opportunity periods. Wolf Pack indicator length parameters are tuned across ranges (e.g., 1-100) with other parameter variations tested against it, creating tens of thousands to hundreds of thousands of parameter combinations.",
+    "priority": 4,
+    "tags": [
+      "wolf-pack",
+      "rsi",
+      "oversold",
+      "flat-market-filter",
+      "custom-indicator"
+    ]
+  },
+  {
+    "id": "yt-claude-code-007",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Market regime filter principles: the bot should avoid trading during sideways, choppy markets with liquidity sweeps. Instead, it should activate during volatile periods with strong directional moves. Specific market conditions to avoid: horizontal trending, periods where direction is unclear. Conditions to trade: high volume periods (measured via On-Balance Volume/OBV or similar), capitulation/liquidation events, strong trending days with clear directional conviction. The key principle: it is more important to define when NOT to trade than when to trade.",
+    "priority": 5,
+    "tags": [
+      "market-regime",
+      "volatility-filter",
+      "volume-filter",
+      "obv",
+      "liquidity-sweeps"
+    ]
+  },
+  {
+    "id": "yt-claude-code-008",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Algorithmic trading eliminates human bias. Human traders carry implicit bias (wanting the market to go up) and cannot process infinite information in real-time 24/7. Trading bots process more mathematical data than a human brain can handle and execute perfectly on that analysis without emotional interference. The bot can monitor multiple data streams (on-chain volume, exchange data, indicator signals) simultaneously and without fatigue.",
+    "priority": 4,
+    "tags": [
+      "bias-elimination",
+      "24-7-trading",
+      "mathematical-edge",
+      "emotion-free",
+      "bot-advantages"
+    ]
+  },
+  {
+    "id": "yt-claude-code-009",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Progressive iteration results showing strategy improvement over Claude Code overnight sessions. Version 1 (Keltner EMA): 73% drawdown - FAILED. Version 2 (MFI regime): still high drawdown, exact number unspecified - FAILED. Version 3: 40% win rate, 0.3 Sharpe in-sample, 28% max drawdown out-of-sample, 0.4 Sharpe out-of-sample, 36% win rate out-of-sample - FAILED (drawdown too high). Version 4: 53% net drawdown in-sample, ~37% win rate, 30% drawdown out-of-sample progressing downward, 0.42 Sharpe. Version 5 (second-last): net profit 566, Sortino above 2.0, Sharpe 0.4, 45% win rate, 33% max drawdown. Final version (V6): 19% max drawdown out-of-sample, 0.66 Sharpe out-of-sample, 0.66 Sharpe in-sample, 409 total trades, 45% win rate in-sample, 44.7% win rate out-of-sample, ~30% drawdown in-sample, ~20% drawdown out-of-sample.",
+    "priority": 5,
+    "tags": [
+      "iteration",
+      "backtesting-results",
+      "progressive-improvement",
+      "strategy-evolution",
+      "performance-trend"
+    ]
+  },
+  {
+    "id": "yt-claude-code-010",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "In-sample vs out-of-sample testing methodology: candlesticks are split into in-sample (training) and out-of-sample (hidden validation) data. The system is trained/configured on in-sample data only, then tested on withheld out-of-sample candlesticks it has never seen. This validates how the system responds to new, unseen market data. Key requirement: minimal divergence between in-sample and out-of-sample metrics (Sharpe ratio, drawdown, win rate). Large divergence signals overfitting. Best practice: use 60-70% of data for training/optimization, save 30-40% for out-of-sample validation.",
+    "priority": 5,
+    "tags": [
+      "in-sample",
+      "out-of-sample",
+      "data-splitting",
+      "validation",
+      "overfitting-prevention"
+    ]
+  },
+  {
+    "id": "yt-claude-code-011",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Overfitting is algorithmic trading's worst fear. Overfitting occurs when a strategy is hyper-optimized for one specific dataset, failing when market conditions change. Prevention methods: (1) out-of-sample testing on withheld data, (2) Monte Carlo simulations with randomized candlesticks, (3) bootstrapping (randomizing candlestick order to test different price structures), (4) ensuring the strategy remains flexible across different randomized price actions rather than being curve-fit to one sequence.",
+    "priority": 5,
+    "tags": [
+      "overfitting-prevention",
+      "curve-fitting",
+      "robustness",
+      "generalization",
+      "validation"
+    ]
+  },
+  {
+    "id": "yt-claude-code-012",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Monte Carlo simulation methodology for strategy validation: candlesticks are randomized (jumbled up) into different sequences, creating different price action structures and scenarios. Multiple simulations are run to test strategy robustness across various possible market orderings. Desired outcome: less variation across simulations, showing stability even when candlestick order changes. A robust strategy should not collapse when candlesticks are randomized. Example: a good bootstrap result showed 150% net profit even with randomized candlesticks, though with some chop. The strategy should survive these stress tests and still produce positive results.",
+    "priority": 5,
+    "tags": [
+      "monte-carlo",
+      "bootstrap-testing",
+      "candlestick-randomization",
+      "stress-testing",
+      "robustness-validation"
+    ]
+  },
+  {
+    "id": "yt-claude-code-013",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Claude Code overnight setup workflow: (1) Download Visual Studio Code or Cursor, (2) Install Claude Code extension, (3) Optionally use ClaudeOpus for enhanced system prompt injection, (4) Set a single prompt defining the task and success criteria, (5) Let it run for 8+ hours overnight. Claude Code builds strategy backbone first, then iteratively adds trading filters and refines parameters. It uses start/sleep commands while waiting for backtest results, consuming minimal tokens during sleep periods. Most of the 8-hour runtime is spent sleeping/waiting for computations, not active token processing.",
+    "priority": 4,
+    "tags": [
+      "claude-code-setup",
+      "overnight-automation",
+      "vscode",
+      "cursor",
+      "claudeopus"
+    ]
+  },
+  {
+    "id": "yt-claude-code-014",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Claude Code terminal benchmarks: Droid with GPT-5 CodeX leads at 77% problem-solve rate on Terminal Bench leaderboards. ClaudeOpus scores 70% solve rate on Terminal Bench. Both are sufficient for algorithmic trading development work. The complexity of coding problems solved is analogous to trading system development tasks.",
+    "priority": 2,
+    "tags": [
+      "terminal-bench",
+      "model-comparison",
+      "gpt-5-codex",
+      "claudeopus",
+      "benchmarks"
+    ]
+  },
+  {
+    "id": "yt-claude-code-015",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Parameter optimization approach: brute-force testing of all parameter combinations across multiple dimensions. For Wolf Pack indicator, this means testing length from 1-100 against 3 other variable parameters, creating tens of thousands to hundreds of thousands of combinations. With local Vector BT processing, thousands of backtests per second quickly rule out bad configurations. The goal is to find the best max drawdown configuration that actually works on the specific instrument being traded (e.g., crypto coin, gold, NQ futures).",
+    "priority": 4,
+    "tags": [
+      "parameter-optimization",
+      "brute-force",
+      "grid-search",
+      "multi-parameter",
+      "instrument-specific"
+    ]
+  },
+  {
+    "id": "yt-claude-code-016",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Strategy development philosophy: develop a robust foundation (backbone strategy) first, then iteratively add filters and refinements. The backbone should perform well in initial testing before adding complexity. Adding trade filters to a choppy baseline dramatically improves the equity curve smoothness. The final strategy should be the result of progressive refinement: solid backbone + well-tuned filters + validated by stress tests.",
+    "priority": 4,
+    "tags": [
+      "strategy-development",
+      "backbone-first",
+      "iterative-refinement",
+      "filter-addition",
+      "progressive-enhancement"
+    ]
+  },
+  {
+    "id": "yt-claude-code-017",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Edge concept in crypto markets: a significant portion of crypto market volume comes from algorithmic trading bots extracting value. These institutional bots can trigger liquidity sweeps and move markets. A retail trader's bot only needs to capture a small fraction of this extracted value to be profitable. Even a 51% win rate is sufficient for long-term profitability, analogous to the house edge in blackjack over many hands.",
+    "priority": 4,
+    "tags": [
+      "edge",
+      "algorithmic-dominance",
+      "liquidity-extraction",
+      "institutional-bots",
+      "market-structure"
+    ]
+  },
+  {
+    "id": "yt-claude-code-018",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Sample size requirements for reliable backtesting: the final validated strategy had 409 total trades, deemed a sufficiently large sample size to base decisions on. Smaller sample sizes in earlier versions (versions 1-4) led to less reliable metric estimates. More trades = more confidence in backtested metrics. When optimizing, ensure enough trades exist for statistical significance.",
+    "priority": 3,
+    "tags": [
+      "sample-size",
+      "statistical-significance",
+      "trade-count",
+      "confidence",
+      "minimum-trades"
+    ]
+  },
+  {
+    "id": "yt-claude-code-019",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Backtesting deception awareness: backtests can be obviously misleading, which is exactly why robustness testing (Monte Carlo, bootstrapping, out-of-sample) is essential. A strategy that looks profitable in a simple backtest may fail under stress tests. The real metrics matter more than backtested returns. Signal Swap marketplace addresses this by requiring both real trading data AND robustness test results for bots listed on the marketplace.",
+    "priority": 4,
+    "tags": [
+      "backtest-deception",
+      "robustness-testing",
+      "real-data",
+      "marketplace-validation",
+      "honest-metrics"
+    ]
+  },
+  {
+    "id": "yt-claude-code-020",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Pine Script to local backtesting workflow: strategies can be developed in TradingView Pine Script for quick visualization, then migrated to Vector BT (Python) for serious backtesting. Vector BT processes on CPU (not GPU), making it accessible on standard hardware. TradingView comparison metrics (net profit, max drawdown) should match between local backtesting and TradingView when the same date ranges and parameters are used. Local testing eliminates manual parameter tuning one-by-one on TradingView.",
+    "priority": 4,
+    "tags": [
+      "pine-script",
+      "vector-bt",
+      "python",
+      "cpu-backtesting",
+      "tradingview-verification"
+    ]
+  },
+  {
+    "id": "yt-claude-code-021",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Signal Swap platform features: allows users to plug Pine Script strategies directly into a backtesting engine without converting to Python or other languages. Supports connections to Bybit, Apex, and Pine X exchanges. Offers automated trading from TradingView signals to exchange execution. Provides a centralized dashboard for bot monitoring, trade history, and performance metrics. Marketplace publishes only real trading data (not backtests). Optional robustness test badges (Monte Carlo, out-of-sample results) for marketplace bots. Free to list, with bot creators keeping majority revenue share. Currently in alpha testing with Discord access for early testers.",
+    "priority": 3,
+    "tags": [
+      "signalswap",
+      "marketplace",
+      "tradingview-integration",
+      "automated-trading",
+      "alpha-testing"
+    ]
+  },
+  {
+    "id": "yt-claude-code-022",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Key insight about edges in trading: no trading system functions in every market condition forever. Edges decay. That is why multiple trade filters and robustness testing are essential - they extend the useful life of a strategy. Multiple uncorrelated signals and filters provide defense against edge degradation. The focus should be on finding what works on a specific instrument during the current market regime, not a universal forever-strategy.",
+    "priority": 3,
+    "tags": [
+      "edge-decay",
+      "market-specific",
+      "filter-defense",
+      "regime-awareness",
+      "no-permanent-edge"
+    ]
+  },
+  {
+    "id": "yt-claude-code-023",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Cross-asset correlation in crypto markets: Bitcoin, Ethereum, and altcoins all highly correlate because many market participants use trading bots across all these instruments simultaneously. This inter-market correlation means that strategies developed for one crypto may have correlated performance across others, and risk management must account for this correlation rather than treating each trade as independent.",
+    "priority": 3,
+    "tags": [
+      "correlation",
+      "cross-asset",
+      "systemic-risk",
+      "portfolio-construction",
+      "crypto-correlation"
+    ]
+  },
+  {
+    "id": "yt-claude-code-024",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "The platform Signal Swap evaluates bots using the exact same robustness methodology as the local trading engine: in-sample vs out-of-sample comparison, Monte Carlo simulations, bootstrap tests. Bots that pass stress tests receive a badge on their marketplace listing, giving users confidence that the bot held up under rigorous validation beyond simple backtesting.",
+    "priority": 3,
+    "tags": [
+      "signalswap-validation",
+      "marketplace-standards",
+      "stress-test-badge",
+      "trust",
+      "verification"
+    ]
+  },
+  {
+    "id": "yt-claude-code-025",
+    "source": "youtube-interviews/How I Got RICH Using AI Trading Bots (working method 2026).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Retail trader survival strategy: retail traders are getting wiped out by institutional and algorithmic trading bots in both financial markets and betting markets. Learning how professional trading systems are built with AI assistance levels the playing field. The democratization of tools like Claude Code, Vector BT, and open knowledge about robust backtesting methodology gives retail traders tools that were previously only available to institutions.",
+    "priority": 4,
+    "tags": [
+      "retail-trader",
+      "institutional-advantage",
+      "democratization",
+      "ai-tools",
+      "level-playing-field"
+    ]
+  }
+]

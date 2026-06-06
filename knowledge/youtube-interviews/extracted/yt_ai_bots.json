@@ -1,0 +1,432 @@
+[
+  {
+    "id": "yt-ai-bot-001",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Three AI agents (Claude, DeepSeek, Qwen) were each given $1,000 to trade cryptocurrency on perpetual futures exchanges. After one day all three were profitable: Claude up $18, Qwen up $50, and DeepSeek down $30 (later recovered). All three traded around half a million dollars in volume. The project was inspired by AlphaArena which gave $10,000 to six AI models to trade, where Chinese models (DeepSeek, Qwen) performed best. The creator believes the results are largely luck-based, noting only 5% of traders make money and LLMs don't yet have reliable trading knowledge.",
+    "priority": 5,
+    "tags": [
+      "ai-trading",
+      "backtesting",
+      "cryptocurrency",
+      "perpetual-futures",
+      "claude",
+      "deepseek",
+      "qwen"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-002",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The tech stack for the AI trading bot: Bun as runtime (required for Lighter SDK compatibility, not Node.js compatible), Vercel AI SDK with Open Router for LLM interactions, Prisma with PostgreSQL for database, React for frontend, Open Router as router layer to connect to multiple LLMs. The code was under 200 lines across approximately 5 files. The entire system was less than 200 lines of code.",
+    "priority": 4,
+    "tags": [
+      "tech-stack",
+      "bun",
+      "vercel-ai",
+      "open-router",
+      "prisma",
+      "react",
+      "postgresql"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-003",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "The AI trading bot architecture: Backend fetches candlestick data every 5 minutes from the exchange, sends it to the LLM along with current position and financial indicators. The LLM responds with tool calls (create position or close all positions). The bot places orders on the exchange via HTTP requests. All connections between backend and exchange are HTTP. The system uses a decentralized perpetual futures exchange (Lighter). The Python SDK was ported to JavaScript for Lighter exchange connectivity.",
+    "priority": 5,
+    "tags": [
+      "architecture",
+      "llm-trading",
+      "tool-calls",
+      "candlestick-data",
+      "lighter-exchange"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-004",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Perpetual futures (perps) differ significantly from spot trading. Perps are future contracts with no expiry date, allowing indefinite position holding. They track the underlying asset price through a funding rate mechanism - longs pay shorts or vice versa at regular intervals, incentivizing price convergence with the index price. Perps enable leverage trading (2x, 10x, 20x etc). With 10x leverage on $7,000 capital, a $70,000 position can be opened. A 10% price increase doubles the base capital ($7,000 to $14,000) but a 10% decrease wipes it out completely. Perps are popular for hard-to-access assets (Tesla, Meta, Japanese stocks, crude oil) that retail users can't easily buy directly.",
+    "priority": 5,
+    "tags": [
+      "perpetual-futures",
+      "leverage",
+      "funding-rate",
+      "derivatives",
+      "spot-vs-futures"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-005",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "Trading fees on leveraged positions can destroy profits. When opening and closing an $18,000 position with 0.01% fee, the trading fee becomes approximately $8. A profitable trade that only made $1 was completely negated by fees. This is why frequently opening and closing leveraged positions is dangerous. The fee percentage is applied to the full leveraged position value, not the base capital.",
+    "priority": 4,
+    "tags": [
+      "trading-fees",
+      "leverage-risk",
+      "cost-management",
+      "slippage"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-006",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "Lighter exchange supports up to 255 API keys per account, each requiring a unique index. Sub-accounts can be created to isolate trading strategies - if one sub-account gets liquidated, others remain unaffected. Each sub-account needs its own set of API keys and cannot affect other sub-accounts. The system created separate sub-accounts for each AI model (Claude, DeepSeek, Qwen) with $1,000 allocated to each. Later $3,000 total was distributed across three sub-accounts ($1,000 each).",
+    "priority": 5,
+    "tags": [
+      "risk-management",
+      "sub-accounts",
+      "isolation",
+      "api-keys",
+      "liquidation-protection"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-007",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Three financial indicators are forwarded to the LLM: mid prices, EMA (exponential moving average), and MACD (moving average convergence divergence). For both short-term (5-minute candles) and long-term (4-hour candles) time frames, plus the latest 10 values of each indicator. The AI receives indicator data for BTC, ETH, and SOL markets simultaneously. AlphaArena project sent indicators calculated from 3-minute and 4-hour candles. Candlestick data for the last 3 days and few hours is provided.",
+    "priority": 5,
+    "tags": [
+      "indicators",
+      "ema",
+      "macd",
+      "mid-prices",
+      "multi-timeframe",
+      "multi-asset"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-008",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Mid price is calculated as the average of open and close prices for each candle interval. Mid prices from the last 10-120 candles are provided to show price movement over time. The mid price represents where the market opened and closed within a specific interval. This differs from using high/low or other price points.",
+    "priority": 2,
+    "tags": [
+      "mid-price",
+      "candlestick",
+      "price-data"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-009",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Exponential Moving Average (EMA) weights recent candles more heavily than older ones. For EMA 20, the multiplier is 2/(21) ≈ 0.095. The formula is: EMA_today = Price_today × multiplier + EMA_yesterday × (1 - multiplier). The first EMA value is initialized using the Simple Moving Average (SMA) of the preceding candles. If prices are trending up, EMA will be above SMA; if trending down, EMA will be below SMA. The system forwards the last 10 EMA 20 values to the LLM.",
+    "priority": 4,
+    "tags": [
+      "ema",
+      "exponential-moving-average",
+      "weighted-average",
+      "trend-indicator"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-010",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "MACD (Moving Average Convergence Divergence) is calculated as EMA 26 minus EMA 12 (the standard periods). When the faster EMA (12) is above the slower EMA (26), MACD is positive (bullish), and vice versa. Convergence indicates trend continuation while divergence signals potential reversal. The system calculates EMA 26 length (24 values from 50 candles) and EMA 12 length (38 values from 50 candles), then takes the last 24 of each and subtracts to get MACD values. The last 10 MACD values are forwarded to the LLM.",
+    "priority": 4,
+    "tags": [
+      "macd",
+      "moving-average-convergence-divergence",
+      "trend-analysis",
+      "momentum"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-011",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "SMA (Simple Moving Average) is distinct from EMA. SMA gives equal weight to all candles: sum of last N mid prices divided by N. SMA 20 would be the last 20 candles' mid prices divided by 20. SMA lags behind price action more than EMA because it doesn't prioritize recent data. SMA is used to initialize the first EMA value - the SMA of the first (prices.length - period) candles becomes the seed for EMA calculations.",
+    "priority": 2,
+    "tags": [
+      "sma",
+      "simple-moving-average",
+      "ema-initialization"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-012",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Options trading compared to perpetuals: Options give the right (not obligation) to buy/sell at a specific price on a specific date. A premium is paid for this right. Unlike perps, options have expiry dates and the buyer can choose not to exercise. 90-95% of Zerodha's revenue comes from futures, not spot trading, showing that derivatives dominate Indian trading volume. Perps are essentially options without expiry dates.",
+    "priority": 3,
+    "tags": [
+      "options",
+      "futures",
+      "derivatives",
+      "premium",
+      "expiry"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-013",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The system uses market orders instead of limit orders. Initially, an 'obnoxious price' hack was used (e.g., $300 for Solana, $200,000 for BTC, $7,500 for ETH) to guarantee execution, but this failed because even market orders have slippage limits (~1% default). The solution was to fetch the latest 1-minute candlestick close price and place the market order at that price (slightly above for longs, slightly below for shorts) to avoid slippage rejection. The Lighter SDK was updated to support market orders with a price field that properly executes at the best available price.",
+    "priority": 4,
+    "tags": [
+      "market-orders",
+      "limit-orders",
+      "slippage",
+      "order-execution",
+      "sdk"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-014",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Closing positions via opposite orders rather than cancel orders. Instead of finding and canceling specific orders (which requires tracking client order IDs), the system creates opposite market orders to flatten positions. For a 10x long with quantity 1 on Ethereum, it creates a 10x short with quantity 1. This effectively closes the position without needing the original order's client order ID. This approach is simpler and more robust than order cancellation.",
+    "priority": 4,
+    "tags": [
+      "position-management",
+      "opposite-orders",
+      "order-cancellation",
+      "flattening"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-015",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Market-specific decimals and price multipliers vary by asset on decentralized exchanges. For Solana: quantity decimals = 1,000 (0.1 SOL submitted as 100), price decimals = 1,000. For Ethereum: quantity decimals = 1,000 (0.1 ETH as 100), price decimals = 100 (price of 3,000 submitted as 300,000). For Bitcoin: quantity decimals = 10,000,000 (0.1 BTC with 7 zeros), price decimals = 10 (100,000 as 1,000,000). All order quantities and prices must be submitted as integers, not floating point numbers. Market IDs: BTC=1, ETH=0, SOL=2 on Lighter exchange.",
+    "priority": 3,
+    "tags": [
+      "decimals",
+      "market-specific",
+      "integer-orders",
+      "price-multipliers",
+      "exchange-requirements"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-016",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "The LLM prompt structure for the AI trading agent: 'You are an expert trader. You were given $1,000 to trade with. You are trading on the crypto market.' It includes: invocation count, current open positions, current portfolio value, available cash, intraday financial information (5-minute candles: mid prices, EMA 20s, MACDs for BTC, ETH, SOL), long-term financial information (4-hour candles: same indicators), and available markets (BTC, ETH, SOL). Two tools available: create_position(symbol, side, quantity) and close_all_positions().",
+    "priority": 5,
+    "tags": [
+      "prompt-engineering",
+      "llm-prompt",
+      "trading-instructions",
+      "tool-definitions"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-017",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The database schema includes: Models table (id, name, openRouterModelName, lighterAPIKey, accountIndex, invocationCount with relations to invocations and portfolio data), Invocations table (id, modelId, response, createdAt with relation to tool calls), ToolCalls table (id, type [CREATE_POSITION/CLOSE_POSITION], invocationId, metadata), and PortfolioSize time series table (id, modelId, netPortfolio string, createdAt). Prisma ORM with PostgreSQL on Neon DB for cloud deployment.",
+    "priority": 3,
+    "tags": [
+      "database-schema",
+      "prisma",
+      "postgresql",
+      "time-series",
+      "invocation-logging"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-018",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The system runs via PM2 process manager with two processes: (1) index.ts - invokes all AI agents every 5 minutes, gathers indicators, calls LLM, executes trades, logs to database; (2) priceTracker.ts - runs every 2 minutes to record portfolio value time series. Initially used 1-second intervals for testing, then changed to 2-minute and 5-minute intervals for production. The bot trades only 3 supported cryptocurrencies: BTC, ETH, and SOL.",
+    "priority": 4,
+    "tags": [
+      "pm2",
+      "cron-jobs",
+      "process-management",
+      "intervals",
+      "production-deployment"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-019",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The system was deployed to a Digital Ocean server to avoid dependency on a local machine. The code was open-sourced at github.com/hk/aitrading-agent. A public dashboard was created at aitrading.honeyext.com where performance can be tracked. The frontend uses Recharts library for showing portfolio performance graphs over time, displays model responses, and tool calls made by each AI agent.",
+    "priority": 3,
+    "tags": [
+      "deployment",
+      "digital-ocean",
+      "open-source",
+      "dashboard",
+      "recharts",
+      "monitoring"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-020",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "No fail-safe was implemented to cancel all orders if the script crashes. The creator acknowledges this is a risk: if the script crashes, positions remain open without rebalancing, and after 8 hours of sleep this could result in significant losses. The system does not use optimistic nonces, reducing failure probability. The creator recommends not trading with money you can't afford to lose. Rate limits were not hit because invocations occur only every 5 minutes.",
+    "priority": 4,
+    "tags": [
+      "fail-safe",
+      "crash-risk",
+      "unmonitored-trading",
+      "risk-warning"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-021",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "First overnight performance results: After ~8 hours of autonomous trading starting at ~8:30 PM, Claude was up ~$40, DeepSeek up ~$67, and Qen near break-even at ~$1,000. All three models traded large volumes (half a million dollars). The script ran without errors overnight. The most profitable trade for Claude and DeepSeek was a Solana long position of ~$10,000 that captured significant gains. Qwen apparently did not take the same Solana long. Both profitable models took similar positions on SOL long. Claude opened a 20x ETH long, DeepSeek opened a 15x SOL long. One model (Quen) took contrarian bets and underperformed.",
+    "priority": 5,
+    "tags": [
+      "performance",
+      "overnight-results",
+      "solana-long",
+      "contrarian",
+      "live-trading"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-022",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The LLMs can set their own leverage levels. Claude set a 20x leverage ETH long, showing aggressive risk-taking. DeepSeek set 15x on SOL. The creator notes the AI models chose leverage autonomously - the system doesn't restrict leverage. If leverage isn't explicitly set, the LLM's requested quantity effectively determines the position size relative to available capital. With $50 initial capital for testing, the LLM attempted to open a 0.0125 ETH position (~$50 at ETH price), using full capital.",
+    "priority": 4,
+    "tags": [
+      "leverage-selection",
+      "position-sizing",
+      "autonomous-leverage",
+      "capital-utilization"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-023",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "AlphaArena observations: Chinese models (DeepSeek, Qwen) outperform Western models in AI trading competitions. CZ (Binance founder) tweeted about this phenomenon. Speculation exists about whether Chinese models are trained on trading data or if their HFT (high-frequency trading) background gives them an edge, though the creator believes it's likely luck. When all LLM trading strategies become widely known and used, the alpha disappears because everyone buys/sells the same positions, pricing in the information.",
+    "priority": 3,
+    "tags": [
+      "alpha",
+      "chinese-models",
+      "hft",
+      "market-efficiency",
+      "crowded-trades"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-024",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Indicator data format sent to LLM: For each of the 3 markets (BTC, ETH, SOL), the prompt contains intraday data (5-minute candles) and long-term data (4-hour candles) with the latest 10 mid prices, latest 10 EMA 20 values, and latest 10 MACD values. All decimal values are joined with commas into strings. The data is labeled with market name, timeframe, and indicator type. Due to exchange limitations (Lighter provides 1, 5, 15 minute and 4-hour candles but not 3-minute), 5-minute candles are used for intraday instead of AlphaArena's 3-minute candles, causing slight data differences.",
+    "priority": 3,
+    "tags": [
+      "data-format",
+      "prompt-data",
+      "indicator-format",
+      "timeframe-differences"
+    ]
+  },
+  {
+    "id": "yt-ai-bot-025",
+    "source": "youtube-interviews/I Gave My AI Trading Bot $3000 Building an AI trading bot from scratch.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "The system constraint design: The LLM can only open one position at a time and can only close ALL positions (not individual ones). If it wants to close one position while keeping others, it must close all then reopen the ones it wants to keep. This constraint exists because finding and closing specific positions by client order ID is technically complex on the Lighter exchange. The close_all_positions tool takes no inputs and cancels orders for all market IDs (BTC=1, ETH=0, SOL=2).",
+    "priority": 4,
+    "tags": [
+      "position-close-constraint",
+      "all-or-nothing",
+      "tool-restrictions",
+      "exchange-limitations"
+    ]
+  }
+]

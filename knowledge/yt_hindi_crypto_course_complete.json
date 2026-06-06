@@ -1,0 +1,137 @@
+[
+  {
+    "id": "yt-hindi-course-001",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging"],
+    "content": "Risk Management Rules: 1) Never risk more than 1-2% of total capital on a single trade. For a ₹2 lakh account, maximum loss per trade = ₹2,000 (1%). 2) Position sizing formula: Lot Size = Risk Amount (₹) / Stop Loss (in points). Example: ₹50 risk / 450 point SL = 0.11 BTC. 3) For intraday trades with ₹2 lakh capital: SL should be ~$23-25 (₹2000/85). For swing trades: SL can be $50-70 (2-3% of capital). 4) Always set Stop Loss BEFORE entering a trade. Never trade without a predefined stop loss. 5) Leverage does NOT change your loss amount if SL is fixed - it only changes margin requirement. 100x or 200x leverage with proper SL keeps risk identical.",
+    "priority": 5,
+    "tags": ["risk-management", "position-sizing", "stop-loss", "leverage"]
+  },
+  {
+    "id": "yt-hindi-course-002",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Two Roadmaps for Crypto: 1) Investor Path: Spot trading, long-term holds, fundamental analysis of projects, portfolio building, risk management. 2) Trader Path: Futures and spot trading, technical analysis, intraday/swing/scalping. Key insight: You need BOTH skill sets. Even as an investor, you need trading skills to time entries. The course covers: Technical Analysis (candlestick patterns, support/resistance, chart patterns), Fundamental Analysis (project research, news, sentiment), Psychology (discipline, patience, emotion control), and Risk Management (money management, position sizing).",
+    "priority": 4,
+    "tags": ["trading-system", "roadmap", "investor", "trader"]
+  },
+  {
+    "id": "yt-hindi-course-003",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "Psychology",
+    "conditions": ["Trending", "HighVolatility", "LowVolatility"],
+    "content": "Trading Psychology Rules: 1) Trading is NOT gambling - gambling is for those who trade without learning. 2) There are NO shortcuts - minimum 1-2 months of serious practice needed. 3) Discipline is everything: follow your plan, don't chase trades, don't revenge trade. 4) Patience: Wait for your setup. Don't trade for excitement. 5) Accept losses as business cost. A 60-70% win rate with 1:2 risk-reward is excellent. 6) Don't compare your ₹10,000 account with someone's ₹10 lakh account. Grow within your circle of competence. 7) Consistent effort compounds - like fitness, your trading 'muscle' develops over time.",
+    "priority": 5,
+    "tags": ["psychology", "discipline", "patience", "mindset"]
+  },
+  {
+    "id": "yt-hindi-course-004",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging"],
+    "content": "Account Setup & Exchange Guide: Use Binance for primary trading (lowest fees, highest liquidity, bank withdrawals). Use Delta Exchange only for specific futures analysis. Key wallets on Binance: Funding (for P2P deposits/withdrawals), Spot (for spot trading), Futures (for leveraged trades), Earn (for staking rewards). Verification: Use national ID card + face verification. Takes 5-30 minutes for approval. P2P Trading: Buy USDT with local currency at ~288 PKR rate. Payment methods: EasyPaisa, Bank Transfer. Important: Never click 'Payment Received' until money is actually in your account.",
+    "priority": 3,
+    "tags": ["exchange", "binance", "setup", "P2P"]
+  },
+  {
+    "id": "yt-hindi-course-005",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Three Types of Crypto Trading: 1) Day Trading/Scalping: Hold for minutes to hours. Use 15-min to 1-hour timeframes. Profit target: small moves (0.5-2%). High frequency. 2) Mid-Term Swing: Hold for days to weeks. Use 4-hour to daily timeframes. Better risk-reward (1:2 to 1:3). Uses scaled buying - first buy 30%, second 20%, third 20%. 3) Long-Term Investing: Hold for months to years. Use weekly/monthly timeframes. Buy BTC and ETH only for safety. Use DCA (Dollar Cost Averaging) - buy in parts, not all at once. Long-term holders of BTC have NEVER lost money if held 4+ years.",
+    "priority": 4,
+    "tags": ["day-trading", "swing-trading", "long-term", "DCA"]
+  },
+  {
+    "id": "yt-hindi-course-006",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Fundamental Analysis of Crypto Projects: Before investing, check: 1) Market Cap - determines realistic price potential (a coin with $4.65B market cap reaching Bitcoin's $2.19T cap would only go ~4.7x). 2) Blockchain system - is it proven and secure? 3) Trading pairs - what can you trade it against (USDT, BDC, etc.)? 4) News & sentiment - stay updated on project developments. CoinMarketCap is the primary research tool. Compare project's current market cap with Bitcoin's to estimate realistic upside. Never judge a coin's potential by price alone - always check market cap.",
+    "priority": 3,
+    "tags": ["fundamental-analysis", "market-cap", "research", "coinmarketcap"]
+  },
+  {
+    "id": "yt-hindi-course-007",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Crypto Staking (Earn Section): On Binance Earn, you can stake USDT, USDC, SOL, ETH, BNB. Two types: 1) Flexible staking - lower returns (~7.4% APY for USDT), but capital can be withdrawn anytime. Risk: value can decrease if market drops. 2) Fixed staking - higher returns (3% for 30 days, 3.6% for 60 days). Capital locked for duration. Important: Staking stablecoins (USDT/USDC) is safer as price doesn't fluctuate. For volatile coins like SOL, staked amount value can drop even while earning staking rewards.",
+    "priority": 2,
+    "tags": ["staking", "earn", "passive-income", "binance"]
+  },
+  {
+    "id": "yt-hindi-course-008",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Futures Trading Risk: In futures, your entire wallet can be liquidated. Example: If you have ₹100 in futures wallet and use 20x leverage on ₹100 = ₹2,000 position. If price moves against you by 5%, you lose ₹100 (your entire wallet). Leverage amplifies BOTH gains and losses. With 100x leverage on ₹100 = ₹10,000 position. Just 1% move = ₹100 loss = account wiped. Key rule: Only risk what you can afford to lose. Never put all your capital in futures. Start with small amounts. Always use stop loss.",
+    "priority": 5,
+    "tags": ["futures", "liquidation", "leverage-risk", "margin"]
+  },
+  {
+    "id": "yt-hindi-course-009",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "RiskManagement",
+    "conditions": ["ExtremeFear", "Trending"],
+    "content": "Long-Term Holding Rules: 1) Never sell in panic during temporary dips. Bitcoin dropped from $69K to $15K (78% drop) then recovered to $110K. 2) Buy the dips in parts - not all at once. First buy at current price, then add more if it drops further. 3) Only hold BTC and ETH for long-term safety. All other coins carry higher risk. 4) Store long-term holdings in hardware wallets (Ledger). Not your keys, not your crypto. 5) A coin that went from $3K to $69K can certainly go higher over 5-10 year horizon.",
+    "priority": 4,
+    "tags": ["long-term", "hardware-wallet", "BTC", "ETH", "HODL"]
+  },
+  {
+    "id": "yt-hindi-course-010",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "Execution",
+    "conditions": ["SessionOpen", "Trending"],
+    "content": "Order Types on Binance: 1) Market Order: Fills immediately at current market price. Use when you need instant execution. 2) Limit Order: Fills at your specified price or better. Use for precise entries. Example: BTC at ₹14,200 - set sell limit at ₹18,000 to auto-sell when target hits. 3) Stop-Limit Order: Triggers a limit order when stop price is reached. Use for stop losses. For beginners: only use Market and Limit orders. Avoid complex order types until experienced.",
+    "priority": 3,
+    "tags": ["orders", "market-order", "limit-order", "binance"]
+  },
+  {
+    "id": "yt-hindi-course-011",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Funded Account Opportunity (Prop Firms): Companies like FTMO, MyFundedFX offer funded accounts from $5,000 to $100,000+. You trade their capital. Profit split: typically 70-80% to you, 20-30% to the firm. Process: Take a test on a demo account. If you pass (meet profit target with max drawdown rules), you get a real funded account. This is a massive opportunity if you have skill but limited capital. No need for large initial investment - your skill is the capital.",
+    "priority": 3,
+    "tags": ["funded-account", "prop-firm", "capital", "opportunity"]
+  },
+  {
+    "id": "yt-hindi-course-012",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Crypto Spot vs Futures: In Spot trading: You own the actual coin. If you buy 10 BNB at $645, you own 10 BNB regardless of price. Price drops to $6 - you still have 10 BNB. No liquidation risk. In Futures trading: You're trading a contract. Price moves against you = unrealized loss. Loss exceeds margin = liquidation (account wiped). Spot = safer, good for beginners. Futures = higher potential but much higher risk. Start with spot trading first.",
+    "priority": 4,
+    "tags": ["spot-trading", "futures-trading", "liquidation", "risk"]
+  },
+  {
+    "id": "yt-hindi-course-013",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "Technical Analysis Levels: 1) Basic (Retail): Price action based - support/resistance, candlestick patterns, trend lines. 2) Indicator-based: Using moving averages, RSI, MACD, Bollinger Bands. 3) Smart Money (Advanced): Institutional trading methods - order flow, liquidity grabs, fair value gaps, market structure shifts. Smart money concept (SMC) explains how big players manipulate retail traders. Learn basics first, then progress to advanced concepts.",
+    "priority": 4,
+    "tags": ["technical-analysis", "smart-money", "price-action", "SMC"]
+  },
+  {
+    "id": "yt-hindi-course-014",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending", "Ranging"],
+    "content": "Complete Trading Framework: Step 1) Pre-requisites: Understand money, cash flow, economic structure. Step 2) Crypto basics + blockchain technology. Step 3) Spot trading on Binance (buy/sell, platform features). Step 4) Technical analysis (chart patterns, indicators). Step 5) Fundamental analysis (project research, CoinMarketCap, news). Step 6) Psychology and execution. Each step builds on the previous. Don't skip steps. Most traders fail because they jump to trading without understanding the foundation.",
+    "priority": 5,
+    "tags": ["framework", "trading-process", "education", "complete-system"]
+  },
+  {
+    "id": "yt-hindi-course-015",
+    "source": "youtube-interviews/Crypto Trading Complete Course Become Cryptocurrency Trading Expert.md",
+    "topic": "Execution",
+    "conditions": ["Trending"],
+    "content": "Crypto Transfer Risks: Cloud transfers (blockchain transfers) between wallets carry risk. If you enter wrong blockchain network (e.g., send BEP20 to ERC20 address), funds are permanently lost. Before any transfer: 1) Double-check the network type (BEP20/ERC20/TRC20/Matic). 2) Verify wallet address. 3) Send small test amount first. One wrong character = total loss. This is why using centralized exchange wallets (like Binance internal transfers) is safer for beginners.",
+    "priority": 4,
+    "tags": ["transfer", "blockchain", "risk", "wallet"]
+  }
+]

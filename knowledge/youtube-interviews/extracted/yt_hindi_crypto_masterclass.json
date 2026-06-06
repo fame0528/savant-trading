@@ -1,0 +1,119 @@
+[
+  {
+    "id": "yt-hindi-masterclass-001",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "SessionOpen"],
+    "content": "Brokerage Cost Management: Delta Exchange charges high fees. Rule: Do scalping within 15 minutes (zero brokerage fee). Intraday trades over 15 minutes incur heavy fees. Example: ₹1.5 lakh trade → ~₹25,000 in fees lost. Strategy: Instead of 3-4 intraday trades risking 1% each (3% total + high fees), take 1-2 higher timeframe trades (4H, 1H, Daily) with 2-3% risk and let them run for 1-3 days. This reduces brokerage costs dramatically while maintaining similar risk exposure. Swing trading direction is preferred over scalping on Delta Exchange.",
+    "priority": 5,
+    "tags": ["brokerage", "fees", "cost-reduction", "swing-vs-scalp"]
+  },
+  {
+    "id": "yt-hindi-masterclass-002",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "TradingSystems",
+    "conditions": ["SessionOpen", "Trending"],
+    "content": "Optimal Trading Timing: Best times to trade crypto: 1) 5:30 PM to 10:00 PM (US session) - high volatility and volume. 2) 9:00 PM to 11:00 PM (overlap of US evening + Tokyo morning opening). 3) Morning 5:30 AM to 7:00 AM (Tokyo session opening, daily candle changes at 5:30 AM IST). Price nature changes throughout the day - these 3 windows have the clearest moves. Avoid trading during London-Tokyo overlap (8:30 AM - 12:30 PM IST) as price often consolidates. Saturday-Sunday: reduced volatility, price tends to retrace.",
+    "priority": 5,
+    "tags": ["session-timing", "US-session", "Tokyo-session", "volatility"]
+  },
+  {
+    "id": "yt-hindi-masterclass-003",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending", "SessionOpen"],
+    "content": "Session-Based Trading Strategy: 4 global sessions: Tokyo (5:30 AM IST), London (12:30 PM IST), New York (7:00 PM IST), Sydney (2:30 AM IST). For crypto: Focus on 2 key sessions - Tokyo (5:30 AM) and New York (7:00 PM). Why? 1) US market drives crypto sentiment. When US traders buy stocks/bonds, they also buy crypto. 2) After US market closes, Sydney opens (low volume) then Tokyo opens (high volume). Strategy: Take trades either during Tokyo closing (1:30 PM IST) or US opening (7:00 PM IST). Both windows give 1 hour of high-probability setups.",
+    "priority": 5,
+    "tags": ["sessions", "Tokyo", "New-York", "institutional-flow"]
+  },
+  {
+    "id": "yt-hindi-masterclass-004",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "Multi-Timeframe Analysis (Top-Down): Start with Weekly → Daily → 4H → 1H → enter on 5-min or 15-min. Weekly/Daily: Determine overall trend direction. 4H: Identify key support/resistance levels. 1H: Find trend change signals using Double AI Super Trend indicator. 5-min: Entry and stop loss placement. Never go below 5-minute timeframe - too much noise. The 1-hour timeframe is where trend changes get confirmed. Below 1H = decision-making points only, not trend determination.",
+    "priority": 5,
+    "tags": ["multi-timeframe", "top-down-analysis", "1H", "trend"]
+  },
+  {
+    "id": "yt-hindi-masterclass-005",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending"],
+    "content": "Indicator Setup: Double AI Super Trend - AI-based, self-adjusting indicator. Uses EMA (Exponential Moving Average) as base. Cumulative algorithm that improves with each signal generation. Green = bullish, Red = bearish. Plot on 4H and 1H for trend identification. When 4H turns from green to red → look for short entries on 1H. When both 4H and 1H are red → strong bearish confirmation. Warning: This is NOT a traditional indicator - it's AI-based and self-correcting with each generation.",
+    "priority": 4,
+    "tags": ["indicator", "AI", "super-trend", "EMA"]
+  },
+  {
+    "id": "yt-hindi-masterclass-006",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Position Sizing & Leverage: Constant rule: Fix your risk in currency terms first, THEN calculate position size. Example: ₹2 lakh capital, 1% risk = ₹2,000. Stop loss = $50 → Position size = ₹2,000 / ₹4,250 (50 × 85) = ~0.47 lots. Leverage doesn't change your fixed loss - only changes margin used. 100x = ₹800 margin. 200x = ₹400 margin. Your LOSS remains ₹2,000 regardless. For beginners: Use 25x leverage for safety. Switch to isolated margin mode. Never use cross margin for new trades - it risks your entire account.",
+    "priority": 5,
+    "tags": ["position-sizing", "leverage", "isolated-margin", "risk"]
+  },
+  {
+    "id": "yt-hindi-masterclass-007",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "Psychology",
+    "conditions": ["Trending"],
+    "content": "Pyramiding (Scaling In): Instead of averaging DOWN (buying more as price falls), use pyramiding UP. Example: Short at 114,370 → when price drops to 112,000 (in your favor), add more short positions. Each new position = smaller size. This increases position size in profitable trades, not losing ones. Most beginners do OPPOSITE - they keep buying in hoping price reverses = dead weight trades. Golden rule: When trade is working, scale in. When trade is against you, exit - don't add.",
+    "priority": 5,
+    "tags": ["pyramiding", "scaling", "position-management", "psychology"]
+  },
+  {
+    "id": "yt-hindi-masterclass-008",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "Execution",
+    "conditions": ["Trending"],
+    "content": "Stop Loss & TP/SL Orders: ALWAYS use Take Profit (TP) and Stop Loss (SL) orders. There are two types: 1) Cross Margin: If SL fails, your ENTIRE account balance at risk. Only use if you understand the risk. 2) Isolated Margin: Only the trade's margin at risk at most. For 20x leverage with ₹800 margin = max loss ₹800. Switch from Cross to Isolated in margin settings. Beginners MUST use isolated mode. One mistake with cross margin = account gone. When trade goes in your favor, trail the stop loss upward. Move SL to break-even once price moves 1:1 in your favor.",
+    "priority": 5,
+    "tags": ["stop-loss", "take-profit", "isolated-margin", "trailing-SL"]
+  },
+  {
+    "id": "yt-hindi-masterclass-009",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "Execution",
+    "conditions": ["HighVolatility"],
+    "content": "Liquidation Risk Education: Bitcoin CAN crash from $10,000 to $3,000 in ONE candle (70% drop in hours). This happened in April 2020. No circuit breaker exists for crypto. Your trade can go 50% against you in one move. With 100x leverage on ₹2,000 with ₹100 margin: 1% price move = liquidation. Solution: Always use stop loss. Trade with isolated margin. Position size appropriately. Never bet more than you can lose. The market doesn't care about your analysis - always protect capital first.",
+    "priority": 5,
+    "tags": ["liquidation", "crash", "risk-management", "capital-preservation"]
+  },
+  {
+    "id": "yt-hindi-masterclass-010",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "Psychology",
+    "conditions": ["Trending", "ExtremeGreed", "ExtremeFear"],
+    "content": "Decision-Making in Trading: 1) Don't wait for 'perfect' entry - wait for 'good enough' setup with plan. 2) Pre-plan every trade: entry, stop loss, target - all before clicking buy/sell. 3) 'No regrets' approach: If you followed your plan, no regret even if trade loses. 4) Don't think about liquidation price - think about your stop loss. If SL is set properly, liquidation is irrelevant. 5) Trading is about consistency, not home runs. Small profits + small losses with positive expectancy wins long-term. Most beginners fail because they skip steps: no plan, no SL, no position sizing.",
+    "priority": 5,
+    "tags": ["psychology", "planning", "discipline", "pre-plan"]
+  },
+  {
+    "id": "yt-hindi-masterclass-011",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending", "SessionOpen"],
+    "content": "Binance vs Delta Exchange: Binance: Better for primary trading. Bank deposits/withdrawals supported. More liquid (BTC spot). Lower slippage. Link bank account directly - no P2P hassle needed. Delta Exchange: Higher fees for intraday. Better for specific futures instruments. NOT recommended for beginners due to high brokerage costs. Recommendation: Use Binance for actual trading. Use TradingView for chart analysis (free version allows 2 indicators simultaneously by using 2 separate chart tabs).",
+    "priority": 3,
+    "tags": ["exchange-selection", "binance", "delta", "fees"]
+  },
+  {
+    "id": "yt-hindi-masterclass-012",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Candlestick Analysis forEntry Confidence: IntoRejection candle example: When price makes a new high (higher high) but closes lower than the open = sellers dominated. Bigger rejection = stronger signal. Compare rejection candles between timeframes: 4H rejection shows stronger conviction than Daily timeframe rejection. If 4H shows large bearish rejection but Daily shows small/weak rejection = sellers are weaker on higher timeframe = less confidence in short. Always confirm with higher timeframe structure before entering on lower timeframe.",
+    "priority": 4,
+    "tags": ["candlestick", "rejection", "pin-bar", "price-action"]
+  },
+  {
+    "id": "yt-hindi-masterclass-013",
+    "source": "youtube-interviews/Crypto Trading MASTERCLASS It could be strategy for 90 Accuracy.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Real Performance Metrics (Last 30 days): 22 trades placed. 72% win rate. Average win: ₹11,000. Average loss: ₹1,600. Risk-reward average: 1:2.2. Many trades ran for 1-3 days (swing style). Goal with ₹2 lakh capital: Earn ₹1 lakh/month (50% monthly return). If achieved consistently = life-changing. Key insight: With discipline and proper process, even modest accounts can grow exponentially through compounding. Worst month still profitable. Drawdown managed through strict position sizing.",
+    "priority": 3,
+    "tags": ["performance", "metrics", "win-rate", "risk-reward"]
+  }
+]

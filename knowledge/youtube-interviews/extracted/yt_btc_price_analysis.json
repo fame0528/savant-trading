@@ -1,0 +1,865 @@
+[
+  {
+    "id": "yt-btc-analysis-001",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "Trader claims ~90% accuracy on Bitcoin directional calls over 15 years of trading experience. Self-referential reputation effect: when this trader calls a long, market participants follow, creating a self-fulfilling prophecy. Notes rare准确性 for upside calls specifically. This is presented as a back-testable pattern recognized by the broader trading community.",
+    "priority": 3,
+    "tags": [
+      "reputation",
+      "self-fulfilling",
+      "bitcoin",
+      "directional-bias",
+      "track-record"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-002",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Bitcoin pumped to $72,500-$72,800 then dropped $1,000 rapidly. Key support at $71,500 which is described as critical psychological level. Resistance at $72,000-$72,450 range. BTC was range-bound for approximately two days, described as 'chop' which typically precedes a large upside move. Seven-minute stochastics pointing to downside is a short-term bearish signal.",
+    "priority": 4,
+    "tags": [
+      "bitcoin",
+      "support-resistance",
+      "ranging",
+      "stochastics",
+      "7-minute",
+      "chop"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-003",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Multi-timeframe analysis approach: 7-minute and 15-minute charts are primary for short-term entries/exits. 1-hour stochastics showed aggressive upside potential pointing up. 4-hour showed indecisive resistance. 12-hour was still bullish with room to run. 7-minute stochastics turning aggressively has historically preceded significant dumps — when this pattern failed to dump this time, it was seen as a strength signal.",
+    "priority": 5,
+    "tags": [
+      "multi-timeframe",
+      "stochastics",
+      "7-minute",
+      "1-hour",
+      "4-hour",
+      "12-hour",
+      "trend-confirmation"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-004",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Breakout pattern after consolidation is one of the strongest bullish setups. After a breakout, price typically flags (consolidates in a tight range) before continuing. Entry on the flag after breakout adds significant bullish conviction. This pattern was cited on the daily timeframe.",
+    "priority": 4,
+    "tags": [
+      "breakout",
+      "flag",
+      "consolidation",
+      "bullish-pattern",
+      "daily",
+      "entry-timing"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-005",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Support cascade framework: If BTC loses $71,500, next stop is 200 SMA on 15-minute timeframe. Losing that leads to $69,000. If $69,000 fails, next target is 200 SMA on 30-minute at $69,764. Then if $70,678 breaks, further downside is expected. This creates a step-down support mapping strategy for risk management.",
+    "priority": 5,
+    "tags": [
+      "support-cascade",
+      "200-sma",
+      "15-minute",
+      "30-minute",
+      "risk-mapping",
+      "bitcoin"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-006",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Inverted Head and Shoulder patterns identified on AVAX at $50 level after weeks of sideways consolidation since January 25th. The measured move gave an entry point with the 7-minute flag suggesting continuation to $58. Breakout of resistance from December 24th confirmed the move. Some bearish divergence noted on the swing but tight moving averages and long consolidation suggested big move incoming.",
+    "priority": 4,
+    "tags": [
+      "inverted-head-shoulders",
+      "avax",
+      "breakout",
+      "consolidation",
+      "measured-move",
+      "7-minute-flag"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-007",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Cup and handle pattern recognized on BTC 1-hour timeframe. Fast formation pattern. Key requirement: price must get back inside the pattern (above 200 SMA on the smallest possible timeframe — even 30-second or 5-second). Failure to reclaim this level results in a bearish retest rather than continuation.",
+    "priority": 3,
+    "tags": [
+      "cup-and-handle",
+      "1-hour",
+      "bearish-retest",
+      "200-sma",
+      "fast-formation",
+      "bitcoin"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-008",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "When in doubt, go to smaller timeframes for trade entries. The 1-hour flag, 7-minute chart, and even 5-second chart provide more precise entry information than daily charts during periods of uncertainty. Smaller timeframes channel what will likely happen in larger ones. This was demonstrated with AI Tech entry on 1-hour flag.",
+    "priority": 4,
+    "tags": [
+      "smaller-timeframes",
+      "7-minute",
+      "1-hour",
+      "5-second",
+      "entry-precision",
+      "timeframe-analysis"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-009",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Leverage trading risk framework: Higher leverage (70x-100x) requires tighter stop losses which get hit by normal volatility. Lower leverage (36x) with wider stop losses has higher survival rate. The trader's edge is NOT being greedy — trading 'small ball' consistently with smaller positions over time outperforms large greedy bets. Market makers target high-leverage traders first because their stops are clustered closer to price. Patient, lower-leverage traders get stopped out less frequently because market makers exhaust the greedy traders first.",
+    "priority": 5,
+    "tags": [
+      "leverage",
+      "risk-management",
+      "stop-loss",
+      "greed",
+      "market-makers",
+      "position-sizing",
+      "patience"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-010",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Risk-to-reward ratio example: Trader opened a BTC long with stop loss near recent wick low, targeting $78,000. The wick provided a 4:1 risk-to-reward ratio (risk amount vs potential $6,000 move). Key concept: trade the flag with stop loss below where price would have to retest the top of the previous pattern or below the wick.",
+    "priority": 4,
+    "tags": [
+      "risk-reward",
+      "4-to-1",
+      "flag-trade",
+      "wick-support",
+      "stop-loss",
+      "bitcoin-long"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-011",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Personal risk formula: If $10,000 total net worth, risking $2,000 on trading account, a $500 drawdown (5% of net worth) causes stress. At $10 million net worth, $500 is negligible. Traders must find their personal risk-to-worth ratio. Most new traders trade leverage without understanding their emotional response to being up or down. Recommendation: trade spot first with $5K, then start day trading once you've backtested your strategy and can handle the emotional swings.",
+    "priority": 4,
+    "tags": [
+      "risk-worth-ratio",
+      "emotion",
+      "spot-first",
+      "leverage-warning",
+      "experience",
+      "position-sizing"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-012",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Take profits strategy: On swing trades where $5,000 became $7,000 or $6,500 and is now only up $1,000, take the $1,000 profit and build a tether nest egg. Don't wait for perfect flag on coins that have already moved — dollar-cost average out of winning positions. Keep long-term bags (Bitcoin, ETH, etc.) but take profits on swing trades that have already delivered returns. Having $23,000 in dry powder (tether) provides optionality for dips.",
+    "priority": 4,
+    "tags": [
+      "profit-taking",
+      "swing-trading",
+      "tether-reserve",
+      "dry-pdca-out",
+      "optionality"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-013",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "content": "Panic selling admission: Trader openly admits to past panic selling and normalizes it. The masses will always panic sell on big wicks/dumps — this is predictable and creates opportunity. After a massive wick down that quickly recovers, trapped short sellers and panic sellers get stopped out, then price recovers. Key: admitting the emotion is the first step to overcoming it.",
+    "priority": 3,
+    "tags": [
+      "panic-selling",
+      "psychology",
+      "market-makers",
+      "wick-recovery",
+      "trap",
+      "emotional-control"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-014",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Live trade example: Entered BTC long on flag with stop loss below the low of the recent wick. At $72,305 perps entry. When stopped on the long, immediately flipped to a 'panic scalp long' from lower level — demonstrating ability to trade both directions. Later lost $1,100 on the demonstrated trade when the initial stop was hit before price recovered.",
+    "priority": 3,
+    "tags": [
+      "live-trade",
+      "flag-entry",
+      "stop-loss-hit",
+      "flip-trade",
+      "demo-trade",
+      "transparency"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-015",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "content": "Demo account taught $114K profit on $33K margin (3.5x leverage) with BTC $1.5M notional position. Liquidation was at $65,100 on a $66,400 entry. Key learning: practicing large-size trades on demo helps understand liquidation dynamics and emotional responses before risking real capital. Mexi exchange demo account specifically mentioned.",
+    "priority": 3,
+    "tags": [
+      "demo-trade",
+      "leverage-practice",
+      "liquidation",
+      "mexi",
+      "education",
+      "position-sizing"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-016",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Adding to losing long positions as a deliberate strategy: When a long goes slightly underwater, trader adds to the position rather than closing. This is his consistent approach — he'd rather add to a long and be temporarily underwater than switch to short. Trading style must match personality; the key is consistency with your chosen approach.",
+    "priority": 3,
+    "tags": [
+      "adding-to-losing-trades",
+      "dca-into-position",
+      "trading-style",
+      "consistency",
+      "long-bias"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-017",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Altcoin call track record presented: CET — inverted Head and Shoulder breakout for 63% gains from months of sideways. GROK — exactly called bottom with stop loss, went up 170%. CVNA — inverted Head and Shoulder breakout for 100% gains. DXY — called short on live stream successfully. GEM — called exact bottom February 6th, went up 17%. AGI — channel pattern breakout for 84% in 4 days. CRX — tight moving averages node, 84% gains. DEX — flag breakout for 100% gains. CHHWA — 57% flag breakout. FET — tight moving averages, 2-day 200 SMA breakthrough, 33% gains. KMONI — cup and handle for 40%. AVAX — tight consolidation, called 20% move. TONE — cup and handle for 62%. BNB — flag called after social media buzz, 250%. BOBO — flag for gains. HBAR — flag for 75%. All within ~3-5 day window.",
+    "priority": 5,
+    "tags": [
+      "track-record",
+      "altcoins",
+      "patterns",
+      "flag",
+      "inverted-head-shoulders",
+      "cup-handle",
+      "breakout"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-018",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "Fear analysis: 'Don't you get it? I'm a time traveler. I've already seen all this happen before.' This self-referential narrative suggests extreme confidence bordering on cult-of-personality dynamics. Market sentiment at time was extremely bullish — 'choose rich' was the opening mantra. Trader projects targets of $75K-$80K BTC with conviction.",
+    "priority": 2,
+    "tags": [
+      "sentiment",
+      "extreme-greed",
+      "bullish",
+      "narrative",
+      "cult-following",
+      "market-psychology"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-019",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Injective (INJ) broke out to all-time high. Had been consolidating since December 20th resistance. Trader called it going to $71. Started at $1.78 in the Trading Group. Demonstrates value of identifying breakouts at all-time highs where there's no overhead resistance.",
+    "priority": 4,
+    "tags": [
+      "injective",
+      "alltime-high",
+      "breakout",
+      "no-overhead-resistance",
+      "altcoin"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-020",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "TIA (Celestia) analysis: Consolidated at $15 level, bounced, inverted Head and Shoulder pattern forming. As long as it holds above 12-hour 200 SMA, target is $32. Only 23% of circulating supply available (noted as low float factor). Previously bought at $2.00 cents when it first launched. Noted as slightly overbought on daily.",
+    "priority": 3,
+    "tags": [
+      "tia",
+      "celestia",
+      "inverted-head-shoulders",
+      "12-hour-200sma",
+      "low-float",
+      "overbought"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-021",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "MARA (Marathon Digital) analysis: Miners have massive moves post-halving when emotional investors get over fear. Profit margins on miners will be 'insane' post-halving. Daily shows bearish divergence on Head and Shoulder pattern (head-right shoulder). Could dump further to 200 SMA. Bought at $8-9, considering exit. Double top pattern visible. Miners will get fewer Bitcoin from mining post-halving.",
+    "priority": 3,
+    "tags": [
+      "mara",
+      "bitcoin-miners",
+      "halving",
+      "bearish-divergence",
+      "head-shoulders",
+      "double-top"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-022",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Solana showing inverted Head and Shoulder / complex inverted Head and Shoulder pattern propping up price. Very bullish on Solana and the Solana ecosystem. Target of $166 for SOL (stated seven times). When Solana has more bullish setup than Bitcoin, it suggests Bitcoin will go sideways or modestly upside while alts outperform.",
+    "priority": 4,
+    "tags": [
+      "solana",
+      "inverted-head-shoulders",
+      "ecosystem",
+      "altcoin-season",
+      "target-166"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-023",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Medic (MED) in giant Adam and Eve double bottom pattern. Above 200 on daily. Buy zone between $1.07-$1.27. Target of $3.00 unless Black Swan event. Wait 2-3 months for the move. 'I buy right here and wait two or three months and I get paid' — core swing-and-hold philosophy.",
+    "priority": 3,
+    "tags": [
+      "medic",
+      "adam-eve",
+      "double-bottom",
+      "daily-200sma",
+      "buy-zone",
+      "hold-strategy"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-024",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ASEN/ASENA creating flag above daily 200 SMA while stochastics reset — very bullish sign. When rising above daily 200 SMA and holding while indicators reset, the resulting breakout has 21 crossover confirming the move. 64-97% gains demonstrated on this setup previously. Posted at 11pm, play delivered 64% gains within 8 hours.",
+    "priority": 4,
+    "tags": [
+      "asena",
+      "daily-200sma",
+      "flag-above-ma",
+      "stochastic-reset",
+      "bullish-crossover"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-025",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Zen (ZEN): Called flag above resistance after stochastics reset and triple-7s appeared on the chart (wallet number showed 419-777). After the call, ZEN moved up 64%. Next target for ZEN is $0.975. Demonstrates using smaller timeframe flags (15-minute) to catch breakouts from resistance levels.",
+    "priority": 3,
+    "tags": [
+      "zen",
+      "flag-above-resistance",
+      "15-minute",
+      "measured-move",
+      "stochastic-reset"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-026",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Total crypto market cap analysis: Above $2.15 trillion (key milestone). Wicked off $2.45 trillion resistance. Next target range $2.7-$3.8 trillion. Support at $2.562, resistance test at $2.44. Close gap between 21-day and 3-day moving averages before continuing. When total market cap holds above $2.562, remains bullish. Crypto market cap looking to Bitcoin the same way Bitcoin looks to individual alts.",
+    "priority": 4,
+    "tags": [
+      "market-cap",
+      "total-market",
+      "support-resistance",
+      "2.15-trillion",
+      "3.8-trillion-target"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-027",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "When Bitcoin goes sideways or pumps, altcoins benefit. When Bitcoin dumps and altcoins dump, people flee to Bitcoin. When Bitcoin dominates, it's because of fear rotation. Currently seeing distribution OUT of Bitcoin INTO altcoins — confirmed by Bitcoin dominance dumping on 15-minute while also seeing some tether buying (mixed signal). Key confirmation: if BTC dominance fails to reclaim its 7,800 level, more downside expected toward 69K.",
+    "priority": 4,
+    "tags": [
+      "bitcoin-dominance",
+      "altcoin-season",
+      "distribution",
+      "correlation",
+      "tether-confirmation"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-028",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SEI analysis and entry strategy: Bought SEI between $0.58-$0.73 in $2,000 tranches. Now holding $7,400 bag. Believes SEI could do 40x to $140,000 portfolio target (meaning 40x on SEI price). Consolidation buying — anywhere between $0.79-$0.90 in coming weeks is a steal. Target $1.93 (193 cents). Demonstrates scaling into position during consolidation with multiple small entries.",
+    "priority": 3,
+    "tags": [
+      "sei",
+      "scaling-in",
+      "consolidation-buy",
+      "tranche-entry",
+      "target-193"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-029",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "SHIB/DOGE analysis: Daily 21-day moving average approaching price action. Typical pattern is return to 21-day MA before continuing. At 27 cents for DOGE, if key level at 14 cents breaks, that's the downside target. SHIB showing similar tightening pattern. Meme frenzy may be 7-10 days per cycle before attention shifts. Attention span of retail is limited in each sector.",
+    "priority": 2,
+    "tags": [
+      "shib",
+      "doge",
+      "meme-coins",
+      "21-day-ma",
+      "cycle-length",
+      "attention-span"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-030",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "FET (Fetch.ai) showing bull flag on 3-hour chart at $0.432. Breaks out to upside, measured move targets $4.30 (10x from $0.432). Setup says 'yes' on the pattern. Trending on Token Metrics along with other AI coins. Hardware AI narrative gaining traction. Nvidia conference upcoming could be 'sell the news' event for AI coins.",
+    "priority": 4,
+    "tags": [
+      "fetch",
+      "fet",
+      "bull-flag",
+      "3hour",
+      "ai-coins",
+      "nvidia-conference",
+      "target-430"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-031",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "XRP pumped last night, pulled back but held uptrend. Key resistance at 74 cents area. Daily shows curve that suggests more pump ahead despite resistance. Target 85 cents for XRP. Symmetrical Triangle on the daily could go either way. When you get these resistance levels where people 'love selling their own coin,' it's similar to Bitcoin's resistance behavior.",
+    "priority": 3,
+    "tags": [
+      "xrp",
+      "pump-and-hold",
+      "daily-curve",
+      "resistance",
+      "target-85cents"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-032",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "AXGT wrapped ETH showing 148% gains coming in the flag on 8-hour. On trader's radar and personally in the coin. High risk due to BTC correlation. Demonstrates using 8-hour flag identification for altcoin targets. Other AI coins on radar: AI Tech at $0.36 (small $168M market cap, 23% circulating supply, getting listed on multiple exchanges). Previously called AI Tech from $30M market cap.",
+    "priority": 3,
+    "tags": [
+      "axgt",
+      "8hour-flag",
+      "ai-coins",
+      "wrapped-eth",
+      "ai-tech",
+      "small-cap"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-033",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BAND protocol showing Adam and Eve double bottom. Previous $1.20 to $20 run in last cycle. Target this time $40-$50. Key buy zone on the green box (consolidation area). Nobody talking about BAND — it's been quiet. Many projects use BAND protocol behind the scenes. Quiet coins with real utility often precede major moves. 90% chance BAND will be $6 before year end.",
+    "priority": 4,
+    "tags": [
+      "band",
+      "oracle",
+      "adam-eve",
+      "quiet-accumulation",
+      "utility",
+      "target-40-50"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-034",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ATOM (Cosmos) showing inverted Head and Shoulder breakout, then cup and handle breakout. Consolidation pattern — 'eventually boom it shoots fast.' Accumulation phase. Support at $5.80 (off the bottom at $1.234 entry). Double bottom pattern visible. Above $15 resistance (clearing the level), next target $21 (which represents 100K for 100K ATOM position). Tight moving averages suggest move is brewing.",
+    "priority": 4,
+    "tags": [
+      "atom",
+      "cosmos",
+      "accumulation",
+      "cup-handle",
+      "inverted-head-shoulders",
+      "tight-averages"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-035",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "LINK (Chainlink) accumulation: Trader got in at $19-$20, believes LINK may never see below $20 again. Target range $30-$36. When moving averages are far apart after a pump, expect return to 21-day MA before continuing. LONG time cycle: consolidate, then move. This is the setup LINK is in.",
+    "priority": 3,
+    "tags": [
+      "link",
+      "chainlink",
+      "accumulation",
+      "21-day-ma",
+      "target-30-36"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-036",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Cardano (ADA) in cup and handle pattern. Must stay above $0.66. Target $1.00. If ADA gets back to $1.00, that's a significant psychological level. Bought ADA at $0.02-$0.081 through bear market DCA. Currently ~$50K position in ADA. Bull flag visible on daily timeframe.",
+    "priority": 3,
+    "tags": [
+      "cardano",
+      "ada",
+      "cup-handle",
+      "dca",
+      "bear-market-buying",
+      "target-1dollar"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-037",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ARROWDRONE (DOME): 'The CAKE for Base.' Bought at $0.37 at the 0.618 golden pocket Fibonacci retracement. Already doubled the $4,000 investment. Target $1.29 before bigger pullback. Previous support at $0.69 became resistance. Coinbase/Base ecosystem growth thesis: Coinbase made the base network, moving into DeFi, going to make a lot of money.",
+    "priority": 3,
+    "tags": [
+      "arrowdrone",
+      "dome",
+      "base",
+      "coinbase",
+      "golden-pocket",
+      "fib-618",
+      "defi"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-038",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "XAI showed rising wedge pattern but only 32% chance of parabolic breakout — it dumped to the downside instead, taking liquidity. This demonstrates NOT all patterns play out; rising wedges can fail. However, beautiful support held with bounce. If flag forms, pole length suggests target of $2.13. Still bullish, in the coin from early entry ($200 → $1,400).",
+    "priority": 3,
+    "tags": [
+      "xai",
+      "rising-wedge",
+      "pattern-failure",
+      "liquidity-grab",
+      "support-hold",
+      "target-213"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-039",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Descending triangle on 5-second chart broke down 68% of the time. This was the pattern that caused BTC to dump from $72K area to ~$71.3K. To catch these moves, one must watch the smallest timeframes. The descending triangle was visible on the 5-second chart right before the dump. Key learning: market structure on smallest timeframes can precede larger moves.",
+    "priority": 3,
+    "tags": [
+      "descending-triangle",
+      "5second",
+      "short-term-pattern",
+      "68-percent",
+      "market-structure",
+      "micro-timeframe"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-040",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "ExtremeFear"
+    ],
+    "content": "BTC V-shape recovery analysis: After wicking down to ~$71,300 and recovering back inside the flag pattern, this was NOT a repeat behavior — it's rare to see two massive wicks in succession because the first wick consumed significant liquidity. This pattern of extreme wick followed by immediate recovery suggests stop hunting rather than genuine selling pressure.",
+    "priority": 4,
+    "tags": [
+      "vshape-recovery",
+      "stop-hunt",
+      "wick-analysis",
+      "liquidity",
+      "pattern-recognition",
+      "bitcoin"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-041",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "content": "Bearish scenario cascading supports for BTC: Lose $6,990 → drop to $69,764 (200 SMA on 30-min). Lose $69,764 → next target $68,174 (200 SMA on 1-hour). On the way down, gap in VVP (Volume Profile Void) visible, creating a 'Bart Simpson head' pattern. Moving averages very far apart on 3-day, 21-day far from 3-day. Bearish divergence on multiple timeframes. Rising wedge pattern forming which breaks down 68% of the time. Measure move to $62,000.",
+    "priority": 5,
+    "tags": [
+      "bearish-scenario",
+      "support-cascade",
+      "volume-profile",
+      "vvp",
+      "rising-wedge",
+      "death-cross",
+      "62000-target"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-042",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Phantom (PHM): Target $1.30. Flagging like entire market. Previous resistance becoming support. When everything is flagging (PHM, GALA, ATOM, SEI, etc.), 'Bitcoin's not going to pump, we're going to go sideways for Bitcoin, and it's going to be altcoin week.' All market flagging simultaneously suggests alt coin season.",
+    "priority": 3,
+    "tags": [
+      "phantom",
+      "phm",
+      "market-flag",
+      "altcoin-season",
+      "target-130",
+      "ecoinsystem"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-043",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Gala (GALA): Adam and Eve pattern identified with target $0.11. Previously flagged on 34-cent level and doubled up. All market in flags — GALA in flag, ATOM in flag, PHM in flag. When entire market flags simultaneously, next collective move is explosive.",
+    "priority": 3,
+    "tags": [
+      "gala",
+      "adam-eve",
+      "market-flag",
+      "double-up",
+      "target-11cents"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-044",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Baby Pepe case study: $300K market cap coin, trader's friend put in $2K early, then another $2K, turned into $45K as market cap expanded to $3-4M. Lesson: Trader personally avoids these micro-caps except for extreme outlier bets (SafeMoon era). Highlights asymmetric risk/reward — small bets on tiny market caps can generate life-changing returns despite high rug risk.",
+    "priority": 2,
+    "tags": [
+      "baby-pepe",
+      "micro-cap",
+      "asymmetric-bets",
+      "rug-risk",
+      "small-positions",
+      "case-study"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-045",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "Retail return signals: Verge (XVg) pumping — 'only retail would know about Verge.' When legacy coins from previous cycles (Dash, XVG, XLM, Stellar) start pumping, it indicates retail is returning to the market. Retail buys what they know, not new narratives. Charts are 'showing the news' before mainstream media covers it. Retail didn't understand new coins, so they bought familiar names.",
+    "priority": 3,
+    "tags": [
+      "retail-return",
+      "legacy-coins",
+      "sentiment",
+      "verge",
+      "diffusion-theory",
+      "charts-before-news"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-046",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "ExtremeGreed",
+      "Trending"
+    ],
+    "content": "Profit-taking framework: Portfolio was at all-time high of $425K. Trader took $18K off table from profitable swing trades, leaving long-term bags untouched (PYTH, FLAKY, PEPE, etc.). Strategy: take profits from coins that have already delivered — don't wait for top. FLAKY was up $2K overnight, then gave back 13% — take money off the table when up nicely and adjust later. Having $23K in dry powder creates optionality.",
+    "priority": 4,
+    "tags": [
+      "profit-taking",
+      "portfolio-management",
+      "dry-powder",
+      "425k-portfolio",
+      "ath",
+      "partial-exit"
+    ]
+  },
+  {
+    "id": "yt-btc-analysis-047",
+    "source": "youtube-interviews/Bitcoin Price Analysis & Live Trading AI Crypto Coin Continues.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Liquidation heatmap analysis: Using 'Lifer Liquidator' indicator to spot 100x/50x/25x leverage clusters. When leverage is roughly equal on both sides (matched highs to lows), direction is uncertain. More leverage clustered below = likely to go low. More leverage clustered above = likely going high. On this day, leverage was roughly balanced in the $71,500-$72,450 range, not giving directional bias. This is similar to what traditional liquidation indicators show.",
+    "priority": 3,
+    "tags": [
+      "liquidations",
+      "leverage-heatmap",
+      "100x",
+      "50x",
+      "25x",
+      "liquidation-clusters",
+      "directional-bias"
+    ]
+  }
+]

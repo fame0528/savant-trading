@@ -1,0 +1,1426 @@
+[
+  {
+    "id": "yt-fabio-001",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "SessionOpen",
+      "Trending"
+    ],
+    "content": "Maximum daily drawdown limit is $10,000. If already in profit, the total acceptable loss from peak is $20,000 ($10,000 profit given back + $10,000 additional). Never risk more than the previous week's profit on a single day. This creates a hard mechanical boundary for daily risk.",
+    "priority": 5,
+    "tags": [
+      "drawdown-limit",
+      "daily-risk",
+      "max-loss",
+      "risk-cap"
+    ]
+  },
+  {
+    "id": "yt-fabio-002",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "SessionOpen",
+      "Any"
+    ],
+    "content": "Cannot generate a $25,000 session with small risk on a $100,000 account. The account must be large enough (multi-million) to absorb the small精益 risks while achieving five-figure sessions. Capital size must match the income expectation.",
+    "priority": 5,
+    "tags": [
+      "capital-requirement",
+      "account-size",
+      "scaling"
+    ]
+  },
+  {
+    "id": "yt-fabio-003",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "All losing trades are contained within $2,500. The best winning trades are $6,000-$12,000. This asymmetry between max loss and max win is the core of profitability: when you are wrong, you are wrong fast. When you are right, you let it run within the scalping framework.",
+    "priority": 5,
+    "tags": [
+      "loss-containment",
+      "asymmetry",
+      "risk-reward",
+      "win-vs-loss-size"
+    ]
+  },
+  {
+    "id": "yt-fabio-004",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Average winning trade is $1,000 on one contract. Average losing trade is $600 per contract. Win rate is 43-49%. Max winning trade can reach $10,000 per contract. Max losing trade is $3,200. With these stats, consistency comes from cutting losses fast and scaling winners. A 15% improvement in win rate combined with strong risk-to-reward massively compounds.",
+    "priority": 5,
+    "tags": [
+      "win-rate",
+      "average-win",
+      "average-loss",
+      "trade-statistics"
+    ]
+  },
+  {
+    "id": "yt-fabio-005",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Five small stop-losses of $2,000 each equals $10,000. Every $2,000 risk must be evaluated against potential reward. The cumulative cost of repeated small losses is what destroys accounts during consolidation days.",
+    "priority": 4,
+    "tags": [
+      "cumulative-loss",
+      "consolidation-risk",
+      "stop-loss-cost"
+    ]
+  },
+  {
+    "id": "yt-fabio-006",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "Wait the first 30 minutes of New York opening for stability before trading. Use this time to observe absorption patterns. Only enter if clear absorption dynamics are visible.",
+    "priority": 4,
+    "tags": [
+      "ny-opening",
+      "session-timing",
+      "patience",
+      "stability"
+    ]
+  },
+  {
+    "id": "yt-fabio-007",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "SessionOpen",
+      "LowVolatility"
+    ],
+    "content": "During New York opening, use a range chart (40-tick range) instead of time-based candles. Range charts aggregate data so you can clearly see what is happening during fast-moving opens. A 1-minute chart shows huge candles with all data aggregated and is too cluttered. A 5-minute chart is also difficult to read. The 40-tick range chart is closest to a 5-minute candle but much clearer for intraday analysis.",
+    "priority": 5,
+    "tags": [
+      "range-chart",
+      "chart-type",
+      "new-york-open",
+      "40-tick",
+      "clarity"
+    ]
+  },
+  {
+    "id": "yt-fabio-008",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "Trending",
+      "SessionOpen"
+    ],
+    "content": "The AAA (triple A) setup: Buy from the value area low targeting the value area high on a momentum day. Entry is at absorption near value area low, stop loss below the value area low point of control (POC). This is the highest probability trend-following trade of the session.",
+    "priority": 5,
+    "tags": [
+      "aaa-setup",
+      "value-area-low",
+      "value-area-high",
+      "momentum-breakout"
+    ]
+  },
+  {
+    "id": "yt-fabio-009",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "SessionOpen",
+      "Trending"
+    ],
+    "content": "Absorption identification: Large aggressive sellers (big trades) hitting a wall and price not following through means buyers are absorbing. Look for big volume at a price level with no directional continuation. This is the signal that aggression is meeting passive order support, creating a launchpad for the opposite direction.",
+    "priority": 5,
+    "tags": [
+      "absorption",
+      "aggressive-orders",
+      "passive-orders",
+      "big-trades",
+      "support"
+    ]
+  },
+  {
+    "id": "yt-fabio-010",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "SessionOpen"
+    ],
+    "content": "Build positions using buy stops below key absorption levels. If sellers are getting heavily absorbed, place a buy stop just above the absorption high. If sellers breach the absorption low with follow-through, cancel the buy stop — the setup is invalid. Only enter when absorption is confirmed by price holding.",
+    "priority": 5,
+    "tags": [
+      "buy-stop",
+      "absorption-confirmation",
+      "scaling-in",
+      "cancellation"
+    ]
+  },
+  {
+    "id": "yt-fabio-011",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Scale in with small contracts as the market moves in your favor. Start with 1-2 contracts, add more at breakouts or strong confirmation points. Never load full size while the market is moving against you. This allows dynamic risk management: risking $2,000 to potentially make $10,000 by the end of the move.",
+    "priority": 5,
+    "tags": [
+      "scaling-in",
+      "position-sizing",
+      "dynamic-risk",
+      "contract-addition"
+    ]
+  },
+  {
+    "id": "yt-fabio-012",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bring stop loss to zero (breakeven or better) within the first minute of a trade when possible. The goal is to remove all risk as early as soon as the market confirms the directional bias. This is the hallmark of elite scalping execution: risking $2,000 to make $10,000 but bringing risk to near-zero within moments.",
+    "priority": 5,
+    "tags": [
+      "stop-to-zero",
+      "breakeven",
+      "risk-removal",
+      "first-minute"
+    ]
+  },
+  {
+    "id": "yt-fabio-013",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending",
+      "SessionOpen"
+    ],
+    "content": "If sellers breach the first absorption area, do NOT go long. Cancel the buy stop immediately. The level is no longer valid. Move down to the next support area (point of control / POC of the value area low) and reassess. Discipline means cutting a failed setup instantly without ego.",
+    "priority": 5,
+    "tags": [
+      "level-breach",
+      "cancellation",
+      "poc",
+      "discipline",
+      "failure-acceptance"
+    ]
+  },
+  {
+    "id": "yt-fabio-014",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "If the value area low / POC level gets broken, do not stay long for the day. It will most probably be a consolidation day. This level is the maximum interest point for the accumulation that created the up movement. Breaking it means the bullish structure has failed.",
+    "priority": 5,
+    "tags": [
+      "value-area-low-break",
+      "consolidation-signal",
+      "bullish-structure",
+      "trend-failure"
+    ]
+  },
+  {
+    "id": "yt-fabio-015",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trail stop-loss during moves. As soon as buyers show aggression, move stop-loss up. When floating $5,000, consider partial profit-taking near round numbers (psychological levels like $25,000). Tighten stops aggressively: every tick down during a rejection is $500 given back.",
+    "priority": 4,
+    "tags": [
+      "trailing-stop",
+      "partial-profit",
+      "round-numbers",
+      "psychological-level"
+    ]
+  },
+  {
+    "id": "yt-fabio-016",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Aggressive buyers on the top means buyers are willing to pay higher prices to acquire the asset. This signals continuation and potential squeeze. Conversely, aggressive sellers being absorbed means sellers cannot push price lower, creating a floor for continuation.",
+    "priority": 4,
+    "tags": [
+      "aggressive-buyers",
+      "aggressive-sellers",
+      "continuation-signal",
+      "squeeze"
+    ]
+  },
+  {
+    "id": "yt-fabio-017",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Stop-loss placement is always below the level of aggressive sellers. If sellers aggressively protect a level and buyers break above it, those trapped sellers must be forced to close, creating an expansion. Place stops just below this battle zone, not at an arbitrary distance.",
+    "priority": 5,
+    "tags": [
+      "stop-placement",
+      "aggressive-sellers-level",
+      "trapped-traders",
+      "liquidation"
+    ]
+  },
+  {
+    "id": "yt-fabio-018",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "When aggressive buyers are absorbed at a high level, sellers need to close their positions. If sellers must close (cover shorts), this creates an expansion higher. This is the liquidation cascade mechanism: trapped participants forced to exit accelerate price in one direction.",
+    "priority": 5,
+    "tags": [
+      "liquidation-cascade",
+      "short-covering",
+      "expansion",
+      "absorption-at-highs"
+    ]
+  },
+  {
+    "id": "yt-fabio-019",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "Trending",
+      "SessionOpen"
+    ],
+    "content": "Use the volume profile distribution of the first hours of the session to define the day's structure. Plot the profile from contraction start to the actual price action. The POC shows the point of maximum interest. The value area defines the expected range. Only take the first directional move of the session — avoid chasing after the initial impulse has already played out.",
+    "priority": 5,
+    "tags": [
+      "volume-profile",
+      "session-distribution",
+      "poc",
+      "value-area",
+      "first-move"
+    ]
+  },
+  {
+    "id": "yt-fabio-020",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "For momentum trades, plot the volume profile from the expansion movement (point A to point B through the actual price). For compression range trading, plot from the contraction range boundaries. These serve different purposes: momentum plotting identifies trend targets, compression plotting identifies mean-reversion zones.",
+    "priority": 4,
+    "tags": [
+      "profile-plotting",
+      "momentum-vs-compression",
+      "point-a-to-b",
+      "range-trading"
+    ]
+  },
+  {
+    "id": "yt-fabio-021",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging",
+      "LowVolatility"
+    ],
+    "content": "After a strong expansion move (the AAA setup), the market usually goes sideways. This is expensive to trade because every trade incurs commissions, and the range offers no directional edge. After taking the best move of London AND New York (e.g., $24,300 in 20 minutes), walk away. Do not force congestion trades.",
+    "priority": 5,
+    "tags": [
+      "walk-away",
+      "congestion",
+      "post-expansion",
+      "commission-cost",
+      "discipline"
+    ]
+  },
+  {
+    "id": "yt-fabio-022",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "In consolidation, do not engage. If you have already achieved your profit target (e.g., $20,000 for the session), stop trading. The market can stay in consolidation for 4-7 more hours. Taking 7-8 small stop-losses in range during that time would erase all profit. Statistically, only 1 in 10 sessions reaches the extreme standard deviation high.",
+    "priority": 5,
+    "tags": [
+      "consolidation-walkaway",
+      "profit-target",
+      "time-waste",
+      "std-dev"
+    ]
+  },
+  {
+    "id": "yt-fabio-023",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Momentum execution model: Place a buy stop above a key high with a tight stop loss. Risk only $1,500-$2,000. Target $3,000-$6,000. As soon as price moves favorably, trail the stop. If triggered, immediately adjust — do not hesitate. Speed of execution and stop-loss management must be simultaneous.",
+    "priority": 5,
+    "tags": [
+      "momentum-execution",
+      "buy-stop",
+      "tight-stop",
+      "speed",
+      "simultaneous-management"
+    ]
+  },
+  {
+    "id": "yt-fabio-024",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "When the auction is fighting and no one is winning, big trades in both directions are just noise. The cumulative volume delta becomes unclear — alternating between buying and selling pressure. This is a signal to NOT engage. Wait for a clear delta direction before trading.",
+    "priority": 4,
+    "tags": [
+      "cumulative-delta",
+      "fighting-auction",
+      "no-edge",
+      "ambiguous-pressure"
+    ]
+  },
+  {
+    "id": "yt-fabio-025",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "The ORB (Opening Range Breakout) model is strong when put in context. The low of the first move is not touched 80% of the time, meaning there is a strong edge in trading the direction of the opening range breakout. After expansion, the reaccumulation at the last protection point before continuation has high probability.",
+    "priority": 4,
+    "tags": [
+      "orb",
+      "opening-range-breakout",
+      "range-breakout",
+      "80-percent-rule"
+    ]
+  },
+  {
+    "id": "yt-fabio-026",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "VolumeProfile",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "P-shape volume profile: All volume is concentrated at the top of the range. This means the market environment cannot go on forever without testing lower levels (value area low). The pattern indicates that the market will likely go back to reaccumulate at lower levels before continuing higher. This is a common expansion-and-rebalance structure.",
+    "priority": 5,
+    "tags": [
+      "p-shape",
+      "volume-concentration",
+      "rebalance",
+      "reaccumulation",
+      "value-area-low-retest"
+    ]
+  },
+  {
+    "id": "yt-fabio-027",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "New York session structure: If the market expands immediately in the first hour and there is no external catalyst like a Trump tweet, 90% of the time the market will rebalance until the power hour. The sequence is: expand immediately → rebalance/consolidate for hours → then power hour movement. 90% of model B executions (testing value area highs after expansion) occur from 7:30 European time till 9:00 (the power hour).",
+    "priority": 5,
+    "tags": [
+      "ny-structure",
+      "power-hour",
+      "immediate-expansion",
+      "rebalance",
+      "730-900-pattern"
+    ]
+  },
+  {
+    "id": "yt-fabio-028",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Buy wall concept: When there is a wall of passive buy orders at a level (buyers stepping in repeatedly), taking a trade protected by this wall means you have institutional-level support behind your entry. You are never taking an unprotected trade — only trades with visible order flow backing.",
+    "priority": 4,
+    "tags": [
+      "buy-wall",
+      "passive-orders",
+      "institutional-support",
+      "protected-trades"
+    ]
+  },
+  {
+    "id": "yt-fabio-029",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Three-losing-trade rule: After three consecutive stop-losses, stop trading for the day. Starting the session with 3-5 stop-losses typically leads to a losing day of $15,000-$20,000. Cutting this to $8,000-$9,000 by stopping at three trades is a key survival rule. You can give more room (4-5) at session open since consolidation often precedes expansion.",
+    "priority": 5,
+    "tags": [
+      "three-stops-rule",
+      "max-loss-trades",
+      "stop-trading",
+      "survival"
+    ]
+  },
+  {
+    "id": "yt-fabio-030",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Maximum daily drawdown is measured from the equity peak. If you start with $11,000 profit (from London session), the maximum acceptable additional loss is another $10,000 FROM THAT PEAK. So the lowest acceptable close for the day is $1,000 profit. This two-tier system (protect session profit, then protect capital) prevents catastrophic givebacks.",
+    "priority": 4,
+    "tags": [
+      "equity-peak",
+      "maximum-drawdown",
+      "two-tier-protection",
+      "giveback-prevention"
+    ]
+  },
+  {
+    "id": "yt-fabio-031",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Only risk profit, not capital, once a cushion is established. After building profit (e.g., $11,000), only risk that profit for additional trades, never the original capital. Build the cushion first, then sit on it like a king. The worst case is you lose your profit back to break-even.",
+    "priority": 5,
+    "tags": [
+      "profit-cushion",
+      "risk-profit-not-capital",
+      "build-first",
+      "cushion-trading"
+    ]
+  },
+  {
+    "id": "yt-fabio-032",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "When in drawdown, you have less clarity and make worse decisions. The immediate goal at session start is to build a profit cushion for the day. This mental cushion prevents the downward spiral where drawdown leads to worse decisions leads to more drawdown.",
+    "priority": 5,
+    "tags": [
+      "drawdown-clarity",
+      "decision-degradation",
+      "cushion-importance",
+      "mental-edge"
+    ]
+  },
+  {
+    "id": "yt-fabio-033",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Risk-to-reward consideration applies to both entry AND management. It does not make sense to take a trade risking $5,000 to make $5,000. Even risking $2,000 to make $8,000 (4:1) is acceptable, but you must also manage the trade: floating $5,000, now you are risking $5,000 of unrealized profit to make $5,000 more — that is no longer good risk-to-reward.",
+    "priority": 5,
+    "tags": [
+      "management-risk-reward",
+      "floating-profit",
+      "dynamic-rr",
+      "take-profit-logic"
+    ]
+  },
+  {
+    "id": "yt-fabio-034",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "It is not worth risking $5,000 to make $5,000. Some traders need to learn the hard way that 1:1 trades destroy value. Risk-to-reward must always be asymmetric in your favor: 1:3, 1:4, 1:5 minimum for scalping.",
+    "priority": 4,
+    "tags": [
+      "no-1-1-trades",
+      "asymmetric-reward",
+      "scalping-rr"
+    ]
+  },
+  {
+    "id": "yt-fabio-035",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "Execution",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Hyperscalping model: Every new piece of market information is a potential monetization opportunity. Trades are opened, managed, and closed rapidly based on real-time order flow interaction. This is not 'set and forget'. It requires continuous engagement with the market's microstructure.",
+    "priority": 4,
+    "tags": [
+      "hyperscalping",
+      "real-time-engagement",
+      "microstructure",
+      "active-management"
+    ]
+  },
+  {
+    "id": "yt-fabio-036",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Boxing match analogy: Like a boxing match, never bet on a winner who is getting destroyed. If buyers pushed price up for 20 minutes but are now getting pushed back symmetrically, this is not a high-probability long. Wait for one side to win another round (break a key level) before placing your bet. Then the probability shifts dramatically in your favor.",
+    "priority": 4,
+    "tags": [
+      "boxing-match",
+      "probability-shift",
+      "battle-analysis",
+      "wait-for-confirmation"
+    ]
+  },
+  {
+    "id": "yt-fabio-037",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Failed auction concept: When price repeatedly tries to break a level and fails (push-absorb, push-absorb), this creates a thick liquidity wall. After 20 minutes of failed attempts in both directions, you KNOW not to engage here. The repeated absorption indicates a strong range-bound condition that won't resolve until the power hour.",
+    "priority": 5,
+    "tags": [
+      "failed-auction",
+      "liquidity-wall",
+      "repeated-absorption",
+      "range-bound"
+    ]
+  },
+  {
+    "id": "yt-fabio-038",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Elastic band analogy: After expansion, the market must breathe and return to a normal state before expanding again. Like a crossbow or bow, you must re-cock before shooting again. After the initial AAA move, give the market time to reaccumulate. Forcing trades during the 'breathing' phase leads to stop-losses.",
+    "priority": 4,
+    "tags": [
+      "elastic-band",
+      "reaccumulation",
+      "market-breathing",
+      "post-expansion-wait"
+    ]
+  },
+  {
+    "id": "yt-fabio-039",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Statistical impossibility of high win rate + high risk-to-reward: You cannot have 1:20 risk-to-reward with a 75% win rate. One must be sacrificed. Choose balance: good win rate (43-49%) with good risk-to-reward (1:4 to 1:5). Chasing extreme ratios is ego, not edge.",
+    "priority": 5,
+    "tags": [
+      "statistical-impossibility",
+      "win-rate-vs-rr",
+      "balance",
+      "no-ego"
+    ]
+  },
+  {
+    "id": "yt-fabio-040",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Model comparison: A 1:1 risk-to-reward model with 75% win rate exists as a separate trading system. The equity line is very consistent but flat with occasional large moves. This is a different approach (patient, swing-focused) that is valid but requires handling strings of red days punctuated by huge green days.",
+    "priority": 3,
+    "tags": [
+      "alternative-model",
+      "1-1-rr",
+      "75-percent-wr",
+      "consistent-equity"
+    ]
+  },
+  {
+    "id": "yt-fabio-041",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "70% of the time, the market is stationary. Strategies designed only for volatile trending days will fail 70% of the time. A robust approach must also work on stationary days. The ability to recognize and sit out the 70% is what separates consistent traders from blowup candidates.",
+    "priority": 5,
+    "tags": [
+      "70-percent-stationary",
+      "market-statistics",
+      "contingency-planning",
+      "robust-strategy"
+    ]
+  },
+  {
+    "id": "yt-fabio-042",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Order flow vs price action: Price action is the impact and the result. Order flow is exactly what is driving the price. They are not in conflict — order flow explains the mechanics behind price action patterns. Using both together provides a complete picture that neither provides alone.",
+    "priority": 5,
+    "tags": [
+      "order-flow-vs-price-action",
+      "causality",
+      "complete-picture",
+      "both-tools"
+    ]
+  },
+  {
+    "id": "yt-fabio-043",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Learning order flow: Start 6 years after initial trading, when you understand why patterns work by studying intra-market structure. The key switch is understanding what happens between orders: aggressive sellers meeting passive buyers creates absorption. Once you understand this interaction, stop guessing about stop runs and failed auctions — you SEE the actual mechanics.",
+    "priority": 4,
+    "tags": [
+      "order-flow-learning",
+      "absorption-mechanics",
+      "aggressive-vs-passive",
+      "understanding-why"
+    ]
+  },
+  {
+    "id": "yt-fabio-044",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Driving analogy: Price action alone is like driving looking at Google Maps — you know you need to go from A to B, but you don't see the street. Order flow is like seeing the cars, obstacles, traffic. You can see that price isn't moving because there is traffic (orders blocking the way). This is the level-up that changes market understanding.",
+    "priority": 4,
+    "tags": [
+      "order-flow-metaphor",
+      "visibility",
+      "market-microstructure",
+      "behind-the-curtain"
+    ]
+  },
+  {
+    "id": "yt-fabio-045",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Order flow showed absorption on value area low with aggressive sellers getting absorbed repeatedly. Without order flow, a price action trader might put a limit order inside the range. But the order flow keeps you out because it shows the level is defended by a liquidity wall — price action alone might suggest the opposite.",
+    "priority": 4,
+    "tags": [
+      "order-flow-advantage",
+      "limit-order-trap",
+      "liquidity-wall-protection",
+      "counter-intuitive"
+    ]
+  },
+  {
+    "id": "yt-fabio-046",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Options sentiment data: Options can reveal market sentiment by showing where pressure is building (calls vs puts). In the session observed, options were completely long, confirming the bullish order flow bias. This is a complimentary data source but costs $300-$500/month for professional platforms and is not strictly necessary — order flow on futures is sufficient.",
+    "priority": 3,
+    "tags": [
+      "options-sentiment",
+      "confirmation-tool",
+      "bullish-options",
+      "complementary-data"
+    ]
+  },
+  {
+    "id": "yt-fabio-047",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "Execution",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Big trade display threshold: Set minimum 30 contracts to show as big trades. If trading in London, use 20 contracts as threshold. Adjust thresholds based on session volume so you only see meaningful institutional activity. This prevents noise from smaller orders cluttering the order flow view.",
+    "priority": 3,
+    "tags": [
+      "big-trade-threshold",
+      "30-contracts",
+      "20-contracts-london",
+      "institutional-activity"
+    ]
+  },
+  {
+    "id": "yt-fabio-048",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Candlestick template: Use hollow candles (empty inside) instead of filled candles. This improves visibility of big order bubbles and volume information inside the candle body. The only change from the normal hollow template — everything else stays the same. Visual clarity is critical for fast order flow reading.",
+    "priority": 3,
+    "tags": [
+      "hollow-candles",
+      "visual-clarity",
+      "candlestick-template",
+      "visibility"
+    ]
+  },
+  {
+    "id": "yt-fabio-049",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "There is no indicator for position management. Position management — scaling in, trailing stops, bringing risk to zero — is purely discretionary and comes from daily practice managing positions session by session. This skill cannot be fully taught; it requires thousands of reps of real-time management.",
+    "priority": 5,
+    "tags": [
+      "position-management",
+      "discretionary",
+      "practice-based",
+      "no-indicator",
+      "reps"
+    ]
+  },
+  {
+    "id": "yt-fabio-050",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Do not overthink. Scalping requires fast decision-making without overanalysis. Traders who overthink are better suited to swing trading. Scalping requires low ego (willing to take stops immediately), fast decision-making, and the ability to change direction instantly when wrong. These are behavioral traits, not just learned skills.",
+    "priority": 5,
+    "tags": [
+      "no-overthinking",
+      "fast-decision",
+      "scalping-personality",
+      "low-ego",
+      "instant-direction-change"
+    ]
+  },
+  {
+    "id": "yt-fabio-051",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "If sick, did not sleep well, or had a bad night — do not trade. Discretionary edge means your brain IS the edge. Lack of focus can burn $20,000-$30,000. Walk away. It is always better to not be at the market when you are not sharp. The law of large numbers (5,000+ executions per year, 120+ this week) gives you an edge over the long term — missing one session does not matter.",
+    "priority": 5,
+    "tags": [
+      "dont-trade-tired",
+      "health-first",
+      "edge-is-brain",
+      "focus-required",
+      "miss-one-session"
+    ]
+  },
+  {
+    "id": "yt-fabio-052",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Do not trade for ego. Breaking rules to prove you are right on a movement burns accounts. A $60,000 profit week is not worth sacrificing for ego. Take the screenshot of your statistical losses from rule-breaking and keep it on your desk. If you do all the work to build an edge, respecting the rules is mandatory.",
+    "priority": 5,
+    "tags": [
+      "no-ego-trading",
+      "rule-respect",
+      "screenshot-reminder",
+      "edge-protection"
+    ]
+  },
+  {
+    "id": "yt-fabio-053",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "If you reach your profit target (e.g., $20,000+), walk away. Close the platform entirely. Do not look again, because if you do, you will see 'opportunities' that are not real and will start trading ego-driven setups. The market will always give you another day.",
+    "priority": 5,
+    "tags": [
+      "walk-away-at-target",
+      "close-platform",
+      "no-look-back",
+      "tomorrow-another-day"
+    ]
+  },
+  {
+    "id": "yt-fabio-054",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "Execution",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Execution speed: At home setup, use four screens with a proper PC (not trackpad). The speed of dragging order lines and managing orders is critical. Every second counts. Professional trading room setup is part of the edge infrastructure.",
+    "priority": 3,
+    "tags": [
+      "four-screens",
+      "execution-speed",
+      "professional-setup",
+      "infrastructure"
+    ]
+  },
+  {
+    "id": "yt-fabio-055",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "During extreme events (Trump tweet volatility), market makers lose profit for the month because liquidity completely disappears. On leverage instruments like crypto, slippage and failed fills are common. On CFDs, brokers control your execution and may not fill at desired levels. Be extremely careful on such days. Spikes and sharp reversals make this environment almost untradeable safely.",
+    "priority": 5,
+    "tags": [
+      "extreme-volatility",
+      "tweet-events",
+      "liquidity-disappearance",
+      "slippage-risk",
+      "cfd-risk"
+    ]
+  },
+  {
+    "id": "yt-fabio-056",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Value area high rejection: After reaching value area high, expect rejection toward the VWAP. VWAP standard deviation maximum is only reached in ~10% of sessions (1 in 10). The probability of rejection at VWAP high is 9 out of 10 times. This means taking the trade toward VWAP rather than waiting for a breakout continuation has a 90% probability edge.",
+    "priority": 4,
+    "tags": [
+      "vwap-rejection",
+      "90-percent-rejection",
+      "std-dev-10-percent",
+      "mean-reversion-vwap"
+    ]
+  },
+  {
+    "id": "yt-fabio-057",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Know your strategy's capacity: For NASDAQ scalping, the capacity is $25-$40 million. Beyond that, you cause too much slippage and your execution degrades. NASDAQ and S&P have 95% correlation, so you can split execution between both to work with more capital. Understanding capacity is critical when scaling with personal funds.",
+    "priority": 4,
+    "tags": [
+      "strategy-capacity",
+      "25-40-million",
+      "nasdaq-capacity",
+      "sp-correlation",
+      "liquidity-limits"
+    ]
+  },
+  {
+    "id": "yt-fabio-058",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "The difficult part of trading is NOT trading. The difficult part is the patience and work required to build an edge before risking real capital. Once you have an edge, it should protect you from gambling behavior. Only risk real capital after you can statistically measure your edge.",
+    "priority": 5,
+    "tags": [
+      "edge-building",
+      "patience",
+      "pre-capital-work",
+      "measure-first",
+      "anti-gambling"
+    ]
+  },
+  {
+    "id": "yt-fabio-059",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Don't check returns — check drawdown. Base your model on maximum drawdown, not on potential returns. If you focus on drawdown control, the returns will come. If you focus on returns, you will experience ruin. Maximum drawdown is the metric that will save your trading career.",
+    "priority": 5,
+    "tags": [
+      "drawdown-focus",
+      "not-returns",
+      "drawdown-metric",
+      "risk-ruin-prevention"
+    ]
+  },
+  {
+    "id": "yt-fabio-060",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Statistical analysis and journaling are non-negotiable. Export all trade data, analyze in Python with machine learning and neural networks. Track win rate, average win/loss, max win/loss, drawdown, profit factor. Data-driven decisions on which trades to take (and which to avoid) are the only path to sustained improvement. Without data, improvement is impossible.",
+    "priority": 5,
+    "tags": [
+      "journaling",
+      "python-analysis",
+      "machine-learning",
+      "data-driven",
+      "profit-factor"
+    ]
+  },
+  {
+    "id": "yt-fabio-061",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Remove specific days/times that show statistical weakness. For instance: after 7 PM European time, win rate drops to 20% — remove those trades. Fridays: 3 out of 4 weeks are losing days — remove Friday trading entirely. Wednesday crude oil model: too volatile for compression model — removing Wednesday improved profit factor from sub-2 to 2.1. Let the data tell you when not to trade.",
+    "priority": 5,
+    "tags": [
+      "time-filtering",
+      "day-removal",
+      "data-informed-exclusions",
+      "friday-removal",
+      "wednesday-removal"
+    ]
+  },
+  {
+    "id": "yt-fabio-062",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Completely systematic edges suffer from edge decay — they break fast. Combining discretionary analysis with data-driven screening gives the best of both worlds. Keep the discretionary element to adapt to market conditions, but use machine learning on your own trade data to validate and refine.",
+    "priority": 4,
+    "tags": [
+      "edge-decay",
+      "systematic-vs-discretionary",
+      "hybrid-approach",
+      "adapt-to-conditions"
+    ]
+  },
+  {
+    "id": "yt-fabio-063",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Diversify by edge: Each trading model gets its own separate account and portfolio. Hyper scalping on one account, intraday on another, options on another, crypto futures on another, long-term investments on another. Do not merge data across different strategy types. If a model fails, remove it and others compensate. Think of it as a Gaussian distribution of edge placements across the market.",
+    "priority": 4,
+    "tags": [
+      "diversify-by-edge",
+      "separate-accounts",
+      "portfolio-gaussian",
+      "model-isolation"
+    ]
+  },
+  {
+    "id": "yt-fabio-064",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Performance benchmarking: In a World Cup competition, Fabio achieved 500% return in 12 months. For private multi-million accounts, target 80-100% per year (World Cup return divided by 5-6). Still exceptional for a private hedge fund working with multi-million capital, but not sufficient for retail traders working with small accounts.",
+    "priority": 3,
+    "tags": [
+      "performance-benchmarking",
+      "80-100-percent-yearly",
+      "world-cup-comparison",
+      "private-fund"
+    ]
+  },
+  {
+    "id": "yt-fabio-065",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Volume-price confluence is required for real edge. Price action alone can create spikes that do not follow through. Validate with volume to confirm the market is actually transacting at a level. Volume and price together provide actual edge. Without volume confirmation, price spikes can be misleading.",
+    "priority": 4,
+    "tags": [
+      "volume-price-confluence",
+      "validation",
+      "volume-confirmation",
+      "no-spike-chasing"
+    ]
+  },
+  {
+    "id": "yt-fabio-066",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Studying your specific market is essential. NASDAQ has its own rhythm. If you trade DAX, the model is completely different and you trade in the morning. Gold requires an entirely different approach (low frequency, huge risk-to-reward). Each instrument has its own optimal session timing and setup characteristics.",
+    "priority": 4,
+    "tags": [
+      "market-specific-rhythm",
+      "nasdaq-vs-dax",
+      "gold-different",
+      "instrument-timing"
+    ]
+  },
+  {
+    "id": "yt-fabio-067",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "Execution",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Walk through the mindset: If you would walk away after a certain profit level in reality regardless of being filmed, do exactly that in real trading. The discipline of walking away, not debating, not negotiating with yourself — is the real edge. The session was done after the first $24,300 move. All the rest was educational demonstration.",
+    "priority": 5,
+    "tags": [
+      "real-vs-demonstration",
+      "walk-away-in-reality",
+      "no-debate",
+      "profit-done"
+    ]
+  },
+  {
+    "id": "yt-fabio-068",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "During live trading, the market contracted back after the initial AAA move. Exactly 2 hours later, reaccumulation occurred and the market continued higher as predicted. The patience to wait for the structure to develop before re-entering is critical. The market itself tells you when it is ready to continue.",
+    "priority": 4,
+    "tags": [
+      "reaccumulation-patience",
+      "two-hour-wait",
+      "pattern-completion",
+      "market-tells-you"
+    ]
+  },
+  {
+    "id": "yt-fabio-069",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Passive orders at inflection points: When sellers try to push down but fail, and instead a huge absorption occurs, this reveals passive buy orders (limit orders sitting passively) absorbing the aggressive sell pressure. Understanding who is aggressive and who is passive at every level is the core insight of order flow scalping.",
+    "priority": 5,
+    "tags": [
+      "passive-buy-orders",
+      "aggressive-sell-pressure",
+      "absorption-reveals-passive",
+      "order-flow-core"
+    ]
+  },
+  {
+    "id": "yt-fabio-070",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "The jaw-dropping accuracy comes from years and years of reading markets, NOT from the tools alone. Order flow is not a magic tool that makes you profitable instantly. It requires thousands of reps of discretionary application. Don't expect order flow + one month of practice to produce results. It requires deep pattern recognition developed over years.",
+    "priority": 5,
+    "tags": [
+      "years-of-reps",
+      "not-magic-tool",
+      "pattern-recognition",
+      "time-investment",
+      "no-shortcut"
+    ]
+  },
+  {
+    "id": "yt-fabio-071",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Starting capital came from crypto: understanding market cycles early with on-chain analysis, jumping on the crypto bull run early, and leveraging futures during a single bull run. The first capital was built through a deep understanding of crypto cycles, not from trading itself. This funded the multi-million account used for NASDAQ scalping.",
+    "priority": 3,
+    "tags": [
+      "starting-capital",
+      "crypto-cycles",
+      "on-chain-analysis",
+      "bull-run-leverage"
+    ]
+  },
+  {
+    "id": "yt-fabio-072",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Dollar allocation: Never hold only fiat dollars for long. Capital should always be at work — either in trading models, long-term options, or crypto. Hold only enough fiat for daily expenses. Every dollar put to work today, properly risk-managed with understanding of halving cycles, can be $10 in 5-10 years.",
+    "priority": 3,
+    "tags": [
+      "dollar-allocation",
+      "always-be-working",
+      "halving-cycles",
+      "exponential-growth"
+    ]
+  },
+  {
+    "id": "yt-fabio-073",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Scalping strategy is used as income, not wealth-building: Crypto futures scalping income is funneled into a long-term account that does arbitrage + long-term investment. The arbitrage strategy (quant, market-neutral) returns 20-30% per year with low capital risk. This two-engine approach (scalping income + compounding long-term) creates the wealth ecosystem.",
+    "priority": 4,
+    "tags": [
+      "scalping-as-income",
+      "long-term-compounding",
+      "arbitrage-engine",
+      "ecosystem-approach"
+    ]
+  },
+  {
+    "id": "yt-fabio-074",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Option models developed with statistical rigor can yield 80%+ per year. However, these are limited by liquidity — viable with $5-10M but not $100M+. Options can be zero-DTE (zero days to expiration) or longer-term. Currently building models that have extremely strong statistical backing and require only 10 minutes per day in the evening.",
+    "priority": 3,
+    "tags": [
+      "option-models",
+      "80-percent-yearly",
+      "zero-dte",
+      "low-time-commitment",
+      "statistical-models"
+    ]
+  },
+  {
+    "id": "yt-fabio-075",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Stock picking model exploits a legal inefficiency: US Congressmen can legally trade on insider information (they cannot be prosecuted for insider trading). Their trades are public record but not widely known. By tracking the most powerful politicians and buying their stock picks, then using earnings model timing on intraday gaps for entry timing, you can outperform by 'following' their informational edge with better execution. Four sub-models run simultaneously.",
+    "priority": 4,
+    "tags": [
+      "congressman-trading",
+      "legal-insider-information",
+      "stock-picking",
+      "earnings-gap-model",
+      "four-sub-models"
+    ]
+  },
+  {
+    "id": "yt-fabio-076",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Check your expectations: you cannot get rich with a $1,000 account. The entire industry of 'get rich with $1,000' creates false expectations that lead to blowouts. Real trading is based on proper risk management with sufficient capital. If people keep expecting unrealistic returns from small accounts, they will chase, leverage, and lose everything.",
+    "priority": 5,
+    "tags": [
+      "realistic-expectations",
+      "small-account-myth",
+      "get-rich-slow",
+      "risk-management-first"
+    ]
+  },
+  {
+    "id": "yt-fabio-077",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "The real work of a professional trader is NOT the 2-3 hours of trading. The real work is the preparation: lives to prepare long-term setups, journaling, metrics review, statistical analysis, platform building, model development. It's like a bodybuilder who builds their life around training. Sacrifice of 'normal life' is required — no partying, no Ferrari distractions. Obsessive organizing and scheduling is mandatory when managing multiple models and companies.",
+    "priority": 4,
+    "tags": [
+      "real-work-is-preparation",
+      "lifestyle-sacrifice",
+      "obsessive-bodybuilder",
+      "no-partying",
+      "scheduling-required"
+    ]
+  },
+  {
+    "id": "yt-fabio-078",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Keep a mechanical barrier to prevent revenge trading: implement a trailing drawdown stop that blocks you from trading if you are profitable by $40,000 the platform locks you out and you must call support. This mechanical stop prevents ego-driven decisions. Professionals implement self-discipline instead, but mechanical barriers are a useful fail-safe.",
+    "priority": 4,
+    "tags": [
+      "mechanical-barrier",
+      "trailing-drawdown",
+      "platform-lockout",
+      "revenge-trading-prevention"
+    ]
+  },
+  {
+    "id": "yt-fabio-079",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Any"
+    ],
+    "content": "On Forex, standard volume is useless because it is fragmented across 1,000+ OTC sources. Instead, use intermarket analysis: watch EUR/USD to understand GBP/USD pressure, watch the dollar index for context, and identify accumulation/distribution phases. Forex still shows absorption via price failure at levels (price spikes and fails = absorption visible on price alone).",
+    "priority": 4,
+    "tags": [
+      "forex-volume-useless",
+      "intermarket-analysis",
+      "eurusd-gbpusd-correlation",
+      "absorption-on-price"
+    ]
+  },
+  {
+    "id": "yt-fabio-080",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Imbalance identification: When a huge expansion occurs in one direction without testing the other side, it creates an imbalance. The nature of the market is to rebalance and expand. This means the market will likely come back to retest the imbalance before continuing. If aggressive buyers are being absorbed and cannot break, the reaccumulation model targets the absorption zone as a momentum setup for continuation.",
+    "priority": 4,
+    "tags": [
+      "imbalance",
+      "rebalance-nature",
+      "reaccumulation-model",
+      "momentum-continuation"
+    ]
+  },
+  {
+    "id": "yt-fabio-081",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Bar replay is NOT backtesting. Going back in time and replaying with hindsight is not valid backtesting. Real systematic backtesting requires coding, feeding parameters into a program like Polygon, and getting statistics on 4-9 years of data across thousands of trades. Bar replay is subjective and biased by knowing what happened next.",
+    "priority": 4,
+    "tags": [
+      "bar-replay-not-backtesting",
+      "systematic-backtesting",
+      "polygon",
+      "9-years-data",
+      "subjective-bias"
+    ]
+  },
+  {
+    "id": "yt-fabio-082",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Completely systematic edges suffer from edge decay: out of 20 automated systems, 4 broke within a month. They must be constantly replaced. Fully quant strategies work for market-making firms but for discretionary-quant hybrid approaches, the edge is more durable because it adapts. The ideal approach: put machine learning on discretionary trade data to get the best of both worlds.",
+    "priority": 4,
+    "tags": [
+      "quant-edge-decay",
+      "20-systems-4-broke",
+      "hybrid-approach",
+      "ml-on-discretionary"
+    ]
+  },
+  {
+    "id": "yt-fabio-083",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Mentor selection: Took a mentor only when already making significant money and looking to scale. The mentor was managing a family office with substantial capital. For order flow specifically, no mentor was used — it was self-taught through weeks of watching price and training pattern recognition. The learning method: watch price for one month without executing, then start on a demo account, then plot statistical distribution. This is how you build a genuine edge.",
+    "priority": 4,
+    "tags": [
+      "mentor-selection",
+      "family-office-mentor",
+      "order-flow-self-taught",
+      "watch-trade-demo-method"
+    ]
+  },
+  {
+    "id": "yt-fabio-084",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Most traders (99%) want ready-made solutions: a YouTube strategy with 99% win rate using moving average crossovers. This expectation destroys the industry. Financial markets are genuinely complicated — multiple information sources, dark pools, order flow, options. You cannot shortcut the learning process. Comparing it to a gym membership: paying doesn't make you fit. Putting in the work does.",
+    "priority": 5,
+    "tags": [
+      "no-ready-made",
+      "99-percent-want-easy",
+      "industry-expectation-problem",
+      "gym-analogy",
+      "no-shortcut"
+    ]
+  },
+  {
+    "id": "yt-fabio-085",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Protection levels from buyers and sellers create a compression range. The smaller the compression range between these two protection levels, the higher the upside potential when one side breaks out. This 'coiling' effect means maximum compression = maximum expansion potential. Identify the tightest part of the battle for the best breakout trade.",
+    "priority": 4,
+    "tags": [
+      "protection-levels",
+      "compression-range",
+      "tight-range-high-potential",
+      "coiling-effect"
+    ]
+  },
+  {
+    "id": "yt-fabio-086",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "OrderFlow",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Dynamic risk management in practice: When a level is broken, cancel that order and immediately evaluate the next level. The market unfolded in real-time while explaining — this demonstrates that you must be fast enough to cancel, reassess, and re-enter. Hesitation means trading yesterday's setup in today's market.",
+    "priority": 5,
+    "tags": [
+      "dynamic-risk",
+      "cancel-and-reassess",
+      "speed-of-adaptation",
+      "real-time-decisions"
+    ]
+  },
+  {
+    "id": "yt-fabio-087",
+    "source": "youtube-interviews/Trading LIVE with the BEST Scalper in the World (PERFECT Accuracy).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Any"
+    ],
+    "content": "Six figures per week target is the benchmark. This week was $60,000+ in 3 days with 2 days remaining. Four winning days and one losing day per week is the expected ratio. Average 5-6 green days per week. Daily session targets build to weekly six-figure results. Accept this rhythm rather than expecting every day to print money.",
+    "priority": 4,
+    "tags": [
+      "six-figures-week",
+      "60k-week",
+      "4-wins-1-loss",
+      "daily-to-weekly",
+      "profit-rhythm"
+    ]
+  }
+]

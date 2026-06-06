@@ -1,0 +1,748 @@
+[
+  {
+    "id": "yt-raoul-001",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "The AI race is the biggest capital allocation event in human history. All capital is funneling into intelligence. This is a race of nations and corporations where nobody can stop because game theory dictates that no superpower can allow another to achieve AGI alone. Only US and China can afford to compete. If one player like OpenAI fails, the US government would immediately auction assets to Microsoft, Google etc rather than lose the race. The game is too big to fail — creating a 'buy the dip' structural dynamic for AI-related assets.",
+    "priority": 5,
+    "tags": [
+      "AI",
+      "macro",
+      "geopolitics",
+      "game-theory",
+      "AGI",
+      "US-China",
+      "liquidity"
+    ]
+  },
+  {
+    "id": "yt-raoul-002",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "AI is the first ever recorded example of Reed's law (Metcalfe's law squared — exponential of exponential growth). Historically all tech adoption followed Metcalfe's law (log channel growth as seen with Google, Facebook, Nasdaq). ARK research shows AI word output in 3 years exceeded all human word output per year. By 2028 (5-6 years after AI emerged), AI will have produced more words than all of humanity ever produced in total. Anthropic grew 80x in one quarter when expecting 10x. This is a fundamental shift in growth dynamics.",
+    "priority": 5,
+    "tags": [
+      "AI",
+      "Reeds-law",
+      "Metcalfes-law",
+      "exponential-growth",
+      "Anthropic"
+    ]
+  },
+  {
+    "id": "yt-raoul-003",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The economic singularity occurs when the economic system can no longer deal with the speed of technology. The formula 'population growth + productivity growth + debt growth' breaks when AI and robots become population (potentially 10-50 billion agents or infinite). Silicon-based intelligence operates at 6 orders of magnitude faster (million x) than carbon-based human neurons. This creates a phase change in how economies function, with instant capital formation and destruction via mechanisms like meme coins.",
+    "priority": 5,
+    "tags": [
+      "economic-singularity",
+      "AI-agents",
+      "phase-change",
+      "productivity"
+    ]
+  },
+  {
+    "id": "yt-raoul-004",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "FomcDate"
+    ],
+    "content": "Scott Bessent is signaling the US will run the economy like the Greenspan years: cut rates then do nothing, letting the productivity miracle handle inflation while the economy grows faster than the debt pile to reduce debt-to-GDP. This is the only viable strategy. The US has rolled debt to the short end, continuously issuing debt. Unless a major inflation spike forces tightening, liquidity should continue expanding. This environment supports risk assets including crypto.",
+    "priority": 4,
+    "tags": [
+      "Greenspan",
+      "Scott-Bessent",
+      "rates",
+      "debt-GDP",
+      "liquidity",
+      "Fed-policy"
+    ]
+  },
+  {
+    "id": "yt-raoul-005",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending",
+      "SessionOpen"
+    ],
+    "content": "Crypto liquidity lags US liquidity withdrawal by approximately 3 months. During the US government shutdown when liquidity was withdrawn, crypto suffered 3 months later. Global liquidity is now picking up again in US, China, and worldwide, accelerating. This means the liquidity environment supports crypto recovery and expansion.",
+    "priority": 4,
+    "tags": [
+      "liquidity",
+      "crypto-correlation",
+      "global-liquidity",
+      "US-shutdown",
+      "lag-effect"
+    ]
+  },
+  {
+    "id": "yt-raoul-006",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The risk curve in crypto means when Bitcoin corrects 50%, other assets (Solana, Ethereum, alts) correct more. Solana dropped 80% in 2021 before its massive run, and that was during a bull market with flowing liquidity. Ethereum and others have experienced similar corrections within bull markets. This is normal bull market behavior, not bear market territory. Bitcoin's drop from $126K to $60K is a 'nasty correction in a bull market', not a bear market.",
+    "priority": 5,
+    "tags": [
+      "Bitcoin",
+      "risk-curve",
+      "correction",
+      "Solana",
+      "Ethereum",
+      "bull-market",
+      "drawdown"
+    ]
+  },
+  {
+    "id": "yt-raoul-007",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The total addressable market for crypto has changed from human-only to infinite because AI agents will be economic actors using crypto rails. They will form treasuries in multiple currencies, use DeFi for rebalancing, execute micro-payments (e.g., 10 cents per API call), and build businesses autonomously. This gives crypto an infinite timeline and market. The crypto AI agents trade is superior to betting on individual AI companies because you get exposure to the entire agentic economy.",
+    "priority": 5,
+    "tags": [
+      "AI-agents",
+      "DeFi",
+      "layer-one",
+      "TAM",
+      "universal-basic-equity"
+    ]
+  },
+  {
+    "id": "yt-raoul-008",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Layer one smart contract blockchains are 'universal basic equity' — for the first time we have globalized digital infrastructure we can participate in. AI agents and others will use these rails and we reap the benefits. Unlike the internet era where we couldn't invest in TCP/IP, we can now own the infrastructure layer. The layer one trade is to own a basket of 3-5 chains (ETH, Solana, Sui, plus maybe 1-2 others) and 'go to the beach' for 10 years. ETH, Solana, and Sui are the only three that maintained economic density when the market fell 80%.",
+    "priority": 5,
+    "tags": [
+      "layer-one",
+      "ETH",
+      "Solana",
+      "Sui",
+      "universal-basic-equity",
+      "infrastructure",
+      "economic-density"
+    ]
+  },
+  {
+    "id": "yt-raoul-009",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The universal code framework: the entire universe converts units of energy into intelligence. This organizing principle applies to atomic structure, solar systems, AI (electricity through silicon creating intelligence), blockchains, Nasdaq, geopolitics, and all human activity. Anything with more intelligence outperforms. Nvidia gets the most money because it creates the most intelligence output. Layer ones that produce the most intelligence per unit of energy will outperform over time.",
+    "priority": 5,
+    "tags": [
+      "universal-code",
+      "energy-to-intelligence",
+      "Nvidia",
+      "blockchain-intersection",
+      "fundamental-framework"
+    ]
+  },
+  {
+    "id": "yt-raoul-010",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "When evaluating layer ones, traditional discounted cash flow analysis is wrong because it looks at fee generation. The purpose of a network is to be the cheapest and fastest, not to maximize fees. The correct metrics are: (1) intelligence of human capital — number of builders, programmers, developers; (2) programmability and efficiency — how fast the chain converts energy to programmable outcomes; (3) economic density — TVL per user, stable coin size vs TVL ratio; (4) applications built on the chain. Sui has more TVL per user than Solana despite being younger, with thousands of transactions per block and different-order-of-magnitude speed to finality.",
+    "priority": 4,
+    "tags": [
+      "layer-one-valuation",
+      "TVL-per-user",
+      "economic-density",
+      "Sulana",
+      "Sui",
+      "programmability",
+      "fees"
+    ]
+  },
+  {
+    "id": "yt-raoul-011",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The entire financial system will move onto blockchain rails because it is the most energy-efficient way to operate. This makes financial sense — you can make more money on efficient rails. Institutions have announced this direction and crypto participants can continue to front-run them. The prediction was made in 2014 (before smart contracts) and is now becoming reality. Meanwhile all financial activity on chain accrues value to layer one tokens.",
+    "priority": 5,
+    "tags": [
+      "institutional-adoption",
+      "blockchain-rails",
+      "front-running",
+      "financial-system",
+      "efficiency"
+    ]
+  },
+  {
+    "id": "yt-raoul-012",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "DeFi is not dead despite mega-hacks. Every bank has internal security teams dealing with hacks — a constant percentage is stolen from all banks, they just don't publicize it. DeFi is better suited for machines/AI agents than humans — agents don't need front ends, they just interact directly with protocols. Multi-chain world means agents will hold multiple stablecoins, need instant rebalancing via DeFi, and execute transactions without humans involved. This makes DeFi the invisible infrastructure layer of the agentic economy.",
+    "priority": 4,
+    "tags": [
+      "DeFi",
+      "hacks",
+      "AI-agents",
+      "multi-chain",
+      "infrastructure"
+    ]
+  },
+  {
+    "id": "yt-raoul-013",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending",
+      "BtcDominant"
+    ],
+    "content": "Bitcoin is a power law distribution targeting global savings (capped at 100%), so its growth follows a diminishing returns curve. Infrastructure layer ones like ETH/Solana/Sui can scale infinitely, following Metcalfe's law on a log regression channel — similar to how Google, cloud computing, and internet infrastructure scaled. Therefore layer ones should be the majority of a crypto portfolio, with Bitcoin as a smaller allocation.",
+    "priority": 5,
+    "tags": [
+      "Bitcoin",
+      "power-law",
+      "layer-one",
+      "portfolio-allocation",
+      "global-savings",
+      "infrastructure"
+    ]
+  },
+  {
+    "id": "yt-raoul-014",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ETH valuation insight: if you pulled the plug on Ethereum today, you would destroy all layer twos, all DeFi, all real world assets, all NFTs built on it. ETH is undervalued for its current importance alone, let alone growth. The ETH economy is not the same as the dollar economy — 50-150% annual growth vs 2%. Being rich in the ETH economy means spending more in that economy (art, digital goods).",
+    "priority": 4,
+    "tags": [
+      "Ethereum",
+      "valuation",
+      "DeFi",
+      "TVL",
+      "economic-destruction"
+    ]
+  },
+  {
+    "id": "yt-raoul-015",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "ETH is like Microsoft — you don't get fired for holding ETH (Lindy effect, security, largest developer base, most economic intelligence density). Solana is more efficient, faster, cheaper than ETH with good density but fewer developers. Sui is earlier stage but has unique technical characteristics: processes thousands of transactions per block, different order of magnitude speed to finality and programmability. The investment strategy is to own a basket of 3-5 layer ones.",
+    "priority": 4,
+    "tags": [
+      "ETH",
+      "Solana",
+      "Sui",
+      "Microsoft-analogy",
+      "Lindy-effect",
+      "basket-strategy"
+    ]
+  },
+  {
+    "id": "yt-raoul-016",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Hyperliquid (HYPE) observation: It has real product-market fit and demonstrated value during war/weekend events by pricing oil markets when traditional markets were closed. However, it has no real moat — Robinhood and Coinbase will quickly move into perps. Specialists can work as niche plays but are different bets than layer ones. For AI agent-driven DeFi usage, you simply buy the layer one that agents build on.",
+    "priority": 3,
+    "tags": [
+      "Hyperliquid",
+      "HYPE",
+      "perps",
+      "Robinhood",
+      "Coinbase",
+      "moat",
+      "product-market-fit"
+    ]
+  },
+  {
+    "id": "yt-raoul-017",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Zcash trade thesis (left curve trade): Bitcoin with privacy. Could be 5-10% of Bitcoin's market cap. Privacy has value and people will understand this more over time. You would never sell if you don't have to. It is also quantum proof (right curve trade), providing protection against government AI control scenarios. The probability of privacy becoming critical is 'reasonably high'. The trade is asymmetric because the downside is that governments ban it (which has been the bear case for entire crypto career and hasn't killed crypto), while the upside is significant adoption.",
+    "priority": 4,
+    "tags": [
+      "Zcash",
+      "privacy",
+      "left-curve",
+      "right-curve",
+      "quantum-proof",
+      "asymmetric"
+    ]
+  },
+  {
+    "id": "yt-raoul-018",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "Log regression channel trading strategy for Bitcoin: When price is 1-2 standard deviations oversold on the log regression channel, buy. This compounds at a very high rate. When 2 standard deviations overbought, consider taking some chips for lifestyle. Otherwise do nothing — just let the trend play out. You should only need to trade about 3 times every 5 years (2 adds, 1 partial sell). This means doing nothing is the optimal strategy the vast majority of the time.",
+    "priority": 5,
+    "tags": [
+      "log-regression",
+      "standard-deviation",
+      "trading-strategy",
+      "buy-signal",
+      "compounding",
+      "low-frequency-trading"
+    ]
+  },
+  {
+    "id": "yt-raoul-019",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "content": "Most people's problem: they can't add back at the bottom after selling at the top. If you take 25% off at tops you have lifestyle chips but less money compounding. If you take 50% off planning to add back at the bottom, psychologically people can't do it — they chase all the way up. On paper, market timing could create amazing compounders, but over 35 years in the industry, Raoul doesn't know anyone who can consistently buy bottoms and sell tops. The optimal compound strategy is to simply never sell and buy every month.",
+    "priority": 5,
+    "tags": [
+      "market-psychology",
+      "market-timing",
+      "compounding",
+      "behavioral-finance",
+      "trading-discipline"
+    ]
+  },
+  {
+    "id": "yt-raoul-020",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "LowVolatility"
+    ],
+    "content": "The people who made the most money in crypto are the ones who don't trade it — Wences Casares, Dan Morehead and others made fortunes by 'doing precisely f*** all'. All the crypto OGs who made money by just holding Bitcoin outperformed traders who made money in 2019-2021 but lost it all by Year 4-5 of the cycle. The ones who survived did so because they held Bitcoin not because they traded. Trading creates a system that is by definition less optimal than passive holding.",
+    "priority": 5,
+    "tags": [
+      "buy-and-hold",
+      "passive-investing",
+      "trading-vs-holding",
+      "Wences-Casares",
+      "patience"
+    ]
+  },
+  {
+    "id": "yt-raoul-021",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "ExtremeFear"
+    ],
+    "content": "The most efficient trade you'll ever do: buy Bitcoin and do nothing. The energy efficiency (mental, emotional, financial) of buying and holding versus constantly trading is dramatically better. People waste vast emotional energy — anger when down, overjoyed when up — for suboptimal outcomes. The universal code framework proves this: intelligence compounds its capital when allowed to run uninterrupted. A trading system is an inefficient use of human energy versus secular bull market holding.",
+    "priority": 5,
+    "tags": [
+      "energy-efficiency",
+      "universal-code",
+      "do-nothing",
+      "optimal-trade",
+      "emotional-cost"
+    ]
+  },
+  {
+    "id": "yt-raoul-022",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeVolatility",
+      "BreakingNews"
+    ],
+    "content": "Volatility makes people think crypto is easier to trade because they're short-term time horizon people. While some can make a living from short-term trading (and it's very hard — Peter Brandt says it's a terrible way to make a living, pit traders in Chicago didn't enjoy it, hard to pay bills timing markets), the optimal approach is just owning the asset in a secular bull market. Use your productive energy elsewhere (building with AI, etc.) rather than burning it on suboptimal trading.",
+    "priority": 3,
+    "tags": [
+      "volatility",
+      "short-term-trading",
+      "Peter-Brandt",
+      "opportunity-cost"
+    ]
+  },
+  {
+    "id": "yt-raoul-023",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "Developing patience and conviction when portfolio is down 60-80% for months: Live off salary/income, not portfolio. If excess capital exists and market is oversold, see it as opportunity — 'Great, I can buy more'. Ask: will tomorrow be more digital than today? If thesis hasn't changed, keep buying. People see opportunity cost as 'I've lost money' but they should see it as 'I can compound more money in the future by buying the dip'. Raoul literally does not care about drawdowns because his thesis is intact and he lives off income, not portfolio.",
+    "priority": 4,
+    "tags": [
+      "drawdown-psychology",
+      "income-vs-portfolio",
+      "conviction",
+      "buying-the-dip",
+      "opportunity-cost"
+    ]
+  },
+  {
+    "id": "yt-raoul-024",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending",
+      "ExtremeGreed"
+    ],
+    "content": "When to take profits: If price goes 2 standard deviations above the log regression channel (massive bull run), take some money off to buy yourself something (lifestyle). Otherwise you don't need to do anything. The discipline is: 1-2 standard deviations oversold = buy, do nothing in the middle (it's noise), 2 standard deviations overbought = consider partial sale. You should only need to trade about twice every 5 years to add and once to potentially take chips.",
+    "priority": 4,
+    "tags": [
+      "profit-taking",
+      "log-regression",
+      "trading-discipline",
+      "lifestyle-chips"
+    ]
+  },
+  {
+    "id": "yt-raoul-025",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "AI sector analysis: AI stocks (SMH, Nvidia, Google) are trading at 2 standard deviations above their long-term log regression trend. This creates a difficult question: is 2022 a new paradigm shift where so much capital flows into intelligence-producing assets that the trend accelerates? Google trades at 22x forward revenues which is reasonable for this growth rate. Unlike late 90s tech boom, the AI boom has very little debt — it's being funded by cash flows of the largest, most cash-generative firms in history. Every hyperscaler has been on TV saying they're booked out for 3 years and booking beyond that.",
+    "priority": 4,
+    "tags": [
+      "Nvidia",
+      "SMH",
+      "Google",
+      "AI-stocks",
+      "two-standard-deviations",
+      "forward-revenue",
+      "paradigm-shift"
+    ]
+  },
+  {
+    "id": "yt-raoul-026",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The demand for intelligence is infinite. AI companies are all making real money from a Cambrian explosion of intelligence — it's not a Ponzi scheme. The growth isn't just P/E ratio expansion but actual earnings explosion. Every chip company, hyperscaler, and AI firm has reported unprecedented demand. XAI is even giving old data centers to Anthropic because they can't get enough chips. Nobody can get enough compute and nobody can get enough energy — a situation never seen before in history.",
+    "priority": 4,
+    "tags": [
+      "AI-demand",
+      "compute-shortage",
+      "energy-shortage",
+      "earnings-growth",
+      "Cambrian-explosion"
+    ]
+  },
+  {
+    "id": "yt-raoul-027",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Comparing Bitcoin/Nasdaq ratio with standard deviation bounds shows Bitcoin and crypto are 2 standard deviations oversold versus Nasdaq — as cheap as they've been in the long-term uptrend. This relative value signal suggests allocating more to crypto than Nasdaq at current levels. Bitcoin can easily 13x from current levels, similar to individual equity opportunities like Rocket Labs which did 13x from Raoul's buy point.",
+    "priority": 4,
+    "tags": [
+      "Bitcoin-Nasdaq-ratio",
+      "relative-value",
+      "2-standard-deviations",
+      "oversold",
+      "allocation-signal"
+    ]
+  },
+  {
+    "id": "yt-raoul-028",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Perfect storm bull case for crypto 2026-2027: (1) Banks entering crypto, regulatory clarity via Clarity Act; (2) Stablecoin explosion — doing $100 trillion annual run rate; (3) Global liquidity increasing as US must print money to cover $6-8 trillion in interest payments; (4) Business cycle running strong, earnings recycling into speculative assets; (5) AI agents arriving; (6) Cheap entry point versus other assets; (7) Extreme fear readings (fear and greed below 10 for longest period in history, lowest reading ever); (8) Potential resolution of Middle East war reducing uncertainty. 70% probability positive outcome, 30% negative.",
+    "priority": 5,
+    "tags": [
+      "2026-outlook",
+      "2027-outlook",
+      "stablecoins",
+      "Clarity-Act",
+      "liquidity",
+      "fear-and-greed",
+      "70-30"
+    ]
+  },
+  {
+    "id": "yt-raoul-029",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "BreakingNews"
+    ],
+    "content": "Bear case for crypto 2026-2027 (30% probability): Middle East war doesn't resolve, drives larger-than-expected inflation, forces tightening cycle, kills business cycle. Liquidity withdrawal starves capital to tech companies, slowing the intelligence buildout. China faces same issue, forcing US to print money. The ISM (manufacturing index) which correlates with crypto would turn negative. Capital starvation is the main risk — if liquidity dries up, the AI/crypto complex suffers.",
+    "priority": 4,
+    "tags": [
+      "bear-case",
+      "Middle-East",
+      "inflation",
+      "tightening",
+      "liquidity-risk",
+      "ISM"
+    ]
+  },
+  {
+    "id": "yt-raoul-030",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Crypto cycle analysis: The banana zone (accelerant phase) hasn't happened yet because liquidity was still subdued in 2024. 2023 was great from the lows, 2024 'petered out', and year 4 (possibly 5-year cycle) everyone gives up. The cycle might be extended by macro factors. Accumulated energy during extended bottom creates explosive moves when breakout happens — like Intel stock after 10-year consolidation then explosion. K-shaped economy (tech booming, real economy struggling) means rate cuts help regular people, data center infrastructure build employs construction/services workers, and money flows back to 'the casino' (crypto).",
+    "priority": 4,
+    "tags": [
+      "crypto-cycle",
+      "banana-zone",
+      "K-shaped",
+      "accumulated-energy",
+      "cycle-extended",
+      "explosion"
+    ]
+  },
+  {
+    "id": "yt-raoul-031",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending",
+      "BtcDominant"
+    ],
+    "content": "Bitcoin as indirect AI proxy: Bitcoin targets global savings, which increases if AI changes economic growth. AI-driven economic growth increases eventual outcomes for Bitcoin. Enormous liquidity from private sector debt feeds the cycle, and debasement of currency feeds Bitcoin directly. Bitcoin is a digital store of value in an increasingly digital world with digital intelligence. However, layer one smart contracts are a BETTER bet on AI than Bitcoin directly because they capture the actual infrastructure usage.",
+    "priority": 4,
+    "tags": [
+      "Bitcoin",
+      "AI-proxy",
+      "savings",
+      "debasement",
+      "digital-store-of-value",
+      "layer-one-superior"
+    ]
+  },
+  {
+    "id": "yt-raoul-032",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The K-shape recovery in crypto means most assets won't come back, but stablecoins, RWAs, Bitcoin and a few other things will go up. People are frustrated because successful companies (stablecoin companies) have no token to buy — requires PE/VC access. This breaks the 'invest early in something that goes up' promise of crypto. Key insight: 'The market owes you nothing' — you have to be better at doing the job. Product market fit wins (like Hyperliquid).",
+    "priority": 3,
+    "tags": [
+      "K-shape",
+      "RWAs",
+      "stablecoins",
+      "product-market-fit",
+      "market-psychology"
+    ]
+  },
+  {
+    "id": "yt-raoul-033",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "Psychology",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "From easy money to hard money shift: People who 'closed their eyes' during 2020-2021 got used to easy money and are now pissed because it's harder to make money. The market owes you nothing — you have to be better at doing the job. For many, the only money they made in crypto came from buying and holding Bitcoin, not from trading. The mindset shift needed is from 'get rich quick' to disciplined accumulation.",
+    "priority": 3,
+    "tags": [
+      "easy-money",
+      "market-owes-you-nothing",
+      "mindset",
+      "discipline"
+    ]
+  },
+  {
+    "id": "yt-raoul-034",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Crypto is humanity's pension plan — for the first time we can invest in the infrastructure rails on which the entire agentic economy will run. This will bail people out of everything happening in the traditional economy. You have approximately 4 more years (originally 6, now revised to 4) before the economic singularity to own as much crypto as possible before entering the biggest moment of uncertainty in human history. Blockchain will survive through to the other side.",
+    "priority": 5,
+    "tags": [
+      "pension-plan",
+      "infrastructure-rails",
+      "economic-singularity",
+      "4-year-window",
+      "uncertainty"
+    ]
+  },
+  {
+    "id": "yt-raoul-035",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "AI agent economy thesis: AI agents are being born and scaling everywhere. Everyone is building them. They will hold treasuries in multiple currencies, use DeFi for rebalancing, execute micro-payments and larger economic transactions. The agentic economy gives crypto an infinite timeline. Metcalfe's law still applies — the log trend takes crypto to $100 trillion market cap or half that if targets are miss. It might just happen a bit earlier with AI agents. The currency debasement won't stop until debt-to-GDP collapses, and we're not there yet.",
+    "priority": 5,
+    "tags": [
+      "agentic-economy",
+      "Metcalfe-law",
+      "100-trillion",
+      "infinite-timeline",
+      "debasement",
+      "debt-GDP"
+    ]
+  },
+  {
+    "id": "yt-raoul-036",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "SessionOpen"
+    ],
+    "content": "The two-economy mental model: We live in two economies — one growing 50-150% per year (tech/crypto) and one growing 2% per year (traditional). Money from the high-growth economy feels different, less real. This is why people spend $75 on a steak and eggs breakfast without thinking but balk at the same amount in crypto. It's also why people will spend 100-1000x more on an NFT that drops 80% than on real goods. Understanding this mental model helps explain crypto behavior and why people make seemingly irrational allocation decisions.",
+    "priority": 3,
+    "tags": [
+      "two-economies",
+      "mental-model",
+      "spending-behavior",
+      "crypto-psychology"
+    ]
+  },
+  {
+    "id": "yt-raoul-037",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "Ramsey's law of portfolio patience: Once you generate significant income, holding becomes much easier because you're not dependent on portfolio for living expenses. For average people with jobs, their dreams and hope are in crypto but they feel pressure to trade because monthly income doesn't enable an exceptional life quickly enough. The solution is to start generating more income from the portfolio itself, which makes the 'buy and hold' strategy psychologically manageable.",
+    "priority": 3,
+    "tags": [
+      "portfolio-management",
+      "income-generation",
+      "patience",
+      "psychology",
+      "wealth-building"
+    ]
+  },
+  {
+    "id": "yt-raoul-038",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "HalvingProximity",
+      "BtcDominant"
+    ],
+    "content": "The chip companies (hyperscalers) are the single most important part of converting units of energy to units of units of intelligence. All capital flows there and there are no signs of stopping. Every hyperscaler has been on TV in the last week saying they're booked out for 3 years and booking beyond that — a situation never seen before. This validates the 'units of energy into units of intelligence' universal code thesis and supports both AI stocks and crypto infrastructure plays.",
+    "priority": 4,
+    "tags": [
+      "hyperscalers",
+      "chips",
+      "compute",
+      "energy-to-intelligence",
+      "Nvidia",
+      "demand"
+    ]
+  },
+  {
+    "id": "yt-raoul-039",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "China allocated capital to gold during the gold rally, showing global diversification away from USD. This confirms the currency debasement thesis — when nations lose faith in fiat, they move to hard assets (gold, Bitcoin). The global liquidity picture is interconnected: US, China, and worldwide liquidity are all flowing, creating a synchronized global liquidity expansion that supports all risk assets including crypto.",
+    "priority": 3,
+    "tags": [
+      "China",
+      "gold",
+      "de-dollarization",
+      "global-liquidity",
+      "hard-assets"
+    ]
+  },
+  {
+    "id": "yt-raoul-040",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The net positioning signal: Put standard deviation bounds on the Nasdaq/Bitcoin ratio. When crypto is 2 standard deviations cheap versus Nasdaq (as it was in this period), allocate more to crypto. This is a systematic, unemotional way to rebalance between crypto and traditional tech based on relative value rather than emotion or narrative.",
+    "priority": 3,
+    "tags": [
+      "Nasdaq-Bitcoin-ratio",
+      "rebalancing",
+      "systematic-investing",
+      "relative-value",
+      "positioning"
+    ]
+  },
+  {
+    "id": "yt-raoul-041",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Stablecoin companies are some of the best-positioned businesses in crypto (handling $100T annual run rate in transactions) but there's no token — requiring PE/VC access to invest. This created frustration for crypto natives. The opportunity is to invest in the infrastructure layer ones (ETH, SOL, etc.) that benefit from all stablecoin activity on-chain rather than trying to access the companies directly.",
+    "priority": 3,
+    "tags": [
+      "stablecoins",
+      "no-token",
+      "PE-VC",
+      "infrastructure-play"
+    ]
+  },
+  {
+    "id": "yt-raoul-042",
+    "source": "youtube-interviews/Raoul Pal The AI Race Will Make Crypto Holders Rich.md",
+    "topic": "MacroAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "IS philanthropic thesis drawn from Raoul's framework: When someone helped him as a kid, he built Robin Hood. This illustrates the universal code principle of kindness creating positive energy and opportunity. The observation that 'kindness is a real attribute that makes the world go round' and creates unexpected opportunities applies to building relationships and networks in crypto and investing.",
+    "priority": 2,
+    "tags": [
+      "kindness",
+      "philanthropy",
+      "network-effects",
+      "universal-code",
+      "opportunity-creation"
+    ]
+  }
+]

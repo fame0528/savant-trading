@@ -1,0 +1,855 @@
+[
+  {
+    "id": "yt-tech-unravels-001",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Silver (SLV) dropped 14% at the open. The trader entered long at $67 off the pre-market low with a stop designed to capture the move back toward VWAP. The trade worked perfectly — SLV rallied to $70.32. The risk was tight at approximately $40 cents, and no profits were taken until $160 in the money. Key lesson: when trading drastically below VWAP, the game plan is to wait for a move back to VWAP on a bottoming signal, then take partial profits. A hammer candle below key support on the higher time frame preceded the entry.",
+    "priority": 5,
+    "tags": [
+      "silver",
+      "SLV",
+      "VWAP",
+      "gap-down",
+      "bottoming-signal",
+      "hammer-candle"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-002",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "MSTZ (inverse leveraged MSTR ETF) was identified as a range trade between $25.50 (support) and $26.50 (resistance). The range held consistently from approximately 10:10 AM onward. Despite forming what looked like a potential ascending wedge/breakout pattern, the range persisted. The trader got stopped out multiple times trying to catch the breakout. Lesson: even when a pattern looks like it's compressing for a breakout, if the broader market is weak, compression can resolve sideways. The half-dollar level ($25.50) acted as a magnet, and the whole-dollar level ($26) was persistent resistance.",
+    "priority": 4,
+    "tags": [
+      "MSTZ",
+      "range-trade",
+      "MSTR",
+      "inverse-ETF",
+      "support-resistance",
+      "ascending-wedge",
+      "breakout-fakeout"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-003",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "BreakingNews",
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "content": "Bitcoin crashed below $70K for the first time since November 2024 (election day levels). Intraday low hit $65,003. Eight consecutive red days. Bitcoin was down more than 40% from its October all-time high of $126,000. Historical data shows Bitcoin routinely retraces 70-80% from highs — the 2013, 2018, and 2021 cycles all showed this pattern. Over $2 billion in long positions were wiped out this week. Institutional demand reversed materially with Bitcoin ETFs becoming net sellers in 2026. Force liquidations amplified intraday moves. The current pullback represents approximately 70% from the $126K high.",
+    "priority": 5,
+    "tags": [
+      "bitcoin",
+      "BTC",
+      "crash",
+      "retracement",
+      "liquidations",
+      "ETFs",
+      "institutional-selling",
+      "8-red-days",
+      "70-percent-pullback"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-004",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "content": "Position management strategy for multi-contract option holders: if you have a multiple (e.g., 4 contracts) on a position that's moved significantly in your favor, lock in profits on the majority (2-3 contracts) and leave only a small 'runner' if you're willing to lose unrealized gains on those. This prevents the scenario where a trader holds silver calls up $40K only to see silver tank 30% hours later, giving back all profits. The principle: take chips off the table systematically as positions go in your favor.",
+    "priority": 4,
+    "tags": [
+      "options",
+      "profit-taking",
+      "position-management",
+      "runner",
+      "scaling-out"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-005",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "content": "MSTZ (inverse MSTR ETF) showed a textbook 'triple top' pattern around $26.41-$26.49. The first rejection at 10:30, second at 11:10 with a reversal candle, and third attempt that briefly made new highs at $26.60 before aggressively reversing. After the triple top, the price dropped sharply to the $25.50 area. Triple tops signal exhaustion of buying pressure and often lead to swift reversals when the level holds as resistance three times.",
+    "priority": 3,
+    "tags": [
+      "triple-top",
+      "MSTZ",
+      "reversal-pattern",
+      "exhaustion",
+      "resistance"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-006",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "LIMN showed a compression pattern with higher lows and a flat top around $182-$185. The trader wanted to see a break above $185 to confirm a flat top breakout. After consolidating for nearly an hour around VWAP, LIMN eventually broke above $190 and rallied to $215 — a 32% gain from the lows. The key was building the position gradually on higher lows rather than chasing. The $90 level on the way up was a hidden seller with approximately 1,000 lots visible on Level 2. The $190 level had been resistance all day until it finally broke.",
+    "priority": 4,
+    "tags": [
+      "LIMN",
+      "compression",
+      "flat-top-breakout",
+      "higher-lows",
+      "VWAP",
+      "hidden-seller",
+      "Level2"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-007",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "The 10 EMA on the 5-minute chart was a key level for inverse ETFs (MSTZ, QBTZ, PLTZ). Throughout the day, these ETFs were 'quite respectful' of the 10 EMA on the 5, meaning bounces off this moving average provided long entry points. The one exception was a candle at 10:50 that breached the 10 EMA slightly on MSTZ (low of $25.28), which would have stopped out entries placed right at the EMA. Lesson: place stops slightly beyond the EMA to avoid being wicked out by 1-cent breaches.",
+    "priority": 3,
+    "tags": [
+      "10-EMA",
+      "5-minute",
+      "inverse-ETF",
+      "MSTZ",
+      "QBTZ",
+      "PLTZ",
+      "moving-average",
+      "stop-placement"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-008",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "ExtremeFear"
+    ],
+    "content": "Market internals showed extreme weakness: Consumer Discretionary down 2%, Energy down 2.2%, Materials down 2.4%. Tech sector down 1%. The IWM (Russell 2000) was the best performing major average, only down 1%. Weekly performance was worse: QQQ down 5.5%, SPY down 2.5%, IWM down 2%. The Dow was the best in class but still slightly negative. This breadth confirms a broad-based selloff, not isolated to one sector.",
+    "priority": 3,
+    "tags": [
+      "market-breadth",
+      "sectors",
+      "IWM",
+      "QQQ",
+      "SPY",
+      "DOW",
+      "selloff",
+      "weakness"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-009",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "The trader's philosophy on low-opportunity days: 'The pickings are slim.' On days when small cap gappers show no quality setups, it's better to sit on hands and wait. The trader only put on one trade (SLV long) early and then spent the rest of the day being patient. 'Sometimes you just got to take a step back and digest what the market is telling us.' Forcing trades when setups aren't there leads to losses. One good trade per day is all you need.",
+    "priority": 5,
+    "tags": [
+      "patience",
+      "selectivity",
+      "one-trade",
+      "low-opportunity",
+      "discipline"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-010",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Robin Hood (HOOD) crashed 50% from its $150 all-time high, trading around $75. It was down as low as $74 intraday. The stock bounced off VWAP multiple times throughout the day. A key intraday strategy: when a stock bounces off VWAP with a bottoming tail candle (like HOOD at $76), you can enter long with a stop about 30 cents below the wick low, targeting a move back to the high of that candle. This provides a favorable risk-to-reward ratio of roughly 1:1 or better.",
+    "priority": 3,
+    "tags": [
+      "HOOD",
+      "Robin-Hood",
+      "VWAP-bounce",
+      "bottoming-tail",
+      "50-percent-drop",
+      "risk-reward"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-011",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "BreakingNews"
+    ],
+    "content": "Polestar (PSNY), a long-term hold in the trader's personal account, surged 26% intraday to $16.35 (later $17.35) on news of a $400 million equity investment from two financial institutions ($200M each) — Feather Top Funding Limited SPV and Standard Chartered. The stock had been a 'hot garbage' long-term bagholder position down 25% from entry. The breakout above $16 resistance (which had been flat top since 9:30 AM) confirmed the move. Volume was thin at only 490K shares, and the spread was too wide to trade actively.",
+    "priority": 3,
+    "tags": [
+      "PSNY",
+      "Polestar",
+      "breakout",
+      "equity-investment",
+      "flat-top",
+      "volume",
+      "spread"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-012",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Applied Digital (APLD) was up 386% from its lows but had pulled back 32% from its previous pivot high. The trader noted that stocks that have had 'monstrous runs' eventually face repercussions — the market asks 'how's this 50% pullback feel?' Names like Robin Hood, SoFi, and Palantir that were up 386% from lows eventually gave back significant portions. This is the nature of high-beta names: parabolic runs are followed by equally violent corrections.",
+    "priority": 3,
+    "tags": [
+      "APLD",
+      "Applied-Digital",
+      "parabolic",
+      "pullback",
+      "high-beta",
+      "386-percent",
+      "repercussions"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-013",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "content": "The trader's personal lesson from the 'tariff tantrum': they hit the panic button and sold Google and Tesla, rotating into names that subsequently underperformed. This time, the strategy is to hold quality names through drawdowns. Key insight: 'I believe I'm in quality names. I believe in what I've bought. Let's see if they get back to those levels before.' Unless you have cash reserves, you can't buy dips — so the strategy should be to hold quality through volatility and add on dips only if you have dry powder.",
+    "priority": 4,
+    "tags": [
+      "panic-selling",
+      "tariff-tantrum",
+      "holding-quality",
+      "dry-powder",
+      "drawdown",
+      "lesson-learned"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-014",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "Neil's lesson on trading in volatile markets: reduce the number of trades and be more selective. In the prior weeks, Neil cut his actual trade count in half. He grades his setups: A+ setups get full size, B setups get smaller size. If an A+ setup doesn't appear, he takes a B setup rather than forcing an A+ that isn't there. He reloads at the same price (not averaging down) if the setup re-trades. The key: 'In increased volatility, you pay a steeper price for being wrong. You can't just swing hoping to run into one big trade.'",
+    "priority": 5,
+    "tags": [
+      "volatility",
+      "selectivity",
+      "setup-grading",
+      "position-size",
+      "patience",
+      "Neil-lesson"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-015",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Breaks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "ZSL (inverse leveraged silver ETF) was traded as a mean reversion strategy for 6 consecutive sessions. The approach: one entry per session, waiting for the trend to reverse and then playing the long side. This worked consistently — the trader hadn't lost on this strategy across 3 days on ZSL and prior days on SLV. The key was patience: the setup could happen at 9:45 AM or 11:45 AM, but the trader waited for it regardless of time. Position size was increased by 50% each day the strategy continued to work.",
+    "priority": 4,
+    "tags": [
+      "ZSL",
+      "mean-reversion",
+      "silver",
+      "one-entry",
+      "patience",
+      "scaling-up",
+      "6-sessions"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-016",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "SMCI (Super Micro Computer) gapped up on earnings to the $30-$31 area, then gave back the entire gain, hitting a low of $26.33 (down 9.33% from open, meaning it was down over 10% at one point). The breakout level was $30-$31. After the pullback, SMCI reclaimed VWAP and the $31 whole-dollar level became resistance. If $31 clears, the next target is $31.75-$32. The stock showed higher lows on the recovery, suggesting the selloff may be exhausted. Monty Lemons in the chat correctly called the VWAP bounce.",
+    "priority": 3,
+    "tags": [
+      "SMCI",
+      "Super-Micro",
+      "VWAP",
+      "breakout",
+      "giveback",
+      "earnings",
+      "whole-dollar-resistance"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-017",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "The Triple Qs (QQQ) VWAP hold strategy: the trader entered long at the VWAP level with a 50-60 cent stop, targeting $49.10-$49.20. The trade worked — QQQ bounced off VWAP and rallied to $49.05-$49.20. Key insight: 'I wouldn't be surprised if we see somewhat of a recovery today because the selling was really aggressive in the pre-market and we've already seen consecutive days with aggressive selling.' The trader scaled out partially at $49 and held the rest for $49.20. The VWAP acted as a clear line in the sand.",
+    "priority": 4,
+    "tags": [
+      "QQQ",
+      "Triple-Qs",
+      "VWAP",
+      "recovery",
+      "scaling-out",
+      "pre-market-selling",
+      "consecutive-selling-days"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-018",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "CISS was entered long at $212 as a 'rule break' trade (going long south of VWAP), with a stop below $205. The trade didn't work — CISS failed to break above the higher low trend and didn't reclaim VWAP. The trader exited with a small loss. Lesson: even when a stock shows higher lows, if it can't reclaim VWAP and the broader market is weak, the long setup is invalidated. The trader acknowledged this was a lower-probability setup from the start.",
+    "priority": 2,
+    "tags": [
+      "CISS",
+      "rule-break",
+      "VWAP",
+      "higher-lows",
+      "failed-setup",
+      "stop-loss"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-019",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "BreakingNews"
+    ],
+    "content": "GDRX (Good RX) spiked on news of being a potential Trump RX integration partner. The stock broke out above VWAP and the $0.60 level, but faced aggressive selling at $0.60-$0.65. The trader entered on the breakout but got stopped out when it lost the $0.50 level (half dollar). The prior bar low on the 5-minute was $0.55, and a topping tail candle followed by a red candle that breached prior bar low was the exit signal. Lesson: in thin small-cap names, whole-dollar and half-dollar levels act as magnets for profit-taking. The spread was also very wide (11 cents), making it untradeable.",
+    "priority": 3,
+    "tags": [
+      "GDRX",
+      "Good-RX",
+      "Trump-RX",
+      "breakout",
+      "half-dollar",
+      "topping-tail",
+      "prior-bar-low",
+      "spread",
+      "small-cap"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-020",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "BreakingNews"
+    ],
+    "content": "BOBS IPO opened at $17, traded between $16.66 (low) and $17.44 (high). The trader entered at $18.08 with a stop at $17.74 (20 cents risk), targeting $18.40 and then $18.50+. A clear buyer was visible at $18 on Level 2. The stock cleared $18.50 briefly but then reversed. The trader exited at $18.75 for a $1 profit. On the second attempt, the trader entered at $18.35 with a stop at $18.20, but the stock reversed and stopped them out. The $18.50 level had a big seller. IPOs with limited data are risky — the trader noted 'very little in the way of data' and the spread was wide (43 cents ask, 21 cents bid).",
+    "priority": 3,
+    "tags": [
+      "BOBS",
+      "IPO",
+      "Level2",
+      "hidden-buyer",
+      "spread",
+      "resistance",
+      "small-cap"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-021",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "A topping tail candle followed by a red candle that breaches the prior candle's low is a strong sell/exit signal. This pattern appeared on GDRX, BOBS, and MSTZ. The topping tail shows rejection at a level, and the subsequent breach of the prior low confirms sellers are in control. The trader used this pattern multiple times as an exit signal throughout the day. On BOBS specifically, the prior bar low on the 5-minute was $18.22, and the breach of that level triggered the stop.",
+    "priority": 4,
+    "tags": [
+      "topping-tail",
+      "prior-bar-low",
+      "exit-signal",
+      "bearish-confirmation",
+      "rejection"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-022",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "BreakingNews",
+      "ExtremeFear"
+    ],
+    "content": "Ethereum (ETH) crashed to $1,950, down 60% from its highs. Tom Lee's Fundstrat had projected $15,000 ETH by end of 2025 — the actual price was nowhere close. The entire crypto market was in 'waterfall' price action with 8 consecutive red days on Bitcoin. The speed and velocity of the drop suggested further downside. Michael Sailor's Strategy (MSTR) earnings report was expected after the bell, with an implied move of plus/minus 10.2%. The at-the-money IV on MSTR options was 2,282% with 7,222 contracts at the $120 strike.",
+    "priority": 4,
+    "tags": [
+      "ETH",
+      "Ethereum",
+      "crash",
+      "60-percent",
+      "Tom-Lee",
+      "MSTR",
+      "Strategy",
+      "earnings",
+      "IV",
+      "options"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-023",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "ExtremeFear"
+    ],
+    "content": "Scott Bessent (US Treasury Secretary) testified before the Senate on crypto regulation. Key points: he believes China may be trying to compete in crypto, emphasized passing the Clarity Act, and noted that people opposing crypto legislation are 'acting out of line.' Coinbase CEO Brian Armstrong has been actively lobbying for proper crypto legislation. Senator Cynthia Lummis (pro-crypto) was also involved. The market did not react significantly to this news — it was already in a selloff.",
+    "priority": 2,
+    "tags": [
+      "Scott-Bessent",
+      "crypto-regulation",
+      "Clarity-Act",
+      "China",
+      "Coinbase",
+      "Brian-Armstrong",
+      "Lummis"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-024",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "HighVolatility"
+    ],
+    "content": "Alphabet (GOOGL) earnings beat: EPS $2.82 vs $2.63 expected, revenue $113.83B vs $111.43B expected. Net income up 30% YoY to almost $35B. Google Cloud grew 48% YoY (vs Azure at ~38-39%). Cloud backlog surged 55% sequentially to $240B in remaining performance obligations. Gemini reached 750M monthly active users (up 100M in one quarter). However, the 2026 capex guidance of $175B-$185B was well above street expectations of $110B-$115B — more than double 2025 spending. YouTube ad revenue grew 9% YoY but missed expectations. The stock initially sold off on the capex concern despite strong fundamentals.",
+    "priority": 4,
+    "tags": [
+      "GOOGL",
+      "Alphabet",
+      "earnings",
+      "cloud-growth",
+      "48-percent",
+      "capex",
+      "Gemini",
+      "YouTube",
+      "guidance"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-025",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "HighVolatility"
+    ],
+    "content": "Amazon earnings expected after the bell: EPS expected $1.98, revenue $211.45B. UBS characterized AMZN as a 'coiled spring' with a $311 price target, arguing investor expectations haven't caught up to AWS growth potential. UBS models AWS capacity roughly doubling by 2027, with capex of $344B from Q4 2025 to Q4 2027 (up from prior estimate of $300B). AWS alone capex estimated at $225B-$260B for that period. The market isn't pricing in a scenario where AWS revenue doubles by 2028. Amazon Music on Alexa price increase of $1/month ($12/year) for 56M+ subscribers provides additional revenue tailwind.",
+    "priority": 3,
+    "tags": [
+      "AMZN",
+      "Amazon",
+      "AWS",
+      "earnings",
+      "capex",
+      "UBS",
+      "coiled-spring",
+      "revenue-growth"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-026",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "HighVolatility"
+    ],
+    "content": "Qualcomm (QCOM) earnings: EPS $3.50 vs $3.41 expected, revenue $12.25B (modestly ahead). However, forward guidance was weak: adjusted EPS $2.45-$2.65 vs street $2.89, revenue $10.2B-$11B vs street $11.11B. The stock fell as much as 10% (SSR). The guidance shortfall was supply-driven, not demand-driven — a global memory shortage driven by data center demand is crowding out smartphone supply. Handset revenue grew only 3% YoY (down from 14% last quarter). Licensing revenue of $1.59B was the highest margin business. The smartphone market remains in an upgrade cycle but memory availability is constraining production.",
+    "priority": 3,
+    "tags": [
+      "QCOM",
+      "Qualcomm",
+      "earnings",
+      "guidance",
+      "memory-shortage",
+      "supply-constraint",
+      "handset",
+      "licensing"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-027",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "HighVolatility"
+    ],
+    "content": "ARM Holdings earnings: Q3 licensing revenue jumped 25% YoY to $550M+, but fell short of $520M analyst expectations. Record quarterly revenue of $1.24B driven largely by AI data center demand. Full year 2026 revenue guided around $505M with 27% clip rate. Non-GAAP operating expenses rose 37% YoY to $716M on R&D. Only 10% of ARM's float is public (SoftBank owns most), which creates manipulation risk. The stock has been in a sideways chop since its IPO after a massive run. Smartphone market (50% of revenue) faces headwinds from global memory shortages.",
+    "priority": 2,
+    "tags": [
+      "ARM",
+      "earnings",
+      "licensing",
+      "data-center",
+      "SoftBank",
+      "float",
+      "R&D",
+      "memory-shortage"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-028",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "HighVolatility"
+    ],
+    "content": "Snap (SNAP) earnings: Revenue $1.72B vs $1.7B expected (up 10% YoY). Net income $45.2M (quadrupled YoY). Adjusted EBITDA $385M vs $300M expected. Daily active users 474M (slightly below 478M expected, down 3M QoQ). Management attributed DAU dip to reduced marketing spend and Australia age verification (removed ~400K accounts). ARPU $3.62 vs $3.56 expected. Q1 guidance $1.5B-$1.53B vs street $1.55B — below estimates, stock down 9.67%. $500M share buyback announced. Snapchat Plus grew 71% YoY to 24M subscribers. North American ads up 6% YoY, European ads up 19%.",
+    "priority": 2,
+    "tags": [
+      "SNAP",
+      "Snapchat",
+      "earnings",
+      "DAU",
+      "ARPU",
+      "guidance",
+      "buyback",
+      "Snapchat-Plus"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-029",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "HighVolatility"
+    ],
+    "content": "Netflix (NFLX) is pursuing acquisition of Warner Brothers Discovery (WBD) for $72B (excluding legacy cable TV assets). Paramount SkyDance countered with a $108B+ hostile bid for all of WBD. President Trump reversed his December stance that the Netflix deal 'could be a problem' and decided not to get involved, leaving it to the DOJ. This removes political headline risk. Some senators expressed concern about ANY acquisition of WBD (not just Netflix's), with Republicans particularly uncomfortable. Netflix stock was up 1.4% on the news.",
+    "priority": 2,
+    "tags": [
+      "NFLX",
+      "Netflix",
+      "WBD",
+      "Warner-Brokers",
+      "acquisition",
+      "Paramount",
+      "Trump",
+      "DOJ",
+      "antitrust"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-030",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "BreakingNews",
+      "ExtremeFear",
+      "HighVolatility"
+    ],
+    "content": "Silver (SLV) crashed 12.4% intraday, snapping a brief two-day rebound after losing more than 30% on Friday. Silver had been up 146% in the prior year on a record-breaking run. The rally became detached from physical demand, driven by speculative flows, leverage, and options-related activity. CME and other exchanges forced margin hikes, accelerating the downside. Dealer hedging flipped from buying strength to selling weakness, triggering stops and cascading losses. The London market's tighter liquidity amplified volatility. In just 5 trading days, silver had a 40% pullback. The trader noted this was the last space they expected this kind of violent correction.",
+    "priority": 5,
+    "tags": [
+      "silver",
+      "SLV",
+      "crash",
+      "30-percent",
+      "margin-hikes",
+      "London-market",
+      "cascading-liquidations",
+      "speculative",
+      "40-percent-pullback"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-031",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "The trader's scanner criteria for small cap gappers: ideally above $1, breaking out above VWAP, above pre-market high, with significant volume. When these criteria aren't met (like RCAT which was down 11.67% and below VWAP), the stock is immediately untradeable. The trader actively asks chat participants to help identify names meeting these criteria, emphasizing the need for community-sourced ideas when the pickings are slim.",
+    "priority": 3,
+    "tags": [
+      "scanner",
+      "small-cap",
+      "gappers",
+      "VWAP",
+      "pre-market-high",
+      "volume",
+      "criteria"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-032",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "The trader accidentally hit a wrong key and went short QQQ instead of long, catching a few pennies on the short before realizing the mistake and getting out. This highlights the importance of having a plan and knowing your intended direction before entering. The trader joked about it but it served as a real-time example of execution errors. 'Sometimes you hit the wrong key, but you hit the right key at the right time sometimes, and that's all that really matters.'",
+    "priority": 2,
+    "tags": [
+      "execution-error",
+      "QQQ",
+      "wrong-key",
+      "plan",
+      "discipline"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-033",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "The concept of 'smaller size, longer holds' — when trading volatile instruments like QQQ with wider stops (50-60 cents instead of the usual 20-30), reduce position size accordingly. This keeps the dollar risk constant while giving the trade more room to work. The trader applied this principle on the QQQ long, using a small position size with a wider stop to account for the increased volatility.",
+    "priority": 3,
+    "tags": [
+      "position-sizing",
+      "volatility",
+      "wider-stops",
+      "smaller-size",
+      "longer-holds",
+      "dollar-risk"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-034",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "HighVolatility"
+    ],
+    "content": "Fed's Bostic (who is stepping down before the next Fed meeting) stated that moderately restrictive rates should probably stay in place. This suggests no imminent rate cuts. Meanwhile, Polymarket showed rate cut expectations surging to 25 basis points following the JOLTS report. The disconnect between Fed commentary and market expectations creates uncertainty. Fed Bostic's comments were hawkish relative to what the market was pricing in.",
+    "priority": 2,
+    "tags": [
+      "Fed",
+      "Bostic",
+      "rates",
+      "restrictive",
+      "JOLTS",
+      "rate-cuts",
+      "Polymarket"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-035",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "The NASDAQ showed a 'square formation' with a double bottom stabilization just shy of 595 on the QQQ, then bounced to 601.50. This 15-minute candle pattern suggested a potential reversal. The trader also noted that the NASDAQ was starting to recover toward the opening price, with the pre-market selling looking overdone. The VIX was rising, which increases volatility and creates opportunities but also increases risk.",
+    "priority": 3,
+    "tags": [
+      "NASDAQ",
+      "QQQ",
+      "double-bottom",
+      "square-formation",
+      "VIX",
+      "recovery",
+      "15-minute"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-036",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "The 5-minute ORB (Opening Range Breakout) strategy for earnings trades: wait for the first 5-minute print after earnings. If it closes bearish, wait for the 5-minute to complete and then play the break of the low. If it closes bullish, wait for volatility to cool and play the break of the high. This simple strategy works because the initial post-earnings move often establishes the direction, and the 5-minute wait allows the initial panic/greed to subside. The trader planned to bring examples the next day.",
+    "priority": 4,
+    "tags": [
+      "ORB",
+      "Opening-Range-Breakout",
+      "earnings",
+      "5-minute",
+      "strategy",
+      "volatility",
+      "post-earnings"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-037",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "HighVolatility"
+    ],
+    "content": "Nvidia H200 chip licensing to China (ByteDance/TikTok) is in negotiation. The Trump administration is willing to allow the sale but with KYC (Know Your Customer) conditions that Nvidia hasn't agreed to. Nvidia argues the conditions must be 'commercially workable' or customers will turn to non-US alternatives (MetaX, Huawei). 2 million orders for H200 were reported, with 700K in storage (later revised to 400K). The market has grown tired of the back-and-forth headlines — these stories no longer generate significant price moves unless actual chips are shipped to Chinese customers.",
+    "priority": 3,
+    "tags": [
+      "Nvidia",
+      "H200",
+      "China",
+      "ByteDance",
+      "TikTok",
+      "KYC",
+      "chip-licensing",
+      "Huawei",
+      "MetaX"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-038",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "HighVolatility"
+    ],
+    "content": "AI infrastructure bottleneck is not just chips and RAM — it's also transformers for the grid, with 2-3 year backlogs. The president of OpenAI noted that data center builders can't get generators, and local utility companies can't provide the near-100% uptime that AI data centers require. People with land and old factories are approaching AI companies offering properties, not realizing the complexity of power requirements. This is a multi-faceted bottleneck: chips, RAM, transformers, generators, and grid capacity all constrain AI growth.",
+    "priority": 4,
+    "tags": [
+      "AI",
+      "data-centers",
+      "bottleneck",
+      "transformers",
+      "generators",
+      "grid",
+      "uptime",
+      "OpenAI",
+      "infrastructure"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-039",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "The danger of copy trading: most traders don't provide specific, binary entry/exit rules. Risk tolerance varies between traders. Execution timing and prices will differ. Some traders average into positions, which is impossible to copy effectively. The solution is to work with key levels and direction from other traders, but develop your own execution strategy. 'You have to find your own journey' and discover what works for you. During the discovery phase, try not to lose a bunch of money.",
+    "priority": 3,
+    "tags": [
+      "copy-trading",
+      "risk-tolerance",
+      "execution",
+      "strategy",
+      "levels",
+      "direction",
+      "learning"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-040",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "SoFi (SOFI) RSI hit 20 on the daily chart — the lowest level in recent history (back to at least early 2022). On the weekly, RSI was in the mid-30s. The stock is below the 50-day MA, approaching a potential death cross between the 50 and 200 MAs. However, it's well above the 200-week MA. The $17-$20 area is an important support zone from the late 2024/early 2025 runup after the election. If the market doesn't completely tank, SoFi could be 'rip city' from these oversold levels. The trader noted that stocks that hit RSI 20 on the daily rarely stay there long.",
+    "priority": 3,
+    "tags": [
+      "SOFi",
+      "RSI",
+      "oversold",
+      "20-RSI",
+      "death-cross",
+      "support-zone",
+      "weekly",
+      "daily"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-041",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "Sentiment",
+    "conditions": [
+      "BreakingNews",
+      "HighVolatility"
+    ],
+    "content": "Microsoft (MSFT) was down 27% from its highs, trading below the $556 level. After its earnings report, the stock gapped up and channeled higher, then reversed sharply. An Azure employee in the chat joked that 'somebody's got to get this stock back up.' The stock has been in a steady downtrend since the post-earnings peak. This illustrates that even the highest-quality companies can experience severe drawdowns when market sentiment turns.",
+    "priority": 2,
+    "tags": [
+      "MSFT",
+      "Microsoft",
+      "27-percent",
+      "drawdown",
+      "Azure",
+      "earnings",
+      "downtrend"
+    ]
+  },
+  {
+    "id": "yt-tech-unravels-042",
+    "source": "youtube-interviews/Tech Unravels AI Trade Breaks Bitcoin Cracks $70K & Layoffs Surge Feb 5 LIVE.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Expected moves for upcoming earnings: Strategy (MSTR) plus/minus 10.2%, Amazon plus/minus 7.8% (high ~$241, low ~$207), Roblox (RBLX) plus/minus 13.2% (high ~$70.94, low ~$54.34), Reddit (RDDT) plus/minus 13.3% (high ~$174, low ~$133), Bloom Energy (BE) plus/minus 18.1% (high ~$164, low ~$113). Bloom Energy's at-the-money IV was 436% — an extremely high level. These expected moves help frame the potential range for post-earnings trades using the ORB strategy.",
+    "priority": 3,
+    "tags": [
+      "expected-move",
+      "earnings",
+      "MSTR",
+      "AMZN",
+      "RBLX",
+      "RDDT",
+      "BE",
+      "Bloom-Energy",
+      "IV",
+      "options"
+    ]
+  }
+]

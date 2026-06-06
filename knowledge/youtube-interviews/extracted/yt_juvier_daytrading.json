@@ -1,0 +1,1250 @@
+[
+  {
+    "id": "yt-juvier-001",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Day trading is predicting where price will go (up or down) and making quick trades. Unlike holding stocks long-term, day traders can profit from both rising and falling prices. The goal is to live life freely - only needing about 30 minutes per day to trade once skilled.",
+    "priority": 5,
+    "tags": [
+      "daytrading",
+      "definition",
+      "lifestyle"
+    ]
+  },
+  {
+    "id": "yt-juvier-002",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "You can start day trading with $200-$500. Suggested minimum is $500. Any laptop with WiFi can be used, even a phone. No expensive equipment needed.",
+    "priority": 4,
+    "tags": [
+      "startup",
+      "capital",
+      "equipment"
+    ]
+  },
+  {
+    "id": "yt-juvier-003",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "Time to become consistently profitable varies: some within 1 month, others 8-12 months. Success depends on how much work and discipline you put in.",
+    "priority": 3,
+    "tags": [
+      "learning-curve",
+      "discipline",
+      "consistency"
+    ]
+  },
+  {
+    "id": "yt-juvier-004",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Five main markets to day trade: Futures, Forex, Crypto, Stocks, Options. Knowledge transfers across all markets. Stocks require more capital for day trading. The instructor primarily trades Futures and Forex.",
+    "priority": 4,
+    "tags": [
+      "markets",
+      "futures",
+      "forex",
+      "crypto",
+      "stocks",
+      "options"
+    ]
+  },
+  {
+    "id": "yt-juvier-005",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Three types of traders: Scalpers (seconds to 5-10 min per trade), Intraday traders (15 min to 2 hours per trade), Swing traders (hours to days per trade). All strategies work across all types by adjusting timeframes.",
+    "priority": 4,
+    "tags": [
+      "scalping",
+      "intraday",
+      "swing",
+      "trader-types"
+    ]
+  },
+  {
+    "id": "yt-juvier-006",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Top 5 Futures instruments: ES (S&P 500 - most traded), NQ (NASDAQ), YM (Dow Jones), GC (Gold), NG (Natural Gas). Start with S&P 500 for beginners. NG moves slowest, good for beginners.",
+    "priority": 4,
+    "tags": [
+      "futures",
+      "ES",
+      "NQ",
+      "YM",
+      "GC",
+      "NG",
+      "beginner"
+    ]
+  },
+  {
+    "id": "yt-juvier-007",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Top 5 Forex pairs: EUR/USD (most traded, beginner friendly - smooth and slow), GBP/USD, GBP/JPY, USD/JPY, USD/CAD. Instructor's favorites: GBP/USD, GBP/JPY, USD/CAD. NQ futures is like NAS100 Forex. ES like SPX. YM like US30.",
+    "priority": 4,
+    "tags": [
+      "forex",
+      "EURUSD",
+      "GBPUSD",
+      "GBPJPY",
+      "USDJPY",
+      "USDCAD",
+      "beginner"
+    ]
+  },
+  {
+    "id": "yt-juvier-008",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Focus on maximum 3 pairs (or even 1-2) to understand each pair's personality. Different pairs behave differently at different times of day. Specializing helps you learn patterns faster.",
+    "priority": 3,
+    "tags": [
+      "focus",
+      "specialization",
+      "watchlist",
+      "personality"
+    ]
+  },
+  {
+    "id": "yt-juvier-009",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "SessionOpen",
+      "SessionClose"
+    ],
+    "content": "Three main trading sessions: London (2am-11am EST), New York (8am-5pm EST), Tokyo (7pm-4am EST). The London-NY overlap (8am-11am EST) has the most volume and price movement. Fewer people trade during these hours. NY session has the most movement for all instruments. Tokyo session has low volume, only relevant for JPY pairs.",
+    "priority": 5,
+    "tags": [
+      "sessions",
+      "london",
+      "newyork",
+      "tokyo",
+      "volume",
+      "overlap"
+    ]
+  },
+  {
+    "id": "yt-juvier-010",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Two types of analysis: Fundamental analysis (news events, earnings, interest rates, real-world events affecting price) and Technical analysis (chart patterns, candlesticks, price action). Day traders primarily use technical analysis but should be aware of fundamental events.",
+    "priority": 5,
+    "tags": [
+      "fundamental",
+      "technical",
+      "analysis",
+      "news"
+    ]
+  },
+  {
+    "id": "yt-juvier-011",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "TradingView (tradingview.com) is the primary charting platform - free to start. Use it to view any asset, markup charts, spot patterns, and analyze price action. Essential for every trader.",
+    "priority": 5,
+    "tags": [
+      "tradingview",
+      "platform",
+      "charts",
+      "free"
+    ]
+  },
+  {
+    "id": "yt-juvier-012",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Timeframes: 1m (1 min per candle), 5m, 15m, hourly, 4H, daily. Lower timeframes show more detail. A 15-minute candle contains three 5-minute candles. The more detail you zoom into, the more granular data you see.",
+    "priority": 4,
+    "tags": [
+      "timeframes",
+      "1m",
+      "5m",
+      "15m",
+      "hourly",
+      "daily"
+    ]
+  },
+  {
+    "id": "yt-juvier-013",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "Use TradingView alerts to avoid watching charts 24/7. Set alerts at key price levels, get notifications on your phone, then check if you want to buy/sell. This allows trading in just 30 minutes per day.",
+    "priority": 4,
+    "tags": [
+      "alerts",
+      "phone",
+      "notifications",
+      "efficiency"
+    ]
+  },
+  {
+    "id": "yt-juvier-014",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility",
+      "LowVolatility"
+    ],
+    "content": "Use TradingView's bar replay feature for backtesting. Go to random points in history, hide future price, and practice trading forward. This simulates real trading conditions better than just viewing completed charts. May require paid TradingView subscription.",
+    "priority": 5,
+    "tags": [
+      "backtesting",
+      "replay",
+      "practice",
+      "simulation"
+    ]
+  },
+  {
+    "id": "yt-juvier-015",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Candlestick anatomy: Body (thick part) = open to close. Wicks (thin lines) = high and low during that period. Green/bullish candle: bottom of body = open, top = close. Red/bearish candle: top of body = open, bottom = close.",
+    "priority": 5,
+    "tags": [
+      "candlesticks",
+      "body",
+      "wick",
+      "bullish",
+      "bearish",
+      "green",
+      "red"
+    ]
+  },
+  {
+    "id": "yt-juvier-016",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Candlestick patterns for prediction: Long lower wick with small body = price was 'scared' of going lower, likely to go up. Long upper wick with small body = price was 'scared' of going higher, likely to go down. Large full-body candles with small wicks tend to continue in the same direction.",
+    "priority": 4,
+    "tags": [
+      "patterns",
+      "rejection",
+      "wicks",
+      "continuation"
+    ]
+  },
+  {
+    "id": "yt-juvier-017",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "HighVolatility"
+    ],
+    "content": "Small candles with equal wicks top and bottom = indecision/uncertainty. After indecision, expect a decisive move. Look for the next large body candle after small uncertain ones to determine direction.",
+    "priority": 3,
+    "tags": [
+      "indecision",
+      "doji",
+      "uncertainty",
+      "breakout"
+    ]
+  },
+  {
+    "id": "yt-juvier-018",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Three market conditions: 1) Trending - making higher highs and higher lows (uptrend) or lower lows and lower highs (downtrend). 2) Consolidation/Ranging - price moves up and down in a range. 3) Breakout - price breaks out of a range after consolidating.",
+    "priority": 5,
+    "tags": [
+      "trending",
+      "ranging",
+      "consolidation",
+      "breakout",
+      "higher-highs",
+      "lower-lows"
+    ]
+  },
+  {
+    "id": "yt-juvier-019",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Use timeframe hierarchy for context: Support/resistance on 1m is weaker than 5m, which is weaker than 15m, which is weaker than hourly, which is weaker than daily. Higher timeframes are more significant and 'scarier' for price.",
+    "priority": 4,
+    "tags": [
+      "timeframes",
+      "hierarchy",
+      "support",
+      "resistance",
+      "strength"
+    ]
+  },
+  {
+    "id": "yt-juvier-020",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Indicators are optional tools, not required for success. Many profitable traders don't use them. Instructor uses custom indicator and Kill Zones (shows session times on chart). Other popular indicators: Moving Averages and VWAP.",
+    "priority": 3,
+    "tags": [
+      "indicators",
+      "optional",
+      "killzones",
+      "vwap",
+      "moving-average"
+    ]
+  },
+  {
+    "id": "yt-juvier-021",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Moving Average: A line showing average price over last X candles. Common settings: 9 (fast), 15, 20, 50 periods. Use as filter - only look for buys above MA, sells below MA. Or enter when price crosses the MA. Settings vary by timeframe (e.g., 50 on 5m = last 50 five-minute candles).",
+    "priority": 3,
+    "tags": [
+      "moving-average",
+      "EMA",
+      "settings",
+      "filter",
+      "trend"
+    ]
+  },
+  {
+    "id": "yt-juvier-022",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Kill Zones indicator (by Oscar vs): Shows London session (yellow line at 3am EST) and New York session (red line at 8am EST) on charts. London-NY overlap ends around 10-11am Central Time. Helps visualize session timing during backtesting.",
+    "priority": 3,
+    "tags": [
+      "killzones",
+      "sessions",
+      "london",
+      "newyork",
+      "overlap"
+    ]
+  },
+  {
+    "id": "yt-juvier-023",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "VWAP (Volume Weighted Average Price): Similar to moving average but weighted by volume. Use as filter - only look for buys above VWAP, sells below VWAP. Turn off upper/lower bands in settings, just show the main line. Especially powerful for intraday trading.",
+    "priority": 4,
+    "tags": [
+      "vwap",
+      "volume",
+      "filter",
+      "bias",
+      "intraday"
+    ]
+  },
+  {
+    "id": "yt-juvier-024",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "SessionOpen",
+      "SessionClose"
+    ],
+    "content": "SUPPORT AND RESISTANCE STRATEGY: Support = bottom zone where price keeps bouncing up. Resistance = top zone where price keeps rejecting down. Draw zones (boxes), not lines, because price doesn't hit exact levels. Look for areas with huge rejections where price was 'scared' of the level.",
+    "priority": 5,
+    "tags": [
+      "support",
+      "resistance",
+      "zones",
+      "boxes",
+      "rejection"
+    ]
+  },
+  {
+    "id": "yt-juvier-025",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Support/Resistance entry: Wait for price to tap into your zone, then wait for confirmation candle (large body, small wicks, rejecting the zone). Don't enter just because price touches the zone - wait to see if it respects it.",
+    "priority": 5,
+    "tags": [
+      "entry",
+      "confirmation",
+      "candlestick",
+      "patience"
+    ]
+  },
+  {
+    "id": "yt-juvier-026",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "content": "Break and retest: When price breaks above resistance, that resistance often becomes new support. When price breaks below support, that support often becomes new resistance. Trade the 'retest' of the broken level.",
+    "priority": 4,
+    "tags": [
+      "breakout",
+      "retest",
+      "role-reversal",
+      "support-becomes-resistance"
+    ]
+  },
+  {
+    "id": "yt-juvier-027",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "STOP LOSS: Always use stop losses. Never profitable without them. Place stop loss above the recent swing high (for sells) or below the recent swing low (for buys). Or place above/below the entry candle that closed outside your zone. NEVER move your stop loss once set.",
+    "priority": 5,
+    "tags": [
+      "stop-loss",
+      "essential",
+      "swing-high",
+      "swing-low",
+      "never-move"
+    ]
+  },
+  {
+    "id": "yt-juvier-028",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "Never move your stop loss. New traders who move stops lose way more - e.g., planned $100 loss becomes $150, $200, $300, $400. TradingView's long/short position tools help plan trades with stop loss and take profit visually.",
+    "priority": 5,
+    "tags": [
+      "discipline",
+      "stop-loss",
+      "emotions",
+      "trading-plan"
+    ]
+  },
+  {
+    "id": "yt-juvier-029",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "Risk/Reward Ratio: Risk/reward means how much you risk vs how much you can make. 2:1 means risking $1 to make $2. Instructor only takes trades with at least 2:1 risk/reward. With 2:1 ratio, losing two trades then winning one = break even.",
+    "priority": 5,
+    "tags": [
+      "risk-reward",
+      "ratio",
+      "2-to-1",
+      "minimum",
+      "math"
+    ]
+  },
+  {
+    "id": "yt-juvier-030",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [
+      "Ranging",
+      "Trending"
+    ],
+    "content": "Take profit: Target the most recent swing low (for sells) or swing high (for buys). Or aim for 2:1 or 3:1 risk/reward minimum. Better entries (going to lower timeframes) = better risk/reward ratio for the same trade.",
+    "priority": 4,
+    "tags": [
+      "take-profit",
+      "swing-low",
+      "swing-high",
+      "target"
+    ]
+  },
+  {
+    "id": "yt-juvier-031",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen",
+      "SessionClose"
+    ],
+    "content": "Multi-timeframe analysis: Draw support/resistance zones on higher timeframe (e.g., hourly) for stronger levels. Then drop to lower timeframe (15m or 5m) for better entry. This improves risk/reward significantly. Example: Hourly entry gives 2.2:1 RR, but 15m entry on same trade gives 4.7:1 RR.",
+    "priority": 5,
+    "tags": [
+      "multi-timeframe",
+      "higher-timeframe",
+      "lower-timeframe",
+      "entry",
+      "risk-reward"
+    ]
+  },
+  {
+    "id": "yt-juvier-032",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [
+      "SessionOpen",
+      "SessionClose"
+    ],
+    "content": "Don't go too low on timeframes. 1-minute and 5-minute zones are less reliable (more fakeouts). Start with hourly for zone identification, then 15-minute for entries. The lower you go, the more price 'lies' and the more sporadic action becomes.",
+    "priority": 4,
+    "tags": [
+      "timeframes",
+      "fakeout",
+      "reliability",
+      "15m",
+      "hourly"
+    ]
+  },
+  {
+    "id": "yt-juvier-033",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "TREND LINE STRATEGY: Similar to support/resistance but lines are slanted, not horizontal. Draw by connecting at least 2 points where price reversed. First two touches = don't trade, just identify. Third touch = look for entry candle (reversal/doji) and trade in the trend direction.",
+    "priority": 5,
+    "tags": [
+      "trendlines",
+      "slanted",
+      "two-touches",
+      "third-touch",
+      "entry"
+    ]
+  },
+  {
+    "id": "yt-juvier-034",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Trend line entry: Wait for price to touch trend line, then look for doji (small body, equal wicks) or rejection candle. Enter there. Stop loss beyond the recent swing. Target recent swing high/low or 2:1-3:1 risk/reward.",
+    "priority": 4,
+    "tags": [
+      "trendline",
+      "doji",
+      "entry",
+      "candlestick"
+    ]
+  },
+  {
+    "id": "yt-juvier-035",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "BREAKOUT STRATEGY: One of the most powerful strategies for beginners. When price breaks out of a support/resistance zone or trend line with strong momentum, enter when a candle CLOSES outside the zone (body, not wick). This is a breakout entry.",
+    "priority": 5,
+    "tags": [
+      "breakout",
+      "close",
+      "body",
+      "candle",
+      "strength"
+    ]
+  },
+  {
+    "id": "yt-juvier-036",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "Breakout entry rules: Wait for candle body to close outside your zone/line (wick alone doesn't count). Enter on that candle. Stop loss below the entry candle (or below recent higher low for buys). Target recent swing high/low for 2:1-3:1 minimum risk/reward.",
+    "priority": 5,
+    "tags": [
+      "breakout",
+      "entry",
+      "stop-loss",
+      "target",
+      "rules"
+    ]
+  },
+  {
+    "id": "yt-juvier-037",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "Breakout strength: The more times price respects a zone without breaking it, the stronger the breakout will be when it finally happens. Like a rubber band - the more you pull, the harder it snaps. Breakouts are fast and can make a lot of money quickly.",
+    "priority": 4,
+    "tags": [
+      "breakout",
+      "strength",
+      "rubber-band",
+      "momentum",
+      "respect"
+    ]
+  },
+  {
+    "id": "yt-juvier-038",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "For breakouts, don't go below 15-minute timeframe (instructor's preference). 5-minute and 1-minute have too many fakeouts for breakouts. The original entry on hourly vs 15m can turn a 2:1 RR into 3.1:1 RR.",
+    "priority": 3,
+    "tags": [
+      "breakout",
+      "timeframe",
+      "15m",
+      "fakeout"
+    ]
+  },
+  {
+    "id": "yt-juvier-039",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "Breakouts work on both support/resistance zones AND trend lines. Same rules apply - wait for close outside, enter, stop loss beyond entry candle, target recent swing levels.",
+    "priority": 4,
+    "tags": [
+      "breakout",
+      "support",
+      "resistance",
+      "trendline",
+      "universal"
+    ]
+  },
+  {
+    "id": "yt-juvier-040",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Master these three strategies and you'll be profitable: 1) Support/Resistance bounces, 2) Trend line reversals, 3) Breakouts. These are the foundation of most profitable trading. Instructor primarily uses breakouts and support/resistance.",
+    "priority": 5,
+    "tags": [
+      "strategies",
+      "foundation",
+      "support-resistance",
+      "trendlines",
+      "breakouts"
+    ]
+  },
+  {
+    "id": "yt-juvier-041",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "BACKTESTING: Essential for success. Use TradingView's bar replay to go to random points in history and practice trading forward. Do 50-70 trades per hour. Close your eyes and scroll to random locations. Practice spotting zones, trend lines, and breakouts.",
+    "priority": 5,
+    "tags": [
+      "backtesting",
+      "practice",
+      "reps",
+      "tradingview",
+      "replay"
+    ]
+  },
+  {
+    "id": "yt-juvier-042",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "JOURNALING: Track every backtest and live trade. Record: strategy used, won/lost, why you think you won/lost. After 100+ trades, review patterns - what causes wins vs losses. This data helps optimize your strategy.",
+    "priority": 5,
+    "tags": [
+      "journaling",
+      "tracking",
+      "data",
+      "patterns",
+      "optimization"
+    ]
+  },
+  {
+    "id": "yt-juvier-043",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "Backtesting tip: Use Kill Zones indicator during backtesting so you only practice trading during realistic hours (e.g., New York session). Don't practice trading at 3am if you won't actually trade then.",
+    "priority": 3,
+    "tags": [
+      "backtesting",
+      "sessions",
+      "realistic",
+      "killzones"
+    ]
+  },
+  {
+    "id": "yt-juvier-044",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "If you're not backtesting and complaining about not being profitable, you're doing yourself a disservice. Even 30 minutes of daily backtesting accelerates learning significantly. Put in the work.",
+    "priority": 4,
+    "tags": [
+      "backtesting",
+      "work",
+      "discipline",
+      "excuses"
+    ]
+  },
+  {
+    "id": "yt-juvier-045",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "HEIKIN-ASHI CANDLES: Alternative to regular candles. Smoother, cleaner charts. Green = uptrend, Red = downtrend. Makes it easier to spot support/resistance zones, trend lines, and breakouts. Less choppy/noisy than regular candles.",
+    "priority": 4,
+    "tags": [
+      "heikin-ashi",
+      "smooth",
+      "clean",
+      "trends",
+      "noise"
+    ]
+  },
+  {
+    "id": "yt-juvier-046",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Heikin-Ashi difference: Body shows AVERAGE price during the period, not actual open/close. Body starts in middle of previous candle. Wicks work same as regular candles. Don't confuse HA body with actual price close.",
+    "priority": 4,
+    "tags": [
+      "heikin-ashi",
+      "average",
+      "body",
+      "close",
+      "difference"
+    ]
+  },
+  {
+    "id": "yt-juvier-047",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "Heikin-Ashi for breakouts: Wait for HA candle body to close outside your zone (not just wick). Since HA body = average price, this confirms the breakout is real, not just a wick fakeout. Significantly reduces fakeouts and increases win rate on breakouts.",
+    "priority": 5,
+    "tags": [
+      "heikin-ashi",
+      "breakout",
+      "fakeout",
+      "confirmation",
+      "average"
+    ]
+  },
+  {
+    "id": "yt-juvier-048",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Heikin-Ashi workflow: Mark up charts on HA (easier to see structure), then switch to regular candles for actual entries. Or use 'Heikin-Ashi Candle Overlay' indicator by bjor gum on regular candles to get both views. TradingView's bar replay only works on regular candles, not HA mode.",
+    "priority": 3,
+    "tags": [
+      "heikin-ashi",
+      "workflow",
+      "overlay",
+      "backtesting",
+      "regular"
+    ]
+  },
+  {
+    "id": "yt-juvier-049",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Master regular candles first before using Heikin-Ashi. Understand standard candlestick patterns, then add HA as a tool. HA has literally changed the instructor's trading game for the better.",
+    "priority": 3,
+    "tags": [
+      "heikin-ashi",
+      "learning-order",
+      "regular-first",
+      "master"
+    ]
+  },
+  {
+    "id": "yt-juvier-050",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "FUNDAMENTAL ANALYSIS: Use forexfactory.com to check daily news events. Shows time, currency affected, and impact level (yellow=low, orange=medium, red=high). Only USD news affects all markets. Avoid trading 15 minutes before and after high-impact news.",
+    "priority": 4,
+    "tags": [
+      "news",
+      "forexfactory",
+      "USD",
+      "high-impact",
+      "buffer"
+    ]
+  },
+  {
+    "id": "yt-juvier-051",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Check stock earnings on NASDAQ website. High-profile stocks (Apple, Nvidia, Amazon, Google, Tesla) affect NQ, ES, and YM futures. If Tesla has earnings, it can heavily impact NASDAQ and S&P 500 price action.",
+    "priority": 3,
+    "tags": [
+      "earnings",
+      "stocks",
+      "NQ",
+      "ES",
+      "YM",
+      "Tesla",
+      "Apple",
+      "Nvidia"
+    ]
+  },
+  {
+    "id": "yt-juvier-052",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "FUTURES PLATFORM: Trade of Eight (tradeofate.com) - simple, easy to use. Has simulation (demo) mode for practice. Use demo for at least 1 month before live trading. Market replay available for backtesting. $7/month for CME data on TradingView, ~$12/month on Trade of Eight.",
+    "priority": 4,
+    "tags": [
+      "platform",
+      "trade-of-eight",
+      "futures",
+      "demo",
+      "simulation"
+    ]
+  },
+  {
+    "id": "yt-juvier-053",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "Trade of Eight features: Buy Market/Sell Market (enter at current price), Limit orders (enter at specific price), ATM (bracket orders for stop loss and take profit). Set stop loss and take profit in ticks or drag lines on chart. Can save templates for quick setup.",
+    "priority": 4,
+    "tags": [
+      "trade-of-eight",
+      "orders",
+      "market",
+      "limit",
+      "bracket",
+      "ATM"
+    ]
+  },
+  {
+    "id": "yt-juvier-054",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "FOREX PLATFORM: Trade Locker (tradelocker.com) - similar to TradingView but allows actual trading. Need separate broker (instructor recommends one in description). Shows balance, equity, margin, P&L. Use lot size for position sizing.",
+    "priority": 4,
+    "tags": [
+      "platform",
+      "trade-locker",
+      "forex",
+      "broker",
+      "lots"
+    ]
+  },
+  {
+    "id": "yt-juvier-055",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "Trade Locker feature: Set stop loss and take profit, then use 'Risk' calculator to automatically determine lot size based on how much you want to risk. E.g., set $100 risk, it calculates exact lot size needed. Much easier than manual calculation.",
+    "priority": 4,
+    "tags": [
+      "trade-locker",
+      "risk-calculator",
+      "lot-size",
+      "position-sizing",
+      "automation"
+    ]
+  },
+  {
+    "id": "yt-juvier-056",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "Trade Locker order types: Market orders (enter now at current price), Pending/Limit orders (enter when price reaches specific level). Can set stop loss and take profit on pending orders. Drag levels on chart to adjust.",
+    "priority": 3,
+    "tags": [
+      "trade-locker",
+      "market-order",
+      "pending-order",
+      "limit",
+      "stop-loss",
+      "take-profit"
+    ]
+  },
+  {
+    "id": "yt-juvier-057",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "Market data subscription required for real-time futures data. Without it, charts are 15 minutes delayed. Get CME Group bundle ($7/month on TradingView, ~$12/month on Trade of Eight). Level 1 data is sufficient, no need for Level 2.",
+    "priority": 4,
+    "tags": [
+      "market-data",
+      "subscription",
+      "real-time",
+      "delayed",
+      "CME"
+    ]
+  },
+  {
+    "id": "yt-juvier-058",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "Day trading is 80% psychology, 20% technical analysis. You can learn the technical part in a week. The hard part is discipline - having the right mindset to follow rules, keep profits, and not make emotional mistakes.",
+    "priority": 5,
+    "tags": [
+      "psychology",
+      "mindset",
+      "discipline",
+      "emotions",
+      "80-20"
+    ]
+  },
+  {
+    "id": "yt-juvier-059",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "Treat trading like a job, not a hobby or gambling. Clock in at the same time, do the same routine, make your money, get out. Don't spend all day looking at charts - this leads to boredom trading and bad setups.",
+    "priority": 5,
+    "tags": [
+      "job",
+      "routine",
+      "professional",
+      "gambling",
+      "boredom"
+    ]
+  },
+  {
+    "id": "yt-juvier-060",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "Overtrading kills careers. More trades ≠ more money. More trades = lower quality trades = more losses. Take only A+ setups. Quality over quantity.",
+    "priority": 5,
+    "tags": [
+      "overtrading",
+      "quality",
+      "quantity",
+      "setups",
+      "selective"
+    ]
+  },
+  {
+    "id": "yt-juvier-061",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "Don't switch strategies after a bad week or month. Markets work in cycles - some months are less profitable. Optimize your strategy for different market conditions instead of jumping to new strategies. Pick 1-2 strategies and master them.",
+    "priority": 5,
+    "tags": [
+      "strategy-switching",
+      "cycles",
+      "consistency",
+      "master",
+      "patience"
+    ]
+  },
+  {
+    "id": "yt-juvier-062",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "Discipline is the key to following your trading plan. Without discipline, the plan is just paper. Discipline comes over time. Master listening to yourself and following rules.",
+    "priority": 5,
+    "tags": [
+      "discipline",
+      "rules",
+      "plan",
+      "consistency",
+      "self-control"
+    ]
+  },
+  {
+    "id": "yt-juvier-063",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "TRADING PLAN components: 1) What pairs you're allowed to trade (max 3), 2) Time window for trading (e.g., 7am-12pm), 3) Set strategies (max 2), 4) Max trades per day (scalers <5, intraday 2-3, swing 1/day or 3-4/week), 5) Max risk per trade (stay under 3% of account, max 5%), 6) Entry criteria (specific conditions required).",
+    "priority": 5,
+    "tags": [
+      "trading-plan",
+      "rules",
+      "pairs",
+      "time",
+      "strategies",
+      "limits",
+      "risk",
+      "entry"
+    ]
+  },
+  {
+    "id": "yt-juvier-064",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "CONSEQUENCE SYSTEM: Losing money isn't enough consequence. Add real-life consequences for breaking rules: ice bath, cold shower, run 5 miles, give money to sister, take ginger shot. Pick something you'd hate doing more than twice. This builds discipline fast.",
+    "priority": 4,
+    "tags": [
+      "consequences",
+      "discipline",
+      "ice-bath",
+      "cold-shower",
+      "rules"
+    ]
+  },
+  {
+    "id": "yt-juvier-065",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "JOURNALING (live trading): Record every trade - strategy, result, why you won/lost. After 100+ trades, review patterns. You can't remember trades from weeks ago, but data shows what causes wins vs losses. Essential for profitability.",
+    "priority": 5,
+    "tags": [
+      "journaling",
+      "live-trading",
+      "data",
+      "patterns",
+      "review"
+    ]
+  },
+  {
+    "id": "yt-juvier-066",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "Journaling example: Instructor had strategy making $3-4k consistently. By reviewing journal data, realized holding longer could make $8-12k. Only discovered this through journal data analysis. Small tweaks = big improvements.",
+    "priority": 4,
+    "tags": [
+      "journaling",
+      "optimization",
+      "data-analysis",
+      "improvement",
+      "tweaks"
+    ]
+  },
+  {
+    "id": "yt-juvier-067",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "PROP FIRMS: Pay small fee (~$200), take challenge with virtual account (e.g., $50k), reach profit target (e.g., $53k), get funded. Keep 80-90% of profits. Great for traders without much capital. Not for complete beginners - practice on demo first.",
+    "priority": 4,
+    "tags": [
+      "prop-firms",
+      "funded",
+      "challenge",
+      "capital",
+      "profit-split"
+    ]
+  },
+  {
+    "id": "yt-juvier-068",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "Prop firm path: 1) Demo trade for 1 month, 2) Small live account ($100-200) for 1 month to practice with real emotions, 3) Buy funded account challenge, 4) Pass and trade prop firm capital, 5) Take percentage of profits to fund your own live account.",
+    "priority": 4,
+    "tags": [
+      "prop-firms",
+      "path",
+      "demo",
+      "live",
+      "funded",
+      "progression"
+    ]
+  },
+  {
+    "id": "yt-juvier-069",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "FOREX PROP FIRM: Funded Pro - connects to Trade Locker, daily payouts, instructor has used for 2+ years with no issues. Use link in description for 10-15% discount.",
+    "priority": 3,
+    "tags": [
+      "funded-pro",
+      "forex",
+      "prop-firm",
+      "trade-locker",
+      "payouts"
+    ]
+  },
+  {
+    "id": "yt-juvier-070",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "FUTURES PROP FIRMS: Topstep - most popular, cheapest ($150/month for $150k account, often on sale). Take Profit Trader - faster payouts, slightly more expensive ($360 for $150k account). Can't trade Forex on futures prop firms or vice versa.",
+    "priority": 3,
+    "tags": [
+      "topstep",
+      "take-profit-trader",
+      "futures",
+      "prop-firms",
+      "comparison"
+    ]
+  },
+  {
+    "id": "yt-juvier-071",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "Prop firm rules typically include: Starting balance (e.g., $50k), maximum drawdown (e.g., can't go below $45k), profit target to pass (e.g., $53k). Once you pass, you don't pay monthly fees anymore. Read all rules on their websites.",
+    "priority": 3,
+    "tags": [
+      "prop-firms",
+      "rules",
+      "drawdown",
+      "profit-target",
+      "balance"
+    ]
+  },
+  {
+    "id": "yt-juvier-072",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "Ultimate goal: Use prop firm profits to fund your own live account. Take percentage of prop firm payouts, put in live account, keep rest for yourself. Eventually trade your own money without giving 10-20% to prop firm.",
+    "priority": 3,
+    "tags": [
+      "prop-firms",
+      "live-account",
+      "funding",
+      "long-term",
+      "goal"
+    ]
+  },
+  {
+    "id": "yt-juvier-073",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "Risk per trade: Stay under 3% of total account balance (max 5%). Don't risk $500 on a $1,000 account. Proper position sizing prevents blowing your account.",
+    "priority": 5,
+    "tags": [
+      "risk-per-trade",
+      "3-percent",
+      "5-percent",
+      "position-sizing",
+      "account-balance"
+    ]
+  },
+  {
+    "id": "yt-juvier-074",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "Win rate math: With 30% win rate and 3:1 or 4:1 risk/reward, you're still profitable. Lose 6 out of 10 trades but win 4 with 3-4x risk/reward = net profit. This is why risk/reward ratio matters more than win rate.",
+    "priority": 4,
+    "tags": [
+      "win-rate",
+      "math",
+      "risk-reward",
+      "profitability",
+      "30-percent"
+    ]
+  },
+  {
+    "id": "yt-juvier-075",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "Entry criteria example: Must be above VWAP for buys, below VWAP for sells. Or must have specific candlestick pattern (full body, doji, etc.). Have at least one specific condition that must be met before entering any trade. Prevents random/bored trading.",
+    "priority": 4,
+    "tags": [
+      "entry-criteria",
+      "vwap",
+      "conditions",
+      "rules",
+      "specific"
+    ]
+  },
+  {
+    "id": "yt-juvier-076",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Time window: Set specific hours you're allowed to trade (e.g., 7am-12pm). Only take trades during this window. If setup happens outside window, don't trade it. Prevents boredom trading at 8pm.",
+    "priority": 4,
+    "tags": [
+      "time-window",
+      "hours",
+      "schedule",
+      "discipline",
+      "limits"
+    ]
+  },
+  {
+    "id": "yt-juvier-077",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Trade limits per day: Scalpers max 5 trades/day. Intraday traders max 2-3 trades/day. Swing traders max 1 trade/day or 3-4/week. Being selective forces you to wait for only the best setups.",
+    "priority": 4,
+    "tags": [
+      "trade-limits",
+      "daily",
+      "selective",
+      "quality",
+      "max-trades"
+    ]
+  },
+  {
+    "id": "yt-juvier-078",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Strategy selection: Pick maximum 2 strategies that resonate with you. Practice only those. Don't trade trend line bounces, trend line breaks, support/resistance, supply demand, AND scalping all at once. Master 1-2, not 10 poorly.",
+    "priority": 4,
+    "tags": [
+      "strategies",
+      "focus",
+      "master",
+      "two-maximum",
+      "specialization"
+    ]
+  },
+  {
+    "id": "yt-juvier-079",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Instructor's results: Multiple six figures every month from day trading. Spends only 30 minutes per day trading. Has helped thousands of people learn to trade. Bought first home for over $1 million, bought wife dream car, has financial/time/location freedom.",
+    "priority": 2,
+    "tags": [
+      "results",
+      "success",
+      "freedom",
+      "income",
+      "lifestyle"
+    ]
+  },
+  {
+    "id": "yt-juvier-080",
+    "source": "youtube-interviews/Day Trading For Beginners MY COMPLETE BEGINNERS COURSE 2026.md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Advanced course available: Same strategies instructor uses daily to make multiple five figures in minutes. Tested over 500+ trades. Shows good setups vs bad setups. Accelerates learning from months to weeks. Link in description.",
+    "priority": 2,
+    "tags": [
+      "advanced",
+      "course",
+      "strategies",
+      "tested",
+      "500-trades"
+    ]
+  }
+]

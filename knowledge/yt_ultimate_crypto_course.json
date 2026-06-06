@@ -1,0 +1,733 @@
+[
+  {
+    "id": "yt-ultimate-crypto-001",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "Most people lose money in crypto not because they are stupid or can't analyze charts, but because they have zero structure and don't know the rules. When you don't know the rules, you get played by the market, whales, hype influencers, and your own emotions. The trainer's personal stats: 65.4% win rate, average risk-reward of 4.16R (for every $1 risked, aim to make $4). Consistency matters more than single big wins.",
+    "priority": 5,
+    "tags": [
+      "mindset",
+      "consistency",
+      "win-rate",
+      "risk-reward",
+      "survival"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-002",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "CryptoNative",
+    "conditions": [],
+    "content": "Crypto was built because the current financial system is broken, slow, and controlled by a few. Crypto gives you direct ownership of value. No banks can boss your funds. No government can print more and dilute your savings. Bitcoin has a limited supply. You don't need permission to move money, trade, invest, or build wealth. Your wallet is literally your bank. Transition is from banks controlling value to code controlling value through transparent protocols and smart contracts that execute automatically with no human involved.",
+    "priority": 3,
+    "tags": [
+      "blockchain",
+      "bitcoin",
+      "decentralization",
+      "ownership",
+      "smart-contracts"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-003",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "CryptoNative",
+    "conditions": [],
+    "content": "Crypto is secured by cryptography and code, not banks or governments. Blockchain is a public database/record book where every transaction is stored permanently. Once recorded, transactions cannot be changed by anyone. Every transaction is publicly verifiable. Think of it like a publicly shared Google Sheet where nobody can change past entries. Crypto is borderless: wallet plus internet connection equals access regardless of identity, location, or credit score.",
+    "priority": 3,
+    "tags": [
+      "blockchain",
+      "transparency",
+      "verification",
+      "access"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-004",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "CryptoNative",
+    "conditions": [],
+    "content": "Crypto asset categories: (1) Core assets: Bitcoin (digital store of value), Ethereum (global computer/apps), Layer 1s like Solana/Avalanche (competing operating systems), Layer 2s like Arbitrum/Optimism/Base/Polygon (express lanes on top of Ethereum), Stablecoins USDT/USDC (digital dollars, pegged to USD but 'stable' doesn't mean zero risk). (2) Functional tokens: DeFi tokens like Uniswap (trade/lend/borrow without banks), infrastructure tokens like Chainlink (price data), exchange tokens like Binance coin (lower fees), payment networks like XRP/XLM (fast money movement). (3) Speculative assets: gaming tokens, AI tokens, privacy coins like Monero, memecoins (internet cultural casino, move on memes/viral energy, not fundamentals).",
+    "priority": 4,
+    "tags": [
+      "asset-categories",
+      "bitcoin",
+      "ethereum",
+      "defi",
+      "layer2",
+      "stablecoins",
+      "memecoins"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-005",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "Rule for speculative assets: Build your foundation with serious assets (Bitcoin, Ethereum) first. Only speculate with money you can afford to lose, e.g., 10% of capital. If you need money for rent or food, never speculate. Memecoins can make you money fast but can also make you lose everything faster.",
+    "priority": 4,
+    "tags": [
+      "capital-allocation",
+      "risk-rules",
+      "memecoins",
+      "speculation"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-006",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "CryptoNative",
+    "conditions": [],
+    "content": "On-chain transactions are recorded publicly on the blockchain, meaning anyone can see them in real time. You can watch whales move millions, funds rotate into ecosystems, retail buying tops, smart money accumulating bottoms. It's transparent, permanent, undeniable. If someone moved $50M into Ethereum or Solana, you see it. Off-chain is trading inside centralized exchanges like Binance or Coinbase - your balance is an IOU from the exchange in a private database. FTX, Celsius, BlockFi proved off-chain carries trust risk. On-chain is truth, off-chain is trust.",
+    "priority": 4,
+    "tags": [
+      "on-chain",
+      "off-chain",
+      "transparency",
+      "exchange-risk",
+      "whale-tracking"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-007",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "Price is a seesaw between buyers and sellers. More buyers than sellers = price up (green candles). More sellers than buyers = price down (red candles). Crypto is a seesaw strapped to a rocket engine - extreme volatility and liquidity. Every candlestick is a battle between buyers (demand) and sellers (supply). Markets evolve but human nature doesn't. These principles persist for 50-100 years as long as humans trade.",
+    "priority": 4,
+    "tags": [
+      "supply-demand",
+      "price-action",
+      "candlesticks",
+      "volatility"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-008",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Liquidity pools exist above and below price in the form of stop losses, liquidation points, and leverage positions. Smart players know exactly where these levels are. Sometimes price moves not because of news, but to hunt liquidity to fuel orders sitting at key levels. Market makers provide liquidity, balance order books, take the opposite side when needed, and push price into liquidity zones. Their job is to make markets efficient, not to hunt your stop loss specifically, but if you chase price emotionally, they'll take your money.",
+    "priority": 5,
+    "tags": [
+      "liquidity",
+      "market-makers",
+      "stop-hunting",
+      "order-flow"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-009",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "CryptoNative",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "Leverage is a double-edged sword in crypto. Leverage allows amplified gains but also amplified losses. When traders borrow money to trade, positions can auto-liquidate if price moves against them. Liquidation creates forced buying or selling, turning the seesaw into a rollercoaster. Crypto dumps and pumps sharper than stocks because of leverage unwinding, not magic.",
+    "priority": 5,
+    "tags": [
+      "leverage",
+      "liquidation",
+      "forced-selling",
+      "volatility"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-010",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Crypto moves in cycles just like every market in history. History doesn't repeat but it rhymes. Four stages of every crypto cycle: (1) Accumulation/Bottom - boring phase, nobody cares, Twitter silent, YouTube views dead, search volume dies, everyone says crypto is dead. Smart money accumulates quietly. (2) Breakout - smart money pushes price out of long consolidation, volume increases, narrative forms, retail starts to notice but still doubts. (3) Euphoria - everyone thinks they are Warren Buffett, baristas give investment advice, people quit 9-to-5 to trade full-time, TikTok overnight millionaires appear, FOMO everywhere, retail buys the top. (4) Crash - reality hits, exchanges blow up, funds liquidated, retail stopped out with overleverage, tokens drop 70-90%, everyone deletes laser-eye profile pics. Then the cycle restarts.",
+    "priority": 5,
+    "tags": [
+      "market-cycles",
+      "accumulation",
+      "breakout",
+      "euphoria",
+      "crash",
+      "fomo"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-011",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear",
+      "ExtremeGreed"
+    ],
+    "content": "Buy when it's boring. Sell when normies are bragging. If your barber is asking about altcoins, it's exit liquidity season, not adoption stage. Bitcoin price closely mirrors Google search interest for 'Bitcoin.' When nobody searches for it and it feels dead, smart money buys. When everyone becomes a crypto expert and searches explode, price is usually about to crash. Crypto follows attention - money flows where attention goes. Pay attention to silence, that's where opportunity hides. Don't chase price.",
+    "priority": 5,
+    "tags": [
+      "contrarian",
+      "attention-cycle",
+      "google-trends",
+      "buy-low-sell-high"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-012",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "HighVolatility"
+    ],
+    "content": "Hierarchy for selecting coins to trade: (1) Start with majors - Bitcoin and Ethereum. They move clean, respect price action, don't wick like crazy. If you can't trade these well, don't worry about anything else. (2) Then strong trending coins - Solana, Avalanche, major Layer 1s and Layer 2s. Narrative leaders that follow Bitcoin. (3) Narrative plays - AI coins, infrastructure tokens, coins following attention flows. Only trade these when there's momentum, volume, and trending conditions. Momentum plus liquidity equals opportunity; narrative without liquidity equals trap. (4) Speculative plays - memecoins, micro caps (like penny stocks). Only trade during very specific moments when volume explodes with real liquidity and real demand. Put at most 10% of capital into this category. You earn the right to trade riskier assets through competence, not the other way around.",
+    "priority": 5,
+    "tags": [
+      "coin-selection",
+      "majors",
+      "altcoins",
+      "narrative-trading",
+      "hierarchy"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-013",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Coin selection fundamentals checklist (filter garbage first): (1) Real use case - Is it solving a real problem or just a fancy website and pipe dream? If no reason for the token to exist, skip it. (2) Strong team - Haven't shipped before? Do they disappear in bear markets? Do they pump and dump? Founders who vanish means your money vanishes. (3) On-chain activity - Follow wallet and user order flow rather than marketing. If usage is increasing, liquidity flows behind it. If nobody uses it, you're gambling. (4) Volume - Volume is oxygen. Without it you're stuck begging someone to take your bags. High volume means high liquidity, easy in-and-out. Low volume means slippage, bad spreads, extra fees. (5) Narrative - Is the narrative hot right now? Crypto moves in story circuits based on sentiment. Examples: AI trending means institutional volume into AI tokens. Being early in narrative = printing; being early is same as being wrong - get in at the right time. More criteria checked = stronger, safer trade.",
+    "priority": 4,
+    "tags": [
+      "fundamentals",
+      "coin-filter",
+      "volume",
+      "narrative",
+      "on-chain",
+      "team"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-014",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Technicals decide entry and exit timing. Key questions to ask: (1) Is it trending? Trend is king. If moving strong and clean, ride it. If chopping sideways with no clear trend, leave it. Choppy markets kill more accounts than bad entries. Crypto trends fast and long when it trends, so ride momentum. (2) Is there clear liquidity? Without sufficient liquidity, entries and exits get wrecked. You won't find sufficient sell orders to fulfill buy orders. Smart traders serve waves, not powders. (3) Is volatility tradable not random? Want structured price movement following price action, not chaos. Volatility is good when controlled and readable. (4) Is Bitcoin supportive? View crypto as a solar system - Bitcoin is the sun, altcoins are planets. If Bitcoin dumps, everything crashes. Never fight the king. Always check Bitcoin first. (5) Is the narrative hot? Crypto moves based on market sentiment and attention flow.",
+    "priority": 4,
+    "tags": [
+      "technical-analysis",
+      "trend",
+      "liquidity",
+      "volatility",
+      "bitcoin-dominance"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-015",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "Setup foundation: (1) Create trusted exchange account - Binance or Coinbase (most trustworthy/popular). Coinbase more beginner-friendly, Binance has more features. Choose one that is trusted and regulated, not some guru-promoted or Telegram-only exchange. (2) Set up secure wallet - Non-negotiable. Don't keep long-term crypto on exchanges. Get a hardware wallet (like Ledger) - your digital safe. Even FTX proved any exchange can fall and recouping funds is very hard. (3) Transfer funds correctly - Always test with small amounts first (e.g., $50-$100 even if you have millions). Double-check every detail. Crypto does not forgive typos - wrong chain or wrong address means funds are gone forever. Even professionals triple-check $1,000 transfers. (4) Start with spot trading only - Trade with your own capital, learn risk management, earn the right to use leverage. 50x/125x leverage looks sexy until it punches your account. Protect your keys.",
+    "priority": 4,
+    "tags": [
+      "setup",
+      "exchange",
+      "wallet",
+      "security",
+      "spot-trading",
+      "leverage-warning"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-016",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "Coinbase platform walkthrough: Basic mode for investing (buy/sell/convert). Advanced mode for active trading (candlestick charts, order books, indicators). Spot trading = you own the asset. Derivatives/perpetual = trading price movement with leverage (riskier, not for beginners). Key terms: Last price = current traded price. Mark price = what liquidation is calculated from (NOT last traded price) - professionals watch mark price while beginners watch candlesticks. Index price = fair value from multiple major exchanges (prevents crazy wicks from one exchange). Funding rate = shows if longs pay shorts (positive) or shorts pay shorts (negative) - indicates market sentiment. Open interest = total open future positions - climbing means money flowing in, volatility coming. Volume = how much is trading - high volume confirms strong moves, low volume means market is asleep.",
+    "priority": 3,
+    "tags": [
+      "coinbase",
+      "platform-guide",
+      "mark-price",
+      "funding-rate",
+      "open-interest",
+      "order-book"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-017",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "Order types and risk controls: Limit order = set a price to enter at, exchange executes when price reaches it. Market order = enter immediately at current market price. Stop limit = triggers at a price. Bracket/TWAP orders also available. Cross margin = uses entire balance as margin. Isolated margin = keeps each position separate (recommended for beginners, especially overnight positions). Leverage options up to 50x - beginners should stick to 1x-3x max. Always set stop loss (where trade idea gets invalidated) and take profit (where you exit if trade goes your way) before entering every single trade.",
+    "priority": 4,
+    "tags": [
+      "order-types",
+      "limit-order",
+      "isolated-margin",
+      "stop-loss",
+      "take-profit",
+      "leverage"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-018",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Trading vs Investing are fundamentally different. Investing is planting a tree - put money in strong assets, let them grow over months/years/decades, job is patience. Trading is being a surgeon - precision, timing, discipline, entering/exiting based on setups not vibes. Panicking like an investor during volatility makes you miss upside. Holding losers like an investor while trading blows your account. Rule: Investing builds wealth slowly. Trading accelerates wealth IF disciplined. Confusing the two is how people blow up accounts. Start as investor (Bitcoin/Ethereum base), then learn trading on top. Never jump straight into 50x altcoin leverage.",
+    "priority": 4,
+    "tags": [
+      "trading-vs-investing",
+      "mindset",
+      "patience",
+      "discipline"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-019",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Strategy 1 - Trend Pullback: Price never moves in straight lines. Uptrend = higher highs + higher lows. Downtrend = lower highs + lower lows. Three steps: (1) Identify trend direction by looking at structure - higher highs/higher lows for bullish. (2) Mark demand zones at points where price reversed and broke structure. Start from the extreme low that led to the break of structure. Wait for price to pull back. (3) Wait for liquidity sweep before entering. When price sweeps available liquidity below a low then reverses sharply (V-shaped reaction), that's institutional footprint. Enter on mitigation of the demand zone that swept liquidity. Place stop loss below the zone, target 2-3R. Multiple entries possible if first gets stopped out - can attack a point of interest twice following your rules.",
+    "priority": 5,
+    "tags": [
+      "trend-pullback",
+      "demand-zone",
+      "liquidity-sweep",
+      "price-action",
+      "structure"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-020",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging",
+      "SessionOpen"
+    ],
+    "content": "Strategy 2 - Breakout Retest: Never trade consolidation/sideways markets. Steps: (1) Draw a box around the entire consolidation from lowest point to highest point. This is a no-go zone. Don't try to buy support and sell resistance - you'll be exit liquidity. (2) Wait for price to break out of consolidation with a momentum candlestick that aligns with higher time frame trend direction. Look for a big, fat, juicy momentum candle (e.g., big red candle if HFT is bearish). This represents institutional footprint entering with billions. (3) Identify the imbalance/gap created between the low of the candle before the momentum candle and the high of the candle after it. Wait for price to pull back and mitigate this imbalance (price usually mitigates about 50% of the imbalance, the equilibrium point). Enter upon mitigation. Place stop loss above the momentum candle. Target 2-3R. This strategy works on all timeframes (5min, 15min, 1hr, 4hr, daily, weekly) because price is fractal.",
+    "priority": 5,
+    "tags": [
+      "breakout-retest",
+      "consolidation",
+      "imbalance",
+      "momentum-candle",
+      "fractal",
+      "institutional-footprint"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-021",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility",
+      "Trending"
+    ],
+    "content": "Strategy 3 - Liquidity Sweep Reversal (highest probability of the three): Steps: (1) Identify who's in control - buyers or sellers - through market structure (higher highs/higher lows = bullish, lower highs/lower lows = bearish). (2) Mark liquidity zones - points of interest aligned with trend direction that have swept liquidity. Look for equal lows (double bottoms) where retail places stop losses below. Price sweeps these stops with sharp V-shaped reactions, breaking structure. This is institutional demand/supply zone. (3) Enter upon mitigation of the liquidity zone. Set alert at the zone, wait patiently. When price enters the zone, enter. Place stop loss below the reversal candlestick. Target 2-3R. Key rule: No matter what, there must be some form of liquidity sweep before entering. If you can't spot the liquidity, you ARE the liquidity. You can attack a trade idea twice if stopped out first time.",
+    "priority": 5,
+    "tags": [
+      "liquidity-sweep",
+      "reversal",
+      "institutional-zone",
+      "v-shaped",
+      "inducement"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-022",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Core principle: Simplicity is the ultimate sophistication. Simplicity scales and complexity kills. If your trading guru can't explain his strategy in 3 sentences, he doesn't have one - he has something to sell you. If you can master just these 3 setups (trend pullback, breakout retest, liquidity sweep reversal), you don't need anything else to make serious money. No indicators needed. Simplicity is the highest form of intellect. Anyone who makes trading sound extra confusing is trying to sell you something.",
+    "priority": 5,
+    "tags": [
+      "simplicity",
+      "three-setups",
+      "no-indicators",
+      "price-action"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-023",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Trading system non-negotiables: (1) Entry - Clear entry trigger (pattern + confirmation), not a feeling, not FOMO, not influencer advice. If no trigger, no trade. Execute with confidence without hesitation when trigger appears. (2) Exit - Two forms: stop loss and take profit. Stop loss goes where the trade idea gets invalidated (not where it hurts). Take profit planned BEFORE the trade, not during. If take profit is based on feelings, you don't have a strategy. (3) Risk - Maximum 1-2% per trade. Risk control = difference between surviving and restarting. Never size up because a trade 'feels good.' Every trade has 50/50 odds regardless of confidence. Discipline in size builds longevity, longevity builds mastery, mastery builds wealth. (4) Frequency - 1 to 3 trades per day maximum. More than 3 means overtrading, giving back profits, compounding losses. You get paid for quality of decisions, not quantity. Better trades = more money, not more trades.",
+    "priority": 5,
+    "tags": [
+      "trading-system",
+      "entry",
+      "exit",
+      "risk-per-trade",
+      "frequency",
+      "position-sizing"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-024",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "Risk management rules: Risk 0.5% to 2% per trade (bare minimum 0.5%). Bigger account = lower percentage risk (e.g., $1M account, 0.5% = $5,000 which is already substantial). These are your 'bullets in the rifle' - more bullets = more likely to stay in the game. You don't get rich by going big on one position. You get rich by staying consistent. One losing day shouldn't destroy your month. One losing month shouldn't destroy your career. If it does, you're risking too much and overleveraging. Risk management is a love letter to your future self. No one can outsource this for you.",
+    "priority": 5,
+    "tags": [
+      "risk-percentage",
+      "position-sizing",
+      "longevity",
+      "survival"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-025",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "Avoid 20x+ leverage addiction. Leverage is like alcohol - a little can help you loosen up, too much leaves you broke and confused. Crypto exchanges offer 50x-100x leverage on perpetual futures because they want you to blow up - when you blow up, they make money. You're competing with your own impulses, not other traders. Exchanges profit from your liquidations.",
+    "priority": 5,
+    "tags": [
+      "leverage",
+      "addiction",
+      "exchange-incentives",
+      "liquidation"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-026",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeFear"
+    ],
+    "content": "Avoid emotion drawdown and revenge trading. Revenge trading is how million-dollar plans become zero-dollar accounts. If you are angry, fearful, or feeling any emotion after a losing position, walk away. Professional traders beat the market by knowing when not to trade. Like an athlete who rests when tired - don't perform when you can't perform your best. When emotional, you make bad decisions, which means losses, which means frustration, which means revenge trading, creating a vicious cycle until your account hits zero. You don't blow accounts from one big loss - you blow them by keeping trading after the big loss. Your job is to stay alive long enough to become competent. This game rewards survival first, skills second, profits last. Protect the downside and the upside takes care of itself.",
+    "priority": 5,
+    "tags": [
+      "revenge-trading",
+      "emotional-control",
+      "walk-away",
+      "survival"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-027",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "Focus is a weapon, distraction is a leak. You don't need 50 charts open or 50 coins to trade. Trade 2-3 coins you understand deeply (Bitcoin, Ethereum, maybe one narrative play). When you chase 15 altcoins your brain turns into scrambled eggs. Master one market's personality first - like dating someone for 100+ days before truly understanding them. Constant exposure to one asset teaches you how it moves, behaves, and when to trade it. Depth always beats breadth in trading.",
+    "priority": 4,
+    "tags": [
+      "focus",
+      "distraction",
+      "specialization",
+      "depth-over-breadth"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-028",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "100 Trade Rule: Don't judge a strategy after 2 losses or 3 wins. Judge it after 100 trades taken and reviewed cleanly. Many traders quit on setup 4 after losing 4 in a row, then lament the market as unfair. In reality, they quit right before learning what they're doing wrong. Data beats feelings. Gather as much data as possible, review it, learn what to do more of and less of. Screenshot every trade - receipts force brutal honesty. Your future self will thank you for the notes you take today.",
+    "priority": 4,
+    "tags": [
+      "100-trades",
+      "data-collection",
+      "journaling",
+      "patience",
+      "sample-size"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-029",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "Emotion log: Trading is a psychology game with price candles as props. Write down how you feel (fear, greed, FOMO, overconfidence, hope) for every trade. If you don't track emotions, you can't become conscious of them, which means you'll trade from them and lose money. Consistency doesn't come from vibes, it comes from systems. A trading strategy is like an opinion - everybody has one. What's difficult is following it during losing or winning streaks. Discipline is following rules when you don't feel good.",
+    "priority": 4,
+    "tags": [
+      "emotion-log",
+      "psychology",
+      "self-awareness",
+      "discipline",
+      "journaling"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-030",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "5R Process for professional improvement: (1) Record trades daily - if you don't track it, it didn't happen. No data means repeating unconscious patterns. (2) Review weekly what you did well and what you messed up - no shame, just brutally honest truth. Stare at your inadequacy and get better. (3) Reflect monthly on big patterns - are losses emotional or technical? Are you breaking rules or does the system need adjustment? (4) Refine trading plan quarterly - make small tweaks only if necessary. Don't change for the sake of changing. Every variable changed needs retesting. If it works, don't touch it. (5) Reassess goals annually - are you trading for growth or protecting capital? Then repeat. Amateurs look for new strategies every week. Professionals refine one strategy every day. Bruce Lee: 'I don't fear the man who knows 1000 kicks. I fear the man who practiced one kick 1000 times.'",
+    "priority": 4,
+    "tags": [
+      "5R-process",
+      "review",
+      "refine",
+      "journaling",
+      "continuous-improvement",
+      "bruce-lee"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-031",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Psychology",
+    "conditions": [
+      "ExtremeGreed"
+    ],
+    "content": "What kills most crypto traders is behavior, not the market or strategy: (1) Chasing pumps - buying after green candle explosions is gambling on FOMO. If everyone starts caring about a coin, you're already late. Crypto rewards the patient, not the desperate. (2) Memecoin addiction - memecoins are lottery tickets, not sustainable wealth. Lotteries exist to make money for the house (the creators), not you. If allocating to memecoins, use 1-10% of portfolio max. Don't build life plans around dog pictures and frog emojis. (3) Overtrading - you get paid for accuracy, not activity. Trade like a sniper, not a machine gun shooting blanks. Professional trading is slow, boring, methodical. If it feels like a casino, you are the customer. (4) Betting life savings - if you put money you can't afford to lose (rent, emergency fund, student loans), your emotions will trade for you. Start small, scale with skill not hope. (5) Following fake gurus - if someone flexes cars and watches more than charts and execution, they're a marketer not a trader. Mute them. Follow people with track records, live trading, journals, receipts.",
+    "priority": 5,
+    "tags": [
+      "behavioral-mistakes",
+      "chasing-pumps",
+      "memecoins",
+      "overtrading",
+      "fake-gurus"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-032",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "In the short term, the market is a voting machine. In the long term, the market is a weighing machine. Trading gurus who rent Lamborghinis for photos might win short term, but professionals who deliver real value and get results win long term. Don't chase hype or trading lifestyle influencers. Protect your attention like it's capital because it is.",
+    "priority": 3,
+    "tags": [
+      "long-term-thinking",
+      "attention",
+      "value",
+      "voting-machine"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-033",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Trading is a skill, not a goal rush. Skills follow phases like university - sacrifice 3-4 years studying to eventually earn more. Apply same mindset: trade for the next 3 years starting the market to eventually make more than any degree could earn. First you learn, then you earn, then you scale. If you skip steps, the market sends you back to step zero.",
+    "priority": 4,
+    "tags": [
+      "skill-development",
+      "learning-curve",
+      "patience",
+      "phases"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-034",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "90-Day Plan from beginner to systematic trader: Days 1-30: Learn basics on demo account. Build trading journal. Learn platform, chart reading, setups, build good habits. Goal is NOT making money - it's building solid foundation and stopping losing money forever. Demo account, tiny lots, screenshot trades, take notes, log emotions, focus on process. Like learning to drive in empty car park before highway. Days 30-60: Trade small with real money ($500-$1000, enough to feel emotion, not enough to destroy confidence). Treat as market tuition. Goal is gathering data, not chasing profits. Focus on following rules, building competence, refining entries/exits. You're still in apprenticeship phase. Losses are the price of buying wisdom. Days 60-90: Focus on one coin, one strategy, scale slowly. Master one thing until it's boring and muscle memory. Depth beats breadth. Become dangerous somewhere, not everywhere. When consistent, then scale capital. Scale because data says so, not for sake of scaling.",
+    "priority": 5,
+    "tags": [
+      "90-day-plan",
+      "demo-account",
+      "small-account",
+      "progression",
+      "mastery"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-035",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "In 90 days you won't be rich, but you will be competent and experienced. Competence is the real edge. The market doesn't reward speed, it rewards patience. You're not trading to get lucky - you're trading to become a money printing machine. It won't come in 7 days or even 90 days. It comes when you've mastered the skill set. Time plus experience equals wisdom. The market will make you money, take it back, teach humility, then reward you again when disciplined enough to deserve it. Most people give up in that last phase before reward.",
+    "priority": 4,
+    "tags": [
+      "expectations",
+      "competence",
+      "patience",
+      "wisdom",
+      "humility"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-036",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "Crypto doesn't reward the smartest - it rewards the most disciplined. You don't need 10 monitors, magical indicators, holy grail ICT strategies, or to chase every coin on Twitter. What you need: proper trading system, trading journal, proper risk control, proper emotional control, and time in the trenches. Don't chase hype, don't gamble, don't rush. Master the free market mechanics concepts, apply for 90 days, journal, grow slowly, earn confidence with data not dopamine. Commit to discipline and you'll be shocked at who you become in a year. This game is about doing what most people are too impatient to do.",
+    "priority": 4,
+    "tags": [
+      "discipline",
+      "essentials",
+      "no-shortcuts",
+      "commitment"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-037",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Break of structure (BOS) definition: A valid break of structure occurs when a candlestick closes above the last swing high (bullish) or below the last swing low (bearish). A wick that penetrates a level but doesn't close is NOT a valid BOS - it's likely a liquidity sweep. Always wait for candle close to confirm structure break.",
+    "priority": 4,
+    "tags": [
+      "break-of-structure",
+      "BOS",
+      "candle-close",
+      "confirmation"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-038",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "Institutional demand zones and scaling: Institutions scale into positions. First entry at initial demand zone, second at next unmitigated demand zone that swept liquidity, third at another, etc. They don't enter all at once. When you see multiple unmitigated demand zones that have each swept liquidity, these represent institutional scaling points. The most recent unmitigated demand zone that swept liquidity is where the next institutional entry is likely.",
+    "priority": 4,
+    "tags": [
+      "institutional-zones",
+      "scaling",
+      "demand-zones",
+      "smart-money"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-039",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "Liquidity sweep confirmation: A liquidity sweep is confirmed by: (1) Price taking out a clear level (equal lows, swing lows, obvious stop-loss clusters), (2) Sharp V-shaped reversal reaction immediately after, (3) Structure break on the move. Retail traders enter at perceived reversal points and place stops below the lows - this creates available liquidity. Smart money sweeps these stops before the real move happens. There can be multiple liquidity sweeps before the real move - never predict with 100% certainty which sweep is the last one. Stack odds with confluence.",
+    "priority": 5,
+    "tags": [
+      "liquidity-sweep",
+      "confirmation",
+      "v-shaped",
+      "inducement",
+      "multiple-sweeps"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-040",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "Imbalance/Fair Value concept: The market moves from imbalance to balance to imbalance. When price creates a huge momentum candlestick (imbalance), it will eventually pull back to balance/fair value before continuing. The imbalance is the gap between the low of the candle before the momentum candle and the high of the candle after it. Price typically mitigates about 50% of this imbalance (equilibrium point) before continuing in the trend direction. This is where you enter on the retest.",
+    "priority": 4,
+    "tags": [
+      "imbalance",
+      "fair-value",
+      "equilibrium",
+      "balance",
+      "gap"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-041",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [],
+    "content": "Price is fractal: Whatever happens on the higher timeframe must first happen on the lower timeframe. Patterns seen on daily/4H appear identically on 5min/15min charts. The same strategies (trend pullback, breakout retest, liquidity sweep) work on all timeframes from 5min to weekly. Lower timeframes often make the patterns more obvious.",
+    "priority": 3,
+    "tags": [
+      "fractals",
+      "multi-timeframe",
+      "patterns",
+      "all-timeframes"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-042",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "RiskManagement",
+    "conditions": [],
+    "content": "You don't lose this game from lack of wins. You lose from one stupid loss. You don't blow an account because of bad entry - you blow an account because you kept trading after the bad entry. The real goal is not to make money fast - it's to not lose money fast. That's how you survive long enough to get good, and the market will reward you.",
+    "priority": 5,
+    "tags": [
+      "survival",
+      "one-stupid-loss",
+      "blow-up-prevention",
+      "longevity"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-043",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Psychology",
+    "conditions": [],
+    "content": "Trading is a probability game. All you can do is wait for as much confluence as possible to stack odds in your favor. You can never predict with 100% certainty what smart money is thinking. But you can spot their footprints (liquidity sweeps, structure breaks, imbalances) and follow them. No matter how good you get at understanding liquidity, you'll never predict with 100% certainty when the last liquidity sweep will be. There can be multiple sweeps before the real move. Stack confluence, manage risk, and let probability work.",
+    "priority": 4,
+    "tags": [
+      "probability",
+      "confluence",
+      "uncertainty",
+      "smart-money-footprints"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-044",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "If it's not written, it's not a rule. If it's emotional, it's not trading - it's gambling. You don't rise to the level of your goals. You fall to the level of your trading system. This system determines whether you survive long enough to become a good trader. Stick to it and you'll get competent and make money. Break it and the market will humble you.",
+    "priority": 5,
+    "tags": [
+      "written-rules",
+      "system",
+      "goals-vs-systems",
+      "discipline"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-045",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "CryptoNative",
+    "conditions": [],
+    "content": "Bitcoin dominance over altcoins: View crypto as a solar system with Bitcoin as the sun and altcoins as planets. All altcoins follow Bitcoin. If Bitcoin dumps, the whole solar system crashes. Never fight Bitcoin direction. Always check Bitcoin first before trading any altcoin. Bitcoin is the market engine - Layer 1s and Layer 2s are sports cars that move harder in trends but follow the engine.",
+    "priority": 4,
+    "tags": [
+      "bitcoin-dominance",
+      "altcoins",
+      "market-leadership",
+      "correlation"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-046",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "TradingSystems",
+    "conditions": [],
+    "content": "The best information about YOUR trading comes from YOUR own trades - not YouTube, Twitter, or indicators. Build one strategy and iterate through feedback. Amateurs look for new strategies every week. Professionals refine one strategy every day. The boring work of recording, reviewing, reflecting, refining, and reassessing is what builds scary good traders. This is the stuff nobody likes to do, which means if you do it, you outcompete the rest.",
+    "priority": 4,
+    "tags": [
+      "self-data",
+      "feedback-loop",
+      "refinement",
+      "competitive-advantage"
+    ]
+  },
+  {
+    "id": "yt-ultimate-crypto-047",
+    "source": "youtube-interviews/ULTIMATE Cryptocurrency Trading Course (From Beginner To PRO).md",
+    "topic": "Execution",
+    "conditions": [],
+    "content": "Order book reading: The order book shows bids and asks in real-time, constantly updating. It shows the exchange between buyers and sellers. Glance at it to see who's in control of price. Don't stare at it 2/7 but use it to gauge buyer/seller pressure. The depth chart visualizes the same data - showing the amount of buy and sell orders in the market at any moment.",
+    "priority": 2,
+    "tags": [
+      "order-book",
+      "depth-chart",
+      "buy-sell-pressure",
+      "real-time"
+    ]
+  }
+]

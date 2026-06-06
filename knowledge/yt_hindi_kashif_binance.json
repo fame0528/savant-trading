@@ -1,0 +1,128 @@
+[
+  {
+    "id": "yt-hindi-binance-001",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging"],
+    "content": "Candlestick Basics for Beginners: Green candle = price went UP during that period. Red candle = price went DOWN. 15-min candle = shows 15 min of price action. 1-hour candle = 1 hour. 4-hour candle = 4 hours. 1-day candle = entire day. Higher timeframe candles = more significance. Always identify: Open, High, Low, Close for each candle. The 'body' = open to close range. 'Wicks/shadows' = high/low extremes before rejection.",
+    "priority": 3,
+    "tags": ["candlestick", "basics", "timeframe", "OHLC"]
+  },
+  {
+    "id": "yt-hindi-binance-002",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending", "Ranging"],
+    "content": "Bitcoin Trading Example (Real): BTC at ₹88,000 - bought. Price dropped to ₹86K, then ₹84K, ₹81K, all the way to ₹74K. Pain point: -₹14K unrealized loss. Temptation: 'I should sell'. KEY LESSON: If you look at SHORT timeframe (15-min), price looks terrible. But if you look at LONGER timeframe (weekly/daily), BTC from ₹74K went to ₹111,000 (+₹37K). Buyers who held = massive profit. Timeframe perspective changes everything.",
+    "priority": 5,
+    "tags": ["BTC", "timeframe", "patience", "HODL"]
+  },
+  {
+    "id": "yt-hindi-binance-003",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Three Trading Types Summary: 1) Day Trading (Scalping): Minutes to hours. 15-min chart. Quick profits, high stress, fees eat profits. 2) Mid-Term Swing: Days to weeks. 4H/Daily charts. Better R:R. Use scaled buying: 30% first entry, +20%, +20%, +10% on dips. Improves average price. 3) Long-Term Position: Months to years. Weekly/Monthly. Only BTC + ETH for safety. Use DCA (Dollar Cost Averaging). ALL successful long-term traders hold BTC and ETH by default.",
+    "priority": 4,
+    "tags": ["day-trading", "swing", "long-term", "DCA", "scale-in"]
+  },
+  {
+    "id": "yt-hindi-binance-004",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "Execution",
+    "conditions": ["Trending"],
+    "content": "Order Types Explained Simply: 1) Market Order: Click Buy/Sell → immediately fills at current price. Example: BNB at $645 → market buy = you pay $645 now. 2) Limit Order: Set your price. Example: BNB at $645 → set buy limit at $620. Only fills IF price reaches $620. 3) Stop-Limit: Set trigger price + execution price. Example: Sell stop-limit: trigger at $630, sell at $628. For beginners: Master market and limit orders first. Stop-limits come later.",
+    "priority": 3,
+    "tags": ["market-order", "limit-order", "stop-limit", "execution"]
+  },
+  {
+    "id": "yt-hindi-binance-005",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Coin Selection - Top 5 for Beginners: 1) Bitcoin (BTC) #1 - Safest, most adopted, governments and institutions investing. 2) Ethereum (ETH) #2 - Smart contract platform, massive ecosystem. 3) BNB - Binance exchange coin. 4) SOL (Solana) - Fast growing L1, good recent updates. 5) Other: DOGE (Elon narrative), ENA (recent hype), DOT (good updates). Rule: For long-term, ONLY buy BTC and ETH. Altcoins are for knowledgeable traders only. Never put all money in one altcoin.",
+    "priority": 4,
+    "tags": ["coin-selection", "BTC", "ETH", "BNB", "SOL"]
+  },
+  {
+    "id": "yt-hindi-binance-006",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Spot Trading Live Example: BNB at $640 (example entry). Bought with $100 → received 0.156 BNB. Price goes to $650 → sold. Profit: $1.40 (1.4% return). Simple math: 0.156 BNB × ($650 - $640) = $1.56 - small fees. Every coin has specific volatility range. BNBe.g., moves $10-25 per day. Trade ALWAYS happens in pairs: BNB/USDT means you buy BNB with USDT. You cannot buy BNG directly with PKR - must convert PKR → USDT → BNB.",
+    "priority": 3,
+    "tags": ["spot-example", "BNB", "USDT", "trading-pair"]
+  },
+  {
+    "id": "yt-hindi-binance-007",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Binance App Navigation: 5 main tabs: 1) Home: Market overview, prices. 2) Markets: All coins listed. Search any coin. 3) Trade: Execute buy/sell orders. 4) Futures: Leveraged trading (dangerous for beginners). 5) Assets: All your wallets - Funding (P2P), Spot (regular trading), Futures (margin), Earn (staking), Alpha (new projects). Always check which wallet you're using. Funds in Funding won't show in Spot until transferred.",
+    "priority": 2,
+    "tags": ["binance", "app", "navigation", "wallets"]
+  },
+  {
+    "id": "yt-hindi-binance-008",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Hardware Wallets for Long-Term Storage: Ledger (recommended) = physical device storing crypto offline. Why? If exchange (Binance) gets hacked or banned, your crypto on exchange can be lost. On hardware wallet = only YOU control it. Even governments cannot access it without your physical device + PIN. For long-term BTC/ETH holding: Buy a Ledger, transfer coins there, forget about them. Not your keys = not your crypto.",
+    "priority": 4,
+    "tags": ["hardware-wallet", "Ledger", "cold-storage", "security"]
+  },
+  {
+    "id": "yt-hindi-binance-009",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Market Cap Concept: Market cap = total value of all coins in circulation. BTC: $2.19 TRILLION market cap. ETH: Much smaller. BNB: Smaller still. Key insight: A coin can NEVER be judged by price alone. E.g., if a coin is $0.01 with 1 trillion supply = $10 billion market cap. It won't go to $1 easily because that would require $1 trillion market cap. When comparing coins, look at market cap, not price. Realistic target for any coin: Estimate what market cap it can reach, THEN calculate price.",
+    "priority": 4,
+    "tags": ["market-cap", "valuation", "price-vs-marketcap"]
+  },
+  {
+    "id": "yt-hindi-binance-010",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Earn Section - Staking Risks: Flexible staking: CAN lose capital if coin price drops while staking. Example: Stake 10 SOL at $200 = $2,000. Earn 3% APY. But if SOL drops 20% to $160, your staked 10 SOL = $1,600. You earned $60 in staking but lost $400 in price = net loss. Fixed staking: Same risk + capital locked. Only stake stablecoins (USDT/USDC) for guaranteed returns. For volatile coins, staking rewards rarely offset price drops in bear markets.",
+    "priority": 4,
+    "tags": ["staking-risk", "flexible-staking", "stablecoin", "earn"]
+  },
+  {
+    "id": "yt-hindi-binance-011",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Mid-Term Trading Strategy: Buy in parts (DCA style). Example: $500 capital. First buy: $150 (30%). If price drops further: buy $100 more (20%). If drops more: buy $100 more (20%). Final: $50 (10%). This improves your average entry price. Hold for 5-6 months or 1 year. Target: When market is bullish and coin is doing well, sell. This is how institutions and smart money trade. They don't go all-in at once. They scale in on dips.",
+    "priority": 4,
+    "tags": ["DCA", "scale-in", "mid-term", "position-building"]
+  },
+  {
+    "id": "yt-hindi-binance-012",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Long-Term Investment Thesis: BTC from $3K (2017) → $69K (ATH) → crashed to $15K → went to $110K+. ETH from $86 → $4,868 (ATH) → crashed → still going higher. Pattern: Each cycle, BTC and ETH make new ATHs. If you bought BTC at ANY point in history and held 4+ years, you made money. This is the power of long-term holding. Best long-term coins: BTC (safest), ETH (2nd safest). Everything else = higher risk. For true long-term: Buy, hold in hardware wallet, forget for 3-5 years.",
+    "priority": 5,
+    "tags": ["long-term", "BTC", "ETH", "cycle", "HODL"]
+  },
+  {
+    "id": "yt-hindi-binance-013",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "Execution",
+    "conditions": ["Trending"],
+    "content": "P2P Trading on Binance: Step 1: Go to Funding wallet → Add Funds → P2P Trading. Step 2: Select 'Buy' USDT. Step 3: Choose seller with best rate (e.g., 288 PKR per USDT). Step 4: Select payment method (EasyPaisa, Bank Transfer). Step 5: Enter amount (e.g., 15,000 PKR = ~51.77 USDT). Step 6: Click 'Place Order'. Step 7: Send payment to seller's account. Step 8: Seller confirms → USDT appears in your Funding wallet. CRITICAL: Never click 'I have paid' until you actually sent money. Never release crypto before receiving payment.",
+    "priority": 3,
+    "tags": ["P2P", "buying-crypto", "PKR", "USDT"]
+  },
+  {
+    "id": "yt-hindi-binance-014",
+    "source": "youtube-interviews/Crypto Trading Full Course for Beginners in 2026 Binance Trading Course by Kashif Majeed.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Futures Trading Warning: Futures = gambling for beginners. With 20x leverage: $100 becomes $2,000 position. 5% price move against you = $100 loss = account wiped. With 100x leverage: 1% move = liquidation. The speaker explicitly says futures trading is 'haram' (forbidden) in their view because it resembles gambling. If you must trade futures: 1) Only risk what you can afford to lose completely. 2) Use stop loss ALWAYS. 3) Start with 5-10x leverage maximum. 4) Never use your rent/money-needed money.",
+    "priority": 5,
+    "tags": ["futures-warning", "leverage", "gambling", "risk"]
+  }
+]

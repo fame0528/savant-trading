@@ -1,0 +1,603 @@
+[
+  {
+    "id": "yt-ai-crypto-001",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "HighVolatility",
+      "Falling"
+    ],
+    "content": "The grid mechanism places sell limit orders (red lines/grid levels) and buy limit orders (green lines/grid levels) simultaneously within a defined trading range. To place sell orders, you must hold enough of the base currency. To place buy limit orders, you must hold enough of the quote currency. The distance between limit orders is called grid spacing. The upper limit price and lower limit price define the trading range and are fully adjustable by the user.",
+    "priority": 5,
+    "tags": [
+      "grid-mechanism",
+      "grid-levels",
+      "limit-orders",
+      "grid-spacing",
+      "trading-range"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-002",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "Falling"
+    ],
+    "content": "When a buy limit order is triggered, the algorithm uses the quote currency to buy the base currency. Immediately after buying, it places a new sell limit order for the acquired base currency at a higher grid level. When that sell limit order triggers, the algorithm sells the base currency, takes profit in the quote currency, and uses a portion of that profit to place a new buy limit order at a lower grid level. This creates a continuous, nearly endless automated trading cycle.",
+    "priority": 5,
+    "tags": [
+      "grid-logic",
+      "buy-low-sell-high",
+      "continuous-trading",
+      "rolling-basis"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-003",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "Execution",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "Falling"
+    ],
+    "content": "A live example of LANDCOIN trading to BDC showed 799 completed trades over 34 days of automated bot operation, which averages approximately 202 trades per day. This demonstrates the high-frequency execution capability of the AI algorithm. No human trader can manually sustain this pace of more than 202 trades per day without rest while remaining fully concentrated and emotionless.",
+    "priority": 5,
+    "tags": [
+      "high-frequency-trading",
+      "trade-volume",
+      "automation-advantage",
+      "consistency"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-004",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Rising"
+    ],
+    "content": "An ION trading to USDT bot example with a total investment of 600 USDT configured with 47 grid levels (only 9 displayed visually for simplicity) demonstrated consistent profit accumulation. Each time the market swung, the algorithm executed buy-low and sell-high trades, accumulating small profits that compounded into significant returns. Across all active bots, the speaker's average annualized return was approximately 240%.",
+    "priority": 4,
+    "tags": [
+      "real-example",
+      "compound-returns",
+      "annualized-return",
+      "profit-accumulation"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-005",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Trending",
+      "Ranging",
+      "Falling"
+    ],
+    "content": "The algorithm is emotionless and not subject to behavioral finance biases. It strictly follows the trading plan, executing trades according to configuration regardless of market direction. Even on a falling market, the bot generates profits by finding opportunities to buy low and sell high from price swings. Automation ensures zero emotional interference in execution.",
+    "priority": 4,
+    "tags": [
+      "emotionless-trading",
+      "behavioral-finance",
+      "discipline",
+      "fully-automated"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-006",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Back testing simulates bot trading against historical price data over configurable time periods (3 days, 1 week, 30 days, or custom ranges). Users can verify what profit, return, and risk the bot would have generated if launched at a specific point in the past. Back testing accounts for volatility, risk, value change, and bot profit. Past performance does not guarantee future results but provides statistical data for decision-making.",
+    "priority": 5,
+    "tags": [
+      "back-testing",
+      "historical-analysis",
+      "strategy-validation",
+      "risk-assessment"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-007",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "All"
+    ],
+    "content": "Users retain full control over their funds via API integration. The API key enables only reading and trading permissions. Withdrawals, margin trades, and futures must NOT be enabled. Only the account holder can deposit or withdraw funds from the exchange. The bot can only execute trades based on the user's configured settings. API keys and secret keys are created and managed exclusively by the user on their exchange account.",
+    "priority": 5,
+    "tags": [
+      "API-security",
+      "fund-control",
+      "no-withdrawals",
+      "permissions"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-008",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "BitsGap offers two strategy modes: Simple and Advanced. The Advanced mode adds three additional instruments: Take Profit, Stop Loss, and Trading Up feature. The recommended strategies panel displays cryptocurrency pairs ranked by highest back-tested returns over selectable periods (weekly, 3 days, monthly). The profit from automated bots is always denominated in the quote currency.",
+    "priority": 3,
+    "tags": [
+      "simple-mode",
+      "advanced-mode",
+      "recommended-strategies",
+      "configuration"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-009",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "The ASBOT strategy offers a high-frequency grid trading algorithm with up to 180 grid levels (narrow setup) or as few as 10 grid levels (wide setup). The more grid levels selected within a defined trading range, the narrower the grid spacing becomes. Narrower spacing means a higher probability that market swings will trigger limit orders, generating more frequent but smaller profits. Wider spacing generates larger per-trade profits but lower hit probability.",
+    "priority": 5,
+    "tags": [
+      "ASBOT",
+      "grid-levels",
+      "narrow-setup",
+      "wide-setup",
+      "high-frequency"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-010",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Trending"
+    ],
+    "content": "The trading range is adjusted visually on the chart by dragging the upper and lower limit price lines. This is faster and less error-prone than manually typing prices. When the trading range is narrowed (upper lowered, lower raised), grid spacing percentage decreases. When widened, grid spacing percentage increases. The system automatically recalculates grid spacing as the range changes.",
+    "priority": 3,
+    "tags": [
+      "chart-based-configuration",
+      "visual-trading-range",
+      "manual-adjustment"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-011",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "All"
+    ],
+    "content": "When configuring a bot, the allocation displays required amounts in both base and base and quote currency. Narrowing the sell zone (lower upper limit) reduces the base currency required. Lowering the lower limit or narrowing the buy zone reduces the quote currency required. This allows users to manipulate allocation based on available funds and preference.",
+    "priority": 4,
+    "tags": [
+      "capital-allocation",
+      "base-currency",
+      "quote-currency",
+      "allocation-control"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-012",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "Execution",
+    "conditions": [
+      "All"
+    ],
+    "content": "If the allocated investment is insufficient to launch with the selected number of grid levels, the system displays an error or offers an 'adjust grid quantity' button that automatically reduces the number of grid levels to match the available funds. For example, a bot configured with 180 grid levels but insufficient funds was auto-adjusted down to 77 grid levels. Users can also manually reduce grid levels or increase their investment to resolve the issue.",
+    "priority": 4,
+    "tags": [
+      "adjust-grid-quantity",
+      "insufficient-funds",
+      "configuration-constraints"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-013",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "All"
+    ],
+    "content": "When launching a bot, if the user does not hold sufficient base currency on their balance, the system prompts them to buy it via a market order. Upon confirming, the system executes a market buy to acquire the necessary base currency and then starts the bot. This ensures all grid levels can be populated with the required orders.",
+    "priority": 3,
+    "tags": [
+      "market-order-entry",
+      "base-currency-requirement",
+      "bot-initialization"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-014",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "All"
+    ],
+    "content": "Two key metrics for tracking bot performance: Bot Profit and Investment Change. Bot Profit is the net profit generated by the bot in the quote currency regardless of market direction (from all buy-low/sell-high executions). Investment Change combines Bot Profit plus the value change (appreciation or depreciation) of the base currency held. In a rising market, investment change exceeds bot profit. In a falling market, investment change is reduced by base currency depreciation even though bot profit is positive.",
+    "priority": 5,
+    "tags": [
+      "bot-profit",
+      "investment-change",
+      "performance-metrics",
+      "quote-currency"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-015",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "All"
+    ],
+    "content": "To calculate current investment value: take the initial investment multiplied by (1 + investment change percentage). To calculate net pure profit: take current investment value minus initial investment. Alternatively, click the View button to see all open orders (base currency allocated to sell limits + quote currency allocated to buy limits); summing these gives the current investment value. Both methods produce identical results.",
+    "priority": 3,
+    "tags": [
+      "profit-calculation",
+      "investment-value",
+      "open-orders",
+      "net-profit"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-016",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Rising"
+    ],
+    "content": "On a rising market, the grid bot keeps buying low and selling high from price swings that occur even during uptrends. The bot generates consistent profit inflow AND the investment change is further positively affected by base currency appreciation. This creates a 'double benefit' scenario: bot profits from trading plus unrealized gains from holding an appreciating asset. The speaker described this as an 'active investment change'.",
+    "priority": 5,
+    "tags": [
+      "rising-market-strategy",
+      "double-benefit",
+      "active-investment",
+      "appreciation"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-017",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "Ranging"
+    ],
+    "content": "On a sideways (consolidation) market where price oscillates within a neutral zone with minimal net movement, a simple HODL strategy would yield approximately 0% investment change. Automation significantly outperforms HODL in these conditions. Real example: Bitcoin Cash trading to USD over a sideways period showed that HODL would have generated 5% return (from start price to end price), but the grid bot generated 14% total investment return from accumulating profits on all intermediate price swings, nearly triple the HODL return.",
+    "priority": 5,
+    "tags": [
+      "sideways-market",
+      "outperforms-hodl",
+      "stagnation-trading",
+      "consolidation",
+      "range-bound"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-018",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "All"
+    ],
+    "content": "The speaker emphasizes that grids are optimal primarily on rising and sideways markets, and secondarily on falling markets where a built-in loss minimization mechanism helps. Automation allows significantly boosting trading performance on rising and sideways markets and minimizes losses on falling markets compared to passive holding.",
+    "priority": 4,
+    "tags": [
+      "optimal-market-conditions",
+      "loss-minimization",
+      "market-regime"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-019",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "All"
+    ],
+    "content": "Narrow grid spacing example: 0.33% between each grid level. Wide grid spacing example: 3.12% between each grid level. With narrow spacing, the market price only needs to move a small percentage (e.g., 0.24%) to trigger the next limit order, so the majority of orders are consistently hit. With wide spacing (e.g., 5% or 7%), the market must move significantly further to trigger orders, risking that orders go unfilled and the user gets stuck holding base currency purchased at unfavorable prices without reaching take-profit levels.",
+    "priority": 5,
+    "tags": [
+      "narrow-vs-wide",
+      "grid-spacing",
+      "order-hit-probability",
+      "volatility-threshold"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-020",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "All"
+    ],
+    "content": "When configuring grid spacing, the user must consider the cryptocurrency's historical volatility. For a coin that typically moves 5% up and 5% down, a grid spacing of 7% will likely fail to trigger most orders consistently. A narrow spacing (e.g., 10 grid levels with 0.13% spacing) on such a coin will result in more than 90% of grid levels being triggered. All the small profits add up to a decent total return. Wide spacing with few grid levels means fewer but larger potential gains, but with much higher risk of orders not triggering.",
+    "priority": 5,
+    "tags": [
+      "volatility-matching",
+      "coin-selection",
+      "narrow-advantage",
+      "wide-risk"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-021",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "All"
+    ],
+    "content": "Real performance comparison from the speaker's account: one bot with 37 total trades over 20 days (wide spacing, grid spacing of 3.38%) versus another bot with 78 total trades over 20 days (narrow spacing, grid spacing of 0.13%). The narrow spacing bot nearly doubled the trade count, confirming that tighter grids generate more frequent execution and more consistent, albeit smaller, profits.",
+    "priority": 4,
+    "tags": [
+      "real-comparison",
+      "trade-frequency",
+      "comparative-performance"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-021b",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "Execution",
+    "conditions": [
+      "Rising"
+    ],
+    "content": "The Trading Up feature allows the bot's trading range to automatically follow an ascending market. When the price breaks above the upper limit and establishes a new higher high, with Trading Up enabled, the entire trading range shifts upward to follow. The bot only follows rising markets, never falling ones. If the price drops below the current trading range, no trades execute within the range, but if price returns, trading resumes. This ensures the bot stays in the market 24/7 during uptrends.",
+    "priority": 5,
+    "tags": [
+      "trading-up",
+      "trailing-up",
+      "uptrend-follow",
+      "automatic-adjustment"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-022",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "Execution",
+    "conditions": [
+      "Rising"
+    ],
+    "content": "Without Trading Up enabled, if the price breaks above the upper limit of the trading range, the bot stops executing trades entirely because price has exited the defined range. The trading range remains stuck at the old level. During this missed upside momentum the bot makes zero trades and zero profits. With Trading Up enabled, the range follows upward and the bot continues generating profits on the entire upward move.",
+    "priority": 4,
+    "tags": [
+      "trading-up-disabled",
+      "missed-upside",
+      "stuck-range",
+      "opportunity-cost"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-023",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "Execution",
+    "conditions": [
+      "Rising"
+    ],
+    "content": "Real example of NGC trading to BDC with Trading Up enabled: The bot initially traded within a defined range. When price appreciated and broke the upper limit, the trading range automatically followed upward. Every price swing during the rise was captured as profitable trades (shown as circles on the chart). This resulted in significantly higher profits compared to a non-Trading Up configuration that would have missed the entire upside move.",
+    "priority": 4,
+    "tags": [
+      "trading-up-success",
+      "real-example",
+      "upside-capture"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-024",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "Execution",
+    "conditions": [
+      "All"
+    ],
+    "content": "Trading Up should be disabled if the user prefers manual intervention. When a user can monitor the market and anticipates a short-term market decline after an overbought condition, they may prefer to close the bot at a high point and relaunch at a lower price, rather than letting Trading Up follow the peak and then experience drawdown. This is a manual trading style using automation as a diversification tool rather than full automation.",
+    "priority": 3,
+    "tags": [
+      "manual-override",
+      "overbought-conditions",
+      "strategic-disable"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-025",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Falling"
+    ],
+    "content": "The bot profit serves as a loss minimization mechanism on falling markets. Real example: Quantum trading to USDT showed that buying at a higher price and holding to a lower price would have resulted in a -6.88% loss with HODL. With the grid bot generating profit during the same decline, the loss was reduced to only -3.18%. The accumulated trading profits offset a significant portion of the negative value change from the depreciating base currency.",
+    "priority": 5,
+    "tags": [
+      "loss-minimization",
+      "downside-buffer",
+      "profit-offset",
+      "decline-protection"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-026",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "Trending",
+      "Ranging"
+    ],
+    "content": "Back testing results demonstrate the risk-return tradeoff between cryptocurrency pairs. Example comparing two pairs over identical 30-day periods (April 11 to May 11): NGcoin trading to BTC yielded 34% bot profit with 66% upside potential and -34% risk (drawdown). BNB trading to BUSD yielded 13% bot profit with 35% upside potential and -23% risk. NGcoin offered 21% higher return but with 11% higher risk. Conservative/risk-averse traders should choose BNB (lower return, lower risk). Aggressive/risk-seeking traders should choose NGcoin (higher return, higher risk).",
+    "priority": 5,
+    "tags": [
+      "risk-return-tradeoff",
+      "coin-comparison",
+      "conservative-vs-aggressive",
+      "back-test-comparison"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-027",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "All"
+    ],
+    "content": "Back testing comparison by period: Cardano to USDT yielded 9% bot profit over a 30-day period. Ethereum to USDT yielded 22% bot profit over the same period. Ethereum showed a stronger rising market with less volatility. Cardano had higher volatility but lower back-tested return. Users can compare cryptocurrencies using the back test tool to find optimal pairs for their trading style and risk appetite.",
+    "priority": 4,
+    "tags": [
+      "ethereum-vs-cardano",
+      "back-test-period-comparison",
+      "optimal-selection"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-028",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "HighVolatility"
+    ],
+    "content": "BitsGap has a built-in optimization algorithm that automatically avoids extreme pump and dump scenarios. Without the optimization, during a pump on GRC trading to Ethereum, all buy limit orders would be executed at the highest price (buying high), then the price reverts, leaving the user stuck with base currency at inflated prices taking a huge loss. With the optimization active, the algorithm detects and avoids these extreme pump scenarios, maintaining consistent returns by not buying into artificial price spikes. The algorithm is continuously being improved to handle nearly all pump/dump situations but is not 100% guaranteed.",
+    "priority": 5,
+    "tags": [
+      "pump-dump-avoidance",
+      "algorithm-optimization",
+      "smart-execution",
+      "spike-detection"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-029",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "Falling"
+    ],
+    "content": "When enabled, Stop Loss automatically sells ALL base currency allocated to the bot if the market price falls to the stop-loss level. This is a full exit from the market, preventing further losses below the stop-loss threshold. The stop-loss level can be adjusted manually on the chart. This is a critical risk control instrument that provides a hard floor on maximum loss.",
+    "priority": 5,
+    "tags": [
+      "stop-loss",
+      "full-exit",
+      "risk-floor",
+      "automatic-liquidation"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-030",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "All"
+    ],
+    "content": "Take Profit relates to Investment Change (not Bot Profit). It represents the user's preferred total return (including both bot profits and base currency appreciation). Example: If Take Profit is set at 10%, the bot automatically closes when investment change reaches +10%. If set at 7%, it closes at +7%. Upon reaching the Take Profit, the bot closes and sells all base currency at the current market price, resulting in a 100% exit from the market with the target return locked in.",
+    "priority": 5,
+    "tags": [
+      "take-profit",
+      "investment-change-target",
+      "auto-close",
+      "return-lock"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-031",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "Execution",
+    "conditions": [
+      "All"
+    ],
+    "content": "BitsGap offers three options when manually closing a bot. Option 1: Cancel all open orders. The bot moves to history but any base currency remaining on the balance stays there (still exposed to price movement). Option 2: Sell at market price. All base currency is immediately sold at current market price for a 100% full exit from the market. Option 3: Place sell limit order at Break Even price (only available when in negative investment change zone). The break even price is the price at which selling all base currency would result in 0% investment change (no gain, no loss). For ERD, the break even was 0.024, requiring a 15% price increase to reach.",
+    "priority": 5,
+    "tags": [
+      "exit-options",
+      "close-bot",
+      "break-even",
+      "market-sell",
+      "cancel-orders"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-032",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "Execution",
+    "conditions": [
+      "All"
+    ],
+    "content": "The break even price is dynamically calculated based on the current amount of base currency allocated to all open sell limit orders. If the amount of base currency changes (through bot trades), the break even price readjusts accordingly. Users must wait for the price to move up to the break even price level to exit at 0% investment change rather than realizing a loss.",
+    "priority": 4,
+    "tags": [
+      "break-even-calculation",
+      "dynamic-adjustment",
+      "loss-recovery"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-033",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "All"
+    ],
+    "content": "BitsGap has five total exit strategies: 1) Manual cancel (no market sell), 2) Manual sell at market price, 3) Break even sell limit order, 4) Stop Loss (automatic), 5) Take Profit (automatic). All trading fees charged by the exchange for executing limit orders are already factored into the bot profit calculation. The bot profit displayed is fully net of all fees. Net profit per trade = sell price minus buy price minus exchange fee.",
+    "priority": 4,
+    "tags": [
+      "five-exit-strategies",
+      "fee-transparent",
+      "net-profit",
+      "exit-instruments"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-034",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": [
+      "All"
+    ],
+    "content": "For timing bot entry, the speaker uses support and resistance levels combined with volume analysis. Most top 20 cryptocurrencies respect support levels. The optimal entry point is when the price approaches support AND bounces off it (confirmed bounce), not merely when it approaches support. Example: Ethereum to USDT was entered when volume was spiking and accumulation was visible at a support bounce, combined with fundamental bullish factors. The trade reached 12% profit. Another example: BNB to USDT launched in early July yielded 14% return over 40 days on 500 USDT allocation, approximately 70 USDT profit for the month.",
+    "priority": 5,
+    "tags": [
+      "support-resistance",
+      "entry-timing",
+      "volume-accumulation",
+      "bounce-confirmation"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-035",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "RiskManagement",
+    "conditions": [
+      "All"
+    ],
+    "content": "Trading Up can be enabled at initial configuration or switched on at any time afterward by clicking View on an active bot. For maximum reliability, Trading Up should be on from the start to guarantee the bot follows rising markets even if the user cannot actively monitor it (e.g., no internet access). Users can also experiment with Trading Up on demo mode bots before applying it to real trading. Full automation for minimal monitoring time requires: Trading Up ON, Stop Loss set, and Take Profit set. More hands-on traders may prefer to enable/disable these features manually over time.",
+    "priority": 4,
+    "tags": [
+      "trading-up-timing",
+      "full-automation",
+      "demo-trading",
+      "flexible-activation"
+    ]
+  },
+  {
+    "id": "yt-ai-crypto-036",
+    "source": "youtube-interviews/A.I. in Crypto Trading - How to maximize your profit.md",
+    "topic": "TradingSystems",
+    "conditions": [
+      "All"
+    ],
+    "content": "Demo mode provides risk-free trading simulation with virtual money. Users can test and experiment with different configurations (grid levels, spacing, trading ranges, exchange, cryptocurrency pairs, Trading Up, Stop Loss, Take Profit) before risking real funds. The speaker maintains both real and demo accounts simultaneously, using demo to test various configurations (ranging from 50 to 180 grid levels) to find optimal setups. Regardless of subscription level, all users can experiment with strategies in demo mode.",
+    "priority": 5,
+    "tags": [
+      "demo-trading",
+      "risk-free-testing",
+      "virtual-money",
+      "strategy-development",
+      "optimization"
+    ]
+  }
+]

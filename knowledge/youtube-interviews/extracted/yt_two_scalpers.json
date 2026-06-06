@@ -1,0 +1,767 @@
+[
+  {
+    "id": "yt-dual-scalper-001",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "Standardize risk per trade to a fixed dollar amount (e.g., $2,500 per 1-hour period). Adjust position size based on stop loss distance: if stop is 2 points away, take larger size; if stop is 4 points, cut size in half. Never exceed the fixed risk amount regardless of setup confidence. Keep risk identical across all trades to protect the account during bad days.",
+    "priority": 5,
+    "tags": ["fixed-risk", "position-sizing", "standardized-risk", "2500-per-hour"]
+  },
+  {
+    "id": "yt-dual-scalper-002",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "Three-loss rule: If three trades in a row with the same analysis, same level, and same setup all fail, shut down the day. You are wrong about that idea. Going against this rule (taking 4-5 trades against it) leads to the biggest losing days. This counteracts revenge trading and emotional escalation.",
+    "priority": 5,
+    "tags": ["three-loss-rule", "risk-management", "discipline", "revenge-trading"]
+  },
+  {
+    "id": "yt-dual-scalper-003",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Risk-to-reward minimum: Never take anything under 2:1. Majority of trades target 4:1 or 3.5:1. On NASDAQ, minimum targets are 20-30 points of movement. On ES/S&P, minimum targets are 12-15 points with about 3 points of risk. In volatile days, risk-to-reward tends to be lower due to fast-moving entries.",
+    "priority": 4,
+    "tags": ["risk-reward", "minimum-2-to-1", "4-to-1-target", "NASDAQ-points", "ES-points"]
+  },
+  {
+    "id": "yt-dual-scalper-004",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Scalper's main objective is being right fast. If wrong fast, it's better because you take smaller stop losses. Aim to be in the first two hours of the session. Best trades work out in 5-7 minutes of entry. Worst trades languish for 1-2 hours and stop you out. Move stop to break even as soon as the trade moves in your favor.",
+    "priority": 5,
+    "tags": ["fast-entry", "first-two-hours", "break-even", "quick-profits"]
+  },
+  {
+    "id": "yt-dual-scalper-005",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Only take AAA+ rated setups (10 out of 10). Even if only 2-3 such setups appear per week, wait for them. Have multiple playbooks but only execute when a setup matches a known playbook. If you can't label the trade immediately or journal why you're taking it, don't take it. No reason = no trade.",
+    "priority": 5,
+    "tags": ["AAA-setups", "playbooks", "discipline", "no-trades-is-a-win"]
+  },
+  {
+    "id": "yt-dual-scalper-006",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "In momentum markets, enter full size on the first good entry. In choppy/range days with no momentum, fractionalize entry across multiple price levels to get better average positioning. On NASDAQ specifically, fractionalize entries since it's more volatile and fast.",
+    "priority": 3,
+    "tags": ["full-size-momentum", "fractionalize-entry", "NASDAQ-execution"]
+  },
+  {
+    "id": "yt-dual-scalper-007",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Spend ammo only when the target is clear. Deploy capital only on obvious setups. If you fire ammo at unclear setups, you have no ammo left when a truly clear target presents itself. Preserving capital on bad days ensures you can maximize on good days.",
+    "priority": 5,
+    "tags": ["ammo-management", "capital-preservation", "patience", "sitting-on-hands"]
+  },
+  {
+    "id": "yt-dual-scalper-008",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Knowing when not to trade is more important than knowing when to trade. Not forcing trades on days with bad market conditions (compression, congestion) wins on discipline even if P&L is flat. Money is made by waiting. A day with zero trades because no setup appeared is a win if it preserves discipline and capital.",
+    "priority": 5,
+    "tags": ["not-trading", "discipline-over-pnl", "waiting", "capital-preservation"]
+  },
+  {
+    "id": "yt-dual-scalper-009",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "SessionOpen",
+    "conditions": ["SessionOpen", "HighVolatility"],
+    "content": "Never trade the first 15 minutes of the New York session open. Let the market digest. The first few minutes have extreme volatility, heavy slippage, and explosive moves that are not smart to trade. Reset depth of market and volume profile at market open. Wait for 9-15 minutes before looking at setups.",
+    "priority": 4,
+    "tags": ["session-open-wait", "first-15-minutes", "avoid-slippage", "reset-dom"]
+  },
+  {
+    "id": "yt-dual-scalper-010",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "SessionOpen",
+    "conditions": ["SessionOpen", "Trending", "HighVolatility"],
+    "content": "First 30 minutes to 1 hour of NY session sets the tone for the day. Look for clean breakout of the top or bottom of the opening range. The side that wins the first battle of the session is likely to squeeze the other side. Opening range breakout models work because they identify directional commitment after digestion.",
+    "priority": 4,
+    "tags": ["opening-range", "first-30-minutes", "tone-setting", "breakout"]
+  },
+  {
+    "id": "yt-dual-scalper-011",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Speed of tape is critical: watch depth of market for speed of tape building. In a reversal candle, watch the speed of tape increase, showing increasing aggression. Speed of tape indicates initiative. When buyers/sellers get more and more aggressive and the tape accelerates, it confirms directional momentum. Low speed of tape at highs or during moves means lack of follow-through interest.",
+    "priority": 5,
+    "tags": ["speed-of-tape", "depth-of-market", "initiative", "aggression", "confirmation"]
+  },
+  {
+    "id": "yt-dual-scalper-012",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "Volume-price relationship is the most important concept: volume is the gas pedal, price is the direction. Price tells you the result that the impact of volume is having. When lots of volume comes in with no price movement, that is absorption and accumulation — a massive reversal signal.",
+    "priority": 5,
+    "tags": ["volume-price-relationship", "absorption", "accumulation", "effort-no-result"]
+  },
+  {
+    "id": "yt-dual-scalper-013",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Absorption: When aggressive buyers or sellers step in and get absorbed (size trades at the level but price doesn't follow through), it signals accumulation and potential reversal. Reload on a sensitive level is the highest probability setup — when buyers/sellers defend a level and reload after being absorbed, stop can go below/above the reload with high continuation probability.",
+    "priority": 5,
+    "tags": ["absorption", "reload", "accumulation", "level-defense"]
+  },
+  {
+    "id": "yt-dual-scalper-014",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Delta is critical: negative delta with cum delta building shows aggressive selling. Delta divergence — when price makes a higher high but delta on the second push is significantly less than the first — signals selling absorption and potential reversal. Positive delta at lows (e.g., 335 positive delta contracts at the low) shows aggressive buying stepping in.",
+    "priority": 4,
+    "tags": ["delta", "delta-divergence", "cumulative-delta", "selling-absorption"]
+  },
+  {
+    "id": "yt-dual-scalper-015",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Zero prints are levels where zero volume traded on one side of the market (e.g., 75 volume on bid, zero on offer). The market likes to revisit these because they are real inefficiencies — one side never got a fair chance to trade. Zero prints act as magnetic forces and can form targets or reversal levels. Mark them immediately when they form; they can be revisited same session, same week, or even a month later.",
+    "priority": 5,
+    "tags": ["zero-prints", "magnetic-levels", "inefficiency", "target", "mean-reversion"]
+  },
+  {
+    "id": "yt-dual-scalper-016",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Big trades / large bubbles on the DOM confirm significant activity at a price level. Highlight when there's a significant delta outlier in a footprint candle column. When volume is thinner, delta outliers are more significant because they stand out from the normal flow. Size of bubble corresponds to size of the outlier.",
+    "priority": 3,
+    "tags": ["big-trades", "bubbles", "DOM", "delta-outliers"]
+  },
+  {
+    "id": "yt-dual-scalper-017",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "VolumeProfile",
+    "conditions": ["Ranging", "LowVolatility"],
+    "content": "Trading in high-volume, fair-value areas gives you choppy price action with edge mostly going to institutions. Trading where there's not much liquidity is where the scalper's edge comes from. Look for inefficiencies, not efficiencies.",
+    "priority": 4,
+    "tags": ["liquidity", "edge", "fair-value", "inefficiency", "avoid-efficiency"]
+  },
+  {
+    "id": "yt-dual-scalper-018",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "VolumeProfile",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "Market structure: price moves from balance to imbalance to balance. Once market revisits a balanced (high-volume consolidation) range, continuation within that range is hard. Acceptance above the balance high signals the line of least resistance and continuation potential. A P-shape or b-shape on the volume distribution indicates directional expansion days.",
+    "priority": 5,
+    "tags": ["balance-imbalance", "line-of-least-resistance", "P-shape", "B-shape", "expansion-day"]
+  },
+  {
+    "id": "yt-dual-scalper-019",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "VolumeProfile",
+    "conditions": ["Ranging", "LowVolatility"],
+    "content": "Line of least resistance: If market accepts above a high-volume consolidation range (e.g., above 68.95 on ES), there should be minimal resistance to the next level. Use long-term volume profile to identify path of least resistance. If buying is above key volume levels, path of least resistance is up.",
+    "priority": 4,
+    "tags": ["line-of-least-resistance", "acceptance", "volume-levels", "continuation"]
+  },
+  {
+    "id": "yt-dual-scalper-020",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "VolumeProfile",
+    "conditions": ["Ranging", "LowVolatility"],
+    "content": "Cash session volume profile is more sensitive and valuable than full session. Use cash session volume for identifying areas to engage trades. Use full session volume (merged with prior day's profile) for longer-term analysis. At market open between two profiles: one cash-only and one full/RTH session.",
+    "priority": 3,
+    "tags": ["cash-session", "volume-profile", "full-session", "profile-merging"]
+  },
+  {
+    "id": "yt-dual-scalper-021",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "VolumeProfile",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Fixed volume profile is significant for news-driven moves: draw a fixed profile on the move that forms after strong news. If the market revisits those buyers and they need to defend price, they reload and defend. Use fixed profile to frame continuation setups after explosive news events.",
+    "priority": 4,
+    "tags": ["fixed-profile", "news-wing", "continuation-setup", "reload-defense"]
+  },
+  {
+    "id": "yt-dual-scalper-022",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "VolumeProfile",
+    "conditions": ["Trending", "Ranging", "LowVolatility"],
+    "content": "Low volume nodes: When market revisits lower volume nodes, you get the most aggressive movement of the week. Look for low volume nodes on rallies to identify potential reload/reversal zones. If there's no low volume node on a rally and it's all high volume buyers, the move may lack structure for a reversal setup.",
+    "priority": 4,
+    "tags": ["low-volume-node", "aggressive-movement", "revisit", "volume-structure"]
+  },
+  {
+    "id": "yt-dual-scalper-023",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "CLC Rule: Context (who's aggressive, who's trapped, market regime), Location (at a good level of interest), and Confirmation (valid order flow signal). When all three pillars align, that's a setup that justifies putting risk on. Never trade without all three.",
+    "priority": 5,
+    "tags": ["CLC-rule", "context-location-confirmation", "three-pillars", "execution-framing"]
+  },
+  {
+    "id": "yt-dual-scalper-024",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "VWAP is a key reference: When market is on VWAP, order activity picks up significantly. VWAP acts as a decision point. Watching speed of tape at VWAP gives clues about directional commitment.",
+    "priority": 3,
+    "tags": ["VWAP", "reference-level", "tape-activity"]
+  },
+  {
+    "id": "yt-dual-scalper-025",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Failed auction: When a candle closes significantly below its high near the top of a range or breakout (or above its low near the bottom), it signals failed auction. Cover risk fast or exit. Failed auction = the side that was pushing got absorbed and is now trapped.",
+    "priority": 4,
+    "tags": ["failed-auction", "absorption", "candlestick-signal", "risk-covering"]
+  },
+  {
+    "id": "yt-dual-scalper-026",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Full body candles with no wick show strong directional control. If candle closes full green and buyers absorbed sellers in the wick of the prior candle, that's a momentum setup. For reversal: when sellers come in the middle of the buyers' wick, it signals potential reversal.",
+    "priority": 3,
+    "tags": ["full-body-candle", "momentum-setup", "reversal-candle", "candlestick-analysis"]
+  },
+  {
+    "id": "yt-dual-scalper-027",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Initiative candle: When you have delta-price coherence with a lot of aggression — e.g., a candle where price moves aggressively in one direction without retracement — it signals directional initiative. A candle that only saw aggressive buyers and never let price retrace is a potential continuation signal.",
+    "priority": 4,
+    "tags": ["initiative-candle", "delta-coherence", "no-retracement", "continuation"]
+  },
+  {
+    "id": "yt-dual-scalper-028",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Aggression candle identification: Candles with more than 70% body and very small wicks are aggression candles that frame reload areas. When price forms the first aggressive sell candle at a level, that defines the reload zone for a potential short setup.",
+    "priority": 3,
+    "tags": ["aggression-candle", "70-percent-body", "reload-area", "small-wick"]
+  },
+  {
+    "id": "yt-dual-scalper-029",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Trap participants: Look for traders showing massive aggression toward one side. If the market moves against them, they'll have to exit causing a domino effect. Look for large bids/asks that fail to support, and then price moves against the trapped side. You're on the other side of the trap.",
+    "priority": 4,
+    "tags": ["trap-participants", "domino-effect", "failed-support", "liquidity-trap"]
+  },
+  {
+    "id": "yt-dual-scalper-030",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Don't chase price. If the move already happened, you missed it. Play for a reload setup instead of chasing. You don't play when the move already happened. Wait for price to revisit a key level with order flow confirmation before engaging.",
+    "priority": 4,
+    "tags": ["no-chasing", "reload-setup", "dont-chase", "wait-for-revisit"]
+  },
+  {
+    "id": "yt-dual-scalper-031",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Intermarket analysis (NASDAQ vs ES): NASDAQ is usually a direction driver because it's less liquid. It breaks out first, and ES follows minutes later. When NASDAQ breaks one side but ES hasn't followed, use NASDAQ's order flow as a bias for ES. If NASDAQ and ES move in sync, there's no edge in intermarket analysis. Significant outlier (one index up significantly while the other is flat) provides edge.",
+    "priority": 3,
+    "tags": ["intermarket", "NASDAQ-driver", "ES-follows", "outlier-analysis"]
+  },
+  {
+    "id": "yt-dual-scalper-032",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "Best setup for continuation: When market breaks a strong level with aggression, the next level of liquidity should trigger with ease. The path of least resistance means if buying is above a key volume level, price should move to the next level with minimal resistance. Best for trend-following.",
+    "priority": 4,
+    "tags": ["continuation-setup", "liquidity-level", "path-of-least-resistance", "trend-following"]
+  },
+  {
+    "id": "yt-dual-scalper-033",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Big institution positioning: If a large buy position is entered and price comes back to entry level, the institution will defend price to protect their position. Others notice and follow. Market maker edging mechanics — large players step in at options levels (call wall, put wall) which frame with volume profile areas.",
+    "priority": 3,
+    "tags": ["institutional-defending", "market-maker-edging", "options-levels", "position-defense"]
+  },
+  {
+    "id": "yt-dual-scalper-034",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "Footprint chart analysis: Use 20-tick range on ES footprint. Look at delta, shape of volume distribution, volume patterns, and total volume. Look for large accumulation at lows of footprint bars to indicate absorption. Total participation bar: if a lot of volume comes in but price doesn't move, that's absorption and accumulation.",
+    "priority": 4,
+    "tags": ["footprint-chart", "20-tick-range", "volume-distribution", "accumulation"]
+  },
+  {
+    "id": "yt-dual-scalper-035",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Ranging", "LowVolatility"],
+    "content": "Footprint bar time: If a bar takes 20 minutes to open/move a 5-point range, that's choppy/not volatile. If bars open quickly (every 30 seconds), speed of tape is increasing. Monitor time between bars as a volatility indicator.",
+    "priority": 2,
+    "tags": ["footprint-time", "bar-timing", "volatility-indicator", "choppy"]
+  },
+  {
+    "id": "yt-dual-scalper-036",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "When price builds horizontal volume (HVN) at a level during a move, and then revisits that level, it should hold as support/resistance because traders who entered there will defend. If it fails, it may move to the next imbalanced area.",
+    "priority": 3,
+    "tags": ["horizontal-volume", "HVN", "support-resistance", "revisit-level"]
+  },
+  {
+    "id": "yt-dual-scalper-037",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Trade management approach — Trailing stops vs wider stop for positioning: For scalping, tight stops and break-even quickly. For positioning (larger moves), wider stop loss and lighter size. On trending days, trail stop loss once the cage is broken. In choppy days with deep retracements, tight stop and break-even works better. Adjust stop loss to break even plus 2-4 ticks to cover commissions from break-even trades.",
+    "priority": 3,
+    "tags": ["trade-management", "trailing-stop", "wider-stop", "position-scalping"]
+  },
+  {
+    "id": "yt-dual-scalper-038",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Do not wait for candle close. Candle close tells minimal information for execution. When you see your trigger on DOM/footprint, execute immediately (market or aggressive limit). Hesitation destroys risk-to-reward. A 4-point move in a split second destroys entry quality. The more you think, the less you make.",
+    "priority": 4,
+    "tags": ["no-candle-close-wait", "immediate-execution", "hesitation-kills", "unconscious-execution"]
+  },
+  {
+    "id": "yt-dual-scalper-039",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Compound profits: When you catch the big directional move, use profits from the first position to load the second, third, and fourth entries on retracements. The first position at risk-free capitalizes the second, etc. This creates a domino effect where you can build 1:5 to 1:10 risk-to-reward setups by pyramiding into the trend during the expansion phase.",
+    "priority": 5,
+    "tags": ["compounding", "pyramiding", "risk-free", "continuation", "domino-effect"]
+  },
+  {
+    "id": "yt-dual-scalper-040",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "Bias system + execution model + trade management: These are three distinct systems. Bias tells you direction and context, execution model tells you when to enter (big trades/DOM/footprint confluence), trade management tells you how to manage. Each must be independent and systematic.",
+    "priority": 4,
+    "tags": ["bias-system", "execution-model", "trade-management", "three-systems"]
+  },
+  {
+    "id": "yt-dual-scalper-041",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Ranging", "LowVolatility"],
+    "content": "When both buyers at the top and sellers at the bottom are absorbed and price is in a cage/range with no clear direction, it is suicide for a scalper to engage in the cage. Wait for a clean breakout of the top or bottom. The tighter the compression, the bigger the potential expansion — but don't trade inside the compression.",
+    "priority": 5,
+    "tags": ["cage-suicide", "both-sides-absorbed", "compression", "wait-for-breakout", "range-trading"]
+  },
+  {
+    "id": "yt-dual-scalper-042",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "After two explosive directional days (trend days), expect a choppy/balancing day. The market needs to rebalance. Institutions may be gone for long weekends (e.g., Friday after CPI). Volume drops significantly on these days. Lower big-trade sensitivity filters (from normal to 40 contracts) on low-volume choppy sessions.",
+    "priority": 3,
+    "tags": ["rebalance-day", "post-explosion", "choppy-volume", "low-volume-filter"]
+  },
+  {
+    "id": "yt-dual-scalper-043",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "SessionOpen",
+    "conditions": ["SessionOpen", "HighVolatility"],
+    "content": "Pre-open battle: Before NY open, observe the fight between buyers and sellers. The side in control in the 3 minutes before open is a clue. If the pre-session buyers are in control (bulls), expect potential long opportunities, but still wait for confirmation. Mark any demand zones formed in the pre-session.",
+    "priority": 2,
+    "tags": ["pre-open", "pre-session-control", "battle", "demand-zone"]
+  },
+  {
+    "id": "yt-dual-scalper-044",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Consolidation near highs is typically a bullish sign — it means accumulation before continuation. V-shape reversals signal aggressive buying absorption. When speed of tape shows sustained aggressive buyers stepping in after pullbacks, that's directional confirmation.",
+    "priority": 3,
+    "tags": ["consolidation-highs", "bullish", "V-shape-reversal", "accumulation"]
+  },
+  {
+    "id": "yt-dual-scalper-045",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "The worst losing days are days with no expansion phase — just market consolidation, challenging the breakout of the high/low, failing 20 times. These are days where you accumulate positions but never monetize them. Contrast these with directional days where 5-6 sessions produce 70% of monthly profits, and a couple of outlier days produce monthly or yearly profits.",
+    "priority": 5,
+    "tags": ["worst-days", "no-expansion", "compression-loss", "outlier-days", "monthly-profits"]
+  },
+  {
+    "id": "yt-dual-scalper-046",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Re-entry is valid when: market pulls back to your original entry level, the original reason/conflict for entering is still present (same order flow context), and the setup still validates within your system model. Some of the best trades are re-entries when you were slightly early the first time.",
+    "priority": 4,
+    "tags": ["re-entry", "pullback-to-entry", "same-setup", "early-entry-correction"]
+  },
+  {
+    "id": "yt-dual-scalper-047",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Stop-and-reverse technique at the DOM level: Enter on breakout of range/confirmation signal, set stop below large absorption. If the entry candle closes red/failed auction, close immediately. Don't use stop-and-reverse (sell stop for double size) — wait for candle close before reversing to avoid effort-without-result traps.",
+    "priority": 3,
+    "tags": ["stop-and-reverse", "entry-exit", "failed-auction-exit", "candle-close-wait"]
+  },
+  {
+    "id": "yt-dual-scalper-048",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "VolumeProfile",
+    "conditions": ["Ranging", "LowVolatility"],
+    "content": "Price action is an advertising mechanism: like a discount store, you want to buy on discount when the market is 'on sale'. Order flow confirms whether others are also buying that discount. If market is on sale (retracement to value area) and nobody's buying, don't buy either. If others are buying the discount via aggressive bid stepping in, follow.",
+    "priority": 4,
+    "tags": ["advertising-mechanism", "discount", "order-flow-confirmation", "buying-discount"]
+  },
+  {
+    "id": "yt-dual-scalper-049",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Gap between two 1-minute candles as a reload signal: When a sell candle gaps and the next buy candle closes above the gap, that's a 'push candle' — buyers absorbed aggressive sellers. Look for this pattern at sensitive levels with speed of tape confirmation.",
+    "priority": 3,
+    "tags": ["candle-gap", "push-candle", "absorption", "reload-signal"]
+  },
+  {
+    "id": "yt-dual-scalper-050",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Achieving risk-free quickly is more valuable than chasing risk-to-reward. Even a 1:1 trade that takes seconds to go risk-free is a 'free shot' — you get your capital back and the position has unlimited upside. Value getting to risk-free above risk-reward ratio.",
+    "priority": 5,
+    "tags": ["risk-free-priority", "free-shot", "capital-protection", "quick-break-even"]
+  },
+  {
+    "id": "yt-dual-scalper-051",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Fixed rule: Only trade one execution model to avoid creative/impulsive trading. Having a single model keeps you accountable and prevents forcing trades. If you had 7-20 models, you'd find a reason to trade every day. One model means some days you simply don't trade.",
+    "priority": 4,
+    "tags": ["single-model", "accountability", "no-creative-trading", "one-execution-model"]
+  },
+  {
+    "id": "yt-dual-scalper-052",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "Never advise going live immediately. Practice on a virtual account for at least 90 days keeping the same risk management. Execution model can improve but keep risk stable for 90 days to develop discipline.",
+    "priority": 4,
+    "tags": ["virtual-account", "90-days-practice", "consistent-risk", "paper-trading"]
+  },
+  {
+    "id": "yt-dual-scalper-053",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "VolumeProfile",
+    "conditions": ["Ranging", "LowVolatility"],
+    "content": "Volume building analysis: When volume builds and expands under/around a price level as the market develops, it's a red flag to transact there. Volume building inside a balanced range means efficiency — transacting in this area is low-probability. Wait for breakout and volume to build outside the cage.",
+    "priority": 3,
+    "tags": ["volume-building", "red-flag", "efficiency", "volume-expansion"]
+  },
+  {
+    "id": "yt-dual-scalper-054",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Ranging", "LowVolatility"],
+    "content": "Bias based on recent order flow only: Recent order flow interaction holds far more value than old levels. A battle happening now with actual live orders is more important than a VWAP point from 1 month ago or a profile level from 3 weeks ago. Most recent information moves the market strongest.",
+    "priority": 4,
+    "tags": ["recent-order-flow", "recency-bias", "live-battle", "information-pricing"]
+  },
+  {
+    "id": "yt-dual-scalper-055",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Ranging", "HighVolatility"],
+    "content": "Prioritize the moment of entry: A 4-point move in a split second destroys risk-to-reward. If you wanted to buy the 65s and price bids up to the 70s instantly, you're paying a much worse price. Wait for a pullback to get better risk-to-reward. Being fast means executing at YOUR price, not chasing after price.",
+    "priority": 4,
+    "tags": ["entry-priority", "price-quality", "dont-chase", "pullback-entry"]
+  },
+  {
+    "id": "yt-dual-scalper-056",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Rejection at value area low: Watch the value area low of the cash session closely. If price rejects from the value area low, it can be a mean-reverting setup back into balance. Combine with rejection of the previous cash session close for reversal plays.",
+    "priority": 3,
+    "tags": ["value-area-low", "cash-session-close", "rejection", "mean-reversion"]
+  },
+  {
+    "id": "yt-dual-scalper-057",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "VolumeProfile",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Volume profile shape analysis: When profile looks like a 'P' shape, if the downside breaks and there is absorption, it creates a mean-reversion setup. Stacked areas forming at highs or lows create thrust potential — when stacking is printed with follow-through, squeeze is likely.",
+    "priority": 3,
+    "tags": ["P-shape", "b-shape", "stacked-areas", "thrust", "squeeze-setup"]
+  },
+  {
+    "id": "yt-dual-scalper-058",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Identifying the best candle: A candle with massive aggressive volume and building speed of tape where all three coherences align (aggression + speed + direction) in a single 1-minute candle is the execution trigger. Wait for the candle to close before reversing the position.",
+    "priority": 3,
+    "tags": ["best-candle", "three-coherences", "execution-trigger", "single-candle-setup"]
+  },
+  {
+    "id": "yt-dual-scalper-059",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Stacked areas principle: When 2-3 stacked areas of the same type form (e.g., stacked sell areas at the top of a range), the skew on risk-to-reward becomes asymmetric. If they break, you get one direction only. Don't fight the pressure — if stacked sell areas form, don't go long.",
+    "priority": 4,
+    "tags": ["stacked-areas", "asymmetric-risk", "breakout-one-direction", "no-countertrend"]
+  },
+  {
+    "id": "yt-dual-scalper-060",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "As price goes against your bias and the model isn't working, reduce exposure. Don't martingale or increase size when wrong. When the market starts paying you (explosive directional move), that's when you add size. Risk more when right, less when wrong.",
+    "priority": 4,
+    "tags": ["reduce-exposure-when-wrong", "no-martingale", "scale-in-when-right", "market-feedback"]
+  },
+  {
+    "id": "yt-dual-scalper-061",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "Maximum loss per trade is fixed (e.g., $2,500 per 1 hour). Maximum loss for the day is capped. If you close $10,000 in open P&L and it reverses to -$2,500, you're out. Having your max loss defined before the day starts removes discretion during drawdown.",
+    "priority": 5,
+    "tags": ["max-loss", "daily-drawdown", "daily-stop", "2500-per-trade", "fixed-exposure"]
+  },
+  {
+    "id": "yt-dual-scalper-062",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Always trade your own setups. If you cannot immediately tell someone why you're taking the trade, don't take it. If you can't journal immediately, there is no valid reason. Don't create setups — observe price action around key levels and let the setup come to you.",
+    "priority": 5,
+    "tags": ["own-setups", "no-forcing", "journal-immediately", "observing-not-creating"]
+  },
+  {
+    "id": "yt-dual-scalper-063",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Pick your fight: Understand whether you are a directional (trend-following) trader or a mean-reverting trader. Don't mix models in the wrong market regime — trading mean-reversion setups in a trending market causes losses. Click only when you know in the long term you have a net edge.",
+    "priority": 4,
+    "tags": ["pick-your-fight", "directional-vs-mean-reverting", "model-regime-alignment", "know-your-edge"]
+  },
+  {
+    "id": "yt-dual-scalper-064",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Market maker / Wall Street approach: Professional traders on Wall Street don't look at candles for short-term trading. They look at order flow (ICT - International CQ/Tape reading). Algorithmic data and depth of market are primary. Discretion exists in pattern recognition but the patterns are back-tested over large amounts of data.",
+    "priority": 3,
+    "tags": ["Wall-Street-approach", "no-candles", "ICT", "tape-reading", "institutional"]
+  },
+  {
+    "id": "yt-dual-scalper-065",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility", "LowVolatility"],
+    "content": "Enter price action and position management: In the correct scenario for trend continuation, the market may test the low 20 times during the day. When it finally breaks and sustains, you can have 20 stacked areas that let you load 20 contracts, giving a session of $50,000+.",
+    "priority": 3,
+    "tags": ["stacked-loading", "patience-reward", "session-profit", "accumulation-before-expansion"]
+  },
+  {
+    "id": "yt-dual-scalper-066",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["SessionOpen", "Trending", "HighVolatility"],
+    "content": "Opening range breakout strategy works well when order flow is layered on top. Breakout of the first 15-minute candle has a smooth equity curve, but adding timing tools (speed of tape, delta confirmation at the breakout) on top significantly improves execution quality.",
+    "priority": 3,
+    "tags": ["opening-range-breakout", "15-minute-breakout", "timing-tools", "equity-curve"]
+  },
+  {
+    "id": "yt-dual-scalper-067",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Liquidity trap: When market breaks a balance range and it looks like sellers are aggressively coming in, but then buyers aggressively step in and absorb — this is a liquidity trap. The breakout picked up stops/liquidity, then reversed. Watch for this pattern especially on 1-minute candles where the wick shows the trap.",
+    "priority": 4,
+    "tags": ["liquidity-trap", "stop-hunt", "absorption-after-breakout", "wick-trap"]
+  },
+  {
+    "id": "yt-dual-scalper-068",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Higher time frame balance vs intraday balance: When the market is in a higher-time-frame balance (revisiting yesterday's range), intraday directional moves are lower probability. Need to see acceptance above the higher-time-frame balance high (e.g., 68.95 on ES) before considering long setups with conviction.",
+    "priority": 4,
+    "tags": ["higher-tf-balance", "intraday-balance", "acceptance-above", "conviction"]
+  },
+  {
+    "id": "yt-dual-scalper-069",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "When market is in a cage and you have a sell signal but buyers are in control, the cage disappears when price breaks out. Never go against the pressure. If buyers are in control and you have a sell signal, wait for the cage to break before considering shorts.",
+    "priority": 3,
+    "tags": ["cage-disappears", "dont-go-against-pressure", "buyers-in-control", "wait-for-break"]
+  },
+  {
+    "id": "yt-dual-scalper-070",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "If-then statements for execution: Define clear if-then conditions before the trade. 'If this holds and that breaks, I enter.' 'If it comes under this and selling builds, it's not a setup.' Having pre-defined conditions removes emotion and hesitation during execution.",
+    "priority": 4,
+    "tags": ["if-then-statements", "pre-defined-conditions", "execution-plan", "no-emotion"]
+  },
+  {
+    "id": "yt-dual-scalper-071",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Impatience is a killer. The Fabio of 5 years ago would enter on bias alone without waiting for confirmation, take more stop losses, and lose more. Losses in earlier stages shape who you are now. Learning to wait for confirmation and not join momentum without absorption evidence is a key evolution.",
+    "priority": 4,
+    "tags": ["impatience-killer", "evolution", "waiting-for-confirmation", "learning-from-losses"]
+  },
+  {
+    "id": "yt-dual-scalper-072",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Enter where you would normally stop out: Instead of entering at your ideal entry point, consider entering at the level where your stop loss would have been if you entered at the original entry. This gives smaller risk and better reward. Works better on choppy/compression days.",
+    "priority": 3,
+    "tags": ["enter-at-stop-level", "better-risk-reward", "compression-days", "alternative-entry"]
+  },
+  {
+    "id": "yt-dual-scalper-073",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "When market is compressing upward (slow grind up with repeated failed breakouts), this is the type of day where you give back money to the market. The regime is expansion-retracement-expansion-retracement. Your trend-following model doesn't work in this regime. Accept the losses and wait for the right condition.",
+    "priority": 4,
+    "tags": ["compression-upward", "give-back-money", "wrong-regime", "accept-losses"]
+  },
+  {
+    "id": "yt-dual-scalper-074",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Different risk for different setups: When trading from the cash session low, you can take a higher stop loss and let the market breathe more. Load everything below the cash session low. But always maintain the same dollar risk ($2,500). Give more room for movement on higher-probability levels.",
+    "priority": 3,
+    "tags": ["variable-stop-same-risk", "cash-session-low", "wider-stop-higher-prob", "2500-fixed"]
+  },
+  {
+    "id": "yt-dual-scalper-075",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Don't pay yourself along the way (taking partial profits too early). Keep stop at break even and let the trade run. The ability to re-enter is more valuable than taking partials. If you take partials and the trade continues without you, you miss the big move. Some of the best trades are re-entries after being stopped out.",
+    "priority": 4,
+    "tags": ["no-partials", "break-even-stop", "let-it-run", "re-entry-value"]
+  },
+  {
+    "id": "yt-dual-scalper-076",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "When market is in the middle of a range, there is no edge. The edge is at the lows and highs of the range, not in the middle. Breakout of one side is where you engage. Trading in the middle of balance is where you lose money.",
+    "priority": 4,
+    "tags": ["middle-of-range-no-edge", "edge-at-extremes", "breakout-engagement", "balance-middle"]
+  },
+  {
+    "id": "yt-dual-scalper-077",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "TechnicalAnalysis",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "When market is in a range and you see buyers getting absorbed at the top and sellers getting absorbed at the bottom repeatedly, this is a cage. The cage rejection for the third time with speed of tape not following through is a failed auction signal. Don't engage until the cage breaks cleanly.",
+    "priority": 4,
+    "tags": ["cage-rejection", "third-rejection", "failed-auction", "no-engagement"]
+  },
+  {
+    "id": "yt-dual-scalper-078",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "When market is building a position on the way down (sellers absorbing buyers at lower levels), they are accumulating for a move down. Watch for absorption at lower levels followed by a push down. The accumulation phase shows up as effort without result at progressively lower prices.",
+    "priority": 3,
+    "tags": ["accumulation-down", "absorption-lower", "building-position", "effort-without-result"]
+  },
+  {
+    "id": "yt-dual-scalper-079",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "When market is moving up but speed of tape is dead and big trades are non-existent, there is no aggression or follow-through. This invalidates the setup. Even if the direction looks right, without speed of tape confirmation, the move lacks conviction and is likely to reverse back into the range.",
+    "priority": 4,
+    "tags": ["dead-speed-of-tape", "no-big-trades", "no-conviction", "invalidated-setup"]
+  },
+  {
+    "id": "yt-dual-scalper-080",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "The market will not pay you out the majority of days in profit. If you have a mean-reverting or low risk-to-reward model (1:1 to 1.5:1), you cannot afford revenge trading or moving your stop loss lower because you want to be right. That skews your risk-to-reward toward 1:1 and worse.",
+    "priority": 4,
+    "tags": ["market-doesnt-pay-daily", "no-revenge", "stop-moving-skew", "mean-reverting-reality"]
+  },
+  {
+    "id": "yt-dual-scalper-081",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "When market is in a range and you see a pop to the highs followed by aggressive sellers stepping in and price coming back down, this is a reload setup. The previous rejection level becomes the area where sellers reload. Look for this pop-and-reload pattern at resistance for short entries.",
+    "priority": 4,
+    "tags": ["pop-and-reload", "seller-reload", "resistance-rejection", "short-setup"]
+  },
+  {
+    "id": "yt-dual-scalper-082",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["LowVolatility"],
+    "content": "Protect yourself from floating equity: Some traders have $2500 risk then escalate to $5000 or $10000 when wrong. On a bad day, this compounds to -$20,000. Keep risk fixed and identical per trade. When wrong, reduce size, don't increase it. Standardizing risk protects on days where you're completely wrong.",
+    "priority": 4,
+    "tags": ["no-escalation", "fixed-risk-per-trade", "standardized-exposure"]
+  },
+  {
+    "id": "yt-dual-scalper-083",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "Execution",
+    "conditions": ["Trending", "HighVolatility"],
+    "content": "Power hour anticipation: The last hour of the session (around 3-4 PM ET) often brings a catch-up movement when the market finally commits to direction. If the session has been compressing all day, watch the power hour for the expansion. However, if there's no clear direction by the power hour, it may not come at all.",
+    "priority": 3,
+    "tags": ["power-hour", "late-session", "expansion", "catch-up-movement"]
+  },
+  {
+    "id": "yt-dual-scalper-084",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Different money management approaches are valid: Some traders prefer small consistent wins with minimal floating drawdown. Others prefer small red days waiting for big directional runs. Personal preference matters. The trading model (order flow) can be the same, but risk tolerance differs. Find what works for your psychology.",
+    "priority": 3,
+    "tags": ["personal-preference", "risk-tolerance", "equity-curve", "psychology"]
+  },
+  {
+    "id": "yt-dual-scalper-085",
+    "source": "youtube-interviews/Trading LIVE with TWO World Class Order Flow Scalpers.md",
+    "topic": "OrderFlow",
+    "conditions": ["Trending", "Ranging", "HighVolatility"],
+    "content": "Even with the right analysis (long bias in an uptrend), you can lose money if your timing/execution model is wrong for the regime. Being right on direction but wrong on trade type (scalp vs position) causes losses. The model must match the market regime. Expansion vs compression regimes require different models.",
+    "priority": 4,
+    "tags": ["regime-matching", "right-analysis-wrong-execution", "model-regime-alignment"]
+  }
+]

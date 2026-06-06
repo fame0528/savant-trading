@@ -1354,7 +1354,7 @@ pub async fn run(
             _atr: Option<f64>,
         }
 
-        // Save pair data for episodic capture (before consuming in JoinSet)
+        // Save pair data for episodic capture (before consuming)
         let _pair_data_for_memory: Vec<(
             String,
             savant_trading::core::types::IndicatorValues,
@@ -1364,56 +1364,143 @@ pub async fn run(
             .map(|pd| (pd.pair.clone(), pd.indicators.clone(), pd.regime))
             .collect();
 
-        let mut join_set = tokio::task::JoinSet::new();
-        let eval_semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(10));
-        for pd in pair_data_vec {
-            let provider = agent.provider_clone();
-            let sys = pd.system_prompt.clone();
-            let usr = pd.user_message.clone();
-            let atr = pd.indicators.atr;
-            let sem = eval_semaphore.clone();
-            join_set.spawn(async move {
-                let Ok(_permit) = sem.acquire().await else {
-                    tracing::warn!("Semaphore closed, skipping LLM query for {}", pd.pair);
-                    return PairResult {
-                        pair: pd.pair,
-                        response: Err(savant_trading::agent::provider::LlmError::InvalidResponse(
-                            "Semaphore closed".into(),
-                        )),
-                        current_price: pd.current_price,
-                        _atr: atr,
-                    };
-                };
-                let messages = vec![savant_trading::agent::provider::Message {
-                    role: "user".to_string(),
-                    content: usr,
-                }];
-                let start = std::time::Instant::now();
-                log_llm!("LLM", "EVALUATING {}", pd.pair);
-                let response = provider.chat_stream(&sys, &messages).await;
-                let elapsed = start.elapsed().as_millis();
-                match &response {
-                    Ok(text) => log_llm_done!("LLM", "COMPLETE {} {} chars in {}ms", pd.pair, text.len(), elapsed),
-                    Err(e) => log_swap_fail!("LLM", "ERROR {} {}", pd.pair, e),
-                }
-                PairResult {
-                    pair: pd.pair,
-                    response,
-                    current_price: pd.current_price,
-                    _atr: atr,
-                }
-            });
-        }
-
+        // === BATCH MODE: Combine all pairs into a single LLM call ===
+        // Instead of N parallel calls ($0.01-0.02 each), make 1 call with all pairs.
+        // This reduces API cost by 80-90%.
         let mut all_results: Vec<PairResult> = Vec::new();
-        while let Some(result) = join_set.join_next().await {
-            match result {
-                Ok(pr) => {
-                    all_results.push(pr);
+
+        if pair_data_vec.is_empty() {
+            log_phase!("PHASE2", "No pairs to evaluate");
+        } else if pair_data_vec.len() == 1 {
+            // Single pair — no batching needed, use direct call
+            let pd = pair_data_vec.into_iter().next().unwrap();
+            let provider = agent.provider_clone();
+            let messages = vec![savant_trading::agent::provider::Message {
+                role: "user".to_string(),
+                content: pd.user_message.clone(),
+            }];
+            let start = std::time::Instant::now();
+            log_llm!("LLM", "EVALUATING {} (single)", pd.pair);
+            let response = provider.chat_stream(&pd.system_prompt, &messages).await;
+            let elapsed = start.elapsed().as_millis();
+            match &response {
+                Ok(text) => log_llm_done!("LLM", "COMPLETE {} {} chars in {}ms", pd.pair, text.len(), elapsed),
+                Err(e) => log_swap_fail!("LLM", "ERROR {} {}", pd.pair, e),
+            }
+            all_results.push(PairResult {
+                pair: pd.pair,
+                response,
+                current_price: pd.current_price,
+                _atr: pd.indicators.atr,
+            });
+        } else {
+            // BATCH MODE: Multiple pairs — combine into single call
+            let batch_size = pair_data_vec.len();
+            let first = &pair_data_vec[0];
+
+            // Use first pair's system prompt (knowledge is similar across pairs)
+            let system_prompt = &first.system_prompt;
+
+            // Build combined user message
+            let mut batch_msg = String::new();
+            batch_msg.push_str(&format!(
+                "## BATCH EVALUATION — {} Pairs\n\n",
+                batch_size
+            ));
+            batch_msg.push_str("Evaluate ALL pairs below independently. For each pair, provide a decision in the specified JSON format.\n");
+            batch_msg.push_str("Return a JSON ARRAY containing one decision object per pair. Each object MUST include the \"pair\" field.\n\n");
+
+            // Track price per pair for parsing later
+            let mut price_map: std::collections::HashMap<String, f64> = std::collections::HashMap::new();
+            let mut atr_map: std::collections::HashMap<String, Option<f64>> = std::collections::HashMap::new();
+
+            for pd in &pair_data_vec {
+                // Extract just the market data section from each pair's user message
+                // (skip the duplicate decision prompt at the end)
+                let user_msg = &pd.user_message;
+                let data_section = if let Some(idx) = user_msg.rfind("## Decision Required") {
+                    &user_msg[..idx]
+                } else {
+                    user_msg
+                };
+                batch_msg.push_str(data_section);
+                batch_msg.push_str("\n---\n\n");
+                price_map.insert(pd.pair.clone(), pd.current_price);
+                atr_map.insert(pd.pair.clone(), pd.indicators.atr);
+            }
+
+            batch_msg.push_str("## Decision Required\n");
+            batch_msg.push_str(&format!(
+                "Return a JSON array with exactly {} decision objects, one per pair evaluated above.\n",
+                batch_size
+            ));
+            batch_msg.push_str("Each object must have the same schema as a single decision, including the \"pair\" field.\n");
+            batch_msg.push_str("Example: [{\"action\":\"Pass\",\"pair\":\"ETH/USD\",...}, {\"action\":\"Buy\",\"pair\":\"BTC/USD\",...}]\n");
+
+            let provider = agent.provider_clone();
+            let messages = vec![savant_trading::agent::provider::Message {
+                role: "user".to_string(),
+                content: batch_msg,
+            }];
+
+            let start = std::time::Instant::now();
+            log_llm!("LLM", "BATCH EVALUATING {} pairs (single call)", batch_size);
+            let response = provider.chat_stream(system_prompt, &messages).await;
+            let elapsed = start.elapsed().as_millis();
+
+            match &response {
+                Ok(text) => {
+                    log_llm_done!("LLM", "BATCH COMPLETE {} pairs, {} chars in {}ms", batch_size, text.len(), elapsed);
+
+                    // Try to parse as JSON array
+                    match serde_json::from_str::<Vec<serde_json::Value>>(text) {
+                        Ok(decisions) => {
+                            log_phase!("PHASE2", "Parsed {} decisions from batch response", decisions.len());
+                            for decision_val in decisions {
+                                let pair = decision_val.get("pair")
+                                    .and_then(|p| p.as_str())
+                                    .unwrap_or("UNKNOWN")
+                                    .to_string();
+                                let price = price_map.get(&pair).copied().unwrap_or(0.0);
+                                let atr = atr_map.get(&pair).copied().flatten();
+                                // Re-serialize individual decision for the existing parser
+                                let individual_response = serde_json::to_string(&decision_val)
+                                    .unwrap_or_default();
+                                all_results.push(PairResult {
+                                    pair,
+                                    response: Ok(individual_response),
+                                    current_price: price,
+                                    _atr: atr,
+                                });
+                            }
+                        }
+                        Err(e) => {
+                            warn!("Batch JSON parse failed ({}), falling back to per-pair evaluation", e);
+                            // Fallback: evaluate each pair individually
+                            for pd in pair_data_vec {
+                                let provider = agent.provider_clone();
+                                let messages = vec![savant_trading::agent::provider::Message {
+                                    role: "user".to_string(),
+                                    content: pd.user_message.clone(),
+                                }];
+                                let response = provider.chat_stream(&pd.system_prompt, &messages).await;
+                                all_results.push(PairResult {
+                                    pair: pd.pair,
+                                    response,
+                                    current_price: pd.current_price,
+                                    _atr: pd.indicators.atr,
+                                });
+                            }
+                        }
+                    }
                 }
-                Err(e) => warn!("Parallel task panicked: {}", e),
+                Err(e) => {
+                    log_swap_fail!("LLM", "BATCH ERROR: {}", e);
+                    // Don't fall back on API errors — just log and continue
+                }
             }
         }
+
         log_phase!("PHASE3", "Processing {} LLM results...", all_results.len());
         log_phase!("PHASE2", "Complete: {}/{} pairs evaluated", all_results.len(), active_pairs.len());
 

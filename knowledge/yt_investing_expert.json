@@ -1,0 +1,497 @@
+[
+  {
+    "id": "yt-invest-expert-001",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Real wages adjusted for inflation have not gone up for decades. The American Dream is not a reality for most people. People grind it out but savings are worth less than expected, pensions are unreliable, and the promise of retiring comfortably is broken. This is the foundational macro problem driving the need for alternative investments.",
+    "priority": 5,
+    "tags": ["wages", "inflation", "wealth-gap", "generational-wealth"]
+  },
+  {
+    "id": "yt-invest-expert-002",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Comparison of a 30-year-old in 1983 vs today: Living independently dropped from 85% to 64%. Marriage rate dropped from 80% to 47%. Having kids dropped from 60% to 32%. Home ownership dropped from 50% to 32%. Population growth is collapsing because people can't afford families. This is the first generation that won't be as wealthy as their parents (baby boomers were the richest generation the world had ever seen).",
+    "priority": 5,
+    "tags": ["generational-wealth", "home-ownership", "marriage-rate", "population-growth", "millennials"]
+  },
+  {
+    "id": "yt-invest-expert-003",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Housing affordability has tripled: when Raoul was 30, a house in London cost 3.5x salary. Today that same house costs 8-10x salary for someone with an investment banker salary. Home ownership for 30-year-olds has fallen from 50% to 32%. This pricing out creates a generation that cannot build wealth through traditional property ladder.",
+    "priority": 4,
+    "tags": ["housing-affordability", "wealth-gap", "property"]
+  },
+  {
+    "id": "yt-invest-expert-004",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending"],
+    "content": "Houses are NOT wealth creation - they are a 'lifestyle bank'. People rarely sell their houses to take the money out. Mortgages are typically 8-10x income now, and most of the payment goes to interest. If anything goes wrong, the bank takes the house. Houses feel safe because prices aren't displayed daily like stocks, but they are illiquid and can collapse suddenly (2008 proved this when job losses and price collapses happened simultaneously).",
+    "priority": 4,
+    "tags": ["housing-risk", "lifestyle-bank", "illiquidity", "2008-crash"]
+  },
+  {
+    "id": "yt-invest-expert-005",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending"],
+    "content": "Real estate rental businesses are often terrible outside major cities: repairs, tenant headaches, and the risk of a leveraged property pyramid (buying multiple houses with mortgages backed by income). If you lose your job and the economy slows, tenants can't pay rent, and the whole structure collapses. There is no easy money in this world.",
+    "priority": 3,
+    "tags": ["real-estate-risk", "leverage", "rental-income", "property-pyramid"]
+  },
+  {
+    "id": "yt-invest-expert-006",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Investment return hierarchy: S&P 500 returns ~10-11% per year (not enough to change your life). Nasdaq returns ~18% per year (compounding starts to add up). Bitcoin has returned ~145% per year since 2011 (even with three 80% drawdowns in between). More speculative crypto assets offer even higher returns but with higher risk. The key insight: the guy with $500 can get rich with crypto in a way that's impossible with traditional investments.",
+    "priority": 5,
+    "tags": ["returns-comparison", "bitcoin-returns", "sp500", "nasdaq", "compounding"]
+  },
+  {
+    "id": "yt-invest-expert-007",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending", "HalvingProximity"],
+    "content": "Bitcoin has had three 80% drawdowns in its history and still returned 145% annually since 2011. This is the nature of the asset - extreme volatility is the price of admission for extraordinary returns. Investors must be prepared to see 60-70% drawdowns and not panic sell.",
+    "priority": 5,
+    "tags": ["bitcoin-volatility", "drawdowns", "long-term-returns"]
+  },
+  {
+    "id": "yt-invest-expert-008",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Meme coins represent betting on attention itself. 99% go to zero, but some can do 1000X in 6 months. This is the super speculative end of crypto. It's cultural, not about investment bankers or gatekeepers. It's about judging whether something will go viral. The mentality that chases these high-risk bets is the same mentality that loses the gains - adrenaline junkies who are terminally online.",
+    "priority": 3,
+    "tags": ["meme-coins", "speculation", "attention-economy", "risk"]
+  },
+  {
+    "id": "yt-invest-expert-009",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "RiskManagement",
+    "conditions": ["ExtremeGreed", "Trending"],
+    "content": "The 'don't mess it up' crypto investment thesis: 80% of portfolio in Bitcoin, Ethereum, and Solana (the three with lowest risk of abandonment in the next 5 years). 90% of portfolio - do NOT use leverage. 10% - speculate on whatever you want (meme coins, etc.) because it will likely go to zero but you'll learn. The one job in crypto is: do not lose your tokens. Leverage (futures, perpetuals, credit card borrowing) is the primary way people destroy gains. Ethereum has returned 160% annually since 2015 - still not enough for some who leveraged up trying to make 400-500% and lost everything.",
+    "priority": 5,
+    "tags": ["portfolio-allocation", "leverage-risk", "bitcoin", "ethereum", "solana", "risk-management"]
+  },
+  {
+    "id": "yt-invest-expert-010",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "Sentiment",
+    "conditions": ["ExtremeGreed", "Trending"],
+    "content": "During the bull market 'banana zone' when prices go vertical, people see others making millions on meme coins and lose their minds. They buy stupid assets far out on the risk curve. When the music stops, those assets go to zero while quality tokens retain value. The pattern: start with intelligent positions (BTC, ETH), then chase risk seeing others make more money, then lose everything in the crash.",
+    "priority": 5,
+    "tags": ["bull-market-psychology", "banana-zone", "fomo", "risk-curve"]
+  },
+  {
+    "id": "yt-invest-expert-011",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "Sentiment",
+    "conditions": ["ExtremeFear", "Trending"],
+    "content": "Personal case study: A friend heavily involved in crypto made the least money and is the least rich among six friends. He invested in Luna (which went to zero), chased meme coins, and used leverage. Meanwhile, the simple strategy of buying one coin and holding for six years without checking the price outperformed. The lesson: the more active and 'expert' the trader, the worse the returns often are.",
+    "priority": 4,
+    "tags": ["trading-psychology", "luna-crash", "hodl", "active-vs-passive"]
+  },
+  {
+    "id": "yt-invest-expert-012",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "Sentiment",
+    "conditions": ["ExtremeFear"],
+    "content": "Suicides occur in bear markets when people have over-invested and lost everything. Real examples: a father with three kids under 7 put family savings into a meme coin that went to zero; a personal trainer put 6000 pounds into a coin that went to zero. These stories are why many people either won't invest in crypto or are scarred by it. The warning: only invest what you can afford to see drop 60-70%.",
+    "priority": 5,
+    "tags": ["bear-market", "over-investment", "mental-health", "risk-warning"]
+  },
+  {
+    "id": "yt-invest-expert-013",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Currency debasement: Your money loses purchasing power versus scarce assets by approximately 8% per year, plus ~3% inflation = 11% total devaluation per year. This is why keeping cash in the bank makes your future self poorer by 11% annually. The S&P 500 returns ~11% per year, meaning investing in the S&P 500 just keeps you even - you don't actually get richer after accounting for debasement.",
+    "priority": 5,
+    "tags": ["debasement", "inflation", "purchasing-power", "cash-devaluation"]
+  },
+  {
+    "id": "yt-invest-expert-014",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "The 'Everything Code' thesis: Aging populations drive debt to GDP ratios higher. Governments take on massive debt, then print money (liquidity injection) every ~4 years to pay interest payments. This cycle started in 2008 when central banks reset interest rates to zero. The US is now at 380% of GDP in debt. The entire world is at 400% of GDP in debt. This is perfectly cyclical and predictable. It will not end until the technological revolution (AI/crypto) changes the paradigm.",
+    "priority": 5,
+    "tags": ["everything-code", "debt-to-gdp", "money-printing", "liquidity-cycle", "4-year-cycle"]
+  },
+  {
+    "id": "yt-invest-expert-015",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Only two assets in the world outperform the 11% annual currency debasement rate: Technology (NASDAQ at 18% per year) and Crypto (150%+ per year). The S&P 500, real estate, and gold do NOT beat debasement. Gold has actually lost purchasing power. This narrows the investment universe to just two bets: technology and crypto.",
+    "priority": 5,
+    "tags": ["debasement-hedge", "technology", "crypto", "nasdaq", "gold-failure"]
+  },
+  {
+    "id": "yt-invest-expert-016",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Raoul Pal has 100% of his liquid net worth in crypto and has held this position for 5 years. He has been in crypto since 2013. His mistakes: selling too early (bought Bitcoin at $200, sold at $2,500 missing the run to $20,000, then bought back in 2020 during COVID sell-off). If he had simply held his original position he would have made 5x more. If he had added aggressively every 4 years during sell-offs, he would have made 25x more.",
+    "priority": 4,
+    "tags": ["allocation", "hodl", "timing-mistakes", "dollar-cost-averaging"]
+  },
+  {
+    "id": "yt-invest-expert-017",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Crypto market cap projection: From $2 trillion today to $100 trillion by 2032-2034. This is 50x the current value and would represent more wealth creation than the S&P 500 achieved in 100 years, compressed into ~20 years. Bitcoin at 40% dominance = ~$40 trillion market cap = ~$2.1 million per Bitcoin (from $62,000 today). Ethereum at 15% dominance = $15 trillion = ~$125,000 per ETH (from $2,400 today). Even if wrong by 50%, Bitcoin reaches ~$1 million.",
+    "priority": 5,
+    "tags": ["price-prediction", "market-cap-projection", "bitcoin-target", "ethereum-target", "2032-2034"]
+  },
+  {
+    "id": "yt-invest-expert-018",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "The 4-year crypto cycle: Major sell-offs occur approximately every 4 years (2014, 2018, 2022). The strategy should be to add as much money as possible during these drawdowns. Bitcoin fell 87% in 2014, 85% in 2018, and 50%+ in 2020. Each cycle bottom has been higher. The halving cycle correlates with these patterns.",
+    "priority": 4,
+    "tags": ["4-year-cycle", "halving", "buy-the-dip", "market-cycles"]
+  },
+  {
+    "id": "yt-invest-expert-019",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Blockchain explained: It's a public database (ledger) in the sky, checked by everyone with a computer. No government or bank needed to verify transactions. It solves the Byzantine Generals Problem - a mathematical problem unsolved until Bitcoin. Thousands of computers confirm each transaction through consensus. The technology is about truth and exchanging/creating value in a digital age, not just money.",
+    "priority": 4,
+    "tags": ["blockchain", "consensus", "byzantine-generals", "decentralization", "truth-machine"]
+  },
+  {
+    "id": "yt-invest-expert-020",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Digital scarcity: In a digital world where everything goes to zero in value (knowledge, content, storage), blockchain creates digital scarcity. NFTs were the first experiment - single pieces of art stored on-chain with provable ownership. This scarcity is what gives value. Everything humans do is contracts (tickets, purchases, money, government, religion) - blockchain puts all contracts on an immutable, verifiable chain.",
+    "priority": 4,
+    "tags": ["digital-scarcity", "nfts", "smart-contracts", "value-creation"]
+  },
+  {
+    "id": "yt-invest-expert-021",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Crypto is the only globally homogeneous asset on Earth. It's the same in Nigeria, Brazil, London, Silicon Valley, India, and Papua New Guinea. Everyone is on equal footing. You can buy fractions (you don't need to buy 1 Bitcoin at $60,000+). It bypasses banking systems, brokerage systems, and all incumbent gatekeepers. This levels the playing field for the fastest-growing technology of all time and the fastest-appreciating asset in history.",
+    "priority": 5,
+    "tags": ["global-access", "fractional-ownership", "financial-inclusion", "equal-footing"]
+  },
+  {
+    "id": "yt-invest-expert-022",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Real-world blockchain adoption is already happening quietly: All major commodity trading houses built on Ethereum in 2020. Every shipment - shipping contracts, quality of goods contracts, letters of credit - is on-chain. This gives them verifiable truth in an industry full of sharks and difficult countries. DocuSign records hashes on the blockchain for contract verification. The blockchain has already penetrated society without most people knowing.",
+    "priority": 4,
+    "tags": ["enterprise-adoption", "commodity-trading", "ethereum", "real-world-use", "docu-sign"]
+  },
+  {
+    "id": "yt-invest-expert-023",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Gaming on blockchain is exploding as a use case. Games like FIFA have in-game assets (Messi cards). Blockchain allows these assets to be traded outside the game on-chain. This creates brand new economies for game developers and makes in-game assets more valuable because more people can access them. Web3 gaming assets become tradeable property.",
+    "priority": 3,
+    "tags": ["web3-gaming", "in-game-assets", "ethereum", "digital-ownership"]
+  },
+  {
+    "id": "yt-invest-expert-024",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "How to invest in crypto: Open an account with Coinbase, Kraken, crypto.com, or Gemini. You can also buy through digital banks like Revolut or PayPal. Start somewhere - the easiest on-ramp is the best. Get a feel for owning an asset that goes up and down a lot (especially down). Learn to handle the volatility. Then move to self-custody: a Ledger device (USB stick) with a seed phrase (24 words stored securely across different countries) so nobody can freeze or take your assets.",
+    "priority": 4,
+    "tags": ["how-to-invest", "exchanges", "self-custody", "ledger", "seed-phrase"]
+  },
+  {
+    "id": "yt-invest-expert-025",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Bank vs crypto custody: When you put money in a bank, you don't own it - you become a creditor to the bank. The bank uses fractional reserve banking (one coin backing 30 pieces of paper). If the bank goes bust, you lose everything above the protected amount (~100K euros/pounds). With crypto on a Ledger, you truly own your assets. No government can freeze it, no bank can empty it. You just need to remember a seed phrase - easier than smuggling gold across borders.",
+    "priority": 4,
+    "tags": ["self-custody", "fractional-reserve", "bank-risk", "true-ownership"]
+  },
+  {
+    "id": "yt-invest-expert-026",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Ethereum investment thesis: Ethereum is the dominant blockchain for smart contracts and applications. It's like the 'world computer' where everyone builds on top. Layer 2 solutions build on Ethereum. If Ethereum becomes bigger and use cases grow, token value goes up. You participate in an entire technological revolution from your mobile phone. Raoul switched from Bitcoin to ETH in 2020, then from ETH to Solana, then from Solana to SUI - trying to maximize returns by chasing the highest-growth chains.",
+    "priority": 4,
+    "tags": ["ethereum", "smart-contracts", "layer2", "solana", "sui", "rotation-strategy"]
+  },
+  {
+    "id": "yt-invest-expert-027",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Solana vs Ethereum: Solana is faster, cheaper, feels more friendly and retail-oriented. It has a massive passionate developer community. The speed of innovation and the ability to do things efficiently attracted capital rotation from Ethereum. Solana was returning 250% per year even with three 80% drawdowns.",
+    "priority": 3,
+    "tags": ["solana", "ethereum-comparison", "developer-community", "block-space"]
+  },
+  {
+    "id": "yt-invest-expert-028",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "SUI blockchain: The next potential major chain. Built by the team that came out of Facebook that built Facebook Libra. Raoul is on the board of the SUI foundation. This represents the pattern of chasing the next high-growth blockchain ecosystem.",
+    "priority": 2,
+    "tags": ["sui", "facebook-libra", "new-chains"]
+  },
+  {
+    "id": "yt-invest-expert-029",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "AI is the single greatest innovation of humanity ever - the only thing that comes close is splitting the atom. Knowledge is now worth zero (like water - infinite supply destroys value). Lawyers, drivers, and most knowledge workers will be replaced. Amazon already employs more robots than humans. Robots work 24/7, never complain, and get cheaper every year. The entire economic model is breaking.",
+    "priority": 5,
+    "tags": ["ai-disruption", "knowledge-scarcity", "robots", "economic-transformation"]
+  },
+  {
+    "id": "yt-invest-expert-030",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "AI is exponential squared - it doubles/triples yearly and accelerates because AI is used to create better AI. Every 3 months everything changes completely. We're 6 months away from agentic AI that can build entire businesses (website, code, branding, marketing, email list) in minutes. This will make human-built software businesses uncompetitive. No company can plan past 6 months because the landscape shifts so fast.",
+    "priority": 5,
+    "tags": ["exponential-growth", "agentic-ai", "innovation-speed", "disruption"]
+  },
+  {
+    "id": "yt-invest-expert-031",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Human thinking is linear but technology is exponential. We perceive time as constant, but exponential growth goes straight up vertically. We are not prepared for a super-intelligence that solves its own energy, compute, and model improvement problems at an exponential rate. Society will split into two paths: those who merge with machines (neuralinks, AI enhancement) and those who reject them - like Neanderthal vs Homo sapiens.",
+    "priority": 4,
+    "tags": ["linear-thinking", "exponential-growth", "neuralink", "two-species"]
+  },
+  {
+    "id": "yt-invest-expert-032",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Investing in AI as a regular person: Buying Microsoft, Meta, or Google stock gives you normal returns, not supernormal returns. A $3 trillion company becoming $10-15 trillion is a 5x return for the most revolutionary technology ever. The VCs, early investors, and entrepreneurs capture the real wealth. The system is rigged against ordinary people - they get disrupted but don't get to participate in the upside. Crypto is the one way regular people can invest in disruption early.",
+    "priority": 5,
+    "tags": ["ai-investing", "big-tech", "vc-advantage", "wealth-concentration", "crypto-equalizer"]
+  },
+  {
+    "id": "yt-invest-expert-033",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Billionaire investment thesis: Two billionaires who invest in AI and crypto said the best investments right now are: (1) AI if you can access it, (2) Entertainment and community. In a world of AI where productivity is extreme and we may move toward universal basic income, people will have massive free time and need something to do. This explains the rise in people buying football clubs and sporting franchises - community and entertainment combined.",
+    "priority": 3,
+    "tags": ["billionaire-advice", "entertainment", "community", "ubi", "sports-franchises"]
+  },
+  {
+    "id": "yt-invest-expert-034",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "The counter-trend to AI/digital: Nature and experiences become the most valuable things. The more time we spend online, the more we desperately crave real experiences. A cafe in Amsterdam with no phones allowed (reading books, knitting) is exploding. Two billionaire friends invest in AI, crypto, AND psychedelics. The 'equal and opposite' investment to AI/digital is real-world experiences, nature, and human connection.",
+    "priority": 3,
+    "tags": ["counter-trend", "nature", "experiences", "digital-detox", "psychedelics"]
+  },
+  {
+    "id": "yt-invest-expert-035",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Tourism paradox: Despite high inflation, job losses, and economic pain in 2022, the Cayman Islands had a record tourist season. Holidays had become a necessity (not discretionary) as a reaction to work-from-home loneliness. People seek out like-minded communities - sporting teams, tour groups, crypto communities. This is the Balaji 'network state' idea: people aggregate around shared interests with no borders.",
+    "priority": 3,
+    "tags": ["tourism", "work-from-home", "community", "network-states", "loneliness"]
+  },
+  {
+    "id": "yt-invest-expert-036",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "Sentiment",
+    "conditions": ["Trending"],
+    "content": "The largest group of interest in all of social media is crypto. Crypto people feel like outcasts - something exciting is happening but 90% of friends don't care or understand. This drives online aggregation and community formation. The rise of crypto communities parallels the rise of podcast success - people searching for answers and new solutions, forming communities around shared ideas.",
+    "priority": 3,
+    "tags": ["crypto-community", "social-media", "network-effects", "outcasts"]
+  },
+  {
+    "id": "yt-invest-expert-037",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Character AI has 150 million conversations (some anime characters have 450 million). Young people are building personal relationships with AI bots at scale. When the model changed, there was uproar - 'it doesn't love me like it used to.' This is TikTok happening all over again but invisible to older generations. The real problem to solve is teenage loneliness, not just knowledge acquisition from AI.",
+    "priority": 3,
+    "tags": ["character-ai", "teenage-loneliness", "ai-relationships", "tiktok"]
+  },
+  {
+    "id": "yt-invest-expert-038",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "The 'expert and generalist' strategy: First become an expert in something (any field - from taxi driving to computer science) because someone will pay you for that expertise. Then become a generalist across as many areas as possible. This combination allows you to earn income AND spot opportunities. The expert part funds your life; the generalist part lets you see where to apply your skills for maximum return.",
+    "priority": 4,
+    "tags": ["expertise", "generalist", "career-strategy", "income"]
+  },
+  {
+    "id": "yt-invest-expert-039",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Manifesting your own destiny: Envision yourself 5 years in the future. What do you want to be? Deconstruct that vision - what skills, knowledge, and steps got you there? Reverse engineer it back to today. Work day and night in your 20s. 'Screw work-life balance' in your 20s - that's the time to put in hard work. Your work-life balance comes later in life. After university, travel for 1-2 years to gain perspective, then get your head down until mid-30s.",
+    "priority": 4,
+    "tags": ["manifesting-destiny", "reverse-engineering", "5-year-plan", "hard-work", "20s"]
+  },
+  {
+    "id": "yt-invest-expert-040",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Find a secular (long-term) trend that is big, meaningful, and provable. Apply your skill set to that trend during the hyper-acceleration phase. Example: Social media was new from ~2010, and early movers rode that secular trend. Now it's saturated. AI is the current secular trend. Crypto is the current secular trend. The key is identifying the trend early and positioning yourself in it.",
+    "priority": 5,
+    "tags": ["secular-trend", "hyper-acceleration", "social-media", "ai-trend", "crypto-trend"]
+  },
+  {
+    "id": "yt-invest-expert-041",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Find a trending market where people are underserved and they'll pay a lot of money. Health and wealth are the two areas where people pay fortunes. Example: Quest Nutrition found the trend of high-protein ketogenic foods when people had a sweet tooth but couldn't have sugar. They built a massive company quickly by serving an underserved trend.",
+    "priority": 3,
+    "tags": ["underserved-markets", "health", "wealth", "quest-nutrition", "trend-spotting"]
+  },
+  {
+    "id": "yt-invest-expert-042",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "How to spot a trend becoming cultural: There's culture around it (movies, books, media). When Raoul got into finance, there was Gordon Gekko, 'Barbarians at the Gate'. For tech, Silicon Valley mythology. For crypto, people getting rich and outsider mythology. For AI, everyone experimenting and talking about it. When every single person is talking about something and trying to figure out what it means, you know something really big is happening.",
+    "priority": 4,
+    "tags": ["trend-spotting", "culture", "media-signals", "adoption-curve"]
+  },
+  {
+    "id": "yt-invest-expert-043",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Choose your market wisely: Either go broad (candy bars - massive scale, very hard) or go niche (specific group of users with lots of money). The ultra-luxury market has price-insensitive buyers - the more expensive it is, the more they want it. Selling to billionaires flipping a $10M property for $50M yields staggering returns vs competing on two-bedroom apartments. Same skill set, different customer = vastly different returns.",
+    "priority": 4,
+    "tags": ["market-selection", "luxury-market", "price-insensitive", "niche", "broad-market"]
+  },
+  {
+    "id": "yt-invest-expert-044",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "The 'game that few people can play' theory: Everyone can buy a house, so assume returns won't be amazing. Find a game where you have high leverage and unfair advantage due to your knowledge, expertise, experience, and contacts. If everyone can play the game, don't expect high returns. If very few people can play it, that's where the highest returns are.",
+    "priority": 4,
+    "tags": ["unfair-advantage", "expertise", "barriers-to-entry", "returns"]
+  },
+  {
+    "id": "yt-invest-expert-045",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "Sentiment",
+    "conditions": ["Trending"],
+    "content": "The best trade is always quality of life. Money is just a scoring system that allows privileges. The privilege is freedom: living where you want, being surrounded by who you want, bringing up a family. If your vision of your future self matches your current state, you're happy. If not, you get upset. The goal is to align your financial strategy with your desired lifestyle, not to accumulate money for its own sake.",
+    "priority": 4,
+    "tags": ["quality-of-life", "money-as-tool", "future-self", "happiness", "freedom"]
+  },
+  {
+    "id": "yt-invest-expert-046",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "Sentiment",
+    "conditions": ["Trending"],
+    "content": "If there is a true currency in the world, it's experiences. Living in the remote wilds of Zambia, off-roading in a tent on a Land Cruiser - these experiences are incredibly valuable. You have to physically go, spend time, and be uncomfortable. Your comfort zone and where the magic happens don't intersect. The best experiences can't be bought directly - you have to go live them.",
+    "priority": 3,
+    "tags": ["experiences", "comfort-zone", "adventure", "presence"]
+  },
+  {
+    "id": "yt-invest-expert-047",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "RiskManagement",
+    "conditions": ["Trending"],
+    "content": "Crypto investment risks: (1) Governments trying to shut it down (they've tried - it's like a cork, distributed everywhere). (2) The blockchain you invest in becomes less valuable. (3) Cyclicality - crypto can fall 70-80% every 3-4 years. (4) Risk of losing your coins. There is no certainty - it's a probabilistic world. You get paid these extraordinary returns BECAUSE of these risks.",
+    "priority": 4,
+    "tags": ["crypto-risks", "government-risk", "cyclicality", "drawdowns", "risk-reward"]
+  },
+  {
+    "id": "yt-invest-expert-048",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "The 2008 bail-in precedent: During the European crisis, banks didn't get bailed out - they got 'bailed in', meaning they took depositors' savings to pay debtors. Friends of Raoul's parents were wiped out. This shattered faith in the system. Occupy Wall Street happened simultaneously. People realized the system wasn't there for them. This is why crypto matters - it's opting out of a system where you don't truly own anything.",
+    "priority": 4,
+    "tags": ["bail-in", "2008-crisis", "systemic-risk", "occupy-wall-street", "ownership"]
+  },
+  {
+    "id": "yt-invest-expert-049",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "Fractional reserve banking means the bank doesn't have your money. The average US government bond was leveraged up to 30 times in 2008 - 30 people thought they owned the same asset. When collateral is pulled, everything collapses instantly. The whole financial system is leveraged. 2008 proved nobody owns anything. This is the fundamental fragility that crypto solves.",
+    "priority": 4,
+    "tags": ["fractional-reserve", "leverage", "systemic-risk", "2008", "collateral"]
+  },
+  {
+    "id": "yt-invest-expert-050",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "The obesity trend reversal: For the first time in 50 years, obesity is falling in the US (Zempic effect). This creates huge opportunities in healthy eating. As more people take weight-loss drugs, they also think about diet. This is a secular trend with significant investment implications in health and wellness.",
+    "priority": 2,
+    "tags": ["obesity-trend", "zempic", "health-eating", "secular-trend"]
+  },
+  {
+    "id": "yt-invest-expert-051",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "Sentiment",
+    "conditions": ["Trending"],
+    "content": "Men are drawn to crypto/gambling because of societal pressure to be successful and provide. 95-98% of gambling addicts are men. It's a desperate need to get ahead combined with dopamine addiction. The internet triggers dopamine (likes, anger, engagement). Crypto's male-dominated culture reflects this. However, women are rising in blockchain, changing the 'crypto bro' culture.",
+    "priority": 3,
+    "tags": ["male-psychology", "gambling", "dopamine", "societal-pressure", "crypto-culture"]
+  },
+  {
+    "id": "yt-invest-expert-052",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "TradingSystems",
+    "conditions": ["Trending"],
+    "content": "Time horizon matters: If you want to get rich by next year, don't do crypto - you'll take too much risk and lose everything. If you want 3-5x your money in 5 years, that's reasonable. Give crypto 10 years. The asset class is projected to go from $2T to $100T by 2032-2034. Take chunks out every ~4 years during cyclical peaks and put them in the 'lifestyle bank'. The 4-year cycle allows for systematic profit-taking.",
+    "priority": 5,
+    "tags": ["time-horizon", "10-year-view", "profit-taking", "4-year-cycle", "lifestyle-bank"]
+  },
+  {
+    "id": "yt-invest-expert-053",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "Sentiment",
+    "conditions": ["Trending"],
+    "content": "Raoul's personal journey: Started in investment banking and hedge funds, then semi-retired to Spain at the beach. Felt intellectually isolated. Moved to the Cayman Islands and started Real Vision and multiple companies. Now busier than ever but happier. The lesson: the 'building season' of life transitions to the 'enjoyment season', but you may need intellectual stimulation too. Life has chapters.",
+    "priority": 2,
+    "tags": ["life-chapters", "semi-retirement", "intellectual-stimulation", "entrepreneurship"]
+  },
+  {
+    "id": "yt-invest-expert-054",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "CryptoNative",
+    "conditions": ["Trending"],
+    "content": "Dollar-cost averaging strategy: Put money into crypto every month regardless of price. Build your savings in an exponential asset that goes up a lot. This removes timing risk and builds position over time. Combined with holding quality assets (BTC, ETH, SOL) and avoiding leverage, this is the most reliable strategy for wealth creation in crypto.",
+    "priority": 4,
+    "tags": ["dollar-cost-averaging", "monthly-investing", "quality-assets", "wealth-building"]
+  },
+  {
+    "id": "yt-invest-expert-055",
+    "source": "youtube-interviews/The Investing & Crypto Expert We Only Have 6 Years Until Everything Changes.md",
+    "topic": "MacroAnalysis",
+    "conditions": ["Trending"],
+    "content": "The debt spiral: All major governments hit 100% debt-to-GDP around 2008. Now the US is at 380% and the world at 400%. Interest payments consume economic growth (if economy grows at 2% and interest is 2%, all growth goes to debt service). The only solution is to print more money, which causes more debasement, which drives people to scarce assets (crypto, tech). This is a self-reinforcing cycle that benefits crypto.",
+    "priority": 5,
+    "tags": ["debt-spiral", "debt-to-gdp", "interest-payments", "money-printing", "debasement-cycle"]
+  }
+]
