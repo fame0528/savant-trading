@@ -208,6 +208,9 @@ export default function Dashboard() {
               <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-shield-halved" className="text-[8px]" />Confidence cap</span><span className="font-semibold text-[var(--cyan)]">{memory?.confidence_cap ?? "—"}</span></div>
               <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-crosshairs" className="text-[8px]" />Brier</span><span className="font-semibold">{memory?.brier_score?.toFixed(3) ?? "—"}{memory?.brier_label ? ` (${memory.brier_label})` : ""}</span></div>
               <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-wave-square" className="text-[8px]" />CUSUM</span><span className="font-semibold">{memory?.cusum_status ?? "—"}</span></div>
+              {portfolio?.hunt_mode && (
+                <div className="flex justify-between"><span className="text-[var(--orange)] flex items-center gap-1"><Icon name="fa-crosshairs" className="text-[8px]" />Mode</span><span className="font-bold text-[var(--orange)]">HUNT</span></div>
+              )}
             </div>
           </div>
         </div>

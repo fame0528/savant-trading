@@ -185,6 +185,7 @@ async fn get_config(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
 
 async fn get_portfolio(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
     let account = state.shared.account.read().await;
+    let hunt = *state.shared.hunt_mode.read().await;
     Json(ApiResponse::ok(serde_json::json!({
         "balance": account.balance,
         "equity": account.equity,
@@ -194,6 +195,7 @@ async fn get_portfolio(State(state): State<AppState>) -> Json<ApiResponse<serde_
         "peak_equity": account.peak_equity,
         "open_positions": account.open_positions,
         "trades_today": account.trades_today,
+        "hunt_mode": hunt,
     })))
 }
 

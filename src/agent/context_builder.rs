@@ -394,13 +394,24 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
     }
 
     // Account state
+    let idle_capital = ctx.account.balance;
+    let equity = ctx.account.equity;
+    let is_hunt_mode = equity < 500.0 && idle_capital > 5.0;
     msg.push_str(&format!(
         "\n## Account\nBalance: ${:.2} | Equity: ${:.2} | DD: {:.1}% | Open: {}\n",
-        ctx.account.balance,
-        ctx.account.equity,
+        idle_capital,
+        equity,
         ctx.account.drawdown_pct * 100.0,
         ctx.account.open_positions
     ));
+    if is_hunt_mode {
+        msg.push_str(&format!(
+            "**HUNT MODE:** ${:.2} idle capital. Under $500 — aggressively scan for high-conviction entries. \
+            Capital velocity > capital preservation. Deploy into the best available setup. \
+            If current positions have room to add, consider expanding. If new setups exist, take them.\n",
+            idle_capital
+        ));
+    }
 
     // Trade history (if available from journal)
     if let Some(trades) = ctx.recent_trades {

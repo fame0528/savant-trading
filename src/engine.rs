@@ -1188,6 +1188,35 @@ pub async fn run(
             );
         }
 
+        // FID-063: Hunt mode — under $500 with idle capital > $5.
+        // Bypass candle hash cache and pre-scoring filter. The LLM decides whether
+        // to enter based on knowledge units, on-chain data, and sentiment — not
+        // just RSI/ADX/EMA. Per soul.md: "Capital velocity > Capital preservation.
+        // Below $500, we treat the account as a call option on our own skill."
+        let total_equity = portfolio.account().equity;
+        let hunt_mode = !fully_deployed && total_equity < 500.0 && available_balance > 5.0;
+        if hunt_mode {
+            shared
+                .log_activity(
+                    savant_trading::core::shared::ActivityLevel::Thinking,
+                    "SYSTEM",
+                    &format!(
+                        "HUNT MODE ACTIVE: ${:.2} idle of ${:.2} equity — scanning all pairs for entries",
+                        available_balance, total_equity
+                    ),
+                )
+                .await;
+            debug!(
+                "HUNT MODE: ${:.2} idle of ${:.2} equity — evaluating all pairs for entries",
+                available_balance, total_equity
+            );
+        }
+        // Sync hunt_mode to shared state for API/dashboard visibility (FID-063)
+        {
+            let mut hm = shared.hunt_mode.write().await;
+            *hm = hunt_mode;
+        }
+
         for pair in &active_pairs {
             if fully_deployed {
                 break;
@@ -1278,8 +1307,10 @@ pub async fn run(
                 // EXCEPTION: Always re-evaluate pairs with open positions — the LLM needs
                 // to see current price + position state for stop adjustments, even if
                 // candle data hasn't changed yet.
+                // EXCEPTION (FID-063): In hunt mode, always evaluate — the LLM should scan
+                // for entries every cycle regardless of candle staleness.
                 let has_position = positions.iter().any(|p| p.pair == *pair);
-                if !has_position {
+                if !has_position && !hunt_mode {
                     use std::hash::{Hash, Hasher};
                     let mut hasher = std::hash::DefaultHasher::new();
                     let tail = candle_data.iter().rev().take(5);
@@ -1331,7 +1362,9 @@ pub async fn run(
                 // Only send to LLM if at least one signal fires: RSI extreme, strong trend, or EMA cross.
                 // EXCEPTION: Always evaluate pairs with open positions — the LLM may need to
                 // adjust stops based on price action even without technical signals.
-                if !has_position {
+                // EXCEPTION (FID-063): In hunt mode, always evaluate — the LLM uses knowledge
+                // units + on-chain data, not just technical indicators.
+                if !has_position && !hunt_mode {
                     let rsi = indicators.rsi.unwrap_or(50.0);
                     let adx = indicators.adx.unwrap_or(0.0);
                     let ema_fast = indicators.ema_fast.unwrap_or(0.0);

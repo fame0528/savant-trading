@@ -24,6 +24,7 @@ export interface Portfolio {
   peak_equity: number;
   open_positions: number;
   trades_today: number;
+  hunt_mode: boolean;
 }
 
 export interface Position {

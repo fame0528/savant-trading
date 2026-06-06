@@ -21,6 +21,9 @@ pub struct SharedEngineData {
     /// Stop-loss overrides from API — pair → new stop price.
     /// Engine reads and applies these each cycle, then clears them.
     pub stop_overrides: Arc<RwLock<HashMap<String, f64>>>,
+    /// FID-063: Hunt mode flag — true when idle capital > $5 and equity < $500.
+    /// Exposed to API/dashboard for visibility.
+    pub hunt_mode: Arc<RwLock<bool>>,
 }
 
 /// Memory system state for TUI display.
@@ -95,6 +98,7 @@ impl SharedEngineData {
             })),
             equity_curve: Arc::new(RwLock::new(Vec::new())),
             stop_overrides: Arc::new(RwLock::new(HashMap::new())),
+            hunt_mode: Arc::new(RwLock::new(false)),
         }
     }
 
