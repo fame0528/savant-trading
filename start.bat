@@ -13,17 +13,30 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":3000 " ^| findstr "LISTENIN
     taskkill /F /PID %%a >nul 2>&1
 )
 timeout /t 2 /nobreak >nul
-echo  Building release binary...
+echo  Building Rust engine...
 echo.
 cargo build --release 2>&1
 if errorlevel 1 (
     echo.
-    echo  BUILD FAILED. Fix errors and restart.
+    echo  ENGINE BUILD FAILED. Fix errors and restart.
     pause
     exit /b 1
 )
 echo.
-echo  Build complete. Starting engine...
+echo  Engine build complete. Building dashboard...
+echo.
+cd dashboard
+call npm run build 2>&1
+if errorlevel 1 (
+    echo.
+    echo  DASHBOARD BUILD FAILED. Fix errors and restart.
+    cd ..
+    pause
+    exit /b 1
+)
+cd ..
+echo.
+echo  Both builds complete. Starting engine + dashboard...
 echo.
 target\release\savant.exe serve
 echo.
