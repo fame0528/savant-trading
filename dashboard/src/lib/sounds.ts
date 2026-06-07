@@ -2,6 +2,10 @@
 
 // Sci-fi sound effects using Web Audio API — no external files needed.
 // Each sound is synthesized on the fly with a retro-futuristic aesthetic.
+//
+// FID-077: Custom sound clips can be placed in /public/sounds/wins/ and
+// /public/sounds/losses/. When available, a random clip is played instead
+// of the synthesized fallback. Supports .mp3, .wav, .ogg.
 
 let audioCtx: AudioContext | null = null;
 
@@ -57,6 +61,66 @@ function playNoise(duration: number, gain = 0.08) {
   src.stop(ctx.currentTime + duration);
 }
 
+// ── FID-077: Custom sound clip support ──────────────────────────────────
+// Drop .mp3/.wav/.ogg files into /public/sounds/wins/ and /public/sounds/losses/.
+// When files exist, a random clip plays instead of the synth fallback.
+
+const WIN_CLIPS = [
+  "/sounds/wins/win-1.mp3",
+  "/sounds/wins/win-2.mp3",
+];
+
+const LOSS_CLIPS = [
+  "/sounds/losses/loss-1.mp3",
+  "/sounds/losses/loss-2.mp3",
+  "/sounds/losses/loss-3.mp3",
+];
+
+let availableWins: string[] | null = null;
+let availableLosses: string[] | null = null;
+
+async function probeClips(candidates: string[]): Promise<string[]> {
+  const found: string[] = [];
+  for (const url of candidates) {
+    try {
+      const r = await fetch(url, { method: "HEAD" });
+      if (r.ok) found.push(url);
+    } catch { /* skip */ }
+  }
+  return found;
+}
+
+async function getAvailableWins(): Promise<string[]> {
+  if (availableWins !== null) return availableWins;
+  availableWins = await probeClips(WIN_CLIPS);
+  return availableWins;
+}
+
+async function getAvailableLosses(): Promise<string[]> {
+  if (availableLosses !== null) return availableLosses;
+  availableLosses = await probeClips(LOSS_CLIPS);
+  return availableLosses;
+}
+
+function pickRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+async function playClipOrDefault(
+  clips: Promise<string[]>,
+  fallback: () => void,
+  volume = 0.5,
+): Promise<void> {
+  const available = await clips;
+  if (available.length > 0) {
+    const audio = new Audio(pickRandom(available));
+    audio.volume = volume;
+    audio.play().catch(() => {});
+  } else {
+    fallback();
+  }
+}
+
 export const sounds = {
   // Trade opened — ascending double blip
   tradeOpen() {
@@ -69,18 +133,28 @@ export const sounds = {
     playSweep(1200, 400, 0.25, "sawtooth", 0.08);
   },
 
-  // Stop loss hit — urgent alarm
+  // Stop loss hit — urgent alarm (or custom loss clip)
   stopLoss() {
-    playTone(440, 0.15, "square", 0.12);
-    setTimeout(() => playTone(330, 0.15, "square", 0.12), 160);
-    setTimeout(() => playTone(220, 0.3, "square", 0.12), 320);
+    playClipOrDefault(
+      getAvailableLosses(),
+      () => {
+        playTone(440, 0.15, "square", 0.12);
+        setTimeout(() => playTone(330, 0.15, "square", 0.12), 160);
+        setTimeout(() => playTone(220, 0.3, "square", 0.12), 320);
+      },
+    );
   },
 
-  // Take profit hit — success chime
+  // Take profit hit — success chime (or custom win clip)
   takeProfit() {
-    playTone(1047, 0.1, "sine", 0.12);
-    setTimeout(() => playTone(1319, 0.1, "sine", 0.12), 100);
-    setTimeout(() => playTone(1568, 0.15, "sine", 0.12), 200);
+    playClipOrDefault(
+      getAvailableWins(),
+      () => {
+        playTone(1047, 0.1, "sine", 0.12);
+        setTimeout(() => playTone(1319, 0.1, "sine", 0.12), 100);
+        setTimeout(() => playTone(1568, 0.15, "sine", 0.12), 200);
+      },
+    );
   },
 
   // Circuit breaker — heavy warning
