@@ -1043,9 +1043,14 @@ pub async fn run(
 
     let mut tick = 0u64;
 
-    // FID-073 Issue 2: Prevent overlapping LLM evaluations.
+    // FID-081: Prevent overlapping LLM evaluations.
     // If a previous cycle's LLM call is still running, skip the new eval phase.
     let eval_in_progress = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+
+    // FID-081: Force LLM review of recovered positions on first cycle.
+    // When the engine starts with wallet-recovered positions, the LLM should
+    // evaluate whether to hold, adjust stops, or close.
+    let mut startup_position_review = !portfolio.positions().is_empty();
 
     loop {
         tick += 1;
@@ -1184,10 +1189,10 @@ pub async fn run(
         let fully_deployed = available_balance < min_order_value;
 
         // FID-081: Stale-recovery re-eval — if prices were stale and just recovered,
-        // force evaluation of open positions to check if hold thesis is still valid.
+        // OR if this is the first cycle with recovered positions, force evaluation.
         let stale_recovery_reval = {
             let staleness = *shared.price_staleness_secs.read().await;
-            staleness > 300 && !portfolio.positions().is_empty()
+            (staleness > 300 || startup_position_review) && !portfolio.positions().is_empty()
         };
 
         if fully_deployed && !stale_recovery_reval {
@@ -1198,7 +1203,12 @@ pub async fn run(
                 min_order_value
             );
         } else if fully_deployed && stale_recovery_reval {
-            warn!("FID-081: Stale data detected with open positions — forcing re-evaluation of held positions");
+            if startup_position_review {
+                warn!("Startup: wallet-recovered positions detected — forcing LLM review of held positions");
+                startup_position_review = false;
+            } else {
+                warn!("FID-081: Stale data detected with open positions — forcing re-evaluation of held positions");
+            }
         }
 
         // FID-063: Hunt mode — under $500 with idle capital > $5.
