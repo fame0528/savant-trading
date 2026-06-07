@@ -1607,7 +1607,10 @@ pub async fn run(
             {
                 Ok(result) => result,
                 Err(_) => {
-                    warn!("Batch LLM call timed out after 180s — skipping {} pairs", batch_size);
+                    warn!(
+                        "Batch LLM call timed out after 180s — skipping {} pairs",
+                        batch_size
+                    );
                     continue;
                 }
             };

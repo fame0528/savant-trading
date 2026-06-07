@@ -75,10 +75,10 @@ impl Session {
     /// Returns a multiplier to apply to the agent's confidence score.
     pub fn breakout_confidence_penalty(&self) -> f64 {
         match self {
-            Session::DeepAsian => 0.6,     // 40% penalty — breakouts fail here
-            Session::LateAsian => 0.85,    // 15% penalty
-            Session::LateUs => 0.85,       // 15% penalty
-            _ => 1.0,                      // No penalty during liquid sessions
+            Session::DeepAsian => 0.6,  // 40% penalty — breakouts fail here
+            Session::LateAsian => 0.85, // 15% penalty
+            Session::LateUs => 0.85,    // 15% penalty
+            _ => 1.0,                   // No penalty during liquid sessions
         }
     }
 

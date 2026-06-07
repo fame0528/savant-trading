@@ -191,6 +191,24 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* ── News Ticker ── */}
+      <div className="shrink-0 overflow-hidden bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md h-6 flex items-center">
+        <div className="flex items-center gap-6 animate-[scroll_30s_linear_infinite] whitespace-nowrap px-4">
+          {insight?.trending_coins?.slice(0, 6).map((c, i) => (
+            <span key={`t-${i}`} className="text-[9px] flex items-center gap-1 text-[var(--cyan)]"><Icon name="fa-fire" className="text-[7px]" />{c}</span>
+          ))}
+          <span className="text-[9px] flex items-center gap-1 text-[var(--amber)]"><Icon name="fa-face-grimace" className="text-[7px]" />F&G: {insight?.fear_greed ?? "—"} ({insight?.fear_greed_label ?? "—"})</span>
+          <span className="text-[9px] flex items-center gap-1 text-[var(--dim)]"><Icon name="fa-faucet-drip" className="text-[7px]" />Funding: {insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"}</span>
+          <span className="text-[9px] flex items-center gap-1 text-[var(--dim)]"><Icon name="fa-bitcoin-sign" className="text-[7px]" />BTC Dom: {insight?.btc_dominance?.toFixed(1) ?? "—"}%</span>
+          <span className="text-[9px] flex items-center gap-1 text-[var(--dim)]"><Icon name="fa-cube" className="text-[7px]" />Block: {insight?.block_height?.toLocaleString() ?? "—"}</span>
+          {insight?.trending_coins?.slice(0, 6).map((c, i) => (
+            <span key={`t2-${i}`} className="text-[9px] flex items-center gap-1 text-[var(--cyan)]"><Icon name="fa-fire" className="text-[7px]" />{c}</span>
+          ))}
+          <span className="text-[9px] flex items-center gap-1 text-[var(--amber)]"><Icon name="fa-face-grimace" className="text-[7px]" />F&G: {insight?.fear_greed ?? "—"} ({insight?.fear_greed_label ?? "—"})</span>
+          <span className="text-[9px] flex items-center gap-1 text-[var(--dim)]"><Icon name="fa-faucet-drip" className="text-[7px]" />Funding: {insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"}</span>
+        </div>
+      </div>
+
       {/* ── KPI Bar ── */}
       <div className="grid grid-cols-6 gap-1.5 shrink-0">
         <KPI icon="fa-wallet" label="Portfolio Value" value={fmt.usd(eq)} color="text-[var(--cyan)]" />
