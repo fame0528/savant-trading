@@ -8,6 +8,7 @@ import {
   ProgressBarFill,
 } from "@heroui/react";
 import { useDashboard } from "@/hooks/useDashboard";
+import { copyFormatters } from "@/lib/copy";
 import { sounds } from "@/lib/sounds";
 import { useEffect, useRef } from "react";
 import toast, { Toaster } from "react-hot-toast";
@@ -76,7 +77,7 @@ function CopyButton({ text, title }: { text: () => string; title?: string }) {
   return (
     <button
       onClick={() => navigator.clipboard.writeText(text())}
-      className="text-[var(--dim)] hover:text-[var(--cyan)] transition-colors cursor-pointer"
+      className="inline-flex items-center justify-center text-[var(--dim)] hover:text-[var(--cyan)] transition-colors cursor-pointer leading-none"
       title={title ?? "Copy to clipboard"}
     >
       <Icon name="fa-copy" className="text-[9px]" />
@@ -87,10 +88,10 @@ function CopyButton({ text, title }: { text: () => string; title?: string }) {
 function SectionHeader({ icon, title, tag, tagColor, onCopy }: { icon: string; title: string; tag?: string; tagColor?: string; onCopy?: () => string }) {
   return (
     <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-[var(--line)]">
-      <Icon name={icon} className="text-[var(--dim)] text-[10px]" />
-      <span className="text-[10px] tracking-[2px] uppercase font-semibold text-[var(--dim)]">{title}</span>
-      {tag && <span className={`ml-auto text-[9px] font-bold ${tagColor ?? "text-[var(--cyan)]"}`}>{tag}</span>}
-      {onCopy && <CopyButton text={onCopy} title={`Copy ${title.toLowerCase()}`} />}
+      <span className="inline-flex items-center"><Icon name={icon} className="text-[var(--dim)] text-[10px]" /></span>
+      <span className="text-[10px] tracking-[2px] uppercase font-semibold text-[var(--dim)] leading-none">{title}</span>
+      {tag && <span className={`ml-auto text-[9px] font-bold leading-none ${tagColor ?? "text-[var(--cyan)]"}`}>{tag}</span>}
+      {onCopy && <span className="ml-auto inline-flex items-center"><CopyButton text={onCopy} title={`Copy ${title.toLowerCase()}`} /></span>}
     </div>
   );
 }
@@ -212,7 +213,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-gauge-high" title="Performance" onCopy={() => `Performance\n${session?.wins ?? 0}W / ${session?.losses ?? 0}L\nDecisions: ${session?.total_decisions ?? 0}\nTrades today: ${portfolio?.trades_today ?? 0}\nConfidence: ${memory?.confidence_cap ?? "—"}\nBrier: ${memory?.brier_score?.toFixed(3) ?? "—"}\nCUSUM: ${memory?.cusum_status ?? "—"}`} />
+          <SectionHeader icon="fa-gauge-high" title="Performance" onCopy={() => copyFormatters.performance(session)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-1 text-[11px]">
             <div className="flex justify-between">
               <span className="text-[var(--green)] flex items-center gap-1"><Icon name="fa-circle-check" className="text-[9px]" />{session?.wins ?? 0}W</span>
@@ -235,7 +236,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-globe" title="Market Insight" onCopy={() => `Market Insight\nFear & Greed: ${insight?.fear_greed ?? "—"} (${insight?.fear_greed_label ?? "—"})\nFunding: ${insight?.funding_rate ?? "—"}\nBTC Dom: ${insight?.btc_dominance ?? "—"}\nBlock: ${insight?.block_height ?? "—"}\nNews: ${insight?.rss_items ?? 0}\nTrending: ${insight?.trending_coins?.join(", ") ?? "—"}`} />
+          <SectionHeader icon="fa-globe" title="Market Insight" onCopy={() => copyFormatters.marketInsight(insight)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             <div className="flex items-center gap-3">
               <div className="text-center shrink-0">
@@ -262,7 +263,7 @@ export default function Dashboard() {
 
         {/* Row 2: Positions | Risk | Decisions */}
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-briefcase" title="Open Positions" tag={`${positions.length}`} onCopy={() => positions.map(p => `${p.pair} ${p.side} @ ${p.entry_price} | SL: ${p.stop_loss} | PnL: ${p.unrealized_pnl?.toFixed(2)}`).join("\n") || "No positions"} />
+          <SectionHeader icon="fa-briefcase" title="Open Positions" tag={`${positions.length}`} onCopy={() => copyFormatters.positions(positions)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {positions.length === 0 ? (
               <p className="text-[var(--dimmer)] text-xs text-center py-4 flex items-center justify-center gap-1.5">
@@ -313,7 +314,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-shield-halved" title="Risk Controls" onCopy={() => `Risk Controls\nCircuit breaker: ${risk?.circuit_breaker ?? "OK"}\nDrawdown: ${((risk?.drawdown_pct ?? 0) * 100).toFixed(1)}% / ${((risk?.max_drawdown ?? 0.1) * 100).toFixed(0)}%\nDaily loss: ${Math.abs((risk?.daily_loss_pct ?? 0) * 100).toFixed(1)}% / ${((risk?.max_daily_loss ?? 0.05) * 100).toFixed(0)}%\nPositions: ${risk?.open_positions ?? 0} / ${risk?.max_positions ?? 3}\nRisk/trade: ${((risk?.max_risk_per_trade ?? 0) * 100).toFixed(0)}%`} />
+          <SectionHeader icon="fa-shield-halved" title="Risk Controls" onCopy={() => copyFormatters.risk(risk)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-1.5 text-[11px]">
             <div className="flex justify-between items-center">
               <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-bolt" className="text-[8px]" />Circuit breaker</span>
@@ -340,7 +341,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-robot" title="AI Decisions" tag="live" onCopy={() => decisions.map(d => `${d.pair} ${d.action} ${(d.confidence * 100).toFixed(0)}% — ${d.reasoning ?? ""}`).join("\n") || "No decisions"} />
+          <SectionHeader icon="fa-robot" title="AI Decisions" tag="live" onCopy={() => copyFormatters.decisions(decisions)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {decisions.length === 0 ? (
               <p className="text-[var(--dimmer)] text-xs text-center py-4 flex items-center justify-center gap-1.5">
@@ -357,9 +358,10 @@ export default function Dashboard() {
                       <span className={`text-[8px] px-1 py-0.5 rounded font-bold flex items-center gap-0.5 ${
                         a === "BUY" ? "text-[var(--green)] bg-[var(--green)]/10" :
                         a === "SELL" || a === "CLOSE" ? "text-[var(--red)] bg-[var(--red)]/10" :
+                        a === "ADJUST" || a === "ADJUSTSTOP" ? "text-[var(--amber)] bg-[var(--amber)]/10" :
                         "text-[var(--dim)] bg-white/5"
                       }`}>
-                        <Icon name={a === "BUY" ? "fa-circle-arrow-up" : a === "SELL" || a === "CLOSE" ? "fa-circle-arrow-down" : "fa-minus"} className="text-[6px]" />
+                        <Icon name={a === "BUY" ? "fa-circle-arrow-up" : a === "SELL" || a === "CLOSE" ? "fa-circle-arrow-down" : a === "ADJUST" || a === "ADJUSTSTOP" ? "fa-sliders" : "fa-minus"} className="text-[6px]" />
                         {a}
                       </span>
                       <ProgressBarRoot className="flex-1 h-[3px] bg-white/5 rounded-full overflow-hidden">
@@ -379,8 +381,23 @@ export default function Dashboard() {
         <div className="bg-[#0a0c14] border border-[var(--line)] flex flex-col overflow-hidden">
           <div className="flex items-center gap-2 px-3 py-1.5 border-b border-[var(--line)]">
             <i className="fa-solid fa-terminal text-[var(--dim)] text-[9px]" />
-            <span className="text-[10px] text-[var(--dim)] tracking-wider font-mono">savant — terminal</span>
+            <span className="text-[10px] text-[var(--dim)] tracking-wider font-mono leading-none">savant — terminal</span>
             <div className="flex-1" />
+            <CopyButton text={() => {
+              try {
+                const el = document.querySelector('.xterm-screen');
+                if (!el) return "Terminal not available";
+                const rows = el.querySelectorAll('.xterm-rows > div');
+                const lines: string[] = [];
+                rows.forEach((row) => {
+                  const spans = row.querySelectorAll('span');
+                  let line = "";
+                  spans.forEach((s) => { line += s.textContent ?? ""; });
+                  if (line.trim()) lines.push(line);
+                });
+                return lines.join("\n") || "No terminal output";
+              } catch { return "Could not read terminal"; }
+            }} title="Copy terminal output" />
             <span className="w-2.5 h-2.5 rounded-full bg-[var(--green)]/80"></span>
             <span className="w-2.5 h-2.5 rounded-full bg-[var(--amber)]/80"></span>
             <span className="w-2.5 h-2.5 rounded-full bg-[var(--red)]/80"></span>
@@ -397,18 +414,9 @@ export default function Dashboard() {
             <Icon name="fa-timeline" className="text-[var(--dim)] text-[10px]" />
             <span className="text-[10px] tracking-[2px] uppercase font-semibold text-[var(--dim)]">Activity</span>
             <span className="ml-auto text-[9px] font-bold text-[var(--cyan)]">{activity.length}</span>
-            <button
-              onClick={() => {
-                const text = [...activity].reverse().map(e =>
-                  `${formatTime12h(e.timestamp)} [${e.pair}] ${e.message}`
-                ).join("\n");
-                navigator.clipboard.writeText(text);
-              }}
-              className="text-[var(--dim)] hover:text-[var(--cyan)] transition-colors cursor-pointer"
-              title="Copy activity log"
-            >
-              <Icon name="fa-copy" className="text-[9px]" />
-            </button>
+            <span className="inline-flex items-center">
+              <CopyButton text={() => copyFormatters.activity(activity)} title="Copy activity log" />
+            </span>
           </div>
           <div className="flex-1 px-3 pb-2 overflow-y-auto font-mono text-[10px]">
             {activity.length === 0 ? (
@@ -428,7 +436,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-receipt" title="Closed Trades" tag={`${trades.length}`} onCopy={() => trades.map(t => `${t.pair} ${t.side} ${t.entry_price}→${t.exit_price} ${t.pnl >= 0 ? "+" : ""}${t.pnl?.toFixed(2)} (${t.pnl_pct?.toFixed(2)}%)`).join("\n") || "No trades"} />
+          <SectionHeader icon="fa-receipt" title="Closed Trades" tag={`${trades.length}`} onCopy={() => copyFormatters.trades(trades)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {trades.length === 0 ? (
               <p className="text-[var(--dimmer)] text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No closed trades yet.</p>
