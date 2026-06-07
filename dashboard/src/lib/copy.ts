@@ -78,3 +78,19 @@ export const copyFormatters = {
           .map((e) => `[${e.timestamp}] [${e.level}] ${e.pair}: ${e.message}`)
           .join("\n"),
 };
+
+export function downloadTradesCSV(t: TradeRecord[]) {
+  if (t.length === 0) return;
+  const header = "pair,side,entry,exit,qty,pnl,pnl_pct,closed_at,notes";
+  const rows = t.map((tr) =>
+    `${tr.pair},${tr.side},${tr.entry_price},${tr.exit_price},${tr.quantity},${tr.pnl.toFixed(2)},${tr.pnl_pct.toFixed(2)},${tr.closed_at},"${(tr.notes ?? "").replace(/"/g, '""')}"`
+  );
+  const csv = [header, ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `savant-trades-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}

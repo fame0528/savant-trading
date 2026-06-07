@@ -8,7 +8,7 @@ import {
   ProgressBarFill,
 } from "@heroui/react";
 import { useDashboard } from "@/hooks/useDashboard";
-import { copyFormatters } from "@/lib/copy";
+import { copyFormatters, downloadTradesCSV } from "@/lib/copy";
 import { sounds } from "@/lib/sounds";
 import { useEffect, useRef } from "react";
 import toast, { Toaster } from "react-hot-toast";
@@ -480,7 +480,23 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-receipt" title="Closed Trades" tag={`${trades.length}`} onCopy={() => copyFormatters.trades(trades)} />
+          <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-[var(--line)]">
+            <span className="inline-flex items-center"><Icon name="fa-receipt" className="text-[var(--dim)] text-[10px]" /></span>
+            <span className="text-[10px] tracking-[2px] uppercase font-semibold text-[var(--dim)] leading-none">Closed Trades</span>
+            <span className="ml-auto text-[9px] font-bold leading-none text-[var(--cyan)]">{trades.length}</span>
+            <span className="ml-auto inline-flex items-center">
+              <CopyButton text={() => copyFormatters.trades(trades)} title="Copy closed trades" />
+            </span>
+            {trades.length > 0 && (
+              <button
+                onClick={() => downloadTradesCSV(trades)}
+                className="inline-flex items-center justify-center text-[var(--dim)] hover:text-[var(--cyan)] transition-colors cursor-pointer leading-none"
+                title="Download CSV"
+              >
+                <Icon name="fa-download" className="text-[9px]" />
+              </button>
+            )}
+          </div>
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {trades.length === 0 ? (
               <p className="text-[var(--dimmer)] text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No closed trades yet.</p>
