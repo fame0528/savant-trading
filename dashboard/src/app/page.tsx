@@ -235,7 +235,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-globe" title="Market Insight" onCopy={() => `Market Insight\nFear & Greed: ${insight?.fear_greed ?? "—"} (${insight?.fear_greed_label ?? "—"})\nFunding: ${insight?.funding_rate ?? "—"}\nBTC Dom: ${insight?.btc_dominance ?? "—"}\nBlock: ${insight?.block_number ?? "—"}\nNews: ${insight?.rss_count ?? 0}\nTrending: ${insight?.trending?.join(", ") ?? "—"}`} />
+          <SectionHeader icon="fa-globe" title="Market Insight" onCopy={() => `Market Insight\nFear & Greed: ${insight?.fear_greed ?? "—"} (${insight?.fear_greed_label ?? "—"})\nFunding: ${insight?.funding_rate ?? "—"}\nBTC Dom: ${insight?.btc_dominance ?? "—"}\nBlock: ${insight?.block_height ?? "—"}\nNews: ${insight?.rss_items ?? 0}\nTrending: ${insight?.trending_coins?.join(", ") ?? "—"}`} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             <div className="flex items-center gap-3">
               <div className="text-center shrink-0">

@@ -23,6 +23,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 - **CRITICAL: Stop-loss execution failure on micro-amounts** — Live incident where 0.01485 WETH (~$23) stop-loss couldn't close via standard 0x swap. API returned 0 output tokens (dust). System retried every cycle for 30+ minutes without success. Gasless fallback now handles this automatically.
+- **Duplicate trade closures inflating win/loss count** — Same position closed multiple times across ticks (stop-loss fires, position re-registers via wallet recovery, stop fires again). Added deduplication: same pair+entry+exit+side within 60s = skip recording. (FID-065)
+- **Dashboard TypeScript build errors** — `block_number` → `block_height`, `rss_count` → `rss_items`, `trending` → `trending_coins`. Caused by editing dashboard without reading full type definitions (Law 1 violation). (FID-066)
 - **Trailing whitespace in engine.rs:5087** — `cargo fmt` internal error caused by trailing space on a `matches!()` line. Fixed manually.
 - **Phantom ETH position in journal DB** — After manual WETH→USDC swap, the SQLite journal still contained the old ETH position record. Engine re-registered it on startup as a wallet-recovered position, inflating portfolio value by ~$23. Cleaned via direct DB deletion. (Wallet recovery side=SHORT bug noted for future fix.)
 
@@ -33,6 +35,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Sandbox test artifacts cleaned** — Removed 15+ temp files from `data/` (sandbox stdout/stderr/output/report files, model comparison reports, test databases).
 - **FID-062: Removed Kraken execution backend** — Deleted `src/execution/kraken.rs` (569 lines of dead code). `KrakenTrader` was never used for live execution. Removed Kraken match arm from engine, removed `KrakenTraderConfig`, removed Kraken balance sync. `exchange.backend = "kraken"` no longer valid — only `"0x"` and `"1inch"` accepted.
 - **FID-062: Renamed data pipeline** — `KrakenClient` → `CandleClient` (`src/data/candle_client.rs`), `KrakenSource` → `KrakenFeed` (`src/data/sources/kraken.rs`). Removed 400+ lines of dead private API code (signing, order placement, balance queries). Console label "Kraken Data" → "Market Data". All variable names updated.
+- **FID-063: Hunt mode under $500** — When idle capital > $5 and equity < $500, engine bypasses candle hash cache and pre-scoring filter to aggressively scan all pairs for entries. LLM receives explicit "HUNT MODE" instruction with idle capital amount. Hunt mode flag exposed via `/api/portfolio` endpoint.
+- **FID-064: Dashboard copy buttons** — Added `CopyButton` component to `SectionHeader`. Copy buttons on Performance, Market Insight, Open Positions, Risk Controls, AI Decisions, Closed Trades sections.
+- **FID-064: Hunt mode header tag** — "HUNT MODE" orange badge in dashboard header next to "LIVE · RUNNING". Only visible when active.
+- **FID-066: Position re-evaluation for open positions** — Pairs with open positions bypass candle hash cache and pre-scoring filter every cycle. LLM evaluates current price + position state for stop adjustments even when candle data hasn't changed.
+- **FID-066: Auto-rebuild in start.bat** — `start.bat` now runs `cargo build --release` before starting engine. Prevents stale binary issues.
 - **Version** — 0.9.1 → 0.10.0
 
 ## [0.9.1] — 2026-06-05

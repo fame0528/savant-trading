@@ -1,5 +1,26 @@
 # LEARNINGS
 
+## Session 2026-06-06: v0.10.0 — DEX-Only, Hunt Mode, Ollama, Housekeeping
+
+**Key Learnings:**
+
+- **Law 1 violations cause cascading failures.** Editing `dashboard/src/app/page.tsx` without reading the full `MarketInsight` type definition caused two TypeScript build errors (`block_number` vs `block_height`, `rss_count` vs `rss_items`). Each required a separate rebuild cycle. Always read the type definition before editing.
+- **Law 2 violations waste work.** Made code changes to engine.rs, context_builder.rs, shared.rs, api/mod.rs without creating FIDs or presenting for approval. Had to revert, create FID-063, and re-implement. Net cost: 30+ minutes of wasted work. "We are not in a rush" — never skip the FID.
+- **Two-layer architecture requires explicit bridging.** PortfolioManager and DexTrader are separate systems. Wallet-recovered positions exist only in PortfolioManager unless explicitly registered in DexTrader via `register_position()`. The stop-loss close path bridges both layers, but the bridge was never wired for recovered positions. FID-061 fixed this.
+- **Next.js production builds are stale until `npm run build`.** Unlike the Rust engine (which auto-rebuilds via `start.bat`), the dashboard serves the `.next/` build output. Any frontend code change requires a manual rebuild. Added auto-rebuild to `start.bat` for the Rust engine, but dashboard rebuilds are separate.
+- **Duplicate trade closures are caused by client-side stop-losses.** When a stop fires locally but no on-chain swap executes, the position still exists on-chain. Wallet recovery re-discovers it on the next tick, and the stop fires again. Fix: deduplicate by same pair+entry+exit+side within 60s. Proper fix: execute on-chain swap (FID-061 bridge).
+- **Arbitrum gas is negligible at current 0.02 gwei.** $0.025/swap, not the $0.10-0.50 that research assumed. The real cost is 0x spread + slippage, not gas.
+- **MiMo v2.5 Pro is the only viable model.** Tested against 5 alternatives in sandbox — all scored 0.00. Do not recommend switching.
+- **Hunt mode is the correct behavior under $500.** Pre-scoring filter and candle hash cache save LLM costs at scale, but under $500 with idle capital they prevent the engine from doing its job. Bypass both when `equity < 500 && balance > 5`.
+
+**Technical Insights:**
+
+- `Cargo.toml` regex crate needed for freeform LLM output parsing (4th pass in decision_parser)
+- Ollama provider works with existing OpenAI-compatible endpoint — just change `endpoint` to `localhost:11434/v1`
+- `CopyButton` component pattern: `onCopy` prop on `SectionHeader` returns text string, button copies to clipboard
+- `hunt_mode: Arc<RwLock<bool>>` in SharedEngineData synced from engine each cycle, exposed via `/api/portfolio`
+- Deduplication in `check_stops()`: check `closed_trades` for matching pair+side+entry+exit within 60s window
+
 ## Session 2026-06-05 21:49: FID-056 — LLM Cost Optimization (6 Measures)
 
 **Key Learnings:**

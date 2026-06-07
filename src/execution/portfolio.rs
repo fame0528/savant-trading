@@ -237,6 +237,24 @@ impl PortfolioManager {
 
                     self.account.balance += pnl;
                     self.account.daily_pnl += pnl;
+
+                    // FID-065: Deduplicate — skip if same pair+entry+exit+side
+                    // already recorded within 60s (prevents repeated stop-loss closures
+                    // when on-chain swap doesn't execute and position re-registers)
+                    let is_dup = self.closed_trades.iter().any(|t| {
+                        t.pair == trade.pair
+                            && t.side == trade.side
+                            && (t.entry_price - trade.entry_price).abs() < 0.0001
+                            && (t.exit_price - trade.exit_price).abs() < 0.0001
+                            && t.notes.contains("Stop loss")
+                            && (trade.closed_at - t.closed_at).num_seconds().abs() < 60
+                    });
+                    if is_dup {
+                        // Already recorded this closure — skip duplicate
+                        to_remove.push(id.clone());
+                        continue;
+                    }
+
                     self.closed_trades.push(trade.clone());
                     closed.push(trade);
                     to_remove.push(id.clone());
