@@ -337,7 +337,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-6 gap-1.5 shrink-0">
         <KPI icon="fa-wallet" label="Portfolio Value" value={fmt.usd(eq)} color="text-[var(--cyan)]" />
         <KPI icon="fa-bank" label="Cash Balance" value={fmt.usd(portfolio?.balance ?? 0)} sub="USD available" />
-        <KPI icon="fa-sack-dollar" label="Profit" value={fmt.usd(session?.total_pnl ?? 0)} sub={`${fmt.usd(session?.starting_balance ?? 30)} invested`} color={pnlClass(session?.total_pnl ?? 0)} />
+        <KPI icon="fa-sack-dollar" label="Profit" value={fmt.usd(session?.total_pnl ?? 0)} sub={`${fmt.usd(session?.starting_balance ?? 30)} invested → ${fmt.usd(portfolio?.equity ?? 0)} on-chain`} color={pnlClass(session?.total_pnl ?? 0)} />
         <KPI icon="fa-bullseye" label="Win Rate" value={`${((session?.win_rate ?? 0) * 100).toFixed(0)}%`} sub={`${session?.wins ?? 0}W / ${session?.losses ?? 0}L`} color="text-[var(--green)]" />
         <KPI icon="fa-rotate" label="Trades Today" value={`${portfolio?.trades_today ?? 0}`} sub={`${session?.total_trades ?? 0} total`} color="text-[var(--violet)]" />
         <KPI icon="fa-layer-group" label="Positions" value={`${positions.length} / ${risk?.max_positions ?? 3}`} sub={positions.length > 0 ? positions.map(p => p.pair.split("/")[0]).join(", ") : "none open"} />
