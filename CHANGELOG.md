@@ -58,6 +58,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Dashboard: Performance section** — Win rate percentage prominently displayed, Brier score color-coded (green <0.20, amber 0.20-0.30, red >0.30), CUSUM color-coded (green positive, red negative), confidence cap color-coded.
 - **Dashboard: Market Insight section** — Sentiment color-coded by Fear & Greed level, funding rate color-coded (green negative/squeeze, red positive/overleveraged).
 - **Dashboard: Risk Controls section** — Drawdown/daily loss/positions progress bars color-coded by severity (green <50%, amber 50-80%, red >80%). Values color-coded to match.
+- **Dashboard: HeroUI component integration** — Performance, Market Insight, Risk Controls sections now use HeroUI Chip (status badges), Tooltip (hover explanations for Brier, CUSUM, funding rate, drawdown, daily loss), and Spinner. Trending coins use Chip instead of raw spans. Circuit breaker, confidence cap, CUSUM, sentiment all use Chip with semantic colors.
 - **Dashboard: scrolling news ticker** — CSS-only infinite scroll between header and KPI bar. Shows trending coins, F&G, funding rate, BTC dominance, block, positions with price + P&L. Pauses on hover. Directional arrows on all metrics.
 - **Dashboard: position close button** — X button on each position with confirmation dialog. Calls `POST /api/positions/{pair}/close`. Engine forces stop to current price → triggers on-chain swap.
 - **Dashboard: connection error banner** — Red banner when engine API unreachable.
