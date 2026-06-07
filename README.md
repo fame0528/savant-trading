@@ -23,7 +23,7 @@ Savant Trading is an autonomous on-chain trading engine. It evaluates 200+ token
 
 Traditional algorithmic engines use hardcoded strategies (momentum, RSI crossovers). Savant inverts this — an LLM agent receives candles, indicators, sentiment, on-chain data, and macro context, then makes trading decisions using knowledge extracted from 150+ books and world-class trader transcripts.
 
-**Kraken CEX support** is available as a secondary backend but is not the primary focus.
+**Kraken WebSocket** is used for real-time candle data. All execution is DEX-only via 0x API on Arbitrum.
 
 ### How It Works
 
@@ -398,7 +398,7 @@ The risk layer is **independent of the AI brain** — the agent cannot override 
 
 ```bash
 cargo build
-cargo test           # 208 tests
+cargo test           # 217 tests
 cargo clippy -- -D warnings
 ```
 
@@ -412,8 +412,8 @@ All development follows the [Savant Protocol](https://github.com/fame0528/savant
 ### Findings
 
 Bugs and improvements tracked as FIDs in `dev/fids/`:
-- 0 active FIDs
-- 71 archived
+- 3 active FIDs (deferred: liquidation cascade, GMX sidecar, GMX native)
+- 99 archived
 
 ---
 

@@ -6,6 +6,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.10.3] — 2026-06-07
 
+### Added — FID-077: Sound Effects System
+
+- **Win/loss audio clips** — Custom `.mp3` files in `dashboard/public/sounds/wins/` and `dashboard/public/sounds/losses/`. Random selection on trade close. Falls back to synthesized Web Audio sounds when no clips exist. (`sounds.ts`)
+- **Sound files included** — 2 win clips (Here Comes the Money, Money SFX), 3 loss clips (Arms of the Angel, Oh God No, Price is Right Losing Horn)
+
+### Added — FID-078: Enterprise Panel Redesign
+
+- **HeroUI v3 migration** — Performance, Market Insight, Risk Controls, Open Positions, AI Decisions panels migrated to v3 components. (`page.tsx`)
+- **`MetricRow` component** — Extracted reusable label+value row. Eliminated 11x repeated inline pattern across 4 panels.
+- **`RiskBar` component** — Extracted labeled progress bar with threshold colors using v3 `ProgressBar` API. Eliminated 3x copy-pasted risk bar pattern.
+- **AI Decisions confidence bars** — Migrated from stale `ProgressBarRoot`/`ProgressBarFill` to v3 `ProgressBar` with `color` prop.
+- **`Separator` between sections** — Added visual dividers between logical sections in Performance, Market Insight, and Risk Controls panels.
+- **13px values / 10px labels** — Data hierarchy across all panels.
+
+### Added — Disconnected Overlay
+
+- **Full-screen overlay when engine offline** — Replaced small red banner with transparent black overlay centered on screen. Savant logo at 64px 50% opacity, gradient text, red pulsing dot, disconnection message. `z-50` covers all content. Auto-disappears when engine reconnects. (`page.tsx`)
+
+### Changed — Toast Notification System Overhaul
+
+- **Position: top-right → bottom-right** — Less congested area, below Closed Trades panel. (`page.tsx`)
+- **`gutter: 12`** — Better visual separation between stacked toasts (was 8px default).
+- **`removeDelay: 500`** — Snappier toast dismissal (was 1000ms default).
+- **`iconTheme`** — Success/error icons now match dashboard `--green`/`--red` CSS variables.
+- **Error duration: 5000ms** — Stop loss toasts display longer for readability (was 4000ms).
+- **Duplicate prevention** — Copy and CSV download toasts use unique IDs to prevent stacking.
+
 ### Fixed — FID-076: Chain-First Verification System
 
 - **All data verified on-chain prior to display** — Fundamental principle enforced: chain is the single source of truth. Every number shown to the user is derived from on-chain state, not journal/stale data.
