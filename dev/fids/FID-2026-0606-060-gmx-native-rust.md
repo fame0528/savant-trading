@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0606-060-gmx-native-rust.md`
 **ID:** FID-2026-0606-060
 **Severity:** critical
-**Status:** created
+**Status:** deferred_until_500
 **Created:** 2026-06-06 04:03
 **Author:** Kilo (mimo-v2.5-pro)
 

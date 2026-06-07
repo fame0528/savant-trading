@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0606-058-gmx-sidecar-poc.md`
 **ID:** FID-2026-0606-058
 **Severity:** critical
-**Status:** in_progress
+**Status:** deferred_until_500
 **Created:** 2026-06-06 00:25
 **Author:** Kilo (mimo-v2.5-pro)
 
