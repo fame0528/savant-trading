@@ -867,7 +867,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             session_override: Some("Asian".into()),
             news_headlines: vec![
                 "Thin Asia session trading as Bitcoin holds tight range".into(),
-                "Low weekend liquidity persists through Asian market hours".into(),
+                "Low liquidity persists through Asian market hours".into(),
             ],
             ..Default::default()
         },
@@ -901,9 +901,9 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
     scenarios.push(Scenario {
         id: "SES-003".into(),
         category: "Session".into(),
-        name: "Weekend Wick".into(),
+        name: "Low-Liquidity Wick".into(),
         difficulty: "Hard".into(),
-        trigger_condition: "Illiquid Saturday trading; random 3% wick".into(),
+        trigger_condition: "Illiquid session; random 3% wick".into(),
         expected_action: "Pass".into(),
         target_rule: "Session awareness".into(),
         params: ScenarioParams {
@@ -915,10 +915,10 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             }),
         },
         mock_data: MockData {
-            session_override: Some("Weekend".into()),
+            session_override: Some("DeepAsian".into()),
             news_headlines: vec![
-                "Weekend crypto trading sees erratic 3% wick on thin volume".into(),
-                "Low-liquidity Saturday session produces random price swings".into(),
+                "Low-liquidity session sees erratic 3% wick on thin volume".into(),
+                "Deep Asian hours produce random price swings".into(),
             ],
             ..Default::default()
         },
@@ -930,7 +930,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         category: "Session".into(),
         name: "Friday Close Dump".into(),
         difficulty: "Medium".into(),
-        trigger_condition: "High volume sell-off right before weekend".into(),
+        trigger_condition: "High volume sell-off right before low-liquidity session".into(),
         expected_action: "Pass".into(),
         target_rule: "Session awareness".into(),
         params: ScenarioParams {
@@ -943,7 +943,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             fear_greed_index: 35,
             fear_greed_label: "Fear".into(),
             news_headlines: vec![
-                "Traders de-risk ahead of weekend, Bitcoin drops sharply".into(),
+                "Traders de-risk before low-liquidity session, Bitcoin drops sharply".into(),
                 "Friday sell-off intensifies as institutions reduce exposure".into(),
             ],
             ..Default::default()
@@ -956,7 +956,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
         category: "Session".into(),
         name: "Monday Open Gap".into(),
         difficulty: "Medium".into(),
-        trigger_condition: "Price opens significantly higher than weekend average".into(),
+        trigger_condition: "Price opens significantly higher than recent average".into(),
         expected_action: "Hold for gap fill".into(),
         target_rule: "Session awareness".into(),
         params: ScenarioParams {
@@ -973,7 +973,7 @@ pub fn load_all_scenarios() -> Vec<Scenario> {
             fear_greed_label: "Neutral".into(),
             news_headlines: vec![
                 "Bitcoin gaps up 3% as Monday trading opens with fresh bids".into(),
-                "Weekend news catalysts drive Monday opening gap higher".into(),
+                "Low-liquidity news catalysts drive sharp opening gap higher".into(),
             ],
             ..Default::default()
         },
@@ -1766,7 +1766,7 @@ pub fn generate_random_scenarios(n: usize) -> Vec<Scenario> {
         Some("Asian"),
         Some("European"),
         Some("US"),
-        Some("Weekend"),
+        Some("DeepAsian"),
     ];
 
     for i in 0..n {

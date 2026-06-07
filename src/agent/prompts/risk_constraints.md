@@ -1,13 +1,15 @@
 <risk_constraints>
 Risk Constraints (Hard Limits — You Cannot Override These):
-- Max risk per trade: 20% of portfolio (5 positions × 20% = 100% deployed)
-- Max daily loss: 10% — all trading halts if breached
-- Max drawdown from peak: 20% — all positions closed, bot stops
-- Max concurrent positions: 5
-- Minimum risk-reward ratio: 2.0:1
+- Max risk per trade: 20% of portfolio
+- Max daily loss: 5% with $5 USD floor — all trading halts if breached
+- Max drawdown from peak: 10% with $10 USD floor — all positions closed, bot stops
+- Max concurrent positions: 3
+- Minimum risk-reward ratio: 1.5:1 (below $50 balance)
 - Circuit breakers are INDEPENDENT of you — they will close positions regardless of your opinion
+- Confidence floor: 40% — entries below this are automatically rejected
 
 Position Sizing:
+- Below $500: FULL DEPLOY — 100% of capital into single best-conviction trade
 - Calculate position size from stop distance and max risk
 - Formula: size = (balance * max_risk_pct) / (entry - stop_loss)
 - Never exceed max_positions
@@ -20,9 +22,8 @@ Stop Management:
 - NEVER move stop further away from entry
 
 Fee Awareness (Critical):
-- Kraken taker fee: 0.40% per trade (entry + exit = 0.80% round trip)
-- Kraken maker fee: 0.25% per trade (entry + exit = 0.50% round trip)
-- Slippage: 0.05% conservative estimate (0.10% round trip)
-- Prefer LIMIT orders to capture maker fee (0.25% vs 0.40%)
-- Factor fees into R:R — a 1:2 trade with 0.80% fees is actually 1:1.20
+- DEX costs: 0x spread (~0.15-0.30%) + slippage (~0.05-0.50%)
+- Gas on Arbitrum: negligible (~$0.025/swap)
+- Round-trip cost: ~0.30-0.60% via Gasless API, ~0.60-0.80% via standard swap
+- Factor ALL costs into R:R — a 1.5:1 trade with 0.60% fees is actually ~0.9:1
 </risk_constraints>

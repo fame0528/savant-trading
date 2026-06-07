@@ -1,12 +1,12 @@
 [exchange]
-name = "kraken"
-# Execution backend: "kraken" (CEX, KYC), "0x" (DEX, no KYC), "1inch" (DEX, no KYC)
+name = "market_data"
+# Execution backend: "0x" (DEX, no KYC), "1inch" (DEX, no KYC)
 backend = "0x"
 ws_url = "wss://ws.kraken.com/v2"
 rest_url = "https://api.kraken.com"
 
 [exchange.dex]
-# DEX-specific settings (only used when backend != "kraken")
+# DEX-specific settings (only used when backend = "0x" or "1inch")
 chain_id = 42161
 rpc_url = "https://arb1.arbitrum.io/rpc"
 wallet_key_env = "WALLET_PRIVATE_KEY"
@@ -85,18 +85,18 @@ scan_all_pairs = false
 timeframe = "5m"
 timeframes = ["5m", "1h", "4h", "1d"]
 base_currency = "USD"
-starting_balance = 50.0
+starting_balance = 30.0
 database_url = "sqlite:data/savant.db"
-# Kraken Pro base tier: 0.40% taker / 0.25% maker
-# At $50 balance we are in lowest volume tier
-fee_rate = 0.0040
-slippage_pct = 0.0005
+# DEX costs: 0x spread (~0.15-0.30%) + slippage (~0.05-0.50%)
+# Gas on Arbitrum is negligible at ~$0.025/swap
+fee_rate = 0.001
+slippage_pct = 0.005
 
 [risk]
 max_risk_per_trade = 0.20
 # Position allocation — how much of the bankroll goes into each trade
-# At $50 with 5 max positions: each position = $10 (20% of bankroll)
-# The bot should be FULLY DEPLOYED, not sitting on cash
+# At $30 with full_deploy: 100% of capital into single best-conviction trade
+# Safety comes from stop losses + daily loss + drawdown limits, not from shrinking positions
 # Safety comes from stop losses + daily loss + drawdown limits, not from shrinking positions
 dynamic_risk_tiers = [
     { balance = 500.0, risk_pct = 1.00 },    # Full deploy at low balance — 100% of capital into best trade

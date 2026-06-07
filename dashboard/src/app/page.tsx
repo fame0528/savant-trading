@@ -362,7 +362,7 @@ export default function Dashboard() {
                         "text-[var(--dim)] bg-white/5"
                       }`}>
                         <Icon name={a === "BUY" ? "fa-circle-arrow-up" : a === "SELL" || a === "CLOSE" ? "fa-circle-arrow-down" : a === "ADJUST" || a === "ADJUSTSTOP" ? "fa-sliders" : "fa-minus"} className="text-[6px]" />
-                        {a}
+                        {a.replace("_", " ")}
                       </span>
                       <ProgressBarRoot className="flex-1 h-[3px] bg-white/5 rounded-full overflow-hidden">
                         <ProgressBarFill className={`h-full rounded-full ${conf >= 67 ? "bg-[var(--green)]" : conf >= 34 ? "bg-[var(--amber)]" : "bg-[var(--red)]"}`} style={{ width: `${conf}%` }} />

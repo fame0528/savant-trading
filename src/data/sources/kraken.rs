@@ -23,7 +23,7 @@ impl KrakenFeed {
 #[async_trait]
 impl CandleSource for KrakenFeed {
     fn name(&self) -> &str {
-        "Kraken"
+        "Market Data"
     }
 
     fn might_have(&self, _pair: &str) -> bool {

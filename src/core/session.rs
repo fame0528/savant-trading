@@ -1,21 +1,21 @@
 //! Session detection — crypto-native 24/7 trading sessions.
 //!
-//! Crypto never closes. Instead of "off-hours", sessions reflect
-//! volatility patterns, liquidity windows, and funding rate resets.
+//! Crypto never closes. Sessions reflect volatility patterns,
+//! liquidity windows, and funding rate resets — NOT traditional
+//! market hours. No weekends. No off-hours. The market never sleeps.
 //!
-//! Key crypto session patterns (FID-015 updated with UTC liquidity profiles):
+//! Key crypto session patterns:
 //! - Asian (00:00-08:00 UTC): Lower volume, range-bound, good for mean reversion
 //!   - 02:00-06:00 UTC: DEEP ASIAN — liquidity trough, 42% less depth, breakouts fail
 //! - European (08:00-14:00 UTC): Higher volume, trend continuations
 //! - US-EU Overlap (13:00-17:00 UTC): PEAK LIQUIDITY — optimal for momentum/breakouts
 //! - US Post-Overlap (17:00-22:00 UTC): Moderate volume, mean reversion increasing
-//! - Weekend: Lower volume, often mean-reverting. Sunday 18:00-23:00 watch for gap opens.
 //! - Funding Reset (every 8h at 00:00, 08:00, 16:00 UTC): Volatility spike
 
-use chrono::{Datelike, Timelike, Utc};
+use chrono::{Timelike, Utc};
 use serde::{Deserialize, Serialize};
 
-/// Trading session — crypto-native, no "off-hours".
+/// Trading session — crypto-native, 24/7, no weekends.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Session {
     /// 00:00-02:00 UTC — Early Asian, moderate volume
@@ -32,10 +32,6 @@ pub enum Session {
     UsPostOverlap,
     /// 22:00-00:00 UTC — Late US / pre-Asian transition
     LateUs,
-    /// Saturday — Lower volume, often range-bound
-    Weekend,
-    /// Sunday 18:00-23:00 UTC — Pre-Monday, watch for institutional gap opens
-    SundayPreOpen,
 }
 
 impl Session {
@@ -48,8 +44,6 @@ impl Session {
             Session::UsEuOverlap => "US-EU Overlap",
             Session::UsPostOverlap => "US Post-Overlap",
             Session::LateUs => "Late US",
-            Session::Weekend => "Weekend",
-            Session::SundayPreOpen => "Sunday Pre-Open",
         }
     }
 
@@ -62,8 +56,6 @@ impl Session {
             Session::UsEuOverlap => "PEAK LIQUIDITY — highest global volume, tightest spreads. Optimal for momentum/breakouts. Full position sizing.",
             Session::UsPostOverlap => "Volume declining. Mean reversion increasingly viable as momentum stalls.",
             Session::LateUs => "Volume declining, position squaring. Mean reversion as traders close before Asian open.",
-            Session::Weekend => "Lower volume, often mean-reverting. Reduced position size.",
-            Session::SundayPreOpen => "Watch for institutional gap opens. Front-running CME futures launch.",
         }
     }
 
@@ -76,8 +68,6 @@ impl Session {
             Session::UsEuOverlap => 1.2,
             Session::UsPostOverlap => 0.9,
             Session::LateUs => 0.8,
-            Session::Weekend => 0.6,
-            Session::SundayPreOpen => 0.7,
         }
     }
 
@@ -88,14 +78,11 @@ impl Session {
             Session::DeepAsian => 0.6,     // 40% penalty — breakouts fail here
             Session::LateAsian => 0.85,    // 15% penalty
             Session::LateUs => 0.85,       // 15% penalty
-            Session::Weekend => 0.7,       // 30% penalty
-            Session::SundayPreOpen => 0.8, // 20% penalty
             _ => 1.0,                      // No penalty during liquid sessions
         }
     }
 
-    /// All crypto sessions are tradeable — no "off-hours" in 24/7 markets.
-    /// But Deep Asian and Weekend require extra caution.
+    /// European and US-EU overlap are peak liquidity windows.
     pub fn is_kill_zone(&self) -> bool {
         matches!(
             self,
@@ -107,28 +94,14 @@ impl Session {
     /// Funding resets often cause volatility spikes.
     pub fn near_funding_reset(&self) -> bool {
         let hour = Utc::now().hour();
-        // Within 30 min of funding reset
         matches!(hour, 0 | 7 | 8 | 15 | 16)
     }
 }
 
 /// Detect current crypto trading session based on UTC time.
+/// No weekend logic — crypto trades 24/7.
 pub fn current_session() -> Session {
-    let now = Utc::now();
-    let hour = now.hour();
-    let weekday = now.weekday();
-
-    use chrono::Weekday;
-    if weekday == Weekday::Sat {
-        return Session::Weekend;
-    }
-    if weekday == Weekday::Sun {
-        return if hour >= 18 {
-            Session::SundayPreOpen
-        } else {
-            Session::Weekend
-        };
-    }
+    let hour = Utc::now().hour();
 
     match hour {
         0..=1 => Session::Asian,

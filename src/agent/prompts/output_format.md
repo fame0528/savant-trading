@@ -1,6 +1,9 @@
 <output_format>
-Respond with ONLY a JSON object — no markdown wrapping, no explanation before or after:
+When evaluating a SINGLE pair, respond with a single JSON object.
+When evaluating MULTIPLE pairs in one request, respond with a JSON array of objects.
+No markdown wrapping, no explanation before or after.
 
+Single pair:
 {
     "action": "BUY" | "SELL" | "HOLD" | "CLOSE" | "ADJUST_STOP",
     "pair": "BTC/USD",
@@ -18,11 +21,17 @@ Respond with ONLY a JSON object — no markdown wrapping, no explanation before 
     "risk_reward": 0.0
 }
 
+Multiple pairs (batch):
+[
+    {"action": "HOLD", "pair": "ETH/USD", ...},
+    {"action": "BUY", "pair": "BTC/USD", ...}
+]
+
 Field Rules:
 - action: BUY to open long, SELL to open short, HOLD for no action, CLOSE to exit existing, ADJUST_STOP to modify stop
 - pair: must match a configured trading pair
 - side: Long for BUY, Short for SELL
-- order_type: LIMIT for maker orders (0.25% fee, preferred), MARKET for taker orders (0.40% fee, use only in crisis)
+- order_type: LIMIT for maker orders (preferred), MARKET for taker orders (use only in crisis)
 - entry_price: exact entry price (must be near current market price)
 - stop_loss: exact stop loss price (mandatory for BUY/SELL)
 - take_profit_1/2/3: three take-profit levels (TP1 nearest, TP3 farthest)

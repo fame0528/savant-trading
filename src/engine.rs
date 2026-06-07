@@ -1599,7 +1599,18 @@ pub async fn run(
 
             let start = std::time::Instant::now();
             log_llm!("LLM", "BATCH EVALUATING {} pairs (single call)", batch_size);
-            let response = provider.chat_stream(system_prompt, &messages).await;
+            let response = match tokio::time::timeout(
+                std::time::Duration::from_secs(180),
+                provider.chat_stream(system_prompt, &messages),
+            )
+            .await
+            {
+                Ok(result) => result,
+                Err(_) => {
+                    warn!("Batch LLM call timed out after 180s — skipping {} pairs", batch_size);
+                    continue;
+                }
+            };
             let elapsed = start.elapsed().as_millis();
 
             match &response {
@@ -1614,6 +1625,12 @@ pub async fn run(
 
                     // Strip thinking tags before JSON parse (MiMo v2.5 Pro wraps in <think></think>)
                     let cleaned = savant_trading::agent::decision_parser::strip_thinking_tags(text);
+
+                    // Log first 500 chars of cleaned response for debugging batch parse failures
+                    tracing::debug!(
+                        "BATCH RESPONSE (cleaned, first 500): {}",
+                        &cleaned[..cleaned.len().min(500)]
+                    );
 
                     // Try to parse as JSON array
                     match serde_json::from_str::<Vec<serde_json::Value>>(&cleaned) {
@@ -3804,7 +3821,6 @@ async fn run_training_batch(
                 "European" => savant_trading::core::session::Session::European,
                 "US" => savant_trading::core::session::Session::UsEuOverlap,
                 "Late US" => savant_trading::core::session::Session::LateUs,
-                "Weekend" => savant_trading::core::session::Session::Weekend,
                 _ => savant_trading::core::session::current_session(),
             }
         } else {
@@ -4948,7 +4964,6 @@ pub async fn run_sandbox(
                 "European" => savant_trading::core::session::Session::European,
                 "US" => savant_trading::core::session::Session::UsEuOverlap,
                 "Late US" => savant_trading::core::session::Session::LateUs,
-                "Weekend" => savant_trading::core::session::Session::Weekend,
                 _ => savant_trading::core::session::current_session(),
             }
         } else {
