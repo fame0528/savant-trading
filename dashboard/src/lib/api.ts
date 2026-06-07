@@ -25,6 +25,7 @@ export interface Portfolio {
   open_positions: number;
   trades_today: number;
   hunt_mode: boolean;
+  monitoring_mode: boolean;
 }
 
 export interface Position {
@@ -105,6 +106,7 @@ export interface SessionData {
   losses: number;
   win_rate: number;
   total_decisions: number;
+  starting_balance: number;
 }
 
 export interface MemoryData {

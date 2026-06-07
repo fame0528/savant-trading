@@ -567,6 +567,8 @@ mod tests {
                 opened_at: chrono::Utc::now(),
                 closed_at: chrono::Utc::now(),
                 notes: String::new(),
+                on_chain_verified: false,
+                tx_hash: None,
             })
             .is_ok());
 

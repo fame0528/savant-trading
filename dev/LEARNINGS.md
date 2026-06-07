@@ -1,5 +1,18 @@
 # LEARNINGS
 
+## Session 2026-06-07: FID-074 + FID-073 — Execution Bugfix Sprint
+
+**Key Learnings:**
+
+- **PortfolioManager and executor are two separate systems with different state.** `check_stops()` in PortfolioManager records trades and modifies balance, but the executor has its own position map and swap logic. The close path must bridge both: pass `trade.quantity` from PortfolioManager to executor, and revert PortfolioManager balance if executor close fails.
+- **`amount_to_wei()` rounding can exceed on-chain balance.** `(amount * 10^decimals).round() as u128` can produce a wei value slightly larger than the actual on-chain balance (difference of ~146 wei in the overnight incident). Always query on-chain balance via `query_token_balance()` before close swaps and use `min(requested, available)`.
+- **Partial close needs different semantics than full close.** Full close removes the position from the map; partial close reduces `pos.quantity`. The `close_position_internal(position_id, close_qty)` pattern handles both: if `close_qty >= pos.quantity * 0.99`, remove; otherwise, reduce.
+- **MiMo v2.5 Pro copies example values literally.** The `"risk_reward": 0.0` example in `output_format.md` caused MiMo to always output `0.0`. Changing the example to `2.5` and adding an explicit formula instruction fixes this.
+- **Wrapping code in `if/else` blocks mid-function creates Rust scope issues.** Variables declared inside the `else` block aren't accessible outside it. Better approach: clear input data (`pair_data_vec.clear()`) and let existing "0 pairs" handling take over.
+- **`resolve_pair()` vs `resolve_pair_on_chain()` — the latter is the correct function.** `resolve_pair()` hardcodes Arbitrum (chain 42161). All production callers should use `resolve_pair_on_chain(pair, side, self.chain_id)`.
+- **`eval_in_progress` AtomicBool prevents overlapping LLM calls.** When the 15-minute cycle interval is shorter than the 100-160s LLM response time, cycles overlap. The flag is set before the batch call and cleared after Phase 2 completes.
+- **Stop directional guard prevents backward stop moves.** The trailing stop mechanism only moves stops in the right direction, but ADJUST_STOP overrides bypass this invariant. Adding `match pos.side { Long => new > old, Short => new < old }` catches this.
+
 ## Session 2026-06-06: v0.10.0 — DEX-Only, Hunt Mode, Ollama, Housekeeping
 
 **Key Learnings:**

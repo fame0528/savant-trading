@@ -18,7 +18,7 @@ use crate::core::types::{Order, OrderStatus, OrderType, Position, ScaleLevel, Si
 use crate::execution::engine::ExecutionEngine;
 use crate::{log_swap, log_swap_fail, log_swap_ok, log_warn};
 
-use super::{amount_to_wei, resolve_pair, DexBackend, SwapParams, SwapTx, TokenInfo};
+use super::{amount_to_wei, resolve_pair_on_chain, DexBackend, SwapParams, SwapTx, TokenInfo};
 
 use alloy_core::primitives::hex;
 use alloy_core::primitives::{Address, U256};
@@ -1102,6 +1102,8 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                         opened_at: pos.opened_at,
                         closed_at: Utc::now(),
                         notes: format!("DEX stop-loss: {:?}", pos.scale_level),
+                        on_chain_verified: false,
+                        tx_hash: None,
                     };
 
                     self.balance += pnl;
@@ -1128,6 +1130,271 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
     pub fn set_balance(&mut self, balance: f64) {
         self.balance = balance;
+    }
+
+    /// Internal close implementation — supports partial closes for TP scale-outs.
+    /// `close_qty` is the amount of the base token to sell (may be less than position qty).
+    async fn close_position_internal(
+        &mut self,
+        position_id: &str,
+        close_qty: f64,
+    ) -> Result<Order, ExecutionError> {
+        let pos = self
+            .positions
+            .get(position_id)
+            .ok_or_else(|| ExecutionError::PositionNotFound(position_id.to_string()))?
+            .clone();
+
+        self.order_counter += 1;
+
+        let (src_token, dst_token) = resolve_pair_on_chain(&pos.pair,
+            match pos.side {
+                Side::Long => Side::Short,
+                Side::Short => Side::Long,
+            },
+            self.chain_id,
+        )?;
+
+        if src_token.address.is_empty() {
+            return Err(ExecutionError::Other(format!(
+                "Cannot approve token '{}' for close — no address in local DB.",
+                src_token.symbol
+            )));
+        }
+
+        // FID-074 Fix 3: Query actual on-chain balance and use min(close_qty, on_chain).
+        // Prevents dust failures when position qty slightly exceeds on-chain balance due to rounding.
+        let on_chain_balance = self
+            .query_token_balance(&src_token.address, src_token.decimals)
+            .await
+            .unwrap_or(close_qty);
+        let actual_close_qty = close_qty.min(on_chain_balance);
+        if actual_close_qty < close_qty {
+            info!(
+                "Close qty adjusted: requested={:.8} on-chain={:.8} → using {:.8}",
+                close_qty, on_chain_balance, actual_close_qty
+            );
+        }
+        let qty_wei = amount_to_wei(actual_close_qty, src_token.decimals);
+
+        let wallet_addr = format!("{:#x}", self.wallet_address);
+        let price_params = super::SwapParams {
+            src_token: src_token.address.clone(),
+            dst_token: dst_token.address.clone(),
+            amount: qty_wei.clone(),
+            slippage: self.slippage_pct,
+            from: wallet_addr.clone(),
+            chain_id: self.chain_id,
+            sell_entire_balance: true,
+        };
+        match self.backend.check_liquidity(&price_params).await {
+            Ok(check) if check.available => {
+                info!(
+                    "Liquidity check OK for {} close — proceeding with swap",
+                    pos.pair
+                );
+            }
+            Ok(_check) => {
+                return Err(ExecutionError::Other(format!(
+                    "No liquidity available to close {} — 0x returned liquidityAvailable=false. \
+                     Position stays open. Will retry next cycle.",
+                    pos.pair
+                )));
+            }
+            Err(e) => {
+                return Err(ExecutionError::Other(format!(
+                    "Liquidity pre-check failed for {} close: {}. Position stays open.",
+                    pos.pair, e
+                )));
+            }
+        }
+
+        if let Err(e) = self
+            .ensure_permit2_approval(&src_token.address, &qty_wei)
+            .await
+        {
+            log_swap_fail!("APPROVE", "Permit2 approval failed on close: {}", e);
+            return Err(e);
+        }
+
+        let usdc_balance_before = self.balance;
+
+        let tx_hash = match self.execute_swap(&src_token, &dst_token, &qty_wei).await {
+            Ok(hash) => hash,
+            Err(e) if e.to_string().contains("Dust output") => {
+                warn!(
+                    "Standard swap returned dust for {} — falling back to Gasless API",
+                    pos.pair
+                );
+                let gasless_params = super::SwapParams {
+                    src_token: src_token.address.clone(),
+                    dst_token: dst_token.address.clone(),
+                    amount: qty_wei.clone(),
+                    slippage: self.slippage_pct,
+                    from: wallet_addr,
+                    chain_id: self.chain_id,
+                    sell_entire_balance: true,
+                };
+                let gasless_result = self
+                    .backend
+                    .build_gasless_swap_tx(&gasless_params)
+                    .await
+                    .map_err(|ge| {
+                        log_swap_fail!(
+                            "GASLESS",
+                            "Gasless fallback also failed for {}: {}",
+                            pos.pair,
+                            ge
+                        );
+                        ge
+                    })?;
+                log_swap_ok!(
+                    "GASLESS",
+                    "Submitted: trade_hash={} buy_amount={}",
+                    gasless_result.trade_hash,
+                    gasless_result.buy_amount
+                );
+                match self
+                    .backend
+                    .poll_gasless_status(&gasless_result.trade_hash, self.chain_id)
+                    .await
+                {
+                    Ok(super::GaslessStatus::Confirmed(hash)) => {
+                        log_swap_ok!("GASLESS", "Confirmed on-chain: {}", hash);
+                        hash
+                    }
+                    Ok(super::GaslessStatus::Failed(reason)) => {
+                        return Err(ExecutionError::Other(format!(
+                            "Gasless trade failed: {}",
+                            reason
+                        )));
+                    }
+                    Err(e) => {
+                        return Err(ExecutionError::Other(format!(
+                            "Gasless status poll error: {}",
+                            e
+                        )));
+                    }
+                }
+            }
+            Err(e) => return Err(e),
+        };
+
+        let usdc_addr = super::usdc_address_for_chain(self.chain_id).ok_or_else(|| {
+            ExecutionError::Other(format!("No USDC address for chain {}", self.chain_id))
+        })?;
+        let usdc_dec = super::usdc_decimals_for_chain(self.chain_id);
+        let padded_addr = format!(
+            "{:0>64}",
+            self.wallet_address.to_string().trim_start_matches("0x")
+        );
+        let call_data = format!("0x70a08231{}", padded_addr);
+        let call_params = serde_json::json!([{
+            "to": usdc_addr,
+            "data": call_data
+        }, "latest"]);
+
+        let verified_proceeds = match self.rpc_call("eth_call", call_params).await {
+            Ok(result) => {
+                if let Some(hex) = result.as_str() {
+                    let usdc_wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
+                        .unwrap_or(U256::ZERO);
+                    let divisor = 10f64.powi(usdc_dec as i32);
+                    let usdc_after: f64 =
+                        usdc_wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
+                    let gained = usdc_after - usdc_balance_before;
+                    if gained <= 0.0 {
+                        return Err(ExecutionError::Other(format!(
+                            "Close tx {} succeeded but delivered ${:.2} USDC (before=${:.2}, after=${:.2}). \
+                             Position stays open. Tokens may be stranded.",
+                            tx_hash, gained, usdc_balance_before, usdc_after
+                        )));
+                    }
+                    info!(
+                        "On-chain verified: {} close delivered ${:.2} USDC (before=${:.2}, after=${:.2})",
+                        pos.pair, gained, usdc_balance_before, usdc_after
+                    );
+                    gained
+                } else {
+                    warn!("Could not parse USDC balance for close verification — using estimate");
+                    pos.entry_price * actual_close_qty
+                        + (pos.current_price - pos.entry_price) * actual_close_qty
+                }
+            }
+            Err(e) => {
+                warn!(
+                    "Failed to verify USDC balance after close: {} — using estimate",
+                    e
+                );
+                pos.entry_price * actual_close_qty
+                    + (pos.current_price - pos.entry_price) * actual_close_qty
+            }
+        };
+
+        // FID-074: For partial close, reduce qty instead of removing position
+        let is_full_close = actual_close_qty >= pos.quantity * 0.99;
+        if is_full_close {
+            self.positions.remove(position_id);
+        } else if let Some(p) = self.positions.get_mut(position_id) {
+            p.quantity -= actual_close_qty;
+        }
+
+        info!(
+            "DEX closed: {} | tx={} | qty={:.8} | verified proceeds=${:.2}",
+            pos.pair, tx_hash, actual_close_qty, verified_proceeds
+        );
+
+        let exit_price = pos.current_price;
+        let gross_pnl = match pos.side {
+            Side::Long => (exit_price - pos.entry_price) * actual_close_qty,
+            Side::Short => (pos.entry_price - exit_price) * actual_close_qty,
+        };
+        let fee_est = exit_price * actual_close_qty * 0.001;
+        let pnl = gross_pnl - fee_est;
+        self.balance = usdc_balance_before + verified_proceeds;
+
+        self.closed_trades.push(TradeRecord {
+            id: uuid::Uuid::new_v4().to_string(),
+            pair: pos.pair.clone(),
+            side: pos.side,
+            entry_price: pos.entry_price,
+            exit_price,
+            quantity: actual_close_qty,
+            pnl,
+            pnl_pct: if pos.entry_price > 0.0 {
+                pnl / (pos.entry_price * actual_close_qty) * 100.0
+            } else {
+                0.0
+            },
+            fees: fee_est,
+            strategy_name: pos.strategy_name.clone(),
+            opened_at: pos.opened_at,
+            closed_at: Utc::now(),
+            notes: format!("DEX close via {} — on-chain verified", self.backend.name()),
+            on_chain_verified: true,
+            tx_hash: Some(tx_hash.clone()),
+        });
+
+        if let Err(e) = self.save_state() {
+            warn!("Failed to save state after close: {}", e);
+        }
+
+        Ok(Order {
+            id: format!("dex-close-{}-{}", self.order_counter, tx_hash),
+            pair: pos.pair,
+            side: match pos.side {
+                Side::Long => Side::Short,
+                Side::Short => Side::Long,
+            },
+            order_type: OrderType::Market,
+            price: Some(exit_price),
+            quantity: actual_close_qty,
+            status: OrderStatus::Filled,
+            created_at: Utc::now(),
+            filled_at: Some(Utc::now()),
+            filled_price: Some(exit_price),
+            tx_hash: Some(tx_hash.clone()),
+        })
     }
 }
 
@@ -1159,7 +1426,7 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
 
         self.order_counter += 1;
 
-        let (src_token, dst_token) = resolve_pair(pair, side)?;
+        let (src_token, dst_token) = resolve_pair_on_chain(pair, side, self.chain_id)?;
         let entry_price = price.unwrap_or(0.0);
         // LONG: src=USDC, amount = entry_price * quantity (USDC value)
         // SHORT: src=base token, amount = quantity (token amount)
@@ -1246,254 +1513,20 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
     }
 
     async fn close_position(&mut self, position_id: &str) -> Result<Order, ExecutionError> {
-        // SAFETY: Clone the position but DO NOT remove it from the map until the swap
-        // is verified on-chain. If the swap fails, the position stays open.
-        let pos = self
+        let qty = self
             .positions
             .get(position_id)
             .ok_or_else(|| ExecutionError::PositionNotFound(position_id.to_string()))?
-            .clone();
+            .quantity;
+        self.close_position_internal(position_id, qty).await
+    }
 
-        self.order_counter += 1;
-
-        let (src_token, dst_token) = resolve_pair(
-            &pos.pair,
-            match pos.side {
-                Side::Long => Side::Short,
-                Side::Short => Side::Long,
-            },
-        )?;
-        let qty_wei = amount_to_wei(pos.quantity, src_token.decimals);
-
-        if src_token.address.is_empty() {
-            return Err(ExecutionError::Other(format!(
-                "Cannot approve token '{}' for close — no address in local DB.",
-                src_token.symbol
-            )));
-        }
-
-        // Step 1: Check liquidity via 0x /price endpoint BEFORE attempting swap.
-        // Per 0x docs: "The API will return liquidityAvailable=false if there
-        // isn't enough liquidity available for the requested quote."
-        let wallet_addr = format!("{:#x}", self.wallet_address);
-        let price_params = super::SwapParams {
-            src_token: src_token.address.clone(),
-            dst_token: dst_token.address.clone(),
-            amount: qty_wei.clone(),
-            slippage: self.slippage_pct,
-            from: wallet_addr.clone(),
-            chain_id: self.chain_id,
-            sell_entire_balance: true, // Use actual on-chain balance for close
-        };
-        match self.backend.check_liquidity(&price_params).await {
-            Ok(check) if check.available => {
-                info!(
-                    "Liquidity check OK for {} close — proceeding with swap",
-                    pos.pair
-                );
-            }
-            Ok(_check) => {
-                return Err(ExecutionError::Other(format!(
-                    "No liquidity available to close {} — 0x returned liquidityAvailable=false. \
-                     Position stays open. Will retry next cycle.",
-                    pos.pair
-                )));
-            }
-            Err(e) => {
-                return Err(ExecutionError::Other(format!(
-                    "Liquidity pre-check failed for {} close: {}. Position stays open.",
-                    pos.pair, e
-                )));
-            }
-        }
-
-        // Step 2: Ensure source token is approved for Permit2.
-        if let Err(e) = self
-            .ensure_permit2_approval(&src_token.address, &qty_wei)
-            .await
-        {
-            log_swap_fail!("APPROVE", "Permit2 approval failed on close: {}", e);
-            return Err(e);
-        }
-
-        // Step 3: Record USDC balance BEFORE swap for on-chain verification.
-        let usdc_balance_before = self.balance;
-
-        // Step 4: Execute the swap — try standard first, fall back to gasless on dust.
-        let tx_hash = match self.execute_swap(&src_token, &dst_token, &qty_wei).await {
-            Ok(hash) => hash,
-            Err(e) if e.to_string().contains("Dust output") => {
-                // Standard swap returned 0 output (0x can't route micro-amounts).
-                // Fall back to 0x Gasless API which handles approvals and gas automatically.
-                warn!(
-                    "Standard swap returned dust for {} — falling back to Gasless API",
-                    pos.pair
-                );
-                let wallet_addr = format!("{:#x}", self.wallet_address);
-                let gasless_params = super::SwapParams {
-                    src_token: src_token.address.clone(),
-                    dst_token: dst_token.address.clone(),
-                    amount: qty_wei.clone(),
-                    slippage: self.slippage_pct,
-                    from: wallet_addr,
-                    chain_id: self.chain_id,
-                    sell_entire_balance: true,
-                };
-                let gasless_result = self
-                    .backend
-                    .build_gasless_swap_tx(&gasless_params)
-                    .await
-                    .map_err(|ge| {
-                        log_swap_fail!(
-                            "GASLESS",
-                            "Gasless fallback also failed for {}: {}",
-                            pos.pair,
-                            ge
-                        );
-                        ge
-                    })?;
-                log_swap_ok!(
-                    "GASLESS",
-                    "Submitted: trade_hash={} buy_amount={}",
-                    gasless_result.trade_hash,
-                    gasless_result.buy_amount
-                );
-                // Poll for confirmation (up to ~60s)
-                match self
-                    .backend
-                    .poll_gasless_status(&gasless_result.trade_hash, self.chain_id)
-                    .await
-                {
-                    Ok(super::GaslessStatus::Confirmed(hash)) => {
-                        log_swap_ok!("GASLESS", "Confirmed on-chain: {}", hash);
-                        hash
-                    }
-                    Ok(super::GaslessStatus::Failed(reason)) => {
-                        return Err(ExecutionError::Other(format!(
-                            "Gasless trade failed: {}",
-                            reason
-                        )));
-                    }
-                    Err(e) => {
-                        return Err(ExecutionError::Other(format!(
-                            "Gasless status poll error: {}",
-                            e
-                        )));
-                    }
-                }
-            }
-            Err(e) => return Err(e),
-        };
-
-        // Step 5: Verify on-chain — query actual USDC balance after swap.
-        // A tx can have status=1 but deliver 0 output (failed internal swap).
-        let usdc_addr = super::usdc_address_for_chain(self.chain_id)
-            .ok_or_else(|| ExecutionError::Other(format!("No USDC address for chain {}", self.chain_id)))?;
-        let usdc_dec = super::usdc_decimals_for_chain(self.chain_id);
-        let padded_addr = format!(
-            "{:0>64}",
-            self.wallet_address.to_string().trim_start_matches("0x")
-        );
-        let call_data = format!("0x70a08231{}", padded_addr);
-        let call_params = serde_json::json!([{
-            "to": usdc_addr,
-            "data": call_data
-        }, "latest"]);
-
-        let verified_proceeds = match self.rpc_call("eth_call", call_params).await {
-            Ok(result) => {
-                if let Some(hex) = result.as_str() {
-                    let usdc_wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
-                        .unwrap_or(U256::ZERO);
-                    let divisor = 10f64.powi(usdc_dec as i32);
-                    let usdc_after: f64 =
-                        usdc_wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
-                    let gained = usdc_after - usdc_balance_before;
-                    if gained <= 0.0 {
-                        // Swap tx succeeded (status=1) but delivered 0 USDC.
-                        // Position stays open — tokens are still in wallet.
-                        return Err(ExecutionError::Other(format!(
-                            "Close tx {} succeeded but delivered ${:.2} USDC (before=${:.2}, after=${:.2}). \
-                             Position stays open. Tokens may be stranded.",
-                            tx_hash, gained, usdc_balance_before, usdc_after
-                        )));
-                    }
-                    info!("On-chain verified: {} close delivered ${:.2} USDC (before=${:.2}, after=${:.2})",
-                        pos.pair, gained, usdc_balance_before, usdc_after);
-                    gained
-                } else {
-                    warn!("Could not parse USDC balance for close verification — using estimate");
-                    pos.entry_price * pos.quantity
-                        + (pos.current_price - pos.entry_price) * pos.quantity
-                }
-            }
-            Err(e) => {
-                warn!(
-                    "Failed to verify USDC balance after close: {} — using estimate",
-                    e
-                );
-                pos.entry_price * pos.quantity
-                    + (pos.current_price - pos.entry_price) * pos.quantity
-            }
-        };
-
-        // Step 6: Swap verified — NOW remove position from map.
-        self.positions.remove(position_id);
-
-        info!(
-            "DEX closed: {} | tx={} | verified proceeds=${:.2}",
-            pos.pair, tx_hash, verified_proceeds
-        );
-
-        let exit_price = pos.current_price;
-        let gross_pnl = match pos.side {
-            Side::Long => (exit_price - pos.entry_price) * pos.quantity,
-            Side::Short => (pos.entry_price - exit_price) * pos.quantity,
-        };
-        let fee_est = exit_price * pos.quantity * 0.001;
-        let pnl = gross_pnl - fee_est;
-        self.balance = usdc_balance_before + verified_proceeds;
-
-        self.closed_trades.push(TradeRecord {
-            id: uuid::Uuid::new_v4().to_string(),
-            pair: pos.pair.clone(),
-            side: pos.side,
-            entry_price: pos.entry_price,
-            exit_price,
-            quantity: pos.quantity,
-            pnl,
-            pnl_pct: if pos.entry_price > 0.0 {
-                pnl / (pos.entry_price * pos.quantity) * 100.0
-            } else {
-                0.0
-            },
-            fees: fee_est,
-            strategy_name: pos.strategy_name.clone(),
-            opened_at: pos.opened_at,
-            closed_at: Utc::now(),
-            notes: format!("DEX close via {} — on-chain verified", self.backend.name()),
-        });
-
-        if let Err(e) = self.save_state() {
-            warn!("Failed to save state after close: {}", e);
-        }
-
-        Ok(Order {
-            id: format!("dex-close-{}-{}", self.order_counter, tx_hash),
-            pair: pos.pair,
-            side: match pos.side {
-                Side::Long => Side::Short,
-                Side::Short => Side::Long,
-            },
-            order_type: OrderType::Market,
-            price: Some(exit_price),
-            quantity: pos.quantity,
-            status: OrderStatus::Filled,
-            created_at: Utc::now(),
-            filled_at: Some(Utc::now()),
-            filled_price: Some(exit_price),
-            tx_hash: Some(tx_hash.clone()),
-        })
+    async fn close_position_partial(
+        &mut self,
+        position_id: &str,
+        quantity: f64,
+    ) -> Result<Order, ExecutionError> {
+        self.close_position_internal(position_id, quantity).await
     }
 
     fn open_positions(&self) -> Vec<&Position> {
@@ -1698,7 +1731,7 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         side: Side,
         amount_usd: f64,
     ) -> Result<super::LiquidityCheck, ExecutionError> {
-        let (src_token, dst_token) = resolve_pair(pair, side)?;
+        let (src_token, dst_token) = resolve_pair_on_chain(pair, side, self.chain_id)?;
         let test_amount = format!("{}", (amount_usd.max(1.0) * 1_000_000.0) as u64);
         let params = SwapParams {
             src_token: src_token.address.clone(),
@@ -1717,7 +1750,7 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         for pair in curated_pairs {
             // resolve_pair returns (src, dst). For LONG: src=USDC, dst=ASSET.
             // We need the ASSET token balance (dst for LONG).
-            if let Ok((_, asset_token)) = resolve_pair(pair, Side::Long) {
+            if let Ok((_, asset_token)) = resolve_pair_on_chain(pair, Side::Long, self.chain_id) {
                 if asset_token.address.is_empty() {
                     continue;
                 }

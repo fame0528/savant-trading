@@ -187,6 +187,7 @@ async fn get_config(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
 async fn get_portfolio(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
     let account = state.shared.account.read().await;
     let hunt = *state.shared.hunt_mode.read().await;
+    let monitoring = *state.shared.monitoring_mode.read().await;
     Json(ApiResponse::ok(serde_json::json!({
         "balance": account.balance,
         "equity": account.equity,
@@ -197,6 +198,7 @@ async fn get_portfolio(State(state): State<AppState>) -> Json<ApiResponse<serde_
         "open_positions": account.open_positions,
         "trades_today": account.trades_today,
         "hunt_mode": hunt,
+        "monitoring_mode": monitoring,
     })))
 }
 
@@ -229,9 +231,11 @@ async fn get_positions(State(state): State<AppState>) -> Json<ApiResponse<Vec<se
 
 async fn get_trades(State(state): State<AppState>) -> Json<ApiResponse<Vec<serde_json::Value>>> {
     let trades = state.shared.closed_trades.read().await;
+    // Chain-first: only show trades verified on-chain to the user
     let items: Vec<serde_json::Value> = trades
         .iter()
         .rev()
+        .filter(|t| t.on_chain_verified)
         .take(50)
         .map(|t| {
             serde_json::json!({
@@ -247,6 +251,8 @@ async fn get_trades(State(state): State<AppState>) -> Json<ApiResponse<Vec<serde
                 "opened_at": t.opened_at.to_rfc3339(),
                 "closed_at": t.closed_at.to_rfc3339(),
                 "notes": t.notes,
+                "on_chain_verified": t.on_chain_verified,
+                "tx_hash": t.tx_hash,
             })
         })
         .collect();
@@ -368,19 +374,28 @@ async fn get_session(State(state): State<AppState>) -> Json<ApiResponse<serde_js
     let trades = state.shared.closed_trades.read().await;
     let decisions = state.shared.decisions.read().await;
     let account = state.shared.account.read().await;
+    let starting = state.config.trading.starting_balance;
 
-    let wins = trades.iter().filter(|t| t.pnl > 0.0).count();
-    let total = trades.len();
+    // Chain-first: only count on-chain verified trades for win/loss stats
+    let verified_trades: Vec<_> = trades.iter().filter(|t| t.on_chain_verified).collect();
+    let wins = verified_trades.iter().filter(|t| t.pnl > 0.0).count();
+    let total = verified_trades.len();
+
+    // Use on-chain equity minus starting balance as true PnL.
+    // Journal trade PnL is unreliable (includes phantom closes from failed swaps).
+    let true_pnl = account.equity - starting;
 
     Json(ApiResponse::ok(serde_json::json!({
-        "total_trades": total,
+        "total_trades": trades.len(),
+        "verified_trades": total,
         "wins": wins,
         "losses": total - wins,
         "win_rate": if total > 0 { wins as f64 / total as f64 } else { 0.0 },
-        "total_pnl": trades.iter().map(|t| t.pnl).sum::<f64>(),
+        "total_pnl": true_pnl,
         "total_decisions": decisions.len(),
         "balance": account.balance,
         "equity": account.equity,
+        "starting_balance": starting,
     })))
 }
 

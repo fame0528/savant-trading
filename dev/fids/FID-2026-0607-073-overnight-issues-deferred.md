@@ -156,7 +156,7 @@ if !valid {
 ## Status
 
 - [x] RED: All issues traced to exact file:line
-- [x] GREEN: 7 code fixes documented
-- [x] AUDIT: All items pass Five Questions
+- [x] GREEN: 5 code fixes implemented (Issues 1, 2, 3, 5a, 5c skipped)
+- [x] AUDIT: 217 tests pass, zero clippy warnings
 - [x] SELF-CORRECT: 3 corrections applied
-- [x] COMPLETE: Ready for implementation — **AWAITING USER APPROVAL**
+- [x] COMPLETE: Issues 1-3 + 5a implemented. 5b (rust_decimal) + 5d (gasless primary) deferred to separate FIDs.

@@ -325,14 +325,13 @@ pub async fn run(
         }
     }
 
-    // Sync on-chain balance on startup — dashboard reads from PortfolioManager
+    // Sync on-chain balance on startup — dashboard reads from PortfolioManager.
+    // Chain is ALWAYS the single source of truth, even when balance is $0.
     if let Some(ref mut ex) = executor {
         if ex.sync_balance().await.is_ok() {
             let on_chain_balance = ex.balance();
-            if on_chain_balance > 0.0 {
-                portfolio.set_balance(on_chain_balance);
-                info!("Synced on-chain balance: ${:.2}", on_chain_balance);
-            }
+            portfolio.set_balance(on_chain_balance);
+            info!("Synced on-chain USDC balance: ${:.6}", on_chain_balance);
         }
     }
 
@@ -854,33 +853,33 @@ pub async fn run(
         for (pair, on_chain_qty, tracked_qty) in &discrepancies {
             if *tracked_qty < 0.001 && *on_chain_qty > 0.001 {
                 // On-chain has tokens but no tracked position — create recovery
-                // Priority 1: entry price from trade history
-                let trade_entry = if let Some(ref j) = journal {
-                    j.get_trades(1000)
-                        .await
-                        .unwrap_or_default()
-                        .iter()
-                        .rfind(|t| t.pair == *pair)
-                        .map(|t| t.entry_price)
-                        .unwrap_or(0.0)
-                } else {
-                    0.0
-                };
-                // Priority 2: current market price from candle data
+                // Chain-first: use current market price as entry for recovered positions.
+                // Journal entry prices are from historical trades, not the current on-chain holding.
                 let market_price = market_stores
                     .get(pair)
                     .and_then(|s| s.last().map(|c| c.close))
                     .unwrap_or(0.0);
-                let entry_price = if trade_entry > 0.0 {
-                    trade_entry
-                } else {
+                let entry_price = if market_price > 0.0 {
                     market_price
+                } else {
+                    // Fallback to trade history only if no market data available
+                    if let Some(ref j) = journal {
+                        j.get_trades(1000)
+                            .await
+                            .unwrap_or_default()
+                            .iter()
+                            .rfind(|t| t.pair == *pair)
+                            .map(|t| t.entry_price)
+                            .unwrap_or(0.0)
+                    } else {
+                        0.0
+                    }
                 };
 
                 // HARD GUARD: never create a position with entry_price <= 0
                 if entry_price <= 0.0 {
-                    error!("WALLET SYNC: Cannot recover {} — no valid entry price (trade_history={:.4}, market={:.4}). Skipping.",
-                        pair, trade_entry, market_price);
+                    error!("WALLET SYNC: Cannot recover {} — no valid entry price (market={:.4}). Skipping.",
+                        pair, market_price);
                     shared
                         .log_activity(
                             savant_trading::core::shared::ActivityLevel::Error,
@@ -925,15 +924,8 @@ pub async fn run(
                     let _ = j.save_position(&recovery_pos).await;
                 }
                 warn!(
-                    "WALLET SYNC: Recovered {} — {:.6} tokens @ ${:.4} (source: {})",
-                    pair,
-                    on_chain_qty,
-                    entry_price,
-                    if trade_entry > 0.0 {
-                        "trade_history"
-                    } else {
-                        "market_price"
-                    }
+                    "WALLET SYNC: Recovered {} — {:.6} tokens @ ${:.4} (source: market_price)",
+                    pair, on_chain_qty, entry_price,
                 );
                 shared
                     .log_activity(
@@ -1049,6 +1041,10 @@ pub async fn run(
         std::collections::HashMap::new();
 
     let mut tick = 0u64;
+
+    // FID-073 Issue 2: Prevent overlapping LLM evaluations.
+    // If a previous cycle's LLM call is still running, skip the new eval phase.
+    let eval_in_progress = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
 
     loop {
         tick += 1;
@@ -1215,6 +1211,11 @@ pub async fn run(
         {
             let mut hm = shared.hunt_mode.write().await;
             *hm = hunt_mode;
+        }
+        // FID-075: Sync monitoring_mode — active when fully deployed (no capital to scan)
+        {
+            let mut mm = shared.monitoring_mode.write().await;
+            *mm = fully_deployed;
         }
 
         for pair in &active_pairs {
@@ -1491,6 +1492,11 @@ pub async fn run(
         }
 
         // === PHASE 2: Send all LLM calls in parallel via streaming ===
+        // FID-073 Issue 2: Skip if previous eval still running
+        if eval_in_progress.load(std::sync::atomic::Ordering::Relaxed) {
+            log_phase!("PHASE2", "SKIPPED — previous LLM eval still in progress");
+            pair_data_vec.clear();
+        }
         log_phase!(
             "PHASE2",
             "{} pairs queued for LLM evaluation",
@@ -1598,6 +1604,7 @@ pub async fn run(
             }];
 
             let start = std::time::Instant::now();
+            eval_in_progress.store(true, std::sync::atomic::Ordering::Relaxed);
             log_llm!("LLM", "BATCH EVALUATING {} pairs (single call)", batch_size);
             let response = match tokio::time::timeout(
                 std::time::Duration::from_secs(180),
@@ -1713,6 +1720,9 @@ pub async fn run(
                 }
             }
         }
+
+        // FID-073 Issue 2: Clear eval flag after Phase 2 completes
+        eval_in_progress.store(false, std::sync::atomic::Ordering::Relaxed);
 
         log_phase!("PHASE3", "Processing {} LLM results...", all_results.len());
         log_phase!(
@@ -2048,6 +2058,8 @@ pub async fn run(
                                                                 "AI {:?} via {}",
                                                                 decision.action, decision.pair
                                                             ),
+                                                            on_chain_verified: false,
+                                                            tx_hash: None,
                                                         };
 
                                                         log_trade!("CLOSED", "{:?} {} | Pos: {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
@@ -2599,6 +2611,18 @@ pub async fn run(
                         .cloned()
                     {
                         let old_stop = pos.stop_loss;
+                        // FID-073 Issue 1: Directional guard — never move stop backward
+                        let valid = match pos.side {
+                            savant_trading::core::types::Side::Long => new_stop > old_stop,
+                            savant_trading::core::types::Side::Short => new_stop < old_stop,
+                        };
+                        if !valid {
+                            warn!(
+                                "Stop override rejected: {} — new ${:.4} is worse than current ${:.4}",
+                                pair, new_stop, old_stop
+                            );
+                            continue;
+                        }
                         // Update in portfolio
                         if let Some((_, pm_pos)) = portfolio
                             .positions_mut()
@@ -2824,7 +2848,7 @@ pub async fn run(
                     .cloned();
 
                 if let Some(ref eid) = exec_id {
-                    match ex.close_position(eid).await {
+                    match ex.close_position_partial(eid, trade.quantity).await {
                         Ok(order) => {
                             // FID-061: Log on-chain tx hash
                             if let Some(ref hash) = order.tx_hash {
@@ -2846,6 +2870,17 @@ pub async fn run(
                                 "Failed to close executor position {}: {} — position stays open",
                                 eid, e
                             );
+                            // FID-074: Revert the PnL that check_stops added to balance,
+                            // since the on-chain close didn't actually execute.
+                            portfolio.account_mut().balance -= trade.pnl;
+                            // Also remove the phantom TradeRecord from closed_trades
+                            portfolio.closed_trades_mut().retain(|t| {
+                                !(t.pair == trade.pair
+                                    && t.side == trade.side
+                                    && (t.entry_price - trade.entry_price).abs() < 0.0001
+                                    && (t.exit_price - trade.exit_price).abs() < 0.0001
+                                    && t.closed_at == trade.closed_at)
+                            });
                             // Restore position to PortfolioManager so it stays tracked
                             if let Some(ref pid) = paper_id {
                                 if let Some(pos) = paper_positions_full.get(pid) {
@@ -2864,18 +2899,27 @@ pub async fn run(
                     }
                 } else {
                     // Fallback: search by pair + side if mapping not found
-                    // This handles edge cases where the mapping wasn't established
                     let fallback_id = ex
                         .open_positions()
                         .iter()
                         .find(|p| p.pair == trade.pair && p.side == trade.side)
                         .map(|p| p.id.clone());
                     if let Some(fid) = fallback_id {
-                        if let Err(e) = ex.close_position(&fid).await {
+                        if let Err(e) = ex.close_position_partial(&fid, trade.quantity).await {
                             warn!(
                                 "Failed to close fallback position {}: {} — position stays open",
                                 fid, e
                             );
+                            // FID-074: Revert balance on failed close
+                            portfolio.account_mut().balance -= trade.pnl;
+                            // Remove phantom TradeRecord
+                            portfolio.closed_trades_mut().retain(|t| {
+                                !(t.pair == trade.pair
+                                    && t.side == trade.side
+                                    && (t.entry_price - trade.entry_price).abs() < 0.0001
+                                    && (t.exit_price - trade.exit_price).abs() < 0.0001
+                                    && t.closed_at == trade.closed_at)
+                            });
                             // Restore position to PortfolioManager
                             if let Some(ref pid) = paper_id {
                                 if let Some(pos) = paper_positions_full.get(pid) {
@@ -3067,9 +3111,9 @@ pub async fn run(
             *sa = portfolio.account().clone();
         }
 
-        // Sync balance from executor for live mode and propagate to PortfolioManager
+        // Sync balance from executor — chain is always the source of truth
         if let Some(ref mut ex) = executor {
-            if tick.is_multiple_of(10) && ex.sync_balance().await.is_ok() {
+            if tick.is_multiple_of(3) && ex.sync_balance().await.is_ok() {
                 let executor_balance = ex.balance();
                 portfolio.account_mut().balance = executor_balance;
                 portfolio.refresh_equity();
@@ -4158,6 +4202,8 @@ async fn run_training_batch(
                             opened_at: chrono::Utc::now(),
                             closed_at: chrono::Utc::now(),
                             notes: String::new(),
+                            on_chain_verified: false,
+                            tx_hash: None,
                         });
 
                         println!(

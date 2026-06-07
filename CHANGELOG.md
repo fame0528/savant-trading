@@ -4,7 +4,44 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.10.3] — 2026-06-07
+
+### Fixed — FID-076: Chain-First Verification System
+
+- **All data verified on-chain prior to display** — Fundamental principle enforced: chain is the single source of truth. Every number shown to the user is derived from on-chain state, not journal/stale data.
+- **Profit KPI uses on-chain equity** — `total_pnl = equity - starting_balance` instead of summing journal closed trades. Eliminates phantom P&L from failed swaps. (`api/mod.rs`)
+- **Closed trades filtered by `on_chain_verified`** — Added `on_chain_verified: bool` and `tx_hash: Option<String>` to `TradeRecord`. Only trades with on-chain tx confirmation are shown to the user. Phantom trades from `check_stops()` are marked unverified. (`types.rs`, `api/mod.rs`)
+- **Win/loss stats from verified trades only** — Session endpoint filters to `on_chain_verified` trades before counting wins/losses. Win rate reflects actual on-chain performance. (`api/mod.rs`)
+- **Phantom trade cleanup on failed close** — When executor close fails, the phantom TradeRecord is now removed from `closed_trades` via `retain()`, preventing phantom P&L accumulation. (`engine.rs`, `portfolio.rs`)
+- **Wallet recovery uses market price** — Recovered positions use current candle close as entry price instead of stale journal trade entry. Eliminates incorrect P&L on recovered positions. (`engine.rs`)
+- **Balance sync always runs** — Removed `if on_chain_balance > 0.0` guard that skipped sync when USDC was $0. Chain is always the source of truth, even at $0. (`engine.rs`)
+- **Periodic balance sync every 3 ticks** — Was 10 ticks (150 min). Now 3 ticks (45 min). Dashboard stays accurate. (`engine.rs`)
+
 ## [0.10.2] — 2026-06-07
+
+### Added — FID-075: Monitoring Mode Dashboard Badge
+
+- **"LIVE · MONITORING" amber badge** — When fully deployed ($0 USDC), dashboard shows amber "MONITORING" badge instead of generic "RUNNING". Same visual pattern as hunt mode (neon glow, border, icon). Uses `fa-eye` icon.
+- **`monitoring_mode` API field** — `/api/portfolio` returns `monitoring_mode: true` when USDC < $1. Dashboard shows badge only when monitoring AND not in hunt mode.
+- **`--neon-amber` CSS variable** — `#ffb347` with matching glow text-shadow for the monitoring badge.
+
+### Fixed — FID-073: Overnight Issues (5 of 8 items)
+
+- **Stop override allows backward move** — LLM's ADJUST_STOP could set a stop lower than the current trailing stop for LONG positions. Added directional guard: for LONG, `new_stop > old_stop` required; for SHORT, `new_stop < old_stop`. Rejects invalid overrides with warning. (`engine.rs:2601`)
+- **Double LLM evaluation overlap** — 15-minute cycle interval shorter than 100-160s LLM response time. Added `eval_in_progress` AtomicBool flag — set before batch call, cleared after. Next cycle skips Phase 2 if flag is still set. (`engine.rs`)
+- **R:R always 0.0** — MiMo v2.5 Pro copied the example value `"risk_reward": 0.0` literally. Changed example to `2.5` and added explicit calculation instruction: "Formula: |TP1 - entry| / |entry - SL|". (`output_format.md`)
+- **resolve_pair hardcoded to Arbitrum** — All 4 production callers in `trader.rs` now use `resolve_pair_on_chain(pair, side, self.chain_id)` instead of `resolve_pair()` which hardcoded chain 42161. Tests still use `resolve_pair()`. (`trader.rs`)
+
+### Deferred from FID-073
+
+- **5b: amount_to_wei uses f64** — Precision loss at scale. Needs `rust_decimal` crate. Separate FID.
+- **5d: Gasless API not wired into main execute_swap** — Only used as fallback in close path. Separate FID.
+
+### Fixed — FID-074: Overnight Execution Bugs (3 critical)
+
+- **TP1 scale-out sent full position qty instead of 50%** — `close_position()` always used `pos.quantity` for the swap amount, ignoring the PortfolioManager's 50% scale calculation. Added `close_position_partial(position_id, quantity)` to `ExecutionEngine` trait. Engine now passes `trade.quantity` from stop results. Partial closes reduce position qty instead of removing it. (`trader.rs`, `engine.rs`, `engine.rs` trait)
+- **Balance not reverted after failed close** — PortfolioManager's `check_stops()` unconditionally added PnL to `account.balance`. When executor close failed (dust), position was restored but balance was not reverted. Now subtracts `trade.pnl` from balance on failure. (`engine.rs:2844`)
+- **Close swap dust failure — qty_wei > on-chain balance** — `amount_to_wei(pos.quantity)` rounded differently than actual on-chain balance. Now queries on-chain token balance via `query_token_balance()` before swap and uses `min(requested, on_chain)` as swap amount. (`trader.rs:close_position_internal`)
 
 ### Fixed — FID-072: Comprehensive Audit Remediation (29 findings)
 

@@ -354,6 +354,8 @@ impl TradeJournal {
                 opened_at,
                 closed_at,
                 notes: notes.unwrap_or_default(),
+                on_chain_verified: false,
+                tx_hash: None,
             });
         }
 

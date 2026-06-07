@@ -220,6 +220,12 @@ export default function Dashboard() {
             HUNT MODE
           </span>
         )}
+        {portfolio?.monitoring_mode && !portfolio?.hunt_mode && (
+          <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase" style={{ color: 'var(--neon-amber)', borderColor: 'rgba(255, 179, 71, 0.3)', backgroundColor: 'rgba(255, 179, 71, 0.1)', textShadow: 'var(--neon-amber-glow)' }}>
+            <Icon name="fa-eye" className="text-[8px]" />
+            MONITORING
+          </span>
+        )}
         <div className="flex-1" />
         <div className="flex gap-4 items-center text-[10px] text-[var(--dim)]">
           <span className="flex items-center gap-1"><Icon name="fa-microchip" className="text-[8px]" /> <b className="text-[var(--txt)]">{config?.model ?? "—"}</b></span>
@@ -277,7 +283,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-6 gap-1.5 shrink-0">
         <KPI icon="fa-wallet" label="Portfolio Value" value={fmt.usd(eq)} color="text-[var(--cyan)]" />
         <KPI icon="fa-bank" label="Cash Balance" value={fmt.usd(portfolio?.balance ?? 0)} sub="USD available" />
-        <KPI icon="fa-sack-dollar" label="Profit" value={fmt.usd((portfolio?.unrealized_pnl ?? 0) + (session?.total_pnl ?? 0))} sub={`${fmt.usd(session?.total_pnl ?? 0)} locked · ${fmt.usd(portfolio?.unrealized_pnl ?? 0)} open`} color={pnlClass((portfolio?.unrealized_pnl ?? 0) + (session?.total_pnl ?? 0))} />
+        <KPI icon="fa-sack-dollar" label="Profit" value={fmt.usd(session?.total_pnl ?? 0)} sub={`${fmt.usd(session?.starting_balance ?? 30)} invested`} color={pnlClass(session?.total_pnl ?? 0)} />
         <KPI icon="fa-bullseye" label="Win Rate" value={`${((session?.win_rate ?? 0) * 100).toFixed(0)}%`} sub={`${session?.wins ?? 0}W / ${session?.losses ?? 0}L`} color="text-[var(--green)]" />
         <KPI icon="fa-rotate" label="Trades Today" value={`${portfolio?.trades_today ?? 0}`} sub={`${session?.total_trades ?? 0} total`} color="text-[var(--violet)]" />
         <KPI icon="fa-layer-group" label="Positions" value={`${positions.length} / ${risk?.max_positions ?? 3}`} sub={positions.length > 0 ? positions.map(p => p.pair.split("/")[0]).join(", ") : "none open"} />
@@ -360,6 +366,14 @@ export default function Dashboard() {
                 <Chip size="sm" variant="soft" color="danger" style={{ color: 'var(--neon-red)', textShadow: 'var(--neon-red-glow)' }}>
                   <i className="fa-solid fa-crosshairs text-[7px] mr-0.5" />
                   <Chip.Label>HUNT MODE</Chip.Label>
+                </Chip>
+              </div>
+            )}
+            {portfolio?.monitoring_mode && !portfolio?.hunt_mode && (
+              <div className="flex items-center justify-center pt-0.5">
+                <Chip size="sm" variant="soft" color="warning" style={{ color: 'var(--neon-amber)', textShadow: 'var(--neon-amber-glow)' }}>
+                  <i className="fa-solid fa-eye text-[7px] mr-0.5" />
+                  <Chip.Label>MONITORING</Chip.Label>
                 </Chip>
               </div>
             )}

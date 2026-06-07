@@ -17,6 +17,17 @@ pub trait ExecutionEngine: Send + Sync {
         position_id: &str,
     ) -> Result<Order, crate::core::error::ExecutionError>;
 
+    /// Close a specific quantity of a position (for TP scale-outs).
+    /// Default: delegates to `close_position()` (full close).
+    async fn close_position_partial(
+        &mut self,
+        position_id: &str,
+        quantity: f64,
+    ) -> Result<Order, crate::core::error::ExecutionError> {
+        let _ = quantity;
+        self.close_position(position_id).await
+    }
+
     fn open_positions(&self) -> Vec<&Position>;
 
     fn balance(&self) -> f64;

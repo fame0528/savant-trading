@@ -241,6 +241,10 @@ pub struct TradeRecord {
     pub opened_at: DateTime<Utc>,
     pub closed_at: DateTime<Utc>,
     pub notes: String,
+    #[serde(default)]
+    pub on_chain_verified: bool,
+    #[serde(default)]
+    pub tx_hash: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

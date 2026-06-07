@@ -119,6 +119,8 @@ mod tests {
             opened_at: Utc::now(),
             closed_at: Utc::now(),
             notes: String::new(),
+            on_chain_verified: false,
+            tx_hash: None,
         }
     }
 

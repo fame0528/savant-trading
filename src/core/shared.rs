@@ -27,6 +27,7 @@ pub struct SharedEngineData {
     /// FID-063: Hunt mode flag — true when idle capital > $5 and equity < $500.
     /// Exposed to API/dashboard for visibility.
     pub hunt_mode: Arc<RwLock<bool>>,
+    pub monitoring_mode: Arc<RwLock<bool>>,
 }
 
 /// Memory system state for TUI display.
@@ -103,6 +104,7 @@ impl SharedEngineData {
             stop_overrides: Arc::new(RwLock::new(HashMap::new())),
             close_overrides: Arc::new(RwLock::new(HashMap::new())),
             hunt_mode: Arc::new(RwLock::new(false)),
+            monitoring_mode: Arc::new(RwLock::new(false)),
         }
     }
 

@@ -18,7 +18,7 @@ Single pair:
     "confidence": 0.0,
     "reasoning": "Your reasoning here — cite specific data points and knowledge sources",
     "knowledge_sources": ["source-id-001"],
-    "risk_reward": 0.0
+    "risk_reward": 2.5
 }
 
 Multiple pairs (batch):
@@ -39,7 +39,7 @@ Field Rules:
 - confidence: 0.0 to 1.0 — be honest, don't inflate. Below 0.40 = automatically downgraded to HOLD.
 - reasoning: cite specific data, indicators, and knowledge sources
 - knowledge_sources: list of knowledge unit IDs that informed your decision
-- risk_reward: calculated R:R ratio for the trade (minimum 2.0:1)
+- risk_reward: calculated R:R ratio from your entry, stop_loss, and take_profit_1 values. Formula: |take_profit_1 - entry_price| / |entry_price - stop_loss|. Do NOT leave at 0.0 — calculate it from your proposed prices.
 
 For HOLD decisions, set all prices to 0.0, position_size_pct to 0.0, and order_type to LIMIT.
 </output_format>

@@ -233,6 +233,8 @@ impl PortfolioManager {
                         opened_at: pos.opened_at,
                         closed_at: Utc::now(),
                         notes: format!("Stop loss hit ({:?})", pos.scale_level),
+                        on_chain_verified: false,
+                        tx_hash: None,
                     };
 
                     self.account.balance += pnl;
@@ -305,6 +307,8 @@ impl PortfolioManager {
                                 opened_at: pos.opened_at,
                                 closed_at: Utc::now(),
                                 notes: "TP1 hit — scale out 50%, SL → break-even".to_string(),
+                                on_chain_verified: false,
+                                tx_hash: None,
                             };
 
                             self.account.balance += pnl;
@@ -354,6 +358,8 @@ impl PortfolioManager {
                                 opened_at: pos.opened_at,
                                 closed_at: Utc::now(),
                                 notes: "TP2 hit — scale out 60% of remaining".to_string(),
+                                on_chain_verified: false,
+                                tx_hash: None,
                             };
 
                             self.account.balance += pnl;
@@ -404,8 +410,9 @@ impl PortfolioManager {
                                 opened_at: pos.opened_at,
                                 closed_at: Utc::now(),
                                 notes: "TP3 hit — full close".to_string(),
+                                on_chain_verified: false,
+                                tx_hash: None,
                             };
-
                             self.account.balance += pnl;
                             self.account.daily_pnl += pnl;
                             self.closed_trades.push(trade.clone());
@@ -440,6 +447,10 @@ impl PortfolioManager {
 
     pub fn closed_trades(&self) -> &[TradeRecord] {
         &self.closed_trades
+    }
+
+    pub fn closed_trades_mut(&mut self) -> &mut Vec<TradeRecord> {
+        &mut self.closed_trades
     }
 
     pub fn set_closed_trades(&mut self, trades: Vec<TradeRecord>) {
