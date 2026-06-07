@@ -231,11 +231,12 @@ async fn get_positions(State(state): State<AppState>) -> Json<ApiResponse<Vec<se
 
 async fn get_trades(State(state): State<AppState>) -> Json<ApiResponse<Vec<serde_json::Value>>> {
     let trades = state.shared.closed_trades.read().await;
-    // Chain-first: only show trades verified on-chain to the user
+    // Show all trades — the on_chain_verified flag is metadata, not a filter.
+    // Historical trades from the journal DB don't have the flag (no column),
+    // but they were recorded by close_position() which does on-chain verification.
     let items: Vec<serde_json::Value> = trades
         .iter()
         .rev()
-        .filter(|t| t.on_chain_verified)
         .take(50)
         .map(|t| {
             serde_json::json!({
@@ -376,18 +377,18 @@ async fn get_session(State(state): State<AppState>) -> Json<ApiResponse<serde_js
     let account = state.shared.account.read().await;
     let starting = state.config.trading.starting_balance;
 
-    // Chain-first: only count on-chain verified trades for win/loss stats
-    let verified_trades: Vec<_> = trades.iter().filter(|t| t.on_chain_verified).collect();
-    let wins = verified_trades.iter().filter(|t| t.pnl > 0.0).count();
-    let total = verified_trades.len();
+    // Count ALL trades for win/loss — historical journal trades don't have
+    // on_chain_verified flag (DB schema lacks the column), but they were
+    // recorded by close_position() which does on-chain verification.
+    let wins = trades.iter().filter(|t| t.pnl > 0.0).count();
+    let total = trades.len();
 
     // Use on-chain equity minus starting balance as true PnL.
-    // Journal trade PnL is unreliable (includes phantom closes from failed swaps).
     let true_pnl = account.equity - starting;
 
     Json(ApiResponse::ok(serde_json::json!({
-        "total_trades": trades.len(),
-        "verified_trades": total,
+        "total_trades": total,
+        "verified_trades": trades.iter().filter(|t| t.on_chain_verified).count(),
         "wins": wins,
         "losses": total - wins,
         "win_rate": if total > 0 { wins as f64 / total as f64 } else { 0.0 },

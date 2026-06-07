@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed — FID-079: Gas Check Only on Active Chain
 
 - **Gas balance warnings for Base/Optimism when trading on Arbitrum** — `sync_balance()` iterated over ALL registered chain clients and logged CRITICAL errors for chains with zero gas. Now only checks the primary trading chain (`self.chain_id`). Eliminates false alarms for unused chains. (`trader.rs:sync_balance`)
+- **Closed trades showing empty** — `get_trades` API filtered by `on_chain_verified` flag, but journal DB has no column for it (all load as `false`). Removed filter from trades list — flag is metadata, not a gate. Session stats also count all trades. (`api/mod.rs`)
+- **AI Decisions "Waiting for first AI cycle…" when monitoring** — Misleading message when engine is in monitoring mode (fully deployed, no LLM calls). Now shows "Monitoring — LLM not active while fully deployed" with `fa-eye` icon. (`page.tsx`)
 
 ### Added — FID-077: Sound Effects System
 

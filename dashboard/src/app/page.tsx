@@ -558,7 +558,8 @@ export default function Dashboard() {
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {decisions.length === 0 ? (
               <p className="text-[var(--dimmer)] text-xs text-center py-4 flex items-center justify-center gap-1.5">
-                <Icon name="fa-spinner fa-spin" />Waiting for first AI cycle…
+                <Icon name={portfolio?.monitoring_mode ? "fa-eye" : "fa-spinner fa-spin"} />
+                {portfolio?.monitoring_mode ? "Monitoring — LLM not active while fully deployed" : "Waiting for first AI cycle…"}
               </p>
             ) : (
               decisions.slice(0, 10).map((d, i) => {
