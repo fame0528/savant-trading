@@ -272,6 +272,87 @@ pub fn strip_thinking_tags(response: &str) -> String {
     result.trim().to_string()
 }
 
+/// Extract a JSON array from a response that may contain surrounding text.
+/// MiMo v2.5 Pro often returns individual JSON objects with text between them
+/// instead of a clean JSON array. This function handles all cases:
+///
+/// 1. Fast path: entire string is a valid JSON array
+/// 2. Find all balanced `{...}` blocks using brace counting
+/// 3. Parse each block as a JSON Value
+/// 4. Return as Vec<Value>
+pub fn extract_json_array(text: &str) -> Result<Vec<serde_json::Value>, serde_json::Error> {
+    let trimmed = text.trim();
+
+    // Fast path: try direct parse as JSON array
+    if let Ok(arr) = serde_json::from_str::<Vec<serde_json::Value>>(trimmed) {
+        return Ok(arr);
+    }
+
+    // Slow path: extract individual JSON objects from surrounding text
+    let mut objects = Vec::new();
+    let chars: Vec<char> = trimmed.chars().collect();
+    let mut i = 0;
+
+    while i < chars.len() {
+        if chars[i] == '{' {
+            // Found start of potential JSON object — count braces to find end
+            let mut depth = 0;
+            let mut in_string = false;
+            let mut escape_next = false;
+            let start = i;
+
+            for j in i..chars.len() {
+                if escape_next {
+                    escape_next = false;
+                    continue;
+                }
+                if chars[j] == '\\' && in_string {
+                    escape_next = true;
+                    continue;
+                }
+                if chars[j] == '"' {
+                    in_string = !in_string;
+                    continue;
+                }
+                if in_string {
+                    continue;
+                }
+                if chars[j] == '{' {
+                    depth += 1;
+                } else if chars[j] == '}' {
+                    depth -= 1;
+                    if depth == 0 {
+                        // Found balanced object
+                        let obj_str: String = chars[start..=j].iter().collect();
+                        if let Ok(val) = serde_json::from_str::<serde_json::Value>(&obj_str) {
+                            objects.push(val);
+                        }
+                        i = j + 1;
+                        break;
+                    }
+                }
+            }
+            if depth != 0 {
+                // Unbalanced braces — skip this `{`
+                i = start + 1;
+            }
+        } else {
+            i += 1;
+        }
+    }
+
+    if objects.is_empty() {
+        // Last resort: try parsing as a single object (batch of 1)
+        if let Ok(val) = serde_json::from_str::<serde_json::Value>(trimmed) {
+            return Ok(vec![val]);
+        }
+        // Return error — no JSON found
+        return Err(serde_json::from_str::<serde_json::Value>("").unwrap_err());
+    }
+
+    Ok(objects)
+}
+
 /// Extract a trading decision from freeform natural language text.
 /// Handles models that don't produce structured JSON output.
 /// Returns a TradeDecision if enough fields can be extracted, None otherwise.

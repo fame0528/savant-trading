@@ -1639,8 +1639,9 @@ pub async fn run(
                         &cleaned[..cleaned.len().min(300)]
                     );
 
-                    // Try to parse as JSON array
-                    match serde_json::from_str::<Vec<serde_json::Value>>(&cleaned) {
+                    // Try to parse as JSON array — handles MiMo returning individual
+                    // objects with text between them instead of a clean array
+                    match savant_trading::agent::decision_parser::extract_json_array(&cleaned) {
                         Ok(decisions) => {
                             log_phase!(
                                 "PHASE2",
