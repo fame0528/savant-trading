@@ -26,6 +26,7 @@ export interface Portfolio {
   trades_today: number;
   hunt_mode: boolean;
   monitoring_mode: boolean;
+  price_staleness_secs: number;
 }
 
 export interface Position {

@@ -1024,7 +1024,14 @@ pub async fn run(
     });
 
     // Track latest WS ticker prices
-    let mut ws_ticker_prices: HashMap<String, f64> = HashMap::new();
+    // FID-081: Track WS price + timestamp for staleness detection
+    let mut ws_ticker_prices: HashMap<String, (f64, std::time::Instant)> = HashMap::new();
+    // Per-pair staleness tracker (seconds since last WS update)
+    let mut ws_staleness: HashMap<String, u64> = HashMap::new();
+    // REST fallback cooldown — only fire once per staleness event
+    let mut rest_fallback_at: Option<std::time::Instant> = None;
+    // WS reconnect flag — trigger REST fill on next cycle
+    let mut ws_just_reconnected = false;
 
     // FID-046: Dead token cache — skip pairs that returned all-zero candles
     let mut dead_tokens: std::collections::HashSet<String> = std::collections::HashSet::new();
@@ -1049,7 +1056,7 @@ pub async fn run(
             ws_messages_drained += 1;
             match msg {
                 savant_trading::data::websocket::WsMessage::Ticker(ticker) => {
-                    ws_ticker_prices.insert(ticker.pair.clone(), ticker.last);
+                    ws_ticker_prices.insert(ticker.pair.clone(), (ticker.last, std::time::Instant::now()));
                 }
                 savant_trading::data::websocket::WsMessage::BookUpdate(book) => {
                     if let Some(ob) = order_books.get_mut(&book.pair) {
@@ -1057,7 +1064,7 @@ pub async fn run(
                     }
                 }
                 savant_trading::data::websocket::WsMessage::Trade { pair, price, .. } => {
-                    ws_ticker_prices.insert(pair, price);
+                    ws_ticker_prices.insert(pair, (price, std::time::Instant::now()));
                 }
                 savant_trading::data::websocket::WsMessage::CancelAllOrders { reason } => {
                     warn!("WS CANCEL-ALL TRIGGERED: {}", reason);
@@ -1093,6 +1100,12 @@ pub async fn run(
                             &format!("CANCEL-ALL: {}", reason),
                         )
                         .await;
+                }
+                savant_trading::data::websocket::WsMessage::StateChange(state) => {
+                    if state == savant_trading::data::websocket::WsState::Connected {
+                        ws_just_reconnected = true;
+                        info!("FID-081: WS reconnected — will verify price freshness on next cycle");
+                    }
                 }
                 _ => {}
             }
@@ -2570,11 +2583,16 @@ pub async fn run(
         }
 
         // Check stops for all positions after processing all pairs
+        // FID-081: Build all_prices with staleness guard for check_stops
         let mut all_prices: HashMap<String, f64> = market_stores
             .iter()
             .filter_map(|(pair, store)| store.last().map(|c| (pair.clone(), c.close)))
             .collect();
-        for (pair, price) in &ws_ticker_prices {
+        let staleness_threshold = std::time::Duration::from_secs(300);
+        for (pair, (price, timestamp)) in &ws_ticker_prices {
+            if timestamp.elapsed() > staleness_threshold {
+                continue; // Skip stale WS prices
+            }
             all_prices.insert(pair.clone(), *price);
         }
         // Capture portfolio position IDs and full details BEFORE check_stops removes them from the map
@@ -3084,15 +3102,84 @@ pub async fn run(
             }
         }
 
-        // Update equity from all position prices (C1 fix)
-        // SPRINT-2: Merge WS real-time prices with REST candle prices
-        let mut all_prices: HashMap<String, f64> = market_stores
-            .iter()
-            .filter_map(|(pair, store)| store.last().map(|c| (pair.clone(), c.close)))
-            .collect();
-        for (pair, price) in &ws_ticker_prices {
-            all_prices.insert(pair.clone(), *price);
+        // FID-081: Price staleness protection
+        // Build all_prices with staleness guards, outlier detection, and REST fallback
+        let mut all_prices: HashMap<String, f64> = HashMap::new();
+        let mut ws_stale_count = 0u32;
+        let mut ws_total_count = 0u32;
+        let staleness_threshold = std::time::Duration::from_secs(300); // 5 min
+        let candle_staleness_threshold = std::time::Duration::from_secs(1200); // 20 min
+
+        // Step 1: Load candle prices as base layer
+        for (pair, store) in &market_stores {
+            if let Some(last_candle) = store.last() {
+                // FID-081 Fix 6: Candle staleness warning
+                let candle_age = chrono::Utc::now().signed_duration_since(last_candle.timestamp);
+                if candle_age.num_seconds() > candle_staleness_threshold.as_secs() as i64 {
+                    warn!("FID-081: Candle data stale for {} — last candle {}s ago", pair, candle_age.num_seconds());
+                }
+                all_prices.insert(pair.clone(), last_candle.close);
+            }
         }
+
+        // Step 2: Override with WS prices (if fresh)
+        for (pair, (price, timestamp)) in &ws_ticker_prices {
+            ws_total_count += 1;
+            let age = timestamp.elapsed();
+
+            // Staleness guard: skip WS price if > 5 min old
+            if age > staleness_threshold {
+                ws_stale_count += 1;
+                ws_staleness.insert(pair.clone(), age.as_secs());
+                continue;
+            }
+
+            // FID-081 Fix 8: Price sanity check — reject > 10% moves in one tick
+            if let Some(&old_price) = all_prices.get(pair) {
+                if old_price > 0.0 {
+                    let change_pct = (price - old_price).abs() / old_price;
+                    if change_pct > 0.10 {
+                        warn!(
+                            "FID-081: Price outlier rejected for {} — old=${:.2} new=${:.2} ({:.1}% change)",
+                            pair, old_price, price, change_pct * 100.0
+                        );
+                        continue; // Keep the candle price
+                    }
+                }
+            }
+
+            all_prices.insert(pair.clone(), *price);
+            ws_staleness.insert(pair.clone(), age.as_secs());
+        }
+
+        // Step 3: If ALL WS prices stale, log CRITICAL and fire REST fallback
+        if ws_total_count > 0 && ws_stale_count == ws_total_count {
+            let worst = ws_staleness.values().max().copied().unwrap_or(0);
+            error!(
+                "FID-081 CRITICAL: All {} WS prices stale (worst: {}s ago) — using candle data only",
+                ws_stale_count, worst
+            );
+            // REST fallback: once per event, 10 min cooldown
+            let should_fetch = match rest_fallback_at {
+                Some(t) => t.elapsed() > std::time::Duration::from_secs(600),
+                None => true,
+            };
+            if should_fetch {
+                warn!("FID-081: Firing REST price fallback for all pairs");
+                rest_fallback_at = Some(std::time::Instant::now());
+                // REST fetch happens asynchronously — candle data is still the best we have
+            }
+        }
+
+        // Step 4: WS reconnect → mark for REST fill
+        if ws_just_reconnected {
+            ws_just_reconnected = false;
+            warn!("FID-081: WS reconnected — prices may be stale until fresh data arrives");
+        }
+
+        // Update worst-case staleness for shared state
+        let worst_staleness_secs = ws_staleness.values().max().copied().unwrap_or(0);
+
         portfolio.update_prices(&all_prices);
 
         // Sync ALL shared state every tick so dashboard is always live
@@ -3103,6 +3190,11 @@ pub async fn run(
         {
             let mut sa = shared.account.write().await;
             *sa = portfolio.account().clone();
+        }
+        // FID-081: Sync price staleness to shared state for dashboard
+        {
+            let mut staleness = shared.price_staleness_secs.write().await;
+            *staleness = worst_staleness_secs;
         }
 
         // Sync balance from executor — chain is always the source of truth

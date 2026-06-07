@@ -28,6 +28,9 @@ pub struct SharedEngineData {
     /// Exposed to API/dashboard for visibility.
     pub hunt_mode: Arc<RwLock<bool>>,
     pub monitoring_mode: Arc<RwLock<bool>>,
+    /// FID-081: Price feed staleness — seconds since last WS price update.
+    /// Dashboard shows amber "STALE PRICES" chip when > 300s.
+    pub price_staleness_secs: Arc<RwLock<u64>>,
 }
 
 /// Memory system state for TUI display.
@@ -105,6 +108,7 @@ impl SharedEngineData {
             close_overrides: Arc::new(RwLock::new(HashMap::new())),
             hunt_mode: Arc::new(RwLock::new(false)),
             monitoring_mode: Arc::new(RwLock::new(false)),
+            price_staleness_secs: Arc::new(RwLock::new(0)),
         }
     }
 

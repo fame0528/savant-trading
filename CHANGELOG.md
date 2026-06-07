@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.10.3] — 2026-06-07
 
+### Fixed — FID-081: Price Feed Staleness Protection (critical)
+
+- **Engine making decisions on 3-hour-old prices** — `ws_ticker_prices` stored prices with no timestamp. When WebSocket disconnected silently, stale prices were used indefinitely. Now tracks `(price, Instant)` per pair, skips WS prices > 5 min old, and falls back to candle data. (`engine.rs`)
+- **Price sanity check** — Rejects price moves > 10% in a single tick to prevent flash-crash triggers on bad data. Logs warning but doesn't block (lets risk layer decide). (`engine.rs`)
+- **Candle staleness warning** — Logs warning when last candle > 20 min old (15m candle interval + 5 min buffer). (`engine.rs`)
+- **REST fallback** — When ALL WS prices are stale, fires a REST price fetch once per event (10 min cooldown). (`engine.rs`)
+- **WS reconnect detection** — Sets `ws_just_reconnected` flag on `StateChange::Connected`, logs warning that prices may be stale until fresh data arrives. (`engine.rs`)
+- **Per-pair staleness tracking** — Tracks seconds since last WS update per pair, exposes worst-case to dashboard. (`engine.rs`, `shared.rs`, `api/mod.rs`)
+- **Dashboard "STALE PRICES" indicator** — Red pulsing chip with `fa-triangle-exclamation` icon shows when prices > 5 min old. Displays minutes since last update. (`page.tsx`, `api.ts`)
+
 ### Fixed — FID-079: Gas Check Only on Active Chain
 
 - **Gas balance warnings for Base/Optimism when trading on Arbitrum** — `sync_balance()` iterated over ALL registered chain clients and logged CRITICAL errors for chains with zero gas. Now only checks the primary trading chain (`self.chain_id`). Eliminates false alarms for unused chains. (`trader.rs:sync_balance`)

@@ -280,6 +280,12 @@ export default function Dashboard() {
             MONITORING
           </span>
         )}
+        {(portfolio?.price_staleness_secs ?? 0) > 300 && (
+          <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase" style={{ color: 'var(--red)', borderColor: 'rgba(255, 45, 85, 0.3)', backgroundColor: 'rgba(255, 45, 85, 0.1)', textShadow: 'var(--neon-red-glow)' }}>
+            <Icon name="fa-triangle-exclamation" className="text-[8px]" />
+            STALE PRICES {Math.floor((portfolio?.price_staleness_secs ?? 0) / 60)}m
+          </span>
+        )}
         <div className="flex-1" />
         <div className="flex gap-4 items-center text-[10px] text-[var(--dim)]">
           <span className="flex items-center gap-1"><Icon name="fa-microchip" className="text-[8px]" /> <b className="text-[var(--txt)]">{config?.model ?? "—"}</b></span>
