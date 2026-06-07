@@ -6,6 +6,10 @@ import { formatTime12h, formatTimeShort } from "@/lib/time";
 import {
   ProgressBarRoot,
   ProgressBarFill,
+  Chip,
+  Table,
+  Tooltip,
+  Spinner,
 } from "@heroui/react";
 import { useDashboard } from "@/hooks/useDashboard";
 import { copyFormatters, downloadTradesCSV } from "@/lib/copy";
@@ -315,53 +319,122 @@ export default function Dashboard() {
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-gauge-high" title="Performance" onCopy={() => copyFormatters.performance(session)} />
-          <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-1 text-[11px]">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <span className="text-[var(--green)] flex items-center gap-1 font-bold"><Icon name="fa-circle-check" className="text-[9px]" />{session?.wins ?? 0}W</span>
-                <span className="text-[var(--red)] flex items-center gap-1 font-bold"><Icon name="fa-circle-xmark" className="text-[9px]" />{session?.losses ?? 0}L</span>
+          <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-2 text-[11px]">
+            {/* Win/Loss row */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Chip color="success" size="sm" variant="soft">
+                  <i className="fa-solid fa-circle-check text-[7px] mr-0.5" />
+                  <Chip.Label>{session?.wins ?? 0}W</Chip.Label>
+                </Chip>
+                <Chip color="danger" size="sm" variant="soft">
+                  <i className="fa-solid fa-circle-xmark text-[7px] mr-0.5" />
+                  <Chip.Label>{session?.losses ?? 0}L</Chip.Label>
+                </Chip>
               </div>
-              <span className={`font-mono font-bold text-[12px] ${((session?.win_rate ?? 0) >= 0.5) ? "text-[var(--green)]" : "text-[var(--red)]"}`}>
+              <span className={`font-mono font-bold text-[13px] ${((session?.win_rate ?? 0) >= 0.5) ? "text-[var(--green)]" : "text-[var(--red)]"}`}>
                 {((session?.win_rate ?? 0) * 100).toFixed(0)}%
               </span>
             </div>
             <ProgressBarRoot className="h-1.5 rounded bg-[var(--red)] overflow-hidden">
               <ProgressBarFill className="h-full bg-[var(--green)] rounded" style={{ width: `${(session?.wins ?? 0) / ((session?.wins ?? 0) + (session?.losses ?? 0) || 1) * 100}%` }} />
             </ProgressBarRoot>
-            <div className="space-y-0.5 pt-1">
-              <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-brain" className="text-[8px]" />Decisions</span><span className="font-semibold">{session?.total_decisions ?? decisions.length}</span></div>
-              <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-right-left" className="text-[8px]" />Trades today</span><span className="font-semibold">{portfolio?.trades_today ?? 0}</span></div>
-              <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-shield-halved" className="text-[8px]" />Confidence cap</span><span className={`font-semibold ${(memory?.confidence_cap ?? "") === "LOW" ? "text-[var(--green)]" : (memory?.confidence_cap ?? "") === "HIGH" ? "text-[var(--red)]" : "text-[var(--cyan)]"}`}>{memory?.confidence_cap ?? "—"}</span></div>
-              <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-crosshairs" className="text-[8px]" />Brier</span><span className={`font-semibold ${(() => { const b = memory?.brier_score; if (b == null) return "text-[var(--dim)]"; return b < 0.20 ? "text-[var(--green)]" : b < 0.30 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>{memory?.brier_score?.toFixed(3) ?? "—"}{memory?.brier_label ? ` (${memory.brier_label})` : ""}</span></div>
-              <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-wave-square" className="text-[8px]" />CUSUM</span><span className={`font-semibold ${String(memory?.cusum_status ?? "").toLowerCase().includes("positive") ? "text-[var(--green)]" : String(memory?.cusum_status ?? "").toLowerCase().includes("negative") ? "text-[var(--red)]" : "text-[var(--dim)]"}`}>{memory?.cusum_status ?? "—"}</span></div>
-              {portfolio?.hunt_mode && (
-                <div className="flex justify-between"><span style={{ color: 'var(--neon-red)', textShadow: 'var(--neon-red-glow)' }} className="flex items-center gap-1"><Icon name="fa-crosshairs" className="text-[8px]" />Mode</span><span className="font-bold" style={{ color: 'var(--neon-red)', textShadow: 'var(--neon-red-glow)' }}>HUNT</span></div>
-              )}
+            {/* Metrics grid */}
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-brain" className="text-[8px]" />Decisions</span>
+                <span className="font-semibold font-mono">{session?.total_decisions ?? decisions.length}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-right-left" className="text-[8px]" />Trades</span>
+                <span className="font-semibold font-mono">{portfolio?.trades_today ?? 0}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-shield-halved" className="text-[8px]" />Conf cap</span>
+                <Chip size="sm" variant="soft" color={(memory?.confidence_cap ?? "") === "LOW" ? "success" : (memory?.confidence_cap ?? "") === "HIGH" ? "danger" : "accent"}>
+                  <Chip.Label>{memory?.confidence_cap ?? "—"}</Chip.Label>
+                </Chip>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-crosshairs" className="text-[8px]" />Brier</span>
+                <Tooltip delay={300}>
+                  <span className={`font-mono font-semibold cursor-help ${(() => { const b = memory?.brier_score; if (b == null) return "text-[var(--dim)]"; return b < 0.20 ? "text-[var(--green)]" : b < 0.30 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>
+                    {memory?.brier_score?.toFixed(3) ?? "—"}
+                  </span>
+                  <Tooltip.Content showArrow>
+                    <p className="text-[10px]">Calibration score. Lower is better. &lt;0.20 = well calibrated. {memory?.brier_label ?? ""}</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              </div>
+              <div className="flex items-center justify-between col-span-2">
+                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-wave-square" className="text-[8px]" />CUSUM</span>
+                <Tooltip delay={300}>
+                  <Chip size="sm" variant="soft" color={String(memory?.cusum_status ?? "").toLowerCase().includes("positive") ? "success" : String(memory?.cusum_status ?? "").toLowerCase().includes("negative") ? "danger" : "default"}>
+                    <Chip.Label>{memory?.cusum_status ?? "—"}</Chip.Label>
+                  </Chip>
+                  <Tooltip.Content showArrow>
+                    <p className="text-[10px]">Cumulative sum control chart. Detects edge decay over time.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              </div>
             </div>
+            {portfolio?.hunt_mode && (
+              <div className="flex items-center justify-center pt-0.5">
+                <Chip size="sm" variant="soft" color="danger" style={{ color: 'var(--neon-red)', textShadow: 'var(--neon-red-glow)' }}>
+                  <i className="fa-solid fa-crosshairs text-[7px] mr-0.5" />
+                  <Chip.Label>HUNT MODE</Chip.Label>
+                </Chip>
+              </div>
+            )}
           </div>
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-globe" title="Market Insight" onCopy={() => copyFormatters.marketInsight(insight)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-2">
               <div className="text-center shrink-0">
                 <FearGauge value={insight?.fear_greed ?? null} />
                 <p className="text-[8px] tracking-[1px] text-[var(--dim)] flex items-center justify-center gap-1"><Icon name="fa-face-grimace" className="text-[7px]" />FEAR &amp; GREED</p>
               </div>
-              <div className="flex-1 space-y-0.5 text-[11px]">
-                <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-heart-pulse" className="text-[8px]" />Sentiment</span><span className={`font-semibold ${(() => { const fg = insight?.fear_greed; if (fg == null) return ""; return fg <= 25 ? "text-[var(--red)]" : fg <= 45 ? "text-[var(--amber)]" : fg <= 55 ? "text-[var(--dim)]" : fg <= 75 ? "text-[var(--green)]" : "text-[var(--red)]"; })()}`}>{insight?.fear_greed_label ?? "—"}</span></div>
-                <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-faucet-drip" className="text-[8px]" />Funding</span><span className={`font-mono font-semibold ${(() => { const f = insight?.funding_rate; if (f == null) return ""; return f < -0.01 ? "text-[var(--green)]" : f > 0.01 ? "text-[var(--red)]" : "text-[var(--dim)]"; })()}`}>{insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"}</span></div>
-                <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-bitcoin-sign" className="text-[8px]" />BTC dom</span><span className="font-mono">{insight?.btc_dominance?.toFixed(1) ?? "—"}%</span></div>
-                <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-cube" className="text-[8px]" />Block</span><span className="font-mono">{insight?.block_height?.toLocaleString() ?? "—"}</span></div>
-                <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-newspaper" className="text-[8px]" />News</span><span className="font-mono">{insight?.rss_items ?? 0}</span></div>
+              <div className="flex-1 space-y-1 text-[11px]">
+                <div className="flex items-center justify-between">
+                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-heart-pulse" className="text-[8px]" />Sentiment</span>
+                  <Chip size="sm" variant="soft" color={(() => { const fg = insight?.fear_greed; if (fg == null) return "default"; return fg <= 25 ? "danger" : fg <= 45 ? "warning" : fg <= 55 ? "default" : fg <= 75 ? "success" : "danger"; })()}>
+                    <Chip.Label>{insight?.fear_greed_label ?? "—"}</Chip.Label>
+                  </Chip>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-faucet-drip" className="text-[8px]" />Funding</span>
+                  <Tooltip delay={300}>
+                    <span className={`font-mono font-semibold cursor-help ${(() => { const f = insight?.funding_rate; if (f == null) return ""; return f < -0.01 ? "text-[var(--green)]" : f > 0.01 ? "text-[var(--red)]" : "text-[var(--dim)]"; })()}`}>
+                      {insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"}
+                    </span>
+                    <Tooltip.Content showArrow>
+                      <p className="text-[10px]">Negative = shorts paying longs (squeeze potential). Positive = longs paying shorts.</p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-bitcoin-sign" className="text-[8px]" />BTC dom</span>
+                  <span className="font-mono">{insight?.btc_dominance?.toFixed(1) ?? "—"}%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-cube" className="text-[8px]" />Block</span>
+                  <span className="font-mono">{insight?.block_height?.toLocaleString() ?? "—"}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-newspaper" className="text-[8px]" />News</span>
+                  <span className="font-mono">{insight?.rss_items ?? 0}</span>
+                </div>
               </div>
             </div>
-            <div className="flex flex-wrap gap-1 mt-1.5">
+            <div className="flex flex-wrap gap-1">
               {insight?.trending_coins?.slice(0, 8).map((c) => (
-                <span key={c} className="text-[8px] px-1.5 py-0.5 rounded bg-[var(--cyan)]/10 border border-[var(--cyan)]/20 text-[var(--cyan)] flex items-center gap-0.5">
-                  <Icon name="fa-fire" className="text-[6px]" />{c}
-                </span>
+                <Chip key={c} size="sm" variant="soft" color="accent">
+                  <i className="fa-solid fa-fire text-[6px] mr-0.5" />
+                  <Chip.Label>{c}</Chip.Label>
+                </Chip>
               ))}
             </div>
           </div>
@@ -434,28 +507,62 @@ export default function Dashboard() {
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-shield-halved" title="Risk Controls" onCopy={() => copyFormatters.risk(risk)} />
-          <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-1.5 text-[11px]">
-            <div className="flex justify-between items-center">
+          <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-2 text-[11px]">
+            {/* Circuit breaker */}
+            <div className="flex items-center justify-between">
               <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-bolt" className="text-[8px]" />Circuit breaker</span>
-              <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold flex items-center gap-1 ${risk?.circuit_breaker === "OK" ? "text-[var(--green)] bg-[var(--green)]/10" : "text-[var(--red)] bg-[var(--red)]/10"}`}>
-                <Icon name={risk?.circuit_breaker === "OK" ? "fa-check" : "fa-triangle-exclamation"} className="text-[7px]" />
-                {risk?.circuit_breaker ?? "OK"}
-              </span>
+              <Chip size="sm" variant="soft" color={risk?.circuit_breaker === "OK" ? "success" : "danger"}>
+                <i className={`fa-solid ${risk?.circuit_breaker === "OK" ? "fa-check" : "fa-triangle-exclamation"} text-[7px] mr-0.5`} />
+                <Chip.Label>{risk?.circuit_breaker ?? "OK"}</Chip.Label>
+              </Chip>
             </div>
+            {/* Drawdown */}
+            <Tooltip delay={300}>
+              <div className="cursor-help">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-arrow-trend-down" className="text-[8px]" />Drawdown</span>
+                  <span className={`font-mono font-semibold ${(() => { const pct = ((risk?.drawdown_pct ?? 0) / (risk?.max_drawdown ?? 0.1)); return pct < 0.5 ? "text-[var(--green)]" : pct < 0.8 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>{((risk?.drawdown_pct ?? 0) * 100).toFixed(1)}% / {((risk?.max_drawdown ?? 0.1) * 100).toFixed(0)}%</span>
+                </div>
+                <ProgressBarRoot className="h-1.5 rounded bg-white/5 overflow-hidden"><ProgressBarFill className={`h-full rounded ${(() => { const pct = ((risk?.drawdown_pct ?? 0) / (risk?.max_drawdown ?? 0.1)); return pct < 0.5 ? "bg-[var(--green)]" : pct < 0.8 ? "bg-[var(--amber)]" : "bg-[var(--red)]"; })()}`} style={{ width: `${Math.min(100, ((risk?.drawdown_pct ?? 0) / (risk?.max_drawdown ?? 0.1)) * 100)}%` }} /></ProgressBarRoot>
+              </div>
+              <Tooltip.Content showArrow>
+                <p className="text-[10px]">Max drawdown from peak equity. Halt at {((risk?.max_drawdown ?? 0.1) * 100).toFixed(0)}%. Floor: $10.</p>
+              </Tooltip.Content>
+            </Tooltip>
+            {/* Daily loss */}
+            <Tooltip delay={300}>
+              <div className="cursor-help">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-calendar-xmark" className="text-[8px]" />Daily loss</span>
+                  <span className={`font-mono font-semibold ${(() => { const pct = (Math.abs(risk?.daily_loss_pct ?? 0) / (risk?.max_daily_loss ?? 0.05)); return pct < 0.5 ? "text-[var(--green)]" : pct < 0.8 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>{Math.abs((risk?.daily_loss_pct ?? 0) * 100).toFixed(1)}% / {((risk?.max_daily_loss ?? 0.05) * 100).toFixed(0)}%</span>
+                </div>
+                <ProgressBarRoot className="h-1.5 rounded bg-white/5 overflow-hidden"><ProgressBarFill className={`h-full rounded ${(() => { const pct = (Math.abs(risk?.daily_loss_pct ?? 0) / (risk?.max_daily_loss ?? 0.05)); return pct < 0.5 ? "bg-[var(--green)]" : pct < 0.8 ? "bg-[var(--amber)]" : "bg-[var(--red)]"; })()}`} style={{ width: `${Math.min(100, (Math.abs(risk?.daily_loss_pct ?? 0) / (risk?.max_daily_loss ?? 0.05)) * 100)}%` }} /></ProgressBarRoot>
+              </div>
+              <Tooltip.Content showArrow>
+                <p className="text-[10px]">Max daily loss. Halt at {((risk?.max_daily_loss ?? 0.05) * 100).toFixed(0)}%. Floor: $5. Resets at midnight UTC.</p>
+              </Tooltip.Content>
+            </Tooltip>
+            {/* Positions */}
             <div>
-              <div className="flex justify-between mb-0.5"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-arrow-trend-down" className="text-[8px]" />Drawdown</span><span className={`font-mono ${(() => { const pct = ((risk?.drawdown_pct ?? 0) / (risk?.max_drawdown ?? 0.1)); return pct < 0.5 ? "text-[var(--green)]" : pct < 0.8 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>{((risk?.drawdown_pct ?? 0) * 100).toFixed(1)}% / {((risk?.max_drawdown ?? 0.1) * 100).toFixed(0)}%</span></div>
-              <ProgressBarRoot className="h-1 rounded bg-white/5 overflow-hidden"><ProgressBarFill className={`h-full rounded ${(() => { const pct = ((risk?.drawdown_pct ?? 0) / (risk?.max_drawdown ?? 0.1)); return pct < 0.5 ? "bg-[var(--green)]" : pct < 0.8 ? "bg-[var(--amber)]" : "bg-[var(--red)]"; })()}`} style={{ width: `${Math.min(100, ((risk?.drawdown_pct ?? 0) / (risk?.max_drawdown ?? 0.1)) * 100)}%` }} /></ProgressBarRoot>
+              <div className="flex items-center justify-between mb-0.5">
+                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-grip" className="text-[8px]" />Positions</span>
+                <span className={`font-mono font-semibold ${(() => { const pct = ((risk?.open_positions ?? 0) / (risk?.max_positions ?? 3)); return pct < 0.7 ? "text-[var(--green)]" : pct < 1.0 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>{risk?.open_positions ?? 0} / {risk?.max_positions ?? 3}</span>
+              </div>
+              <ProgressBarRoot className="h-1.5 rounded bg-white/5 overflow-hidden"><ProgressBarFill className={`h-full rounded ${(() => { const pct = ((risk?.open_positions ?? 0) / (risk?.max_positions ?? 3)); return pct < 0.7 ? "bg-[var(--cyan)]" : pct < 1.0 ? "bg-[var(--amber)]" : "bg-[var(--red)]"; })()}`} style={{ width: `${Math.min(100, ((risk?.open_positions ?? 0) / (risk?.max_positions ?? 3)) * 100)}%` }} /></ProgressBarRoot>
             </div>
-            <div>
-              <div className="flex justify-between mb-0.5"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-calendar-xmark" className="text-[8px]" />Daily loss</span><span className={`font-mono ${(() => { const pct = (Math.abs(risk?.daily_loss_pct ?? 0) / (risk?.max_daily_loss ?? 0.05)); return pct < 0.5 ? "text-[var(--green)]" : pct < 0.8 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>{Math.abs((risk?.daily_loss_pct ?? 0) * 100).toFixed(1)}% / {((risk?.max_daily_loss ?? 0.05) * 100).toFixed(0)}%</span></div>
-              <ProgressBarRoot className="h-1 rounded bg-white/5 overflow-hidden"><ProgressBarFill className={`h-full rounded ${(() => { const pct = (Math.abs(risk?.daily_loss_pct ?? 0) / (risk?.max_daily_loss ?? 0.05)); return pct < 0.5 ? "bg-[var(--green)]" : pct < 0.8 ? "bg-[var(--amber)]" : "bg-[var(--red)]"; })()}`} style={{ width: `${Math.min(100, (Math.abs(risk?.daily_loss_pct ?? 0) / (risk?.max_daily_loss ?? 0.05)) * 100)}%` }} /></ProgressBarRoot>
+            {/* Bottom row */}
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1 pt-0.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-percent" className="text-[8px]" />Risk/trade</span>
+                <span className="font-mono font-semibold">{((risk?.max_risk_per_trade ?? 0) * 100).toFixed(0)}%</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-book-open" className="text-[8px]" />Replays</span>
+                <Chip size="sm" variant="soft" color="accent">
+                  <Chip.Label>{memory?.replay_lesson_count ?? 0}</Chip.Label>
+                </Chip>
+              </div>
             </div>
-            <div>
-              <div className="flex justify-between mb-0.5"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-grip" className="text-[8px]" />Positions</span><span className={`font-mono ${(() => { const pct = ((risk?.open_positions ?? 0) / (risk?.max_positions ?? 3)); return pct < 0.7 ? "text-[var(--green)]" : pct < 1.0 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>{risk?.open_positions ?? 0} / {risk?.max_positions ?? 3}</span></div>
-              <ProgressBarRoot className="h-1 rounded bg-white/5 overflow-hidden"><ProgressBarFill className={`h-full rounded ${(() => { const pct = ((risk?.open_positions ?? 0) / (risk?.max_positions ?? 3)); return pct < 0.7 ? "bg-[var(--cyan)]" : pct < 1.0 ? "bg-[var(--amber)]" : "bg-[var(--red)]"; })()}`} style={{ width: `${Math.min(100, ((risk?.open_positions ?? 0) / (risk?.max_positions ?? 3)) * 100)}%` }} /></ProgressBarRoot>
-            </div>
-            <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-percent" className="text-[8px]" />Risk / trade</span><span className="font-mono">{((risk?.max_risk_per_trade ?? 0) * 100).toFixed(0)}%</span></div>
-            <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-book-open" className="text-[8px]" />Replay lessons</span><span className="font-mono text-[var(--violet)]">{memory?.replay_lesson_count ?? 0}</span></div>
           </div>
         </div>
 
