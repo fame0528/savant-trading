@@ -72,12 +72,25 @@ function FearGauge({ value }: { value: number | null }) {
   );
 }
 
-function SectionHeader({ icon, title, tag, tagColor }: { icon: string; title: string; tag?: string; tagColor?: string }) {
+function CopyButton({ text, title }: { text: () => string; title?: string }) {
+  return (
+    <button
+      onClick={() => navigator.clipboard.writeText(text())}
+      className="text-[var(--dim)] hover:text-[var(--cyan)] transition-colors cursor-pointer"
+      title={title ?? "Copy to clipboard"}
+    >
+      <Icon name="fa-copy" className="text-[9px]" />
+    </button>
+  );
+}
+
+function SectionHeader({ icon, title, tag, tagColor, onCopy }: { icon: string; title: string; tag?: string; tagColor?: string; onCopy?: () => string }) {
   return (
     <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-[var(--line)]">
       <Icon name={icon} className="text-[var(--dim)] text-[10px]" />
       <span className="text-[10px] tracking-[2px] uppercase font-semibold text-[var(--dim)]">{title}</span>
       {tag && <span className={`ml-auto text-[9px] font-bold ${tagColor ?? "text-[var(--cyan)]"}`}>{tag}</span>}
+      {onCopy && <CopyButton text={onCopy} title={`Copy ${title.toLowerCase()}`} />}
     </div>
   );
 }
@@ -158,6 +171,12 @@ export default function Dashboard() {
           <Icon name={live ? "fa-satellite-dish" : "fa-moon"} className="text-[8px]" />
           {status?.mode ?? "—"} · {status?.running ? "RUNNING" : "IDLE"}
         </span>
+        {portfolio?.hunt_mode && (
+          <span className="inline-flex items-center gap-1 rounded border border-[var(--orange)]/30 bg-[var(--orange)]/10 px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase text-[var(--orange)]">
+            <Icon name="fa-crosshairs" className="text-[8px]" />
+            HUNT MODE
+          </span>
+        )}
         <div className="flex-1" />
         <div className="flex gap-4 items-center text-[10px] text-[var(--dim)]">
           <span className="flex items-center gap-1"><Icon name="fa-microchip" className="text-[8px]" /> <b className="text-[var(--txt)]">{config?.model ?? "—"}</b></span>
@@ -193,7 +212,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-gauge-high" title="Performance" />
+          <SectionHeader icon="fa-gauge-high" title="Performance" onCopy={() => `Performance\n${session?.wins ?? 0}W / ${session?.losses ?? 0}L\nDecisions: ${session?.total_decisions ?? 0}\nTrades today: ${portfolio?.trades_today ?? 0}\nConfidence: ${memory?.confidence_cap ?? "—"}\nBrier: ${memory?.brier_score?.toFixed(3) ?? "—"}\nCUSUM: ${memory?.cusum_status ?? "—"}`} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-1 text-[11px]">
             <div className="flex justify-between">
               <span className="text-[var(--green)] flex items-center gap-1"><Icon name="fa-circle-check" className="text-[9px]" />{session?.wins ?? 0}W</span>
@@ -216,7 +235,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-globe" title="Market Insight" />
+          <SectionHeader icon="fa-globe" title="Market Insight" onCopy={() => `Market Insight\nFear & Greed: ${insight?.fear_greed ?? "—"} (${insight?.fear_greed_label ?? "—"})\nFunding: ${insight?.funding_rate ?? "—"}\nBTC Dom: ${insight?.btc_dominance ?? "—"}\nBlock: ${insight?.block_number ?? "—"}\nNews: ${insight?.rss_count ?? 0}\nTrending: ${insight?.trending?.join(", ") ?? "—"}`} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             <div className="flex items-center gap-3">
               <div className="text-center shrink-0">
@@ -243,7 +262,7 @@ export default function Dashboard() {
 
         {/* Row 2: Positions | Risk | Decisions */}
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-briefcase" title="Open Positions" tag={`${positions.length}`} />
+          <SectionHeader icon="fa-briefcase" title="Open Positions" tag={`${positions.length}`} onCopy={() => positions.map(p => `${p.pair} ${p.side} @ ${p.entry_price} | SL: ${p.stop_loss} | PnL: ${p.unrealized_pnl?.toFixed(2)}`).join("\n") || "No positions"} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {positions.length === 0 ? (
               <p className="text-[var(--dimmer)] text-xs text-center py-4 flex items-center justify-center gap-1.5">
@@ -294,7 +313,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-shield-halved" title="Risk Controls" />
+          <SectionHeader icon="fa-shield-halved" title="Risk Controls" onCopy={() => `Risk Controls\nCircuit breaker: ${risk?.circuit_breaker ?? "OK"}\nDrawdown: ${((risk?.drawdown_pct ?? 0) * 100).toFixed(1)}% / ${((risk?.max_drawdown ?? 0.1) * 100).toFixed(0)}%\nDaily loss: ${Math.abs((risk?.daily_loss_pct ?? 0) * 100).toFixed(1)}% / ${((risk?.max_daily_loss ?? 0.05) * 100).toFixed(0)}%\nPositions: ${risk?.open_positions ?? 0} / ${risk?.max_positions ?? 3}\nRisk/trade: ${((risk?.max_risk_per_trade ?? 0) * 100).toFixed(0)}%`} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-1.5 text-[11px]">
             <div className="flex justify-between items-center">
               <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-bolt" className="text-[8px]" />Circuit breaker</span>
@@ -321,7 +340,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-robot" title="AI Decisions" tag="live" />
+          <SectionHeader icon="fa-robot" title="AI Decisions" tag="live" onCopy={() => decisions.map(d => `${d.pair} ${d.action} ${d.confidence}% — ${d.reasoning?.slice(0, 100)}`).join("\n") || "No decisions"} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {decisions.length === 0 ? (
               <p className="text-[var(--dimmer)] text-xs text-center py-4 flex items-center justify-center gap-1.5">
@@ -409,7 +428,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-receipt" title="Closed Trades" tag={`${trades.length}`} />
+          <SectionHeader icon="fa-receipt" title="Closed Trades" tag={`${trades.length}`} onCopy={() => trades.map(t => `${t.pair} ${t.side} ${t.entry_price}→${t.exit_price} ${t.pnl >= 0 ? "+" : ""}${t.pnl?.toFixed(2)} (${t.pnl_pct?.toFixed(2)}%)`).join("\n") || "No trades"} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {trades.length === 0 ? (
               <p className="text-[var(--dimmer)] text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No closed trades yet.</p>

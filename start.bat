@@ -3,7 +3,7 @@ title SAVANT Trading Engine
 echo.
 echo  ========================================
 echo   SAVANT Trading Engine
-echo   Starting engine + dashboard...
+echo   Building + starting engine + dashboard...
 echo  ========================================
 echo.
 cd /d "%~dp0"
@@ -13,7 +13,17 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":3000 " ^| findstr "LISTENIN
     taskkill /F /PID %%a >nul 2>&1
 )
 timeout /t 2 /nobreak >nul
-echo  Starting engine...
+echo  Building release binary...
+echo.
+cargo build --release 2>&1
+if errorlevel 1 (
+    echo.
+    echo  BUILD FAILED. Fix errors and restart.
+    pause
+    exit /b 1
+)
+echo.
+echo  Build complete. Starting engine...
 echo.
 target\release\savant.exe serve
 echo.
