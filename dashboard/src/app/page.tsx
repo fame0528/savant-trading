@@ -363,9 +363,9 @@ export default function Dashboard() {
                         {a}
                       </span>
                       <ProgressBarRoot className="flex-1 h-[3px] bg-white/5 rounded-full overflow-hidden">
-                        <ProgressBarFill className="h-full bg-gradient-to-r from-[var(--violet)] to-[var(--cyan)] rounded-full" style={{ width: `${conf}%` }} />
+                        <ProgressBarFill className={`h-full rounded-full ${conf >= 67 ? "bg-[var(--green)]" : conf >= 34 ? "bg-[var(--amber)]" : "bg-[var(--red)]"}`} style={{ width: `${conf}%` }} />
                       </ProgressBarRoot>
-                      <span className="text-[9px] text-[var(--dim)] font-mono">{conf.toFixed(0)}%</span>
+                      <span className={`text-[9px] font-mono font-bold ${conf >= 67 ? "text-[var(--green)]" : conf >= 34 ? "text-[var(--amber)]" : "text-[var(--red)]"}`}>{conf.toFixed(0)}%</span>
                     </div>
                     <p className="text-[9px] text-[var(--dim)] mt-0.5 break-words">{d.reasoning}</p>
                   </div>
