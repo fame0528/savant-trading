@@ -229,20 +229,66 @@ export default function Dashboard() {
       </div>
 
       {/* ── News Ticker ── */}
-      <div className="shrink-0 overflow-hidden bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md h-6 flex items-center">
-        <div className="flex items-center gap-6 animate-[scroll_30s_linear_infinite] whitespace-nowrap px-4">
-          {insight?.trending_coins?.slice(0, 6).map((c, i) => (
+      <div className="shrink-0 overflow-hidden bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md h-6 flex items-center group/ticker">
+        <div className="flex items-center gap-8 animate-[ticker-scroll_40s_linear_infinite] whitespace-nowrap px-4 group-hover/ticker:[animation-play-state:paused]">
+          {insight?.trending_coins?.slice(0, 8).map((c, i) => (
             <span key={`t-${i}`} className="text-[9px] flex items-center gap-1 text-[var(--cyan)]"><Icon name="fa-fire" className="text-[7px]" />{c}</span>
           ))}
-          <span className="text-[9px] flex items-center gap-1 text-[var(--amber)]"><Icon name="fa-face-grimace" className="text-[7px]" />F&G: {insight?.fear_greed ?? "—"} ({insight?.fear_greed_label ?? "—"})</span>
-          <span className="text-[9px] flex items-center gap-1 text-[var(--dim)]"><Icon name="fa-faucet-drip" className="text-[7px]" />Funding: {insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"}</span>
-          <span className="text-[9px] flex items-center gap-1 text-[var(--dim)]"><Icon name="fa-bitcoin-sign" className="text-[7px]" />BTC Dom: {insight?.btc_dominance?.toFixed(1) ?? "—"}%</span>
-          <span className="text-[9px] flex items-center gap-1 text-[var(--dim)]"><Icon name="fa-cube" className="text-[7px]" />Block: {insight?.block_height?.toLocaleString() ?? "—"}</span>
-          {insight?.trending_coins?.slice(0, 6).map((c, i) => (
+          <span className="text-[9px] flex items-center gap-1.5">
+            <Icon name={(insight?.fear_greed ?? 50) < 30 ? "fa-arrow-trend-down" : (insight?.fear_greed ?? 50) > 70 ? "fa-arrow-trend-up" : "fa-minus"} className="text-[7px]" />
+            <span className="text-[var(--amber)]">F&amp;G: {insight?.fear_greed ?? "—"}</span>
+            <span className="text-[var(--dim)]">({insight?.fear_greed_label ?? "—"})</span>
+          </span>
+          <span className="text-[9px] flex items-center gap-1.5">
+            <Icon name={(insight?.funding_rate ?? 0) < 0 ? "fa-arrow-up" : "fa-arrow-down"} className={`text-[7px] ${(insight?.funding_rate ?? 0) < 0 ? "text-[var(--green)]" : "text-[var(--red)]"}`} />
+            <span className="text-[var(--dim)]">Funding:</span>
+            <span className={`font-mono ${(insight?.funding_rate ?? 0) < -0.005 ? "text-[var(--green)]" : (insight?.funding_rate ?? 0) > 0.005 ? "text-[var(--red)]" : "text-[var(--dim)]"}`}>{insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"}</span>
+          </span>
+          <span className="text-[9px] flex items-center gap-1.5">
+            <Icon name="fa-bitcoin-sign" className="text-[7px] text-[var(--dim)]" />
+            <span className="text-[var(--dim)]">BTC Dom:</span>
+            <span className="font-mono text-[var(--txt)]">{insight?.btc_dominance?.toFixed(1) ?? "—"}%</span>
+          </span>
+          <span className="text-[9px] flex items-center gap-1.5">
+            <Icon name="fa-cube" className="text-[7px] text-[var(--dim)]" />
+            <span className="text-[var(--dim)]">Block:</span>
+            <span className="font-mono text-[var(--txt)]">{insight?.block_height?.toLocaleString() ?? "—"}</span>
+          </span>
+          <span className="text-[9px] flex items-center gap-1.5">
+            <Icon name="fa-newspaper" className="text-[7px] text-[var(--dim)]" />
+            <span className="text-[var(--dim)]">News:</span>
+            <span className="font-mono text-[var(--txt)]">{insight?.rss_items ?? 0}</span>
+          </span>
+          {positions.map((p) => (
+            <span key={`pos-${p.id}`} className="text-[9px] flex items-center gap-1.5">
+              <Icon name={p.side === "Long" ? "fa-arrow-trend-up" : "fa-arrow-trend-down"} className={`text-[7px] ${(p.unrealized_pnl ?? 0) >= 0 ? "text-[var(--green)]" : "text-[var(--red)]"}`} />
+              <span className="text-[var(--txt)] font-semibold">{p.pair.split("/")[0]}</span>
+              <span className="font-mono text-[var(--dim)]">{fmt.price(p.current_price)}</span>
+              <span className={`font-mono ${(p.unrealized_pnl ?? 0) >= 0 ? "text-[var(--green)]" : "text-[var(--red)]"}`}>{fmt.pct(p.entry_price ? ((p.side === "Long" ? (p.current_price - p.entry_price) : (p.entry_price - p.current_price)) / p.entry_price * 100) : 0)}</span>
+            </span>
+          ))}
+          {/* Duplicate for seamless wrap */}
+          {insight?.trending_coins?.slice(0, 8).map((c, i) => (
             <span key={`t2-${i}`} className="text-[9px] flex items-center gap-1 text-[var(--cyan)]"><Icon name="fa-fire" className="text-[7px]" />{c}</span>
           ))}
-          <span className="text-[9px] flex items-center gap-1 text-[var(--amber)]"><Icon name="fa-face-grimace" className="text-[7px]" />F&G: {insight?.fear_greed ?? "—"} ({insight?.fear_greed_label ?? "—"})</span>
-          <span className="text-[9px] flex items-center gap-1 text-[var(--dim)]"><Icon name="fa-faucet-drip" className="text-[7px]" />Funding: {insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"}</span>
+          <span className="text-[9px] flex items-center gap-1.5">
+            <Icon name={(insight?.fear_greed ?? 50) < 30 ? "fa-arrow-trend-down" : (insight?.fear_greed ?? 50) > 70 ? "fa-arrow-trend-up" : "fa-minus"} className="text-[7px]" />
+            <span className="text-[var(--amber)]">F&amp;G: {insight?.fear_greed ?? "—"}</span>
+            <span className="text-[var(--dim)]">({insight?.fear_greed_label ?? "—"})</span>
+          </span>
+          <span className="text-[9px] flex items-center gap-1.5">
+            <Icon name={(insight?.funding_rate ?? 0) < 0 ? "fa-arrow-up" : "fa-arrow-down"} className={`text-[7px] ${(insight?.funding_rate ?? 0) < 0 ? "text-[var(--green)]" : "text-[var(--red)]"}`} />
+            <span className="text-[var(--dim)]">Funding:</span>
+            <span className={`font-mono ${(insight?.funding_rate ?? 0) < -0.005 ? "text-[var(--green)]" : (insight?.funding_rate ?? 0) > 0.005 ? "text-[var(--red)]" : "text-[var(--dim)]"}`}>{insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"}</span>
+          </span>
+          {positions.map((p) => (
+            <span key={`pos2-${p.id}`} className="text-[9px] flex items-center gap-1.5">
+              <Icon name={p.side === "Long" ? "fa-arrow-trend-up" : "fa-arrow-trend-down"} className={`text-[7px] ${(p.unrealized_pnl ?? 0) >= 0 ? "text-[var(--green)]" : "text-[var(--red)]"}`} />
+              <span className="text-[var(--txt)] font-semibold">{p.pair.split("/")[0]}</span>
+              <span className="font-mono text-[var(--dim)]">{fmt.price(p.current_price)}</span>
+              <span className={`font-mono ${(p.unrealized_pnl ?? 0) >= 0 ? "text-[var(--green)]" : "text-[var(--red)]"}`}>{fmt.pct(p.entry_price ? ((p.side === "Long" ? (p.current_price - p.entry_price) : (p.entry_price - p.current_price)) / p.entry_price * 100) : 0)}</span>
+            </span>
+          ))}
         </div>
       </div>
 

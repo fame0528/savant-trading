@@ -1629,10 +1629,14 @@ pub async fn run(
                     // Strip thinking tags before JSON parse (MiMo v2.5 Pro wraps in <think></think>)
                     let cleaned = savant_trading::agent::decision_parser::strip_thinking_tags(text);
 
-                    // Log first 500 chars of cleaned response for debugging batch parse failures
-                    tracing::debug!(
-                        "BATCH RESPONSE (cleaned, first 500): {}",
-                        &cleaned[..cleaned.len().min(500)]
+                    // Log raw and cleaned response for debugging batch parse failures
+                    tracing::info!(
+                        "BATCH RAW (first 300): {}",
+                        &text[..text.len().min(300)]
+                    );
+                    tracing::info!(
+                        "BATCH CLEANED (first 300): {}",
+                        &cleaned[..cleaned.len().min(300)]
                     );
 
                     // Try to parse as JSON array
