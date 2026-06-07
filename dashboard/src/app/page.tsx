@@ -340,7 +340,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-robot" title="AI Decisions" tag="live" onCopy={() => decisions.map(d => `${d.pair} ${d.action} ${d.confidence}% — ${d.reasoning?.slice(0, 100)}`).join("\n") || "No decisions"} />
+          <SectionHeader icon="fa-robot" title="AI Decisions" tag="live" onCopy={() => decisions.map(d => `${d.pair} ${d.action} ${(d.confidence * 100).toFixed(0)}% — ${d.reasoning ?? ""}`).join("\n") || "No decisions"} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {decisions.length === 0 ? (
               <p className="text-[var(--dimmer)] text-xs text-center py-4 flex items-center justify-center gap-1.5">
@@ -367,7 +367,7 @@ export default function Dashboard() {
                       </ProgressBarRoot>
                       <span className="text-[9px] text-[var(--dim)] font-mono">{conf.toFixed(0)}%</span>
                     </div>
-                    <p className="text-[9px] text-[var(--dim)] mt-0.5 line-clamp-1 break-words">{d.reasoning}</p>
+                    <p className="text-[9px] text-[var(--dim)] mt-0.5 break-words">{d.reasoning}</p>
                   </div>
                 );
               })
