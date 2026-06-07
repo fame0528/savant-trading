@@ -470,30 +470,15 @@ pub async fn run(
             }
         }
 
-        // Load equity curve snapshots into shared state
-        match j.get_snapshots(500).await {
-            Ok(snapshots) if !snapshots.is_empty() => {
-                info!("Loaded {} equity snapshots from journal", snapshots.len());
-                let mut shared_curve = shared.equity_curve.write().await;
-                *shared_curve = snapshots;
-            }
-            _ => {
-                info!("No equity snapshots in journal");
-            }
-        }
-    }
-
-    // Seed equity curve with current equity so dashboard doesn't show stale $22-23
-    {
-        let mut curve = shared.equity_curve.write().await;
-        curve.push(serde_json::json!({
-            "timestamp": chrono::Utc::now().to_rfc3339(),
-            "equity": portfolio.account().equity,
-            "balance": portfolio.account().balance,
-        }));
+        // Don't load historical equity snapshots — they contain stale data from
+        // before the chain-first verification fix. The equity curve should only
+        // show current session data which starts after wallet sync + refresh_equity().
+        info!("Equity curve: starting fresh for current session (historical snapshots skipped)");
     }
 
     // Seed shared state IMMEDIATELY — don't wait for tick 10
+    // Equity curve seed is deferred to after wallet sync (line ~970) so it
+    // captures the correct portfolio value including recovered positions.
     {
         let mut shared_account = shared.account.write().await;
         *shared_account = portfolio.account().clone();
@@ -980,6 +965,15 @@ pub async fn run(
             portfolio.account().balance,
             portfolio.account().equity
         );
+        // Seed equity curve AFTER wallet sync so it captures recovered positions
+        {
+            let mut curve = shared.equity_curve.write().await;
+            curve.push(serde_json::json!({
+                "timestamp": chrono::Utc::now().to_rfc3339(),
+                "equity": portfolio.account().equity,
+                "balance": portfolio.account().balance,
+            }));
+        }
     }
 
     // FID-061: Auto-apply tighter stops on wallet-recovered positions
