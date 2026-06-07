@@ -16,6 +16,8 @@
   --red: #ff5470;
   --amber: #ffb347;
   --violet: #a98cff;
+  --neon-red: #ff2d55;
+  --neon-red-glow: 0 0 8px rgba(255, 45, 85, 0.6), 0 0 20px rgba(255, 45, 85, 0.3);
   --radius: 4px;
 }
 

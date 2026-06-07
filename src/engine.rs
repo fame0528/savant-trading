@@ -1645,12 +1645,31 @@ pub async fn run(
                                 e
                             );
                             // Fallback: evaluate each pair individually
-                            for pd in pair_data_vec {
+                            // FID-067: Add per-call logging and total timeout to prevent silent hang
+                            let fallback_start = std::time::Instant::now();
+                            let fallback_timeout = std::time::Duration::from_secs(300); // 5 min total
+                            for (idx, pd) in pair_data_vec.into_iter().enumerate() {
+                                if fallback_start.elapsed() > fallback_timeout {
+                                    warn!(
+                                        "Fallback evaluation timed out after {}s — processed {}/{} pairs",
+                                        fallback_timeout.as_secs(),
+                                        idx,
+                                        batch_size
+                                    );
+                                    break;
+                                }
                                 let provider = agent.provider_clone();
                                 let messages = vec![savant_trading::agent::provider::Message {
                                     role: "user".to_string(),
                                     content: pd.user_message.clone(),
                                 }];
+                                log_phase!(
+                                    "FALLBACK",
+                                    "Evaluating {} individually ({}/{})",
+                                    pd.pair,
+                                    idx + 1,
+                                    batch_size
+                                );
                                 let response =
                                     provider.chat_stream(&pd.system_prompt, &messages).await;
                                 all_results.push(PairResult {

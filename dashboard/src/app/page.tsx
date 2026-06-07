@@ -172,7 +172,7 @@ export default function Dashboard() {
           {status?.mode ?? "—"} · {status?.running ? "RUNNING" : "IDLE"}
         </span>
         {portfolio?.hunt_mode && (
-          <span className="inline-flex items-center gap-1 rounded border border-[var(--orange)]/30 bg-[var(--orange)]/10 px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase text-[var(--orange)]">
+          <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase" style={{ color: 'var(--neon-red)', borderColor: 'rgba(255, 45, 85, 0.3)', backgroundColor: 'rgba(255, 45, 85, 0.1)', textShadow: 'var(--neon-red-glow)' }}>
             <Icon name="fa-crosshairs" className="text-[8px]" />
             HUNT MODE
           </span>
@@ -228,7 +228,7 @@ export default function Dashboard() {
               <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-crosshairs" className="text-[8px]" />Brier</span><span className="font-semibold">{memory?.brier_score?.toFixed(3) ?? "—"}{memory?.brier_label ? ` (${memory.brier_label})` : ""}</span></div>
               <div className="flex justify-between"><span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-wave-square" className="text-[8px]" />CUSUM</span><span className="font-semibold">{memory?.cusum_status ?? "—"}</span></div>
               {portfolio?.hunt_mode && (
-                <div className="flex justify-between"><span className="text-[var(--orange)] flex items-center gap-1"><Icon name="fa-crosshairs" className="text-[8px]" />Mode</span><span className="font-bold text-[var(--orange)]">HUNT</span></div>
+                <div className="flex justify-between"><span style={{ color: 'var(--neon-red)', textShadow: 'var(--neon-red-glow)' }} className="flex items-center gap-1"><Icon name="fa-crosshairs" className="text-[8px]" />Mode</span><span className="font-bold" style={{ color: 'var(--neon-red)', textShadow: 'var(--neon-red-glow)' }}>HUNT</span></div>
               )}
             </div>
           </div>
