@@ -4,6 +4,40 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.10.2] — 2026-06-07
+
+### Fixed — FID-072: Comprehensive Audit Remediation (29 findings)
+
+- **`drain_retry_queue` — failed swaps silently dropped** — `kept` was always empty, `self.retry_queue = kept` cleared the queue every drain. Now clears queue explicitly. (F-07)
+- **`usdc_address_for_chain` defaulted to Arbitrum for unknown chains** — Changed return type to `Option<&str>`. All 5 callers updated to handle `None` explicitly. Silent wrong-chain bug eliminated. (NF-01)
+- **`TradeAction::Pass => unreachable!()` — engine panic risk** — Changed to `continue`. Pass decisions no longer crash the engine. (NF-11)
+- **`TradeAction::AdjustStop` was a no-op** — Now wires to `stop_overrides` shared state. LLM stop adjustments are actually executed. (NF-12)
+- **BUY/SELL accepted with `stop_loss=0.0`** — Added validation: Buy/Sell decisions must have `stop_loss > 0`. Naked positions blocked. (F-11)
+- **No pre-trade balance sync** — `sync_balance()` now called before opening new position. Prevents trading with stale paper balance. (F-12)
+- **Stablecoin pairs accepted** — USDC/USDT/DAI base pairs now rejected in `resolve_pair`. (F-13)
+- **`normalize_llm_json` missed spaces** — Replaced string replace with regex: handles `"action" : "BUY"` (space before colon) and `"action": "ADJUST_STOP"` (underscore variant). (F-10)
+- **Poisoned mutex cascade** — All 12 `.lock().unwrap()` calls replaced with `.lock().unwrap_or_else(|e| e.into_inner())`. Thread panic no longer cascades through mutex locks.
+
+### Changed — FID-072: Behavioral Fixes
+
+- **R:R logging** — `actual_rr` (calculated from prices) now logged alongside LLM's `claimed risk_reward` for debugging calibration. (B-01)
+- **Max positions context** — LLM told "AT MAX POSITIONS — Do not propose new entries" when at capacity. Prevents wasted evaluation cycles. (B-02)
+- **DeepAsian session penalty reduced** — Position size multiplier 0.5→0.7, breakout confidence penalty 0.6→0.75. Crypto markets don't respect traditional session boundaries. (B-03)
+- **Volume filter active in all modes** — Previously skipped in live/DEX mode. Now active with lowered threshold ($10). Dead tokens filtered regardless of mode. (B-04)
+- **Confidence discipline instruction** — Added to `strategy_knowledge.md`: "Evaluate setup quality independent of position P&L." Prevents confidence inflation from winning positions. (B-05)
+- **`AccountState` now includes `max_positions`** — Previously only tracked `open_positions`. Now both available for context injection and validation.
+
+### Lifecycle
+
+- **FID-061 (Stop-Swap Bridge)** — Closed. Implemented via gasless fallback + `register_position()`.
+- **FID-068 (HeroUI Color Migration)** — Cancelled. Not worth the risk.
+- **FID-069 (Batch Fix + Dashboard Overhaul)** — Closed. All items complete.
+- **FID-070 (Full HeroUI Conversion)** — Cancelled. User agreed current code is clean.
+- **FID-071 (Batch Parse Fix)** — Closed. Implemented.
+- **FID-072 (Audit Remediation)** — Closed. 13 items implemented.
+- **FID-058 (GMX Sidecar POC)** — Deferred until $500+.
+- **FID-060 (GMX Native Rust)** — Deferred until $500+.
+
 ## [0.10.1] — 2026-06-07
 
 ### Fixed
