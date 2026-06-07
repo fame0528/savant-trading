@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Dashboard TypeScript build errors** — `block_number` → `block_height`, `rss_count` → `rss_items`, `trending` → `trending_coins`. Caused by editing dashboard without reading full type definitions (Law 1 violation). (FID-066)
 - **Trailing whitespace in engine.rs:5087** — `cargo fmt` internal error caused by trailing space on a `matches!()` line. Fixed manually.
 - **Phantom ETH position in journal DB** — After manual WETH→USDC swap, the SQLite journal still contained the old ETH position record. Engine re-registered it on startup as a wallet-recovered position, inflating portfolio value by ~$23. Cleaned via direct DB deletion. (Wallet recovery side=SHORT bug noted for future fix.)
+- **Dashboard crash: toLowerCase on non-string** — `memory?.cusum_status` could be a number. `(0 ?? "")` returns `0`, `0.toLowerCase()` throws TypeError. Wrapped with `String()`. (FID-066)
 
 ### Changed
 
@@ -39,8 +40,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **FID-064: Dashboard copy buttons** — Added `CopyButton` component to `SectionHeader`. Copy buttons on Performance, Market Insight, Open Positions, Risk Controls, AI Decisions, Closed Trades sections.
 - **FID-064: Hunt mode header tag** — "HUNT MODE" orange badge in dashboard header next to "LIVE · RUNNING". Only visible when active.
 - **FID-066: Position re-evaluation for open positions** — Pairs with open positions bypass candle hash cache and pre-scoring filter every cycle. LLM evaluates current price + position state for stop adjustments even when candle data hasn't changed.
-- **FID-066: Auto-rebuild in start.bat** — `start.bat` now runs `cargo build --release` before starting engine. Prevents stale binary issues.
+- **FID-066: Auto-rebuild in start.bat** — `start.bat` now runs `cargo build --release` AND `npm run build` (dashboard) before starting engine. Prevents stale binary and stale dashboard issues.
+- **FID-067: Neon red hunt mode badge** — `--neon-red` CSS variable with glow text-shadow. Header badge and Performance section indicator both use neon red with glow effect.
+- **FID-067: Engine fallback timeout** — LLM fallback path (9 individual calls when batch JSON parse fails) now has 5-minute total timeout. Per-call logging added so progress is visible in terminal.
+- **Batch evaluation: thinking tag stripping** — MiMo v2.5 Pro wraps responses in `<think>...</think>`. `strip_thinking_tags()` now called on batch response before JSON parse attempt.
+- **Batch evaluation: output_format.md updated** — System prompt now includes batch instruction: "When evaluating MULTIPLE pairs, respond with a JSON array." Previously only said "single JSON object."
+- **Batch evaluation: 180s timeout** — `tokio::time::timeout(180s)` wraps the batch LLM call to prevent indefinite hang.
+- **Batch evaluation: raw response logging** — Both raw and thinking-stripped response logged at INFO level before parse attempt for debugging.
+- **Weekend mode removed** — `Session::Weekend` and `Session::SundayPreOpen` variants deleted. All days use time-of-day sessions (Asian/DeepAsian/LateAsian/European/UsEuOverlap/UsPostOverlap/LateUs). Crypto trades 24/7 — no off-hours.
+- **Config alignment** — `starting_balance: 50.0 → 30.0`, `fee_rate: 0.0040 → 0.001` (DEX actual), `slippage_pct: 0.0005 → 0.005` (realistic), `exchange.name: "kraken" → "market_data"`.
+- **Risk constraints updated** — `risk_constraints.md`: 5% daily loss (was 10%), 10% drawdown (was 20%), DEX fees (was Kraken fees), 1.5:1 R:R (was 2.0:1).
+- **Sources label** — `KrakenFeed::name()` returns "Market Data" instead of "Kraken". Console shows `Sources: Market Data: [ETH/USD]` instead of `Sources: Kraken: [ETH/USD]`.
+- **Dead dependencies removed** — `howler`, `use-sound`, `lucide-react`, `@types/howler` removed from dashboard. Sound effects use Web Audio API directly (sounds.ts).
+- **Dashboard: ADJUST STOP formatting** — `ADJUSTSTOP` → `ADJUST STOP` via `.replace("_", " ")`.
+- **Dashboard: 3-tier confidence coloring** — AI Decisions confidence bars and percentages color-coded: red (0-33%), amber (34-66%), green (67-100%).
+- **Dashboard: action badge colors** — BUY=green, SELL/CLOSE=red, ADJUST/ADJUSTSTOP=amber with fa-sliders icon.
+- **Dashboard: Performance section** — Win rate percentage prominently displayed, Brier score color-coded (green <0.20, amber 0.20-0.30, red >0.30), CUSUM color-coded (green positive, red negative), confidence cap color-coded.
+- **Dashboard: Market Insight section** — Sentiment color-coded by Fear & Greed level, funding rate color-coded (green negative/squeeze, red positive/overleveraged).
+- **Dashboard: Risk Controls section** — Drawdown/daily loss/positions progress bars color-coded by severity (green <50%, amber 50-80%, red >80%). Values color-coded to match.
+- **Dashboard: scrolling news ticker** — CSS-only infinite scroll between header and KPI bar. Shows trending coins, F&G, funding rate, BTC dominance, block, positions with price + P&L. Pauses on hover. Directional arrows on all metrics.
+- **Dashboard: position close button** — X button on each position with confirmation dialog. Calls `POST /api/positions/{pair}/close`. Engine forces stop to current price → triggers on-chain swap.
+- **Dashboard: connection error banner** — Red banner when engine API unreachable.
+- **Dashboard: CSV export** — Download button on Closed Trades section. `Ctrl+Shift+E` keyboard shortcut.
+- **Dashboard: keyboard shortcuts** — `Ctrl+Shift+C` copies all sections, `Ctrl+Shift+E` exports trades CSV.
+- **Dashboard: unified copy formatters** — `dashboard/src/lib/copy.ts` with `copyFormatters` for all 7 sections. Replaces all inline copy functions.
+- **Dashboard: terminal copy button** — Extracts xterm buffer text for clipboard.
+- **Dashboard: hunt mode header tag** — "HUNT MODE" neon red badge with glow, only visible when active.
+- **Position close API** — `POST /api/positions/{pair}/close` endpoint. `close_overrides` in SharedEngineData. Engine reads close requests and forces stop to current price.
 - **Version** — 0.9.1 → 0.10.0
+
+### Decisions
+
+- **FID-070: HeroUI full conversion — CANCELLED** — Evaluated converting all dashboard components to HeroUI (Card, Chip, Button, Table, ProgressBar). Decided against it: current custom components are clean and consistent, HeroUI conversion adds complexity with className overrides to maintain visual parity, risk of visual regression outweighs benefit. Dashboard uses HeroUI primitives (ProgressBarRoot/ProgressBarFill) where it matters. Will use HeroUI for new components going forward.
 
 ## [0.9.1] — 2026-06-05
 
