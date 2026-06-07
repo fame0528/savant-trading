@@ -1612,8 +1612,11 @@ pub async fn run(
                         elapsed
                     );
 
+                    // Strip thinking tags before JSON parse (MiMo v2.5 Pro wraps in <think></think>)
+                    let cleaned = savant_trading::agent::decision_parser::strip_thinking_tags(text);
+
                     // Try to parse as JSON array
-                    match serde_json::from_str::<Vec<serde_json::Value>>(text) {
+                    match serde_json::from_str::<Vec<serde_json::Value>>(&cleaned) {
                         Ok(decisions) => {
                             log_phase!(
                                 "PHASE2",

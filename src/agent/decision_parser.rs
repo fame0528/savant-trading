@@ -246,9 +246,9 @@ pub fn parse_decision(
 }
 
 /// Strip thinking/reasoning tags that some local models produce.
-/// Removes `<think>...</think>`, `</think>` tags that local models (Qwen, DeepSeek, etc.) produce.
+/// Removes `<think>...</think>` and `</think>` tags that local models (Qwen, DeepSeek, etc.) produce.
 /// Extracts any JSON block that appears after the thinking tags.
-fn strip_thinking_tags(response: &str) -> String {
+pub fn strip_thinking_tags(response: &str) -> String {
     let mut result = response.to_string();
 
     // Remove <think>...</think> blocks (Qwen, DeepSeek)
