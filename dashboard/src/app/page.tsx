@@ -161,6 +161,14 @@ export default function Dashboard() {
         duration: 4000,
       }} />
 
+      {/* ── Connection Error Banner ── */}
+      {!online && (
+        <div className="shrink-0 bg-[var(--red)]/10 border border-[var(--red)]/30 text-[var(--red)] text-[10px] font-mono px-3 py-1 flex items-center gap-2">
+          <Icon name="fa-link-slash" className="text-[8px]" />
+          <span>Disconnected from engine — data may be stale. Retrying...</span>
+        </div>
+      )}
+
       {/* ── Header ── */}
       <div className="flex items-center gap-3 bg-gradient-to-b from-[rgba(20,24,40,0.7)] to-[rgba(12,14,24,0.5)] border border-[var(--line)] backdrop-blur-xl px-3 py-1.5 shrink-0">
         <Image src="/savant.png" alt="SAVANT" width={36} height={36} className="rounded" />
