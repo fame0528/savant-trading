@@ -360,7 +360,6 @@ impl<B: DexBackend + 'static> DexTrader<B> {
     /// Expired entries (attempts >= max_retries) are discarded.
     pub fn drain_retry_queue(&mut self) -> Vec<RetrySwap> {
         let mut to_retry = Vec::new();
-        let kept = Vec::new();
         for swap in self.retry_queue.drain(..) {
             if swap.attempts >= self.max_retries {
                 log_warn!(
@@ -374,7 +373,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                 to_retry.push(swap);
             }
         }
-        self.retry_queue = kept;
+        self.retry_queue.clear();
         to_retry
     }
 
@@ -1388,7 +1387,8 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
 
         // Step 5: Verify on-chain — query actual USDC balance after swap.
         // A tx can have status=1 but deliver 0 output (failed internal swap).
-        let usdc_addr = super::usdc_address_for_chain(self.chain_id);
+        let usdc_addr = super::usdc_address_for_chain(self.chain_id)
+            .ok_or_else(|| ExecutionError::Other(format!("No USDC address for chain {}", self.chain_id)))?;
         let usdc_dec = super::usdc_decimals_for_chain(self.chain_id);
         let padded_addr = format!(
             "{:0>64}",
@@ -1609,7 +1609,13 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         self.gas_halted = self.chain_gas_halted.get(&self.chain_id) == Some(&true);
 
         // Query USDC balance on primary chain — this is the cash available for new trades
-        let usdc_addr = super::usdc_address_for_chain(self.chain_id);
+        let usdc_addr = match super::usdc_address_for_chain(self.chain_id) {
+            Some(addr) => addr,
+            None => {
+                warn!("No USDC address for chain {} — skipping balance sync", self.chain_id);
+                return Ok(());
+            }
+        };
         let usdc_dec = super::usdc_decimals_for_chain(self.chain_id);
         let padded_addr = format!("{:0>64}", addr_hex.trim_start_matches("0x"));
         let call_data = format!("0x70a08231{}", padded_addr);

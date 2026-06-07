@@ -1267,13 +1267,13 @@ pub async fn run(
                     continue;
                 }
 
-                // Pre-filter: Skip pairs with negligible volume (< $100 average)
-                // FID-044: Skip this filter in DEX mode — spot volume is low for
-                // Arbitrum tokens, but real volume is on-chain. The LLM can evaluate them.
-                // FID-046 caveat: Still reject tokens with ZERO candle activity (dead tokens).
+                // Pre-filter: Skip pairs with negligible volume.
+                // FID-072: Active in all modes — even DEX tokens need SOME volume signal.
+                // Threshold is low ($10) to avoid rejecting legitimate low-cap tokens
+                // while still filtering completely dead pairs.
                 let avg_volume: f64 =
                     candle_data.iter().map(|c| c.volume).sum::<f64>() / candle_data.len() as f64;
-                if avg_volume < 100.0 && !config.mode.live_execution {
+                if avg_volume < 10.0 {
                     continue;
                 }
                 // DEX safety: reject tokens with near-zero price diversity
@@ -1910,11 +1910,18 @@ pub async fn run(
 
                     buy_sell_count += 1;
 
+                    // FID-072: Calculate actual R:R from prices for comparison with LLM's claim
+                    let actual_rr = if decision.entry_price > 0.0 && decision.stop_loss > 0.0 && decision.take_profit_1 > 0.0 {
+                        let risk = (decision.entry_price - decision.stop_loss).abs();
+                        let reward = (decision.take_profit_1 - decision.entry_price).abs();
+                        if risk > 0.0 { reward / risk } else { 0.0 }
+                    } else { 0.0 };
+
                     info!(
-                        "AI DECISION: {:?} {} {} @ {:.2} | SL: {:.2} | TP1: {:.2} | Conf: {:.0}% | R:R: {:.2} | Reason: {}",
+                        "AI DECISION: {:?} {} {} @ {:.2} | SL: {:.2} | TP1: {:.2} | Conf: {:.0}% | R:R claimed={:.2} actual={:.2} | Reason: {}",
                         decision.action, decision.pair, decision.side,
                         decision.entry_price, decision.stop_loss, decision.take_profit_1,
-                        decision.confidence * 100.0, decision.risk_reward, decision.reasoning,
+                        decision.confidence * 100.0, decision.risk_reward, actual_rr, decision.reasoning,
                     );
 
                     // Execute if autonomous
@@ -2103,6 +2110,15 @@ pub async fn run(
                                             "Calculating position size for {}",
                                             decision.pair
                                         );
+
+                                        // FID-072: Sync on-chain balance before opening new position
+                                        if let Some(ref mut ex) = executor {
+                                            if ex.sync_balance().await.is_ok() {
+                                                let fresh = ex.balance();
+                                                portfolio.account_mut().balance = fresh;
+                                                debug!("Pre-trade balance sync: ${:.2}", fresh);
+                                            }
+                                        }
 
                                         // Price tolerance check (FID-035): reject if price drifted
                                         // too far from AI's entry during LLM evaluation (20-60s window)
@@ -2500,13 +2516,30 @@ pub async fn run(
                                             ).await;
                                         }
                                     }
-                                    TradeAction::Pass => unreachable!(),
+                                    TradeAction::Pass => {
+                                        // Already handled in pre-execution filter above.
+                                        // Reaching here means Pass was not filtered — skip silently.
+                                        continue;
+                                    }
                                     TradeAction::AdjustStop => {
-                                        // TODO: Update stop-loss on existing position
-                                        info!(
-                                            "AI ADJUST_STOP for {} — not yet implemented, skipping",
-                                            decision.pair
-                                        );
+                                        // Wire AdjustStop to stop_overrides shared state
+                                        if decision.stop_loss > 0.0 {
+                                            let mut overrides = shared.stop_overrides.write().await;
+                                            overrides.insert(decision.pair.clone(), decision.stop_loss);
+                                            info!(
+                                                "AI ADJUST_STOP for {} → ${:.4} (confidence {:.0}%)",
+                                                decision.pair,
+                                                decision.stop_loss,
+                                                decision.confidence * 100.0
+                                            );
+                                            shared.log_activity(
+                                                savant_trading::core::shared::ActivityLevel::Info,
+                                                &decision.pair,
+                                                &format!("ADJUST STOP → ${:.4}", decision.stop_loss),
+                                            ).await;
+                                        } else {
+                                            warn!("AI ADJUST_STOP for {} but stop_loss={:.4} — ignoring", decision.pair, decision.stop_loss);
+                                        }
                                     }
                                 }
                             }

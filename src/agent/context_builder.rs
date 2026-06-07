@@ -398,12 +398,16 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
     let equity = ctx.account.equity;
     let is_hunt_mode = equity < 500.0 && idle_capital > 5.0;
     msg.push_str(&format!(
-        "\n## Account\nBalance: ${:.2} | Equity: ${:.2} | DD: {:.1}% | Open: {}\n",
+        "\n## Account\nBalance: ${:.2} | Equity: ${:.2} | DD: {:.1}% | Open: {} / {}\n",
         idle_capital,
         equity,
         ctx.account.drawdown_pct * 100.0,
-        ctx.account.open_positions
+        ctx.account.open_positions,
+        ctx.account.max_positions
     ));
+    if ctx.account.open_positions >= ctx.account.max_positions {
+        msg.push_str("**AT MAX POSITIONS** — Do not propose new entries. Only ADJUST_STOP or PASS.\n");
+    }
     if is_hunt_mode {
         msg.push_str(&format!(
             "**HUNT MODE:** ${:.2} idle capital. Under $500 — aggressively scan for high-conviction entries. \

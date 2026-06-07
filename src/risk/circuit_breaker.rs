@@ -184,6 +184,7 @@ mod tests {
             peak_equity: equity / (1.0 - dd_pct),
             drawdown_pct: dd_pct,
             open_positions: positions,
+            max_positions: 3,
             trades_today: 0,
         }
     }

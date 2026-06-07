@@ -62,7 +62,7 @@ impl Session {
     pub fn position_size_multiplier(&self) -> f64 {
         match self {
             Session::Asian => 0.8,
-            Session::DeepAsian => 0.5,
+            Session::DeepAsian => 0.7,
             Session::LateAsian => 0.7,
             Session::European => 1.0,
             Session::UsEuOverlap => 1.2,
@@ -75,7 +75,7 @@ impl Session {
     /// Returns a multiplier to apply to the agent's confidence score.
     pub fn breakout_confidence_penalty(&self) -> f64 {
         match self {
-            Session::DeepAsian => 0.6,  // 40% penalty — breakouts fail here
+            Session::DeepAsian => 0.75, // 25% penalty — reduced from 40%
             Session::LateAsian => 0.85, // 15% penalty
             Session::LateUs => 0.85,    // 15% penalty
             _ => 1.0,                   // No penalty during liquid sessions

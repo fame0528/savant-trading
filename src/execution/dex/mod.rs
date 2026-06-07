@@ -113,16 +113,17 @@ pub struct LiquidityCheck {
 }
 
 /// USDC addresses per chain (native USDC, not bridged).
-pub fn usdc_address_for_chain(chain_id: u64) -> &'static str {
+/// Returns `None` for unknown chains — callers must handle explicitly.
+pub fn usdc_address_for_chain(chain_id: u64) -> Option<&'static str> {
     match chain_id {
-        42161 => "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", // Arbitrum native USDC
-        8453 => "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",  // Base native USDC
-        10 => "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",    // Optimism native USDC
-        56 => "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",    // BSC USDC (18 decimals!)
-        137 => "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",   // Polygon native USDC
-        1 => "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",     // Ethereum native USDC
-        43114 => "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E", // Avalanche native USDC
-        _ => "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",     // Default: Arbitrum
+        42161 => Some("0xaf88d065e77c8cC2239327C5EDb3A432268e5831"), // Arbitrum native USDC
+        8453 => Some("0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"),  // Base native USDC
+        10 => Some("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"),    // Optimism native USDC
+        56 => Some("0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d"),    // BSC USDC (18 decimals!)
+        137 => Some("0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"),   // Polygon native USDC
+        1 => Some("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"),     // Ethereum native USDC
+        43114 => Some("0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"), // Avalanche native USDC
+        _ => None, // Unknown chain — caller must handle
     }
 }
 
@@ -621,10 +622,10 @@ pub fn lookup_token(symbol: &str, chain_id: u64) -> Option<(String, u8)> {
         _ => {
             // Unknown chain — only USDC is guaranteed
             if symbol == "USDC" {
-                return Some((
-                    usdc_address_for_chain(chain_id).to_string(),
-                    usdc_decimals_for_chain(chain_id),
-                ));
+                if let Some(addr) = usdc_address_for_chain(chain_id) {
+                    return Some((addr.to_string(), usdc_decimals_for_chain(chain_id)));
+                }
+                return None;
             }
             return None;
         }
@@ -680,6 +681,11 @@ pub fn resolve_pair_on_chain(
         "WETH".to_string()
     } else if base_sym == "BTC" {
         "WBTC".to_string()
+    } else if base_sym == "USDC" || base_sym == "USDT" || base_sym == "DAI" {
+        return Err(ExecutionError::Other(format!(
+            "Cannot trade stablecoin pair '{}' — no directional edge",
+            pair
+        )));
     } else {
         base_sym
     };
@@ -923,7 +929,7 @@ mod tests {
     fn usdc_address_for_chain_arbitrum() {
         assert_eq!(
             usdc_address_for_chain(42161),
-            "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            Some("0xaf88d065e77c8cC2239327C5EDb3A432268e5831")
         );
     }
 
@@ -931,7 +937,7 @@ mod tests {
     fn usdc_address_for_chain_base() {
         assert_eq!(
             usdc_address_for_chain(8453),
-            "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+            Some("0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913")
         );
     }
 

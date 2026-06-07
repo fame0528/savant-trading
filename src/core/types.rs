@@ -252,6 +252,7 @@ pub struct AccountState {
     pub peak_equity: f64,
     pub drawdown_pct: f64,
     pub open_positions: usize,
+    pub max_positions: usize,
     pub trades_today: usize,
 }
 
@@ -265,6 +266,7 @@ impl AccountState {
             peak_equity: balance,
             drawdown_pct: 0.0,
             open_positions: 0,
+            max_positions: 3,
             trades_today: 0,
         }
     }

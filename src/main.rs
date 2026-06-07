@@ -833,8 +833,8 @@ async fn close_all_positions(
     .await?;
 
     let wallet_hex = format!("{:#x}", trader.wallet_address());
-    let usdc_address =
-        savant_trading::execution::dex::usdc_address_for_chain(config.exchange.dex.chain_id);
+    let usdc_address = savant_trading::execution::dex::usdc_address_for_chain(config.exchange.dex.chain_id)
+        .ok_or_else(|| anyhow::anyhow!("No USDC address for chain {}", config.exchange.dex.chain_id))?;
 
     let journal = TradeJournal::new(&config.trading.database_url).await?;
     let positions = journal.load_positions().await?;

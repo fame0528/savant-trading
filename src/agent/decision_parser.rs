@@ -180,6 +180,12 @@ pub fn parse_decision(
         if decision.entry_price <= 0.0 {
             return Err(ParseError::MissingField("entry_price".to_string()));
         }
+        // FID-072: Reject BUY/SELL with no stop loss — naked positions are dangerous
+        if decision.stop_loss <= 0.0 {
+            return Err(ParseError::InvalidValue(
+                "STOP_LOSS_REQUIRED: Buy/Sell must have stop_loss > 0".to_string(),
+            ));
+        }
         // Price tolerance only constrains entry_price (prevents hallucinated entries)
         validate_price("entry_price", decision.entry_price, min_price, max_price)?;
 
@@ -548,26 +554,38 @@ fn extract_json(response: &str) -> &str {
     trimmed
 }
 
-/// Normalize LLM JSON output — fix common casing issues.
+/// Normalize LLM JSON output — fix common casing and spacing issues.
+/// Uses regex to handle arbitrary whitespace between key, colon, and value.
 fn normalize_llm_json(json: &str) -> String {
-    json.replace("\"action\": \"HOLD\"", "\"action\": \"Pass\"")
-        .replace("\"action\": \"BUY\"", "\"action\": \"Buy\"")
-        .replace("\"action\": \"SELL\"", "\"action\": \"Sell\"")
-        .replace("\"action\": \"CLOSE\"", "\"action\": \"Close\"")
-        .replace("\"action\": \"ADJUSTSTOP\"", "\"action\": \"AdjustStop\"")
-        .replace("\"action\":\"HOLD\"", "\"action\":\"Pass\"")
-        .replace("\"action\":\"BUY\"", "\"action\":\"Buy\"")
-        .replace("\"action\":\"SELL\"", "\"action\":\"Sell\"")
-        .replace("\"action\":\"CLOSE\"", "\"action\":\"Close\"")
-        .replace("\"action\":\"ADJUSTSTOP\"", "\"action\":\"AdjustStop\"")
-        .replace("\"side\": \"LONG\"", "\"side\": \"Long\"")
-        .replace("\"side\": \"SHORT\"", "\"side\": \"Short\"")
-        .replace("\"side\":\"LONG\"", "\"side\":\"Long\"")
-        .replace("\"side\":\"SHORT\"", "\"side\":\"Short\"")
-        .replace("\"side\": \"long\"", "\"side\": \"Long\"")
-        .replace("\"side\": \"short\"", "\"side\": \"Short\"")
-        .replace("\"side\": \"\"", "\"side\": \"Long\"")
-        .replace("\"side\":\"\"", "\"side\": \"Long\"")
+    let action_re = regex::Regex::new(r#""action"\s*:\s*"([^"]+)""#).unwrap();
+    let result = action_re.replace_all(json, |caps: &regex::Captures| {
+        let val = caps.get(1).unwrap().as_str();
+        let upper = val.to_uppercase();
+        let normalized = match upper.as_str() {
+            "HOLD" | "PASS" => "Pass",
+            "BUY" | "LONG" => "Buy",
+            "SELL" | "SHORT" => "Sell",
+            "CLOSE" | "EXIT" => "Close",
+            "ADJUSTSTOP" | "ADJUST_STOP" | "ADJUST" => "AdjustStop",
+            _ => val,
+        };
+        format!("\"action\": \"{}\"", normalized)
+    });
+
+    let side_re = regex::Regex::new(r#""side"\s*:\s*"([^"]+)""#).unwrap();
+    let result = side_re.replace_all(result.as_ref(), |caps: &regex::Captures| {
+        let val = caps.get(1).unwrap().as_str();
+        let upper = val.to_uppercase();
+        let normalized = match upper.as_str() {
+            "LONG" | "BUY" => "Long",
+            "SHORT" | "SELL" => "Short",
+            "" => "Long",
+            _ => val,
+        };
+        format!("\"side\": \"{}\"", normalized)
+    });
+
+    result.into_owned()
 }
 
 /// Manual JSON repair — fix truncated strings, unclosed brackets, trailing commas.

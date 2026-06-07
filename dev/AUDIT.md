@@ -10,7 +10,19 @@
 ## EXECUTIVE SUMMARY
 
 **Original audit: 17 findings (3 Critical, 6 High, 5 Medium, 3 Low)**
-**After re-scan: 5 confirmed fixes, 1 still-open High, 5 new findings**
+**After re-scan: 5 confirmed fixes, 1 still-open High, 5+ new findings**
+
+### Still Open 🔴
+
+| ID | Finding | Status |
+|----|---------|--------|
+| **F-07** | **`drain_retry_queue` — `let kept = Vec::new()` STILL always empty** | 🔴 **NOT FIXED — same bug at line 339** |
+| F-02 | `amount_to_wei` uses `f64` | ⚠️ Landmine for large accounts |
+| F-03 | Exchange proxy address hardcoded | ⚠️ Soft risk |
+| F-06 | `eth_call` dry-run ≠ real state | ⚠️ Mitigated by F-01 but not eliminated |
+| F-10–F-17 | Unchanged from original audit | ⚠️ See below |
+
+**Top Priority for Agent:** `drain_retry_queue` return value is ignored and `kept` is always empty. Failed swaps are silently dropped with no recovery.
 
 ### Fixes Confirmed ✅
 
@@ -409,3 +421,48 @@ The engine match on `TradeAction` treats `Pass` as unreachable, but `decision_pa
 ---
 
 *End of audit. 29 total findings (17 original + 12 new). 5 fixed. 1 still-critical (retry queue). Multi-chain ready to activate.*
+
+## AGENT INVESTIGATION PROMPT — CONFIRMED FINDINGS TO INVESTIGATE
+
+**Context:** `drain_retry_queue` remains NOT FIXED. Use this as the starting checklist for deeper investigation.
+
+**Primary target:** `drain_retry_queue` — `kept` is always empty, return value is ignored. Failed swaps are silently dropped.
+
+**Investigates these confirmed behaviors first:**
+- `R:0.0` on every signal: trace risk-reward calculation path in `src/agent/` and `src/engine.rs`.
+- "Already at max positions" suppresses valid setups: identify the hard gate and how it interacts with confidence scoring.
+- "Deep Asian session" applied uniformly: verify session classification logic and where the 60reakout penalty is injected.
+- Zero/low volume treated as soft Pass instead of circuit breaker: LDO at 0.00 volume, ARB at 0.70f average.
+- LINK confidence driven by position state not edge quality: confidence score appears to weight open-position metadata over setup strength.
+
+**Specific areas to inspect:**
+1. `src/engine.rs` — main loop gating, max-positions check, session timing, R:R calculation
+2. `src/agent/decision_parser.rs` — confidence scoring, risk math, `partial_extract` defaults
+3. `src/agent/orchestrator.rs` or equivalent — decision routing and action mapping
+4. `src/execution/dex/trader.rs` — retry queue drain, `max_retries` usage, caller-visible behavior
+
+**Deliverable:** root-cause map with exact locations, not a redesign. Confirm which findings are symptoms vs. root causes.
+
+## FID-072 REVIEW NOTES — Pending Follow-Up
+
+**Date:** 2026-06-07
+**Status:** Approved with corrections needed before next implementation cycle
+
+### Issues Found in FID-072
+
+1. **Phase 5 duplicates earlier phases** — F-13, NF-08, F-15, F-16, NF-10 all appear in both Group 4/LOW and Phase 5/Cleanup. Phase 5 should only contain items NOT already covered.
+2. **Missing implementations** — F-14 (PaperTrader/DexTrader desync) and NF-04 (programmatic token verification) are cataloged in Group 4 but have no implementation items.
+3. **GREEN Phase / SELF-CORRECT mismatch** —
+   - B-03: SELF-CORRECT says "reduce DeepAsian multiplier from 0.5 to 0.7" but GREEN item 11 still says "Add session_override field."
+   - B-05: SELF-CORRECT says "add explicit instruction: evaluate setup quality independent of existing position P&L" but GREEN item 13 still says "Strip P&L from context."
+
+### Required Corrections Before FID-073
+
+- Dedupe Phase 5 to ~4-5 unique cleanup items.
+- Add implementation items for F-14 and NF-04.
+- Sync GREEN Phase with SELF-CORRECT for B-03 and B-05.
+- Confirm 3 validation gates before coding: `config.exchange.chain_id` accessibility, `docs/0x-llms-full.md` AllowanceHolder logic, `Cargo.toml` rust_decimal conflicts.
+
+### Priority Reminder
+
+Phase 3 behavioral fixes are the highest-value changes. Dedupe and sync are administrative — do not defer the behavioral work.

@@ -19,5 +19,10 @@ Session Awareness (UTC):
 - 08:00-13:00: High liquidity (EU morning). Good for trend continuation.
 - 17:00-22:00: Moderate (US post-overlap). Mean reversion increasingly viable.
 - 02:00-06:00: Liquidity trough (deep Asian). Breakouts prone to failure. Reduce size or skip.
-- Sunday 18:00-23:00: Watch for institutional gap opens.
+
+Confidence Discipline:
+- Evaluate setup quality based on technicals, volume, and regime — NOT on existing position P&L.
+- A position being +5% unrealized does not make the setup better. The setup is the setup.
+- When evaluating for ADJUST_STOP, base confidence on current price action relative to levels, not on how much profit the position has.
+- Do not inflate confidence because a position is winning. Do not deflate because it's losing.
 </strategy_knowledge>

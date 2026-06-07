@@ -663,8 +663,16 @@ async fn get_wallet(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
     let eth_balance = query_eth_balance(rpc_url, &address).await.unwrap_or(0.0);
 
     // Query USDC balance
-    let usdc_contract =
-        savant_trading::execution::dex::usdc_address_for_chain(state.config.exchange.dex.chain_id);
+    let usdc_contract = match savant_trading::execution::dex::usdc_address_for_chain(state.config.exchange.dex.chain_id) {
+        Some(addr) => addr,
+        None => {
+            return Json(ApiResponse {
+                data: serde_json::Value::Null,
+                error: Some("No USDC address for configured chain".into()),
+                timestamp: chrono::Utc::now().to_rfc3339(),
+            });
+        }
+    };
     let usdc_balance = query_erc20_balance(rpc_url, usdc_contract, &address)
         .await
         .unwrap_or(0.0);
