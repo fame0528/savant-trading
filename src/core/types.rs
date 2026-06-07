@@ -279,12 +279,20 @@ impl AccountState {
     /// This is the SINGLE source of truth for account metrics.
     /// equity = cash balance + sum(position market values)
     /// unrealized_pnl = sum(per-position unrealized P&L)
+    /// Recalculates per-position PnL from entry_price vs current_price
+    /// so it's always live — not dependent on stale fields.
     pub fn refresh_from_positions(&mut self, positions: &HashMap<String, Position>) {
-        let position_values: f64 = positions
-            .values()
-            .map(|p| p.current_price * p.quantity)
-            .sum();
-        self.unrealized_pnl = positions.values().map(|p| p.unrealized_pnl).sum();
+        let mut position_values: f64 = 0.0;
+        let mut total_pnl: f64 = 0.0;
+        for p in positions.values() {
+            position_values += p.current_price * p.quantity;
+            let pnl = match p.side {
+                Side::Long => (p.current_price - p.entry_price) * p.quantity,
+                Side::Short => (p.entry_price - p.current_price) * p.quantity,
+            };
+            total_pnl += pnl;
+        }
+        self.unrealized_pnl = total_pnl;
         self.equity = self.balance + position_values;
         self.open_positions = positions.len();
         if self.equity > self.peak_equity {

@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Closed trades showing empty** — `get_trades` API filtered by `on_chain_verified` flag, but journal DB has no column for it (all load as `false`). Removed filter from trades list — flag is metadata, not a gate. Session stats also count all trades. (`api/mod.rs`)
 - **AI Decisions "Waiting for first AI cycle…" when monitoring** — Misleading message when engine is in monitoring mode (fully deployed, no LLM calls). Now shows "Monitoring — LLM not active while fully deployed" with `fa-eye` icon. (`page.tsx`)
 - **Equity curve showing stale/$0 data** — Historical snapshots from journal DB had stale values from before chain-first fix. Equity curve seed ran before wallet sync (captured $0). Now skips historical snapshots and seeds equity curve AFTER wallet sync so it captures recovered positions + correct balance. (`engine.rs`)
+- **Position PnL stuck at $0.00** — `refresh_from_positions()` summed stale `p.unrealized_pnl` fields instead of recalculating from `entry_price` vs `current_price`. Now recalculates live PnL every cycle. Also: engine binary was locked by running process — `start.bat` couldn't overwrite. Must stop engine before rebuilding. (`types.rs:refresh_from_positions`)
 
 ### Added — FID-077: Sound Effects System
 
