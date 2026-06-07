@@ -216,13 +216,13 @@ export default function Dashboard() {
           copyFormatters.activity(activity),
         ].join("\n\n---\n\n");
         navigator.clipboard.writeText(sections);
-        toast.success("All sections copied", { duration: 2000 });
+        toast.success("All sections copied", { duration: 2000, id: 'clipboard' });
       }
       // Ctrl+Shift+E — export trades CSV
       if (e.ctrlKey && e.shiftKey && e.key === "E") {
         e.preventDefault();
         downloadTradesCSV(trades);
-        toast.success("Trades CSV downloaded", { duration: 2000 });
+        toast.success("Trades CSV downloaded", { duration: 2000, id: 'csv-download' });
       }
     };
     window.addEventListener("keydown", handler);
@@ -231,9 +231,17 @@ export default function Dashboard() {
 
   return (
     <div className="h-screen w-screen flex flex-col p-1.5 gap-1.5 overflow-hidden">
-      <Toaster position="top-right" toastOptions={{
+      <Toaster position="bottom-right" gutter={12} containerStyle={{ bottom: 16, right: 16 }} toastOptions={{
         className: "!bg-[var(--panel-solid)] !text-[var(--txt)] !border !border-[var(--line)] !text-xs !font-mono",
         duration: 4000,
+        removeDelay: 500,
+        success: {
+          iconTheme: { primary: 'var(--green)', secondary: 'var(--bg)' },
+        },
+        error: {
+          duration: 5000,
+          iconTheme: { primary: 'var(--red)', secondary: 'var(--bg)' },
+        },
       }} />
 
       {/* ── Connection Overlay ── */}
