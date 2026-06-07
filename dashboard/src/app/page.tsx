@@ -4,12 +4,15 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { formatTime12h, formatTimeShort } from "@/lib/time";
 import {
+  ProgressBar,
   ProgressBarRoot,
   ProgressBarFill,
   Chip,
   Table,
   Tooltip,
   Spinner,
+  Separator,
+  Label,
 } from "@heroui/react";
 import { useDashboard } from "@/hooks/useDashboard";
 import { copyFormatters, downloadTradesCSV } from "@/lib/copy";
@@ -75,6 +78,44 @@ function FearGauge({ value }: { value: number | null }) {
         <text x="65" y="66" textAnchor="middle" fill="#fff" fontSize="22" fontWeight="700">{value}</text>
       </svg>
     </div>
+  );
+}
+
+function MetricRow({ icon, label, value, color }: { icon: string; label: string; value: React.ReactNode; color?: string }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5">
+        <Icon name={icon} className="text-[7px]" />{label}
+      </span>
+      <span className={`text-[13px] font-mono font-semibold ${color ?? ""}`}>{value}</span>
+    </div>
+  );
+}
+
+function RiskBar({ icon, label, value, max, tooltip }: { icon: string; label: string; value: number; max: number; tooltip?: string }) {
+  const pct = max > 0 ? (value / max) * 100 : 0;
+  const color = pct < 50 ? "success" : pct < 80 ? "warning" : "danger";
+  return (
+    <Tooltip delay={300}>
+      <div className="cursor-help">
+        <ProgressBar aria-label={label} size="md" value={pct} color={color}>
+          <Label>
+            <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5">
+              <Icon name={icon} className="text-[7px]" />{label}
+            </span>
+          </Label>
+          <ProgressBar.Output>
+            <span className="text-[13px] font-mono font-semibold">
+              {(value * 100).toFixed(1)}% / {(max * 100).toFixed(0)}%
+            </span>
+          </ProgressBar.Output>
+          <ProgressBar.Track>
+            <ProgressBar.Fill />
+          </ProgressBar.Track>
+        </ProgressBar>
+      </div>
+      {tooltip && <Tooltip.Content showArrow><p className="text-[10px]">{tooltip}</p></Tooltip.Content>}
+    </Tooltip>
   );
 }
 
@@ -302,8 +343,7 @@ export default function Dashboard() {
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-gauge-high" title="Performance" onCopy={() => copyFormatters.performance(session)} />
-          <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-2 text-[11px]">
-            {/* Win/Loss row */}
+          <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Chip color="success" size="sm" variant="soft">
@@ -322,26 +362,20 @@ export default function Dashboard() {
             <ProgressBarRoot className="h-1.5 rounded bg-[var(--red)] overflow-hidden">
               <ProgressBarFill className="h-full bg-[var(--green)] rounded" style={{ width: `${(session?.wins ?? 0) / ((session?.wins ?? 0) + (session?.losses ?? 0) || 1) * 100}%` }} />
             </ProgressBarRoot>
-            {/* Metrics grid */}
+            <Separator className="my-1" />
             <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+              <MetricRow icon="fa-brain" label="Decisions" value={session?.total_decisions ?? decisions.length} />
+              <MetricRow icon="fa-right-left" label="Trades" value={portfolio?.trades_today ?? 0} />
               <div className="flex items-center justify-between">
-                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-brain" className="text-[8px]" />Decisions</span>
-                <span className="font-semibold font-mono">{session?.total_decisions ?? decisions.length}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-right-left" className="text-[8px]" />Trades</span>
-                <span className="font-semibold font-mono">{portfolio?.trades_today ?? 0}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-shield-halved" className="text-[8px]" />Conf cap</span>
+                <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5"><Icon name="fa-shield-halved" className="text-[7px]" />Conf cap</span>
                 <Chip size="sm" variant="soft" color={(memory?.confidence_cap ?? "") === "LOW" ? "success" : (memory?.confidence_cap ?? "") === "HIGH" ? "danger" : "accent"}>
                   <Chip.Label>{memory?.confidence_cap ?? "—"}</Chip.Label>
                 </Chip>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-crosshairs" className="text-[8px]" />Brier</span>
+                <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5"><Icon name="fa-crosshairs" className="text-[7px]" />Brier</span>
                 <Tooltip delay={300}>
-                  <span className={`font-mono font-semibold cursor-help ${(() => { const b = memory?.brier_score; if (b == null) return "text-[var(--dim)]"; return b < 0.20 ? "text-[var(--green)]" : b < 0.30 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>
+                  <span className={`text-[13px] font-mono font-semibold cursor-help ${(() => { const b = memory?.brier_score; if (b == null) return "text-[var(--dim)]"; return b < 0.20 ? "text-[var(--green)]" : b < 0.30 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>
                     {memory?.brier_score?.toFixed(3) ?? "—"}
                   </span>
                   <Tooltip.Content showArrow>
@@ -350,7 +384,7 @@ export default function Dashboard() {
                 </Tooltip>
               </div>
               <div className="flex items-center justify-between col-span-2">
-                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-wave-square" className="text-[8px]" />CUSUM</span>
+                <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5"><Icon name="fa-wave-square" className="text-[7px]" />CUSUM</span>
                 <Tooltip delay={300}>
                   <Chip size="sm" variant="soft" color={String(memory?.cusum_status ?? "").toLowerCase().includes("positive") ? "success" : String(memory?.cusum_status ?? "").toLowerCase().includes("negative") ? "danger" : "default"}>
                     <Chip.Label>{memory?.cusum_status ?? "—"}</Chip.Label>
@@ -361,21 +395,23 @@ export default function Dashboard() {
                 </Tooltip>
               </div>
             </div>
-            {portfolio?.hunt_mode && (
-              <div className="flex items-center justify-center pt-0.5">
-                <Chip size="sm" variant="soft" color="danger" style={{ color: 'var(--neon-red)', textShadow: 'var(--neon-red-glow)' }}>
-                  <i className="fa-solid fa-crosshairs text-[7px] mr-0.5" />
-                  <Chip.Label>HUNT MODE</Chip.Label>
-                </Chip>
-              </div>
-            )}
-            {portfolio?.monitoring_mode && !portfolio?.hunt_mode && (
-              <div className="flex items-center justify-center pt-0.5">
-                <Chip size="sm" variant="soft" color="warning" style={{ color: 'var(--neon-amber)', textShadow: 'var(--neon-amber-glow)' }}>
-                  <i className="fa-solid fa-eye text-[7px] mr-0.5" />
-                  <Chip.Label>MONITORING</Chip.Label>
-                </Chip>
-              </div>
+            {(portfolio?.hunt_mode || (portfolio?.monitoring_mode && !portfolio?.hunt_mode)) && (
+              <>
+                <Separator className="my-1" />
+                <div className="flex items-center justify-center">
+                  {portfolio?.hunt_mode ? (
+                    <Chip size="sm" variant="soft" color="danger" style={{ color: 'var(--neon-red)', textShadow: 'var(--neon-red-glow)' }}>
+                      <i className="fa-solid fa-crosshairs text-[7px] mr-0.5" />
+                      <Chip.Label>HUNT MODE</Chip.Label>
+                    </Chip>
+                  ) : (
+                    <Chip size="sm" variant="soft" color="warning" style={{ color: 'var(--neon-amber)', textShadow: 'var(--neon-amber-glow)' }}>
+                      <i className="fa-solid fa-eye text-[7px] mr-0.5" />
+                      <Chip.Label>MONITORING</Chip.Label>
+                    </Chip>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -383,43 +419,25 @@ export default function Dashboard() {
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-globe" title="Market Insight" onCopy={() => copyFormatters.marketInsight(insight)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-2.5 mb-2">
               <div className="text-center shrink-0">
                 <FearGauge value={insight?.fear_greed ?? null} />
                 <p className="text-[8px] tracking-[1px] text-[var(--dim)] flex items-center justify-center gap-1"><Icon name="fa-face-grimace" className="text-[7px]" />FEAR &amp; GREED</p>
               </div>
-              <div className="flex-1 space-y-1 text-[11px]">
+              <div className="flex-1 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-heart-pulse" className="text-[8px]" />Sentiment</span>
+                  <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5"><Icon name="fa-heart-pulse" className="text-[7px]" />Sentiment</span>
                   <Chip size="sm" variant="soft" color={(() => { const fg = insight?.fear_greed; if (fg == null) return "default"; return fg <= 25 ? "danger" : fg <= 45 ? "warning" : fg <= 55 ? "default" : fg <= 75 ? "success" : "danger"; })()}>
                     <Chip.Label>{insight?.fear_greed_label ?? "—"}</Chip.Label>
                   </Chip>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-faucet-drip" className="text-[8px]" />Funding</span>
-                  <Tooltip delay={300}>
-                    <span className={`font-mono font-semibold cursor-help ${(() => { const f = insight?.funding_rate; if (f == null) return ""; return f < -0.01 ? "text-[var(--green)]" : f > 0.01 ? "text-[var(--red)]" : "text-[var(--dim)]"; })()}`}>
-                      {insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"}
-                    </span>
-                    <Tooltip.Content showArrow>
-                      <p className="text-[10px]">Negative = shorts paying longs (squeeze potential). Positive = longs paying shorts.</p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-bitcoin-sign" className="text-[8px]" />BTC dom</span>
-                  <span className="font-mono">{insight?.btc_dominance?.toFixed(1) ?? "—"}%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-cube" className="text-[8px]" />Block</span>
-                  <span className="font-mono">{insight?.block_height?.toLocaleString() ?? "—"}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-newspaper" className="text-[8px]" />News</span>
-                  <span className="font-mono">{insight?.rss_items ?? 0}</span>
-                </div>
+                <MetricRow icon="fa-faucet-drip" label="Funding" value={insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"} color={(() => { const f = insight?.funding_rate; if (f == null) return ""; return f < -0.01 ? "text-[var(--green)]" : f > 0.01 ? "text-[var(--red)]" : "text-[var(--dim)]"; })()} />
+                <MetricRow icon="fa-bitcoin-sign" label="BTC dom" value={`${insight?.btc_dominance?.toFixed(1) ?? "—"}%`} />
+                <MetricRow icon="fa-cube" label="Block" value={insight?.block_height?.toLocaleString() ?? "—"} />
+                <MetricRow icon="fa-newspaper" label="News" value={insight?.rss_items ?? 0} />
               </div>
             </div>
+            <Separator className="my-1" />
             <div className="flex flex-wrap gap-1">
               {insight?.trending_coins?.slice(0, 8).map((c) => (
                 <Chip key={c} size="sm" variant="soft" color="accent">
@@ -482,12 +500,12 @@ export default function Dashboard() {
                       <span>entry {fmt.price(p.entry_price)}</span>
                       <span className="text-[var(--green)] flex items-center gap-0.5">TP {fmt.price(p.take_profit_1)} <Icon name="fa-flag-checkered" className="text-[6px]" /></span>
                     </div>
-                    <div className="grid grid-cols-4 gap-1 mt-1 text-[9px]">
-                      <div><span className="block text-[7px] text-[var(--dimmer)] uppercase flex items-center gap-0.5"><Icon name="fa-eye" className="text-[5px]" />Now</span>{fmt.price(p.current_price)}</div>
-                      <div><span className="block text-[7px] text-[var(--dimmer)] uppercase flex items-center gap-0.5"><Icon name="fa-coins" className="text-[5px]" />Qty</span>{p.quantity.toPrecision(3)}</div>
-                      <div><span className="block text-[7px] text-[var(--dimmer)] uppercase flex items-center gap-0.5"><Icon name="fa-coins" className="text-[5px]" />Size</span>{fmt.usd(p.entry_price * p.quantity)}</div>
-                      <div><span className="block text-[7px] text-[var(--dimmer)] uppercase flex items-center gap-0.5"><Icon name="fa-shield" className="text-[5px]" />Risk</span>{fmt.usd(Math.abs(p.entry_price - p.stop_loss) * p.quantity)}</div>
-                      <div><span className="block text-[7px] text-[var(--dimmer)] uppercase flex items-center gap-0.5"><Icon name="fa-hourglass-half" className="text-[5px]" />Age</span>{dayjs(p.opened_at).fromNow(true)}</div>
+                    <div className="grid grid-cols-4 gap-1 mt-1">
+                      <MetricRow icon="fa-eye" label="Now" value={fmt.price(p.current_price)} />
+                      <MetricRow icon="fa-coins" label="Qty" value={p.quantity.toPrecision(3)} />
+                      <MetricRow icon="fa-coins" label="Size" value={fmt.usd(p.entry_price * p.quantity)} />
+                      <MetricRow icon="fa-shield" label="Risk" value={fmt.usd(Math.abs(p.entry_price - p.stop_loss) * p.quantity)} />
+                      <MetricRow icon="fa-hourglass-half" label="Age" value={dayjs(p.opened_at).fromNow(true)} />
                     </div>
                   </div>
                 );
@@ -498,57 +516,22 @@ export default function Dashboard() {
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-shield-halved" title="Risk Controls" onCopy={() => copyFormatters.risk(risk)} />
-          <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-2 text-[11px]">
-            {/* Circuit breaker */}
+          <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-bolt" className="text-[8px]" />Circuit breaker</span>
+              <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5"><Icon name="fa-bolt" className="text-[7px]" />Circuit breaker</span>
               <Chip size="sm" variant="soft" color={risk?.circuit_breaker === "OK" ? "success" : "danger"}>
                 <i className={`fa-solid ${risk?.circuit_breaker === "OK" ? "fa-check" : "fa-triangle-exclamation"} text-[7px] mr-0.5`} />
                 <Chip.Label>{risk?.circuit_breaker ?? "OK"}</Chip.Label>
               </Chip>
             </div>
-            {/* Drawdown */}
-            <Tooltip delay={300}>
-              <div className="cursor-help">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-arrow-trend-down" className="text-[8px]" />Drawdown</span>
-                  <span className={`font-mono font-semibold ${(() => { const pct = ((risk?.drawdown_pct ?? 0) / (risk?.max_drawdown ?? 0.1)); return pct < 0.5 ? "text-[var(--green)]" : pct < 0.8 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>{((risk?.drawdown_pct ?? 0) * 100).toFixed(1)}% / {((risk?.max_drawdown ?? 0.1) * 100).toFixed(0)}%</span>
-                </div>
-                <ProgressBarRoot className="h-1.5 rounded bg-white/5 overflow-hidden"><ProgressBarFill className={`h-full rounded ${(() => { const pct = ((risk?.drawdown_pct ?? 0) / (risk?.max_drawdown ?? 0.1)); return pct < 0.5 ? "bg-[var(--green)]" : pct < 0.8 ? "bg-[var(--amber)]" : "bg-[var(--red)]"; })()}`} style={{ width: `${Math.min(100, ((risk?.drawdown_pct ?? 0) / (risk?.max_drawdown ?? 0.1)) * 100)}%` }} /></ProgressBarRoot>
-              </div>
-              <Tooltip.Content showArrow>
-                <p className="text-[10px]">Max drawdown from peak equity. Halt at {((risk?.max_drawdown ?? 0.1) * 100).toFixed(0)}%. Floor: $10.</p>
-              </Tooltip.Content>
-            </Tooltip>
-            {/* Daily loss */}
-            <Tooltip delay={300}>
-              <div className="cursor-help">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-calendar-xmark" className="text-[8px]" />Daily loss</span>
-                  <span className={`font-mono font-semibold ${(() => { const pct = (Math.abs(risk?.daily_loss_pct ?? 0) / (risk?.max_daily_loss ?? 0.05)); return pct < 0.5 ? "text-[var(--green)]" : pct < 0.8 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>{Math.abs((risk?.daily_loss_pct ?? 0) * 100).toFixed(1)}% / {((risk?.max_daily_loss ?? 0.05) * 100).toFixed(0)}%</span>
-                </div>
-                <ProgressBarRoot className="h-1.5 rounded bg-white/5 overflow-hidden"><ProgressBarFill className={`h-full rounded ${(() => { const pct = (Math.abs(risk?.daily_loss_pct ?? 0) / (risk?.max_daily_loss ?? 0.05)); return pct < 0.5 ? "bg-[var(--green)]" : pct < 0.8 ? "bg-[var(--amber)]" : "bg-[var(--red)]"; })()}`} style={{ width: `${Math.min(100, (Math.abs(risk?.daily_loss_pct ?? 0) / (risk?.max_daily_loss ?? 0.05)) * 100)}%` }} /></ProgressBarRoot>
-              </div>
-              <Tooltip.Content showArrow>
-                <p className="text-[10px]">Max daily loss. Halt at {((risk?.max_daily_loss ?? 0.05) * 100).toFixed(0)}%. Floor: $5. Resets at midnight UTC.</p>
-              </Tooltip.Content>
-            </Tooltip>
-            {/* Positions */}
-            <div>
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-grip" className="text-[8px]" />Positions</span>
-                <span className={`font-mono font-semibold ${(() => { const pct = ((risk?.open_positions ?? 0) / (risk?.max_positions ?? 3)); return pct < 0.7 ? "text-[var(--green)]" : pct < 1.0 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>{risk?.open_positions ?? 0} / {risk?.max_positions ?? 3}</span>
-              </div>
-              <ProgressBarRoot className="h-1.5 rounded bg-white/5 overflow-hidden"><ProgressBarFill className={`h-full rounded ${(() => { const pct = ((risk?.open_positions ?? 0) / (risk?.max_positions ?? 3)); return pct < 0.7 ? "bg-[var(--cyan)]" : pct < 1.0 ? "bg-[var(--amber)]" : "bg-[var(--red)]"; })()}`} style={{ width: `${Math.min(100, ((risk?.open_positions ?? 0) / (risk?.max_positions ?? 3)) * 100)}%` }} /></ProgressBarRoot>
-            </div>
-            {/* Bottom row */}
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1 pt-0.5">
+            <RiskBar icon="fa-arrow-trend-down" label="Drawdown" value={risk?.drawdown_pct ?? 0} max={risk?.max_drawdown ?? 0.1} tooltip={`Max drawdown from peak equity. Halt at ${((risk?.max_drawdown ?? 0.1) * 100).toFixed(0)}%. Floor: $10.`} />
+            <RiskBar icon="fa-calendar-xmark" label="Daily loss" value={Math.abs(risk?.daily_loss_pct ?? 0)} max={risk?.max_daily_loss ?? 0.05} tooltip={`Max daily loss. Halt at ${((risk?.max_daily_loss ?? 0.05) * 100).toFixed(0)}%. Floor: $5. Resets at midnight UTC.`} />
+            <RiskBar icon="fa-grip" label="Positions" value={risk?.open_positions ?? 0} max={risk?.max_positions ?? 3} />
+            <Separator className="my-1" />
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+              <MetricRow icon="fa-percent" label="Risk/trade" value={`${((risk?.max_risk_per_trade ?? 0) * 100).toFixed(0)}%`} />
               <div className="flex items-center justify-between">
-                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-percent" className="text-[8px]" />Risk/trade</span>
-                <span className="font-mono font-semibold">{((risk?.max_risk_per_trade ?? 0) * 100).toFixed(0)}%</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[var(--dim)] flex items-center gap-1"><Icon name="fa-book-open" className="text-[8px]" />Replays</span>
+                <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5"><Icon name="fa-book-open" className="text-[7px]" />Replays</span>
                 <Chip size="sm" variant="soft" color="accent">
                   <Chip.Label>{memory?.replay_lesson_count ?? 0}</Chip.Label>
                 </Chip>
@@ -581,9 +564,11 @@ export default function Dashboard() {
                         <Icon name={a === "BUY" ? "fa-circle-arrow-up" : a === "SELL" || a === "CLOSE" ? "fa-circle-arrow-down" : a === "ADJUST" || a === "ADJUSTSTOP" ? "fa-sliders" : "fa-minus"} className="text-[6px]" />
                         {a.replace("_", " ")}
                       </span>
-                      <ProgressBarRoot className="flex-1 h-[3px] bg-white/5 rounded-full overflow-hidden">
-                        <ProgressBarFill className={`h-full rounded-full ${conf >= 67 ? "bg-[var(--green)]" : conf >= 34 ? "bg-[var(--amber)]" : "bg-[var(--red)]"}`} style={{ width: `${conf}%` }} />
-                      </ProgressBarRoot>
+                      <ProgressBar aria-label="Confidence" size="sm" value={conf} color={conf >= 67 ? "success" : conf >= 34 ? "warning" : "danger"} className="flex-1">
+                        <ProgressBar.Track>
+                          <ProgressBar.Fill />
+                        </ProgressBar.Track>
+                      </ProgressBar>
                       <span className={`text-[9px] font-mono font-bold ${conf >= 67 ? "text-[var(--green)]" : conf >= 34 ? "text-[var(--amber)]" : "text-[var(--red)]"}`}>{conf.toFixed(0)}%</span>
                     </div>
                     <p className="text-[9px] text-[var(--dim)] mt-0.5 break-words">{d.reasoning}</p>
