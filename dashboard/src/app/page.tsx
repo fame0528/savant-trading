@@ -154,6 +154,35 @@ export default function Dashboard() {
     if (online) sounds.connected();
   }, [online]);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Ctrl+Shift+C — copy all sections
+      if (e.ctrlKey && e.shiftKey && e.key === "C") {
+        e.preventDefault();
+        const sections = [
+          copyFormatters.performance(session),
+          copyFormatters.marketInsight(insight),
+          copyFormatters.positions(positions),
+          copyFormatters.risk(risk),
+          copyFormatters.decisions(decisions),
+          copyFormatters.trades(trades),
+          copyFormatters.activity(activity),
+        ].join("\n\n---\n\n");
+        navigator.clipboard.writeText(sections);
+        toast.success("All sections copied", { duration: 2000 });
+      }
+      // Ctrl+Shift+E — export trades CSV
+      if (e.ctrlKey && e.shiftKey && e.key === "E") {
+        e.preventDefault();
+        downloadTradesCSV(trades);
+        toast.success("Trades CSV downloaded", { duration: 2000 });
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [session, insight, positions, risk, decisions, trades, activity]);
+
   return (
     <div className="h-screen w-screen flex flex-col p-1.5 gap-1.5 overflow-hidden">
       <Toaster position="top-right" toastOptions={{
