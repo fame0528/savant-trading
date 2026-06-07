@@ -424,7 +424,7 @@ async fn get_equity_curve(
 async fn start_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
     // Check if already running
     {
-        let child_lock = state.engine_child.lock().unwrap();
+        let child_lock = state.engine_child.lock().unwrap_or_else(|e| e.into_inner());
         if child_lock.is_some() {
             return Json(ApiResponse::ok(
                 serde_json::json!({"message": "Engine already running"}),
@@ -480,8 +480,8 @@ async fn start_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_j
                 }
             });
 
-            *state.engine_child.lock().unwrap() = None;
-            *state.engine_started_at.lock().unwrap() = Some(Instant::now());
+            *state.engine_child.lock().unwrap_or_else(|e| e.into_inner()) = None;
+            *state.engine_started_at.lock().unwrap_or_else(|e| e.into_inner()) = Some(Instant::now());
 
             let mut status = state.engine_status.write().await;
             status.running = true;
@@ -504,12 +504,12 @@ async fn start_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_j
 }
 
 async fn stop_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
-    let child = state.engine_child.lock().unwrap().take();
+    let child = state.engine_child.lock().unwrap_or_else(|e| e.into_inner()).take();
     if let Some(mut child) = child {
         let _ = child.start_kill();
     }
     state.engine_running.store(false, Ordering::Relaxed);
-    *state.engine_started_at.lock().unwrap() = None;
+    *state.engine_started_at.lock().unwrap_or_else(|e| e.into_inner()) = None;
 
     let mut status = state.engine_status.write().await;
     status.running = false;
@@ -524,12 +524,12 @@ async fn stop_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_js
 async fn restart_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
     // Stop
     {
-        let child = state.engine_child.lock().unwrap().take();
+        let child = state.engine_child.lock().unwrap_or_else(|e| e.into_inner()).take();
         if let Some(mut child) = child {
             let _ = child.start_kill();
         }
         state.engine_running.store(false, Ordering::Relaxed);
-        *state.engine_started_at.lock().unwrap() = None;
+        *state.engine_started_at.lock().unwrap_or_else(|e| e.into_inner()) = None;
     }
     tokio::time::sleep(std::time::Duration::from_millis(500)).await;
 

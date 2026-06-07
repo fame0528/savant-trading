@@ -590,7 +590,7 @@ pub fn token_map() -> &'static HashMap<&'static str, (&'static str, u8)> {
 /// Add discovered tokens to the runtime extension database.
 /// These are merged with the static `ARBITRUM_TOKENS` during resolution.
 pub fn extend_token_db(tokens: &[(String, String, u8)]) {
-    let mut ext = TOKEN_EXTENSIONS.lock().unwrap();
+    let mut ext = TOKEN_EXTENSIONS.lock().unwrap_or_else(|e| e.into_inner());
     let map = ext.get_or_insert_with(HashMap::new);
     for (symbol, address, decimals) in tokens {
         map.insert(symbol.clone(), (address.clone(), *decimals));
@@ -600,7 +600,7 @@ pub fn extend_token_db(tokens: &[(String, String, u8)]) {
 /// Look up a token by symbol and chain_id — checks extensions first, then static DB.
 pub fn lookup_token(symbol: &str, chain_id: u64) -> Option<(String, u8)> {
     // Check runtime extensions first (chain-specific)
-    let ext = TOKEN_EXTENSIONS.lock().unwrap();
+    let ext = TOKEN_EXTENSIONS.lock().unwrap_or_else(|e| e.into_inner());
     if let Some(ref map) = *ext {
         let key = format!("{}:{}", chain_id, symbol);
         if let Some(&(ref addr, dec)) = map.get(&key) {
@@ -639,7 +639,7 @@ pub fn lookup_token(symbol: &str, chain_id: u64) -> Option<(String, u8)> {
 /// Add discovered tokens to the runtime extension database.
 /// Format: (chain_id, symbol, address, decimals)
 pub fn extend_token_db_multi(tokens: &[(u64, String, String, u8)]) {
-    let mut ext = TOKEN_EXTENSIONS.lock().unwrap();
+    let mut ext = TOKEN_EXTENSIONS.lock().unwrap_or_else(|e| e.into_inner());
     let map = ext.get_or_insert_with(HashMap::new);
     for (chain_id, symbol, address, decimals) in tokens {
         let key = format!("{}:{}", chain_id, symbol);

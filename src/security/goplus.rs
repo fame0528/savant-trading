@@ -57,7 +57,7 @@ impl GoPlusClient {
     ) -> Result<bool, ExecutionError> {
         // Check cache first
         {
-            let cache = self.cache.lock().unwrap();
+            let cache = self.cache.lock().unwrap_or_else(|e| e.into_inner());
             if let Some(cached) = cache.get(contract_address) {
                 if !cached.is_safe {
                     info!(
@@ -146,7 +146,7 @@ impl GoPlusClient {
 
         // Cache result
         {
-            let mut cache = self.cache.lock().unwrap();
+            let mut cache = self.cache.lock().unwrap_or_else(|e| e.into_inner());
             cache.insert(
                 contract_address.to_string(),
                 TokenSecurity {
