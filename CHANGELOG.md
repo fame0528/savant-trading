@@ -4,6 +4,20 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.10.1] — 2026-06-07
+
+### Fixed
+
+- **Batch evaluation JSON parse failure** — MiMo v2.5 Pro returns individual JSON objects with text between them instead of a clean JSON array. Added `extract_json_array()` with balanced brace counting to extract objects from surrounding text. Eliminates 9 sequential fallback calls in normal operation. (FID-071)
+- **Ticker wrap-around** — CSS `translateX(-33.333%)` animation didn't work because `display:contents` spans return `offsetWidth=0`. Replaced with `requestAnimationFrame`-based Ticker component that measures `track.scrollWidth/3` and snaps by one copy width. Pauses on hover.
+- **Dashboard crash: toLowerCase on non-string** — `memory?.cusum_status` could be a number. `String()` coercion added.
+
+### Changed
+
+- **HeroUI redesign: Performance, Market Insight, Risk Controls** — W/L uses HeroUI Chip (success/danger), sentiment uses Chip, trending coins use Chip (accent). Brier/CUSUM/funding rate have Tooltips explaining meaning. Circuit breaker uses Chip. Metrics in 2-column grid layout.
+- **Batch evaluation debug logging** — Raw and thinking-stripped response logged at INFO level for debugging parse failures.
+- **Version** — 0.10.0 → 0.10.1
+
 ## [0.10.0] — 2026-06-06
 
 ### Added

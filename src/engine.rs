@@ -1630,10 +1630,7 @@ pub async fn run(
                     let cleaned = savant_trading::agent::decision_parser::strip_thinking_tags(text);
 
                     // Log raw and cleaned response for debugging batch parse failures
-                    tracing::info!(
-                        "BATCH RAW (first 300): {}",
-                        &text[..text.len().min(300)]
-                    );
+                    tracing::info!("BATCH RAW (first 300): {}", &text[..text.len().min(300)]);
                     tracing::info!(
                         "BATCH CLEANED (first 300): {}",
                         &cleaned[..cleaned.len().min(300)]
