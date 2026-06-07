@@ -137,6 +137,7 @@ pub async fn start_server(
         .route("/api/engine/stop", post(stop_engine))
         .route("/api/engine/restart", post(restart_engine))
         .route("/api/positions/{pair}/stop", patch(update_stop))
+        .route("/api/positions/{pair}/close", post(close_position))
         .route("/api/terminal", get(terminal_ws))
         .with_state(state)
         .layer(cors)
@@ -585,6 +586,35 @@ async fn update_stop(
         "new_stop_loss": body.stop_loss,
         "status": "queued",
         "message": "Engine will apply on next cycle"
+    })))
+}
+
+/// Close a position — queues a close request for the engine to execute on next cycle.
+async fn close_position(
+    State(state): State<AppState>,
+    Path(pair): Path<String>,
+) -> Json<ApiResponse<serde_json::Value>> {
+    let normalized = pair.replace("-", "/");
+    let positions = state.shared.positions.read().await;
+    let exists = positions.iter().any(|p| p.pair == normalized);
+    drop(positions);
+
+    if !exists {
+        return Json(ApiResponse {
+            data: serde_json::Value::Null,
+            error: Some(format!("No open position for {}", normalized)),
+            timestamp: chrono::Utc::now().to_rfc3339(),
+        });
+    }
+
+    let mut overrides = state.shared.close_overrides.write().await;
+    overrides.insert(normalized.clone(), true);
+
+    info!("Close request queued: {}", normalized);
+    Json(ApiResponse::ok(serde_json::json!({
+        "pair": normalized,
+        "status": "queued",
+        "message": "Engine will close on next cycle via on-chain swap"
     })))
 }
 

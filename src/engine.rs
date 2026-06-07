@@ -2636,6 +2636,32 @@ pub async fn run(
             }
         }
 
+        // Apply close requests from API — force close by setting stop to current price
+        {
+            let mut close_reqs = shared.close_overrides.write().await;
+            for (pair, _) in close_reqs.drain() {
+                if let Some(current_price) = all_prices.get(&pair) {
+                    if let Some((_, pos)) = portfolio
+                        .positions_mut()
+                        .iter_mut()
+                        .find(|(_, p)| p.pair == pair)
+                    {
+                        // For LONG: set stop above current price to trigger immediate close
+                        // For SHORT: set stop below current price to trigger immediate close
+                        match pos.side {
+                            savant_trading::core::types::Side::Long => {
+                                pos.stop_loss = current_price + 0.01;
+                            }
+                            savant_trading::core::types::Side::Short => {
+                                pos.stop_loss = current_price - 0.01;
+                            }
+                        }
+                        log_trade!("CLOSE", "{} — manual close requested via API", pair);
+                    }
+                }
+            }
+        }
+
         let stop_result = portfolio.check_stops(&all_prices);
 
         // Log trailing stop events

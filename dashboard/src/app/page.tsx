@@ -309,7 +309,20 @@ export default function Dashboard() {
                           <Icon name={p.side === "Long" ? "fa-arrow-up" : "fa-arrow-down"} className="text-[6px]" />{p.side}
                         </span>
                       </div>
-                      <span className={`text-sm font-bold font-mono ${pnlClass(upnl)}`}>{fmt.usd(upnl)} <span className="text-[9px]">({fmt.pct(upPct)})</span></span>
+                      <div className="flex items-center gap-1.5">
+                        <span className={`text-sm font-bold font-mono ${pnlClass(upnl)}`}>{fmt.usd(upnl)} <span className="text-[9px]">({fmt.pct(upPct)})</span></span>
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`Close ${p.pair} ${p.side}? This will execute an on-chain swap.`)) {
+                              fetch(`/api/positions/${p.pair.replace("/", "-")}/close`, { method: "POST" });
+                            }
+                          }}
+                          className="text-[8px] text-[var(--dim)] hover:text-[var(--red)] transition-colors cursor-pointer px-1"
+                          title="Close position"
+                        >
+                          <Icon name="fa-xmark" className="text-[8px]" />
+                        </button>
+                      </div>
                     </div>
                     <div className="relative h-1 rounded-full bg-gradient-to-r from-[var(--red)]/50 via-[var(--dim)]/20 to-[var(--green)]/50 mb-1">
                       <div className="absolute -top-0.5 w-0.5 h-2 bg-[var(--red)]" style={{ left: `${at(p.stop_loss)}%` }} />
