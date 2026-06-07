@@ -236,11 +236,16 @@ export default function Dashboard() {
         duration: 4000,
       }} />
 
-      {/* ── Connection Error Banner ── */}
+      {/* ── Connection Overlay ── */}
       {!online && (
-        <div className="shrink-0 bg-[var(--red)]/10 border border-[var(--red)]/30 text-[var(--red)] text-[10px] font-mono px-3 py-1 flex items-center gap-2">
-          <Icon name="fa-link-slash" className="text-[8px]" />
-          <span>Disconnected from engine — data may be stale. Retrying...</span>
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--bg)]/90 backdrop-blur-sm">
+          <Image src="/savant.png" alt="SAVANT" width={64} height={64} className="rounded-lg mb-4 opacity-50" />
+          <span className="text-xl font-extrabold tracking-[8px] bg-gradient-to-r from-white/50 to-[var(--cyan)]/50 bg-clip-text text-transparent mb-2">SAVANT</span>
+          <span className="text-[10px] tracking-[3px] uppercase text-[var(--dim)] mb-6">Autonomous Trading Agent</span>
+          <div className="flex items-center gap-2 text-[var(--dim)] text-[11px] font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--red)] shadow-[0_0_6px_var(--red)] animate-pulse" />
+            <span>Disconnected from engine — data may be stale. Retrying...</span>
+          </div>
         </div>
       )}
 
