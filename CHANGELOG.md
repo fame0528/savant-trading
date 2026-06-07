@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.10.3] — 2026-06-07
 
+### Fixed — FID-079: Gas Check Only on Active Chain
+
+- **Gas balance warnings for Base/Optimism when trading on Arbitrum** — `sync_balance()` iterated over ALL registered chain clients and logged CRITICAL errors for chains with zero gas. Now only checks the primary trading chain (`self.chain_id`). Eliminates false alarms for unused chains. (`trader.rs:sync_balance`)
+
 ### Added — FID-077: Sound Effects System
 
 - **Win/loss audio clips** — Custom `.mp3` files in `dashboard/public/sounds/wins/` and `dashboard/public/sounds/losses/`. Random selection on trade close. Falls back to synthesized Web Audio sounds when no clips exist. (`sounds.ts`)

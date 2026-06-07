@@ -1555,9 +1555,12 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         // Dynamic gas check (FID-052): query current gas price, calculate how many
         // swaps we can afford. Halt only if we can't afford even 1 swap.
         // A typical 0x swap on Arbitrum uses ~500K gas. On Base/Optimism ~200K.
+        // FID-079: Only check gas on the primary trading chain — don't warn about
+        // chains the user isn't actively using.
         let typical_gas_limit: u64 = 500_000;
 
-        for &cid in self.chain_clients.keys() {
+        {
+            let cid = self.chain_id;
             let chain_name = self
                 .chain_configs
                 .get(&cid)
