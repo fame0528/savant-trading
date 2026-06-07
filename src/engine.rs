@@ -1182,13 +1182,23 @@ pub async fn run(
         };
         let min_order_value = 1.0_f64;
         let fully_deployed = available_balance < min_order_value;
-        if fully_deployed {
+
+        // FID-081: Stale-recovery re-eval — if prices were stale and just recovered,
+        // force evaluation of open positions to check if hold thesis is still valid.
+        let stale_recovery_reval = {
+            let staleness = *shared.price_staleness_secs.read().await;
+            staleness > 300 && !portfolio.positions().is_empty()
+        };
+
+        if fully_deployed && !stale_recovery_reval {
             log_phase!(
                 "PHASE2",
                 "SKIPPED — fully deployed (${:.2} < ${:.2} min). Monitoring positions only.",
                 available_balance,
                 min_order_value
             );
+        } else if fully_deployed && stale_recovery_reval {
+            warn!("FID-081: Stale data detected with open positions — forcing re-evaluation of held positions");
         }
 
         // FID-063: Hunt mode — under $500 with idle capital > $5.
@@ -1226,8 +1236,15 @@ pub async fn run(
         }
 
         for pair in &active_pairs {
-            if fully_deployed {
+            if fully_deployed && !stale_recovery_reval {
                 break;
+            }
+            // In stale-recovery mode, only evaluate pairs we have positions in
+            if stale_recovery_reval && fully_deployed {
+                let has_position = portfolio.positions().values().any(|p| p.pair == *pair);
+                if !has_position {
+                    continue;
+                }
             }
             if dead_tokens.contains(pair.as_str()) {
                 continue;

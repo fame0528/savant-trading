@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **WS reconnect detection** — Sets `ws_just_reconnected` flag on `StateChange::Connected`, logs warning that prices may be stale until fresh data arrives. (`engine.rs`)
 - **Per-pair staleness tracking** — Tracks seconds since last WS update per pair, exposes worst-case to dashboard. (`engine.rs`, `shared.rs`, `api/mod.rs`)
 - **Dashboard "STALE PRICES" indicator** — Red pulsing chip with `fa-triangle-exclamation` icon shows when prices > 5 min old. Displays minutes since last update. (`page.tsx`, `api.ts`)
+- **Stale-recovery re-eval** — When prices were stale (> 5 min) and positions are open, engine forces LLM re-evaluation of held positions on next cycle. Only evaluates pairs with open positions. Ensures hold thesis is still valid after price feed recovery. (`engine.rs`)
 
 ### Fixed — FID-079: Gas Check Only on Active Chain
 
