@@ -1,5 +1,20 @@
 # LEARNINGS
 
+## Session 2026-06-08: FID-087 — Position Lifecycle Failures (8 Bugs)
+
+**Key Learnings:**
+
+- **Rushing fixes without FIDs creates cascading failures.** v0.11.3 through v0.11.5 were all pushed without FIDs. Each fix introduced new bugs because interconnected failure modes weren't analyzed together. FID-087's 8-bug analysis caught the full chain that individual fixes missed.
+- **Journal cleanup must happen at close time, not at load time.** `check_stops()` removed positions from the in-memory map but never called `delete_position()` on SQLite. Every restart resurrected "closed" positions. The fix: delete from SQLite in the on-chain close success path.
+- **`unwrap_or(U256::ZERO)` is a silent killer.** In `query_token_balance()`, this made failed balance queries return `Some(0.0)` instead of `None`. The caller's safety net (`unwrap_or(close_qty)`) never fired because the function returned `Some`, not `Err`. Always use `match` for fallible parses in critical paths.
+- **Tuple patterns `(journal, &paper_id)` move `journal` in Rust.** Even with `ref` on inner bindings, the tuple pattern itself moves the outer value. Use nested `if let Some(ref j) = journal { if let Some(ref pid) = paper_id {` instead.
+- **The LLM's action field and reasoning can contradict.** The LLM said "Recommend closing" in reasoning but chose `"action": "HOLD"` in JSON. The parser correctly reads the action field, but a safety net is needed: if reasoning contains "close"/"exit" without "hold"/"keep", override to CLOSE.
+- **Auto-stop overrides must be side-aware.** `entry * 0.92` (LONG-style, below entry) applied to SHORT positions creates an SL that triggers immediately. For SHORT: `entry * 1.08` (above entry).
+- **Reverted trades from FID-074 were still saved to journal.** `check_stops()` returns a separate Vec of closed trades. FID-074 reverts portfolio state but the second loop still iterates over the original Vec and saves to journal. Fix: track reverted trades in the first loop, skip journal save in the second.
+- **Wallet recovery is reconciliation, not just creation.** Must validate side (holding tokens = LONG), SL direction, and entry price against on-chain reality. Not just quantity.
+- **Nova audit caught Bug H ordering issue.** The `on_chain_verified` flag IS set in the DEX path — the real issue was that `check_stops()` records before execution, and reverted trades were still saved to journal. External audit (Nova) corrected the analysis.
+- **8 bugs across 5 subsystems require atomic fixing.** Fixing any subset creates different failure modes. The dependency order matters: structural (F, G) → validation (A, C, E) → execution (D) → safety nets (B, H).
+
 ## Session 2026-06-08: FID-085 v2 — Context Window Overhaul
 
 **Key Learnings:**
