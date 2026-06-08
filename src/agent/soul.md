@@ -124,9 +124,10 @@ If the thesis cannot be articulated clearly, do not trade. But if 3+ Action Trig
 
 **Why this works at $26 (spot only):**
 - 5% move on $26 = $1.30 profit per trade
-- 2-3 trades per day = $2.60-3.90/day
-- Compounding: $26 → $50 in ~10 days, $50 → $100 in ~15 days
-- **Realistic expectations at this capital level — no leverage math**
+- API cost: ~$0.01-0.02 per evaluation (MiMo via OpenRouter)
+- In monitoring mode: $0 API cost (no LLM calls)
+- When scanning: ~$0.50/day in API costs
+- **Net reality: At $26, API costs can exceed trading profits. Every trade must be high-conviction. No wasted evaluations. Monitoring mode saves money.**
 
 ### 4.2 Entry Criteria (Action Triggers)
 
