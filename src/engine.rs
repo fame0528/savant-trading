@@ -1562,25 +1562,26 @@ pub async fn run(
                 
                 // Step 2: Compose prompt and build user message (mutable borrow of agent)
                 let system_prompt = agent.composer_mut().compose(&knowledge_refs);
-                let user_message_raw = ctx_engine.build_user_message_for(&ctx);
+                let user_message = ctx_engine.build_user_message_for(&ctx);
 
-                // FID-085: Delta-compression — skip if data hasn't changed
-                let user_message = match ctx_state.compute_delta(&user_message_raw, config.context.delta_compression_threshold) {
+                // FID-085: Delta-compression for observability ONLY.
+                // Always send the full prompt to the LLM — never strip context.
+                // The delta % is logged so we can monitor data freshness.
+                match ctx_state.compute_delta(&user_message, config.context.delta_compression_threshold) {
                     savant_trading::agent::context_state::DeltaResult::NoChange => {
-                        tracing::debug!("Delta-compression: no change for {}", pair);
-                        user_message_raw
+                        tracing::debug!("Delta: {} — identical to last cycle", pair);
                     }
-                    savant_trading::agent::context_state::DeltaResult::Delta(delta) => {
-                        delta
+                    savant_trading::agent::context_state::DeltaResult::Delta(_) => {
+                        tracing::debug!("Delta: {} — small change, full prompt sent", pair);
                     }
-                    savant_trading::agent::context_state::DeltaResult::Full(text) => {
-                        text
+                    savant_trading::agent::context_state::DeltaResult::Full(_) => {
+                        tracing::debug!("Delta: {} — full data injection", pair);
                     }
                 };
 
-                // FID-085: Anti-thrashing check
+                // FID-085: Anti-thrashing check (observability only)
                 if ctx_state.should_skip_compression(config.context.anti_thrash_min_savings) {
-                    tracing::warn!("Anti-thrashing: skipping {} due to low compression efficiency", pair);
+                    tracing::warn!("Anti-thrashing: {} has low compression efficiency", pair);
                 }
 
                 ctx_state.increment_cycle();
