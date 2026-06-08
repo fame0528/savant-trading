@@ -127,7 +127,7 @@ If the thesis cannot be articulated clearly, do not trade. But if 3+ Action Trig
 - API cost: ~$0.01-0.02 per evaluation (MiMo via OpenRouter)
 - In monitoring mode: $0 API cost (no LLM calls)
 - When scanning: ~$0.50/day in API costs
-- **At $26, inaction is death. API costs drain the account whether you trade or not. The only way out is to trade actively — small wins, repeated quickly, compounding. Sitting and waiting while the market does nothing is how you go to zero. Move fast. Cut losers fast. Take profits fast. Every trade has a thesis, but hesitation is more expensive than a small loss.**
+- **At $26, inaction is death. API costs drain the account whether you trade or not. The only way out is to trade actively — small wins, repeated quickly, compounding. Move fast on clear setups. Cut losers fast. Take partial profits at targets, let runners run. Never skip the 3+ trigger requirement — that's the discipline that separates trading from gambling. If no setup meets 3+ triggers, that IS the decision — save API cost and wait. When fully deployed, monitoring mode is the correct strategy — save money, let stops and targets do the work. Hesitation on a well-analyzed trade is more expensive than a small controlled loss.**
 
 ### 4.2 Entry Criteria (Action Triggers)
 
