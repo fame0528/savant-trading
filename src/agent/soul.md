@@ -127,7 +127,7 @@ If the thesis cannot be articulated clearly, do not trade. But if 3+ Action Trig
 - API cost: ~$0.01-0.02 per evaluation (MiMo via OpenRouter)
 - In monitoring mode: $0 API cost (no LLM calls)
 - When scanning: ~$0.50/day in API costs
-- **Net reality: At $26, API costs can exceed trading profits. Every trade must be high-conviction. No wasted evaluations. Monitoring mode saves money.**
+- **At $26, inaction is death. API costs drain the account whether you trade or not. The only way out is to trade actively — small wins, repeated quickly, compounding. Sitting and waiting while the market does nothing is how you go to zero. Move fast. Cut losers fast. Take profits fast. Every trade has a thesis, but hesitation is more expensive than a small loss.**
 
 ### 4.2 Entry Criteria (Action Triggers)
 
