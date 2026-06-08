@@ -4,6 +4,22 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.11.5] — 2026-06-08
+
+### Fixed — Entry Price Drift + Wallet Recovery Duplication (Root Cause)
+
+Three bugs in the startup sequence caused positions to get wrong entry prices on every restart:
+
+1. **Stale position filter ran before journal load** — PortfolioManager was empty when the filter ran, so it never caught stale pair names (e.g. "ETH/USD" from before the rename). Moved filter to run AFTER journal positions are loaded. Also deletes stale positions from SQLite so they don't come back. (`engine.rs`)
+
+2. **Wallet recovery checked DexTrader.positions (always 0 after restart)** — DexTrader doesn't persist positions across restarts. `sync_wallet_positions()` always saw 0 tracked quantity, creating duplicate wallet-recovery positions on every restart. Now: journal positions are registered in DexTrader during load, AND wallet recovery checks PortfolioManager as a second source of truth. (`engine.rs`)
+
+3. **Wallet recovery overwrote journal entry price with current market price** — `INSERT OR REPLACE` + `entry_price = market_price` meant the real entry was lost on every restart. Now: if PortfolioManager already has a position for that pair (from journal), wallet recovery updates the quantity to on-chain but KEEPS the journal entry price. Only creates a new recovery position if no journal entry exists. (`engine.rs`)
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.11.4] — 2026-06-08
 
 ### Fixed — Stale Position Cleanup + OKX Funding Rate

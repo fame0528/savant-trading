@@ -353,29 +353,8 @@ pub async fn run(
         }
     }
 
-    // FID-085: Filter stale positions whose pair names don't match current config.
-    // Prevents old pair names (e.g. "ETH/USD" before rename to "WETH/USD") from
-    // creating phantom positions after config changes.
-    {
-        let config_pairs: std::collections::HashSet<&str> = config.trading.pairs.iter().map(|s| s.as_str()).collect();
-        let stale_ids: Vec<String> = portfolio.positions().keys()
-            .filter(|id| {
-                portfolio.positions().get(*id).is_some_and(|p| !config_pairs.contains(p.pair.as_str()))
-            })
-            .cloned()
-            .collect();
-        let mut stale_removed = false;
-        for stale_id in &stale_ids {
-            if let Some(pos) = portfolio.positions_mut().remove(stale_id) {
-                warn!("STALE POSITION REMOVED: {} ({}) — not in current config pairs", stale_id, pos.pair);
-                stale_removed = true;
-            }
-        }
-        if stale_removed {
-            portfolio.account_mut().open_positions = portfolio.positions().len();
-            portfolio.refresh_equity();
-        }
-    }
+    // Declared early so journal positions can be registered in DexTrader during load.
+    let mut executor_position_map: HashMap<String, String> = HashMap::new();
 
     let journal = match TradeJournal::new(&config.trading.database_url).await {
         Ok(j) => {
@@ -449,9 +428,47 @@ pub async fn run(
                 }
                 portfolio.account_mut().open_positions = portfolio.positions().len();
                 info!("Loaded {} positions from DB", portfolio.positions().len());
+                // Register journal positions in DexTrader so close_position() and
+                // sync_wallet_positions() can find them.
+                if let Some(ref mut ex) = executor {
+                    for (id, pos) in portfolio.positions().iter() {
+                        let exec_id = format!("exec-{}", id);
+                        ex.register_position(exec_id.clone(), pos.clone());
+                        executor_position_map.insert(id.clone(), exec_id.clone());
+                    }
+                    info!("Registered {} journal positions in DexTrader", portfolio.positions().len());
+                }
             }
             Ok(_) => info!("No persisted positions in DB"),
             Err(e) => warn!("Failed to load positions from DB: {}", e),
+        }
+
+        // FID-085: Filter stale positions whose pair names don't match current config.
+        // Runs AFTER journal load so it actually has positions to filter.
+        // Prevents old pair names (e.g. "ETH/USD" before rename to "WETH/USD") from
+        // creating phantom positions after config changes.
+        {
+            let config_pairs: std::collections::HashSet<&str> = config.trading.pairs.iter().map(|s| s.as_str()).collect();
+            let stale_ids: Vec<String> = portfolio.positions().keys()
+                .filter(|id| {
+                    portfolio.positions().get(*id).is_some_and(|p| !config_pairs.contains(p.pair.as_str()))
+                })
+                .cloned()
+                .collect();
+            let mut stale_removed = false;
+            for stale_id in &stale_ids {
+                if let Some(pos) = portfolio.positions_mut().remove(stale_id) {
+                    warn!("STALE POSITION REMOVED: {} ({}) — not in current config pairs", stale_id, pos.pair);
+                    if let Some(ref j) = journal {
+                        let _ = j.delete_position(stale_id).await;
+                    }
+                    stale_removed = true;
+                }
+            }
+            if stale_removed {
+                portfolio.account_mut().open_positions = portfolio.positions().len();
+                portfolio.refresh_equity();
+            }
         }
 
         // Load closed trades into BOTH PortfolioManager and shared state
@@ -851,9 +868,8 @@ pub async fn run(
 
     // WALLET SYNC: Reconcile on-chain balances with DB positions.
     // Runs AFTER candle data loads so market prices are available for recovery.
-    // FID-061: executor_position_map must exist before wallet sync so recovered
+    // FID-061: executor_position_map declared before journal load so recovered
     // positions can be registered in DexTrader.
-    let mut executor_position_map: HashMap<String, String> = HashMap::new();
     if let Some(ref mut ex) = executor {
         info!(
             "Wallet sync: checking on-chain balances for {} pairs...",
@@ -873,9 +889,41 @@ pub async fn run(
         };
         for (pair, on_chain_qty, tracked_qty) in &discrepancies {
             if *tracked_qty < 0.001 && *on_chain_qty > 0.001 {
-                // On-chain has tokens but no tracked position — create recovery
-                // Chain-first: use current market price as entry for recovered positions.
-                // Journal entry prices are from historical trades, not the current on-chain holding.
+                // On-chain has tokens but DexTrader has none tracked.
+                // Check if PortfolioManager (loaded from journal) already has a position.
+                let existing_pos = portfolio.positions().values()
+                    .find(|p| p.pair == *pair)
+                    .cloned();
+
+                if let Some(mut existing) = existing_pos {
+                    // Journal already has a position — update quantity to on-chain
+                    // but KEEP the journal entry price (source of truth).
+                    let old_qty = existing.quantity;
+                    existing.quantity = *on_chain_qty;
+                    existing.current_price = market_stores
+                        .get(pair)
+                        .and_then(|s| s.last().map(|c| c.close))
+                        .unwrap_or(existing.current_price);
+                    existing.risk_amount = existing.entry_price * on_chain_qty;
+                    portfolio.positions_mut().insert(existing.id.clone(), existing.clone());
+                    // Register in DexTrader so close_position() can find it
+                    if let Some(ref mut ex) = executor {
+                        let exec_id = format!("exec-{}", existing.id);
+                        ex.register_position(exec_id.clone(), existing.clone());
+                        executor_position_map.insert(existing.id.clone(), exec_id.clone());
+                    }
+                    if let Some(ref j) = journal {
+                        let _ = j.save_position(&existing).await;
+                    }
+                    info!(
+                        "WALLET SYNC: Updated {} quantity {:.6} → {:.6} (kept journal entry @ ${:.4})",
+                        pair, old_qty, on_chain_qty, existing.entry_price,
+                    );
+                    continue;
+                }
+
+                // No journal position — true recovery needed (first time or journal lost).
+                // Use current market price as entry since we have no historical data.
                 let market_price = market_stores
                     .get(pair)
                     .and_then(|s| s.last().map(|c| c.close))
@@ -945,7 +993,7 @@ pub async fn run(
                     let _ = j.save_position(&recovery_pos).await;
                 }
                 warn!(
-                    "WALLET SYNC: Recovered {} — {:.6} tokens @ ${:.4} (source: market_price)",
+                    "WALLET SYNC: Recovered {} — {:.6} tokens @ ${:.4} (source: market_price — no journal entry)",
                     pair, on_chain_qty, entry_price,
                 );
                 shared
