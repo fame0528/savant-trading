@@ -415,6 +415,27 @@ pub async fn run(
                             warn!("Failed to persist fixed stop-loss: {}", e);
                         }
                     }
+                    // FID-087 Bug E: Validate SL direction matches position side.
+                    // LONG SL must be below entry. SHORT SL must be above entry.
+                    // A mismatch means the SL will trigger immediately on first price check.
+                    let sl_valid = match pos.side {
+                        Side::Long => pos.stop_loss < pos.entry_price,
+                        Side::Short => pos.stop_loss > pos.entry_price,
+                    };
+                    if !sl_valid {
+                        let old_sl = pos.stop_loss;
+                        pos.stop_loss = match pos.side {
+                            Side::Long => pos.entry_price * 0.92,
+                            Side::Short => pos.entry_price * 1.08,
+                        };
+                        warn!(
+                            "SL DIRECTION FIX: {} {} — SL {:.4} was wrong direction for {:?}. Recalculated to {:.4} (8% buffer)",
+                            pos.pair, pos.side, old_sl, pos.side, pos.stop_loss
+                        );
+                        if let Err(e) = j.save_position(&pos).await {
+                            warn!("Failed to persist corrected stop-loss: {}", e);
+                        }
+                    }
                     info!(
                         "  {} {} | Entry: {:.4} SL: {:.4} TP1: {:.4} | Qty: {:.6}",
                         pos.pair,
@@ -898,6 +919,20 @@ pub async fn run(
                 if let Some(mut existing) = existing_pos {
                     // Journal already has a position — update quantity to on-chain
                     // but KEEP the journal entry price (source of truth).
+                    // FID-087 Bug A: If on-chain has tokens but journal says SHORT,
+                    // the position is stale. Holding tokens = LONG exposure. Force LONG.
+                    if existing.side == Side::Short {
+                        warn!(
+                            "WALLET SYNC: {} journal says SHORT but on-chain holds {:.6} tokens — forcing LONG",
+                            pair, on_chain_qty
+                        );
+                        existing.side = Side::Long;
+                        // FID-087 Bug C: Recalculate SL for LONG (below entry)
+                        existing.stop_loss = existing.entry_price * 0.92;
+                        existing.take_profit_1 = existing.entry_price * 1.10;
+                        existing.take_profit_2 = existing.entry_price * 1.20;
+                        existing.take_profit_3 = existing.entry_price * 1.30;
+                    }
                     let old_qty = existing.quantity;
                     existing.quantity = *on_chain_qty;
                     existing.current_price = market_stores
@@ -1062,22 +1097,33 @@ pub async fn run(
 
     // FID-061: Auto-apply tighter stops on wallet-recovered positions
     // Runs AFTER wallet sync so recovered positions exist in PortfolioManager.
+    // FID-087 Bug G: Side-aware SL calculation. LONG: below entry. SHORT: above entry.
     {
         let stop_overrides: Vec<(String, f64)> = portfolio
             .positions()
             .values()
             .filter(|p| p.strategy_name == "wallet_recovery")
             .filter_map(|p| {
-                let default_sl = p.entry_price * 0.85;
+                // Check if SL is at the default wallet-recovery value (15% from entry)
+                let default_sl = match p.side {
+                    Side::Long => p.entry_price * 0.85,
+                    Side::Short => p.entry_price * 1.15,
+                };
                 if (p.stop_loss - default_sl).abs() < 0.01 {
-                    match p.pair.as_str() {
-                        "LINK/USD" => Some((p.pair.clone(), 7.00)),
-                        "WETH/USD" => Some((
-                            p.pair.clone(),
+                    let new_sl = match (p.pair.as_str(), p.side) {
+                        ("LINK/USD", Side::Long) => Some(7.00),
+                        ("LINK/USD", Side::Short) => Some(
+                            (p.entry_price * 1.08 * 100.0).round() / 100.0,
+                        ),
+                        ("WETH/USD", Side::Long) => Some(
                             (p.entry_price * 0.92 * 100.0).round() / 100.0,
-                        )),
+                        ),
+                        ("WETH/USD", Side::Short) => Some(
+                            (p.entry_price * 1.08 * 100.0).round() / 100.0,
+                        ),
                         _ => None,
-                    }
+                    };
+                    new_sl.map(|sl| (p.pair.clone(), sl))
                 } else {
                     None
                 }
@@ -3038,6 +3084,10 @@ pub async fn run(
                 .await;
         }
 
+        // FID-087 Bug H: Track trades that were reverted due to failed on-chain close.
+        // The second loop (journal save) must skip these to prevent phantom trades in DB.
+        let mut reverted_trades: Vec<(String, Side, f64, f64)> = Vec::new();
+
         // In live mode, close positions on executor that PortfolioManager closed via stops
         for trade in &stop_result.closed {
             if let Some(ref mut ex) = executor {
@@ -3074,6 +3124,15 @@ pub async fn run(
                             if let Some(ref pid) = paper_id {
                                 executor_position_map.remove(pid);
                             }
+                            // FID-087 Bug F: Delete closed position from SQLite journal
+                            // so it doesn't resurrect on next restart.
+                            if let Some(ref j) = journal {
+                                if let Some(ref pid) = paper_id {
+                                    if let Err(e) = j.delete_position(pid).await {
+                                        warn!("Failed to delete closed position {} from journal: {}", pid, e);
+                                    }
+                                }
+                            }
                         }
                         Err(e) => {
                             warn!(
@@ -3091,6 +3150,13 @@ pub async fn run(
                                     && (t.exit_price - trade.exit_price).abs() < 0.0001
                                     && t.closed_at == trade.closed_at)
                             });
+                            // FID-087 Bug H: Track reverted trade so journal save is skipped
+                            reverted_trades.push((
+                                trade.pair.clone(),
+                                trade.side,
+                                trade.entry_price,
+                                trade.exit_price,
+                            ));
                             // Restore position to PortfolioManager so it stays tracked
                             if let Some(ref pid) = paper_id {
                                 if let Some(pos) = paper_positions_full.get(pid) {
@@ -3130,6 +3196,13 @@ pub async fn run(
                                     && (t.exit_price - trade.exit_price).abs() < 0.0001
                                     && t.closed_at == trade.closed_at)
                             });
+                            // FID-087 Bug H: Track reverted trade so journal save is skipped
+                            reverted_trades.push((
+                                trade.pair.clone(),
+                                trade.side,
+                                trade.entry_price,
+                                trade.exit_price,
+                            ));
                             // Restore position to PortfolioManager
                             if let Some(ref pid) = paper_id {
                                 if let Some(pos) = paper_positions_full.get(pid) {
@@ -3142,6 +3215,15 @@ pub async fn run(
                                         &trade.pair,
                                         &format!("CLOSE FAILED: {} — position stays open, will retry. Error: {}", trade.pair, e),
                                     ).await;
+                                }
+                            }
+                        } else {
+                            // FID-087 Bug F: Successful fallback close — delete from journal
+                            if let Some(ref j) = journal {
+                                if let Some(ref pid) = paper_id {
+                                    if let Err(e) = j.delete_position(pid).await {
+                                        warn!("Failed to delete closed position {} from journal: {}", pid, e);
+                                    }
                                 }
                             }
                         }
@@ -3174,26 +3256,42 @@ pub async fn run(
                 trade.notes
             );
 
-            // DB: delete position, record trade, log activity — all instant
-            if let Some(ref j) = journal {
-                // Find and delete the closed position from DB
-                for (id, pair, _side, _entry) in paper_positions_before.iter() {
-                    if *pair == trade.pair {
-                        let _ = j.delete_position(id).await;
-                        break;
+            // FID-087 Bug H: Skip journal save for trades that were reverted
+            // due to failed on-chain close. Prevents phantom trades in DB.
+            let is_reverted = reverted_trades.iter().any(|(pair, side, entry, exit)| {
+                *pair == trade.pair
+                    && *side == trade.side
+                    && (*entry - trade.entry_price).abs() < 0.0001
+                    && (*exit - trade.exit_price).abs() < 0.0001
+            });
+
+            if !is_reverted {
+                // DB: delete position, record trade, log activity — all instant
+                if let Some(ref j) = journal {
+                    // Find and delete the closed position from DB
+                    for (id, pair, _side, _entry) in paper_positions_before.iter() {
+                        if *pair == trade.pair {
+                            let _ = j.delete_position(id).await;
+                            break;
+                        }
                     }
+                    let _ = j.record_trade(&trade).await;
+                    let _ = j
+                        .record_activity(
+                            "Trade",
+                            &trade.pair,
+                            &format!(
+                                "{} {} | PnL: ${:.2} ({:.2}%) | {}",
+                                tp_label, trade.side, trade.pnl, trade.pnl_pct, trade.notes
+                            ),
+                        )
+                        .await;
                 }
-                let _ = j.record_trade(&trade).await;
-                let _ = j
-                    .record_activity(
-                        "Trade",
-                        &trade.pair,
-                        &format!(
-                            "{} {} | PnL: ${:.2} ({:.2}%) | {}",
-                            tp_label, trade.side, trade.pnl, trade.pnl_pct, trade.notes
-                        ),
-                    )
-                    .await;
+            } else {
+                warn!(
+                    "SKIPPED journal save for reverted trade: {} {} — on-chain close failed",
+                    trade.pair, trade.side
+                );
             }
 
             // Write close alert to file for external monitoring

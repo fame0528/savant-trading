@@ -29,6 +29,9 @@ Multiple pairs (batch):
 
 Field Rules:
 - action: BUY to open long, SELL to open short, HOLD for no action, CLOSE to exit existing, ADJUST_STOP to modify stop
+  **IMPORTANT:** If your reasoning recommends exiting a position — even at breakeven or a small loss — the action MUST be CLOSE, not HOLD.
+  HOLD means "take no action and keep the position open." Do NOT use HOLD when you want to exit.
+  When in doubt between HOLD and CLOSE: if your reasoning says "close", "exit", "exit now", "close at breakeven", "unwind", or "liquidate", use CLOSE.
 - pair: must match a configured trading pair
 - side: Long for BUY, Short for SELL
 - order_type: LIMIT for maker orders (preferred), MARKET for taker orders (use only in crisis)

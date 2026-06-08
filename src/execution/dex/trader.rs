@@ -1794,8 +1794,19 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         match self.rpc_call("eth_call", call_params).await {
             Ok(result) => {
                 if let Some(hex) = result.as_str() {
-                    let wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
-                        .unwrap_or(U256::ZERO);
+                    let hex_clean = hex.trim_start_matches("0x");
+                    // FID-087 Bug D: Return None on parse failure instead of Some(0.0).
+                    // The caller's unwrap_or(close_qty) will then use the requested quantity.
+                    let wei = match U256::from_str_radix(hex_clean, 16) {
+                        Ok(w) => w,
+                        Err(e) => {
+                            tracing::warn!(
+                                "Failed to parse balance hex '{}' for {}: {}",
+                                hex_clean, token_address, e
+                            );
+                            return None;
+                        }
+                    };
                     let divisor = 10f64.powi(decimals as i32);
                     let balance = wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
                     Some(balance)

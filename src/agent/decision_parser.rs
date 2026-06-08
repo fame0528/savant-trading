@@ -248,6 +248,25 @@ pub fn parse_decision(
         decision.action = TradeAction::Pass;
     }
 
+    // FID-087 Bug B: Safety net for reasoning/action contradictions.
+    // If reasoning text contains close/exit language but action is HOLD/PASS,
+    // the LLM chose the wrong action. Override to CLOSE.
+    if matches!(decision.action, TradeAction::Pass) {
+        let reasoning_lower = decision.reasoning.to_lowercase();
+        let close_signals = ["close", "exit", "unwind", "liquidate"];
+        let has_close_signal = close_signals.iter().any(|s| reasoning_lower.contains(s));
+        // Only override if reasoning strongly suggests closing (not just mentioning "close" in passing)
+        let hold_signals = ["hold", "keep", "maintain", "stay"];
+        let has_hold_signal = hold_signals.iter().any(|s| reasoning_lower.contains(s));
+        if has_close_signal && !has_hold_signal {
+            tracing::warn!(
+                "ACTION OVERRIDE: reasoning contains close/exit signal but action is {:?}. Overriding to Close. Pair: {}",
+                decision.action, decision.pair
+            );
+            decision.action = TradeAction::Close;
+        }
+    }
+
     Ok(decision)
 }
 

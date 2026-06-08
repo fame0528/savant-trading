@@ -4,6 +4,27 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.11.6] — 2026-06-08
+
+### Fixed — FID-087: Position Lifecycle Failures (8 interconnected bugs, critical)
+
+**The problem:** On restart, the engine loaded stale SHORT positions from SQLite, applied LONG-only stop-losses, ignored the AI's close recommendation, reported 0 on-chain balance, and fired fabricated stop-loss exits — recording $2.62 in phantom PnL while real tokens remained untouched on-chain.
+
+**8 bugs fixed atomically:**
+
+- **Bug F — Journal cleanup:** Added `delete_position()` in on-chain close success paths (both main and fallback). Positions are now removed from SQLite when closed, preventing resurrection on restart. (`engine.rs`)
+- **Bug G — Auto-stop side-aware:** Auto-stop override now computes SL based on position side. LONG: 8% below entry. SHORT: 8% above entry. Default SL check also side-aware (15% below for LONG, 15% above for SHORT). (`engine.rs`)
+- **Bug A — Stale position detection:** Wallet recovery now checks if on-chain has tokens but journal says SHORT — forces LONG with corrected SL and take-profits. (`engine.rs`)
+- **Bug C — Wallet recovery SL:** SL calculation now uses actual position side instead of hardcoded LONG. (`engine.rs`)
+- **Bug E — SL direction validation:** On journal load, validates SL direction matches side. SHORT with below-entry SL (or LONG with above-entry SL) is corrected to 8% buffer. (`engine.rs`)
+- **Bug D — Balance query:** `query_token_balance()` now returns `None` on hex parse failure instead of `Some(0.0)`. Caller's `unwrap_or(close_qty)` correctly falls back to requested quantity. (`trader.rs`)
+- **Bug B — Action consistency:** Updated `output_format.md` with explicit CLOSE vs HOLD guidance. Added post-parse safety net: if reasoning contains "close"/"exit" without "hold"/"keep", overrides HOLD to CLOSE. (`decision_parser.rs`, `output_format.md`)
+- **Bug H — Phantom trade prevention:** Added reverted trade tracking. When on-chain close fails and FID-074 reverts the portfolio state, the journal save is skipped. Prevents phantom trades from being persisted to SQLite. (`engine.rs`)
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.11.5] — 2026-06-08
 
 ### Fixed — Entry Price Drift + Wallet Recovery Duplication (Root Cause)
