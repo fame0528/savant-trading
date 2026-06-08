@@ -3212,8 +3212,17 @@ pub async fn run(
             warn!("FID-081: WS reconnected — prices may be stale until fresh data arrives");
         }
 
-        // Update worst-case staleness for shared state
-        let worst_staleness_secs = ws_staleness.values().max().copied().unwrap_or(0);
+        // Update worst-case staleness for shared state — only count pairs with
+        // open positions. Idle pairs going stale during low-liquidity sessions
+        // should not trigger a false "STALE PRICES" alert.
+        let held_pairs: std::collections::HashSet<String> =
+            portfolio.positions().keys().cloned().collect();
+        let worst_staleness_secs = ws_staleness
+            .iter()
+            .filter(|(pair, _)| held_pairs.contains(*pair))
+            .map(|(_, age)| *age)
+            .max()
+            .unwrap_or(0);
 
         portfolio.update_prices(&all_prices);
 
