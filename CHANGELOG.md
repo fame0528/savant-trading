@@ -4,6 +4,11 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.10.5] — 2026-06-07
+
+### Version bump
+- Previous v0.10.4 release used same version across multiple pushes. Correcting to v0.10.5.
+
 ## [0.10.4] — 2026-06-07
 
 ### Added — FID-084: Live Situation Sandbox
