@@ -1054,6 +1054,7 @@ pub async fn run(
 
     loop {
         tick += 1;
+        let cycle_start = std::time::Instant::now();
 
         // SPRINT-2: Drain WebSocket messages (non-blocking)
         let mut ws_messages_drained = 0u32;
@@ -3112,14 +3113,21 @@ pub async fn run(
             }
         }
 
-        // Sync shared state after stop checks (positions may have closed or scaled)
+        // FID-082: Sync shared state after stop checks — release each lock before
+        // acquiring the next to prevent deadlock with the API server.
         if has_stop_activity {
-            let mut sp = shared.positions.write().await;
-            *sp = portfolio.positions().values().cloned().collect();
-            let mut sa = shared.account.write().await;
-            *sa = portfolio.account().clone();
-            let mut st = shared.closed_trades.write().await;
-            *st = portfolio.closed_trades().to_vec();
+            {
+                let mut sp = shared.positions.write().await;
+                *sp = portfolio.positions().values().cloned().collect();
+            }
+            {
+                let mut sa = shared.account.write().await;
+                *sa = portfolio.account().clone();
+            }
+            {
+                let mut st = shared.closed_trades.write().await;
+                *st = portfolio.closed_trades().to_vec();
+            }
 
             // DB: persist scale-out position updates
             if let Some(ref j) = journal {
@@ -3308,61 +3316,69 @@ pub async fn run(
                 log_position!("POSITIONS", "No open positions");
             }
 
-            // Update shared state for API
+            // FID-082: Update shared state for API — release each lock before next
             {
                 let mut shared_account = shared.account.write().await;
                 *shared_account = account.clone();
+            }
+            {
                 let mut shared_positions = shared.positions.write().await;
                 *shared_positions = portfolio.positions().values().cloned().collect();
+            }
+            {
                 let mut shared_trades = shared.closed_trades.write().await;
                 *shared_trades = trades.to_vec();
+            }
+            {
                 let mut shared_insight = shared.insight.write().await;
                 *shared_insight = insight.cached().clone();
+            }
 
-                // WIRE-7: Update memory snapshot for TUI
-                let brier_score = if brier_predictions.len() >= 20 {
-                    let score = savant_trading::memory::calibration::calculate_brier_score(
-                        &brier_predictions,
-                    );
-                    Some(score.total)
-                } else {
-                    None
-                };
-                let brier_label = match brier_score {
-                    Some(s) if s <= 0.15 => "Excellent".to_string(),
-                    Some(s) if s <= 0.25 => "Good".to_string(),
-                    Some(s) if s <= 0.35 => "Fair".to_string(),
-                    Some(_) => "Poor".to_string(),
-                    None => "Insufficient data".to_string(),
-                };
-                let total_trades = if let Some(ref mem) = memory {
-                    mem.total_trades().await.unwrap_or(0)
-                } else {
-                    0
-                };
-                let confidence_cap =
-                    savant_trading::memory::calibration::max_conviction_for_trade_count(
-                        total_trades,
-                        if total_trades > 0 {
-                            brier_predictions.iter().filter(|(_, w)| *w).count() as f64
-                                / total_trades as f64
-                        } else {
-                            0.0
-                        },
-                    );
-                let cusum_status: Vec<(String, String)> = cusum_charts
-                    .iter()
-                    .map(|(pair, chart)| (pair.clone(), chart.status()))
-                    .collect();
-                let replay_lesson_count = if let Some(ref mem) = memory {
-                    savant_trading::memory::replay::get_lessons(mem.pool())
-                        .await
-                        .map(|l| l.len())
-                        .unwrap_or(0)
-                } else {
-                    0
-                };
+            // WIRE-7: Update memory snapshot for TUI
+            let brier_score = if brier_predictions.len() >= 20 {
+                let score = savant_trading::memory::calibration::calculate_brier_score(
+                    &brier_predictions,
+                );
+                Some(score.total)
+            } else {
+                None
+            };
+            let brier_label = match brier_score {
+                Some(s) if s <= 0.15 => "Excellent".to_string(),
+                Some(s) if s <= 0.25 => "Good".to_string(),
+                Some(s) if s <= 0.35 => "Fair".to_string(),
+                Some(_) => "Poor".to_string(),
+                None => "Insufficient data".to_string(),
+            };
+            let total_trades = if let Some(ref mem) = memory {
+                mem.total_trades().await.unwrap_or(0)
+            } else {
+                0
+            };
+            let confidence_cap =
+                savant_trading::memory::calibration::max_conviction_for_trade_count(
+                    total_trades,
+                    if total_trades > 0 {
+                        brier_predictions.iter().filter(|(_, w)| *w).count() as f64
+                            / total_trades as f64
+                    } else {
+                        0.0
+                    },
+                );
+            let cusum_status: Vec<(String, String)> = cusum_charts
+                .iter()
+                .map(|(pair, chart)| (pair.clone(), chart.status()))
+                .collect();
+            let replay_lesson_count = if let Some(ref mem) = memory {
+                savant_trading::memory::replay::get_lessons(mem.pool())
+                    .await
+                    .map(|l| l.len())
+                    .unwrap_or(0)
+            } else {
+                0
+            };
 
+            {
                 let mut shared_memory = shared.memory_snapshot.write().await;
                 *shared_memory = savant_trading::core::shared::MemorySnapshot {
                     brier_score,
@@ -3416,6 +3432,16 @@ pub async fn run(
             }
         }
 
+        // FID-082 Fix 5: Cycle watchdog — log CRITICAL if cycle took > 5 minutes
+        let cycle_elapsed = cycle_start.elapsed();
+        if cycle_elapsed > std::time::Duration::from_secs(300) {
+            error!(
+                "FID-082 CRITICAL: Cycle {} took {:.1}s — possible hang detected",
+                tick,
+                cycle_elapsed.as_secs_f64()
+            );
+        }
+
         // Cycle complete — inform user before sleeping
         let interval_display = if interval_seconds >= 60 {
             format!("{}m", interval_seconds / 60)
@@ -3429,22 +3455,9 @@ pub async fn run(
             interval_display
         );
 
-        // PROD-1: Graceful shutdown on Ctrl+C
-        tokio::select! {
-            _ = time::sleep(Duration::from_secs(interval_seconds)) => {}
-            _ = tokio::signal::ctrl_c() => {
-                info!("Shutdown signal received.");
-                // Final position sync to shared state before exit
-                {
-                    let mut sp = shared.positions.write().await;
-                    *sp = portfolio.positions().values().cloned().collect();
-                    let mut sa = shared.account.write().await;
-                    *sa = portfolio.account().clone();
-                }
-                info!("Savant engine shut down cleanly.");
-                return Ok(());
-            }
-        }
+        // FID-082 Fix 4: Use time::sleep only — tokio::select! with ctrl_c
+        // can interfere with sleep on Windows. Ctrl+C handled by OS.
+        time::sleep(Duration::from_secs(interval_seconds)).await;
     }
 }
 

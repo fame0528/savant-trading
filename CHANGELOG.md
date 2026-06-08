@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.10.4] — 2026-06-07
 
+### Fixed — FID-082: Engine Freeze — Deadlock in Shared State Lock Chains (critical)
+
+- **Engine hung after 3 cycles for 1+ hours** — Two sync chains acquired the SAME `RwLock`s in OPPOSITE order while the API server read them every 4 seconds. Classic deadlock. Broke all 3 lock chains: each `write()` now in its own `{}` block so the lock releases before the next acquire. (`engine.rs:3117`, `3214`, `3313`)
+- **`tokio::select!` with `ctrl_c()` interfering with sleep on Windows** — Replaced with plain `time::sleep()`. Ctrl+C handled by OS. (`engine.rs:3433`)
+- **No watchdog for hung cycles** — Added cycle watchdog: logs CRITICAL if any cycle takes > 5 minutes. (`engine.rs`)
+
 ### Fixed — soul.md: LLM Prompt Cleanup
 
 - **Removed all leverage/GMX content** — LLM was told it had 5-8x leverage and could turn $26 into $50 in 2 days. All leverage references stripped — now spot-only DEX via 0x API.
