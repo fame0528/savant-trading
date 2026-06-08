@@ -4,6 +4,15 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.10.4] — 2026-06-07
+
+### Fixed — soul.md: LLM Prompt Cleanup
+
+- **Removed all leverage/GMX content** — LLM was told it had 5-8x leverage and could turn $26 into $50 in 2 days. All leverage references stripped — now spot-only DEX via 0x API.
+- **Honest cost math** — Added API cost context ($0.01-0.02/eval, ~$0.50/day when scanning, $0 when monitoring).
+- **Survival framing with guard rails** — "Inaction is death at $26" balanced with "never skip 3+ triggers" and "if no setup, save API cost."
+- **5 contradictions resolved** — "Take profits fast" vs scale-out strategy, "Move fast" vs entry criteria, "Trade actively" vs monitoring mode, "Hesitation" vs discipline.
+
 ## [0.10.3] — 2026-06-07
 
 ### Fixed — FID-081: Price Feed Staleness Protection (critical)
