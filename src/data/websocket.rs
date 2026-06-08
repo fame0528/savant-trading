@@ -119,8 +119,18 @@ fn parse_ticker(json: &serde_json::Value) -> Option<WsMessage> {
         .get("bid")
         .and_then(|b| b.get("price"))
         .and_then(|p| p.as_f64())?;
-    let last = data.get("last").and_then(|l| l.as_f64()).unwrap_or(0.0);
-    let volume = data.get("volume").and_then(|v| v.as_f64()).unwrap_or(0.0);
+    let last = data
+        .get("last")
+        .and_then(|l| l.get("price"))
+        .and_then(|p| p.as_f64())
+        .or_else(|| data.get("last").and_then(|l| l.as_f64()))
+        .unwrap_or(0.0);
+    let volume = data
+        .get("volume")
+        .and_then(|v| v.get("today").or_else(|| v.get("24h")))
+        .and_then(|v| v.as_f64())
+        .or_else(|| data.get("volume").and_then(|v| v.as_f64()))
+        .unwrap_or(0.0);
 
     Some(WsMessage::Ticker(TickerData {
         pair,

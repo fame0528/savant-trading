@@ -1498,6 +1498,8 @@ pub async fn run(
                     context_tags: savant_trading::agent::context_builder::generate_context_tags(
                         &indicators,
                     ),
+                    // FID-086: Pass live WS price to prompt builder
+                    live_price: ws_ticker_prices.get(pair).map(|(p, _)| *p),
                 };
 
                 let (system_prompt, user_message) =
@@ -3592,6 +3594,7 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
         memory_context: None,
         higher_tf_candles: vec![],
         context_tags: savant_trading::agent::context_builder::generate_context_tags(&indicators),
+        live_price: None,
     };
 
     let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
@@ -3844,6 +3847,7 @@ pub async fn run_live_test(
             memory_context: None,
             higher_tf_candles: vec![],
             context_tags: savant_trading::agent::context_builder::generate_context_tags(&indicators),
+            live_price: None,
         };
 
         let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
@@ -4331,6 +4335,7 @@ async fn run_training_batch(
             context_tags: savant_trading::agent::context_builder::generate_context_tags(
                 &indicators,
             ),
+            live_price: None,
         };
 
         let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
@@ -5474,6 +5479,7 @@ pub async fn run_sandbox(
             memory_context: None,
             higher_tf_candles,
             context_tags: vec![],
+            live_price: None,
         };
 
         let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(

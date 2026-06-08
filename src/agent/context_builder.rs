@@ -29,6 +29,9 @@ pub struct FullContext<'a> {
     pub higher_tf_candles: Vec<(String, Vec<Candle>)>,
     /// Tags derived from current market context for precise knowledge matching
     pub context_tags: Vec<String>,
+    /// Live price from WebSocket ticker — injected directly so the model
+    /// always sees the real-time price, not just the candle close.
+    pub live_price: Option<f64>,
 }
 
 /// Build the system prompt and user message for the LLM.
@@ -233,6 +236,16 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
         msg.push_str(
             "Note: Latest candle may still be forming. Use 20-period volume SMA for volume analysis, not latest candle volume alone.\n",
         );
+    }
+
+    // FID-086: Inject live WebSocket price directly into the prompt.
+    // The candle close may lag behind the real-time market price.
+    // The model MUST see the actual current price for accurate decision-making.
+    if let Some(live) = ctx.live_price {
+        msg.push_str(&format!(
+            "**LIVE PRICE (WebSocket): ${:.4}** — This is the real-time market price. Use this for P&L calculations and stop comparisons, NOT the candle close.\n",
+            live
+        ));
     }
 
     // Multi-timeframe candles (SPRINT-1)
