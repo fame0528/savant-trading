@@ -118,7 +118,8 @@ pub async fn fetch_funding(client: &reqwest::Client, symbol: &str) -> FundingDat
 /// OKX returns decimal rate: 0.0001 = 0.01% per 8hr.
 /// Pair mapping: "BTC/USD" → "BTC-USDT-SWAP"
 async fn fetch_okx_funding(client: &reqwest::Client, symbol: &str) -> Option<FundingData> {
-    let base = symbol.split('/').next().unwrap_or(symbol).to_uppercase();
+    let raw_base = symbol.split('/').next().unwrap_or(symbol).to_uppercase();
+    let base = crate::core::types::Candle::exchange_base(&raw_base).to_string();
     let inst_id = format!("{}-USDT-SWAP", base);
 
     let url = format!(

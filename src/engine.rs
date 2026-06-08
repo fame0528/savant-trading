@@ -353,6 +353,30 @@ pub async fn run(
         }
     }
 
+    // FID-085: Filter stale positions whose pair names don't match current config.
+    // Prevents old pair names (e.g. "ETH/USD" before rename to "WETH/USD") from
+    // creating phantom positions after config changes.
+    {
+        let config_pairs: std::collections::HashSet<&str> = config.trading.pairs.iter().map(|s| s.as_str()).collect();
+        let stale_ids: Vec<String> = portfolio.positions().keys()
+            .filter(|id| {
+                portfolio.positions().get(*id).is_some_and(|p| !config_pairs.contains(p.pair.as_str()))
+            })
+            .cloned()
+            .collect();
+        let mut stale_removed = false;
+        for stale_id in &stale_ids {
+            if let Some(pos) = portfolio.positions_mut().remove(stale_id) {
+                warn!("STALE POSITION REMOVED: {} ({}) — not in current config pairs", stale_id, pos.pair);
+                stale_removed = true;
+            }
+        }
+        if stale_removed {
+            portfolio.account_mut().open_positions = portfolio.positions().len();
+            portfolio.refresh_equity();
+        }
+    }
+
     let journal = match TradeJournal::new(&config.trading.database_url).await {
         Ok(j) => {
             info!("Trade journal connected: {}", config.trading.database_url);

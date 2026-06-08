@@ -4,6 +4,17 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.11.4] — 2026-06-08
+
+### Fixed — Stale Position Cleanup + OKX Funding Rate
+
+- **Stale position filter** — Old pair names (e.g. "ETH/USD" before rename to "WETH/USD") were creating phantom positions from SQLite journal history. Added config-pair filter that drops positions whose pair names don't match current config on startup. (`engine.rs`)
+- **OKX funding rate for WETH** — `fetch_okx_funding()` wasn't using `exchange_base()` mapping. "WETH/USD" was being sent to OKX as "WETH-USDT-SWAP" (doesn't exist). Fixed to use "ETH-USDT-SWAP". (`insight/funding_rates.rs`)
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.11.3] — 2026-06-08
 
 ### Fixed — ETH/WETH Data Integrity
