@@ -444,7 +444,7 @@ async fn run_backtest_cmd(config: &AppConfig) -> anyhow::Result<()> {
 }
 
 fn print_help() {
-    println!("SAVANT TRADING ENGINE v0.9.1");
+    println!("SAVANT TRADING ENGINE v0.10.5");
     println!();
     println!("USAGE:");
     println!("  savant                    Start trading engine + API server");

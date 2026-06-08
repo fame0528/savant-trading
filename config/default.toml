@@ -97,7 +97,6 @@ max_risk_per_trade = 0.20
 # Position allocation — how much of the bankroll goes into each trade
 # At $30 with full_deploy: 100% of capital into single best-conviction trade
 # Safety comes from stop losses + daily loss + drawdown limits, not from shrinking positions
-# Safety comes from stop losses + daily loss + drawdown limits, not from shrinking positions
 dynamic_risk_tiers = [
     { balance = 500.0, risk_pct = 1.00 },    # Full deploy at low balance — 100% of capital into best trade
     { balance = 5000.0, risk_pct = 0.10 },    # 5 positions × 10% = 50% deployed
