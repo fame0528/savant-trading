@@ -102,6 +102,16 @@ impl Candle {
     pub fn lower_wick(&self) -> f64 {
         self.open.min(self.close) - self.low
     }
+
+    /// Return timestamp as Unix seconds.
+    pub fn timestamp_unix(&self) -> i64 {
+        self.timestamp.timestamp()
+    }
+
+    /// Return timestamp as RFC 3339 string.
+    pub fn timestamp_rfc3339(&self) -> String {
+        self.timestamp.to_rfc3339()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

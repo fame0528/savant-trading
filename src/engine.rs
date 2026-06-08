@@ -5,6 +5,9 @@ use tokio::time;
 use tracing::{debug, error, info, warn};
 
 use savant_trading::agent::context_builder::FullContext;
+use savant_trading::agent::context_engine::ContextEngine;
+use savant_trading::agent::context_state::ContextState;
+use savant_trading::agent::decision_log::DecisionLog;
 use savant_trading::agent::knowledge::KnowledgeBase;
 use savant_trading::agent::openrouter_management::OpenRouterManagementClient;
 use savant_trading::agent::orchestrator::{AgentConfig, AgentOrchestrator, AutonomyLevel};
@@ -539,10 +542,19 @@ pub async fn run(
         max_retries: config.ai.max_retries,
     };
 
-    let agent = AgentOrchestrator::new(provider, agent_config, knowledge_base, composer);
+    let mut agent = AgentOrchestrator::new(provider, agent_config, knowledge_base, composer);
+    let mut ctx_engine = ContextEngine::new(config.context.clone());
+    let mut ctx_state = ContextState::new(
+        config.context.microcompact_soft_ratio,
+        config.context.microcompact_hard_ratio,
+    );
+    let mut decision_log = DecisionLog::open(
+        "data/decision_log.json",
+        config.context.decision_log_max_entries,
+    );
     info!(
-        "AI agent initialized: {:?} mode with provider '{}'",
-        autonomy, config.ai.provider
+        "AI agent initialized: {:?} mode with provider '{}', encoding={}",
+        autonomy, config.ai.provider, ctx_engine.encoding_mode()
     );
 
     // === OPENROUTER MANAGEMENT (optional, only if management key is set) ===
@@ -1125,6 +1137,39 @@ pub async fn run(
             debug!("Drained {} WS messages", ws_messages_drained);
         }
 
+        // FID-085/086: Refresh candle data every cycle.
+        // Without this, candles are loaded once at startup and indicators go stale.
+        // WS ticker only updates the LAST candle's close — all other candles freeze.
+        {
+            let tf = config.trading.timeframe.clone();
+            let tf_minutes = parse_timeframe_minutes(&tf);
+            let mut candle_refresh_futures = tokio::task::JoinSet::new();
+            for pair in &active_pairs {
+                let router = candle_router.clone();
+                let pair_clone = pair.clone();
+                candle_refresh_futures.spawn(async move {
+                    let result = router.fetch_candles(&pair_clone, tf_minutes, 200).await;
+                    (pair_clone, result)
+                });
+            }
+            while let Some(result) = candle_refresh_futures.join_next().await {
+                if let Ok((pair, Ok(mut candles))) = result {
+                    if candles.len() > 1 {
+                        candles.pop(); // Remove incomplete last candle
+                    }
+                    if let Some(store) = market_stores.get_mut(&pair) {
+                        store.add_candles(candles);
+                    }
+                }
+            }
+            // Re-apply any live WS prices on top of fresh candles
+            for (pair, (price, _)) in &ws_ticker_prices {
+                if let Some(store) = market_stores.get_mut(pair) {
+                    store.update_last_close(*price);
+                }
+            }
+        }
+
         // Refresh insight every 5 ticks (all pairs, single funding API call)
         if tick.is_multiple_of(5) {
             insight.refresh_multi(&active_pairs).await;
@@ -1502,13 +1547,44 @@ pub async fn run(
                     live_price: ws_ticker_prices.get(pair).map(|(p, _)| *p),
                 };
 
-                let (system_prompt, user_message) =
-                    savant_trading::agent::context_builder::build_context(
-                        &ctx,
-                        agent.knowledge_base(),
-                        agent.composer(),
+                // Step 1: Select knowledge units and clone to release borrow on agent
+                let knowledge_units: Vec<savant_trading::agent::knowledge::KnowledgeUnit> = {
+                    let conditions = savant_trading::agent::context_builder::determine_conditions(&ctx);
+                    let selected = agent.knowledge_base().select_with_tags(
+                        &conditions,
+                        &ctx.context_tags,
                         config.ai.knowledge_token_budget,
                     );
+                    selected.into_iter().cloned().collect()
+                };
+                let knowledge_refs: Vec<&savant_trading::agent::knowledge::KnowledgeUnit> =
+                    knowledge_units.iter().collect();
+                
+                // Step 2: Compose prompt and build user message (mutable borrow of agent)
+                let system_prompt = agent.composer_mut().compose(&knowledge_refs);
+                let user_message_raw = ctx_engine.build_user_message_for(&ctx);
+
+                // FID-085: Delta-compression — skip if data hasn't changed
+                let user_message = match ctx_state.compute_delta(&user_message_raw, config.context.delta_compression_threshold) {
+                    savant_trading::agent::context_state::DeltaResult::NoChange => {
+                        tracing::debug!("Delta-compression: no change for {}", pair);
+                        user_message_raw
+                    }
+                    savant_trading::agent::context_state::DeltaResult::Delta(delta) => {
+                        delta
+                    }
+                    savant_trading::agent::context_state::DeltaResult::Full(text) => {
+                        text
+                    }
+                };
+
+                // FID-085: Anti-thrashing check
+                if ctx_state.should_skip_compression(config.context.anti_thrash_min_savings) {
+                    tracing::warn!("Anti-thrashing: skipping {} due to low compression efficiency", pair);
+                }
+
+                ctx_state.increment_cycle();
+
                 pair_data_vec.push(PairData {
                     pair: pair.clone(),
                     indicators,
@@ -1821,6 +1897,19 @@ pub async fn run(
                     };
                     shared.push_decision(decision_record);
 
+                    // FID-085: Append to persistent decision log
+                    decision_log.append(savant_trading::agent::decision_log::DecisionEntry {
+                        timestamp: Utc::now().to_rfc3339(),
+                        pair: decision.pair.clone(),
+                        action: action_label.to_string(),
+                        confidence: decision.confidence,
+                        risk_reward: decision.risk_reward,
+                        stop_loss: decision.stop_loss,
+                        take_profit: decision.take_profit_1,
+                        reasoning: decision.reasoning.clone(),
+                        outcome: None,
+                    });
+
                     // Activity feed: mirror terminal decisions (not PASS — too noisy)
                     if action_label != "PASS" {
                         shared
@@ -2108,6 +2197,17 @@ pub async fn run(
                                                             &trade.pair,
                                                             &format!("CLOSED {} | PnL: ${:.2} ({:.2}%)", trade.side, pnl, pnl_pct),
                                                         ).await;
+
+                                                        // FID-085: Update decision log with trade outcome
+                                                        decision_log.update_outcome(&trade.pair, savant_trading::agent::decision_log::TradeOutcome {
+                                                            raw_return_pct: pnl_pct,
+                                                            alpha_vs_benchmark: 0.0, // TODO: compute vs BTC benchmark
+                                                            reflection: if pnl > 0.0 {
+                                                                format!("WIN: {} closed at {:.4}, PnL ${:.2}", trade.side, exit_price, pnl)
+                                                            } else {
+                                                                format!("LOSS: {} closed at {:.4}, PnL ${:.2}", trade.side, exit_price, pnl)
+                                                            },
+                                                        });
 
                                                         // Update shared state immediately
                                                         {

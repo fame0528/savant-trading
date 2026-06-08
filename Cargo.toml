@@ -76,6 +76,9 @@ rlp = "0.5"
 # Regex — universal parser for freeform LLM output
 regex = "1"
 
+# BPE token counting (FID-085 Item 4)
+tiktoken-rs = "0.6"
+
 [dev-dependencies]
 wiremock = "0.6"
 

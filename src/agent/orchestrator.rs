@@ -214,6 +214,10 @@ impl AgentOrchestrator {
         &self.composer
     }
 
+    pub fn composer_mut(&mut self) -> &mut PromptComposer {
+        &mut self.composer
+    }
+
     pub fn provider_clone(&self) -> LlmProvider {
         LlmProvider::new(self.provider.config_clone())
     }

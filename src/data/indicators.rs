@@ -343,8 +343,160 @@ impl IndicatorEngine {
 
         result
     }
-}
 
+    /// ZigZag pivot extraction (FID-085 Phase 2).
+    ///
+    /// Identifies significant peaks and troughs in price data using an ATR-based
+    /// threshold. Falls back to 1.5% when ATR lookback is insufficient (< 14 periods).
+    ///
+    /// Returns a list of pivots as (index, price, is_peak) tuples.
+    #[allow(clippy::needless_range_loop)]
+    pub fn zigzag_pivots(candles: &[Candle], atr_period: usize) -> Vec<(usize, f64, bool)> {
+        if candles.len() < 3 {
+            return vec![];
+        }
+
+        // Compute ATR threshold. Fallback: 1.5% of price.
+        let atr_values = Self::atr(candles, atr_period);
+        let atr_threshold = if atr_values.len() >= atr_period {
+            atr_values.last().copied().unwrap_or(0.0)
+        } else {
+            // Fallback: 1.5% of average price
+            let avg_price: f64 = candles.iter().map(|c| c.close).sum::<f64>() / candles.len() as f64;
+            avg_price * 0.015
+        };
+
+        if atr_threshold <= 0.0 {
+            return vec![];
+        }
+
+        let mut pivots: Vec<(usize, f64, bool)> = Vec::new();
+        let mut direction: i8 = 0; // 0=unknown, 1=up, -1=down
+        let mut last_pivot_price = candles[0].close;
+        let mut extreme_idx = 0usize;
+        let mut extreme_price = candles[0].close;
+
+        for i in 1..candles.len() {
+            let high = candles[i].high;
+            let low = candles[i].low;
+
+            if direction == 0 {
+                // Determine initial direction
+                if high - last_pivot_price >= atr_threshold {
+                    direction = 1;
+                    extreme_price = high;
+                    extreme_idx = i;
+                } else if last_pivot_price - low >= atr_threshold {
+                    direction = -1;
+                    extreme_price = low;
+                    extreme_idx = i;
+                }
+                continue;
+            }
+
+            if direction == 1 {
+                // Looking for peak
+                if high > extreme_price {
+                    extreme_price = high;
+                    extreme_idx = i;
+                }
+                if extreme_price - low >= atr_threshold {
+                    // Confirmed peak
+                    pivots.push((extreme_idx, extreme_price, true));
+                    direction = -1;
+                    last_pivot_price = extreme_price;
+                    extreme_price = low;
+                    extreme_idx = i;
+                }
+            } else {
+                // Looking for trough
+                if low < extreme_price {
+                    extreme_price = low;
+                    extreme_idx = i;
+                }
+                if high - extreme_price >= atr_threshold {
+                    // Confirmed trough
+                    pivots.push((extreme_idx, extreme_price, false));
+                    direction = 1;
+                    last_pivot_price = extreme_price;
+                    extreme_price = high;
+                    extreme_idx = i;
+                }
+            }
+        }
+
+        // Add the last extreme as a pivot if we have enough data
+        if pivots.len() >= 2 {
+            let is_peak = direction == 1;
+            pivots.push((extreme_idx, extreme_price, is_peak));
+        }
+
+        pivots
+    }
+
+    /// KBar feature extraction (FID-085 Phase 2).
+    ///
+    /// Pre-computes statistical features from candle data for compact representation.
+    /// Returns: (z_score, annualized_vol, trend_score, volume_ratio)
+    ///
+    /// Requires at least 20 candles for meaningful features.
+    pub fn kbar_features(candles: &[Candle]) -> Option<(f64, f64, f64, f64)> {
+        if candles.len() < 20 {
+            return None;
+        }
+
+        let n = candles.len();
+        let closes: Vec<f64> = candles.iter().map(|c| c.close).collect();
+        let volumes: Vec<f64> = candles.iter().map(|c| c.volume).collect();
+
+        // SMA20 of closes
+        let sma20: f64 = closes[n - 20..].iter().sum::<f64>() / 20.0;
+        let last_close = closes[n - 1];
+
+        // z-score: distance from SMA20 in standard deviations
+        let variance: f64 = closes[n - 20..]
+            .iter()
+            .map(|c| (c - sma20).powi(2))
+            .sum::<f64>()
+            / 20.0;
+        let std_dev = variance.sqrt();
+        let z_score = if std_dev > 0.0 {
+            (last_close - sma20) / std_dev
+        } else {
+            0.0
+        };
+
+        // Annualized volatility from 20-period returns
+        let returns: Vec<f64> = closes[n - 20..]
+            .windows(2)
+            .map(|w| (w[1] / w[0]).ln())
+            .collect();
+        let vol_variance: f64 = returns.iter().map(|r| r.powi(2)).sum::<f64>() / returns.len() as f64;
+        let annualized_vol = vol_variance.sqrt() * (525_960.0_f64).sqrt(); // 5-min candles per year
+
+        // Trend score: linear regression slope over 20 periods
+        let x_mean = 9.5f64; // mean of 0..19
+        let y_mean = closes[n - 20..].iter().sum::<f64>() / 20.0;
+        let mut xy_sum = 0.0f64;
+        let mut xx_sum = 0.0f64;
+        for (i, &y) in closes[n - 20..].iter().enumerate() {
+            let x = i as f64;
+            xy_sum += (x - x_mean) * (y - y_mean);
+            xx_sum += (x - x_mean).powi(2);
+        }
+        let trend_score = if xx_sum > 0.0 { xy_sum / xx_sum } else { 0.0 };
+
+        // Volume ratio: current volume vs SMA20 volume
+        let vol_sma20: f64 = volumes[n - 20..].iter().sum::<f64>() / 20.0;
+        let volume_ratio = if vol_sma20 > 0.0 {
+            volumes[n - 1] / vol_sma20
+        } else {
+            1.0
+        };
+
+        Some((z_score, annualized_vol, trend_score, volume_ratio))
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -467,5 +619,46 @@ mod tests {
         let indicators = IndicatorEngine::calculate_all(&[], 14);
         assert!(indicators.ema_fast.is_none());
         assert!(indicators.rsi.is_none());
+    }
+
+    #[test]
+    fn zigzag_detects_pivots() {
+        // Price goes up then down then up — enough variation for pivots
+        let prices: Vec<f64> = vec![
+            100.0, 102.0, 104.0, 106.0, 108.0, 110.0,
+            108.0, 106.0, 104.0, 102.0, 100.0, 98.0,
+            100.0, 102.0, 104.0, 106.0, 108.0, 110.0,
+            108.0, 106.0, 104.0, 102.0, 100.0, 98.0,
+            100.0, 102.0, 104.0, 106.0, 108.0, 110.0,
+        ];
+        let candles = make_candles(prices);
+        let pivots = IndicatorEngine::zigzag_pivots(&candles, 14);
+        assert!(pivots.len() >= 2, "Expected >= 2 pivots, got {}", pivots.len());
+    }
+
+    #[test]
+    fn zigzag_empty_input() {
+        let pivots = IndicatorEngine::zigzag_pivots(&[], 14);
+        assert!(pivots.is_empty());
+    }
+
+    #[test]
+    fn kbar_features_computed() {
+        let prices: Vec<f64> = (0..50).map(|i| 100.0 + (i as f64 * 0.5)).collect();
+        let candles = make_candles(prices);
+        let features = IndicatorEngine::kbar_features(&candles);
+        assert!(features.is_some());
+        let (_z, vol, trend, vol_ratio) = features.unwrap();
+        assert!(vol >= 0.0);
+        assert!(vol_ratio >= 0.0);
+        assert!(trend > 0.0, "Expected positive trend for uptrend, got {}", trend);
+    }
+
+    #[test]
+    fn kbar_features_insufficient_data() {
+        let prices: Vec<f64> = (0..10).map(|i| 100.0 + i as f64).collect();
+        let candles = make_candles(prices);
+        let features = IndicatorEngine::kbar_features(&candles);
+        assert!(features.is_none());
     }
 }

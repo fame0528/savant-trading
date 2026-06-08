@@ -12,6 +12,8 @@ pub struct AppConfig {
     pub strategy: StrategyConfig,
     pub mode: ModeConfig,
     pub ai: AiConfig,
+    #[serde(default)]
+    pub context: ContextConfig,
     pub insight: InsightConfig,
     #[serde(default)]
     pub training: TrainingConfig,
@@ -236,6 +238,156 @@ pub struct AiConfig {
     pub openrouter: OpenRouterConfig,
     #[serde(default)]
     pub nvidia: NvidiaConfig,
+}
+
+/// Context management configuration (FID-085).
+///
+/// Controls prompt assembly, encoding, caching, and compaction.
+#[derive(Debug, Clone, Deserialize)]
+pub struct ContextConfig {
+    /// Encoding mode for OHLC data: "json" | "tsln" | "zigzag"
+    #[serde(default = "default_encoding_mode")]
+    pub encoding_mode: String,
+    /// Brain cache TTL in seconds (how long the static prefix stays cached)
+    #[serde(default = "default_brain_cache_ttl")]
+    pub brain_cache_ttl: u64,
+    /// Delta compression threshold: skip data injection if changed less than this fraction
+    #[serde(default = "default_delta_threshold")]
+    pub delta_compression_threshold: f64,
+    /// Anti-thrash: minimum savings fraction over 2 cycles to continue compression
+    #[serde(default = "default_anti_thrash_min_savings")]
+    pub anti_thrash_min_savings: f64,
+    /// Hard minimum context window (tokens) — warn if model is below this
+    #[serde(default = "default_min_context_guard")]
+    pub min_context_guard: u32,
+    /// Warn if context window is below this many tokens
+    #[serde(default = "default_warn_context_guard")]
+    pub warn_context_guard: u32,
+    /// Max decision log entries before rotation
+    #[serde(default = "default_decision_log_max_entries")]
+    pub decision_log_max_entries: usize,
+    /// Budget for knowledge tokens
+    #[serde(default = "default_knowledge_token_budget")]
+    pub knowledge_token_budget: usize,
+    /// SGDR epoch length in cycles
+    #[serde(default = "default_sgdr_epoch_length")]
+    pub sgdr_epoch_length: usize,
+    /// SGDR max token budget (scanning phase)
+    #[serde(default = "default_sgdr_max_budget")]
+    pub sgdr_max_budget: u32,
+    /// SGDR min token budget (monitoring phase)
+    #[serde(default = "default_sgdr_min_budget")]
+    pub sgdr_min_budget: u32,
+    /// Candle count for ranging markets (ADX < 15)
+    #[serde(default = "default_candles_ranging")]
+    pub adaptive_candles_ranging: usize,
+    /// Candle count for trending markets (ADX > 25)
+    #[serde(default = "default_candles_trending")]
+    pub adaptive_candles_trending: usize,
+    /// Candle count for volatile markets (GK > 2x avg)
+    #[serde(default = "default_candles_volatile")]
+    pub adaptive_candles_volatile: usize,
+    /// Microcompaction soft trim ratio
+    #[serde(default = "default_microcompact_soft_ratio")]
+    pub microcompact_soft_ratio: f64,
+    /// Microcompaction hard clear ratio
+    #[serde(default = "default_microcompact_hard_ratio")]
+    pub microcompact_hard_ratio: f64,
+    /// Price data TTL in milliseconds
+    #[serde(default = "default_ttl_prices_ms")]
+    pub ttl_prices_ms: u64,
+    /// Indicator data TTL in milliseconds
+    #[serde(default = "default_ttl_indicators_ms")]
+    pub ttl_indicators_ms: u64,
+    /// Enable session-sticky routing for cache affinity
+    #[serde(default = "default_true")]
+    pub provider_session_sticky: bool,
+}
+
+fn default_knowledge_token_budget() -> usize {
+    20000
+}
+
+impl Default for ContextConfig {
+    fn default() -> Self {
+        Self {
+            encoding_mode: default_encoding_mode(),
+            brain_cache_ttl: default_brain_cache_ttl(),
+            delta_compression_threshold: default_delta_threshold(),
+            anti_thrash_min_savings: default_anti_thrash_min_savings(),
+            min_context_guard: default_min_context_guard(),
+            warn_context_guard: default_warn_context_guard(),
+            decision_log_max_entries: default_decision_log_max_entries(),
+            sgdr_epoch_length: default_sgdr_epoch_length(),
+            sgdr_max_budget: default_sgdr_max_budget(),
+            sgdr_min_budget: default_sgdr_min_budget(),
+            adaptive_candles_ranging: default_candles_ranging(),
+            adaptive_candles_trending: default_candles_trending(),
+            adaptive_candles_volatile: default_candles_volatile(),
+            microcompact_soft_ratio: default_microcompact_soft_ratio(),
+            microcompact_hard_ratio: default_microcompact_hard_ratio(),
+            ttl_prices_ms: default_ttl_prices_ms(),
+            ttl_indicators_ms: default_ttl_indicators_ms(),
+            provider_session_sticky: default_true(),
+            knowledge_token_budget: default_knowledge_token_budget(),
+        }
+    }
+}
+
+fn default_encoding_mode() -> String {
+    "tsln".to_string()
+}
+fn default_brain_cache_ttl() -> u64 {
+    3600
+}
+fn default_delta_threshold() -> f64 {
+    0.02
+}
+fn default_anti_thrash_min_savings() -> f64 {
+    0.10
+}
+fn default_min_context_guard() -> u32 {
+    4096
+}
+fn default_warn_context_guard() -> u32 {
+    8192
+}
+fn default_decision_log_max_entries() -> usize {
+    500
+}
+fn default_sgdr_epoch_length() -> usize {
+    288
+}
+fn default_sgdr_max_budget() -> u32 {
+    8000
+}
+fn default_sgdr_min_budget() -> u32 {
+    3000
+}
+fn default_candles_ranging() -> usize {
+    50
+}
+fn default_candles_trending() -> usize {
+    100
+}
+fn default_candles_volatile() -> usize {
+    200
+}
+fn default_microcompact_soft_ratio() -> f64 {
+    0.30
+}
+fn default_microcompact_hard_ratio() -> f64 {
+    0.50
+}
+fn default_ttl_prices_ms() -> u64 {
+    300_000
+}
+fn default_ttl_indicators_ms() -> u64 {
+    3_600_000
+}
+
+fn default_true() -> bool {
+    true
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -540,6 +692,7 @@ impl Default for AppConfig {
                 openrouter: OpenRouterConfig::default(),
                 nvidia: NvidiaConfig::default(),
             },
+            context: ContextConfig::default(),
             insight: InsightConfig {
                 funding_rate_enabled: true,
                 liquidation_enabled: true,

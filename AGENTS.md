@@ -16,7 +16,7 @@ Never push code without updating CHANGELOG + README first. Never skip the GitHub
 
 ```bash
 cargo clippy -- -D warnings   # Zero warnings
-cargo test                     # 217 tests
+cargo test                     # 264 tests
 cargo build --release          # Release build
 cd dashboard && npm run build  # Dashboard TypeScript
 ```

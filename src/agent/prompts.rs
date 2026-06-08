@@ -16,8 +16,21 @@ pub struct PromptLayer {
 }
 
 /// Composes the system prompt from fixed layers + dynamic knowledge.
+///
+/// The Brain is partitioned into:
+/// - **Immutable:** base_identity, risk_constraints, strategy_knowledge, output_format
+///   (cached permanently, never re-serialized)
+/// - **Mutable:** knowledge_units (cached until market conditions change)
+///
+/// The immutable portion is composed once and stored as `Arc<String>`.
+/// The mutable portion is composed per evaluation but cached via digest.
 pub struct PromptComposer {
     layers: Vec<PromptLayer>,
+    /// Cached immutable Brain portion (fixed layers only).
+    /// Computed once at init via `compute_immutable_brain()`.
+    immutable_brain: Option<String>,
+    /// SHA-256 digest of the last mutable section for change detection.
+    mutable_digest: Option<String>,
 }
 
 impl PromptComposer {
@@ -28,36 +41,108 @@ impl PromptComposer {
         strategy_knowledge: &str,
         output_format: &str,
     ) -> Self {
-        Self {
-            layers: vec![
-                PromptLayer {
-                    name: "base_identity".to_string(),
-                    content: base_identity.to_string(),
-                },
-                PromptLayer {
-                    name: "risk_constraints".to_string(),
-                    content: risk_constraints.to_string(),
-                },
-                PromptLayer {
-                    name: "strategy_knowledge".to_string(),
-                    content: strategy_knowledge.to_string(),
-                },
-                PromptLayer {
-                    name: "output_format".to_string(),
-                    content: output_format.to_string(),
-                },
-            ],
-        }
+        let layers = vec![
+            PromptLayer {
+                name: "base_identity".to_string(),
+                content: base_identity.to_string(),
+            },
+            PromptLayer {
+                name: "risk_constraints".to_string(),
+                content: risk_constraints.to_string(),
+            },
+            PromptLayer {
+                name: "strategy_knowledge".to_string(),
+                content: strategy_knowledge.to_string(),
+            },
+            PromptLayer {
+                name: "output_format".to_string(),
+                content: output_format.to_string(),
+            },
+        ];
+
+        let mut composer = Self {
+            layers,
+            immutable_brain: None,
+            mutable_digest: None,
+        };
+        composer.compute_immutable_brain();
+        composer
     }
 
-    /// Compose the full system prompt with selected knowledge units injected.
-    pub fn compose(&self, knowledge_units: &[&KnowledgeUnit]) -> String {
+    /// Compute the immutable Brain portion (fixed layers only).
+    /// Called once at init. The output is cached permanently.
+    fn compute_immutable_brain(&mut self) {
         let mut parts: Vec<String> = Vec::new();
-
-        // Add fixed layers (base_identity, risk_constraints, strategy_knowledge, echo_rules)
         for layer in &self.layers {
             if layer.name != "output_format" {
                 parts.push(layer.content.clone());
+            }
+        }
+        // Output format always comes last in the Brain
+        if let Some(output_layer) = self.layers.iter().find(|l| l.name == "output_format") {
+            parts.push(output_layer.content.clone());
+        }
+        self.immutable_brain = Some(parts.join("\n\n"));
+    }
+
+    /// Get the immutable Brain string (cached permanently).
+    pub fn immutable_brain(&self) -> Option<&str> {
+        self.immutable_brain.as_deref()
+    }
+
+    /// Compose the mutable knowledge section.
+    /// Cached: if the knowledge selection hasn't changed (same digest), returns cached result.
+    /// Returns (knowledge_section, digest).
+    pub fn compose_mutable(
+        &mut self,
+        knowledge_units: &[&KnowledgeUnit],
+    ) -> (String, String) {
+        let mut knowledge_section = String::new();
+
+        if !knowledge_units.is_empty() {
+            knowledge_section.push_str("## Relevant Trading Knowledge\n\n");
+            for unit in knowledge_units {
+                knowledge_section.push_str(&format!(
+                    "### [{}] {}\n{}\n\n",
+                    unit.source,
+                    unit.topic_as_str(),
+                    unit.content
+                ));
+            }
+        }
+
+        // Compute digest for change detection
+        let digest = format!("{:x}", {
+            use std::collections::hash_map::DefaultHasher;
+            use std::hash::{Hash, Hasher};
+            let mut hasher = DefaultHasher::new();
+            knowledge_section.hash(&mut hasher);
+            hasher.finish()
+        });
+
+        self.mutable_digest = Some(digest.clone());
+        (knowledge_section, digest)
+    }
+
+    /// Check if the current mutable digest matches a previous one.
+    pub fn is_mutable_unchanged(&self, digest: &str) -> bool {
+        self.mutable_digest.as_deref() == Some(digest)
+    }
+
+    /// Legacy: Compose the full system prompt (for backward compatibility).
+    /// Prefer using `immutable_brain()` + `compose_mutable()` for FID-085 optimizations.
+    pub fn compose(&self, knowledge_units: &[&KnowledgeUnit]) -> String {
+        let mut parts: Vec<String> = Vec::new();
+
+        // Use cached immutable brain if available
+        if let Some(ref brain) = self.immutable_brain {
+            parts.push(brain.clone());
+        } else {
+            // Fallback: compose from layers
+            for layer in &self.layers {
+                if layer.name != "output_format" {
+                    parts.push(layer.content.clone());
+                }
             }
         }
 
@@ -80,7 +165,7 @@ impl PromptComposer {
             parts.push(output_layer.content.clone());
         }
 
-        parts.join("\n\n---\n\n")
+        parts.join("\n\n")
     }
 }
 

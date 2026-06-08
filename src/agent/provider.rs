@@ -257,15 +257,25 @@ impl LlmProvider {
     }
 
     fn build_body(&self, system: &str, messages: &[Message], stream: bool) -> serde_json::Value {
+        // FID-085: Check model capabilities for cache_control support
+        let caps = crate::agent::provider_caps::ModelCapabilities::for_model(&self.config.model);
+
         // KV cache optimization (FID-035): Mark system message with cache_control
         // so OpenRouter can cache the static prefix (rules, risk, knowledge).
         // Dynamic content (candles, indicators) is in user messages only.
         // Expected: 40-60% reduction in TTFT for repeated evaluations.
-        let system_msg = serde_json::json!({
-            "role": "system",
-            "content": system,
-            "cache_control": { "type": "ephemeral" }
-        });
+        let system_msg = if caps.supports_cache_control {
+            serde_json::json!({
+                "role": "system",
+                "content": system,
+                "cache_control": { "type": "ephemeral" }
+            })
+        } else {
+            serde_json::json!({
+                "role": "system",
+                "content": system
+            })
+        };
 
         let mut all_messages = vec![system_msg];
         for msg in messages {

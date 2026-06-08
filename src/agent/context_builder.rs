@@ -60,7 +60,7 @@ pub fn build_context(
 }
 
 /// Determine current market conditions from context.
-fn determine_conditions(ctx: &FullContext) -> Vec<MarketCondition> {
+pub fn determine_conditions(ctx: &FullContext) -> Vec<MarketCondition> {
     let mut conditions = determine_conditions_static(
         ctx.regime,
         ctx.market_context.sentiment.fear_greed_index,

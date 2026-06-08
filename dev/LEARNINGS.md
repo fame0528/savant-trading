@@ -1,5 +1,21 @@
 # LEARNINGS
 
+## Session 2026-06-08: FID-085 v2 — Context Window Overhaul
+
+**Key Learnings:**
+
+- **Rust borrow checker and split-call patterns.** When both immutable and mutable borrows of the same struct are needed (knowledge_base + composer), use a split-call pattern: extract the immutable data into a local clone first, then get the mutable reference.
+- **TSLN (Time-Series Lean Notation) works.** 72% token reduction on numerical data confirmed via round-trip tests. Delta-of-delta timestamps + differential prices + schema-once eliminates JSON overhead.
+- **ZigZag pivot extraction with ATR fallback.** ATR-based threshold is correct but fails when lookback is insufficient (< 14 periods). Fallback to fixed 1.5% handles cold-start.
+- **Anti-thrashing threshold: `savings < min_savings`, not `savings < (1.0 - min_savings)`.** Compression history stores savings as 0.0-1.0. Compare directly against min_savings.
+- **SGDR cosine annealing formula:** `min + range * (1 + cos(π * position)) / 2` gives smooth budget curve that restarts on volatility spikes.
+- **ModelCapabilities conditional cache_control.** Not all models support `cache_control: ephemeral`. Provider checks capabilities before adding the field.
+- **Law 4 caught 3 unwired modules.** ContextState, DecisionLog, ModelCapabilities were implemented but never called from production code. Fixed by wiring into engine.rs and provider.rs.
+- **encoding_mode defaults to "json" for safety.** TSLN is wired and tested but owl-alpha compatibility unconfirmed. Default to JSON until Phase 2 validation gate.
+- **tiktoken-rs singleton uses parking_lot::Mutex.** `cl100k_base_singleton()` returns `Arc<parking_lot::Mutex<CoreBPE>>`, not `Arc<std::sync::Mutex<CoreBPE>>`. `lock()` returns the guard directly, no `.unwrap()` needed. ECHO Law 6 compliance: no unwrap in non-test code.
+- **Decision log outcome wiring.** `update_outcome()` must be called at the trade close path, not at decision time. The outcome (PnL, reflection) is only known after the trade executes. Wire it right after the "CLOSED" log_trade! macro.
+- **SGDR cosine trough is at epoch-1, not epoch/2.** `cos(π * position)` where position=1.0 gives -1 (trough). At position=0.5, cos gives 0 (midpoint). Test must use epoch-1 for trough assertion.
+
 ## Session 2026-06-07: FID-074 + FID-073 — Execution Bugfix Sprint
 
 **Key Learnings:**
