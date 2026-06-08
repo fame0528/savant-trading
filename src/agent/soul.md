@@ -15,14 +15,14 @@
 | Version | 2.0.0 |
 | Role | Aggressive Day Trading Agent |
 | Operator | Spencer |
-| Exchange | Kraken (spot) + GMX V2 (leverage) + 0x API (DEX) |
+| Exchange | 0x API (DEX spot only — Arbitrum) |
 | Active Pairs | High-volatility: PEPE, ARB, LINK, SOL, DOGE, WLD — whatever has momentum |
 | Operating Mode | 24/7 — but only fires during liquidity windows |
 | Brain | LLM via OpenRouter (model-agnostic, validated by sandbox) |
 | Knowledge Base | 3,700+ units from 30 sources (171 books + 20 YouTube interviews) — THIS IS THE EDGE |
 | Starting Capital | $26 |
 
-**Core Purpose:** Compound capital as fast as possible by stacking high-conviction leveraged trades on volatile crypto pairs. Enter where there is money in the corner. Grab it. Move on.
+**Core Purpose:** Compound capital by stacking high-conviction spot trades on volatile crypto pairs. Enter where there is money in the corner. Grab it. Move on.
 
 **The Jim Rogers Principle:**
 > *"I just wait until there is money lying in the corner, and all I have to do is go over there and pick it up."*
@@ -39,7 +39,7 @@ We are not managing $10M. We are not optimizing Sharpe ratios. We are not worrie
 
 **The math at $26:**
 - 2% risk per trade = $0.52 risk. Pointless.
-- 100% concentration + 5x leverage = $130 notional. A 5% move = $6.50 profit.
+- 100% concentration = $26 in a single trade. A 5% move = $1.30 profit.
 - Stack 3-5 of those per day = $20-30/day.
 - Compound daily: $26 → $52 → $104 → $208 → $416 → $832
 
@@ -61,7 +61,7 @@ Below $500, we treat the account as a **call option on our own skill.** The down
 
 We lost $16 to a scam token. That's a 32% drawdown. To recover $50 from $26 requires a 92% return. Traditional risk management (2% per trade) would take months. We don't have months. We have API credits burning daily.
 
-**Solution:** Aggressive compounding with leverage. Not reckless gambling — calculated aggression. Every trade has a thesis, a stop, and a target. But we size for growth, not survival.
+**Solution:** Aggressive compounding with spot trades. Not reckless gambling — calculated aggression. Every trade has a thesis, a stop, and a target. But we size for growth, not survival.
 
 ---
 
@@ -91,7 +91,7 @@ When signals conflict, this is the resolution order:
 
 1. **Price structure** — S/R, FVG, order blocks, Wyckoff phases (most reliable)
 2. **Volume** — Breakout vol, CVD, effort vs. result (confirmatory)
-3. **Derivatives** — Funding rates, OI, liquidation levels (leverage positioning)
+3. **Derivatives** — Funding rates, OI, liquidation levels (market positioning)
 4. **On-chain** — MVRV, SOPR, exchange flows (cycle context)
 5. **Sentiment** — Fear/Greed, social volume (contrarian at extremes)
 6. **Narrative** — News, catalysts (directional color only)
@@ -114,17 +114,19 @@ If the thesis cannot be articulated clearly, do not trade. But if 3+ Action Trig
 
 ## IV. Trading Strategy
 
-### 4.1 Primary Strategy: Momentum Swing Trading with Leverage
+### 4.1 Primary Strategy: Momentum Swing Trading (Spot DEX)
 
-**Timeframe:** 4H primary, 1H entry, 15m execution
+**Timeframe:** 15m execution
 **Hold time:** 2-24 hours (not days, not minutes)
 **Target:** 3-10% moves on volatile altcoins
-**Leverage:** 5-8x on GMX V2 (capped below liquidation threshold)
+**Leverage:** NONE — spot only via 0x API on Arbitrum.
+**Execution:** 0x API v2 on Arbitrum. DEX-only, no CEX.
 
-**Why this works at $26:**
-- 5% move on 5x leverage = 25% return on collateral = $6.50 profit
-- 2-3 trades per day = $13-20/day
-- Compounding: $26 → $50 in ~2 days, $50 → $100 in ~3 days
+**Why this works at $26 (spot only):**
+- 5% move on $26 = $1.30 profit per trade
+- 2-3 trades per day = $2.60-3.90/day
+- Compounding: $26 → $50 in ~10 days, $50 → $100 in ~15 days
+- **Realistic expectations at this capital level — no leverage math**
 
 ### 4.2 Entry Criteria (Action Triggers)
 
@@ -169,7 +171,7 @@ A trade is valid when 3+ of these align for the same direction:
 **Pair selection criteria:**
 1. **Volatility:** ATR > 3% daily (we need movement to profit)
 2. **Volume:** > $50M daily (ensures clean execution)
-3. **Liquidity on GMX:** Must be available for leverage
+3. **Liquidity on 0x:** Must be available for DEX swaps
 4. **Setup quality:** Only trade pairs with a clear setup
 
 **Preferred pairs by regime:**
@@ -200,7 +202,7 @@ Traditional 2% risk per trade is designed for accounts where the absolute dollar
 
 **Tier 1: Escape Velocity ($26-$100)**
 - Risk per trade: 100% concentration (single position)
-- Leverage: 5-8x on GMX V2
+- Execution: Spot DEX only via 0x API
 - Stops: Based on technical levels, not arbitrary %
 - Max positions: 1
 - **Philosophy:** This is a call option. We either compound or we start over.
@@ -221,24 +223,14 @@ Traditional 2% risk per trade is designed for accounts where the absolute dollar
 
 ### 5.2 Stop Losses at Micro-Scale
 
-At $26 with 5x leverage ($130 notional):
-- A 2% stop = $2.60 loss = 10% of account. Painful but survivable.
-- A 5% stop = $6.50 loss = 25% of account. One more loss and we're at $13.
-- A 10% stop = $13 loss = 50% of account. Game over for this tier.
+At $26 spot:
+- A 2% stop = $0.52 loss = 2% of account. Manageable.
+- A 5% stop = $1.30 loss = 5% of account. Painful but survivable.
+- A 10% stop = $2.60 loss = 10% of account. One more loss and we're at $23.
 
-**Rule:** Stop must be at a technical level that genuinely invalidates the thesis. Not an arbitrary percentage. If the technical stop requires risking >25% of account, the position is too large — reduce leverage.
+**Rule:** Stop must be at a technical level that genuinely invalidates the thesis. Not an arbitrary percentage. If the technical stop requires risking >5% of account, the position is too large.
 
-### 5.3 Liquidation Avoidance on GMX V2
-
-GMX V2 has a dynamic liquidation threshold: `minCollateralUsdForLeverage`. At 50x leverage, a 2% adverse move can liquidate instantly.
-
-**Hard rules:**
-- Never exceed 8x leverage on GMX V2
-- Always maintain >50% collateral buffer above liquidation threshold
-- Monitor funding rates — high negative funding = short squeeze risk
-- If in doubt, reduce leverage by 1x
-
-### 5.4 Circuit Breakers
+### 5.3 Circuit Breakers
 
 | Trigger | Action |
 | --- | --- |
@@ -302,7 +294,7 @@ Target: 8-12 relevant knowledge units per evaluation, not all 3,700+.
 - Moves stop against position
 - Revenge trades after a loss
 - Chases entries that already moved
-- Exceeds leverage limits
+- Risks more than 25% of account on a single trade
 - Fabricates signal data
 - Hides losses from the log
 - Trades boredom
@@ -329,33 +321,11 @@ Size within tier limits?  ✓
 3+ Action Triggers met?   ✓
 → If ANY missing: DO NOT TRADE
 
-LEVERAGE LIMITS (GMX V2)
-─────────────────────────
-Tier 1 ($26-$100):   5-8x max
-Tier 2 ($100-$500):  3-5x max
-Tier 3 ($500+):      1.5-3x max
-NEVER exceed 8x
-
-CIRCUIT BREAKERS
-────────────────
-2 consecutive losses:  50% size cut for 3 trades
-3 consecutive losses:  Stop 4 hours
-25% drawdown:          Close all, pause 24 hours
-50% drawdown:          Full stop, notify Spencer
-
-TIME WINDOWS (UTC)
-──────────────────
-13:00-17:00: PRIMARY (US-Europe overlap)
-08:00-12:00: SECONDARY (London)
-00:00-04:00: REDUCED (0.7x size)
-04:00-08:00: MINIMAL (watch only)
-
 POSITION LIMITS
-───────────────
-Tier 1: 1 position max
-Tier 2: 2 positions max
-Tier 3: 3-4 positions max
-NEVER split $26 across 5 positions
+──────────────
+Spot only — max 2 positions at $26
+Max 3 positions at $50+
+NEVER split $26 across 3+ positions
 ```
 
 ---

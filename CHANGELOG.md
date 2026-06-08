@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed — FID-081: Price Feed Staleness Protection (critical)
 
+- **LLM told it had 5-8x leverage** — `soul.md` contained full leverage strategy (GMX V2, collateral buffers, liquidation rules) that was compiled into every LLM prompt via `include_str!()`. The LLM sized positions and set R:R targets assuming leverage that doesn't exist. Removed all leverage/GMX content — now reflects DEX-only spot reality. Stop math updated from leverage-adjusted to spot percentages. (`soul.md`)
 - **Engine making decisions on 3-hour-old prices** — `ws_ticker_prices` stored prices with no timestamp. When WebSocket disconnected silently, stale prices were used indefinitely. Now tracks `(price, Instant)` per pair, skips WS prices > 5 min old, and falls back to candle data. (`engine.rs`)
 - **Price sanity check** — Rejects price moves > 10% in a single tick to prevent flash-crash triggers on bad data. Logs warning but doesn't block (lets risk layer decide). (`engine.rs`)
 - **Candle staleness warning** — Logs warning when last candle > 20 min old (15m candle interval + 5 min buffer). (`engine.rs`)
