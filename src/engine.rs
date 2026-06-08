@@ -1566,22 +1566,25 @@ pub async fn run(
 
                 // FID-085: Delta-compression for observability ONLY.
                 // Always send the full prompt to the LLM — never strip context.
-                // The delta % is logged so we can monitor data freshness.
-                match ctx_state.compute_delta(&user_message, config.context.delta_compression_threshold) {
-                    savant_trading::agent::context_state::DeltaResult::NoChange => {
-                        tracing::debug!("Delta: {} — identical to last cycle", pair);
+                // The delta % is logged at debug level to avoid noise.
+                let delta_result = ctx_state.compute_delta(&user_message, config.context.delta_compression_threshold);
+                if tracing::enabled!(tracing::Level::DEBUG) {
+                    match delta_result {
+                        savant_trading::agent::context_state::DeltaResult::NoChange => {
+                            tracing::debug!("Delta: {} — identical to last cycle", pair);
+                        }
+                        savant_trading::agent::context_state::DeltaResult::Delta(_) => {
+                            tracing::debug!("Delta: {} — small change, full prompt sent", pair);
+                        }
+                        savant_trading::agent::context_state::DeltaResult::Full(_) => {
+                            tracing::debug!("Delta: {} — full data injection", pair);
+                        }
                     }
-                    savant_trading::agent::context_state::DeltaResult::Delta(_) => {
-                        tracing::debug!("Delta: {} — small change, full prompt sent", pair);
-                    }
-                    savant_trading::agent::context_state::DeltaResult::Full(_) => {
-                        tracing::debug!("Delta: {} — full data injection", pair);
-                    }
-                };
+                }
 
-                // FID-085: Anti-thrashing check (observability only)
+                // FID-085: Anti-thrashing check (observability only, debug level)
                 if ctx_state.should_skip_compression(config.context.anti_thrash_min_savings) {
-                    tracing::warn!("Anti-thrashing: {} has low compression efficiency", pair);
+                    tracing::debug!("Anti-thrashing: {} has low compression efficiency", pair);
                 }
 
                 ctx_state.increment_cycle();
