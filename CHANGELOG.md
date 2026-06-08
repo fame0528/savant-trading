@@ -6,8 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.10.5] — 2026-06-07
 
-### Version bump
-- Previous v0.10.4 release used same version across multiple pushes. Correcting to v0.10.5.
+### Changed — Cycle Interval: 15m → 5m
+
+- **Timeframe changed from 15m to 5m** — With owl-alpha (free model), API cost is $0. More frequent scanning catches moves faster. Trailing stops update every 5 minutes instead of 15. AI Decisions countdown updated to match. (`config/default.toml`, `page.tsx`)
 
 ## [0.10.4] — 2026-06-07
 

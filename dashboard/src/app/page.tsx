@@ -564,7 +564,7 @@ export default function Dashboard() {
             if (decisions.length === 0) return "live";
             const last = new Date(decisions[0].timestamp).getTime();
             const elapsed = Date.now() - last;
-            const interval = 15 * 60 * 1000; // 15 min cycle
+            const interval = 5 * 60 * 1000; // 5 min cycle (was 15m with paid model)
             const remaining = Math.max(0, interval - elapsed);
             if (remaining === 0) return `${dayjs(decisions[0].timestamp).fromNow(true)} ago · next cycle soon`;
             const mins = Math.ceil(remaining / 60000);

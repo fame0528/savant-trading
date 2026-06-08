@@ -82,7 +82,7 @@ full_deploy = true
 # Set to true to scan all Kraken USD pairs for opportunity
 # WARNING: Scans 455+ pairs, takes 15+ minutes per cycle. Only enable if needed.
 scan_all_pairs = false
-timeframe = "15m"
+timeframe = "5m"
 timeframes = ["5m", "1h", "4h", "1d"]
 base_currency = "USD"
 starting_balance = 30.0
