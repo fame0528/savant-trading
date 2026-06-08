@@ -560,7 +560,16 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-robot" title="AI Decisions" tag={decisions.length > 0 ? `${dayjs(decisions[0].timestamp).fromNow(true)} ago` : "live"} onCopy={() => copyFormatters.decisions(decisions)} />
+          <SectionHeader icon="fa-robot" title="AI Decisions" tag={(() => {
+            if (decisions.length === 0) return "live";
+            const last = new Date(decisions[0].timestamp).getTime();
+            const elapsed = Date.now() - last;
+            const interval = 15 * 60 * 1000; // 15 min cycle
+            const remaining = Math.max(0, interval - elapsed);
+            if (remaining === 0) return `${dayjs(decisions[0].timestamp).fromNow(true)} ago · next cycle soon`;
+            const mins = Math.ceil(remaining / 60000);
+            return `${dayjs(decisions[0].timestamp).fromNow(true)} ago · next in ${mins}m`;
+          })()} onCopy={() => copyFormatters.decisions(decisions)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {decisions.length === 0 ? (
               <p className="text-[var(--dimmer)] text-xs text-center py-4 flex items-center justify-center gap-1.5">

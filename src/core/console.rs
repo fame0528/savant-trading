@@ -65,15 +65,15 @@ pub const GREY: &str = GREY_FG;
 pub const BOLD: &str = "\x1b[1m";
 pub const DIM: &str = "\x1b[2m";
 
-/// Returns current EST time formatted as `MM-DD-YYYY H:MM AM/PM`.
+/// Returns current local time formatted as `MM-DD-YYYY H:MM AM/PM`.
+/// Uses chrono::Local to respect system timezone including DST.
 pub fn est_now() -> String {
-    let now = chrono::Utc::now();
-    let est = now - chrono::Duration::hours(5);
-    let hour = est.format("%I").to_string();
+    let now = chrono::Local::now();
+    let hour = now.format("%I").to_string();
     let hour = hour.trim_start_matches('0');
-    let minute = est.format("%M").to_string();
-    let ampm = est.format("%p").to_string();
-    format!("{} {}:{} {}", est.format("%m-%d-%Y"), hour, minute, ampm)
+    let minute = now.format("%M").to_string();
+    let ampm = now.format("%p").to_string();
+    format!("{} {}:{} {}", now.format("%m-%d-%Y"), hour, minute, ampm)
 }
 
 /// Set the console window title using Windows API (more reliable than ANSI).

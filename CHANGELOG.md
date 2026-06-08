@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.10.4] — 2026-06-07
 
+### Fixed — Terminal Timestamps + AI Decisions Countdown
+
+- **Engine timestamps 1 hour behind** — `est_now()` hardcoded `UTC - 5 hours` (EST) instead of using system timezone. EDT is UTC-4. Now uses `chrono::Local::now()` which respects DST automatically. (`console.rs`)
+- **Duplicate timestamps in terminal** — Terminal component added client-side prefix (correct time, wrong position) on top of engine timestamps (wrong time, right position). Removed client-side prefix — engine timestamps are the single source of truth. (`Terminal.tsx`)
+- **Terminal placeholder misleading** — "type command..." implied an interactive command system that doesn't exist. Changed to "Engine log viewer — click terminal to scroll, Ctrl+C to interrupt". (`Terminal.tsx`)
+- **AI Decisions no countdown** — Section header showed "4m ago" but not when the next cycle fires. Now shows "4m ago · next in 11m" with live countdown based on 15-min cycle interval. (`page.tsx`)
+
 ### Fixed — FID-083: AI Decisions Panel — Stale Decision Display
 
 - **No timestamps on decisions** — User couldn't tell WHEN the decision was made. Same decision text shown across cycles looked like the agent was repeating itself. Added relative timestamp ("2m ago") next to each decision pair name and in the section header tag. (`page.tsx`)

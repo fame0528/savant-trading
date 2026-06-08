@@ -31,17 +31,9 @@ export default function TerminalPanel({ className }: TerminalPanelProps) {
 
     socket.onmessage = (event) => {
       const text = event.data as string;
-      const now = new Date();
-      const h = now.getHours();
-      const ampm = h >= 12 ? "PM" : "AM";
-      const h12 = h % 12 || 12;
-      const ts = `${h12}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")} ${ampm}`;
-      const prefixed = text.split("\r\n").map((line: string) => {
-        if (!line.trim()) return line;
-        if (/^\x1b\[[\d;]*m?\[/.test(line) || /^\[/.test(line)) return `\x1b[90m${ts}\x1b[0m ${line}`;
-        return `\x1b[90m${ts}\x1b[0m \x1b[36m[SAVANT]\x1b[0m ${line}`;
-      }).join("\r\n");
-      terminal.current?.write(prefixed);
+      // Engine already includes timestamps — don't add client-side prefix.
+      // Just pass through the raw output.
+      terminal.current?.write(text);
     };
 
     socket.onclose = () => {
@@ -170,7 +162,7 @@ export default function TerminalPanel({ className }: TerminalPanelProps) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="type command..."
+          placeholder="Engine log viewer — click terminal to scroll, Ctrl+C to interrupt"
           className="flex-1 bg-transparent text-[var(--txt)] font-mono text-xs outline-none placeholder:text-[var(--dimmer)]"
           autoFocus
         />
