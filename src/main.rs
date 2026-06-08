@@ -230,6 +230,18 @@ async fn main() -> anyhow::Result<()> {
             )
             .await;
         }
+        Some("--live-test") => {
+            let ta = parse_test_args(&args);
+            let pairs_override: Vec<String> = args
+                .iter()
+                .position(|a| a == "--pairs")
+                .and_then(|i| args.get(i + 1))
+                .map(|s| s.split(',').map(|p| p.trim().to_string()).collect())
+                .unwrap_or_default();
+            let show_prompt = args.iter().any(|a| a == "--show-prompt");
+            info!("=== SAVANT LIVE SITUATION TEST ===");
+            return engine::run_live_test(config, ta.model, pairs_override, show_prompt).await;
+        }
         Some("--tui") => {
             info!("=== SAVANT TRADING ENGINE (TUI MODE) ===");
 

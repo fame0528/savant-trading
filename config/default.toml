@@ -149,7 +149,7 @@ live_execution = true
 [ai]
 provider = "openrouter"
 endpoint = "https://openrouter.ai/api/v1"
-model = "xiaomi/mimo-v2.5-pro"
+model = "openrouter/owl-alpha"
 api_key_env = "OPENROUTER_API_KEY"
 autonomy_level = 3
 max_decisions_per_hour = 20
@@ -169,7 +169,7 @@ timeout_secs = 300
 # OpenRouter-specific configuration (only used when provider = "openrouter")
 [ai.openrouter]
 endpoint = "https://openrouter.ai/api/v1"
-model = "xiaomi/mimo-v2.5-pro"
+model = "openrouter/owl-alpha"
 api_key_env = "OPENROUTER_API_KEY"
 # Your site URL — OpenRouter uses this for ranking
 referer = "https://github.com/spencer-thompson/savant-trading"

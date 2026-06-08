@@ -53,7 +53,7 @@ Knowledge Base ────────┤                       │
 | **DEX-first, no KYC** | 0x API on Arbitrum. Swap any token on-chain. No exchange account needed. |
 | **AI is the brain** | The LLM reasons across all context — candles, indicators, sentiment, on-chain data. No hardcoded strategies. |
 | **Multi-chain ready** | 0x supports 20+ EVM chains. Currently running on Arbitrum; Base, Optimism, BSC supported in code. |
-| **Model-agnostic** | Any OpenAI-compatible model works. MiMo v2.5 Pro is what we test with, but the provider layer supports switching. |
+| **Model-agnostic** | Any OpenAI-compatible model works. owl-alpha (free) is currently active. The provider layer supports switching. |
 | **5-layer system prompt** | Base identity → Risk constraints → Strategy knowledge → Transcript knowledge → Output format. |
 | **6 candle sources** | Kraken, OKX, KuCoin, Gate.io, CryptoCompare, CoinGecko. Automatic fallback with all-zero rejection. |
 | **3 autonomy levels** | Suggest (log only), Confirm (human-in-the-loop), Autonomous (full auto). |
@@ -82,7 +82,7 @@ Knowledge Base ────────┤                       │
 - **WebSocket** — Kraken WebSocket v2 for real-time price updates
 
 ### AI Agent
-- **LLM-agnostic** — Any OpenAI-compatible model via OpenRouter. Tested with MiMo v2.5 Pro
+- **LLM-agnostic** — Any OpenAI-compatible model via OpenRouter. Currently using owl-alpha (free)
 - **SSE streaming** — Real-time response streaming, no timeout risk during long reasoning
 - **Structured output** — JSON with entry, stop, 3 take-profit levels, confidence, reasoning
 - **Knowledge base** — 2,959 units across 10 JSON files, MMR selection with utility scoring
@@ -245,7 +245,7 @@ min_rr_ratio_low_balance = 1.2     # Relaxed R:R at <$50 balance
 
 [ai]
 provider = "openrouter"
-model = "xiaomi/mimo-v2.5-pro"     # Any OpenAI-compatible model
+model = "openrouter/owl-alpha"     # Any OpenAI-compatible model
 autonomy_level = 3
 temperature = 0.6
 max_tokens = 16384

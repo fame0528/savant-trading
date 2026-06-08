@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.10.4] — 2026-06-07
 
+### Added — FID-084: Live Situation Sandbox
+
+- **`--live-test` CLI flag** — Test any model against current live market data without starting the engine. Uses the exact same prompt pipeline as production (soul.md, knowledge base, context builder). Fetches live candles, insight, and positions from `dex_state.json`. Read-only, no state mutation, can run alongside active engine. (`main.rs`, `engine.rs`)
+- **Usage:** `cargo run --release -- --live-test --model openrouter/owl-alpha --pairs ETH/USD,LINK/USD --show-prompt`
+
+### Changed — Model Switch: MiMo → owl-alpha
+
+- **Default model switched from `xiaomi/mimo-v2.5-pro` to `openrouter/owl-alpha`** — Free model, comparable quality on live test (same actions, similar R:R, 0 parse errors). Saves ~$0.50/day in API costs. Preserves $11 OpenRouter credit for when account grows past $500. (`config/default.toml`)
+
 ### Fixed — Terminal Timestamps + AI Decisions Countdown
 
 - **Engine timestamps 1 hour behind** — `est_now()` hardcoded `UTC - 5 hours` (EST) instead of using system timezone. EDT is UTC-4. Now uses `chrono::Local::now()` which respects DST automatically. (`console.rs`)
