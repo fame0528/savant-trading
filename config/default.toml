@@ -143,6 +143,10 @@ adx_ranging_threshold = 20.0
 atr_volatility_multiplier = 1.5
 
 [mode]
+# SAFETY: live_execution = true means REAL MONEY trades on the live account.
+# A failed swap or bad slippage costs real capital.
+# Set to false for paper-trading / backtesting mode.
+# When false, the engine still evaluates and logs decisions but never submits txns.
 live_execution = true
 
 [ai]

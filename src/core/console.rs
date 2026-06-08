@@ -86,6 +86,10 @@ pub fn set_console_title(title: &str) {
             .encode_wide()
             .chain(std::iter::once(0))
             .collect();
+        // SAFETY: `wide` is a null-terminated Vec<u16> constructed from an owned
+        // OsStr with an explicit 0 terminator appended. The pointer is valid for
+        // the duration of the call. SetConsoleTitleW is a safe Win32 API that
+        // only reads the title string; no memory allocation or ownership transfer.
         unsafe {
             extern "system" {
                 fn SetConsoleTitleW(lpConsoleTitle: *const u16) -> i32;
