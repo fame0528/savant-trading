@@ -1067,6 +1067,36 @@ pub async fn run(
                 }
             }
         }
+        // FID-087: Force all positions to LONG in spot-only mode.
+        // On spot DEX, holding tokens = LONG exposure. Any SHORT is wrong.
+        // This catches cases where journal loaded stale SHORT positions that
+        // wallet recovery didn't touch (quantity matched).
+        let short_ids: Vec<String> = portfolio.positions().iter()
+            .filter(|(_, p)| p.side == Side::Short)
+            .map(|(id, _)| id.clone())
+            .collect();
+        for id in &short_ids {
+            if let Some(p) = portfolio.positions_mut().get_mut(id) {
+                warn!(
+                    "SIDE CORRECTION: {} — spot-only mode, forcing SHORT → LONG",
+                    p.pair
+                );
+                let pair = p.pair.clone();
+                p.side = Side::Long;
+                p.stop_loss = p.entry_price * 0.92;
+                p.take_profit_1 = p.entry_price * 1.10;
+                p.take_profit_2 = p.entry_price * 1.20;
+                p.take_profit_3 = p.entry_price * 1.30;
+                if let Some(ref j) = journal {
+                    let _ = j.save_position(p).await;
+                }
+                shared.log_activity(
+                    savant_trading::core::shared::ActivityLevel::Warning,
+                    &pair,
+                    "SIDE CORRECTION: spot-only mode, forced SHORT → LONG",
+                ).await;
+            }
+        }
         if discrepancies.is_empty() {
             info!("Wallet sync: all positions reconciled with on-chain balances");
         }
