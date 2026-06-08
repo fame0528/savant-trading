@@ -4,6 +4,20 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.11.2] — 2026-06-08
+
+### Changed
+
+- **FID-057 deferred** — Liquidation Cascade Strategy moved to `dev/fids/deferred/`. Coinglass API costs $29/mo (entire account equity). Engine just stabilized after FID-085 overhaul — not the right time to add complexity. Revisit when equity grows or free OI data sources become available.
+- **FID-082 archived** — Engine Freeze Deadlock. Fix verified in production (watchdog at engine.rs:3546). Released in v0.10.4.
+- **FID-084 archived** — Live Situation Sandbox. Implementation verified: `--live-test` CLI flag at main.rs:233, `run_live_test()` at engine.rs:3779.
+- **FID-057 Perfection Loop** — 5 iterations completed before deferral. 10 RED issues identified, 3 design refinements, 2 audit findings, 1 self-correction. Leverage references removed (execution is spot-only via 0x API).
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+- Engine running stable: 10+ cycles with fresh candle data, delta-compression logging, context engine active
+
 ## [0.11.1] — 2026-06-08
 
 ### Fixed — Post-Release Pipeline Fixes
