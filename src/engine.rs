@@ -1047,11 +1047,6 @@ pub async fn run(
     // If a previous cycle's LLM call is still running, skip the new eval phase.
     let eval_in_progress = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
 
-    // FID-081: Force LLM review of recovered positions on first cycle.
-    // When the engine starts with wallet-recovered positions, the LLM should
-    // evaluate whether to hold, adjust stops, or close.
-    let mut startup_position_review = !portfolio.positions().is_empty();
-
     loop {
         tick += 1;
         let cycle_start = std::time::Instant::now();
@@ -1178,9 +1173,10 @@ pub async fn run(
             dead_tokens.clear();
         }
 
-        // FID-056 #1: Skip LLM evaluation when no deployable capital.
-        // No reason to burn API calls if there's no USDC to open new positions.
-        // Continue to position monitoring (stops/trailing/TP) below.
+        // FID-056 #1: When fully deployed (no deployable capital), skip
+        // scanning for new entries but ALWAYS evaluate held positions.
+        // The model IS the edge — if it's not actively evaluating every
+        // cycle, the trade is running on autopilot with no intelligence.
         let available_balance = if let Some(ref ex) = executor {
             ex.balance()
         } else {
@@ -1189,27 +1185,15 @@ pub async fn run(
         let min_order_value = 1.0_f64;
         let fully_deployed = available_balance < min_order_value;
 
-        // FID-081: Stale-recovery re-eval — if prices were stale and just recovered,
-        // OR if this is the first cycle with recovered positions, force evaluation.
-        let stale_recovery_reval = {
-            let staleness = *shared.price_staleness_secs.read().await;
-            (staleness > 300 || startup_position_review) && !portfolio.positions().is_empty()
-        };
-
-        if fully_deployed && !stale_recovery_reval {
+        // When fully deployed, log monitoring status but ALWAYS evaluate below.
+        // The model IS the edge — it must evaluate held positions every cycle.
+        if fully_deployed && !portfolio.positions().is_empty() {
             log_phase!(
                 "PHASE2",
-                "SKIPPED — fully deployed (${:.2} < ${:.2} min). Monitoring positions only.",
+                "MONITORING — fully deployed (${:.2} < ${:.2} min). Evaluating held positions only.",
                 available_balance,
                 min_order_value
             );
-        } else if fully_deployed && stale_recovery_reval {
-            if startup_position_review {
-                warn!("Startup: wallet-recovered positions detected — forcing LLM review of held positions");
-                startup_position_review = false;
-            } else {
-                warn!("FID-081: Stale data detected with open positions — forcing re-evaluation of held positions");
-            }
         }
 
         // FID-063: Hunt mode — under $500 with idle capital > $5.
@@ -1247,11 +1231,9 @@ pub async fn run(
         }
 
         for pair in &active_pairs {
-            if fully_deployed && !stale_recovery_reval {
-                break;
-            }
-            // In stale-recovery mode, only evaluate pairs we have positions in
-            if stale_recovery_reval && fully_deployed {
+            // When fully deployed, only evaluate pairs with open positions.
+            // The model monitors existing trades every cycle — it IS the edge.
+            if fully_deployed {
                 let has_position = portfolio.positions().values().any(|p| p.pair == *pair);
                 if !has_position {
                     continue;
