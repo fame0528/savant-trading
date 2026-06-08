@@ -4,6 +4,16 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.11.1] — 2026-06-08
+
+### Fixed — Post-Release Pipeline Fixes
+
+- **Per-cycle candle refresh** — Candles were fetched once at startup and never refreshed. 199 of 200 candles were frozen, causing stale indicators and flat PnL. Added candle refresh at the start of every cycle loop: fetches fresh 200 candles from API for all active pairs, re-applies WS ticker prices on top. (`engine.rs`)
+- **Delta-compression was stripping LLM context** — `DeltaResult::Delta` was sending ONLY the changed lines to the LLM instead of the full prompt. This caused the model to make decisions without position info, knowledge units, or market regime context. Fixed: always send the full prompt. Delta-compression is now observability-only. (`engine.rs`)
+- **Noisy log suppression** — Delta-compression logged "92% change — regime shift" at INFO level every cycle because TSLN character-level diff cascades through all data rows when any price changes. Anti-thrashing WARN fired every cycle for the same reason. Changed both to DEBUG level. (`engine.rs`)
+- **FID-086 archived** — Stale price pipeline fix verified in production. (`dev/fids/archive/`)
+- **FID-085 original archived** — Superseded by v2 implementation. (`dev/fids/archive/`)
+
 ## [0.11.0] — 2026-06-08
 
 ### Added — FID-085: Context Window Overhaul (28 items across 8 phases)

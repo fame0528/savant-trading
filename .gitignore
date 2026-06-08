@@ -52,6 +52,7 @@ trade-data/
 
 # === Research & prompt outputs (not code) ===
 prompt-results/
+reserch/sources/
 DEEP-RESEARCH-PROMPT.md
 MODEL-TRAINING-RESEARCH.md
 LLM Crypto Trading Growth Strategy.md

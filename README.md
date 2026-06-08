@@ -1,4 +1,4 @@
-# SAVANT TRADING v0.11.0
+# SAVANT TRADING v0.11.1
 
 <!-- markdownlint-disable MD033 -->
 <div align="center">
@@ -9,9 +9,9 @@
 
 No KYC. No CEX. Arbitrum on-chain swaps via 0x API — powered by 6,676+ knowledge units from 168 source books and 548 curated sources.
 
-**Model-agnostic:** Any OpenAI-compatible LLM via [OpenRouter](https://openrouter.ai/). Tested with MiMo v2.5 Pro (1M context, 131K output).
+**Model-agnostic:** Any OpenAI-compatible LLM via [OpenRouter](https://openrouter.ai/). Default: [Owl Alpha](https://openrouter.ai/openrouter/owl-alpha) (free, 1M context, 2.25T weekly tokens). Previously tested with MiMo v2.5 Pro.
 
-[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![0x](https://img.shields.io/badge/0x-DEX-%23000000?style=flat-square&logo=ethereum&logoColor=%2300fbff)](https://0x.org/)[![Arbitrum](https://img.shields.io/badge/Arbitrum-L2-%23000000?style=flat-square&logo=arbitrum&logoColor=%2300fbff)](https://arbitrum.io/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-LLM-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/)[![Version](https://img.shields.io/badge/Version-0.11.0-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![0x](https://img.shields.io/badge/0x-DEX-%23000000?style=flat-square&logo=ethereum&logoColor=%2300fbff)](https://0x.org/)[![Arbitrum](https://img.shields.io/badge/Arbitrum-L2-%23000000?style=flat-square&logo=arbitrum&logoColor=%2300fbff)](https://arbitrum.io/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-LLM-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/)[![Version](https://img.shields.io/badge/Version-0.11.1-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-MIT-%23000000?style=flat-square&logo=github&logoColor=%2300fbff)](LICENSE)
 
 </div>
 
