@@ -560,7 +560,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <SectionHeader icon="fa-robot" title="AI Decisions" tag="live" onCopy={() => copyFormatters.decisions(decisions)} />
+          <SectionHeader icon="fa-robot" title="AI Decisions" tag={decisions.length > 0 ? `${dayjs(decisions[0].timestamp).fromNow(true)} ago` : "live"} onCopy={() => copyFormatters.decisions(decisions)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {decisions.length === 0 ? (
               <p className="text-[var(--dimmer)] text-xs text-center py-4 flex items-center justify-center gap-1.5">
@@ -571,10 +571,13 @@ export default function Dashboard() {
               decisions.slice(0, 10).map((d, i) => {
                 const a = d.action.toUpperCase();
                 const conf = d.confidence * 100;
+                const age = Date.now() - new Date(d.timestamp).getTime();
+                const isStale = age > 30 * 60 * 1000; // 30 min
                 return (
-                  <div key={i} className="border-l-2 border-[var(--line2)] pl-2 py-1 mb-1">
+                  <div key={i} className={`border-l-2 border-[var(--line2)] pl-2 py-1 mb-1 ${isStale ? "opacity-50" : ""}`}>
                     <div className="flex items-center gap-1.5">
                       <span className="font-semibold text-[11px]">{d.pair}</span>
+                      <span className="text-[8px] text-[var(--dimmer)]">{dayjs(d.timestamp).fromNow(true)}</span>
                       <span className={`text-[8px] px-1 py-0.5 rounded font-bold flex items-center gap-0.5 ${
                         a === "BUY" ? "text-[var(--green)] bg-[var(--green)]/10" :
                         a === "SELL" || a === "CLOSE" ? "text-[var(--red)] bg-[var(--red)]/10" :

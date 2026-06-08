@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.10.4] — 2026-06-07
 
+### Fixed — FID-083: AI Decisions Panel — Stale Decision Display
+
+- **No timestamps on decisions** — User couldn't tell WHEN the decision was made. Same decision text shown across cycles looked like the agent was repeating itself. Added relative timestamp ("2m ago") next to each decision pair name and in the section header tag. (`page.tsx`)
+- **Stale decisions not visually distinct** — Decisions older than 30 minutes now dimmed with `opacity-50`. (`page.tsx`)
+
 ### Fixed — FID-082: Engine Freeze — Deadlock in Shared State Lock Chains (critical)
 
 - **Engine hung after 3 cycles for 1+ hours** — Two sync chains acquired the SAME `RwLock`s in OPPOSITE order while the API server read them every 4 seconds. Classic deadlock. Broke all 3 lock chains: each `write()` now in its own `{}` block so the lock releases before the next acquire. (`engine.rs:3117`, `3214`, `3313`)
