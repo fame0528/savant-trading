@@ -1058,6 +1058,11 @@ pub async fn run(
             match msg {
                 savant_trading::data::websocket::WsMessage::Ticker(ticker) => {
                     ws_ticker_prices.insert(ticker.pair.clone(), (ticker.last, std::time::Instant::now()));
+                    // FID-086: Feed live WS price into candle store so the LLM
+                    // model sees real-time prices instead of startup-frozen data.
+                    if let Some(store) = market_stores.get_mut(&ticker.pair) {
+                        store.update_last_close(ticker.last);
+                    }
                 }
                 savant_trading::data::websocket::WsMessage::BookUpdate(book) => {
                     if let Some(ob) = order_books.get_mut(&book.pair) {
@@ -1065,7 +1070,12 @@ pub async fn run(
                     }
                 }
                 savant_trading::data::websocket::WsMessage::Trade { pair, price, .. } => {
-                    ws_ticker_prices.insert(pair, (price, std::time::Instant::now()));
+                    ws_ticker_prices.insert(pair.clone(), (price, std::time::Instant::now()));
+                    // FID-086: Feed live WS price into candle store so the LLM
+                    // model sees real-time prices instead of startup-frozen data.
+                    if let Some(store) = market_stores.get_mut(&pair) {
+                        store.update_last_close(price);
+                    }
                 }
                 savant_trading::data::websocket::WsMessage::CancelAllOrders { reason } => {
                     warn!("WS CANCEL-ALL TRIGGERED: {}", reason);

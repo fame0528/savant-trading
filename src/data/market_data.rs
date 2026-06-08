@@ -70,4 +70,20 @@ impl MarketDataStore {
     pub fn pair(&self) -> &str {
         &self.pair
     }
+
+    /// Update the last candle's close price with a live WebSocket price.
+    /// Extends high/low if the live price exceeds the current candle range.
+    /// Ensures the LLM model sees real-time prices instead of startup-frozen data.
+    /// Called on every WS ticker/trade message in the engine drain loop.
+    pub fn update_last_close(&mut self, price: f64) {
+        if let Some(last) = self.candles.back_mut() {
+            last.close = price;
+            if price > last.high {
+                last.high = price;
+            }
+            if price < last.low {
+                last.low = price;
+            }
+        }
+    }
 }
