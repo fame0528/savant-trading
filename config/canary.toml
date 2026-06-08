@@ -29,7 +29,7 @@ rest_url = "https://api.kraken.com"
 # fee floor will naturally filter the ones with no edge.
 pairs = [
     # Core
-    "BTC/USD", "ETH/USD",
+    "BTC/USD", "WETH/USD",
     # Top 10 by market cap
     "SOL/USD", "XRP/USD", "ADA/USD", "AVAX/USD", "DOT/USD", "LINK/USD",
     # High volatility / momentum

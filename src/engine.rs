@@ -1000,7 +1000,7 @@ pub async fn run(
                 if (p.stop_loss - default_sl).abs() < 0.01 {
                     match p.pair.as_str() {
                         "LINK/USD" => Some((p.pair.clone(), 7.00)),
-                        "ETH/USD" => Some((
+                        "WETH/USD" => Some((
                             p.pair.clone(),
                             (p.entry_price * 0.92 * 100.0).round() / 100.0,
                         )),
@@ -1704,7 +1704,7 @@ pub async fn run(
                 batch_size
             ));
             batch_msg.push_str("Each object must have the same schema as a single decision, including the \"pair\" field.\n");
-            batch_msg.push_str("Example: [{\"action\":\"Pass\",\"pair\":\"ETH/USD\",...}, {\"action\":\"Buy\",\"pair\":\"BTC/USD\",...}]\n");
+            batch_msg.push_str("Example: [{\"action\":\"Pass\",\"pair\":\"WETH/USD\",...}, {\"action\":\"Buy\",\"pair\":\"BTC/USD\",...}]\n");
 
             let provider = agent.provider_clone();
             let messages = vec![savant_trading::agent::provider::Message {

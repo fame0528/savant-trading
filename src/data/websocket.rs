@@ -208,7 +208,12 @@ fn parse_trades(json: &serde_json::Value) -> Option<WsMessage> {
 /// Runs indefinitely with exponential backoff reconnection (1s → 30s cap).
 /// Sends parsed messages through the channel. Spawn as a tokio task.
 pub async fn connect(url: &str, pairs: Vec<String>, tx: mpsc::UnboundedSender<WsMessage>) {
-    let subscribe_msgs = build_subscribe_messages(&pairs, 10);
+    // Convert on-chain pair names to exchange names for Kraken subscription
+    // WETH/USD → ETH/USD, WBTC/USD → BTC/USD
+    let exchange_pairs: Vec<String> = pairs.iter().map(|p| {
+        crate::core::types::Candle::exchange_pair(p).to_string()
+    }).collect();
+    let subscribe_msgs = build_subscribe_messages(&exchange_pairs, 10);
     let mut backoff_secs = 1u64;
     let max_backoff = 30u64;
     let mut consecutive_failures = 0u32;

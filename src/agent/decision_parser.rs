@@ -468,7 +468,11 @@ fn extract_pair(text: &str) -> Option<String> {
             "USD" | "USDT" | "USDC" => "USD",
             _ => return None,
         };
-        return Some(format!("{}/{}", base, quote_norm));
+        // Normalize on-chain token names: ETH → WETH, BTC → WBTC
+        let base_norm = crate::core::types::Candle::display_pair(
+            &format!("{}/{}", base, quote_norm)
+        ).split('/').next().unwrap_or(&base).to_string();
+        return Some(format!("{}/{}", base_norm, quote_norm));
     }
     None
 }

@@ -87,6 +87,39 @@ impl Candle {
         self.close < self.open
     }
 
+    /// On-chain display name for a trading pair.
+    /// Maps exchange pair names to their actual on-chain token names.
+    /// "ETH/USD" → "WETH/USD" (on Arbitrum, ETH is gas, WETH is the trade)
+    /// "BTC/USD" → "WBTC/USD" (on Arbitrum, BTC is bridged as WBTC)
+    /// All other pairs pass through unchanged.
+    pub fn display_pair(pair: &str) -> &str {
+        match pair {
+            "ETH/USD" => "WETH/USD",
+            "BTC/USD" => "WBTC/USD",
+            _ => pair,
+        }
+    }
+
+    /// Exchange API pair name (reverse of display_pair).
+    /// "WETH/USD" → "ETH/USD" for Kraken/OKX/Binance APIs.
+    pub fn exchange_pair(pair: &str) -> &str {
+        match pair {
+            "WETH/USD" => "ETH/USD",
+            "WBTC/USD" => "BTC/USD",
+            _ => pair,
+        }
+    }
+
+    /// Normalize base token for exchange APIs.
+    /// "WETH" → "ETH", "WBTC" → "BTC". All others pass through.
+    pub fn exchange_base(base: &str) -> &str {
+        match base {
+            "WETH" => "ETH",
+            "WBTC" => "BTC",
+            _ => base,
+        }
+    }
+
     pub fn body_size(&self) -> f64 {
         (self.close - self.open).abs()
     }

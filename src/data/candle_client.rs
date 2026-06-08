@@ -183,7 +183,14 @@ impl CandleClient {
     }
 
     fn to_api_pair(pair: &str) -> String {
-        pair.replace("/", "")
+        // Map on-chain token names back to exchange API names
+        // WETH → ETH, WBTC → BTC (exchanges use native names)
+        let exchange_pair = match pair {
+            "WETH/USD" => "ETH/USD",
+            "WBTC/USD" => "BTC/USD",
+            _ => pair,
+        };
+        exchange_pair.replace("/", "")
     }
 
     pub async fn get_order_book(&self, pair: &str, depth: u32) -> Result<OrderBook, DataError> {

@@ -179,9 +179,10 @@ fn parse_kraken_futures(response: &KrakenFuturesResponse, symbol: &str) -> Fundi
     };
 
     // Convert symbol to Kraken Futures format
-    // "BTC/USD" → look for "PF_XBTUSD" (perpetual)
-    // "ETH/USD" → look for "PF_ETHUSD"
-    let base = symbol.split('/').next().unwrap_or(symbol).to_uppercase();
+    // "WETH/USD" → "ETH/USD" → look for "PF_ETHUSD" (perpetual)
+    // "BTC/USD" → look for "PF_XBTUSD"
+    let raw_base = symbol.split('/').next().unwrap_or(symbol).to_uppercase();
+    let base = crate::core::types::Candle::exchange_base(&raw_base).to_string();
 
     // Kraken uses XBT for BTC in futures symbols
     let futures_base = if base == "BTC" { "XBT" } else { &base };

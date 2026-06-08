@@ -67,7 +67,7 @@ enabled = false
 # BTC & ETH are the foundation. Top 10 + meme coins are where the action is.
 pairs = [
     # Tier 1: GUARANTEED deep liquidity on Arbitrum (>$100M daily DEX volume)
-    "ETH/USD", "BTC/USD", "ARB/USD",
+    "WETH/USD", "BTC/USD", "ARB/USD",
     # Tier 2: Major DeFi tokens — verified Arbitrum addresses, deep 0x routes
     "LINK/USD", "UNI/USD", "AAVE/USD", "PEPE/USD",
     # Tier 3: DeFi with good Arbitrum presence

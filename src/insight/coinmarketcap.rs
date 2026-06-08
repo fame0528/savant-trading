@@ -126,7 +126,7 @@ pub async fn fetch_top_coins(
 fn kraken_pair_map(symbol: &str) -> Option<&str> {
     match symbol.to_uppercase().as_str() {
         "BTC" => Some("BTC/USD"),
-        "ETH" => Some("ETH/USD"),
+        "ETH" => Some("WETH/USD"),
         "SOL" => Some("SOL/USD"),
         "XRP" => Some("XRP/USD"),
         "DOGE" => Some("DOGE/USD"),

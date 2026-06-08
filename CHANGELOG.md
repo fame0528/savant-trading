@@ -4,6 +4,20 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.11.3] — 2026-06-08
+
+### Fixed — ETH/WETH Data Integrity
+
+- **Renamed ETH/USD → WETH/USD** — On Arbitrum, ETH is the native gas token ($1.99). WETH is the wrapped ERC-20 token used for trading ($13.60). The engine was labeling positions as "ETH/USD" when the actual holdings are WETH. This is a logic issue, not cosmetic — if the engine conflates ETH (gas) with WETH (trade), position valuations and LLM decisions break.
+- **`display_pair()` / `exchange_pair()` functions** — Maps "ETH/USD" → "WETH/USD" for on-chain display, "WETH/USD" → "ETH/USD" for exchange APIs (Kraken/OKX/Binance all use "ETH"). (`core/types.rs`)
+- **`exchange_base()` normalization** — All 6 data sources (OKX, KuCoin, Gate, CryptoCompare, Bybit, Binance) + Kraken candle client + WebSocket + funding rates now normalize "WETH" → "ETH" before calling exchange APIs.
+- **Decision parser normalization** — LLM output "ETH/USD" is normalized to "WETH/USD" in `extract_pair()` so decisions match config pair names.
+- **Config updated** — `default.toml` and `canary.toml` now use "WETH/USD" instead of "ETH/USD".
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.11.2] — 2026-06-08
 
 ### Changed
