@@ -3,7 +3,7 @@
 **Filename:** `FID-2026-0605-057-liquidation-cascade-strategy.md`
 **ID:** FID-2026-0605-057
 **Severity:** critical
-**Status:** in_progress
+**Status:** deferred
 **Created:** 2026-06-05 23:45
 **Updated:** 2026-06-08 17:10
 **Author:** Kilo
