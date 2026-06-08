@@ -144,71 +144,43 @@ Entry threshold: Score > 70 triggers LLM evaluation.
 
 ### Phase 3: LLM Integration
 
-**3.1 Cascade-Specific Prompt**
+The LLM is called ONLY when a cascade trigger fires. Its job:
+1. Confirm the cascade is real (not a false signal)
+2. Assess the V-recovery probability
+3. Define entry, stop, and target based on liquidation cluster levels
+4. Size the position using equity-based risk management
 
-When cascade score > 70, inject cascade context into the LLM prompt:
-```
-## CASCADE ALERT — {pair}
-State: {state} | Score: {score}/100
-OI Change (1h): {oi_change}% | Funding: {funding}%
-Nearest Liquidation Cluster: ${cluster_price} (${cluster_size}M)
-Volume vs SMA(20): {vol_ratio}×
-Kill Zone: {active/inactive}
+### Phase 4: Risk Management (Spot — No Leverage)
 
-Analyze this liquidation cascade setup. Is this a real cascade or a false signal?
-What is the V-recovery probability? Define entry, stop, and target.
-```
+Execution is via 0x API spot swaps on Arbitrum. Leverage is deferred (separate FID).
 
-**3.2 Integration with ContextEngine (FID-085)**
-
-The cascade data is injected as a new section in `build_tsln_message()`:
-- Cascade alert section goes BETWEEN indicators and market insight
-- High priority — always included when cascade score > 70
-- Low token cost: ~200 tokens for cascade context
-
-### Phase 4: Kill Zone Enforcement
-
-**4.1 Kill Zone Config**
-```toml
-[cascade.kill_zones]
-enabled = true
-zones = [
-    { name = "EU", start = "07:00", end = "10:00", timezone = "UTC" },
-    { name = "US", start = "13:30", end = "16:30", timezone = "UTC" },
-    { name = "ASIA", start = "00:00", end = "03:00", timezone = "UTC" },
-]
-allow_off_hours_monitoring = true  # Monitor 24/7, only trade in kill zones
-```
-
-**4.2 Enforcement**
-- Cascade detection runs 24/7 (cascades don't check the clock)
-- Entry execution ONLY during kill zones
-- If cascade exhausted outside kill zone: log alert, wait for next kill zone
-- If cascade exhausted inside kill zone: immediate LLM evaluation
-
-### Phase 5: Risk Management for Leveraged Positions
-
-**5.1 Position Sizing**
-- Max leverage: 5× (conservative for $26 account)
+**4.1 Position Sizing**
 - Max risk per trade: 10% of equity ($2.60 at current balance)
-- Kelly fraction: 0.25× Kelly (quarter-Kelly for safety)
-- Scale-in: 50% at entry, 50% at confirmation (2% move in favor)
+- Position size: equity × risk_fraction ÷ stop_distance
+- At $26 equity, 5% stop = $13 position (0.0077 ETH at $1687)
+- Scale-in: 100% at entry confirmation (no scale-in at micro scale)
 
-**5.2 Stop Loss**
+**4.2 Stop Loss**
 - Stop: Below the cascade low (invalidation level)
-- Max stop distance: 5% from entry (leverage-adjusted: 25% of equity)
-- Trailing: Activate at 1:1 R:R, trail at 2× ATR
+- Max stop distance: 5% from entry
+- Client-side monitoring (DEX stop-losses are not exchange-guaranteed)
 
-**5.3 Take Profit**
+**4.3 Take Profit**
 - TP1: Next liquidation cluster above (50% scale-out)
 - TP2: 2× ATR from entry (30% scale-out)
 - Trail: Remaining 20% with 2× ATR trail
 
-**5.4 Existing Position Handling**
+**4.4 Existing Position Handling**
 - If cascade fires on a pair we already have a position in:
-  - LONG position + bullish cascade: HOLD, consider adding at confirmation
-  - LONG position + bearish cascade: CLOSE immediately, reverse if confirmed
+  - LONG position + bullish cascade: HOLD, no add (micro account)
+  - LONG position + bearish cascade: CLOSE via 0x swap, wait for cascade to resolve
   - No position: Standard cascade entry protocol
+
+**4.5 Profit Expectations**
+- At $26 equity, spot trading, 5% V-recovery = $1.30 profit per trade
+- At 1-5 cascade trades/day = $1.30-6.50/day
+- Compounding: profits increase position size over time
+- Leverage (future FID) would multiply these by 5-8×
 
 ### Phase 6: Alerting
 
@@ -227,15 +199,15 @@ allow_off_hours_monitoring = true  # Monitor 24/7, only trade in kill zones
 ## Implementation Order
 
 1. **FID-057a** — OI + funding monitor (data acquisition, 60s polling)
-2. **FID-057b** — Liquidation level mapper (Coinglass API integration)
+2. **FID-057b** — Liquidation level mapper (Coinglass API or DeFiLlama fallback)
 3. **FID-057c** — Cascade detection state machine + score calculator
 4. **FID-057d** — Kill zone enforcement
 5. **FID-057e** — Cascade-specific LLM prompt + ContextEngine integration
-6. **FID-057f** — Risk management + position sizing for leveraged trades
+6. **FID-057f** — Risk management + position sizing for spot trades
 7. **FID-057g** — Dashboard cascade widget + alerting
 8. **FID-057h** — Sandbox validation with historical cascade events
 
-Each sub-FID is independently deployable and testable.
+**Deferred (separate FID):** Leverage execution via GMX V2 / Hyperliquid. Current system uses 0x API spot swaps on Arbitrum only.
 
 ---
 
@@ -278,12 +250,14 @@ Each sub-FID is independently deployable and testable.
 
 ### Loop 4 — SELF-CORRECT Phase
 
-- **RED:** 1 issue:
+- **RED:** 2 issues:
   1. The FID references "Coinglass API" but the free tier may have changed since the research was done
+  2. Leverage was deferred — execution via GMX V2/Hyperliquid removed, spot-only via 0x API
 - **GREEN:**
   1. Add fallback data sources: DeFiLlama (free, on-chain OI), Binance API (free, funding rates), existing OKX data. Coinglass is preferred but not required.
-- **AUDIT:** Fallback chain is robust.
-- **CHANGE_DELTA:** ~2% (fallback documentation)
+  2. Removed all leverage references. Execution stays with 0x API spot swaps. Risk management rewritten for spot sizing. Profit expectations adjusted for micro account.
+- **AUDIT:** Both corrections are sound. Spot execution is the current reality.
+- **CHANGE_DELTA:** ~8% (leverage removal + spot sizing)
 
 ### Loop 5 — COMPLETE Phase
 
