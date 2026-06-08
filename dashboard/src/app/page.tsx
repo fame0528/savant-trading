@@ -153,8 +153,10 @@ export default function Dashboard() {
   const eq = portfolio?.equity ?? portfolio?.balance ?? 0;
 
   // Sound effects on state changes
+  // FID-087: Skip sounds on initial data load (prevTradeCount === 0 means first poll).
+  // Prevents false loss notifications when dashboard loads before on-chain sync completes.
   useEffect(() => {
-    if (trades.length > prevTradeCount.current) {
+    if (trades.length > prevTradeCount.current && prevTradeCount.current > 0) {
       const latest = trades[0];
       if (latest) {
         if (latest.notes?.includes("Stop loss")) {
@@ -173,7 +175,7 @@ export default function Dashboard() {
   }, [trades]);
 
   useEffect(() => {
-    if (positions.length > prevPosCount.current) {
+    if (positions.length > prevPosCount.current && prevPosCount.current > 0) {
       sounds.tradeOpen();
       const latest = positions[positions.length - 1];
       if (latest) toast.success(`Opened: ${latest.side} ${latest.pair} @ ${fmt.price(latest.entry_price)}`, { icon: "🚀" });
