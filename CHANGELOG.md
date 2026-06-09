@@ -4,6 +4,18 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.12.3] — 2026-06-09
+
+### Fixed — Reconciliation queried wrong token (USDC instead of WETH/LINK)
+
+The on-chain reconciliation used `resolve_pair_on_chain(pair, Side::Long)` which returns `(USDC, WETH)` — so it queried USDC balance ($25.97) instead of WETH balance (0). Since USDC was non-zero, the reconciliation never detected the phantom positions.
+
+Changed to `Side::Short` which returns `(WETH, USDC)` — now correctly queries the base token (WETH/LINK) balance. Same class of bug as FID-094 (wrong token resolution for side).
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.12.2] — 2026-06-09
 
 ### Fixed — Version integrity: external close trade record separated from v0.12.1
