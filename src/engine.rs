@@ -3917,6 +3917,48 @@ pub async fn run(
 
                                 let old_equity = portfolio.account().equity;
 
+                                // FID-096 Item 12: Record trade for external close
+                                // before removing the position. Uses last known market price.
+                                let pos_snapshot = portfolio.positions().get(&pos_id).cloned();
+                                if let Some(pos) = pos_snapshot {
+                                    let market_price = market_stores
+                                        .get(&pair)
+                                        .and_then(|s| s.last().map(|c| c.close))
+                                        .unwrap_or(pos.current_price);
+                                    let pnl = match pos.side {
+                                        Side::Long => (market_price - pos.entry_price) * pos.quantity,
+                                        Side::Short => (pos.entry_price - market_price) * pos.quantity,
+                                    };
+                                    let pnl_pct = if pos.entry_price > 0.0 && pos.quantity > 0.0 {
+                                        pnl / (pos.entry_price * pos.quantity) * 100.0
+                                    } else { 0.0 };
+                                    let trade = savant_trading::core::types::TradeRecord {
+                                        id: uuid::Uuid::new_v4().to_string(),
+                                        pair: pair.clone(),
+                                        side: pos.side,
+                                        entry_price: pos.entry_price,
+                                        exit_price: market_price,
+                                        quantity: pos.quantity,
+                                        pnl,
+                                        pnl_pct,
+                                        fees: 0.0,
+                                        strategy_name: pos.strategy_name.clone(),
+                                        opened_at: pos.opened_at,
+                                        closed_at: chrono::Utc::now(),
+                                        notes: "External close — tokens sold outside engine. Exit price estimated from market data.".to_string(),
+                                        on_chain_verified: false,
+                                        tx_hash: None,
+                                    };
+                                    portfolio.closed_trades_mut().push(trade.clone());
+                                    if let Some(ref j) = journal {
+                                        let _ = j.record_trade(&trade).await;
+                                    }
+                                    info!(
+                                        "Recorded external close trade: {} {} | Entry: {:.4} → Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
+                                        pair, pos.side, pos.entry_price, market_price, pnl, pnl_pct
+                                    );
+                                }
+
                                 // Remove from PortfolioManager
                                 if let Some(_removed) = portfolio.positions_mut().remove(&pos_id) {
                                     portfolio.account_mut().open_positions = portfolio.positions().len();
