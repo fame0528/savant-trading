@@ -2982,6 +2982,28 @@ pub async fn run(
                                             }
                                         }
 
+                                        // FID-104: Auto-extend TP to meet minimum R:R before sizer check
+                                        let risk = (decision.entry_price - decision.stop_loss).abs();
+                                        if risk > 0.0 {
+                                            let reward = match decision.side {
+                                                Side::Long => decision.take_profit_1 - decision.entry_price,
+                                                Side::Short => decision.entry_price - decision.take_profit_1,
+                                            };
+                                            let actual_rr = reward / risk;
+                                            let min_rr = config.risk.min_rr_ratio;
+                                            if actual_rr < min_rr && reward > 0.0 {
+                                                let required_reward = risk * min_rr;
+                                                let old_tp = decision.take_profit_1;
+                                                decision.take_profit_1 = match decision.side {
+                                                    Side::Long => decision.entry_price + required_reward,
+                                                    Side::Short => decision.entry_price - required_reward,
+                                                };
+                                                decision.risk_reward = min_rr;
+                                                info!("FID-104: Extended TP for {}: {:.4} → {:.4} (R:R {:.2}→{:.2})",
+                                                    decision.pair, old_tp, decision.take_profit_1, actual_rr, min_rr);
+                                            }
+                                        }
+
                                         let ps = position_sizer.calculate(
                                             portfolio.account(),
                                             decision.entry_price,

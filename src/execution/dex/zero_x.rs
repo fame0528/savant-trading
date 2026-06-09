@@ -667,6 +667,7 @@ impl ZeroXBackend {
 
         // 4. Build submit payload
         let mut submit_body = serde_json::json!({
+            "chainId": params.chain_id,
             "trade": {
                 "type": trade["type"],
                 "eip712": trade["eip712"],
