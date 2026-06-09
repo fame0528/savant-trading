@@ -3890,10 +3890,11 @@ pub async fn run(
                 debug!("Balance synced from executor: ${:.2}", executor_balance);
             }
 
-            // FID-096 Fix 1: On-chain token balance reconciliation (every 2 cycles).
+            // FID-096 Fix 1: On-chain token balance reconciliation.
+            // Runs on first cycle (tick==1) and every 2 cycles after.
             // Detects externally sold tokens (manual swap, another app) and removes
             // phantom positions that no longer have on-chain backing.
-            if tick.is_multiple_of(2) && tick > 1 {
+            if tick == 1 || tick.is_multiple_of(2) {
                 let position_pairs: Vec<(String, String, f64)> = portfolio.positions().iter()
                     .map(|(id, p)| (id.clone(), p.pair.clone(), p.quantity))
                     .collect();

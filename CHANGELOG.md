@@ -4,6 +4,16 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.12.2] — 2026-06-09
+
+### Fixed — Version integrity: external close trade record separated from v0.12.1
+
+- **External close trade record** — When reconciliation detects tokens sold externally (on-chain balance = 0), now records a `TradeRecord` with estimated exit price from market data. `on_chain_verified: false`, notes: "External close — tokens sold outside engine." Previously the position was silently removed with no trade history.
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.12.1] — 2026-06-09
 
 ### Fixed — FID-096: On-Chain Reconciliation + Zero-Base Enforcement
