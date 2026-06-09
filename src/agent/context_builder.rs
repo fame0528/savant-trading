@@ -32,6 +32,8 @@ pub struct FullContext<'a> {
     /// Live price from WebSocket ticker — injected directly so the model
     /// always sees the real-time price, not just the candle close.
     pub live_price: Option<f64>,
+    /// FID-098 Fix 2: Decision log context for this pair — recent decisions with outcomes.
+    pub decision_log_context: Option<String>,
 }
 
 /// Build the system prompt and user message for the LLM.
@@ -495,6 +497,14 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
     if let Some(ref memory) = ctx.memory_context {
         if !memory.is_empty() {
             msg.push_str(memory);
+        }
+    }
+
+    // FID-098 Fix 2: Decision log context — recent same-pair decisions with outcomes
+    if let Some(ref log_ctx) = ctx.decision_log_context {
+        if !log_ctx.is_empty() {
+            msg.push_str("\n## Recent Decision Log\n");
+            msg.push_str(log_ctx);
         }
     }
 

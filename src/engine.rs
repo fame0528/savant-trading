@@ -408,6 +408,10 @@ pub async fn run(
     // Declared early so journal positions can be registered in DexTrader during load.
     let mut executor_position_map: HashMap<String, String> = HashMap::new();
 
+    // FID-098: Maps pair-action-tick → episode_id for outcome updates when trades closes.
+    // Worst case: 10 pairs × 5 min × 60 min = 20 entries/hour, negligible memory.
+    let mut episode_store: HashMap<String, String> = HashMap::new();
+
     let journal = match TradeJournal::new(&config.trading.database_url).await {
         Ok(j) => {
             info!("Trade journal connected: {}", config.trading.database_url);
@@ -1779,6 +1783,9 @@ pub async fn run(
                     htf
                 };
 
+                // FID-098 Fix 2: Build decision log context for this pair
+                let decision_log_ctx = decision_log.context_for_pair(pair, 3, 2);
+
                 let ctx = FullContext {
                     candles: &candle_data,
                     indicators: &indicators,
@@ -1802,6 +1809,12 @@ pub async fn run(
                     ),
                     // FID-086: Pass live WS price to prompt builder
                     live_price: ws_ticker_prices.get(pair).map(|(p, _)| *p),
+                    // FID-098: Pass decision log context with recent outcomes
+                    decision_log_context: if decision_log_ctx.is_empty() {
+                        None
+                    } else {
+                        Some(decision_log_ctx)
+                    },
                 };
 
                 // Step 1: Select knowledge units and clone to release borrow on agent
@@ -2332,15 +2345,35 @@ pub async fn run(
                                 "executed".to_string()
                             },
                         };
-                        match tokio::time::timeout(
+                        // FID-098 Fix 1a: Store episode_id so we can update outcomes when trades close
+                        let episode_id = match tokio::time::timeout(
                             std::time::Duration::from_secs(2),
                             mem.capture_episode(&snapshot),
                         )
                         .await
                         {
-                            Ok(Ok(_)) => log_phase!("EPISODIC", "Saved {}", decision.pair),
-                            Ok(Err(e)) => log_warn!("EPISODIC", "Failed {}: {}", decision.pair, e),
-                            Err(_) => log_warn!("EPISODIC", "Timeout {}", decision.pair),
+                            Ok(Ok(id)) => {
+                                log_phase!("EPISODIC", "Saved {} [{}]", decision.pair, &id[..8]);
+                                Some(id)
+                            }
+                            Ok(Err(e)) => {
+                                log_warn!("EPISODIC", "Failed {}: {}", decision.pair, e);
+                                None
+                            }
+                            Err(_) => {
+                                log_warn!("EPISODIC", "Timeout {}", decision.pair);
+                                None
+                            }
+                        };
+                        // Store episode_id for outcome updates when trades close.
+                        // For PASS decisions, update immediately with counterfactual.
+                        // For BUY/SELL, store for later update on trade close.
+                        if let Some(eid) = episode_id {
+                            let action_str = format!("{:?}", decision.action);
+                            episode_store.insert(
+                                format!("{}-{}-{}", decision.pair, action_str, tick),
+                                eid,
+                            );
                         }
                     }
 
@@ -2748,6 +2781,31 @@ pub async fn run(
                                                                 format!("LOSS: {} closed at {:.4}, PnL ${:.2}", trade.side, exit_price, pnl)
                                                             },
                                                         });
+
+                                                        // FID-098 Fix 1b: Update episodic memory with actual outcome
+                                                        if let Some(ref mem) = memory {
+                                                            let action_str = format!("{:?}", decision.action);
+                                                            let lookup_key = format!("{}-{}-{}", trade.pair, action_str, tick);
+                                                            if let Some(episode_id) = episode_store.get(&lookup_key) {
+                                                                let achieved_rr = if trade.entry_price > 0.0 && trade.quantity > 0.0 {
+                                                                    pnl / (trade.entry_price * trade.quantity)
+                                                                } else {
+                                                                    0.0
+                                                                };
+                                                                if let Err(e) = mem.update_outcome(
+                                                                    episode_id,
+                                                                    pnl,
+                                                                    pnl_pct,
+                                                                    pnl > 0.0,
+                                                                    achieved_rr,
+                                                                ).await {
+                                                                    warn!("FID-098: Failed to update episode outcome for {}: {}", trade.pair, e);
+                                                                } else {
+                                                                    debug!("FID-098: Updated episode {} outcome: PnL=${:.2}", &episode_id[..8], pnl);
+                                                                }
+                                                                episode_store.remove(&lookup_key);
+                                                            }
+                                                        }
 
                                                         // Update shared state immediately
                                                         {
@@ -3782,6 +3840,38 @@ pub async fn run(
                 }
             }
 
+            // FID-098 Fix 1c: Update episodic memory with stop-loss/TP outcome
+            if let Some(ref mem) = memory {
+                // Find the episode for this pair — stop/TP closes may not have an exact
+                // tick match, so search by pair prefix in the store
+                let pair_prefix = format!("{}-Buy", trade.pair);
+                let found = episode_store.iter()
+                    .find(|(k, _)| k.starts_with(&pair_prefix))
+                    .map(|(k, v)| (k.clone(), v.clone()));
+                if let Some((key, episode_id)) = found {
+                    let achieved_rr = if trade.entry_price > 0.0 && trade.quantity > 0.0 {
+                        trade.pnl / (trade.entry_price * trade.quantity)
+                    } else {
+                        0.0
+                    };
+                    let is_reverted = reverted_trades.iter().any(|(pair, side, entry, exit)| {
+                        *pair == trade.pair && *side == trade.side
+                            && (*entry - trade.entry_price).abs() < 0.0001
+                            && (*exit - trade.exit_price).abs() < 0.0001
+                    });
+                    if !is_reverted {
+                        if let Err(e) = mem.update_outcome(
+                            &episode_id, trade.pnl, trade.pnl_pct, trade.pnl > 0.0, achieved_rr,
+                        ).await {
+                            warn!("FID-098: Failed to update episode outcome for {}: {}", trade.pair, e);
+                        } else {
+                            debug!("FID-098: Updated episode {} outcome: PnL=${:.2} ({})", &episode_id[..8], trade.pnl, tp_label);
+                        }
+                    }
+                    episode_store.remove(&key);
+                }
+            }
+
             // WIRE-2: Update CUSUM chart on trade close
             if let Some(chart) = cusum_charts.get_mut(&trade.pair) {
                 // Calculate achieved R:R from trade
@@ -4001,7 +4091,8 @@ pub async fn run(
                                 // FID-096 Item 12: Record trade for external close
                                 // before removing the position. Uses last known market price.
                                 let pos_snapshot = portfolio.positions().get(&pos_id).cloned();
-                                if let Some(pos) = pos_snapshot {
+                                // FID-098: Extract PnL for outcome update (must be accessible after this block)
+                                let (ext_pnl, ext_pnl_pct) = if let Some(ref pos) = pos_snapshot {
                                     let market_price = market_stores
                                         .get(&pair)
                                         .and_then(|s| s.last().map(|c| c.close))
@@ -4013,6 +4104,15 @@ pub async fn run(
                                     let pnl_pct = if pos.entry_price > 0.0 && pos.quantity > 0.0 {
                                         pnl / (pos.entry_price * pos.quantity) * 100.0
                                     } else { 0.0 };
+                                    (pnl, pnl_pct)
+                                } else {
+                                    (0.0, 0.0)
+                                };
+                                if let Some(pos) = pos_snapshot {
+                                    let market_price = market_stores
+                                        .get(&pair)
+                                        .and_then(|s| s.last().map(|c| c.close))
+                                        .unwrap_or(pos.current_price);
                                     let trade = savant_trading::core::types::TradeRecord {
                                         id: uuid::Uuid::new_v4().to_string(),
                                         pair: pair.clone(),
@@ -4020,8 +4120,8 @@ pub async fn run(
                                         entry_price: pos.entry_price,
                                         exit_price: market_price,
                                         quantity: pos.quantity,
-                                        pnl,
-                                        pnl_pct,
+                                        pnl: ext_pnl,
+                                        pnl_pct: ext_pnl_pct,
                                         fees: 0.0,
                                         strategy_name: pos.strategy_name.clone(),
                                         opened_at: pos.opened_at,
@@ -4036,7 +4136,7 @@ pub async fn run(
                                     }
                                     info!(
                                         "Recorded external close trade: {} {} | Entry: {:.4} → Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
-                                        pair, pos.side, pos.entry_price, market_price, pnl, pnl_pct
+                                        pair, pos.side, pos.entry_price, market_price, ext_pnl, ext_pnl_pct
                                     );
                                 }
 
@@ -4104,6 +4204,24 @@ pub async fn run(
                                     &pair,
                                     &format!("EXTERNAL CLOSE: tokens no longer on-chain — position removed. Equity: ${:.2}", new_equity),
                                 ).await;
+
+                                // FID-098 Fix 1d: Update episodic memory with external close outcome
+                                if let Some(ref mem) = memory {
+                                    let pair_prefix = format!("{}-Buy", pair);
+                                    let found = episode_store.iter()
+                                        .find(|(k, _)| k.starts_with(&pair_prefix))
+                                        .map(|(k, v)| (k.clone(), v.clone()));
+                                    if let Some((key, episode_id)) = found {
+                                        if let Err(e) = mem.update_outcome(
+                                            &episode_id, ext_pnl, ext_pnl_pct, ext_pnl > 0.0, 0.0,
+                                        ).await {
+                                            warn!("FID-098: Failed to update episode for external close {}: {}", pair, e);
+                                        } else {
+                                            debug!("FID-098: Updated episode {} for external close: PnL=${:.2}", &episode_id[..8], ext_pnl);
+                                        }
+                                        episode_store.remove(&key);
+                                    }
+                                }
 
                             } else if on_chain > 0.0001 && on_chain < pos_qty * 0.5 {
                                 // Partial external close
@@ -4487,6 +4605,7 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
         higher_tf_candles: vec![],
         context_tags: savant_trading::agent::context_builder::generate_context_tags(&indicators),
         live_price: None,
+        decision_log_context: None,
     };
 
     let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
@@ -4740,6 +4859,7 @@ pub async fn run_live_test(
             higher_tf_candles: vec![],
             context_tags: savant_trading::agent::context_builder::generate_context_tags(&indicators),
             live_price: None,
+            decision_log_context: None,
         };
 
         let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
@@ -5228,6 +5348,7 @@ async fn run_training_batch(
                 &indicators,
             ),
             live_price: None,
+            decision_log_context: None,
         };
 
         let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
@@ -6372,6 +6493,7 @@ pub async fn run_sandbox(
             higher_tf_candles,
             context_tags: vec![],
             live_price: None,
+            decision_log_context: None,
         };
 
         let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(

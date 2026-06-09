@@ -4,6 +4,24 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.12.5] — 2026-06-09
+
+### Fixed — FID-098: Episodic Memory Feedback Loop (Model Never Learns)
+
+The LLM was making decisions every 5 minutes but never learning from outcomes. `EpisodicMemory::update_outcome()` was never called when trades closed — the feedback loop was completely broken.
+
+**Fixes:**
+- **Wired `update_outcome()` in 3 trade close paths** — AI-initiated close, stop-loss/TP close, and external close (reconciliation). Episodes now get actual PnL, win/loss, and achieved R:R when trades close.
+- **Wired `DecisionLog::context_for_pair()` into prompt** — The model now sees its recent same-pair decisions with outcomes in a new `## Recent Decision Log` section.
+- **Episode store** — Maps pair-action-tick → episode_id so outcomes can be matched to decisions at close time.
+
+**Before:** `## Dynamic Memory Context` showed 0 win rates, all episodes as "HELD"/"OPEN". Model flew blind.
+**After:** Win rates populate after first closed trades. Recent analogs show "WIN (+1.2R)" or "LOSS (-0.5R)". Decision log shows past reasoning with outcomes.
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.12.4] — 2026-06-09
 
 ### Fixed — FID-097: Circuit breaker baseline corruption + position resurrection
