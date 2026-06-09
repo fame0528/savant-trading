@@ -1,4 +1,4 @@
-# SAVANT TRADING v0.12.6
+# SAVANT TRADING v0.12.7
 
 <!-- markdownlint-disable MD033 -->
 <div align="center">

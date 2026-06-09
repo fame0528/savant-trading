@@ -4,6 +4,26 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.12.7] — 2026-06-09
+
+### Fixed — FID-104: Critical On-Chain Execution Failures
+
+Two bugs causing trades to fail on-chain:
+
+**R:R Auto-Adjust (engine.rs):** Position sizer rejected trades when actual R:R < min_rr (e.g., COMP/USD: claimed 1.5, actual 1.0). The sizer returned `None` and the engine just logged the rejection — no retry. **Fix:** Auto-extend `take_profit_1` to meet minimum R:R before sizer check. Also updates `decision.risk_reward` for log consistency.
+
+**Gasless API chainId (zero_x.rs):** The 0x Gasless API `/submit` endpoint requires `chainId` as a top-level integer field (OpenAPI spec: `required: [chainId, trade]`). Our code omitted it → HTTP 400 "Expected number, received nan". **Fix:** Added `chainId` to the submit body.
+
+### Chores
+
+- Archived all resolved FIDs into `dev/fids/archive/2026-0609-cleanup/`
+- `dev/fids/` now contains only `MASTER-FID-2026-0609.md`
+- Updated Master FID to v0.12.7 with FID-104 marked fixed
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.12.6] — 2026-06-09
 
 ### Fixed — FID-103: DEX Price as Authoritative Source (Structural Plumbing)
