@@ -3889,6 +3889,121 @@ pub async fn run(
                 *sa = portfolio.account().clone();
                 debug!("Balance synced from executor: ${:.2}", executor_balance);
             }
+
+            // FID-096 Fix 1: On-chain token balance reconciliation (every 2 cycles).
+            // Detects externally sold tokens (manual swap, another app) and removes
+            // phantom positions that no longer have on-chain backing.
+            if tick.is_multiple_of(2) && tick > 1 {
+                let position_pairs: Vec<(String, String, f64)> = portfolio.positions().iter()
+                    .map(|(id, p)| (id.clone(), p.pair.clone(), p.quantity))
+                    .collect();
+
+                for (pos_id, pair, pos_qty) in position_pairs {
+                    if pos_qty <= 0.0001 { continue; }
+
+                    // Resolve token address
+                    if let Ok((src_token, _)) = savant_trading::execution::dex::resolve_pair_on_chain(
+                        &pair, Side::Long, ex.chain_id(),
+                    ) {
+                        if src_token.address.is_empty() { continue; }
+
+                        if let Some(on_chain) = ex.query_token_balance(&src_token.address, src_token.decimals).await {
+                            if on_chain <= 0.0001 && pos_qty > 0.0001 {
+                                // EXTERNAL CLOSE: tokens gone from on-chain
+                                warn!(
+                                    "FID-096 EXTERNAL CLOSE: {} — on-chain balance is 0, position quantity was {:.6}. Removing.",
+                                    pair, pos_qty
+                                );
+
+                                let old_equity = portfolio.account().equity;
+
+                                // Remove from PortfolioManager
+                                if let Some(_removed) = portfolio.positions_mut().remove(&pos_id) {
+                                    portfolio.account_mut().open_positions = portfolio.positions().len();
+                                }
+
+                                // Remove from DexTrader
+                                {
+                                    let exec_id = executor_position_map.get(&pos_id)
+                                        .cloned()
+                                        .unwrap_or_else(|| format!("exec-{}", pos_id));
+                                    let ghost = savant_trading::core::types::Position {
+                                        id: pos_id.clone(),
+                                        pair: pair.clone(),
+                                        side: Side::Long,
+                                        entry_price: 0.0,
+                                        current_price: 0.0,
+                                        quantity: 0.0,
+                                        stop_loss: 0.0,
+                                        take_profit_1: 0.0,
+                                        take_profit_2: 0.0,
+                                        take_profit_3: 0.0,
+                                        unrealized_pnl: 0.0,
+                                        risk_amount: 0.0,
+                                        strategy_name: String::new(),
+                                        scale_level: savant_trading::core::types::ScaleLevel::Full,
+                                        opened_at: chrono::Utc::now(),
+                                    };
+                                    ex.register_position(exec_id.clone(), ghost);
+                                }
+
+                                // Remove from executor_position_map
+                                executor_position_map.remove(&pos_id);
+
+                                // Delete from journal
+                                if let Some(ref j) = journal {
+                                    if let Err(e) = j.delete_position(&pos_id).await {
+                                        warn!("Failed to delete externally closed position {} from journal: {}", pos_id, e);
+                                    }
+                                }
+
+                                // Clear close failure cooldown
+                                close_failure_cooldown.remove(&pair);
+
+                                // Refresh equity and log correction
+                                portfolio.refresh_equity();
+                                let new_equity = portfolio.account().equity;
+                                info!(
+                                    "FID-096 EQUITY CORRECTED: ${:.2} → ${:.2} after external close of {}",
+                                    old_equity, new_equity, pair
+                                );
+
+                                // Sync to shared state for dashboard
+                                let mut sa = shared.account.write().await;
+                                *sa = portfolio.account().clone();
+                                let mut sp = shared.positions.write().await;
+                                *sp = portfolio.positions().values().cloned().collect();
+
+                                // Dashboard notification
+                                shared.log_activity(
+                                    savant_trading::core::shared::ActivityLevel::Warning,
+                                    &pair,
+                                    &format!("EXTERNAL CLOSE: tokens no longer on-chain — position removed. Equity: ${:.2}", new_equity),
+                                ).await;
+
+                            } else if on_chain > 0.0001 && on_chain < pos_qty * 0.5 {
+                                // Partial external close
+                                warn!(
+                                    "FID-096 PARTIAL EXTERNAL CLOSE: {} — on-chain {:.6} vs position {:.6}",
+                                    pair, on_chain, pos_qty
+                                );
+                                if let Some(pos) = portfolio.positions_mut().get_mut(&pos_id) {
+                                    let old_qty = pos.quantity;
+                                    pos.quantity = on_chain;
+                                    pos.risk_amount = pos.entry_price * on_chain;
+                                    info!(
+                                        "Updated {} quantity: {:.6} → {:.6} (partial external close)",
+                                        pair, old_qty, on_chain
+                                    );
+                                    if let Some(ref j) = journal {
+                                        let _ = j.save_position(pos).await;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         if tick.is_multiple_of(10) {

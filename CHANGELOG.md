@@ -4,6 +4,24 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.12.1] — 2026-06-09
+
+### Fixed — FID-096: On-Chain Reconciliation + Zero-Base Enforcement
+
+**The problem:** Engine operated on stale portfolio data. `sync_balance()` only synced USDC every 3 cycles — token balances (WETH, LINK) were checked once at startup and never again. If tokens were sold externally, the engine continued tracking phantom positions, making decisions on non-existent holdings, and showing incorrect portfolio values.
+
+Additionally, the Zero-Base Review ("Would you buy at current price?") was correctly performed by the LLM but had no parser enforcement. The AI said "No" and chose HOLD anyway.
+
+**Fixes:**
+- **On-chain token reconciliation** — Every 2 cycles (10 min), queries on-chain balance for all held positions. If balance is 0 but position exists → external close detected → removes position from PortfolioManager, DexTrader, journal, and executor_position_map. Logs equity correction and dashboard notification. (`engine.rs`)
+- **Zero-Base Review enforcement** — Added `would_initiate_new_long` field to TradeDecision struct. Parsed from nested `position_audit[0]` in LLM JSON. If `false` + action is HOLD → parser overrides to CLOSE. (`decision_parser.rs`)
+- **ExecutionEngine trait** — Added `query_token_balance()` and `chain_id()` to the trait so the engine can query on-chain balances via the trait object. (`engine.rs`, `trader.rs`)
+- **HOLD confidence prompt** — Updated output_format.md: "For HOLD decisions, set confidence to your conviction in the HOLD thesis, NOT 0.0." (`output_format.md`)
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.12.0] — 2026-06-08
 
 ### Fixed — FID-093: A-Z Logic Cleanup (Partial) + FID-094: Close Death Loop

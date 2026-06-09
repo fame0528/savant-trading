@@ -77,7 +77,7 @@ Field Rules:
 - stop_loss: exact stop loss price (mandatory for BUY/SELL/ADJUST_STOP)
 - take_profit_1/2/3: three take-profit levels (TP1 nearest, TP3 farthest)
 - position_size_pct: percentage of portfolio to allocate (0-100)
-- confidence: 0.0 to 1.0 — be honest, don't inflate. Below 0.40 = automatically downgraded to HOLD for NEW ENTRIES ONLY. ADJUST_STOP and CLOSE are NOT gated by confidence.
+- confidence: 0.0 to 1.0 — be honest, don't inflate. Below 0.40 = automatically downgraded to HOLD for NEW ENTRIES ONLY. ADJUST_STOP and CLOSE are NOT gated by confidence. For HOLD decisions on existing positions, set confidence to your conviction in the HOLD thesis, NOT 0.0. A confidence of 0.0 means "no conviction" which contradicts holding the position. If you're holding, you believe it will recover — express that as a score.
 - reasoning: cite specific data, indicators, and knowledge sources
 - knowledge_sources: list of knowledge unit IDs that informed your decision
 - risk_reward: calculated R:R ratio. Formula: |take_profit_1 - entry_price| / |entry_price - stop_loss|. Do NOT leave at 0.0.

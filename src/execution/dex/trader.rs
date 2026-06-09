@@ -1795,6 +1795,50 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         }
         discrepancies
     }
+
+    // FID-096: Delegate to concrete methods for on-chain reconciliation
+    async fn query_token_balance(&self, token_address: &str, decimals: u8) -> Option<f64> {
+        // Delegate to the concrete impl on DexTrader
+        let padded_addr = format!(
+            "{:0>64}",
+            self.wallet_address.to_string().trim_start_matches("0x")
+        );
+        let call_data = format!("0x70a08231{}", padded_addr);
+        let call_params = serde_json::json!([{
+            "to": token_address,
+            "data": call_data
+        }, "latest"]);
+        match self.rpc_call("eth_call", call_params).await {
+            Ok(result) => {
+                if let Some(hex) = result.as_str() {
+                    let hex_clean = hex.trim_start_matches("0x");
+                    let wei = match U256::from_str_radix(hex_clean, 16) {
+                        Ok(w) => w,
+                        Err(e) => {
+                            tracing::warn!("query_token_balance: parse failed for {}: {}", token_address, e);
+                            return None;
+                        }
+                    };
+                    let divisor = 10f64.powi(decimals as i32);
+                    let balance = wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
+                    if balance <= 0.0 {
+                        tracing::warn!("BALANCE QUERY: {} returned 0 (hex='{}', decimals={})", token_address, hex, decimals);
+                    }
+                    Some(balance)
+                } else {
+                    None
+                }
+            }
+            Err(e) => {
+                tracing::debug!("query_token_balance failed for {}: {}", token_address, e);
+                None
+            }
+        }
+    }
+
+    fn chain_id(&self) -> u64 {
+        self.chain_id
+    }
 }
 
 impl<B: DexBackend + 'static> DexTrader<B> {

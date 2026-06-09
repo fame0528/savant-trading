@@ -63,6 +63,9 @@ pub struct TradeDecision {
     pub mandated_action: String,
     #[serde(default)]
     pub mandated_stop_price: f64,
+    // FID-096 Fix 2: Zero-Base Review field — parsed from position_audit[0]
+    #[serde(default)]
+    pub would_initiate_new_long: Option<bool>,
 }
 
 fn default_order_type() -> String {
@@ -317,6 +320,17 @@ pub fn parse_decision(
         decision.action = TradeAction::Close;
     }
 
+    // FID-096 Fix 2: Zero-Base Review enforcement.
+    // If the LLM's position_audit says "would not buy at current price" but
+    // action is HOLD, the agent is contradicting its own analysis. Override to CLOSE.
+    if decision.would_initiate_new_long == Some(false) && matches!(decision.action, TradeAction::Pass) {
+        tracing::warn!(
+            "FID-096 ZERO-BASE ENFORCEMENT: would_initiate_new_long=false but action was {:?}. Overriding to Close. Pair: {}",
+            decision.action, decision.pair
+        );
+        decision.action = TradeAction::Close;
+    }
+
     Ok(decision)
 }
 
@@ -478,6 +492,7 @@ fn extract_from_freeform(text: &str) -> Option<TradeDecision> {
             opportunity_cost: String::new(),
             mandated_action: String::new(),
             mandated_stop_price: 0.0,
+            would_initiate_new_long: None,
         });
     }
 
@@ -534,6 +549,7 @@ fn extract_from_freeform(text: &str) -> Option<TradeDecision> {
         opportunity_cost: String::new(),
         mandated_action: String::new(),
         mandated_stop_price: 0.0,
+        would_initiate_new_long: None,
     })
 }
 
@@ -853,6 +869,13 @@ fn partial_extract(json: &str) -> Option<TradeDecision> {
             .get("mandated_stop_price")
             .and_then(|v| v.as_f64())
             .unwrap_or(0.0),
+        // FID-096: Extract from position_audit[0] (nested field)
+        would_initiate_new_long: value
+            .get("position_audit")
+            .and_then(|v| v.as_array())
+            .and_then(|arr| arr.first())
+            .and_then(|first| first.get("would_initiate_new_long_at_current_price"))
+            .and_then(|v| v.as_bool()),
     })
 }
 

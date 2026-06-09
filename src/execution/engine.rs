@@ -86,4 +86,14 @@ pub trait ExecutionEngine: Send + Sync {
     /// Called during wallet sync for positions discovered on-chain but not in the executor.
     /// Default: no-op (paper trading doesn't need this).
     fn register_position(&mut self, _id: String, _pos: Position) {}
+
+    /// Query on-chain ERC-20 token balance for a specific token.
+    /// Returns Some(balance) or None if query fails.
+    /// Default: None (paper trading has no on-chain state).
+    async fn query_token_balance(&self, _token_address: &str, _decimals: u8) -> Option<f64> {
+        None
+    }
+
+    /// Get the chain ID for this executor.
+    fn chain_id(&self) -> u64 { 0 }
 }
