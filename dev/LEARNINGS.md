@@ -502,3 +502,21 @@
 - `reconciliation_removed: HashSet<String>` declared early (before first use site ~370), populated at 2 removal sites, checked at 2 revert sites
 - Batch dedup uses `HashMap<String, usize>` to track pair→last_index, then `retain` to filter
 - Wallet masking: `&addr[..6]` + `&addr[addr.len()-4..]` — panic-safe with len > 10 guard
+
+---
+
+## Session 2026-06-09: FID-098 — Episodic Memory Feedback Loop
+
+**Key Learnings:**
+
+- **The feedback loop was completely broken.** `EpisodicMemory::update_outcome()` had zero call sites in production. Episodes were captured with NULL outcomes and never updated. Win rate queries always returned 0 rows (filtered on `status = 'closed'`). The model was flying blind.
+- **DecisionLog was write-only.** `context_for_pair()` existed but was only called from unit tests. The JSON decision log accumulated data that was never read back.
+- **Three trade close paths need outcome wiring:** AI-initiated close, stop-loss/TP close, and external close (reconciliation). Each needs to look up the episode_id and call `update_outcome()`.
+- **Episode store pattern:** Use a `HashMap<String, String>` mapping `pair-action-tick → episode_id` to connect decisions to outcomes. The tick provides uniqueness within a cycle.
+- **`format!` in `format!` triggers clippy.** Use a local variable for the inner format string instead of nesting `format!` calls.
+
+**Technical Insights:**
+
+- `episode_store: HashMap<String, String>` declared at line ~413, populated at capture site (~2380), consumed at 3 close paths (lines ~2800, ~3869, ~4221)
+- `decision_log_context` added to `FullContext` struct, populated at line ~1787, injected into prompt at `context_builder.rs:504`
+- `context_for_pair(pair, 3, 2)` — 3 same-pair entries, 2 cross-pair entries with outcomes
