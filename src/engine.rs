@@ -2182,6 +2182,7 @@ pub async fn run(
                     // If the LLM returned Pass but a position has a management trigger,
                     // override to the mandated action. This catches cases where the LLM
                     // didn't produce the position_audit fields (weak model fallback).
+                    // FID-089: Use actual market price from market_stores, not stale pos.current_price.
                     if decision.action == savant_trading::agent::decision_parser::TradeAction::Pass {
                         let pair_pos = portfolio.positions().values()
                             .find(|p| p.pair == decision.pair)
@@ -2194,76 +2195,103 @@ pub async fn run(
                                 .map(|(_, ind, reg)| (ind.atr, ind.adx, ind.rsi, format!("{}", reg)))
                                 .unwrap_or((None, None, None, "Unknown".to_string()));
 
-                            let mut trigger_fired = false;
-                            let mut mandated_action = String::new();
-                            let mut mandated_stop = 0.0;
-                            let mut trigger_reason = String::new();
+                            // FID-089 Fix 1: Get actual market price from candle data
+                            let actual_market_price = market_stores
+                                .get(decision.pair.as_str())
+                                .and_then(|s| s.last().map(|c| c.close))
+                                .unwrap_or(0.0);
 
-                            // Trigger 1: Stop Distance Violation
-                            if let Some(atr) = atr_val {
-                                if atr > 0.0 {
-                                    let stop_distance = (pos.entry_price - pos.stop_loss).abs();
-                                    let stop_distance_atr = stop_distance / atr;
-                                    if stop_distance_atr > 2.5 {
-                                        trigger_fired = true;
-                                        mandated_action = "adjust_stop".to_string();
-                                        // Set stop to 1.5x ATR from current price
-                                        mandated_stop = match pos.side {
-                                            Side::Long => pos.current_price - (atr * 1.5),
-                                            Side::Short => pos.current_price + (atr * 1.5),
-                                        };
-                                        trigger_reason = format!(
-                                            "Stop distance {:.1}x ATR exceeds 2.5x threshold",
-                                            stop_distance_atr
-                                        );
-                                    }
-                                }
-                            }
+                            // FID-089 Fix 5: Guard — skip trigger if price not yet updated
+                            // (current_price still equals entry_price from wallet recovery)
+                            let price_stale = pos.entry_price > 0.0
+                                && (pos.current_price - pos.entry_price).abs() / pos.entry_price < 0.001;
+                            if price_stale && actual_market_price <= 0.0 {
+                                // No market data available and price hasn't been updated — skip
+                                debug!("FID-089: Skipping trigger for {} — price not yet updated from market data", decision.pair);
+                            } else {
+                                // Use actual market price if available, else fall back to pos.current_price
+                                let effective_price = if actual_market_price > 0.0 {
+                                    actual_market_price
+                                } else {
+                                    pos.current_price
+                                };
 
-                            // Trigger 2: Regime Incompatibility (if ADX available)
-                            if !trigger_fired {
-                                if let Some(adx) = adx_val {
-                                    // If position was likely opened in trending (wide stop suggests momentum entry)
-                                    // and now ADX < 20, regime has changed
-                                    let stop_pct = if pos.entry_price > 0.0 {
-                                        (pos.entry_price - pos.stop_loss).abs() / pos.entry_price * 100.0
-                                    } else { 0.0 };
-                                    if adx < 20.0 && stop_pct > 5.0 {
-                                        trigger_fired = true;
-                                        mandated_action = "adjust_stop".to_string();
-                                        if let Some(atr) = atr_val {
+                                let mut trigger_fired = false;
+                                let mut mandated_action = String::new();
+                                let mut mandated_stop = 0.0;
+                                let mut trigger_reason = String::new();
+
+                                // FID-089 Fix 7: ATR sanity check — skip if ATR > 10% of price
+                                let atr_valid = atr_val.is_some_and(|a| {
+                                    a > 0.0 && a < effective_price * 0.10
+                                });
+
+                                // Trigger 1: Stop Distance Violation
+                                if atr_valid {
+                                    if let Some(atr) = atr_val {
+                                        let stop_distance = (pos.entry_price - pos.stop_loss).abs();
+                                        let stop_distance_atr = stop_distance / atr;
+                                        if stop_distance_atr > 2.5 {
+                                            trigger_fired = true;
+                                            mandated_action = "adjust_stop".to_string();
+                                            // FID-089: Use actual market price, not stale pos.current_price
                                             mandated_stop = match pos.side {
-                                                Side::Long => pos.current_price - (atr * 1.5),
-                                                Side::Short => pos.current_price + (atr * 1.5),
+                                                Side::Long => effective_price - (atr * 1.5),
+                                                Side::Short => effective_price + (atr * 1.5),
                                             };
+                                            trigger_reason = format!(
+                                                "Stop distance {:.1}x ATR exceeds 2.5x threshold (market price: {:.2})",
+                                                stop_distance_atr, effective_price
+                                            );
                                         }
-                                        trigger_reason = format!(
-                                            "Regime change: ADX={:.1} (ranging) but position has {:.1}% stop (trending-era)",
-                                            adx, stop_pct
-                                        );
                                     }
                                 }
-                            }
 
-                            if trigger_fired {
-                                warn!(
-                                    "FID-088 ENGINE TRIGGER: {} — {}. Overriding Pass to {}. New stop: {:.4}",
-                                    decision.pair, trigger_reason, mandated_action, mandated_stop
-                                );
-                                shared.log_activity(
-                                    savant_trading::core::shared::ActivityLevel::Warning,
-                                    &decision.pair,
-                                    &format!(
-                                        "FID-088 TRIGGER: {} — overriding to {}",
-                                        trigger_reason, mandated_action
-                                    ),
-                                ).await;
-                                // Override the decision
-                                if mandated_action == "adjust_stop" && mandated_stop > 0.0 {
-                                    decision.action = savant_trading::agent::decision_parser::TradeAction::AdjustStop;
-                                    decision.stop_loss = mandated_stop;
-                                } else if mandated_action == "close" {
-                                    decision.action = savant_trading::agent::decision_parser::TradeAction::Close;
+                                // Trigger 2: Regime Incompatibility (if ADX available)
+                                if !trigger_fired {
+                                    if let Some(adx) = adx_val {
+                                        let stop_pct = if pos.entry_price > 0.0 {
+                                            (pos.entry_price - pos.stop_loss).abs() / pos.entry_price * 100.0
+                                        } else { 0.0 };
+                                        if adx < 20.0 && stop_pct > 5.0 {
+                                            trigger_fired = true;
+                                            mandated_action = "adjust_stop".to_string();
+                                            if atr_valid {
+                                                if let Some(atr) = atr_val {
+                                                    mandated_stop = match pos.side {
+                                                        Side::Long => effective_price - (atr * 1.5),
+                                                        Side::Short => effective_price + (atr * 1.5),
+                                                    };
+                                                }
+                                            }
+                                            trigger_reason = format!(
+                                                "Regime change: ADX={:.1} (ranging) but position has {:.1}% stop (trending-era, market price: {:.2})",
+                                                adx, stop_pct, effective_price
+                                            );
+                                        }
+                                    }
+                                }
+
+                                if trigger_fired {
+                                    warn!(
+                                        "FID-088 ENGINE TRIGGER: {} — {}. Overriding Pass to {}. New stop: {:.4}",
+                                        decision.pair, trigger_reason, mandated_action, mandated_stop
+                                    );
+                                    shared.log_activity(
+                                        savant_trading::core::shared::ActivityLevel::Warning,
+                                        &decision.pair,
+                                        &format!(
+                                            "FID-088 TRIGGER: {} — overriding to {}",
+                                            trigger_reason, mandated_action
+                                        ),
+                                    ).await;
+                                    // Override the decision
+                                    if mandated_action == "adjust_stop" && mandated_stop > 0.0 {
+                                        decision.action = savant_trading::agent::decision_parser::TradeAction::AdjustStop;
+                                        decision.stop_loss = mandated_stop;
+                                    } else if mandated_action == "close" {
+                                        decision.action = savant_trading::agent::decision_parser::TradeAction::Close;
+                                    }
                                 }
                             }
                         }

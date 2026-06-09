@@ -1702,8 +1702,15 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
 
             if let Ok(result) = self.rpc_call("eth_call", bal_call).await {
                 if let Some(hex) = result.as_str() {
-                    let wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
-                        .unwrap_or(U256::ZERO);
+                    let hex_clean = hex.trim_start_matches("0x");
+                    // FID-089: Use match instead of unwrap_or(U256::ZERO)
+                    let wei = match U256::from_str_radix(hex_clean, 16) {
+                        Ok(w) => w,
+                        Err(e) => {
+                            tracing::warn!("sync_balance: Failed to parse hex '{}' for {}: {}", hex_clean, sym, e);
+                            continue;
+                        }
+                    };
                     let divisor = 10f64.powi(*decimals as i32);
                     let bal: f64 = wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
                     if bal > 0.0001 {
@@ -1797,6 +1804,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                     let hex_clean = hex.trim_start_matches("0x");
                     // FID-087 Bug D: Return None on parse failure instead of Some(0.0).
                     // The caller's unwrap_or(close_qty) will then use the requested quantity.
+                    // FID-089: Add debug logging for balance query diagnosis
                     let wei = match U256::from_str_radix(hex_clean, 16) {
                         Ok(w) => w,
                         Err(e) => {
@@ -1809,8 +1817,21 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                     };
                     let divisor = 10f64.powi(decimals as i32);
                     let balance = wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
+                    // FID-089: Log balance query for diagnosis
+                    if balance <= 0.0 {
+                        tracing::warn!(
+                            "BALANCE QUERY: {} returned 0 (hex='{}', decimals={}). Token may have zero balance or RPC returned stale data.",
+                            token_address, hex, decimals
+                        );
+                    } else {
+                        tracing::debug!(
+                            "BALANCE QUERY: {} = {:.8} (hex='{}', decimals={})",
+                            token_address, balance, hex, decimals
+                        );
+                    }
                     Some(balance)
                 } else {
+                    tracing::warn!("BALANCE QUERY: {} returned non-string result: {:?}", token_address, result);
                     None
                 }
             }

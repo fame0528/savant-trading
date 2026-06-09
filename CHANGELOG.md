@@ -4,6 +4,24 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.11.8] — 2026-06-08
+
+### Fixed — FID-089: Engine Trigger Stale Price + Balance Query Zero
+
+**The problem:** FID-088's engine-side management trigger used `pos.current_price` (stale entry price from wallet recovery) instead of the actual market price from candle data. This set the stop ABOVE market price, causing an immediate false stop loss. Additionally, `query_token_balance` returned 0 despite tokens existing on-chain, and `sync_balance` still used the old `unwrap_or(U256::ZERO)` pattern.
+
+**4 fixes + 3 guards:**
+
+- **Bug 1 — Stale price:** Engine trigger now uses `market_stores.get(&pair).last().close` for actual market price instead of `pos.current_price`. (`engine.rs`)
+- **Bug 3 — Balance query:** Added debug logging to `query_token_balance` (logs token address, hex response, parsed value). Fixed `sync_balance` to use `match` instead of `.unwrap_or(U256::ZERO)`. (`trader.rs`)
+- **Guard 1 — Stale price detection:** If `pos.current_price` is within 0.1% of `pos.entry_price`, skip trigger entirely (price hasn't been refreshed yet). (`engine.rs`)
+- **Guard 2 — ATR sanity check:** If ATR > 10% of price, ATR data is unreliable, skip trigger. (`engine.rs`)
+- **Guard 3 — Effective price fallback:** Use actual market price if available, else fall back to `pos.current_price`. (`engine.rs`)
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.11.7] — 2026-06-08
 
 ### Fixed — FID-088: Agent Action Paralysis (Cognitive Forcing Functions)
