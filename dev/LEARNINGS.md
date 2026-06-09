@@ -1,5 +1,14 @@
 # LEARNINGS
 
+## Session 2026-06-09: FID-104 — On-Chain Execution Failures
+
+**Key Learnings:**
+
+- **Always read full files 0-EOF before diagnosing.** Reading fragments of engine.rs and zero_x.rs caused me to miss the gasless chainId bug initially. The error was in the submit body construction, not the quote URL. Law 1 is non-negotiable.
+- **OpenAPI spec takes priority over docs examples.** The 0x Gasless API docs curl example didn't show `chainId` in the submit body, but the OpenAPI spec (line 23694) marked it as `required: [chainId, trade]`. Always check the machine-readable spec when available.
+- **Keep related fields consistent.** When auto-adjusting TP1, the `decision.risk_reward` field must also be updated. Inconsistent state between prices and claimed R:R causes confusing logs and potential downstream bugs.
+- **Dev folder hygiene prevents confusion.** 11 FIDs in dev/fids/ made it hard to identify what was active vs. archived. Now only the Master FID stays active; everything else gets archived immediately on closure.
+
 ## Session 2026-06-08: FID-088 — Agent Action Paralysis (Cognitive Forcing Functions)
 
 **Key Learnings:**
