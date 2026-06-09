@@ -1,5 +1,5 @@
 use chrono::Utc;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::time::Duration;
 use tokio::time;
 use tracing::{debug, error, info, warn};
@@ -346,7 +346,13 @@ pub async fn run(
                         if let Ok(addr) = derive_address_from_key(&pk) {
                             let mut wa = shared.wallet_address.write().await;
                             *wa = addr.clone();
-                            info!("Wallet address cached: {}", addr);
+                            // FID-097 Fix 4: Mask wallet address in logs (Law 12)
+                            let masked = if addr.len() > 10 {
+                                format!("{}...{}", &addr[..6], &addr[addr.len()-4..])
+                            } else {
+                                addr.clone()
+                            };
+                            info!("Wallet address cached: {}", masked);
                         }
                     }
                 }
@@ -359,6 +365,10 @@ pub async fn run(
             }
         }
     }
+
+    // FID-097 Fix 2: Tracks positions removed by on-chain reconciliation.
+    // Prevents FID-074 revert path from resurrecting phantom positions.
+    let mut reconciliation_removed: HashSet<String> = HashSet::new();
 
     // Sync on-chain balance on startup — dashboard reads from PortfolioManager.
     // Chain is ALWAYS the single source of truth, even when balance is $0.
@@ -379,9 +389,19 @@ pub async fn run(
                 "PHANTOM POSITIONS: executor has 0 positions but PortfolioManager has {}. Clearing PortfolioManager.",
                 portfolio.positions().len()
             );
+            // FID-097 Fix 2: Record cleared IDs so FID-074 doesn't resurrect them
+            for pid in portfolio.positions().keys() {
+                reconciliation_removed.insert(pid.clone());
+            }
             portfolio.positions_mut().clear();
             portfolio.account_mut().open_positions = 0;
             portfolio.account_mut().unrealized_pnl = 0.0;
+            portfolio.account_mut().peak_equity = portfolio.account().equity;
+            portfolio.account_mut().drawdown_pct = 0.0;
+            warn!(
+                "FID-097: Reset peak_equity to ${:.2} after phantom position reconciliation",
+                portfolio.account().equity
+            );
         }
     }
 
@@ -1997,12 +2017,65 @@ pub async fn run(
                     // objects with text between them instead of a clean array
                     match savant_trading::agent::decision_parser::extract_json_array(&cleaned) {
                         Ok(decisions) => {
+                            // FID-097 Fix 3: Deduplicate by pair name (keep last decision).
+                            // LLM sometimes returns duplicate pairs in a single batch response.
+                            let mut seen_pairs: HashMap<String, usize> = HashMap::new();
+                            let mut deduped_decisions: Vec<serde_json::Value> = Vec::new();
+                            for (idx, decision_val) in decisions.iter().enumerate() {
+                                let pair = decision_val
+                                    .get("pair")
+                                    .and_then(|p| p.as_str())
+                                    .unwrap_or("UNKNOWN");
+                                if let Some(prev_idx) = seen_pairs.get(pair) {
+                                    warn!(
+                                        "FID-097: Duplicate pair '{}' at index {} (already at {}) — keeping latest",
+                                        pair, idx, prev_idx
+                                    );
+                                    // Remove the earlier duplicate from deduped
+                                    deduped_decisions.retain(|d| {
+                                        d.get("pair").and_then(|p| p.as_str()).unwrap_or("") != pair
+                                    });
+                                }
+                                seen_pairs.insert(pair.to_string(), idx);
+                                deduped_decisions.push(decision_val.clone());
+                            }
+                            let duplicates_found = decisions.len() - deduped_decisions.len();
+                            if duplicates_found > 0 {
+                                warn!(
+                                    "FID-097: Removed {} duplicate(s) from batch → {} unique decisions",
+                                    duplicates_found,
+                                    deduped_decisions.len()
+                                );
+                            }
                             log_phase!(
                                 "PHASE2",
-                                "Parsed {} decisions from batch response",
-                                decisions.len()
+                                "Parsed {} decisions from batch response ({}/{} pairs{})",
+                                deduped_decisions.len(),
+                                deduped_decisions.len(),
+                                batch_size,
+                                if duplicates_found > 0 {
+                                    format!(" — {} dupes removed", duplicates_found)
+                                } else {
+                                    String::new()
+                                }
                             );
-                            for decision_val in decisions {
+                            // FID-097 Fix 5: Validate batch size — log missing pairs
+                            if deduped_decisions.len() < batch_size {
+                                let returned_pairs: std::collections::HashSet<String> = deduped_decisions
+                                    .iter()
+                                    .filter_map(|d| d.get("pair").and_then(|p| p.as_str()).map(String::from))
+                                    .collect();
+                                let requested: &std::collections::HashSet<String> = &price_map.keys().cloned().collect();
+                                let missing: Vec<&String> = requested.difference(&returned_pairs).collect();
+                                if !missing.is_empty() {
+                                    warn!(
+                                        "FID-097: Batch incomplete — missing {} pair(s): {}. Will auto-evaluate next cycle.",
+                                        missing.len(),
+                                        missing.iter().map(|s| s.as_str()).collect::<Vec<_>>().join(", ")
+                                    );
+                                }
+                            }
+                            for decision_val in deduped_decisions {
                                 let pair = decision_val
                                     .get("pair")
                                     .and_then(|p| p.as_str())
@@ -3526,9 +3599,12 @@ pub async fn run(
                                 trade.entry_price,
                                 trade.exit_price,
                             ));
-                            // Restore position to PortfolioManager so it stays tracked
+                            // FID-097 Fix 2: Restore position to PortfolioManager — but NOT if
+                            // reconciliation removed it (phantom position guard).
                             if let Some(ref pid) = paper_id {
-                                if let Some(pos) = paper_positions_full.get(pid) {
+                                if reconciliation_removed.contains(pid) {
+                                    warn!("FID-097: Skipping restore of {} — removed by reconciliation, not a real position", pid);
+                                } else if let Some(pos) = paper_positions_full.get(pid) {
                                     portfolio.positions_mut().insert(pid.clone(), pos.clone());
                                     portfolio.account_mut().open_positions =
                                         portfolio.positions().len();
@@ -3572,9 +3648,12 @@ pub async fn run(
                                 trade.entry_price,
                                 trade.exit_price,
                             ));
-                            // Restore position to PortfolioManager
+                            // FID-097 Fix 2: Restore position to PortfolioManager — but NOT if
+                            // reconciliation removed it (phantom position guard).
                             if let Some(ref pid) = paper_id {
-                                if let Some(pos) = paper_positions_full.get(pid) {
+                                if reconciliation_removed.contains(pid) {
+                                    warn!("FID-097: Skipping restore of {} — removed by reconciliation, not a real position", pid);
+                                } else if let Some(pos) = paper_positions_full.get(pid) {
                                     portfolio.positions_mut().insert(pid.clone(), pos.clone());
                                     portfolio.account_mut().open_positions =
                                         portfolio.positions().len();
@@ -3964,6 +4043,7 @@ pub async fn run(
                                 // Remove from PortfolioManager
                                 if let Some(_removed) = portfolio.positions_mut().remove(&pos_id) {
                                     portfolio.account_mut().open_positions = portfolio.positions().len();
+                                    reconciliation_removed.insert(pos_id.clone());
                                 }
 
                                 // Remove from DexTrader

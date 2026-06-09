@@ -4,6 +4,22 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.12.4] — 2026-06-09
+
+### Fixed — FID-097: Circuit breaker baseline corruption + position resurrection
+
+Five fixes from FID-097 after v0.12.3 exposed downstream issues:
+
+- **peak_equity reset after reconciliation** — After phantom positions are removed (both at startup and per-cycle), `peak_equity` and `drawdown_pct` are reset to current equity. Fixes the circuit breaker being permanently stuck at 50%+ drawdown.
+- **Position resurrection guard** — Added `reconciliation_removed: HashSet<String>` that tracks all positions removed by on-chain reconciliation. Both FID-074 revert paths check this set before restoring positions — prevents phantom positions from reappearing.
+- **Batch deduplication** — LLM batch responses are now deduplicated by pair name (keep last decision). Duplicates are logged with a warning.
+- **Wallet address masking (Law 12)** — Wallet address in logs is now masked to first 6 + last 4 characters.
+- **Batch size validation** — When LLM returns fewer decisions than requested, missing pair names are logged as a warning for observability.
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.12.3] — 2026-06-09
 
 ### Fixed — Reconciliation queried wrong token (USDC instead of WETH/LINK)
