@@ -1,9 +1,10 @@
-# MASTER FID — Savant Trading v0.12.6 Baseline
+# MASTER FID — Savant Trading v0.12.7 Development Plan
 
 **ID:** MASTER-FID-2026-0609
 **Created:** 2026-06-09 19:00
+**Updated:** 2026-06-09 20:00
 **Status:** active
-**Scope:** All FIDs consolidated, validated against v0.12.6 codebase
+**Scope:** All FIDs consolidated, validated against v0.12.7 codebase
 
 ---
 
@@ -22,6 +23,7 @@
 | FID-101 | R:R auto-adjust + bear market filter | created | ❌ No |
 | FID-102 | Gemini Priority 1 (ATR TP, BB squeeze, dynamic ADX) | created | ❌ No |
 | FID-103 | DEX price authoritative (salvaged) | analyzed | ⚠️ Partial (plumbing done, live data pending) |
+| FID-104 | On-chain execution failures (R:R adjust + gasless chainId) | ✅ fixed | Yes (v0.12.7) |
 
 ---
 
