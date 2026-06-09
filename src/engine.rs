@@ -3902,13 +3902,14 @@ pub async fn run(
                 for (pos_id, pair, pos_qty) in position_pairs {
                     if pos_qty <= 0.0001 { continue; }
 
-                    // Resolve token address
-                    if let Ok((src_token, _)) = savant_trading::execution::dex::resolve_pair_on_chain(
-                        &pair, Side::Long, ex.chain_id(),
+                    // Resolve token address — use Side::Short to get the BASE token
+                    // (what we hold for a LONG position). Side::Long would return USDC.
+                    if let Ok((base_token, _)) = savant_trading::execution::dex::resolve_pair_on_chain(
+                        &pair, Side::Short, ex.chain_id(),
                     ) {
-                        if src_token.address.is_empty() { continue; }
+                        if base_token.address.is_empty() { continue; }
 
-                        if let Some(on_chain) = ex.query_token_balance(&src_token.address, src_token.decimals).await {
+                        if let Some(on_chain) = ex.query_token_balance(&base_token.address, base_token.decimals).await {
                             if on_chain <= 0.0001 && pos_qty > 0.0001 {
                                 // EXTERNAL CLOSE: tokens gone from on-chain
                                 warn!(
