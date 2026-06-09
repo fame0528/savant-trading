@@ -1815,6 +1815,7 @@ pub async fn run(
                     } else {
                         Some(decision_log_ctx)
                     },
+                    dex_price: None,
                 };
 
                 // Step 1: Select knowledge units and clone to release borrow on agent
@@ -4606,6 +4607,7 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
         context_tags: savant_trading::agent::context_builder::generate_context_tags(&indicators),
         live_price: None,
         decision_log_context: None,
+        dex_price: None,
     };
 
     let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
@@ -4860,6 +4862,7 @@ pub async fn run_live_test(
             context_tags: savant_trading::agent::context_builder::generate_context_tags(&indicators),
             live_price: None,
             decision_log_context: None,
+            dex_price: None,
         };
 
         let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
@@ -5349,6 +5352,7 @@ async fn run_training_batch(
             ),
             live_price: None,
             decision_log_context: None,
+            dex_price: None,
         };
 
         let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
@@ -6494,6 +6498,7 @@ pub async fn run_sandbox(
             context_tags: vec![],
             live_price: None,
             decision_log_context: None,
+            dex_price: None,
         };
 
         let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(

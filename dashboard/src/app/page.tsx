@@ -497,6 +497,17 @@ export default function Dashboard() {
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className={`text-sm font-bold font-mono ${pnlClass(upnl)}`}>{fmt.usd(upnl)} <span className="text-[9px]">({fmt.pct(upPct)})</span></span>
+                        {p.dex_price && p.current_price > 0 && (
+                          <span className={`text-[8px] px-1 py-0.5 rounded ${
+                            Math.abs((p.dex_price.price - p.current_price) / p.current_price * 100) > 2
+                              ? "text-[var(--red)] bg-[var(--red)]/10"
+                              : Math.abs((p.dex_price.price - p.current_price) / p.current_price * 100) > 0.5
+                              ? "text-[var(--amber)] bg-[var(--amber)]/10"
+                              : "text-[var(--green)] bg-[var(--green)]/10"
+                          }`}>
+                            {((p.dex_price.price - p.current_price) / p.current_price * 100).toFixed(1)}% spread
+                          </span>
+                        )}
                         <button
                           onClick={() => {
                             if (window.confirm(`Close ${p.pair} ${p.side}? This will execute an on-chain swap.`)) {
@@ -523,6 +534,9 @@ export default function Dashboard() {
                     </div>
                     <div className="grid grid-cols-4 gap-1 mt-1">
                       <MetricRow icon="fa-eye" label="Now" value={fmt.price(p.current_price)} />
+                      {p.dex_price && (
+                        <MetricRow icon="fa-link" label="DEX" value={fmt.price(p.dex_price.price)} />
+                      )}
                       <MetricRow icon="fa-coins" label="Qty" value={p.quantity.toPrecision(3)} />
                       <MetricRow icon="fa-coins" label="Size" value={fmt.usd(p.entry_price * p.quantity)} />
                       <MetricRow icon="fa-shield" label="Risk" value={fmt.usd(Math.abs(p.entry_price - p.stop_loss) * p.quantity)} />

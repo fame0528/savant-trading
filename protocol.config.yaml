@@ -8,7 +8,7 @@
 project:
   name: "savant-trading"
   description: "AI-native autonomous crypto trading engine — DEX-only via 0x API"
-  version: "0.12.5"
+  version: "0.12.6"
 
 protocol:
   version: "0.1.0"

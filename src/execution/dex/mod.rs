@@ -110,6 +110,8 @@ pub struct LiquidityCheck {
     pub allowance_ok: bool,
     /// Human-readable price string.
     pub price: String,
+    /// FID-103: USD price of buy token from 0x response.
+    pub buy_token_price_usd: Option<f64>,
 }
 
 /// USDC addresses per chain (native USDC, not bridged).

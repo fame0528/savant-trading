@@ -72,6 +72,7 @@ pub trait ExecutionEngine: Send + Sync {
             balance_ok: true,
             allowance_ok: true,
             price: "0".to_string(),
+            buy_token_price_usd: None,
         })
     }
 

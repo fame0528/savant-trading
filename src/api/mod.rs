@@ -206,9 +206,16 @@ async fn get_portfolio(State(state): State<AppState>) -> Json<ApiResponse<serde_
 
 async fn get_positions(State(state): State<AppState>) -> Json<ApiResponse<Vec<serde_json::Value>>> {
     let positions = state.shared.positions.read().await;
+    let dex_prices = state.shared.dex_prices.read().await;
     let items: Vec<serde_json::Value> = positions
         .iter()
         .map(|p| {
+            let dex_price = dex_prices.get(&p.pair).map(|(price, ts)| {
+                serde_json::json!({
+                    "price": price,
+                    "age_secs": ts.elapsed().as_secs(),
+                })
+            });
             serde_json::json!({
                 "id": p.id,
                 "pair": p.pair,
@@ -225,6 +232,7 @@ async fn get_positions(State(state): State<AppState>) -> Json<ApiResponse<Vec<se
                 "strategy_name": p.strategy_name,
                 "scale_level": format!("{:?}", p.scale_level),
                 "opened_at": p.opened_at.to_rfc3339(),
+                "dex_price": dex_price,
             })
         })
         .collect();
@@ -684,8 +692,9 @@ async fn get_wallet(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
     drop(cached_addr);
 
     // Query on-chain ETH balance via RPC
+    // FID-103 Fix 9: Return null on RPC failure instead of silent $0.00
     let rpc_url = &state.config.exchange.dex.rpc_url;
-    let eth_balance = query_eth_balance(rpc_url, &address).await.unwrap_or(0.0);
+    let eth_balance = query_eth_balance(rpc_url, &address).await;
 
     // Query USDC balance
     let usdc_contract = match savant_trading::execution::dex::usdc_address_for_chain(state.config.exchange.dex.chain_id) {
@@ -698,9 +707,7 @@ async fn get_wallet(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
             });
         }
     };
-    let usdc_balance = query_erc20_balance(rpc_url, usdc_contract, &address)
-        .await
-        .unwrap_or(0.0);
+    let usdc_balance = query_erc20_balance(rpc_url, usdc_contract, &address).await;
 
     Json(ApiResponse::ok(serde_json::json!({
         "address": address,

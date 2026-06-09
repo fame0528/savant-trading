@@ -32,8 +32,9 @@ pub struct SharedEngineData {
     /// Dashboard shows amber "STALE PRICES" chip when > 300s.
     pub price_staleness_secs: Arc<RwLock<u64>>,
     /// FID-093 C1: Cached wallet address — derived once at startup.
-    /// Avoids re-deriving on every /api/wallet request.
     pub wallet_address: Arc<RwLock<String>>,
+    /// FID-103: DEX prices from 0x /price responses. Pair → (price, timestamp).
+    pub dex_prices: Arc<RwLock<HashMap<String, (f64, std::time::Instant)>>>,
 }
 
 /// Memory system state for TUI display.
@@ -113,6 +114,7 @@ impl SharedEngineData {
             monitoring_mode: Arc::new(RwLock::new(false)),
             price_staleness_secs: Arc::new(RwLock::new(0)),
             wallet_address: Arc::new(RwLock::new(String::new())),
+            dex_prices: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 

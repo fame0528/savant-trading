@@ -4,6 +4,28 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.12.6] — 2026-06-09
+
+### Fixed — FID-103: DEX Price as Authoritative Source (Structural Plumbing)
+
+The agent and dashboard were using Kraken (CEX) prices for all decisions and PnL, but trades execute on 0x DEX (Arbitrum). This created a systematic price gap between what the agent sees and what actually happens on-chain.
+
+**Fixes:**
+- **Added `dex_price: Option<f64>` to `FullContext`** — The agent prompt now shows DEX price as authoritative when available, with spread warning vs Kraken price. Falls back to Kraken-only display when DEX price unavailable.
+- **Added `dex_prices` to `SharedEngineData`** — Thread-safe shared map for DEX prices, mirrors existing `ws_ticker_prices` pattern.
+- **DEX price in positions API** — `/api/positions` now includes `dex_price` object with price and age for each open position.
+- **DEX price parsing from 0x `/price` response** — `buy_token_price_usd` extracted from 0x API and stored in `LiquidityCheck`.
+- **Dashboard spread indicator** — Color-coded spread badge (green/amber/red) shows DEX vs Kraken price divergence. DEX price row added to position metrics.
+- **Better PnL calculation** — TradeRecord exit price now uses actual DEX execution proceeds (`verified_proceeds / actual_close_qty`) instead of stale Kraken price.
+- **Balance query fallback warning** — `warn!()` instead of silent `unwrap_or(close_qty)` when on-chain balance query fails during close.
+- **Restored doc comments** on `LiquidityCheck` struct fields (stripped by bad session).
+
+**Note:** Structural plumbing is complete. Live DEX price population in the main evaluation loop (calling 0x `/price` per cycle and wiring into `FullContext::dex_price`) is planned future work (FID-103 remaining items).
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.12.5] — 2026-06-09
 
 ### Fixed — FID-098: Episodic Memory Feedback Loop (Model Never Learns)

@@ -450,6 +450,11 @@ impl DexBackend for ZeroXBackend {
                     .as_object()
                     .is_none_or(|a| a.is_empty());
 
+                let buy_token_price_usd = json["tokenMetadata"]["buyToken"]["price"]
+                    .as_str()
+                    .and_then(|s| s.parse::<f64>().ok())
+                    .filter(|&p| p > 0.0);
+
                 Ok(super::LiquidityCheck {
                     available: available && buy_amount != "0",
                     buy_tax_bps: buy_tax,
@@ -458,6 +463,7 @@ impl DexBackend for ZeroXBackend {
                     balance_ok,
                     allowance_ok,
                     price,
+                    buy_token_price_usd,
                 })
             }
             Err(e) => {
@@ -470,6 +476,7 @@ impl DexBackend for ZeroXBackend {
                     balance_ok: false,
                     allowance_ok: false,
                     price: "0".to_string(),
+                    buy_token_price_usd: None,
                 })
             }
         }

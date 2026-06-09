@@ -143,6 +143,7 @@ impl DexBackend for InchBackend {
                 balance_ok: true,
                 allowance_ok: true,
                 price: q.price,
+                buy_token_price_usd: None,
             }),
             Err(_) => Ok(super::LiquidityCheck {
                 available: false,
@@ -152,6 +153,7 @@ impl DexBackend for InchBackend {
                 balance_ok: false,
                 allowance_ok: false,
                 price: "0".to_string(),
+                buy_token_price_usd: None,
             }),
         }
     }

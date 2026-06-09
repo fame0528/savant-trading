@@ -1163,11 +1163,17 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         }
 
         // FID-074 Fix 3: Query actual on-chain balance and use min(close_qty, on_chain).
-        // Prevents dust failures when position qty slightly exceeds on-chain balance due to rounding.
-        let on_chain_balance = self
+        // FID-103 Fix 10: Warn when balance query fails (fallback to requested qty).
+        let on_chain_balance = match self
             .query_token_balance(&src_token.address, src_token.decimals)
             .await
-            .unwrap_or(close_qty);
+        {
+            Some(b) if b > 0.0001 => b,
+            _ => {
+                warn!("FID-103: Balance query failed for {} — using requested qty as fallback", pos.pair);
+                close_qty
+            }
+        };
         let actual_close_qty = close_qty.min(on_chain_balance);
         if actual_close_qty < close_qty {
             info!(
@@ -1356,7 +1362,12 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             pos.pair, tx_hash, actual_close_qty, verified_proceeds
         );
 
-        let exit_price = pos.current_price;
+        // FID-103 Fix 6: Use actual DEX execution price for PnL
+        let exit_price = if actual_close_qty > 0.0001 {
+            verified_proceeds / actual_close_qty
+        } else {
+            pos.current_price
+        };
         let gross_pnl = match pos.side {
             Side::Long => (exit_price - pos.entry_price) * actual_close_qty,
             Side::Short => (pos.entry_price - exit_price) * actual_close_qty,

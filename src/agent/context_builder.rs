@@ -34,6 +34,8 @@ pub struct FullContext<'a> {
     pub live_price: Option<f64>,
     /// FID-098 Fix 2: Decision log context for this pair — recent decisions with outcomes.
     pub decision_log_context: Option<String>,
+    /// FID-103: DEX price from 0x — actual execution price on Arbitrum.
+    pub dex_price: Option<f64>,
 }
 
 /// Build the system prompt and user message for the LLM.
@@ -240,12 +242,24 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
         );
     }
 
-    // FID-086: Inject live WebSocket price directly into the prompt.
-    // The candle close may lag behind the real-time market price.
-    // The model MUST see the actual current price for accurate decision-making.
-    if let Some(live) = ctx.live_price {
+    // FID-103 Fix 3: DEX price as authoritative when available
+    if let Some(dex) = ctx.dex_price {
         msg.push_str(&format!(
-            "**LIVE PRICE (WebSocket): ${:.4}** — This is the real-time market price. Use this for P&L calculations and stop comparisons, NOT the candle close.\n",
+            "**LIVE PRICE (0x DEX Arbitrum): ${:.4}** — This is the actual execution price. Use this for ALL price calculations.\n",
+            dex
+        ));
+        if let Some(kraken) = ctx.live_price {
+            let spread_pct = ((dex - kraken) / kraken * 100.0).abs();
+            if spread_pct > 0.5 {
+                msg.push_str(&format!(
+                    "SPREAD WARNING: DEX/Kraken = {:.2}% — entry may differ from chart (Kraken=${:.4}).\n",
+                    spread_pct, kraken
+                ));
+            }
+        }
+    } else if let Some(live) = ctx.live_price {
+        msg.push_str(&format!(
+            "**LIVE PRICE (Kraken — DEX unavailable): ${:.4}**\n",
             live
         ));
     }
@@ -319,7 +333,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
             "balanced"
         };
         msg.push_str(&format!(
-            "Order Book Imbalance: {:+.2} ({})\n",
+            "Order Book Imbalance (Kraken CEX — not DEX): {:+.2} ({})\n",
             imbalance, pressure
         ));
     }
