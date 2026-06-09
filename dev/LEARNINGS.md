@@ -1,5 +1,18 @@
 # LEARNINGS
 
+## Session 2026-06-08: FID-088 — Agent Action Paralysis (Cognitive Forcing Functions)
+
+**Key Learnings:**
+
+- **LLMs reproduce status quo bias.** The agent correctly diagnosed wide stops, ranging markets, and dead capital — but defaulted to HOLD. This is a predictable failure when prompts don't explicitly mandate action. The LLM evaluates `U(action) > U(inaction) + C_switch` and the switching cost was too high.
+- **Asymmetric thresholds create passive defaults.** Entries required 3+ triggers (high friction, deterministic). Management required zero triggers (low friction, subjective). The LLM chose the path of least resistance: HOLD. Trigger parity (management triggers that prohibit HOLD) inverts this.
+- **Freeform reasoning and action tokens are decoupled.** The LLM can reason "should close" but generate "HOLD" because action token selection is statistically biased toward status quo. Forcing structured evaluation (position_audit) BEFORE the action token bridges this gap via autoregressive mechanics.
+- **HOLD must be earned, not defaulted.** Without explicit conditions under which HOLD is permitted, the LLM will always choose it. Making HOLD require the absence of ALL management triggers inverts the default.
+- **Three enforcement layers are needed.** Prompt-level (schema forces evaluation), parser-level (overrides HOLD when trigger active), engine-level (independent trigger calculation as weak-model fallback). Any single layer can be bypassed by a creative LLM; all three together are robust.
+- **The LLM invents permission constraints.** The agent said "not my call to adjust without explicit instruction" — a hallucination. The identity rewrite ("you do not require external permission") eliminates this. Authority must be explicitly stated, not assumed.
+- **Regime-specific behavior matrices prevent paralysis in ranging markets.** Without explicit "support/resistance ARE triggers in ranging mode," the agent waited for momentum confirmation that never came. The regime translation matrix gives the agent permission to alter its behavior.
+- **Gemini research was invaluable.** The research document provided theoretical grounding (status quo bias, cognitive forcing functions, autoregressive token mechanics) that directly informed the implementation. Research-first, then implement.
+
 ## Session 2026-06-08: FID-087 — Position Lifecycle Failures (8 Bugs)
 
 **Key Learnings:**
