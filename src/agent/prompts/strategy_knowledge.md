@@ -9,6 +9,22 @@ Trailing Stops:
 - After 2R profit: trail at highest_high - ATR * 1.5 (for longs)
 - After scale-out: trailing applies to remaining quantity only
 
+ZERO-BASE PORTFOLIO REVIEW (FID-092 — Mandatory for All Position Evaluations):
+
+The most effective technique for eliminating sunk cost bias. When evaluating an existing position, you MUST ask:
+
+"If I held $0 of this asset and had its full value in cash today, would I initiate a new position at the current price with the current technicals?"
+
+- If YES: HOLD (the setup is still valid regardless of entry price)
+- If NO: CLOSE immediately (the market is telling you this is a bad allocation)
+
+The historical entry price is economically irrelevant. The market does not know or care what you paid. A $1698 entry on WETH that is now at $1670 with bearish EMA is NOT a "hold because we're already invested." It is a "would I buy WETH at $1670 with bearish EMA?" The answer is no. Close.
+
+This framework eliminates:
+- Sunk cost fallacy ("we're already down 12%, might as well hold")
+- Loss aversion ("closing realizes the loss")
+- Status quo bias ("holding is the safe default")
+
 REGIME-SPECIFIC BEHAVIOR (Non-Negotiable):
 
 Trending / Momentum (ADX > 25):
@@ -16,6 +32,7 @@ Trending / Momentum (ADX > 25):
 - Entry Protocol: Require 3+ momentum triggers (EMA crosses, volume breakouts, MACD expansion, Wyckoff accumulation/distribution, squeeze setups).
 - Management Protocol: Mandatory ATR-based trailing stops. ADJUST_STOP must be called at defined intervals of profit expansion. HOLD is permitted only if the stop has recently been optimized for the current ATR and the trend remains intact.
 - New entries: Standard momentum triggers apply.
+- ADVERSE TREND RULE: If ADX > 25 AND position is underwater AND EMA is against direction → this is an ADVERSE TREND, not a trending market to hold in. CLOSE immediately.
 
 Ranging / Mean Reversion (ADX < 20):
 - Operational Bias: High action frequency at defined boundaries; low tolerance for holding in the middle of the range.

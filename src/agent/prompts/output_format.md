@@ -13,10 +13,13 @@ Single pair:
             "current_stop_distance_atr": 3.2,
             "is_stop_valid": false,
             "thesis_status": "intact | weakened | invalidated",
-            "management_trigger": "none | stop_violation | regime_change | structural_invalidation | dead_capital | profit_ratchet",
+            "management_trigger": "none | stop_violation | regime_change | structural_invalidation | dead_capital | adverse_trend | max_hold_duration | drawdown_limit | profit_ratchet",
             "mandated_action": "HOLD | ADJUST_STOP | CLOSE",
             "mandated_stop_price": 0.0,
-            "opportunity_cost": "What is lost by holding this position — be specific"
+            "opportunity_cost": "What is lost by holding this position — be specific",
+            "would_initiate_new_long_at_current_price": true,
+            "is_ema_bullish": true,
+            "is_price_making_higher_highs": true
         }
     ],
     "action": "BUY" | "SELL" | "HOLD" | "CLOSE" | "ADJUST_STOP",
@@ -51,12 +54,21 @@ Field Rules:
   - mandated_stop_price: If mandated_action is ADJUST_STOP, the specific technical level (swing low/high, 1.5x ATR)
   - opportunity_cost: Articulate what you lose by holding — capital lockup, exposure to macro shocks, inability to deploy into better setups
 
+  ZERO-BASE FORCED-CHOICE FIELDS (MANDATORY for positions with PnL <= 0):
+  - would_initiate_new_long_at_current_price: If you held $0 of this asset and had its full value in cash, would you buy it at the current price with current technicals? true/false.
+  - is_ema_bullish: Is EMA_F > EMA_S? true/false
+  - is_price_making_higher_highs: Is the price structure showing higher highs and higher lows? true/false
+
+  CRITICAL FORCED-CHOICE RULE: If would_initiate_new_long_at_current_price is FALSE, the final action MUST be CLOSE. No exceptions. If you would not buy this asset today, you must not hold it.
+
 - action: BUY to open long, SELL to open short, HOLD for no action, CLOSE to exit existing, ADJUST_STOP to modify stop
   **CRITICAL RULES:**
   1. If ANY position_audit has management_trigger != "none", the action CANNOT be HOLD. You MUST execute the mandated_action.
-  2. If your reasoning recommends exiting — even at breakeven or small loss — the action MUST be CLOSE, not HOLD.
-  3. HOLD means "take no action and keep the position open." Do NOT use HOLD when you want to exit.
-  4. ADJUST_STOP is your primary risk management tool. Use it proactively when stops are too wide or profit needs protection.
+  2. If would_initiate_new_long_at_current_price is FALSE for a held position, action MUST be CLOSE.
+  3. If your reasoning identifies that the thesis has weakened — EMA crossover against direction, volume selloff, lower highs/lower lows — the action MUST be CLOSE, not HOLD. A weakened thesis is a failing thesis.
+  4. If your reasoning recommends exiting — even at breakeven or small loss — the action MUST be CLOSE, not HOLD.
+  5. HOLD means "take no action and keep the position open." Do NOT use HOLD when you want to exit.
+  6. ADJUST_STOP is your primary risk management tool. Use it proactively when stops are too wide or profit needs protection.
 
 - pair: must match a configured trading pair
 - side: Long for BUY, Short for SELL
@@ -70,5 +82,5 @@ Field Rules:
 - knowledge_sources: list of knowledge unit IDs that informed your decision
 - risk_reward: calculated R:R ratio. Formula: |take_profit_1 - entry_price| / |entry_price - stop_loss|. Do NOT leave at 0.0.
 
-For HOLD decisions, set all prices to 0.0, position_size_pct to 0.0, and order_type to LIMIT. But ONLY if position_audit confirms no management triggers are active.
+For HOLD decisions, set all prices to 0.0, position_size_pct to 0.0, and order_type to LIMIT. But ONLY if position_audit confirms no management triggers are active AND would_initiate_new_long_at_current_price is TRUE.
 </output_format>

@@ -372,6 +372,7 @@ pub struct IndicatorValues {
     pub vwap: Option<f64>,
     pub volume_sma: Option<f64>,
     pub garman_klass: Option<f64>,
+    pub parabolic_sar: Option<f64>,
 }
 
 #[derive(Debug, Clone)]

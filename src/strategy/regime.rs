@@ -78,6 +78,7 @@ mod tests {
             vwap: None,
             volume_sma: None,
             garman_klass: None,
+            parabolic_sar: None,
         }
     }
 

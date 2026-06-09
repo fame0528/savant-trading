@@ -2284,6 +2284,83 @@ pub async fn run(
                                     }
                                 }
 
+                                // FID-092 Trigger 3: Adverse Trend Exit
+                                // ADX > 25 AND position underwater AND EMA bearish → CLOSE
+                                // High ADX + underwater = strong trend AGAINST position
+                                if !trigger_fired {
+                                    if let Some(adx) = adx_val {
+                                    let ema_bearish = pair_data.is_some_and(|(_, ind, _)| {
+                                        match (ind.ema_fast, ind.ema_slow) {
+                                            (Some(f), Some(s)) => f < s,
+                                            _ => false,
+                                        }
+                                    });
+                                        let underwater = pos.unrealized_pnl < 0.0
+                                            || effective_price < pos.entry_price;
+                                        if adx > 25.0 && underwater && ema_bearish && pos.side == Side::Long {
+                                            trigger_fired = true;
+                                            mandated_action = "close".to_string();
+                                            trigger_reason = format!(
+                                                "Adverse trend: ADX={:.1} (strong trend), EMA bearish, position underwater ({:.2}% loss)",
+                                                adx,
+                                                if pos.entry_price > 0.0 { (effective_price - pos.entry_price) / pos.entry_price * 100.0 } else { 0.0 }
+                                            );
+                                        }
+                                    }
+                                }
+
+                                // FID-092 Trigger 4: Maximum Hold Duration (24h)
+                                // Position age > 24h AND PnL <= 0 → CLOSE
+                                if !trigger_fired {
+                                    let hold_duration = chrono::Utc::now() - pos.opened_at;
+                                    let max_hold = chrono::Duration::hours(24);
+                                    if hold_duration > max_hold && pos.unrealized_pnl <= 0.0 {
+                                        trigger_fired = true;
+                                        mandated_action = "close".to_string();
+                                        trigger_reason = format!(
+                                            "Max hold duration: {:.1}h > 24h limit, PnL: ${:.2}",
+                                            hold_duration.num_minutes() as f64 / 60.0,
+                                            pos.unrealized_pnl
+                                        );
+                                    }
+                                }
+
+                                // FID-092 Trigger 5: Per-Position Drawdown Limit
+                                // Position loss > 5% of portfolio equity → CLOSE
+                                if !trigger_fired {
+                                    let equity = portfolio.account().equity;
+                                    let max_loss = equity * 0.05;
+                                    if pos.unrealized_pnl < -max_loss && pos.unrealized_pnl < 0.0 {
+                                        trigger_fired = true;
+                                        mandated_action = "close".to_string();
+                                        trigger_reason = format!(
+                                            "Per-position drawdown: PnL ${:.2} exceeds 5% of equity ${:.2} (limit: ${:.2})",
+                                            pos.unrealized_pnl, equity, max_loss
+                                        );
+                                    }
+                                }
+
+                                // FID-092 Trigger 6: Parabolic SAR Exit
+                                // Current price below SAR → CLOSE
+                                if !trigger_fired {
+                                    let sar_val = pair_data.and_then(|(_, ind, _)| ind.parabolic_sar);
+                                    if let Some(sar) = sar_val {
+                                        let price_below_sar = match pos.side {
+                                            Side::Long => effective_price < sar,
+                                            Side::Short => effective_price > sar,
+                                        };
+                                        if price_below_sar {
+                                            trigger_fired = true;
+                                            mandated_action = "close".to_string();
+                                            trigger_reason = format!(
+                                                "Parabolic SAR exit: price {:.2} crossed SAR {:.2} ({})",
+                                                effective_price, sar,
+                                                if pos.side == Side::Long { "below for long" } else { "above for short" }
+                                            );
+                                        }
+                                    }
+                                }
+
                                 if trigger_fired {
                                     warn!(
                                         "FID-088 ENGINE TRIGGER: {} — {}. Overriding Pass to {}. New stop: {:.4}",

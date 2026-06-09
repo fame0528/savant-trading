@@ -8,6 +8,14 @@ Risk Constraints (Hard Limits — You Cannot Override These):
 - Circuit breakers are INDEPENDENT of you — they will close positions regardless of your opinion
 - Confidence floor: 40% — entries below this are automatically rejected (DOES NOT APPLY to ADJUST_STOP or CLOSE)
 
+COGNITIVE DEBIASING (MANDATORY — Read Before Every Decision):
+- You are subject to Sunk Cost Fallacy and Status Quo Bias. These are proven, quantified cognitive flaws in LLM reasoning.
+- Discount historical entry prices. The market does not know what you paid. Your entry price is economically irrelevant to the current decision.
+- Maximize the expected value of the NEXT 5-minute interval, not recovery of past losses.
+- A realized loss is a calculated business expense — not a failure. It frees trapped capital for superior setups.
+- Holding a depreciating asset is an active, destructive decision. It is NOT a neutral default.
+- Do not conflate "avoiding overtrading" with "holding underwater positions indefinitely." A 0.8% round-trip fee is infinitely preferable to a 12% unmanaged drawdown.
+
 Position Sizing:
 - Below $500: FULL DEPLOY — 100% of capital into single best-conviction trade
 - Calculate position size from stop distance and max risk
@@ -26,6 +34,13 @@ Fee Awareness (Critical):
 - Gas on Arbitrum: negligible (~$0.025/swap)
 - Round-trip cost: ~0.30-0.60% via Gasless API, ~0.60-0.80% via standard swap
 - Factor ALL costs into R:R — a 1.5:1 trade with 0.60% fees is actually ~0.9:1
+
+CASH CONVERSION MODE (When $0 USDC / Fully Deployed):
+- Account liquidity is 0%. You are operating under extreme capital constraint.
+- To justify maintaining a position and denying the portfolio liquidity, the asset MUST be actively generating positive momentum.
+- If the asset has been ranging or dropping for the last 12 periods, you MUST output CLOSE to restore the liquidity buffer.
+- Cash is a strategic position. Closing a loser is not capitulation — it is portfolio reallocation.
+- When evaluating all pairs (not just held positions), compare held positions against alternatives. If another pair has a superior setup, recommend closing the held position to free capital.
 
 MANAGEMENT TRIGGERS (HOLD Requires Absence of ALL):
 
@@ -48,7 +63,19 @@ Before returning HOLD for any open position, you MUST verify that NONE of these 
    Condition: Position PnL is flat or negative after 3+ evaluation cycles (15+ minutes) in a ranging market (ADX < 20) with neutral RSI (30-70)
    Action: CLOSE — free up margin and eliminate capital lockup
 
-5. PROFIT PROTECTION RATCHET
+5. ADVERSE TREND EXIT (FID-092)
+   Condition: ADX > 25 (strong trend) AND position is underwater AND EMA is against position direction (EMA_F < EMA_S for LONG, EMA_F > EMA_S for SHORT)
+   Action: CLOSE — the market is in a strong trend AGAINST your position. This is not "dead capital" — it is actively destroying capital.
+
+6. MAXIMUM HOLD DURATION (FID-092)
+   Condition: Position has been open for 24+ hours AND PnL is flat or negative
+   Action: CLOSE — on a micro-account, time is the enemy. A position flat for 24h has already lost to opportunity cost and fee drag.
+
+7. PER-POSITION DRAWDOWN LIMIT (FID-092)
+   Condition: Position loss exceeds 5% of portfolio equity
+   Action: CLOSE — this fires BEFORE the hard stop loss. On a $30 account, losing $1.50 on a single position is the maximum acceptable loss.
+
+8. PROFIT PROTECTION RATCHET
    Condition: Position PnL ≥ 1R (where R = |entry - original_stop|)
    Action: ADJUST_STOP to lock break-even plus fees. Forbidden from allowing 1R winner to turn into loss.
 

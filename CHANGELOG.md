@@ -4,6 +4,35 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.11.9] — 2026-06-08
+
+### Fixed — FID-092: Dead Capital Trap (Parabolic SAR, Zero-Base Review, Adverse Trend Exit)
+
+**The problem:** Agent held two LONG positions for 48+ hours, losing $3.73 of $30 (12.4%) with no exit mechanism. The agent evaluated every 5 minutes, said "hold and monitor," and never exited. Root cause: ADX logic error (FID-088's Dead Capital trigger suppressed exit when ADX was high), LLM cognitive biases (status quo, sunk cost, default effect), no time-based exit, no Parabolic SAR.
+
+**Gemini research identified 3 key insights:**
+- ADX measures trend STRENGTH, not direction. ADX 26-54 + underwater LONG = strong bearish trend AGAINST the position. The trigger should fire MORE urgently.
+- Parabolic SAR accelerates toward price as time passes — prevents indefinite holding.
+- Zero-Base Review ("would you buy this asset today?") eliminates sunk cost bias.
+
+**Engine-side forcing functions (4 new triggers):**
+- **Parabolic SAR exit:** Dynamic trailing stop that accelerates toward price. If price crosses SAR → engine executes CLOSE automatically, bypassing LLM. (`indicators.rs`, `engine.rs`)
+- **Adverse trend exit:** ADX > 25 AND position underwater AND EMA bearish → CLOSE. Fixes FID-088's backwards ADX logic. (`engine.rs`)
+- **Maximum hold duration:** Position open > 24 hours AND PnL <= 0 → CLOSE. Winning positions exempt. (`engine.rs`)
+- **Per-position drawdown limit:** Position loss > 5% of portfolio equity → CLOSE. Fires BEFORE hard stop loss. (`engine.rs`)
+- **Full scan:** All 10 pairs evaluated even when fully deployed (MONITORING mode). Agent now sees all charts for opportunity cost awareness. (`engine.rs`)
+
+**Prompt architecture redesign (4 prompt files):**
+- **Zero-Base Review** (`base_identity.md`, `strategy_knowledge.md`): "If you held $0 of this asset, would you buy it today?" If no → CLOSE. Eliminates sunk cost fallacy.
+- **Forced-choice Boolean schema** (`output_format.md`): `would_initiate_new_long_at_current_price`, `is_ema_bullish`, `is_price_making_higher_highs`. If would_initiate is FALSE → action MUST be CLOSE.
+- **Debiasing directive** (`risk_constraints.md`): Explicit prompt about sunk cost fallacy, status quo bias, and opportunity cost decay.
+- **Cash Conversion Mode** (`risk_constraints.md`): When $0 USDC, close unless asset justifies consuming 100% of liquidity. Cash is a strategic position.
+- **New management triggers** (`risk_constraints.md`): Adverse trend, max hold duration, drawdown limit added to trigger list.
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.11.8] — 2026-06-08
 
 ### Fixed — FID-089: Engine Trigger Stale Price + Balance Query Zero

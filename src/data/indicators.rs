@@ -283,6 +283,7 @@ impl IndicatorEngine {
                 vwap: None,
                 volume_sma: None,
                 garman_klass: None,
+                parabolic_sar: None,
             };
         }
 
@@ -297,6 +298,7 @@ impl IndicatorEngine {
         let vwap_vals = Self::vwap(candles);
         let vol_sma = Self::sma(&volumes, 20);
         let gk_vals = Self::garman_klass(candles, 14);
+        let sar_val = Self::parabolic_sar(candles);
 
         IndicatorValues {
             ema_fast: ema20.last().copied(),
@@ -307,6 +309,7 @@ impl IndicatorEngine {
             vwap: vwap_vals.last().copied(),
             volume_sma: vol_sma.last().copied(),
             garman_klass: gk_vals.last().copied(),
+            parabolic_sar: sar_val,
         }
     }
 
@@ -342,6 +345,86 @@ impl IndicatorEngine {
         }
 
         result
+    }
+
+    /// Parabolic SAR (Stop and Reverse) — Wilder (1978).
+    ///
+    /// Dynamic trailing stop that accelerates toward price as time passes.
+    /// Prevents indefinite holding by formalizing time decay into the stop level.
+    ///
+    /// Formula: SAR_new = SAR_old + AF * (EP - SAR_old)
+    /// - AF starts at 0.02, increases by 0.02 each new extreme, max 0.20
+    /// - EP = extreme point (highest high for long, lowest low for short)
+    /// - When price crosses SAR, direction reverses
+    ///
+    /// Returns the final SAR value (the current stop level).
+    pub fn parabolic_sar(candles: &[Candle]) -> Option<f64> {
+        if candles.len() < 2 {
+            return None;
+        }
+
+        let af_start = 0.02_f64;
+        let af_step = 0.02_f64;
+        let af_max = 0.20_f64;
+
+        // Initialize: assume long direction, SAR = first candle's low
+        let mut is_long = true;
+        let mut sar = candles[0].low;
+        let mut ep = candles[0].high;
+        let mut af = af_start;
+
+        for i in 1..candles.len() {
+            let high = candles[i].high;
+            let low = candles[i].low;
+
+            if is_long {
+                // Long: SAR rises toward price
+                sar = sar + af * (ep - sar);
+                // SAR must be below prior two lows
+                if i >= 2 {
+                    sar = sar.min(candles[i - 1].low).min(candles[i - 2].low);
+                } else {
+                    sar = sar.min(candles[i - 1].low);
+                }
+
+                if low < sar {
+                    // Reverse to short
+                    is_long = false;
+                    sar = ep; // SAR = prior extreme high
+                    ep = low;
+                    af = af_start;
+                } else {
+                    if high > ep {
+                        ep = high;
+                        af = (af + af_step).min(af_max);
+                    }
+                }
+            } else {
+                // Short: SAR falls toward price
+                sar = sar + af * (ep - sar);
+                // SAR must be above prior two highs
+                if i >= 2 {
+                    sar = sar.max(candles[i - 1].high).max(candles[i - 2].high);
+                } else {
+                    sar = sar.max(candles[i - 1].high);
+                }
+
+                if high > sar {
+                    // Reverse to long
+                    is_long = true;
+                    sar = ep; // SAR = prior extreme low
+                    ep = high;
+                    af = af_start;
+                } else {
+                    if low < ep {
+                        ep = low;
+                        af = (af + af_step).min(af_max);
+                    }
+                }
+            }
+        }
+
+        Some(sar)
     }
 
     /// ZigZag pivot extraction (FID-085 Phase 2).
