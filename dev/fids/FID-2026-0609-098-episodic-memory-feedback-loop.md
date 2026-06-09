@@ -3,7 +3,8 @@
 **ID:** FID-2026-0609-098
 **Severity:** critical
 **Status:** fixed
-**Closed:** 2026-06-09 04:30
+**Closed:** 2026-06-09 05:53
+**Committed:** v0.12.5 (aeb063c, 29bb092)
 **Created:** 2026-06-09 03:55
 **Author:** Kilo (ECHO Protocol v0.1.0, Level 3)
 

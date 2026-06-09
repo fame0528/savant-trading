@@ -3,7 +3,10 @@
 **Filename:** `FID-2026-0608-089-trigger-stale-price-balance-zero.md`
 **ID:** FID-2026-0608-089
 **Severity:** critical
-**Status:** analyzed
+**Status:** merged-into-master
+**Superseded by:** MASTER-FID-2026-0609 (P0-1)
+
+**Note:** This FID is a duplicate of FID-2026-0608-091. Both merged into Master FID P0-1.
 **Created:** 2026-06-08 21:10
 **Author:** Kilo (ECHO Protocol v0.1.0, Level 3)
 

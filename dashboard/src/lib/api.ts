@@ -45,6 +45,7 @@ export interface Position {
   strategy_name: string;
   scale_level: string;
   opened_at: string;
+  dex_price: { price: number; age_secs: number } | null;
 }
 
 export interface TradeRecord {

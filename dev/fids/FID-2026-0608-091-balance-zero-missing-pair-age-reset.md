@@ -3,7 +3,8 @@
 **Filename:** `FID-2026-0608-091-balance-zero-missing-pair-age-reset.md`
 **ID:** FID-2026-0608-091
 **Severity:** high
-**Status:** analyzed
+**Status:** merged-into-master
+**Superseded by:** MASTER-FID-2026-0609 (P0-1)
 **Created:** 2026-06-08 21:19
 **Author:** Kilo (ECHO Protocol v0.1.0, Level 3)
 
