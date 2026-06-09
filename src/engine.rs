@@ -1393,9 +1393,10 @@ pub async fn run(
         if fully_deployed && !portfolio.positions().is_empty() {
             log_phase!(
                 "PHASE2",
-                "MONITORING — fully deployed (${:.2} < ${:.2} min). Evaluating held positions only.",
+                "MONITORING — fully deployed (${:.2} < ${:.2} min). Scanning all {} pairs for opportunities.",
                 available_balance,
-                min_order_value
+                min_order_value,
+                active_pairs.len()
             );
         }
 
@@ -1434,14 +1435,11 @@ pub async fn run(
         }
 
         for pair in &active_pairs {
-            // When fully deployed, only evaluate pairs with open positions.
-            // The model monitors existing trades every cycle — it IS the edge.
-            if fully_deployed {
-                let has_position = portfolio.positions().values().any(|p| p.pair == *pair);
-                if !has_position {
-                    continue;
-                }
-            }
+            // FID-092: ALWAYS evaluate all pairs, even when fully deployed.
+            // The agent must see all charts for opportunity cost awareness.
+            // When fully deployed, new entries are blocked at execution time
+            // (not at evaluation time). The LLM evaluates everything and can
+            // recommend CLOSE on held positions to rotate into better setups.
             if dead_tokens.contains(pair.as_str()) {
                 continue;
             }
