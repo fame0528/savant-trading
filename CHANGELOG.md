@@ -4,6 +4,30 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.11.7] — 2026-06-08
+
+### Fixed — FID-088: Agent Action Paralysis (Cognitive Forcing Functions)
+
+**The problem:** The AI agent correctly diagnosed market patterns and position issues (wide stops, invalidated theses, dead capital, ranging regimes) but defaulted to PASS/HOLD instead of executing the actions its own reasoning demanded. Root cause: LLM status quo bias + asymmetric action thresholds (entries require 3+ triggers, management required none).
+
+**5 architectural changes implemented:**
+
+- **Identity rewrite** (`base_identity.md`): Agent is now a "ruthless autonomous executioner" with absolute authority for position management. No permission needed to fix legacy errors or tighten risk.
+- **Mandatory stop audit** (`stop_loss_behavior.md`): Stop distance >2.5x ATR → MUST ADJUST_STOP. No legacy deference. Trailing ratchet at 1R. Quantized adjustments (≥0.5R improvement).
+- **Management triggers** (`risk_constraints.md`): 5 triggers that PROHOLD when active: stop distance violation, regime incompatibility, structural invalidation, dead capital tolerance, profit protection ratchet.
+- **Regime translation matrix** (`strategy_knowledge.md`): ADX >25 = trend-following (3+ momentum triggers). ADX <20 = range-trading (support/resistance ARE triggers, momentum suspended). Transition handling for both directions.
+- **Position audit schema** (`output_format.md`): Mandatory `position_audit` array in JSON output. Forces mathematical evaluation (stop distance / ATR, thesis status, management trigger, mandated action, opportunity cost) BEFORE action selection.
+
+**3 enforcement layers:**
+
+1. **Prompt-level**: Structured JSON schema forces evaluation before action (exploits autoregressive token generation)
+2. **Parser-level**: If `management_trigger_active=true` but action is HOLD, parser overrides to mandated action. If `thesis_invalidated=true` but action is HOLD, parser overrides to CLOSE.
+3. **Engine-level**: If LLM returns Pass but position has stop >2.5x ATR or regime incompatibility, engine overrides to ADJUST_STOP. This is the weak-model fallback.
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.11.6] — 2026-06-08
 
 ### Fixed — FID-087: Position Lifecycle Failures (8 interconnected bugs, critical)

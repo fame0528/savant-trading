@@ -2008,7 +2008,7 @@ pub async fn run(
                 pr.current_price,
                 config.ai.price_tolerance_pct,
             ) {
-                Ok(decision) => {
+                Ok(mut decision) => {
                     // Compact decision log: [PASS] LONG BTC/USD | 0% | R:R 0.0 | reason...
                     let reasoning_short: String = decision.reasoning.chars().take(60).collect();
                     let reasoning_short = if decision.reasoning.len() > 60 {
@@ -2175,6 +2175,97 @@ pub async fn run(
                             Ok(Ok(_)) => log_phase!("EPISODIC", "Saved {}", decision.pair),
                             Ok(Err(e)) => log_warn!("EPISODIC", "Failed {}: {}", decision.pair, e),
                             Err(_) => log_warn!("EPISODIC", "Timeout {}", decision.pair),
+                        }
+                    }
+
+                    // FID-088: Engine-side management trigger evaluation (Safety Net #2).
+                    // If the LLM returned Pass but a position has a management trigger,
+                    // override to the mandated action. This catches cases where the LLM
+                    // didn't produce the position_audit fields (weak model fallback).
+                    if decision.action == savant_trading::agent::decision_parser::TradeAction::Pass {
+                        let pair_pos = portfolio.positions().values()
+                            .find(|p| p.pair == decision.pair)
+                            .cloned();
+                        if let Some(pos) = pair_pos {
+                            let pair_data = _pair_data_for_memory
+                                .iter()
+                                .find(|(p, _, _)| *p == decision.pair);
+                            let (atr_val, adx_val, _rsi_val, _regime_str) = pair_data
+                                .map(|(_, ind, reg)| (ind.atr, ind.adx, ind.rsi, format!("{}", reg)))
+                                .unwrap_or((None, None, None, "Unknown".to_string()));
+
+                            let mut trigger_fired = false;
+                            let mut mandated_action = String::new();
+                            let mut mandated_stop = 0.0;
+                            let mut trigger_reason = String::new();
+
+                            // Trigger 1: Stop Distance Violation
+                            if let Some(atr) = atr_val {
+                                if atr > 0.0 {
+                                    let stop_distance = (pos.entry_price - pos.stop_loss).abs();
+                                    let stop_distance_atr = stop_distance / atr;
+                                    if stop_distance_atr > 2.5 {
+                                        trigger_fired = true;
+                                        mandated_action = "adjust_stop".to_string();
+                                        // Set stop to 1.5x ATR from current price
+                                        mandated_stop = match pos.side {
+                                            Side::Long => pos.current_price - (atr * 1.5),
+                                            Side::Short => pos.current_price + (atr * 1.5),
+                                        };
+                                        trigger_reason = format!(
+                                            "Stop distance {:.1}x ATR exceeds 2.5x threshold",
+                                            stop_distance_atr
+                                        );
+                                    }
+                                }
+                            }
+
+                            // Trigger 2: Regime Incompatibility (if ADX available)
+                            if !trigger_fired {
+                                if let Some(adx) = adx_val {
+                                    // If position was likely opened in trending (wide stop suggests momentum entry)
+                                    // and now ADX < 20, regime has changed
+                                    let stop_pct = if pos.entry_price > 0.0 {
+                                        (pos.entry_price - pos.stop_loss).abs() / pos.entry_price * 100.0
+                                    } else { 0.0 };
+                                    if adx < 20.0 && stop_pct > 5.0 {
+                                        trigger_fired = true;
+                                        mandated_action = "adjust_stop".to_string();
+                                        if let Some(atr) = atr_val {
+                                            mandated_stop = match pos.side {
+                                                Side::Long => pos.current_price - (atr * 1.5),
+                                                Side::Short => pos.current_price + (atr * 1.5),
+                                            };
+                                        }
+                                        trigger_reason = format!(
+                                            "Regime change: ADX={:.1} (ranging) but position has {:.1}% stop (trending-era)",
+                                            adx, stop_pct
+                                        );
+                                    }
+                                }
+                            }
+
+                            if trigger_fired {
+                                warn!(
+                                    "FID-088 ENGINE TRIGGER: {} — {}. Overriding Pass to {}. New stop: {:.4}",
+                                    decision.pair, trigger_reason, mandated_action, mandated_stop
+                                );
+                                shared.log_activity(
+                                    savant_trading::core::shared::ActivityLevel::Warning,
+                                    &decision.pair,
+                                    &format!(
+                                        "FID-088 TRIGGER: {} — overriding to {}",
+                                        trigger_reason, mandated_action
+                                    ),
+                                ).await;
+                                // Override the decision
+                                if mandated_action == "adjust_stop" && mandated_stop > 0.0 {
+                                    decision.action = savant_trading::agent::decision_parser::TradeAction::AdjustStop;
+                                    decision.stop_loss = mandated_stop;
+                                } else if mandated_action == "close" {
+                                    decision.action = savant_trading::agent::decision_parser::TradeAction::Close;
+                                }
+                            }
                         }
                     }
 

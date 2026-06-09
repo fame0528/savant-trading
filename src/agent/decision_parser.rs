@@ -50,6 +50,19 @@ pub struct TradeDecision {
     pub reasoning: String,
     pub knowledge_sources: Vec<String>,
     pub risk_reward: f64,
+    // FID-088: Cognitive Forcing Function fields
+    #[serde(default)]
+    pub management_trigger_active: bool,
+    #[serde(default)]
+    pub stop_distance_atr_multiple: f64,
+    #[serde(default)]
+    pub thesis_invalidated: bool,
+    #[serde(default)]
+    pub opportunity_cost: String,
+    #[serde(default)]
+    pub mandated_action: String,
+    #[serde(default)]
+    pub mandated_stop_price: f64,
 }
 
 fn default_order_type() -> String {
@@ -267,6 +280,43 @@ pub fn parse_decision(
         }
     }
 
+    // FID-088: Management trigger enforcement.
+    // If the LLM's own position_audit flagged a management trigger but the
+    // final action is still HOLD/PASS, override to the mandated action.
+    // This is the structural enforcement that prevents the LLM from ignoring
+    // its own audit — the cognitive forcing function.
+    if decision.management_trigger_active && matches!(decision.action, TradeAction::Pass) {
+        let mandated = decision.mandated_action.to_lowercase();
+        let override_action = if mandated.contains("close") || decision.thesis_invalidated {
+            Some(TradeAction::Close)
+        } else if mandated.contains("adjust") || mandated.contains("stop") {
+            Some(TradeAction::AdjustStop)
+        } else {
+            None
+        };
+        if let Some(new_action) = override_action {
+            tracing::warn!(
+                "FID-088 OVERRIDE: management_trigger_active=true, mandated_action='{}', but action was {:?}. Overriding to {:?}. Pair: {}",
+                decision.mandated_action, decision.action, new_action, decision.pair
+            );
+            decision.action = new_action;
+            // If mandated_stop_price is set and action is ADJUST_STOP, use it
+            if decision.mandated_stop_price > 0.0 && matches!(decision.action, TradeAction::AdjustStop) {
+                decision.stop_loss = decision.mandated_stop_price;
+            }
+        }
+    }
+
+    // FID-088: Thesis invalidation override.
+    // If the LLM flagged thesis_invalidated=true but action is HOLD, override to CLOSE.
+    if decision.thesis_invalidated && matches!(decision.action, TradeAction::Pass) {
+        tracing::warn!(
+            "FID-088 OVERRIDE: thesis_invalidated=true but action was {:?}. Overriding to Close. Pair: {}",
+            decision.action, decision.pair
+        );
+        decision.action = TradeAction::Close;
+    }
+
     Ok(decision)
 }
 
@@ -422,6 +472,12 @@ fn extract_from_freeform(text: &str) -> Option<TradeDecision> {
             order_type: "market".to_string(),
             knowledge_sources: vec![],
             risk_reward: 0.0,
+            management_trigger_active: false,
+            stop_distance_atr_multiple: 0.0,
+            thesis_invalidated: false,
+            opportunity_cost: String::new(),
+            mandated_action: String::new(),
+            mandated_stop_price: 0.0,
         });
     }
 
@@ -472,6 +528,12 @@ fn extract_from_freeform(text: &str) -> Option<TradeDecision> {
         order_type: "market".to_string(),
         knowledge_sources: vec![],
         risk_reward: rr,
+        management_trigger_active: false,
+        stop_distance_atr_multiple: 0.0,
+        thesis_invalidated: false,
+        opportunity_cost: String::new(),
+        mandated_action: String::new(),
+        mandated_stop_price: 0.0,
     })
 }
 
@@ -763,6 +825,32 @@ fn partial_extract(json: &str) -> Option<TradeDecision> {
         knowledge_sources: vec![],
         risk_reward: value
             .get("risk_reward")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(0.0),
+        management_trigger_active: value
+            .get("management_trigger_active")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false),
+        stop_distance_atr_multiple: value
+            .get("stop_distance_atr_multiple")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(0.0),
+        thesis_invalidated: value
+            .get("thesis_invalidated")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false),
+        opportunity_cost: value
+            .get("opportunity_cost")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string(),
+        mandated_action: value
+            .get("mandated_action")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string(),
+        mandated_stop_price: value
+            .get("mandated_stop_price")
             .and_then(|v| v.as_f64())
             .unwrap_or(0.0),
     })
