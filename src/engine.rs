@@ -2201,6 +2201,20 @@ pub async fn run(
                                 .and_then(|s| s.last().map(|c| c.close))
                                 .unwrap_or(0.0);
 
+                            // FID-089: Debug log for trigger price diagnosis
+                            if actual_market_price <= 0.0 {
+                                warn!(
+                                    "FID-089 TRIGGER PRICE: {} — market_stores lookup returned 0. Keys available: {:?}",
+                                    decision.pair,
+                                    market_stores.keys().collect::<Vec<_>>()
+                                );
+                            } else {
+                                debug!(
+                                    "FID-089 TRIGGER PRICE: {} — market={:.2}, entry={:.2}, current={:.2}",
+                                    decision.pair, actual_market_price, pos.entry_price, pos.current_price
+                                );
+                            }
+
                             // FID-089 Fix 5: Guard — skip trigger if price not yet updated
                             // (current_price still equals entry_price from wallet recovery)
                             let price_stale = pos.entry_price > 0.0
