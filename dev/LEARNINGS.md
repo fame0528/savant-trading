@@ -486,3 +486,19 @@
 - Receipt verification (`wait_for_receipt`) prevents phantom positions from reverted swaps
 
 ---
+
+## Session 2026-06-09: FID-097 — Circuit Breaker Baseline + Position Resurrection + Batch Dedup
+
+**Key Learnings:**
+
+- **`peak_equity` is a derivative of position data.** When positions are externally modified (reconciliation removed), all derivative state must be re-derived. The circuit breaker's peak_equity was computed before reconciliation but never updated after.
+- **Multiple removal paths need a shared guard.** The startup clear and per-cycle external close are independent code paths, but both must feed the same guard set that prevents resurrection. A single `HashSet<String>` is the correct pattern.
+- **Batch LLM responses are unreliable.** The model can return duplicates, truncate, or hallucinate pairs. The parser must validate: deduplicate, check bounds, and surface discrepancies via logging.
+- **Law 12 applies to wallet addresses.** Even though the address is derived from a private key, it's still sensitive — it identifies the on-chain identity. Mask in logs.
+- **Law 4 (reachability) must verify both insert and check sites.** A HashSet guard is only effective if every removal path inserts AND every restoration path checks. Grep confirmed 5 sites: 1 decl, 2 inserts, 2 checks.
+
+**Technical Insights:**
+
+- `reconciliation_removed: HashSet<String>` declared early (before first use site ~370), populated at 2 removal sites, checked at 2 revert sites
+- Batch dedup uses `HashMap<String, usize>` to track pair→last_index, then `retain` to filter
+- Wallet masking: `&addr[..6]` + `&addr[addr.len()-4..]` — panic-safe with len > 10 guard
