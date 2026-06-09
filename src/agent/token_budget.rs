@@ -55,7 +55,7 @@ mod tests {
         // Numerical data should tokenize more efficiently than chars/4
         let data = "2450.50 2455.00 2448.00 2452.00 1000.00".repeat(10);
         let bpe_count = count_tokens(&data);
-        let chars4_count = data.len() / 4;
+        let _chars4_count = data.len() / 4;
         // BPE should be different from chars/4 (more accurate)
         // For numerical data, BPE typically produces MORE tokens than chars/4
         assert!(bpe_count > 0, "BPE count should be > 0");
