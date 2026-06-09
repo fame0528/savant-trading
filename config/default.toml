@@ -116,9 +116,6 @@ min_rr_ratio = 1.5
 min_rr_ratio_low_balance = 1.2  # When balance < $50, accept tighter R:R
 low_balance_threshold = 50.0    # Below this, use relaxed R:R
 # Spread filter — reject trades where spread > 30bps (FID-035)
-# At $11 positions, 30bps = $0.033 friction. Round-trip gas = $0.06.
-# Total friction = $0.093. With 3% stop ($0.33), friction = 28% of margin.
-max_spread_bps = 30
 # Risk buckets for correlation cap (FID-035)
 # Max 1 open position from meme bucket at any time
 [risk.buckets]
@@ -159,7 +156,7 @@ max_decisions_per_hour = 20
 # Expanded to use more of the 1M context window (FID-015)
 context_window_candles = 500
 knowledge_token_budget = 12000
-price_tolerance_pct = 0.5
+price_tolerance_pct = 1.0
 max_retries = 3
 # 0.6 optimal for MoE reasoning models emitting structured JSON (FID-015)
 temperature = 0.6

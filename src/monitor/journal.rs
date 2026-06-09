@@ -293,6 +293,16 @@ impl TradeJournal {
         Ok(())
     }
 
+    /// FID-093 D5: Prune equity snapshots older than 30 days to prevent unbounded growth.
+    pub async fn prune_old_snapshots(&self) -> Result<u64, sqlx::Error> {
+        let cutoff = (chrono::Utc::now() - chrono::Duration::days(30)).to_rfc3339();
+        let result = sqlx::query("DELETE FROM equity_snapshots WHERE timestamp < ?")
+            .bind(cutoff)
+            .execute(&self.pool)
+            .await?;
+        Ok(result.rows_affected())
+    }
+
     pub async fn get_snapshots(&self, limit: i64) -> Result<Vec<serde_json::Value>, sqlx::Error> {
         let rows = sqlx::query(
             "SELECT timestamp, balance, equity, drawdown_pct, open_positions FROM equity_snapshots ORDER BY timestamp DESC LIMIT ?"

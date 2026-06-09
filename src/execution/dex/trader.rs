@@ -1177,6 +1177,18 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         }
         let qty_wei = amount_to_wei(actual_close_qty, src_token.decimals);
 
+        // FID-094 Fix 5: Zero-amount swap guard — don't call 0x with 0 amount
+        if actual_close_qty < 0.0001 || qty_wei == "0" {
+            tracing::warn!(
+                "FID-094: Close qty too small for {} — actual={:.8}, wei={}. Returning error.",
+                pos.pair, actual_close_qty, qty_wei
+            );
+            return Err(ExecutionError::Other(format!(
+                "Close quantity too small: {:.8} {} (on-chain balance may be 0)",
+                actual_close_qty, src_token.symbol
+            )));
+        }
+
         let wallet_addr = format!("{:#x}", self.wallet_address);
         let price_params = super::SwapParams {
             src_token: src_token.address.clone(),

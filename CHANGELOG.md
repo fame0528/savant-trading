@@ -4,6 +4,33 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.12.0] — 2026-06-08
+
+### Fixed — FID-093: A-Z Logic Cleanup (Partial) + FID-094: Close Death Loop
+
+**FID-093 (Partial — 9 of 28 items):**
+- C9: eval_in_progress flag stuck on LLM timeout → reset flag before continue
+- C2: Version string hardcoded v0.10.5 → use env!("CARGO_PKG_VERSION")
+- C5: Permanent dead tokens list (never cleared)
+- C6: Ethereum DAI address typo fixed
+- C7: Duplicate USDT0/USDTE removed
+- C8: Price tolerance widened from 0.5% to 1.0%
+- C10: Base chain placeholder addresses marked as unsupported
+- D1: Midnight UTC reset independent of price updates
+- D4: Removed unwired max_spread_bps from config
+
+**FID-094: Close Execution Death Loop (critical):**
+- **Root cause:** Side correction at startup updated PortfolioManager but NOT DexTrader's internal positions map. close_position_internal read stale SHORT from DexTrader, resolved USDC as src_token instead of WETH, queried USDC balance (= $0), close failed. SL fired again next cycle. 45+ minutes of phantom SL events.
+- **Fix 1:** Sync corrected positions to DexTrader after side correction via register_position()
+- **Fix 2:** Close retry cooldown (30 min) — skip close if recently failed, breaks death loop
+- **Fix 3:** FID-088 trigger guard — don't fire ADJUST_STOP when close is on cooldown
+- **Fix 4:** Death loop detection — 3+ consecutive SL fires → halt close attempts for 1 hour
+- **Fix 5:** Zero-amount swap guard — return error if close qty < 0.0001 instead of calling 0x
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.11.9] — 2026-06-08
 
 ### Fixed — FID-092: Dead Capital Trap (Parabolic SAR, Zero-Base Review, Adverse Trend Exit)

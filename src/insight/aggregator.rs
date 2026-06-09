@@ -276,6 +276,8 @@ pub struct InsightAggregator {
     // TTL cache for on-chain data (BGeometrics rate limit)
     last_onchain_fetch: Option<std::time::Instant>,
     onchain_ttl: std::time::Duration,
+    // FID-093 D6: Track last successful refresh for health monitoring
+    last_successful_refresh: Option<std::time::Instant>,
 }
 
 impl InsightAggregator {
@@ -290,6 +292,23 @@ impl InsightAggregator {
             rss_disabled: false,
             last_onchain_fetch: None,
             onchain_ttl: std::time::Duration::from_secs(1800), // 30 minutes (on-chain data changes daily)
+            last_successful_refresh: None,
+        }
+    }
+
+    /// FID-093 D6: Check if insight data is stale (>30 minutes since last refresh).
+    pub fn is_stale(&self) -> bool {
+        match self.last_successful_refresh {
+            Some(t) => t.elapsed() > std::time::Duration::from_secs(1800),
+            None => true,
+        }
+    }
+
+    /// FID-093 D6: Minutes since last successful refresh.
+    pub fn minutes_since_refresh(&self) -> u64 {
+        match self.last_successful_refresh {
+            Some(t) => t.elapsed().as_secs() / 60,
+            None => 999,
         }
     }
 

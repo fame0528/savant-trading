@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
-use tracing::{info, warn};
+use tracing::{error, info, warn};
 use tracing_subscriber::prelude::*;
 
 use savant_trading::backtest::engine::{run_backtest, BacktestConfig};
@@ -320,21 +320,53 @@ async fn main() -> anyhow::Result<()> {
                 }
             }
 
-            // 2. Start dashboard in background (fire-and-forget child process)
+            // 2. Start dashboard in background with crash detection (FID-093 C3)
             info!("Starting dashboard on http://localhost:3000");
-            #[allow(clippy::zombie_processes)]
-            let _dashboard = npm_cmd()
-                .args(["start"])
-                .current_dir(dashboard_dir)
-                .spawn()
-                .unwrap_or_else(|e| {
-                    warn!("Failed to start dashboard: {} — trying `npm run dev`", e);
-                    npm_cmd()
-                        .args(["run", "dev"])
-                        .current_dir(dashboard_dir)
+            let dashboard_dir_clone = dashboard_dir.to_path_buf();
+            tokio::spawn(async move {
+                loop {
+                    info!("Spawning dashboard process...");
+                    let mut child = match npm_cmd()
+                        .args(["start"])
+                        .current_dir(&dashboard_dir_clone)
                         .spawn()
-                        .expect("Failed to start dashboard — is Node.js installed?")
-                });
+                    {
+                        Ok(c) => c,
+                        Err(e) => {
+                            warn!("Failed to start dashboard: {} — trying `npm run dev`", e);
+                            match npm_cmd()
+                                .args(["run", "dev"])
+                                .current_dir(&dashboard_dir_clone)
+                                .spawn()
+                            {
+                                Ok(c) => c,
+                                Err(e2) => {
+                                    error!("Failed to start dashboard: {} — retrying in 30s", e2);
+                                    tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+                                    continue;
+                                }
+                            }
+                        }
+                    };
+                    // Monitor: wait for process to exit
+                    loop {
+                        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                        match child.try_wait() {
+                            Ok(Some(status)) => {
+                                warn!("Dashboard process exited with status: {} — restarting in 5s", status);
+                                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                                break; // Break inner loop to restart
+                            }
+                            Ok(None) => { /* still running */ }
+                            Err(e) => {
+                                error!("Error checking dashboard status: {} — restarting in 10s", e);
+                                tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
 
             // 3. Start API server in background
             let api_config = config.clone();
@@ -361,7 +393,7 @@ async fn main() -> anyhow::Result<()> {
         _ => {}
     }
 
-    info!("=== SAVANT TRADING ENGINE v0.5.0 ===");
+    info!("=== SAVANT TRADING ENGINE v{} ===", env!("CARGO_PKG_VERSION"));
     info!(
         "Mode: {}",
         if !config.mode.live_execution {
@@ -444,7 +476,7 @@ async fn run_backtest_cmd(config: &AppConfig) -> anyhow::Result<()> {
 }
 
 fn print_help() {
-    println!("SAVANT TRADING ENGINE v0.10.5");
+    println!("SAVANT TRADING ENGINE v{}", env!("CARGO_PKG_VERSION"));
     println!();
     println!("USAGE:");
     println!("  savant                    Start trading engine + API server");

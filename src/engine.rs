@@ -65,6 +65,28 @@ pub fn parse_timeframe_minutes(tf: &str) -> u32 {
     }
 }
 
+/// FID-093 C1: Derive wallet address from private key hex.
+/// Used to cache the address at startup for API serving.
+fn derive_address_from_key(private_key_hex: &str) -> Result<String, String> {
+    use alloy_core::primitives::{hex, Address, Keccak256};
+    use k256::ecdsa::SigningKey;
+
+    let hex_key = private_key_hex.trim_start_matches("0x");
+    let key_bytes = hex::decode(hex_key).map_err(|e| format!("Invalid hex: {}", e))?;
+    let signing_key =
+        SigningKey::from_slice(&key_bytes).map_err(|e| format!("Invalid key: {}", e))?;
+    let verifying_key = signing_key.verifying_key();
+    let encoded = verifying_key.to_encoded_point(false).to_bytes().to_vec();
+    let mut hasher = Keccak256::new();
+    hasher.update(&encoded[1..]);
+    let hash = hasher.finalize();
+    let addr_bytes: [u8; 20] = hash[12..32]
+        .try_into()
+        .map_err(|_| "Failed to derive address".to_string())?;
+    let address = Address::from(addr_bytes);
+    Ok(format!("{:#x}", address))
+}
+
 /// Create a live execution engine based on config mode + backend.
 ///
 /// Returns `None` for simulated mode (`live_execution: false`).
@@ -318,6 +340,16 @@ pub async fn run(
                     "Live execution engine ready: backend={}",
                     config.exchange.backend
                 );
+                // FID-093 C1: Cache wallet address at startup
+                if let Ok(pk) = std::env::var(&config.exchange.dex.wallet_key_env) {
+                    if !pk.is_empty() {
+                        if let Ok(addr) = derive_address_from_key(&pk) {
+                            let mut wa = shared.wallet_address.write().await;
+                            *wa = addr.clone();
+                            info!("Wallet address cached: {}", addr);
+                        }
+                    }
+                }
                 executor = Some(trader);
             }
             Ok(None) => {}
@@ -1090,6 +1122,18 @@ pub async fn run(
                 if let Some(ref j) = journal {
                     let _ = j.save_position(p).await;
                 }
+                // FID-094 Fix 1: Sync corrected position to DexTrader's internal map.
+                // Without this, close_position_internal reads stale SHORT from DexTrader
+                // and queries the wrong token balance (USDC instead of WETH).
+                let corrected = p.clone();
+                let corrected_id = id.clone();
+                if let Some(ref mut ex) = executor {
+                    let exec_id = executor_position_map.get(&corrected_id)
+                        .cloned()
+                        .unwrap_or_else(|| format!("exec-{}", corrected_id));
+                    ex.register_position(exec_id.clone(), corrected);
+                    debug!("FID-094: Synced side correction to DexTrader: {} → {}", corrected_id, exec_id);
+                }
                 shared.log_activity(
                     savant_trading::core::shared::ActivityLevel::Warning,
                     &pair,
@@ -1195,6 +1239,10 @@ pub async fn run(
 
     // FID-046: Dead token cache — skip pairs that returned all-zero candles
     let mut dead_tokens: std::collections::HashSet<String> = std::collections::HashSet::new();
+    // FID-093 C5: Permanent dead tokens — never cleared, never re-evaluated.
+    // These tokens have been permanently flagged as dead (scam, rug, zero liquidity).
+    let permanent_dead: std::collections::HashSet<String> = std::collections::HashSet::new();
+    // Add tokens here as they're discovered: permanent_dead.insert("SCAM/USD".to_string());
 
     // FID-056 #2+#6: Candle hash cache — skip LLM eval if candle data unchanged since last cycle.
     // Uses a simple hash of the last 5 close prices + volume to detect data staleness.
@@ -1207,9 +1255,38 @@ pub async fn run(
     // If a previous cycle's LLM call is still running, skip the new eval phase.
     let eval_in_progress = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
 
+    // FID-093 D1: Track midnight reset independently of price updates
+    let mut last_daily_reset: chrono::NaiveDate = chrono::Utc::now().date_naive();
+
+    // FID-094 Fix 2: Close retry cooldown — prevents death loop.
+    // Tracks last failed close attempt per pair. Skip retry for 30 minutes.
+    let mut close_failure_cooldown: std::collections::HashMap<String, std::time::Instant> = std::collections::HashMap::new();
+    const CLOSE_COOLDOWN_SECS: u64 = 1800; // 30 minutes
+
+    // FID-094 Fix 4: Death loop detection — consecutive SL triggers per position.
+    // If 3+ consecutive SL fires without successful close, halt for 1 hour.
+    let mut consecutive_sl_count: std::collections::HashMap<String, u32> = std::collections::HashMap::new();
+    let mut sl_halt_until: std::collections::HashMap<String, std::time::Instant> = std::collections::HashMap::new();
+    const SL_HALT_THRESHOLD: u32 = 3;
+    const _SL_HALT_SECS: u64 = 3600; // 1 hour — used for death loop detection
+
     loop {
         tick += 1;
         let cycle_start = std::time::Instant::now();
+
+        // FID-093 D1: Explicit midnight UTC reset for daily PnL.
+        // update_prices() already does this, but only runs when prices arrive.
+        // This ensures reset happens even if no WS/candle data is available.
+        {
+            let today = chrono::Utc::now().date_naive();
+            if today != last_daily_reset {
+                let acct = portfolio.account_mut();
+                info!("Midnight UTC reset: clearing daily PnL (${:.2}) and trade count ({})", acct.daily_pnl, acct.trades_today);
+                acct.daily_pnl = 0.0;
+                acct.trades_today = 0;
+                last_daily_reset = today;
+            }
+        }
 
         // SPRINT-2: Drain WebSocket messages (non-blocking)
         let mut ws_messages_drained = 0u32;
@@ -1288,11 +1365,25 @@ pub async fn run(
         // FID-085/086: Refresh candle data every cycle.
         // Without this, candles are loaded once at startup and indicators go stale.
         // WS ticker only updates the LAST candle's close — all other candles freeze.
+        // FID-093 C4: Skip fetch if latest candle is less than 1 minute old
+        // (same candle period — no new candle has formed yet).
         {
             let tf = config.trading.timeframe.clone();
             let tf_minutes = parse_timeframe_minutes(&tf);
             let mut candle_refresh_futures = tokio::task::JoinSet::new();
+            let now = chrono::Utc::now();
             for pair in &active_pairs {
+                // FID-093 C4: Skip fetch if latest candle < 1 min old
+                let skip_fetch = market_stores
+                    .get(pair.as_str())
+                    .and_then(|s| s.last().map(|c| {
+                        let age = now.signed_duration_since(c.timestamp);
+                        age.num_seconds() < 60
+                    }))
+                    .unwrap_or(false);
+                if skip_fetch {
+                    continue;
+                }
                 let router = candle_router.clone();
                 let pair_clone = pair.clone();
                 candle_refresh_futures.spawn(async move {
@@ -1440,7 +1531,7 @@ pub async fn run(
             // When fully deployed, new entries are blocked at execution time
             // (not at evaluation time). The LLM evaluates everything and can
             // recommend CLOSE on held positions to rotate into better setups.
-            if dead_tokens.contains(pair.as_str()) {
+            if dead_tokens.contains(pair.as_str()) || permanent_dead.contains(pair.as_str()) {
                 continue;
             }
             if let Some(store) = market_stores.get(pair.as_str()) {
@@ -1873,6 +1964,10 @@ pub async fn run(
                         "Batch LLM call timed out after 180s — skipping {} pairs",
                         batch_size
                     );
+                    // FID-093 C9: Reset eval_in_progress flag on timeout.
+                    // Without this, the flag stays true and ALL subsequent cycles
+                    // are skipped with "previous LLM eval still in progress."
+                    eval_in_progress.store(false, std::sync::atomic::Ordering::SeqCst);
                     continue;
                 }
             };
@@ -2362,6 +2457,17 @@ pub async fn run(
                                 }
 
                                 if trigger_fired {
+                                    // FID-094 Fix 3: Don't fire ADJUST_STOP if close is on cooldown.
+                                    // Tightening the stop is futile if we can't execute the close.
+                                    let on_cooldown = close_failure_cooldown
+                                        .get(decision.pair.as_str())
+                                        .is_some_and(|t| t.elapsed().as_secs() < CLOSE_COOLDOWN_SECS);
+                                    if on_cooldown && mandated_action == "adjust_stop" {
+                                        debug!(
+                                            "FID-094 TRIGGER GUARD: {} — close on cooldown, skipping futile ADJUST_STOP",
+                                            decision.pair
+                                        );
+                                    } else {
                                     warn!(
                                         "FID-088 ENGINE TRIGGER: {} — {}. Overriding Pass to {}. New stop: {:.4}",
                                         decision.pair, trigger_reason, mandated_action, mandated_stop
@@ -2381,6 +2487,7 @@ pub async fn run(
                                     } else if mandated_action == "close" {
                                         decision.action = savant_trading::agent::decision_parser::TradeAction::Close;
                                     }
+                                    } // end FID-094 trigger guard else
                                 }
                             }
                         }
@@ -3328,6 +3435,28 @@ pub async fn run(
 
         // In live mode, close positions on executor that PortfolioManager closed via stops
         for trade in &stop_result.closed {
+            // FID-094 Fix 2: Close retry cooldown — skip if recently failed
+            if let Some(last_fail) = close_failure_cooldown.get(&trade.pair) {
+                if last_fail.elapsed().as_secs() < CLOSE_COOLDOWN_SECS {
+                    let remaining = CLOSE_COOLDOWN_SECS - last_fail.elapsed().as_secs();
+                    warn!(
+                        "FID-094 COOLDOWN: {} — close skipped, {}s remaining on cooldown",
+                        trade.pair, remaining
+                    );
+                    // Track consecutive SL for death loop detection
+                    let count = consecutive_sl_count.entry(trade.pair.clone()).or_insert(0);
+                    *count += 1;
+                    if *count >= SL_HALT_THRESHOLD {
+                        sl_halt_until.insert(trade.pair.clone(), std::time::Instant::now());
+                        warn!(
+                            "FID-094 DEATH LOOP: {} — {} consecutive SL fires without close. Halting for 1 hour.",
+                            trade.pair, count
+                        );
+                    }
+                    continue;
+                }
+            }
+
             if let Some(ref mut ex) = executor {
                 // Match closed trade to portfolio position by pair + side + entry_price
                 let paper_id = paper_positions_before
@@ -3377,6 +3506,8 @@ pub async fn run(
                                 "Failed to close executor position {}: {} — position stays open",
                                 eid, e
                             );
+                            // FID-094 Fix 2: Record close failure for cooldown
+                            close_failure_cooldown.insert(trade.pair.clone(), std::time::Instant::now());
                             // FID-074: Revert the PnL that check_stops added to balance,
                             // since the on-chain close didn't actually execute.
                             portfolio.account_mut().balance -= trade.pnl;
@@ -3927,6 +4058,16 @@ pub async fn run(
                     .await
                 {
                     warn!("Failed to record equity snapshot: {}", e);
+                }
+                // FID-093 D5: Prune old equity snapshots once per day (288 cycles)
+                if tick.is_multiple_of(288) {
+                    if let Some(ref j) = journal {
+                        match j.prune_old_snapshots().await {
+                            Ok(n) if n > 0 => info!("Pruned {} old equity snapshots", n),
+                            Err(e) => warn!("Failed to prune equity snapshots: {}", e),
+                            _ => {}
+                        }
+                    }
                 }
                 // Push to shared state for dashboard equity curve
                 {

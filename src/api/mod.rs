@@ -656,25 +656,32 @@ async fn health(State(state): State<AppState>) -> Json<serde_json::Value> {
 
 /// Wallet endpoint — returns address + on-chain balances.
 async fn get_wallet(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
-    let private_key = std::env::var(&state.config.exchange.dex.wallet_key_env).unwrap_or_default();
-    if private_key.is_empty() {
-        return Json(ApiResponse {
-            data: serde_json::json!({"address": null, "error": "WALLET_PRIVATE_KEY not set"}),
-            error: None,
-            timestamp: chrono::Utc::now().to_rfc3339(),
-        });
-    }
-
-    let address = match derive_wallet_address(&private_key) {
-        Ok(addr) => addr,
-        Err(e) => {
+    // FID-093 C1: Use cached wallet address from startup
+    let cached_addr = state.shared.wallet_address.read().await;
+    let address = if cached_addr.is_empty() {
+        // Fallback: derive on first request if startup caching failed
+        let private_key = std::env::var(&state.config.exchange.dex.wallet_key_env).unwrap_or_default();
+        if private_key.is_empty() {
             return Json(ApiResponse {
-                data: serde_json::json!({"address": null, "error": e}),
+                data: serde_json::json!({"address": null, "error": "WALLET_PRIVATE_KEY not set"}),
                 error: None,
                 timestamp: chrono::Utc::now().to_rfc3339(),
             });
         }
+        match derive_wallet_address(&private_key) {
+            Ok(addr) => addr,
+            Err(e) => {
+                return Json(ApiResponse {
+                    data: serde_json::json!({"address": null, "error": e}),
+                    error: None,
+                    timestamp: chrono::Utc::now().to_rfc3339(),
+                });
+            }
+        }
+    } else {
+        cached_addr.clone()
     };
+    drop(cached_addr);
 
     // Query on-chain ETH balance via RPC
     let rpc_url = &state.config.exchange.dex.rpc_url;

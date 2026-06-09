@@ -31,6 +31,9 @@ pub struct SharedEngineData {
     /// FID-081: Price feed staleness — seconds since last WS price update.
     /// Dashboard shows amber "STALE PRICES" chip when > 300s.
     pub price_staleness_secs: Arc<RwLock<u64>>,
+    /// FID-093 C1: Cached wallet address — derived once at startup.
+    /// Avoids re-deriving on every /api/wallet request.
+    pub wallet_address: Arc<RwLock<String>>,
 }
 
 /// Memory system state for TUI display.
@@ -109,6 +112,7 @@ impl SharedEngineData {
             hunt_mode: Arc::new(RwLock::new(false)),
             monitoring_mode: Arc::new(RwLock::new(false)),
             price_staleness_secs: Arc::new(RwLock::new(0)),
+            wallet_address: Arc::new(RwLock::new(String::new())),
         }
     }
 
