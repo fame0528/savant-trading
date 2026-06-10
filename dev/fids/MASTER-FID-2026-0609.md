@@ -3,7 +3,7 @@
 **ID:** MASTER-FID-2026-0609
 **Created:** 2026-06-09 19:00
 **Updated:** 2026-06-09 20:00
-**Status:** active
+**Status:** active (1 item remaining — FID-093: Tabbed terminal)
 **Scope:** All FIDs consolidated, validated against v0.12.7 codebase
 
 ---
@@ -24,6 +24,7 @@
 | FID-102 | Gemini Priority 1 (ATR TP, BB squeeze, dynamic ADX) | ✅ fixed | Yes (v0.12.7) |
 | FID-103 | DEX price authoritative (salvaged) | ✅ fixed | Yes (v0.12.6) |
 | FID-104 | On-chain execution failures | ✅ fixed | Yes (v0.12.7) |
+| FID-105 | 0x API swap direction reversal | ✅ fixed | Yes (v0.12.8) |
 
 ---
 
