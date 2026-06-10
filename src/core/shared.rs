@@ -1,6 +1,6 @@
 //! Shared engine state for cross-module access (API, TUI, engine).
 
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -35,6 +35,17 @@ pub struct SharedEngineData {
     pub wallet_address: Arc<RwLock<String>>,
     /// FID-103: DEX prices from 0x /price responses. Pair → (price, timestamp).
     pub dex_prices: Arc<RwLock<HashMap<String, (f64, std::time::Instant)>>>,
+    // ---- FID-093: Command bridge fields ----
+    /// Operator commands queued for the engine to drain each cycle.
+    pub pending_commands: Arc<RwLock<VecDeque<crate::agent::commands::PendingCommand>>>,
+    /// Runtime autonomy level override (None = use config default).
+    pub autonomy_override: Arc<RwLock<Option<crate::agent::commands::AutonomyLevel>>>,
+    /// Pending action awaiting operator approval (confirm/suggest mode).
+    pub pending_approval: Arc<RwLock<Option<crate::agent::commands::PendingAction>>>,
+    /// Operator context messages to inject into next LLM evaluation.
+    pub inject_context_queue: Arc<RwLock<Vec<String>>>,
+    /// Command history for undo support (last 10 commands).
+    pub command_history: Arc<RwLock<VecDeque<crate::agent::commands::CommandHistoryEntry>>>,
 }
 
 /// Memory system state for TUI display.
@@ -115,6 +126,12 @@ impl SharedEngineData {
             price_staleness_secs: Arc::new(RwLock::new(0)),
             wallet_address: Arc::new(RwLock::new(String::new())),
             dex_prices: Arc::new(RwLock::new(HashMap::new())),
+            // FID-093: Command bridge fields
+            pending_commands: Arc::new(RwLock::new(VecDeque::new())),
+            autonomy_override: Arc::new(RwLock::new(None)),
+            pending_approval: Arc::new(RwLock::new(None)),
+            inject_context_queue: Arc::new(RwLock::new(Vec::new())),
+            command_history: Arc::new(RwLock::new(VecDeque::new())),
         }
     }
 

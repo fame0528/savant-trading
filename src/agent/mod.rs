@@ -7,6 +7,7 @@
 //! - `decision_parser` — Extracts structured TradeDecision from LLM responses
 //! - `orchestrator` — Main decision loop with autonomy level control
 
+pub mod commands;
 pub mod context_builder;
 pub mod context_engine;
 pub mod context_state;

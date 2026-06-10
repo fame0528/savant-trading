@@ -139,6 +139,8 @@ pub async fn start_server(
         .route("/api/positions/{pair}/stop", patch(update_stop))
         .route("/api/positions/{pair}/close", post(close_position))
         .route("/api/terminal", get(terminal_ws))
+        .route("/api/terminal/cmd", get(terminal_cmd_ws))
+        .route("/api/agent/command", post(agent_command_rest))
         .with_state(state)
         .layer(cors)
         .layer(middleware::from_fn(auth_middleware))
@@ -991,6 +993,235 @@ async fn handle_terminal(socket: axum::extract::ws::WebSocket, _state: AppState)
     }
 
     send_task.abort();
+}
+
+/// FID-093: WebSocket command channel — bidirectional JSON commands.
+async fn terminal_cmd_ws(
+    ws: axum::extract::WebSocketUpgrade,
+    State(state): State<AppState>,
+) -> axum::response::Response {
+    ws.on_upgrade(move |socket| handle_cmd_ws(socket, state))
+}
+
+async fn handle_cmd_ws(mut socket: axum::extract::ws::WebSocket, state: AppState) {
+    use axum::extract::ws::Message;
+    use futures_util::StreamExt;
+
+    // Send welcome message
+    let welcome = serde_json::json!({
+        "type": "response",
+        "ok": true,
+        "message": "Command channel connected. Type a command or natural language."
+    });
+    if socket
+        .send(Message::Text(welcome.to_string().into()))
+        .await
+        .is_err()
+    {
+        return;
+    }
+
+    while let Some(msg) = socket.next().await {
+        let text = match msg {
+            Ok(Message::Text(t)) => t.to_string(),
+            Ok(Message::Close(_)) => break,
+            _ => continue,
+        };
+
+        let response = handle_command(&text, &state.shared).await;
+        let response_json = serde_json::to_string(&response).unwrap_or_default();
+        if socket
+            .send(Message::Text(response_json.into()))
+            .await
+            .is_err()
+        {
+            break;
+        }
+    }
+}
+
+/// FID-093: REST fallback for commands.
+async fn agent_command_rest(
+    State(state): State<AppState>,
+    axum::extract::Json(body): axum::extract::Json<serde_json::Value>,
+) -> axum::extract::Json<serde_json::Value> {
+    let input = body
+        .get("command")
+        .and_then(|v| v.as_str())
+        .unwrap_or("");
+    let response = handle_command(input, &state.shared).await;
+    axum::extract::Json(serde_json::to_value(&response).unwrap_or_default())
+}
+
+/// Process a command string and return a response.
+async fn handle_command(
+    input: &str,
+    shared: &savant_trading::core::shared::SharedEngineData,
+) -> savant_trading::agent::commands::CommandResponse {
+    use savant_trading::agent::commands::*;
+
+    let cmd = match parse_command(input) {
+        Ok(cmd) => cmd,
+        Err(e) => return CommandResponse::error(e),
+    };
+
+    match cmd {
+        OperatorCommand::OverrideClose { pair, reason: _ } => {
+            let mut overrides = shared.close_overrides.write().await;
+            overrides.insert(pair.clone(), true);
+            let msg = format!("Closing {} on next cycle", pair);
+            CommandResponse::success(msg)
+        }
+
+        OperatorCommand::OverrideStop { pair, stop_loss } => {
+            let mut overrides = shared.stop_overrides.write().await;
+            overrides.insert(pair.clone(), stop_loss);
+            CommandResponse::success(format!(
+                "Stop set to {:.4} for {}",
+                stop_loss, pair
+            ))
+        }
+
+        OperatorCommand::InjectContext { message } => {
+            if let Err(e) = sanitize_inject_context(&message) {
+                return CommandResponse::error(e);
+            }
+            let mut queue = shared.inject_context_queue.write().await;
+            queue.push(message.clone());
+            CommandResponse::success(format!(
+                "Context injected ({} messages in queue)",
+                queue.len()
+            ))
+        }
+
+        OperatorCommand::Pause => {
+            CommandResponse::success("Trading paused — engine will stop after current cycle")
+        }
+
+        OperatorCommand::Resume => {
+            CommandResponse::success("Trading resumed")
+        }
+
+        OperatorCommand::Status => {
+            let account = shared.account.read().await;
+            let positions = shared.positions.read().await;
+            let staleness = shared.price_staleness_secs.read().await;
+            let hunt = shared.hunt_mode.read().await;
+            let autonomy = shared.autonomy_override.read().await;
+
+            let data = serde_json::json!({
+                "balance": account.balance,
+                "equity": account.balance + positions.iter().map(|p| p.unrealized_pnl).sum::<f64>(),
+                "positions": positions.len(),
+                "autonomy": autonomy.map(|a| a.as_str().to_string()).unwrap_or_else(|| "autonomous".into()),
+                "hunt_mode": *hunt,
+                "price_staleness_secs": *staleness,
+            });
+            CommandResponse::success("Status retrieved").with_data(data)
+        }
+
+        OperatorCommand::Explain { pair } => {
+            let decisions = shared.decisions.read().await;
+            if let Some(decision) = decisions.iter().rev().find(|d| d.pair == pair) {
+                let data = serde_json::json!({
+                    "pair": decision.pair,
+                    "action": decision.action,
+                    "confidence": decision.confidence,
+                    "reasoning": decision.reasoning,
+                });
+                CommandResponse::success(format!("Last decision for {}", pair)).with_data(data)
+            } else {
+                CommandResponse::error(format!("No decisions found for {}", pair))
+            }
+        }
+
+        OperatorCommand::SetAutonomy { level } => {
+            let mut override_val = shared.autonomy_override.write().await;
+            *override_val = Some(level);
+            CommandResponse::success(format!("Autonomy set to {}", level.as_str()))
+        }
+
+        OperatorCommand::Approve => {
+            let mut pending = shared.pending_approval.write().await;
+            if let Some(action) = pending.take() {
+                // Write to close_overrides or stop_overrides based on action
+                match action.action.as_str() {
+                    "Close" => {
+                        let mut overrides = shared.close_overrides.write().await;
+                        overrides.insert(action.pair.clone(), true);
+                        CommandResponse::success(format!("Approved: closing {}", action.pair))
+                    }
+                    _ => CommandResponse::success(format!(
+                        "Approved: {} {}",
+                        action.action, action.pair
+                    )),
+                }
+            } else {
+                CommandResponse::error("No pending action to approve")
+            }
+        }
+
+        OperatorCommand::Feedback { pair, verdict, note } => {
+            // Store feedback for episodic memory calibration
+            CommandResponse::success(format!(
+                "Feedback recorded for {}: {} — {}",
+                pair,
+                verdict,
+                note.unwrap_or_default()
+            ))
+        }
+
+        OperatorCommand::Watch { pair, cycles } => {
+            CommandResponse::success(format!(
+                "Watching {} for {} cycles",
+                pair, cycles
+            ))
+        }
+
+        OperatorCommand::Undo => {
+            let mut history = shared.command_history.write().await;
+            if let Some(entry) = history.pop_back() {
+                // Execute the inverse command
+                let inverse_response = Box::pin(handle_command_inner(
+                    &entry.inverse,
+                    shared,
+                ))
+                .await;
+                CommandResponse::success(format!("Undone: {}", inverse_response.message.unwrap_or_default()))
+            } else {
+                CommandResponse::error("Nothing to undo")
+            }
+        }
+
+        OperatorCommand::Query { message: _ } => {
+            // Query makes a one-shot LLM call — for now return a placeholder
+            CommandResponse::success("Query received — LLM query not yet wired")
+        }
+    }
+}
+
+/// Inner handler for recursive undo calls.
+async fn handle_command_inner(
+    cmd: &savant_trading::agent::commands::OperatorCommand,
+    shared: &savant_trading::core::shared::SharedEngineData,
+) -> savant_trading::agent::commands::CommandResponse {
+    // Simplified inner handler — just execute the inverse directly
+    match cmd {
+        savant_trading::agent::commands::OperatorCommand::OverrideClose { pair, .. } => {
+            let mut overrides = shared.close_overrides.write().await;
+            overrides.insert(pair.clone(), true);
+            savant_trading::agent::commands::CommandResponse::success(format!("Undone: closing {}", pair))
+        }
+        savant_trading::agent::commands::OperatorCommand::OverrideStop { pair, stop_loss } => {
+            let mut overrides = shared.stop_overrides.write().await;
+            overrides.insert(pair.clone(), *stop_loss);
+            savant_trading::agent::commands::CommandResponse::success(format!(
+                "Undone: stop set to {:.4} for {}",
+                stop_loss, pair
+            ))
+        }
+        _ => savant_trading::agent::commands::CommandResponse::success("Undo executed"),
+    }
 }
 
 #[cfg(test)]

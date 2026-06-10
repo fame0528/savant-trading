@@ -26,7 +26,7 @@ import Ticker from "@/components/Ticker";
 
 dayjs.extend(relativeTime);
 
-const TerminalPanel = dynamic(() => import("@/components/Terminal"), { ssr: false });
+const TerminalContainer = dynamic(() => import("@/components/TerminalContainer"), { ssr: false });
 const EquityChart = dynamic(() => import("@/components/EquityChart"), { ssr: false });
 
 const fmt = {
@@ -654,7 +654,7 @@ export default function Dashboard() {
           </div>
           <div className="flex-1 min-h-0">
             <ErrorBoundary label="Terminal">
-              <TerminalPanel className="h-full" />
+              <TerminalContainer className="h-full" />
             </ErrorBoundary>
           </div>
         </div>
