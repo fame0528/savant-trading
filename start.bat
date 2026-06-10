@@ -9,8 +9,8 @@ echo.
 cd /d "%~dp0"
 :: Load environment variables from .env (GITHUB_TOKEN for gh CLI, etc.)
 if exist .env (
-    for /f "usebackq tokens=1,* delims==" %%a in (`.env`) do (
-        set "%%a=%%b"
+    for /f "usebackq tokens=1,* delims==" %%a in ('findstr /v /b "#" .env') do (
+        if not "%%a"=="" set "%%a=%%b"
     )
     echo  .env loaded.
 ) else (
