@@ -4,6 +4,27 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.13.0] — 2026-06-10
+
+### Fixed — Position Sizing: Session Multiplier Overflow + Hard Rejection
+
+The position sizer capped at 99% of balance, but the session multiplier (1.2x during US-EU Overlap) was applied AFTER the cap, inflating position size past wallet balance. The concentration check then hard-rejected with no fallback — killing valid signals.
+
+**Root cause:** `$24.117 * 0.99 = $23.88` → session 1.2x → `$28.65` → exceeds `$24.12` → BUY REJECTED. Signal dead, no retry.
+
+1. **PositionSizer overflow cap** (`src/risk/position.rs:173`) — Changed from `0.99` to `0.9999` (99.99%). Prevents rounding `$24.117` up to `$24.12`.
+2. **Auto-adjust instead of reject** (`src/engine.rs:3260-3289`) — When order value exceeds concentration cap, quantity is reduced to fit (`safe_max = balance * cap * 0.9999`). Logs `ADJUSTED` instead of `REJECTED`. Signal preserved.
+3. **Correct percentage in log** — Hardcoded "33%" replaced with dynamic label (`100%` in full_deploy, `33%` otherwise).
+4. **LLM feedback injection** — On auto-adjust, appends a `FEEDBACK` entry to the decision log: "Your BUY signal was correct. Position auto-adjusted." Prevents the LLM from second-guessing valid analysis on the next cycle.
+
+**Before:** Position sized → session inflates → hard reject → signal lost
+**After:** Position sized → session inflates → auto-adjust to cap → order placed
+
+### Changed
+
+- `position.rs` overflow cap: `0.99` → `0.9999`
+- `engine.rs` concentration check: hard reject → auto-adjust with fallback
+
 ## [0.12.9] — 2026-06-10
 
 ### Added — FID-108: DEX Execution Reliability (9 Changes)
