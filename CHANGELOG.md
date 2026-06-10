@@ -4,6 +4,38 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.13.1] — 2026-06-10
+
+### Changed — FID-110: Engine Decomposition (Sessions 1–4)
+
+The 7,214-line monolithic `engine.rs` was decomposed into a structured module with extracted utilities, test harness, and state management.
+
+**Extracted modules:**
+- `engine/utils.rs` (200 lines) — `parse_timeframe`, `create_executor`, `derive_address_from_key`, `load_knowledge_base`, `exchange_base`
+- `engine/training.rs` (1,846 lines) — 11 functions: `run_training`, `run_sandbox`, `run_action_test`, `run_training_batch`, `run_live_test`, `run_historical`, `run_model_comparison`, and helpers
+- `engine/debug.rs` (407 lines) — `dry_run`, `run_live_test` (sandbox dry-run and live test modes)
+
+**EngineState struct (Session 3):**
+- 48-field struct encapsulating all mutable engine state (portfolio, agent, insight, metrics, etc.)
+- `EngineState::new()` constructor (~1,150 lines of init code extracted from `run()`)
+- `run()` is now a thin wrapper: calls `new()`, destructures, delegates to loop
+
+**Result:** `engine/mod.rs` is now 4,581 lines (down from 7,214). Modules are independently testable. Sessions 5–7 (loop body extraction, cycle sub-phases, audit) deferred.
+
+### Changed
+- `src/engine.rs` (deleted) → `src/engine/mod.rs` + `utils.rs` + `training.rs` + `debug.rs`
+- Root scripts (`run-247.bat`, `run-canary.ps1`, etc.) moved to `scripts/` folder (keep `start.bat` in root)
+- Session file `session-ses_14d3.md` moved to `dev/session-summaries/`
+- `dashboard/src/app/page.tsx` — Disconnected overlay message updated
+- Stale research docs deleted: `dev/AI Crypto Scalping Agent Optimization.md`, `dev/research-prompt-scalping-optimization.md`
+- Archived FIDs: FID-107 (scalping conversion), FID-108 (DEX reliability — superseded), FID-109 (chain-first — superseded), MASTER-FID-2026-0609
+
+### Build & Test
+- 273 tests passing, 0 clippy warnings
+- Engine tested in production: 3 cycles completed, all systems operational
+
+---
+
 ## [0.13.0] — 2026-06-10
 
 ### Fixed — Position Sizing: Session Multiplier Overflow + Hard Rejection

@@ -1,3 +1,15 @@
+pub mod debug;
+pub mod training;
+pub mod utils;
+
+pub use debug::{dry_run, run_live_test};
+pub use training::{run_action_test, run_sandbox, run_training};
+pub use utils::parse_timeframe;
+pub use utils::parse_timeframe_minutes;
+
+use utils::{create_executor, derive_address_from_key, load_knowledge_base};
+use training::verify_token_safety;
+
 use chrono::{Timelike, Utc};
 use std::collections::{HashMap, HashSet};
 use std::time::Duration;
@@ -8,7 +20,6 @@ use savant_trading::agent::context_builder::FullContext;
 use savant_trading::agent::context_engine::ContextEngine;
 use savant_trading::agent::context_state::ContextState;
 use savant_trading::agent::decision_log::DecisionLog;
-use savant_trading::agent::knowledge::KnowledgeBase;
 use savant_trading::agent::openrouter_management::OpenRouterManagementClient;
 use savant_trading::agent::orchestrator::{AgentConfig, AgentOrchestrator, AutonomyLevel};
 use savant_trading::agent::prompts::{self, PromptComposer};
@@ -20,18 +31,13 @@ use savant_trading::data::candle_client::CandleClient;
 use savant_trading::data::indicators::IndicatorEngine;
 use savant_trading::data::market_data::MarketDataStore;
 use savant_trading::data::orderbook::OrderBookManager;
-use savant_trading::execution::dex::inch::InchBackend;
-use savant_trading::execution::dex::zero_x::ZeroXBackend;
-use savant_trading::execution::dex::DexTrader;
 use savant_trading::execution::engine::ExecutionEngine;
 use savant_trading::execution::portfolio::PortfolioManager;
 use savant_trading::insight::aggregator::{InsightAggregator, InsightConfig};
 use savant_trading::monitor::journal::TradeJournal;
-use savant_trading::monitor::metrics::{Metrics, PerformanceMetrics};
+use savant_trading::monitor::metrics::PerformanceMetrics;
 use savant_trading::risk::circuit_breaker::{CircuitBreaker, CircuitBreakerResult};
 use savant_trading::risk::position::PositionSizer;
-use savant_trading::strategy::mean_reversion::MeanReversionStrategy;
-use savant_trading::strategy::momentum::MomentumStrategy;
 use savant_trading::strategy::regime::RegimeDetector;
 use savant_trading::vault::config::VaultConfig;
 use savant_trading::vault::watcher::VaultWatcher;
@@ -41,1192 +47,430 @@ use savant_trading::{
     log_swap_fail, log_trade, log_vault, log_warn,
 };
 
-pub fn parse_timeframe(tf: &str) -> u64 {
-    match tf {
-        "1m" => 60,
-        "5m" => 300,
-        "15m" => 900,
-        "1h" => 3600,
-        "4h" => 14400,
-        "1d" => 86400,
-        _ => 300,
-    }
-}
-
-pub fn parse_timeframe_minutes(tf: &str) -> u32 {
-    match tf {
-        "1m" => 1,
-        "5m" => 5,
-        "15m" => 15,
-        "1h" => 60,
-        "4h" => 240,
-        "1d" => 1440,
-        _ => 5,
-    }
-}
-
-/// FID-093 C1: Derive wallet address from private key hex.
-/// Used to cache the address at startup for API serving.
-fn derive_address_from_key(private_key_hex: &str) -> Result<String, String> {
-    use alloy_core::primitives::{hex, Address, Keccak256};
-    use k256::ecdsa::SigningKey;
-
-    let hex_key = private_key_hex.trim_start_matches("0x");
-    let key_bytes = hex::decode(hex_key).map_err(|e| format!("Invalid hex: {}", e))?;
-    let signing_key =
-        SigningKey::from_slice(&key_bytes).map_err(|e| format!("Invalid key: {}", e))?;
-    let verifying_key = signing_key.verifying_key();
-    let encoded = verifying_key.to_encoded_point(false).to_bytes().to_vec();
-    let mut hasher = Keccak256::new();
-    hasher.update(&encoded[1..]);
-    let hash = hasher.finalize();
-    let addr_bytes: [u8; 20] = hash[12..32]
-        .try_into()
-        .map_err(|_| "Failed to derive address".to_string())?;
-    let address = Address::from(addr_bytes);
-    Ok(format!("{:#x}", address))
-}
-
-/// Create a live execution engine based on config mode + backend.
-///
-/// Returns `None` for simulated mode (`live_execution: false`).
-/// Otherwise creates the appropriate backend:
-///   - `"0x"`     → [`DexTrader<ZeroXBackend>`] (requires WALLET_PRIVATE_KEY + ZEROEX_API_KEY)
-///   - `"1inch"`  → [`DexTrader<InchBackend>`] (requires WALLET_PRIVATE_KEY + 1INCH_API_KEY)
-async fn create_executor(
-    config: &AppConfig,
-) -> Result<Option<Box<dyn ExecutionEngine>>, anyhow::Error> {
-    if !config.mode.live_execution {
-        info!("portfolio trading mode: using PortfolioManager");
-        return Ok(None);
-    }
-
-    match config.exchange.backend.as_str() {
-        "0x" => {
-            let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env).map_err(|_| {
-                anyhow::anyhow!(
-                    "{} not set — required for 0x DEX trading",
-                    config.exchange.dex.wallet_key_env
-                )
-            })?;
-            let api_key = std::env::var(&config.exchange.dex.api_key_env).map_err(|_| {
-                anyhow::anyhow!(
-                    "{} not set — required for 0x API",
-                    config.exchange.dex.api_key_env
-                )
-            })?;
-
-            let signing_key = {
-                let key_hex = wallet_key.trim_start_matches("0x");
-                let key_bytes = alloy_core::primitives::hex::decode(key_hex)
-                    .map_err(|e| anyhow::anyhow!("Invalid wallet key hex: {}", e))?;
-                k256::ecdsa::SigningKey::from_bytes(key_bytes.as_slice().into())
-                    .map_err(|e| anyhow::anyhow!("Invalid wallet key for signing: {}", e))?
-            };
-            let backend = ZeroXBackend::new(api_key, signing_key);
-            let mut trader = DexTrader::new(
-                backend,
-                &wallet_key,
-                &config.exchange.dex.rpc_url,
-                config.exchange.dex.chain_id,
-                config.exchange.dex.slippage_pct,
-                config.trading.starting_balance,
-            )
-            .await
-            .map_err(|e| anyhow::anyhow!("Failed to create DexTrader (0x): {}", e))?;
-
-            // Register additional chains from config (FID-045)
-            for chain_cfg in config.chains.values() {
-                if chain_cfg.enabled && chain_cfg.chain_id != config.exchange.dex.chain_id {
-                    info!(
-                        "Registering chain: {} (id={})",
-                        chain_cfg.name, chain_cfg.chain_id
-                    );
-                    let chain_config = savant_trading::execution::dex::ChainConfig {
-                        chain_id: chain_cfg.chain_id,
-                        name: Box::leak(chain_cfg.name.clone().into_boxed_str()),
-                        rpc_url: chain_cfg.rpc_url.clone(),
-                        native_token: Box::leak(chain_cfg.native_token.clone().into_boxed_str()),
-                        min_gas_native: chain_cfg.min_gas_native,
-                        slippage_pct: chain_cfg.slippage_pct,
-                    };
-                    trader.add_chain(chain_config);
-                }
-            }
-
-            info!(
-                "LIVE trading mode: DexTrader (0x) initialized on chain {} ({} total chains)",
-                config.exchange.dex.chain_id,
-                trader.chain_ids().len()
-            );
-            Ok(Some(Box::new(trader)))
-        }
-        "1inch" => {
-            let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env).map_err(|_| {
-                anyhow::anyhow!(
-                    "{} not set — required for 1inch DEX trading",
-                    config.exchange.dex.wallet_key_env
-                )
-            })?;
-            let api_key = std::env::var(&config.exchange.dex.api_key_env).map_err(|_| {
-                anyhow::anyhow!(
-                    "{} not set — required for 1inch API",
-                    config.exchange.dex.api_key_env
-                )
-            })?;
-
-            let backend = InchBackend::new(api_key);
-            let trader = DexTrader::new(
-                backend,
-                &wallet_key,
-                &config.exchange.dex.rpc_url,
-                config.exchange.dex.chain_id,
-                config.exchange.dex.slippage_pct,
-                config.trading.starting_balance,
-            )
-            .await
-            .map_err(|e| anyhow::anyhow!("Failed to create DexTrader (1inch): {}", e))?;
-
-            info!(
-                "LIVE trading mode: DexTrader (1inch) initialized on chain {}",
-                config.exchange.dex.chain_id
-            );
-            Ok(Some(Box::new(trader)))
-        }
-        other => Err(anyhow::anyhow!("Unknown exchange backend '{}'", other)),
-    }
-}
-
-fn load_knowledge_base() -> KnowledgeBase {
-    let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
-    let knowledge_root = manifest_dir.join("knowledge");
-    let knowledge_src = manifest_dir.join("src").join("agent").join("knowledge");
-
-    let knowledge_dir = if knowledge_root.exists() {
-        knowledge_root
-    } else {
-        warn!(
-            "knowledge/ not found at {:?}, falling back to src/agent/knowledge/",
-            manifest_dir
-        );
-        knowledge_src
-    };
-
-    info!("Loading knowledge from {:?}", knowledge_dir);
-
-    let mut all_units = Vec::new();
-
-    if let Ok(entries) = std::fs::read_dir(&knowledge_dir) {
-        for entry in entries.flatten() {
-            let path = entry.path();
-            if path.extension().and_then(|e| e.to_str()) == Some("json") {
-                match std::fs::read_to_string(&path) {
-                    Ok(json) => match KnowledgeBase::from_json(&json) {
-                        Ok(kb) => {
-                            let count = kb.len();
-                            all_units.extend_from_slice(kb.all());
-                            info!(
-                                "Loaded {} knowledge units from {:?}",
-                                count,
-                                path.file_name()
-                            );
-                        }
-                        Err(e) => warn!("Failed to parse {:?}: {}", path.file_name(), e),
-                    },
-                    Err(e) => warn!("Failed to read {:?}: {}", path.file_name(), e),
-                }
-            }
-        }
-    }
-
-    info!("Knowledge base loaded: {} total units", all_units.len());
-    let mut kb = KnowledgeBase::new(all_units);
-
-    // Load persisted utility scores if available
-    let scores_path = std::path::Path::new("data/knowledge_utility.json");
-    if let Err(e) = kb.load_utility_scores(scores_path) {
-        warn!("Failed to load utility scores: {}", e);
-    } else if scores_path.exists() {
-        info!("Loaded utility scores from {:?}", scores_path);
-    }
-
-    kb
-}
-
-pub async fn run(
+/// Engine state — bundles all long-lived variables from run() into a struct.
+/// Defined for future decomposition (Sessions 4-8 will extract methods).
+#[allow(dead_code)]
+struct EngineState {
+    // Config & shared
     config: AppConfig,
     shared: savant_trading::core::shared::SharedEngineData,
-    _engine_running: std::sync::Arc<std::sync::atomic::AtomicBool>,
-) -> anyhow::Result<()> {
-    // PROD-2: Block file check — refuse to start if circuit breaker wrote block file
-    let block_path = "savant.blocked";
-    if std::path::Path::new(block_path).exists() {
-        let contents = std::fs::read_to_string(block_path).unwrap_or_default();
-        error!(
-            "ENGINE BLOCKED: {} exists. Delete file to resume. Contents: {}",
-            block_path, contents
-        );
-        return Err(anyhow::anyhow!(
-            "Engine blocked by {}. Delete file to resume.",
-            block_path
-        ));
-    }
+    running: std::sync::Arc<std::sync::atomic::AtomicBool>,
 
-    let candle_api = CandleClient::new(&config.exchange.rest_url);
+    // Market data
+    candle_api: CandleClient,
+    active_pairs: Vec<String>,
+    curated_pairs: HashSet<String>,
+    market_stores: HashMap<String, MarketDataStore>,
+    candle_router: std::sync::Arc<savant_trading::data::sources::SourceRouter>,
+    interval_seconds: u64,
 
-    // SPRINT-3: Scan all pairs — discover USD pairs from API with safety filters
-    let active_pairs = if config.trading.scan_all_pairs {
-        match candle_api
-            .discover_safe_usd_pairs(
-                config.trading.min_volume_24h_usd,
-                config.trading.min_price_usd,
-                &config.trading.blacklisted_symbols,
-            )
-            .await
-        {
-            Ok(discovered) => {
-                info!("Scan mode: discovered {} safe pairs", discovered.len());
-                discovered
-            }
-            Err(e) => {
-                warn!(
-                    "Pair discovery failed ({}), falling back to config pairs",
-                    e
-                );
-                config.trading.pairs.clone()
-            }
-        }
-    } else {
-        config.trading.pairs.clone()
-    };
+    // Trading
+    portfolio: PortfolioManager,
+    executor: Option<Box<dyn ExecutionEngine>>,
+    executor_position_map: HashMap<String, String>,
+    reconciliation_removed: HashSet<String>,
+    failure_tracker: savant_trading::execution::dex::trader::FailureTracker,
+    episode_store: HashMap<String, String>,
+    journal: Option<TradeJournal>,
 
-    // Token DB: load ALL static Arbitrum addresses for resolution (needed by 0x API)
-    // When scan_all_pairs is true, discovered pairs are also curated (FID-052 fix)
-    let mut curated_pairs: std::collections::HashSet<String> =
-        config.trading.pairs.iter().cloned().collect();
-    if config.trading.scan_all_pairs {
-        for p in &active_pairs {
-            curated_pairs.insert(p.clone());
-        }
-        info!(
-            "Curated pairs: {} (config {} + discovered {})",
-            curated_pairs.len(),
-            config.trading.pairs.len(),
-            active_pairs.len()
-        );
-    }
-    if config.mode.live_execution {
-        let mut all_token_entries: Vec<(String, String, u8)> = Vec::new();
-        for &(sym, addr, dec) in savant_trading::execution::dex::ARBITRUM_TOKENS {
-            all_token_entries.push((sym.to_string(), addr.to_string(), dec));
-        }
-        savant_trading::execution::dex::extend_token_db(&all_token_entries);
-        info!(
-            "Token DB: {} Arbitrum addresses loaded for resolution",
-            all_token_entries.len()
-        );
-        // P1-1d: Discover additional Arbitrum tokens from Blockscout
-        match savant_trading::data::token_discovery::discover_tokens(1_000_000.0, 500, 100).await {
-            Ok(discovered) => {
-                let mut discovered_entries: Vec<(String, String, u8)> = Vec::new();
-                for token in &discovered {
-                    if !curated_pairs.contains(&format!("{}/USD", token.symbol)) {
-                        discovered_entries.push((
-                            token.symbol.clone(),
-                            token.address.clone(),
-                            token.decimals,
-                        ));
-                    }
-                }
-                if !discovered_entries.is_empty() {
-                    savant_trading::execution::dex::extend_token_db(&discovered_entries);
-                    info!("Token discovery: {} discovered → {} new pairs added to DB",
-                        discovered.len(), discovered_entries.len());
-                } else {
-                    info!("Token discovery: {} discovered — all already in curated list", discovered.len());
-                }
-            }
-            Err(e) => {
-                warn!("Token discovery failed ({}), continuing with static DB only", e);
-            }
-        }
-    }
-    info!("Active pairs ({}): {:?}", active_pairs.len(), active_pairs);
+    // AI
+    agent: AgentOrchestrator,
+    ctx_engine: ContextEngine,
+    ctx_state: ContextState,
+    decision_log: DecisionLog,
 
-    let mut market_stores: HashMap<String, MarketDataStore> = HashMap::new();
-    for pair in &active_pairs {
-        market_stores.insert(
-            pair.clone(),
-            MarketDataStore::new(pair, config.strategy.mean_reversion.profile_periods + 100),
-        );
-    }
+    // Monitoring
+    insight: InsightAggregator,
+    event_bus: EventBus,
 
-    let mut portfolio = PortfolioManager::new(
-        config.trading.starting_balance,
-        config.trading.fee_rate,
-        config.trading.slippage_pct,
-    );
+    // Vault
+    vault_config: VaultConfig,
+    vault_writer: VaultWriter,
+    vault_watcher: VaultWatcher,
 
-    // NOTE: paper_state.json removed — DB + on-chain sync are source of truth.
-    // Old state files can contain stale data from crashed runs.
+    // Memory & learning
+    order_books: HashMap<String, OrderBookManager>,
+    memory: Option<savant_trading::memory::episodic::EpisodicMemory>,
+    cusum_charts: HashMap<String, savant_trading::memory::cusum::CusumChart>,
+    brier_predictions: Vec<(f64, bool)>,
+    operator_rules: Vec<String>,
 
-    // Create execution engine based on backend config
-    // engine.rs uses the ExecutionEngine trait, which now includes default no-op
-    // implementations for kill(), sync_balance(), and place_stop_loss() — so
-    // DexTrader and future engines all work through the same
-    // Box<dyn ExecutionEngine> handle.
-    let mut executor: Option<Box<dyn ExecutionEngine>> = None;
-    if config.mode.live_execution {
-        match create_executor(&config).await {
-            Ok(Some(trader)) => {
-                info!(
-                    "Live execution engine ready: backend={}",
-                    config.exchange.backend
-                );
-                // FID-093 C1: Cache wallet address at startup
-                if let Ok(pk) = std::env::var(&config.exchange.dex.wallet_key_env) {
-                    if !pk.is_empty() {
-                        if let Ok(addr) = derive_address_from_key(&pk) {
-                            let mut wa = shared.wallet_address.write().await;
-                            *wa = addr.clone();
-                            // FID-097 Fix 4: Mask wallet address in logs (Law 12)
-                            let masked = if addr.len() > 10 {
-                                format!("{}...{}", &addr[..6], &addr[addr.len()-4..])
-                            } else {
-                                addr.clone()
-                            };
-                            info!("Wallet address cached: {}", masked);
-                        }
-                    }
-                }
-                executor = Some(trader);
-            }
-            Ok(None) => {}
-            Err(e) => {
-                error!("Failed to initialize live executor: {}", e);
-                warn!("Falling back to PortfolioManager for safety");
-            }
-        }
-    }
+    // Risk
+    regime_detector: RegimeDetector,
+    position_sizer: PositionSizer,
+    circuit_breaker: CircuitBreaker,
+    goplus_client: Option<savant_trading::security::goplus::GoPlusClient>,
 
-    // FID-097 Fix 2: Tracks positions removed by on-chain reconciliation.
-    // Prevents FID-074 revert path from resurrecting phantom positions.
-    let mut reconciliation_removed: HashSet<String> = HashSet::new();
+    // WebSocket & price tracking
+    ws_rx: tokio::sync::mpsc::UnboundedReceiver<savant_trading::data::websocket::WsMessage>,
+    ws_ticker_prices: HashMap<String, (f64, std::time::Instant)>,
+    ws_staleness: HashMap<String, u64>,
+    rest_fallback_at: Option<std::time::Instant>,
+    ws_just_reconnected: bool,
 
-    // Sync on-chain balance on startup — dashboard reads from PortfolioManager.
-    // Chain is ALWAYS the single source of truth, even when balance is $0.
-    if let Some(ref mut ex) = executor {
-        if ex.sync_balance().await.is_ok() {
-            let on_chain_balance = ex.balance();
-            portfolio.set_balance(on_chain_balance);
-            info!("Synced on-chain USDC balance: ${:.6}", on_chain_balance);
-        }
-    }
+    // Cycle state
+    dead_tokens: HashSet<String>,
+    permanent_dead: HashSet<String>,
+    candle_hash_cache: HashMap<String, u64>,
+    tick: u64,
+    eval_in_progress: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    last_daily_reset: chrono::NaiveDate,
 
-    // Reconcile: if the executor has no positions (e.g., phantom positions were
-    // cleared during DexTrader init), clear PortfolioManager positions too.
-    // This prevents the engine from managing phantom positions that don't exist on-chain.
-    if let Some(ref ex) = executor {
-        if ex.open_positions().is_empty() && !portfolio.positions().is_empty() {
-            warn!(
-                "PHANTOM POSITIONS: executor has 0 positions but PortfolioManager has {}. Clearing PortfolioManager.",
-                portfolio.positions().len()
+    // Cooldown & tracking
+    close_failure_cooldown: HashMap<String, std::time::Instant>,
+    consecutive_sl_count: HashMap<String, u32>,
+    sl_halt_until: HashMap<String, std::time::Instant>,
+}
+
+impl EngineState {
+    /// Initialize engine state from config. Performs all startup setup.
+    async fn new(
+        config: AppConfig,
+        shared: savant_trading::core::shared::SharedEngineData,
+        running: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    ) -> anyhow::Result<Self> {
+        // PROD-2: Block file check — refuse to start if circuit breaker wrote block file
+        let block_path = "savant.blocked";
+        if std::path::Path::new(block_path).exists() {
+            let contents = std::fs::read_to_string(block_path).unwrap_or_default();
+            error!(
+                "ENGINE BLOCKED: {} exists. Delete file to resume. Contents: {}",
+                block_path, contents
             );
-            // FID-097 Fix 2: Record cleared IDs so FID-074 doesn't resurrect them
-            for pid in portfolio.positions().keys() {
-                reconciliation_removed.insert(pid.clone());
-            }
-            portfolio.positions_mut().clear();
-            portfolio.account_mut().open_positions = 0;
-            portfolio.account_mut().unrealized_pnl = 0.0;
-            portfolio.account_mut().peak_equity = portfolio.account().equity;
-            portfolio.account_mut().drawdown_pct = 0.0;
-            warn!(
-                "FID-097: Reset peak_equity to ${:.2} after phantom position reconciliation",
-                portfolio.account().equity
-            );
-        }
-    }
-
-    // Declared early so journal positions can be registered in DexTrader during load.
-    let mut executor_position_map: HashMap<String, String> = HashMap::new();
-
-    // FID-108: Failure tracker for blacklisting tokens that repeatedly fail execution.
-    let mut failure_tracker = savant_trading::execution::dex::trader::FailureTracker::new();
-
-    // FID-098: Maps pair-action-tick → episode_id for outcome updates when trades closes.
-    // Worst case: 10 pairs × 5 min × 60 min = 20 entries/hour, negligible memory.
-    let mut episode_store: HashMap<String, String> = HashMap::new();
-
-    let journal = match TradeJournal::new(&config.trading.database_url).await {
-        Ok(j) => {
-            info!("Trade journal connected: {}", config.trading.database_url);
-            Some(j)
-        }
-        Err(e) => {
-            warn!(
-                "Trade journal unavailable ({}), running without persistence",
-                e
-            );
-            None
-        }
-    };
-
-    if let Some(ref j) = journal {
-        let trades = j.get_trades(10000).await.unwrap_or_default();
-        if !trades.is_empty() {
-            let total_pnl: f64 = trades.iter().map(|t| t.pnl).sum();
-            // Only restore balance from DB trades in portfolio mode.
-            // In live mode, the on-chain sync (above) is the source of truth.
-            if executor.is_none() {
-                let restored_balance = config.trading.starting_balance + total_pnl;
-                info!(
-                    "Restored balance: ${:.2} (starting: ${:.2}, total PnL: ${:.2}, trades: {})",
-                    restored_balance,
-                    config.trading.starting_balance,
-                    total_pnl,
-                    trades.len()
-                );
-                portfolio.set_balance(restored_balance);
-            } else {
-                info!(
-                    "Loaded {} closed trades from journal (PnL: ${:.2}) — balance from on-chain: ${:.2}",
-                    trades.len(), total_pnl, portfolio.account().balance
-                );
-            }
+            return Err(anyhow::anyhow!(
+                "Engine blocked by {}. Delete file to resume.",
+                block_path
+            ));
         }
 
-        // Load persisted positions from DB — source of truth
-        match j.load_positions().await {
-            Ok(db_positions) if !db_positions.is_empty() => {
-                info!("Restored {} open positions from DB", db_positions.len());
-                for mut pos in db_positions {
-                    // Validate stop-loss: if 0 or missing, set a 5% default
-                    if pos.stop_loss <= 0.0 {
-                        let sl_pct = 0.05;
-                        pos.stop_loss = match pos.side {
-                            Side::Long => pos.entry_price * (1.0 - sl_pct),
-                            Side::Short => pos.entry_price * (1.0 + sl_pct),
-                        };
-                        warn!(
-                            "Position {} had no stop-loss — set to {:.4} (5% default)",
-                            pos.pair, pos.stop_loss
-                        );
-                        // Persist the fixed stop-loss back to DB
-                        if let Err(e) = j.save_position(&pos).await {
-                            warn!("Failed to persist fixed stop-loss: {}", e);
-                        }
-                    }
-                    // FID-087 Bug E: Validate SL direction matches position side.
-                    // LONG SL must be below entry. SHORT SL must be above entry.
-                    // A mismatch means the SL will trigger immediately on first price check.
-                    let sl_valid = match pos.side {
-                        Side::Long => pos.stop_loss < pos.entry_price,
-                        Side::Short => pos.stop_loss > pos.entry_price,
-                    };
-                    if !sl_valid {
-                        let old_sl = pos.stop_loss;
-                        pos.stop_loss = match pos.side {
-                            Side::Long => pos.entry_price * 0.92,
-                            Side::Short => pos.entry_price * 1.08,
-                        };
-                        warn!(
-                            "SL DIRECTION FIX: {} {} — SL {:.4} was wrong direction for {:?}. Recalculated to {:.4} (8% buffer)",
-                            pos.pair, pos.side, old_sl, pos.side, pos.stop_loss
-                        );
-                        if let Err(e) = j.save_position(&pos).await {
-                            warn!("Failed to persist corrected stop-loss: {}", e);
-                        }
-                    }
-                    info!(
-                        "  {} {} | Entry: {:.4} SL: {:.4} TP1: {:.4} | Qty: {:.6}",
-                        pos.pair,
-                        pos.side,
-                        pos.entry_price,
-                        pos.stop_loss,
-                        pos.take_profit_1,
-                        pos.quantity
+        let candle_api = CandleClient::new(&config.exchange.rest_url);
+
+        // SPRINT-3: Scan all pairs — discover USD pairs from API with safety filters
+        let active_pairs = if config.trading.scan_all_pairs {
+            match candle_api
+                .discover_safe_usd_pairs(
+                    config.trading.min_volume_24h_usd,
+                    config.trading.min_price_usd,
+                    &config.trading.blacklisted_symbols,
+                )
+                .await
+            {
+                Ok(discovered) => {
+                    info!("Scan mode: discovered {} safe pairs", discovered.len());
+                    discovered
+                }
+                Err(e) => {
+                    warn!(
+                        "Pair discovery failed ({}), falling back to config pairs",
+                        e
                     );
-                    portfolio.positions_mut().insert(pos.id.clone(), pos);
+                    config.trading.pairs.clone()
                 }
-                portfolio.account_mut().open_positions = portfolio.positions().len();
-                info!("Loaded {} positions from DB", portfolio.positions().len());
-                // Register journal positions in DexTrader so close_position() and
-                // sync_wallet_positions() can find them.
-                if let Some(ref mut ex) = executor {
-                    for (id, pos) in portfolio.positions().iter() {
-                        let exec_id = format!("exec-{}", id);
-                        ex.register_position(exec_id.clone(), pos.clone());
-                        executor_position_map.insert(id.clone(), exec_id.clone());
+            }
+        } else {
+            config.trading.pairs.clone()
+        };
+
+        // Token DB: load ALL static Arbitrum addresses for resolution (needed by 0x API)
+        // When scan_all_pairs is true, discovered pairs are also curated (FID-052 fix)
+        let mut curated_pairs: std::collections::HashSet<String> =
+            config.trading.pairs.iter().cloned().collect();
+        if config.trading.scan_all_pairs {
+            for p in &active_pairs {
+                curated_pairs.insert(p.clone());
+            }
+            info!(
+                "Curated pairs: {} (config {} + discovered {})",
+                curated_pairs.len(),
+                config.trading.pairs.len(),
+                active_pairs.len()
+            );
+        }
+        if config.mode.live_execution {
+            let mut all_token_entries: Vec<(String, String, u8)> = Vec::new();
+            for &(sym, addr, dec) in savant_trading::execution::dex::ARBITRUM_TOKENS {
+                all_token_entries.push((sym.to_string(), addr.to_string(), dec));
+            }
+            savant_trading::execution::dex::extend_token_db(&all_token_entries);
+            info!(
+                "Token DB: {} Arbitrum addresses loaded for resolution",
+                all_token_entries.len()
+            );
+            // P1-1d: Discover additional Arbitrum tokens from Blockscout
+            match savant_trading::data::token_discovery::discover_tokens(1_000_000.0, 500, 100).await {
+                Ok(discovered) => {
+                    let mut discovered_entries: Vec<(String, String, u8)> = Vec::new();
+                    for token in &discovered {
+                        if !curated_pairs.contains(&format!("{}/USD", token.symbol)) {
+                            discovered_entries.push((
+                                token.symbol.clone(),
+                                token.address.clone(),
+                                token.decimals,
+                            ));
+                        }
                     }
-                    info!("Registered {} journal positions in DexTrader", portfolio.positions().len());
-                }
-            }
-            Ok(_) => info!("No persisted positions in DB"),
-            Err(e) => warn!("Failed to load positions from DB: {}", e),
-        }
-
-        // FID-085: Filter stale positions whose pair names don't match current config.
-        // Runs AFTER journal load so it actually has positions to filter.
-        // Prevents old pair names (e.g. "ETH/USD" before rename to "WETH/USD") from
-        // creating phantom positions after config changes.
-        {
-            let config_pairs: std::collections::HashSet<&str> = config.trading.pairs.iter().map(|s| s.as_str()).collect();
-            let stale_ids: Vec<String> = portfolio.positions().keys()
-                .filter(|id| {
-                    portfolio.positions().get(*id).is_some_and(|p| !config_pairs.contains(p.pair.as_str()))
-                })
-                .cloned()
-                .collect();
-            let mut stale_removed = false;
-            for stale_id in &stale_ids {
-                if let Some(pos) = portfolio.positions_mut().remove(stale_id) {
-                    warn!("STALE POSITION REMOVED: {} ({}) — not in current config pairs", stale_id, pos.pair);
-                    if let Some(ref j) = journal {
-                        let _ = j.delete_position(stale_id).await;
+                    if !discovered_entries.is_empty() {
+                        savant_trading::execution::dex::extend_token_db(&discovered_entries);
+                        info!("Token discovery: {} discovered → {} new pairs added to DB",
+                            discovered.len(), discovered_entries.len());
+                    } else {
+                        info!("Token discovery: {} discovered — all already in curated list", discovered.len());
                     }
-                    stale_removed = true;
+                }
+                Err(e) => {
+                    warn!("Token discovery failed ({}), continuing with static DB only", e);
                 }
             }
-            if stale_removed {
-                portfolio.account_mut().open_positions = portfolio.positions().len();
-                portfolio.refresh_equity();
-            }
+        }
+        info!("Active pairs ({}): {:?}", active_pairs.len(), active_pairs);
+
+        let mut market_stores: HashMap<String, MarketDataStore> = HashMap::new();
+        for pair in &active_pairs {
+            market_stores.insert(
+                pair.clone(),
+                MarketDataStore::new(pair, config.strategy.mean_reversion.profile_periods + 100),
+            );
         }
 
-        // Load closed trades into BOTH PortfolioManager and shared state
-        // (portfolio is the source of truth — shared syncs from it every tick)
-        match j.get_trades(500).await {
-            Ok(closed) if !closed.is_empty() => {
-                info!("Loaded {} closed trades from journal", closed.len());
-                portfolio.set_closed_trades(closed.clone());
-                let mut shared_trades = shared.closed_trades.write().await;
-                *shared_trades = closed;
-            }
-            Ok(_) => {
-                info!("No closed trades in journal");
-            }
-            Err(e) => {
-                warn!("Failed to load closed trades from journal: {}", e);
-            }
-        }
+        let mut portfolio = PortfolioManager::new(
+            config.trading.starting_balance,
+            config.trading.fee_rate,
+            config.trading.slippage_pct,
+        );
 
-        // Load activity log into shared state
-        match j.load_activity(200).await {
-            Ok(entries) if !entries.is_empty() => {
-                let mut shared_activity = shared.activity_log.write().await;
-                for (ts, level, pair, msg) in entries {
-                    let lvl = match level.as_str() {
-                        "Trade" => savant_trading::core::shared::ActivityLevel::Trade,
-                        "Decision" => savant_trading::core::shared::ActivityLevel::Decision,
-                        "Warning" => savant_trading::core::shared::ActivityLevel::Warning,
-                        "Error" => savant_trading::core::shared::ActivityLevel::Error,
-                        "Thinking" => savant_trading::core::shared::ActivityLevel::Thinking,
-                        _ => savant_trading::core::shared::ActivityLevel::Info,
-                    };
-                    shared_activity.push(savant_trading::core::shared::ActivityEntry {
-                        timestamp: ts,
-                        level: lvl,
-                        pair,
-                        message: msg,
-                    });
-                }
-            }
-            _ => {
-                info!("No activity entries in journal");
-            }
-        }
-
-        // Don't load historical equity snapshots — they contain stale data from
-        // before the chain-first verification fix. The equity curve should only
-        // show current session data which starts after wallet sync + refresh_equity().
-        info!("Equity curve: starting fresh for current session (historical snapshots skipped)");
-    }
-
-    // Seed shared state IMMEDIATELY — don't wait for tick 10
-    // Equity curve seed is deferred to after wallet sync (line ~970) so it
-    // captures the correct portfolio value including recovered positions.
-    {
-        let mut shared_account = shared.account.write().await;
-        *shared_account = portfolio.account().clone();
-        let mut shared_positions = shared.positions.write().await;
-        *shared_positions = portfolio.positions().values().cloned().collect();
-    }
-    info!(
-        "Shared state seeded: balance=${:.2}, {} positions, {} trades",
-        portfolio.account().balance,
-        portfolio.positions().len(),
-        shared.closed_trades.read().await.len()
-    );
-
-    // === AI AGENT SETUP ===
-    let knowledge_base = load_knowledge_base();
-
-    // Extract knowledge tuples for Glass House projection (before move)
-    let knowledge_tuples: Vec<(String, String, String)> = knowledge_base
-        .all()
-        .iter()
-        .map(|u| {
-            let title = u.content.chars().take(60).collect::<String>();
-            (u.id.clone(), format!("{:?}", u.topic), title)
-        })
-        .collect();
-
-    let composer = PromptComposer::new(
-        &prompts::default_base_identity(),
-        include_str!("agent/prompts/risk_constraints.md"),
-        &format!(
-            "{}\n\n---\n\n{}",
-            include_str!("agent/prompts/strategy_knowledge.md"),
-            include_str!("agent/prompts/echo_rules.md")
-        ),
-        include_str!("agent/prompts/output_format.md"),
-    );
-
-    let autonomy = match config.ai.autonomy_level {
-        1 => AutonomyLevel::Suggest,
-        2 => AutonomyLevel::Confirm,
-        _ => AutonomyLevel::Autonomous,
-    };
-
-    let provider = create_provider(&config.ai);
-
-    let agent_config = AgentConfig {
-        autonomy_level: autonomy,
-        max_decisions_per_hour: config.ai.max_decisions_per_hour,
-        knowledge_token_budget: config.ai.knowledge_token_budget,
-        price_tolerance_pct: config.ai.price_tolerance_pct,
-        max_retries: config.ai.max_retries,
-    };
-
-    let mut agent = AgentOrchestrator::new(provider, agent_config, knowledge_base, composer);
-    let mut ctx_engine = ContextEngine::new(config.context.clone());
-    let mut ctx_state = ContextState::new(
-        config.context.microcompact_soft_ratio,
-        config.context.microcompact_hard_ratio,
-    );
-    let mut decision_log = DecisionLog::open(
-        "data/decision_log.json",
-        config.context.decision_log_max_entries,
-    );
-    info!(
-        "AI agent initialized: {:?} mode with provider '{}', encoding={}",
-        autonomy, config.ai.provider, ctx_engine.encoding_mode()
-    );
-
-    // === OPENROUTER MANAGEMENT (optional, only if management key is set) ===
-    if config.ai.provider == "openrouter" {
-        let mgmt_key_env = &config.ai.openrouter.management.management_key_env;
-        if let Ok(mgmt_key) = std::env::var(mgmt_key_env) {
-            if !mgmt_key.is_empty() {
-                let mgmt = OpenRouterManagementClient::with_endpoint(
-                    mgmt_key,
-                    &config.ai.openrouter.management.endpoint,
-                );
-                match mgmt.list_keys(None).await {
-                    Ok(keys) => {
-                        info!(
-                            "OpenRouter Management: {} API keys (logged at startup)",
-                            keys.len()
-                        );
-                        for key in &keys {
-                            if key.limit > 0.0 && key.limit_remaining < key.limit * 0.1 {
-                                warn!(
-                                    "OpenRouter key '{}' is approaching limit: {:.0}/{:.0} credits remaining",
-                                    key.name, key.limit_remaining, key.limit
-                                );
+        let mut executor: Option<Box<dyn ExecutionEngine>> = None;
+        if config.mode.live_execution {
+            match create_executor(&config).await {
+                Ok(Some(trader)) => {
+                    info!(
+                        "Live execution engine ready: backend={}",
+                        config.exchange.backend
+                    );
+                    // FID-093 C1: Cache wallet address at startup
+                    if let Ok(pk) = std::env::var(&config.exchange.dex.wallet_key_env) {
+                        if !pk.is_empty() {
+                            if let Ok(addr) = derive_address_from_key(&pk) {
+                                let mut wa = shared.wallet_address.write().await;
+                                *wa = addr.clone();
+                                let masked = if addr.len() > 10 {
+                                    format!("{}...{}", &addr[..6], &addr[addr.len()-4..])
+                                } else {
+                                    addr.clone()
+                                };
+                                info!("Wallet address cached: {}", masked);
                             }
                         }
                     }
-                    Err(e) => {
-                        warn!(
-                            "OpenRouter Management unavailable ({}). Key monitoring disabled.",
-                            e
-                        );
-                    }
+                    executor = Some(trader);
+                }
+                Ok(None) => {}
+                Err(e) => {
+                    error!("Failed to initialize live executor: {}", e);
+                    warn!("Falling back to PortfolioManager for safety");
                 }
             }
         }
-    }
 
-    // === INSIGHT SETUP ===
-    let insight_config = InsightConfig {
-        funding_rate_enabled: config.insight.funding_rate_enabled,
-        liquidation_enabled: config.insight.liquidation_enabled,
-        fear_greed_enabled: config.insight.fear_greed_enabled,
-        btc_dominance_enabled: config.insight.btc_dominance_enabled,
-        exchange_flows_enabled: config.insight.exchange_flows_enabled,
-        news_sentiment_enabled: config.insight.news_sentiment_enabled,
-        rss_enabled: config.insight.rss_enabled,
-        rss_max_items: config.insight.rss_max_items,
-        onchain_enabled: config.insight.onchain_enabled,
-    };
-    let mut insight = InsightAggregator::new(insight_config);
-    info!("Insight aggregator initialized");
+        let mut reconciliation_removed: HashSet<String> = HashSet::new();
 
-    // === EVENT BUS ===
-    let event_bus = EventBus::new(256);
-
-    // === VAULT (Glass House) ===
-    let vault_config = VaultConfig::default();
-    let vault_writer = VaultWriter::new(vault_config.clone());
-    if vault_config.enabled {
-        if let Err(e) = vault_writer.ensure_scaffolded() {
-            warn!("Vault scaffold failed: {}", e);
-        } else {
-            info!("Vault scaffolded at {}", vault_config.vault_path);
-        }
-
-        // Project knowledge index to Glass House
-        if let Err(e) = vault_writer.project_knowledge(&knowledge_tuples) {
-            warn!("Knowledge projection failed: {}", e);
-        }
-    }
-
-    // === VAULT WATCHER — ingest lessons on startup ===
-    let vault_watcher = VaultWatcher::new(&vault_config.vault_path);
-    let lessons = vault_watcher.read_lessons();
-    if !lessons.is_empty() {
-        info!("Ingested {} lesson files from vault", lessons.len());
-        for (name, _content) in &lessons {
-            info!("  Lesson: {}", name);
-        }
-    }
-
-    // === ORDER BOOK MANAGERS (one per pair) ===
-    let mut order_books: HashMap<String, OrderBookManager> = HashMap::new();
-    for pair in &active_pairs {
-        order_books.insert(pair.clone(), OrderBookManager::new(pair));
-    }
-
-    // === EPISODIC MEMORY (persistent decision ledger) ===
-    let memory = match savant_trading::memory::episodic::EpisodicMemory::new(
-        "sqlite:data/memory.db",
-    )
-    .await
-    {
-        Ok(m) => {
-            info!("Episodic memory initialized");
-            Some(m)
-        }
-        Err(e) => {
-            warn!("Episodic memory init failed: {} — memory disabled", e);
-            None
-        }
-    };
-
-    // === CUSUM CHARTS (WIRE-2: edge decay detection per pair) ===
-    let mut cusum_charts: HashMap<String, savant_trading::memory::cusum::CusumChart> =
-        HashMap::new();
-    for pair in &active_pairs {
-        cusum_charts.insert(
-            pair.clone(),
-            savant_trading::memory::cusum::CusumChart::default_trading(),
-        );
-    }
-
-    // === BRIER SCORE TRACKING (WIRE-3) ===
-    let mut brier_predictions: Vec<(f64, bool)> = Vec::new();
-
-    // === OPERATOR RULES FROM VAULT (WIRE-5) ===
-    let mut operator_rules: Vec<String> = Vec::new();
-    for (name, content) in &lessons {
-        if name.ends_with(".md") {
-            // Extract rules from lesson content (non-empty lines)
-            for line in content.lines() {
-                let trimmed = line.trim();
-                if !trimmed.is_empty() && !trimmed.starts_with('#') && !trimmed.starts_with('>') {
-                    operator_rules.push(trimmed.to_string());
-                }
+        if let Some(ref mut ex) = executor {
+            if ex.sync_balance().await.is_ok() {
+                let on_chain_balance = ex.balance();
+                portfolio.set_balance(on_chain_balance);
+                info!("Synced on-chain USDC balance: ${:.6}", on_chain_balance);
             }
         }
-    }
-    if !operator_rules.is_empty() {
-        info!("Loaded {} operator rules from vault", operator_rules.len());
-    }
 
-    // === EXPERIENCE REPLAY (WIRE-4: run on startup if enough data) ===
-    if let Some(ref mem) = memory {
-        match mem.total_trades().await {
-            Ok(count) if count >= 20 => {
-                info!("Running experience replay ({} trades in history)", count);
-                if let Ok(losses) =
-                    savant_trading::memory::replay::query_high_conviction_losses(mem, 5).await
-                {
-                    for (ep_id, pair, regime, reasoning) in &losses {
-                        let heuristic = format!(
-                            "HIGH conviction loss on {} in {} regime: {}",
-                            pair,
-                            regime,
-                            reasoning.chars().take(100).collect::<String>()
-                        );
-                        let _ = savant_trading::memory::replay::store_lesson(
-                            mem.pool(),
-                            ep_id,
-                            "high_conviction_loss",
-                            &heuristic,
-                        )
-                        .await;
-                    }
+        if let Some(ref ex) = executor {
+            if ex.open_positions().is_empty() && !portfolio.positions().is_empty() {
+                warn!(
+                    "PHANTOM POSITIONS: executor has 0 positions but PortfolioManager has {}. Clearing PortfolioManager.",
+                    portfolio.positions().len()
+                );
+                for pid in portfolio.positions().keys() {
+                    reconciliation_removed.insert(pid.clone());
                 }
-            }
-            _ => {
-                info!("Not enough trades for experience replay (need 20+)");
+                portfolio.positions_mut().clear();
+                portfolio.account_mut().open_positions = 0;
+                portfolio.account_mut().unrealized_pnl = 0.0;
+                portfolio.account_mut().peak_equity = portfolio.account().equity;
+                portfolio.account_mut().drawdown_pct = 0.0;
+                warn!(
+                    "FID-097: Reset peak_equity to ${:.2} after phantom position reconciliation",
+                    portfolio.account().equity
+                );
             }
         }
-    }
 
-    // === RULE-BASED STRATEGIES (parallel signals, not primary brain) ===
-    let _momentum = MomentumStrategy::new(
-        config.strategy.momentum.ema_period,
-        config.strategy.momentum.volume_spike_multiplier,
-        config.strategy.momentum.atr_compression_threshold,
-    );
+        let mut executor_position_map: HashMap<String, String> = HashMap::new();
+        let failure_tracker = savant_trading::execution::dex::trader::FailureTracker::new();
+        let episode_store: HashMap<String, String> = HashMap::new();
 
-    let _mean_rev = MeanReversionStrategy::new(
-        config.strategy.mean_reversion.profile_periods,
-        config.strategy.mean_reversion.value_area_pct,
-        config.strategy.mean_reversion.volume_spike_multiplier,
-    );
-
-    let regime_detector = RegimeDetector::new(
-        config.strategy.regime.adx_period,
-        config.strategy.regime.adx_trending_threshold,
-        config.strategy.regime.adx_ranging_threshold,
-        config.strategy.regime.atr_volatility_multiplier,
-    );
-
-    let position_sizer =
-        PositionSizer::new(config.risk.max_risk_per_trade, config.risk.min_rr_ratio)
-            .with_full_deploy(config.trading.full_deploy)
-            .with_low_balance_rr(
-                config.risk.min_rr_ratio_low_balance,
-                config.risk.low_balance_threshold,
-            );
-
-    let circuit_breaker = CircuitBreaker::new(
-        config.risk.max_daily_loss,
-        config.risk.max_drawdown,
-        config.risk.max_positions,
-    )
-    .with_daily_loss_floor(config.risk.min_daily_loss_usd)
-    .with_drawdown_floor(config.risk.min_drawdown_usd);
-
-    // GoPlus security client (FID-035): honeypot/tax detection for meme coins
-    let goplus_client = Some(savant_trading::security::goplus::GoPlusClient::new());
-
-    let interval_seconds = parse_timeframe(&config.trading.timeframe);
-
-    info!(
-        "Fetching initial data for {} pairs (parallel)...",
-        active_pairs.len()
-    );
-
-    // Parallel candle fetch — all pairs simultaneously
-    // Source rotation: MarketData → OKX → KuCoin → Gate.io → CryptoCompare → CoinGecko
-    // All free, no API keys required (except CoinGecko which has a demo key).
-    // Binance/Bybit excluded: geo-blocked in US (HTTP 451/403).
-    // CMC excluded: free tier doesn't support OHLCV endpoint.
-    // GeckoTerminal excluded (FID-046): 99% failed requests, 30 req/min rate limit.
-    let candle_router =
-        std::sync::Arc::new(savant_trading::data::sources::SourceRouter::new(vec![
-            Box::new(savant_trading::data::sources::kraken::KrakenFeed::new(
-                &config.exchange.rest_url,
-            )),
-            Box::new(savant_trading::data::sources::okx::OkxSource::new()),
-            Box::new(savant_trading::data::sources::kucoin::KuCoinSource::new()),
-            Box::new(savant_trading::data::sources::gate::GateSource::new()),
-            Box::new(savant_trading::data::sources::cryptocompare::CryptoCompareSource::new()),
-            Box::new(savant_trading::data::sources::coingecko::CoinGeckoSource::new()),
-        ]));
-
-    let mut candle_futures = tokio::task::JoinSet::new();
-    for pair in &active_pairs {
-        let router = candle_router.clone();
-        let pair_clone = pair.clone();
-        let tf = config.trading.timeframe.clone();
-        candle_futures.spawn(async move {
-            let result = router
-                .fetch_candles(&pair_clone, parse_timeframe_minutes(&tf), 200)
-                .await;
-            (pair_clone, result)
-        });
-    }
-
-    while let Some(result) = candle_futures.join_next().await {
-        match result {
-            Ok((pair, Ok(mut candles))) => {
-                if candles.len() > 1 {
-                    candles.pop();
-                }
-                if let Some(store) = market_stores.get_mut(&pair) {
-                    let count = candles.len();
-                    store.add_candles(candles);
-                    info!("Loaded {} historical candles for {}", count, pair);
-                }
+        let journal = match TradeJournal::new(&config.trading.database_url).await {
+            Ok(j) => {
+                info!("Trade journal connected: {}", config.trading.database_url);
+                Some(j)
             }
-            Ok((pair, Err(e))) => error!("Failed to fetch initial data for {}: {}", pair, e),
-            Err(e) => error!("Candle fetch task panicked: {}", e),
-        }
-    }
-    // Initial insight fetch (single call for all pairs)
-    info!(
-        "Fetching initial market insight for {} pairs...",
-        active_pairs.len()
-    );
-    insight.refresh_multi(&active_pairs).await;
-    // Seed shared insight immediately so dashboard doesn't show placeholder
-    {
-        let mut shared_insight = shared.insight.write().await;
-        *shared_insight = insight.cached().clone();
-    }
-    info!("Initial market insight seeded to dashboard");
-
-    // WALLET SYNC: Reconcile on-chain balances with DB positions.
-    // Runs AFTER candle data loads so market prices are available for recovery.
-    // FID-061: executor_position_map declared before journal load so recovered
-    // positions can be registered in DexTrader.
-    if let Some(ref mut ex) = executor {
-        // FID-108: Include discovered pairs in wallet sync, not just static config pairs.
-        // Otherwise, positions opened on discovered pairs (e.g. STG/USD) are never recovered.
-        let all_sync_pairs: Vec<String> = curated_pairs.iter().cloned().collect();
-        info!(
-            "Wallet sync: checking on-chain balances for {} pairs ({} config + {} discovered)...",
-            all_sync_pairs.len(),
-            config.trading.pairs.len(),
-            all_sync_pairs.len().saturating_sub(config.trading.pairs.len()),
-        );
-        let discrepancies = match tokio::time::timeout(
-            std::time::Duration::from_secs(30),
-            ex.sync_wallet_positions(&all_sync_pairs),
-        )
-        .await
-        {
-            Ok(d) => d,
-            Err(_) => {
-                error!("Wallet sync timed out after 30s — continuing without sync");
-                Vec::new()
+            Err(e) => {
+                warn!(
+                    "Trade journal unavailable ({}), running without persistence",
+                    e
+                );
+                None
             }
         };
-        for (pair, on_chain_qty, tracked_qty) in &discrepancies {
-            if *tracked_qty < 0.001 && *on_chain_qty > 0.001 {
-                // On-chain has tokens but DexTrader has none tracked.
-                // Check if PortfolioManager (loaded from journal) already has a position.
-                let existing_pos = portfolio.positions().values()
-                    .find(|p| p.pair == *pair)
-                    .cloned();
 
-                if let Some(mut existing) = existing_pos {
-                    // Journal already has a position — update quantity to on-chain
-                    // but KEEP the journal entry price (source of truth).
-                    // FID-087 Bug A: If on-chain has tokens but journal says SHORT,
-                    // the position is stale. Holding tokens = LONG exposure. Force LONG.
-                    if existing.side == Side::Short {
-                        warn!(
-                            "WALLET SYNC: {} journal says SHORT but on-chain holds {:.6} tokens — forcing LONG",
-                            pair, on_chain_qty
-                        );
-                        existing.side = Side::Long;
-                        // FID-087 Bug C: Recalculate SL for LONG (below entry)
-                        existing.stop_loss = existing.entry_price * 0.92;
-                        existing.take_profit_1 = existing.entry_price * 1.10;
-                        existing.take_profit_2 = existing.entry_price * 1.20;
-                        existing.take_profit_3 = existing.entry_price * 1.30;
-                    }
-                    let old_qty = existing.quantity;
-                    existing.quantity = *on_chain_qty;
-                    existing.current_price = market_stores
-                        .get(pair)
-                        .and_then(|s| s.last().map(|c| c.close))
-                        .unwrap_or(existing.current_price);
-                    existing.risk_amount = existing.entry_price * on_chain_qty;
-                    portfolio.positions_mut().insert(existing.id.clone(), existing.clone());
-                    // Register in DexTrader so close_position() can find it
-                    if let Some(ref mut ex) = executor {
-                        let exec_id = format!("exec-{}", existing.id);
-                        ex.register_position(exec_id.clone(), existing.clone());
-                        executor_position_map.insert(existing.id.clone(), exec_id.clone());
-                    }
-                    if let Some(ref j) = journal {
-                        let _ = j.save_position(&existing).await;
-                    }
+        if let Some(ref j) = journal {
+            let trades = j.get_trades(10000).await.unwrap_or_default();
+            if !trades.is_empty() {
+                let total_pnl: f64 = trades.iter().map(|t| t.pnl).sum();
+                if executor.is_none() {
+                    let restored_balance = config.trading.starting_balance + total_pnl;
                     info!(
-                        "WALLET SYNC: Updated {} quantity {:.6} → {:.6} (kept journal entry @ ${:.4})",
-                        pair, old_qty, on_chain_qty, existing.entry_price,
+                        "Restored balance: ${:.2} (starting: ${:.2}, total PnL: ${:.2}, trades: {})",
+                        restored_balance,
+                        config.trading.starting_balance,
+                        total_pnl,
+                        trades.len()
                     );
-                    continue;
-                }
-
-                // No journal position — true recovery needed (first time or journal lost).
-                // Use current market price as entry since we have no historical data.
-                let market_price = market_stores
-                    .get(pair)
-                    .and_then(|s| s.last().map(|c| c.close))
-                    .unwrap_or(0.0);
-                let entry_price = if market_price > 0.0 {
-                    market_price
+                    portfolio.set_balance(restored_balance);
                 } else {
-                    // Fallback to trade history only if no market data available
-                    if let Some(ref j) = journal {
-                        j.get_trades(1000)
-                            .await
-                            .unwrap_or_default()
-                            .iter()
-                            .rfind(|t| t.pair == *pair)
-                            .map(|t| t.entry_price)
-                            .unwrap_or(0.0)
-                    } else {
-                        0.0
-                    }
-                };
-
-                // HARD GUARD: never create a position with entry_price <= 0
-                if entry_price <= 0.0 {
-                    error!("WALLET SYNC: Cannot recover {} — no valid entry price (market={:.4}). Skipping.",
-                        pair, market_price);
-                    shared
-                        .log_activity(
-                            savant_trading::core::shared::ActivityLevel::Error,
-                            pair,
-                            "WALLET SYNC FAILED: Cannot recover — no valid entry price",
-                        )
-                        .await;
-                    continue;
-                }
-
-                let recovery_pos = savant_trading::core::types::Position {
-                    id: format!("wallet-recovery-{}", pair.replace('/', "_").to_lowercase()),
-                    pair: pair.clone(),
-                    side: savant_trading::core::types::Side::Long,
-                    entry_price,
-                    current_price: market_price.max(entry_price),
-                    quantity: *on_chain_qty,
-                    stop_loss: entry_price * 0.85,
-                    take_profit_1: entry_price * 1.10,
-                    take_profit_2: entry_price * 1.20,
-                    take_profit_3: entry_price * 1.30,
-                    unrealized_pnl: 0.0,
-                    risk_amount: entry_price * on_chain_qty,
-                    strategy_name: "wallet_recovery".to_string(),
-                    scale_level: savant_trading::core::types::ScaleLevel::Full,
-                    // P0-1c: Epoch-0 sentinel for wallet recovery — dashboard shows "unknown"
-                    opened_at: chrono::DateTime::from_timestamp(0, 0).unwrap_or_else(chrono::Utc::now),
-                };
-                portfolio
-                    .positions_mut()
-                    .insert(recovery_pos.id.clone(), recovery_pos.clone());
-                // FID-061: Register in DexTrader so close_position() can find it
-                if let Some(ref mut ex) = executor {
-                    let exec_id = format!("exec-{}", recovery_pos.id);
-                    ex.register_position(exec_id.clone(), recovery_pos.clone());
-                    executor_position_map.insert(recovery_pos.id.clone(), exec_id.clone());
                     info!(
-                        "WALLET SYNC: Registered {} in DexTrader as {}",
-                        pair, exec_id
+                        "Loaded {} closed trades from journal (PnL: ${:.2}) — balance from on-chain: ${:.2}",
+                        trades.len(), total_pnl, portfolio.account().balance
                     );
                 }
-                if let Some(ref j) = journal {
-                    let _ = j.save_position(&recovery_pos).await;
-                }
-                warn!(
-                    "WALLET SYNC: Recovered {} — {:.6} tokens @ ${:.4} (source: market_price — no journal entry)",
-                    pair, on_chain_qty, entry_price,
-                );
-                shared
-                    .log_activity(
-                        savant_trading::core::shared::ActivityLevel::Warning,
-                        pair,
-                        &format!(
-                            "WALLET SYNC: Recovered {:.6} tokens @ ${:.4}",
-                            on_chain_qty, entry_price
-                        ),
-                    )
-                    .await;
-            } else if *on_chain_qty < 0.001 && *tracked_qty > 0.001 {
-                // Tracked position but no on-chain tokens — ghost, remove
-                if let Some(pos_id) = portfolio
-                    .positions()
-                    .iter()
-                    .find(|(_, p)| p.pair == *pair)
-                    .map(|(id, _)| id.clone())
-                {
-                    portfolio.positions_mut().remove(&pos_id);
-                    if let Some(ref j) = journal {
-                        let _ = j.delete_position(&pos_id).await;
+            }
+
+            match j.load_positions().await {
+                Ok(db_positions) if !db_positions.is_empty() => {
+                    info!("Restored {} open positions from DB", db_positions.len());
+                    for mut pos in db_positions {
+                        if pos.stop_loss <= 0.0 {
+                            let sl_pct = 0.05;
+                            pos.stop_loss = match pos.side {
+                                Side::Long => pos.entry_price * (1.0 - sl_pct),
+                                Side::Short => pos.entry_price * (1.0 + sl_pct),
+                            };
+                            warn!(
+                                "Position {} had no stop-loss — set to {:.4} (5% default)",
+                                pos.pair, pos.stop_loss
+                            );
+                            if let Err(e) = j.save_position(&pos).await {
+                                warn!("Failed to persist fixed stop-loss: {}", e);
+                            }
+                        }
+                        let sl_valid = match pos.side {
+                            Side::Long => pos.stop_loss < pos.entry_price,
+                            Side::Short => pos.stop_loss > pos.entry_price,
+                        };
+                        if !sl_valid {
+                            let old_sl = pos.stop_loss;
+                            pos.stop_loss = match pos.side {
+                                Side::Long => pos.entry_price * 0.92,
+                                Side::Short => pos.entry_price * 1.08,
+                            };
+                            warn!(
+                                "SL DIRECTION FIX: {} {} — SL {:.4} was wrong direction for {:?}. Recalculated to {:.4} (8% buffer)",
+                                pos.pair, pos.side, old_sl, pos.side, pos.stop_loss
+                            );
+                            if let Err(e) = j.save_position(&pos).await {
+                                warn!("Failed to persist corrected stop-loss: {}", e);
+                            }
+                        }
+                        info!(
+                            "  {} {} | Entry: {:.4} SL: {:.4} TP1: {:.4} | Qty: {:.6}",
+                            pos.pair,
+                            pos.side,
+                            pos.entry_price,
+                            pos.stop_loss,
+                            pos.take_profit_1,
+                            pos.quantity
+                        );
+                        portfolio.positions_mut().insert(pos.id.clone(), pos);
                     }
-                    warn!(
-                        "WALLET SYNC: {} position gone from chain — removed ghost",
-                        pair
-                    );
-                    shared
-                        .log_activity(
-                            savant_trading::core::shared::ActivityLevel::Warning,
+                    portfolio.account_mut().open_positions = portfolio.positions().len();
+                    info!("Loaded {} positions from DB", portfolio.positions().len());
+                    if let Some(ref mut ex) = executor {
+                        for (id, pos) in portfolio.positions().iter() {
+                            let exec_id = format!("exec-{}", id);
+                            ex.register_position(exec_id.clone(), pos.clone());
+                            executor_position_map.insert(id.clone(), exec_id.clone());
+                        }
+                        info!("Registered {} journal positions in DexTrader", portfolio.positions().len());
+                    }
+                }
+                Ok(_) => info!("No persisted positions in DB"),
+                Err(e) => warn!("Failed to load positions from DB: {}", e),
+            }
+
+            {
+                let config_pairs: std::collections::HashSet<&str> = config.trading.pairs.iter().map(|s| s.as_str()).collect();
+                let stale_ids: Vec<String> = portfolio.positions().keys()
+                    .filter(|id| {
+                        portfolio.positions().get(*id).is_some_and(|p| !config_pairs.contains(p.pair.as_str()))
+                    })
+                    .cloned()
+                    .collect();
+                let mut stale_removed = false;
+                for stale_id in &stale_ids {
+                    if let Some(pos) = portfolio.positions_mut().remove(stale_id) {
+                        warn!("STALE POSITION REMOVED: {} ({}) — not in current config pairs", stale_id, pos.pair);
+                        if let Some(ref j) = journal {
+                            let _ = j.delete_position(stale_id).await;
+                        }
+                        stale_removed = true;
+                    }
+                }
+                if stale_removed {
+                    portfolio.account_mut().open_positions = portfolio.positions().len();
+                    portfolio.refresh_equity();
+                }
+            }
+
+            match j.get_trades(500).await {
+                Ok(closed) if !closed.is_empty() => {
+                    info!("Loaded {} closed trades from journal", closed.len());
+                    portfolio.set_closed_trades(closed.clone());
+                    let mut shared_trades = shared.closed_trades.write().await;
+                    *shared_trades = closed;
+                }
+                Ok(_) => {
+                    info!("No closed trades in journal");
+                }
+                Err(e) => {
+                    warn!("Failed to load closed trades from journal: {}", e);
+                }
+            }
+
+            match j.load_activity(200).await {
+                Ok(entries) if !entries.is_empty() => {
+                    let mut shared_activity = shared.activity_log.write().await;
+                    for (ts, level, pair, msg) in entries {
+                        let lvl = match level.as_str() {
+                            "Trade" => savant_trading::core::shared::ActivityLevel::Trade,
+                            "Decision" => savant_trading::core::shared::ActivityLevel::Decision,
+                            "Warning" => savant_trading::core::shared::ActivityLevel::Warning,
+                            "Error" => savant_trading::core::shared::ActivityLevel::Error,
+                            "Thinking" => savant_trading::core::shared::ActivityLevel::Thinking,
+                            _ => savant_trading::core::shared::ActivityLevel::Info,
+                        };
+                        shared_activity.push(savant_trading::core::shared::ActivityEntry {
+                            timestamp: ts,
+                            level: lvl,
                             pair,
-                            "WALLET SYNC: Position gone from chain — removed ghost",
-                        )
-                        .await;
+                            message: msg,
+                        });
+                    }
+                }
+                _ => {
+                    info!("No activity entries in journal");
                 }
             }
+
+            info!("Equity curve: starting fresh for current session (historical snapshots skipped)");
         }
-        // FID-087: Force all positions to LONG in spot-only mode.
-        // On spot DEX, holding tokens = LONG exposure. Any SHORT is wrong.
-        // This catches cases where journal loaded stale SHORT positions that
-        // wallet recovery didn't touch (quantity matched).
-        let short_ids: Vec<String> = portfolio.positions().iter()
-            .filter(|(_, p)| p.side == Side::Short)
-            .map(|(id, _)| id.clone())
-            .collect();
-        for id in &short_ids {
-            if let Some(p) = portfolio.positions_mut().get_mut(id) {
-                warn!(
-                    "SIDE CORRECTION: {} — spot-only mode, forcing SHORT → LONG",
-                    p.pair
-                );
-                let pair = p.pair.clone();
-                p.side = Side::Long;
-                p.stop_loss = p.entry_price * 0.92;
-                p.take_profit_1 = p.entry_price * 1.10;
-                p.take_profit_2 = p.entry_price * 1.20;
-                p.take_profit_3 = p.entry_price * 1.30;
-                if let Some(ref j) = journal {
-                    let _ = j.save_position(p).await;
-                }
-                // FID-094 Fix 1: Sync corrected position to DexTrader's internal map.
-                // Without this, close_position_internal reads stale SHORT from DexTrader
-                // and queries the wrong token balance (USDC instead of WETH).
-                let corrected = p.clone();
-                let corrected_id = id.clone();
-                if let Some(ref mut ex) = executor {
-                    let exec_id = executor_position_map.get(&corrected_id)
-                        .cloned()
-                        .unwrap_or_else(|| format!("exec-{}", corrected_id));
-                    ex.register_position(exec_id.clone(), corrected);
-                    debug!("FID-094: Synced side correction to DexTrader: {} → {}", corrected_id, exec_id);
-                }
-                shared.log_activity(
-                    savant_trading::core::shared::ActivityLevel::Warning,
-                    &pair,
-                    "SIDE CORRECTION: spot-only mode, forced SHORT → LONG",
-                ).await;
-            }
-        }
-        if discrepancies.is_empty() {
-            info!("Wallet sync: all positions reconciled with on-chain balances");
-        }
-        portfolio.refresh_equity();
-        // FID-108: Update open_positions count BEFORE shared state sync
-        portfolio.account_mut().open_positions = portfolio.positions().len();
-        // FID-109: Calculate equity from token values if portfolio shows $0
-        if portfolio.account().equity < 0.01 && !portfolio.positions().is_empty() {
-            let token_value: f64 = portfolio.positions().values()
-                .map(|p| p.current_price * p.quantity)
-                .sum();
-            if token_value > 0.0 {
-                portfolio.account_mut().equity = token_value;
-                info!("FID-109: Set equity to token value ${:.2}", token_value);
-            }
-        }
-        // FID-109: Sync to shared state so dashboard and AI see correct balance/equity
+
         {
             let mut shared_account = shared.account.write().await;
             *shared_account = portfolio.account().clone();
@@ -1234,52 +478,503 @@ pub async fn run(
             *shared_positions = portfolio.positions().values().cloned().collect();
         }
         info!(
-            "Wallet sync complete: {} positions, balance=${:.2}, equity=${:.2}, open={}",
-            portfolio.positions().len(),
+            "Shared state seeded: balance=${:.2}, {} positions, {} trades",
             portfolio.account().balance,
-            portfolio.account().equity,
-            portfolio.account().open_positions,
+            portfolio.positions().len(),
+            shared.closed_trades.read().await.len()
         );
-        // FID-109: Verify shared state is correct
-        let shared_pos_count = shared.positions.read().await.len();
-        let shared_open = shared.account.read().await.open_positions;
-        if shared_pos_count != portfolio.positions().len() || shared_open != portfolio.positions().len() {
-            warn!(
-                "FID-109: Shared state mismatch — portfolio={} positions, shared_positions={}, shared_open={}. Forcing sync.",
-                portfolio.positions().len(), shared_pos_count, shared_open
-            );
-            let mut sp = shared.positions.write().await;
-            *sp = portfolio.positions().values().cloned().collect();
-            let mut sa = shared.account.write().await;
-            *sa = portfolio.account().clone();
-        }
-        // Seed equity curve AFTER wallet sync so it captures recovered positions
-        {
-            let mut curve = shared.equity_curve.write().await;
-            curve.push(serde_json::json!({
-                "timestamp": chrono::Utc::now().to_rfc3339(),
-                "equity": portfolio.account().equity,
-                "balance": portfolio.account().balance,
-            }));
-        }
-    }
 
-    // FID-109: If portfolio is empty but executor has positions (from dex_state.json),
-    // copy them to portfolio so dashboard and AI see them.
-    if let Some(ref ex) = executor {
-        let exec_positions = ex.open_positions();
-        if portfolio.positions().is_empty() && !exec_positions.is_empty() {
-            for pos in exec_positions {
-                info!(
-                    "FID-109: Syncing executor position to portfolio: {} {} qty={:.6}",
-                    pos.pair, pos.side, pos.quantity
-                );
-                portfolio.positions_mut().insert(pos.id.clone(), pos.clone());
+        let knowledge_base = load_knowledge_base();
+        let knowledge_tuples: Vec<(String, String, String)> = knowledge_base
+            .all()
+            .iter()
+            .map(|u| {
+                let title = u.content.chars().take(60).collect::<String>();
+                (u.id.clone(), format!("{:?}", u.topic), title)
+            })
+            .collect();
+
+        let composer = PromptComposer::new(
+            &prompts::default_base_identity(),
+            include_str!("../agent/prompts/risk_constraints.md"),
+            &format!(
+                "{}\n\n---\n\n{}",
+                include_str!("../agent/prompts/strategy_knowledge.md"),
+                include_str!("../agent/prompts/echo_rules.md")
+            ),
+            include_str!("../agent/prompts/output_format.md"),
+        );
+
+        let autonomy = match config.ai.autonomy_level {
+            1 => AutonomyLevel::Suggest,
+            2 => AutonomyLevel::Confirm,
+            _ => AutonomyLevel::Autonomous,
+        };
+
+        let provider = create_provider(&config.ai);
+
+        let agent_config = AgentConfig {
+            autonomy_level: autonomy,
+            max_decisions_per_hour: config.ai.max_decisions_per_hour,
+            knowledge_token_budget: config.ai.knowledge_token_budget,
+            price_tolerance_pct: config.ai.price_tolerance_pct,
+            max_retries: config.ai.max_retries,
+        };
+
+        let agent = AgentOrchestrator::new(provider, agent_config, knowledge_base, composer);
+        let ctx_engine = ContextEngine::new(config.context.clone());
+        let ctx_state = ContextState::new(
+            config.context.microcompact_soft_ratio,
+            config.context.microcompact_hard_ratio,
+        );
+        let decision_log = DecisionLog::open(
+            "data/decision_log.json",
+            config.context.decision_log_max_entries,
+        );
+        info!(
+            "AI agent initialized: {:?} mode with provider '{}', encoding={}",
+            autonomy, config.ai.provider, ctx_engine.encoding_mode()
+        );
+
+        if config.ai.provider == "openrouter" {
+            let mgmt_key_env = &config.ai.openrouter.management.management_key_env;
+            if let Ok(mgmt_key) = std::env::var(mgmt_key_env) {
+                if !mgmt_key.is_empty() {
+                    let mgmt = OpenRouterManagementClient::with_endpoint(
+                        mgmt_key,
+                        &config.ai.openrouter.management.endpoint,
+                    );
+                    match mgmt.list_keys(None).await {
+                        Ok(keys) => {
+                            info!(
+                                "OpenRouter Management: {} API keys (logged at startup)",
+                                keys.len()
+                            );
+                            for key in &keys {
+                                if key.limit > 0.0 && key.limit_remaining < key.limit * 0.1 {
+                                    warn!(
+                                        "OpenRouter key '{}' is approaching limit: {:.0}/{:.0} credits remaining",
+                                        key.name, key.limit_remaining, key.limit
+                                    );
+                                }
+                            }
+                        }
+                        Err(e) => {
+                            warn!(
+                                "OpenRouter Management unavailable ({}). Key monitoring disabled.",
+                                e
+                            );
+                        }
+                    }
+                }
             }
-            portfolio.account_mut().open_positions = portfolio.positions().len();
+        }
+
+        let insight_config = InsightConfig {
+            funding_rate_enabled: config.insight.funding_rate_enabled,
+            liquidation_enabled: config.insight.liquidation_enabled,
+            fear_greed_enabled: config.insight.fear_greed_enabled,
+            btc_dominance_enabled: config.insight.btc_dominance_enabled,
+            exchange_flows_enabled: config.insight.exchange_flows_enabled,
+            news_sentiment_enabled: config.insight.news_sentiment_enabled,
+            rss_enabled: config.insight.rss_enabled,
+            rss_max_items: config.insight.rss_max_items,
+            onchain_enabled: config.insight.onchain_enabled,
+        };
+        let mut insight = InsightAggregator::new(insight_config);
+        info!("Insight aggregator initialized");
+
+        let event_bus = EventBus::new(256);
+
+        let vault_config = VaultConfig::default();
+        let vault_writer = VaultWriter::new(vault_config.clone());
+        if vault_config.enabled {
+            if let Err(e) = vault_writer.ensure_scaffolded() {
+                warn!("Vault scaffold failed: {}", e);
+            } else {
+                info!("Vault scaffolded at {}", vault_config.vault_path);
+            }
+            if let Err(e) = vault_writer.project_knowledge(&knowledge_tuples) {
+                warn!("Knowledge projection failed: {}", e);
+            }
+        }
+
+        let vault_watcher = VaultWatcher::new(&vault_config.vault_path);
+        let lessons = vault_watcher.read_lessons();
+        if !lessons.is_empty() {
+            info!("Ingested {} lesson files from vault", lessons.len());
+            for (name, _content) in &lessons {
+                info!("  Lesson: {}", name);
+            }
+        }
+
+        let mut order_books: HashMap<String, OrderBookManager> = HashMap::new();
+        for pair in &active_pairs {
+            order_books.insert(pair.clone(), OrderBookManager::new(pair));
+        }
+
+        let memory = match savant_trading::memory::episodic::EpisodicMemory::new(
+            "sqlite:data/memory.db",
+        )
+        .await
+        {
+            Ok(m) => {
+                info!("Episodic memory initialized");
+                Some(m)
+            }
+            Err(e) => {
+                warn!("Episodic memory init failed: {} — memory disabled", e);
+                None
+            }
+        };
+
+        let mut cusum_charts: HashMap<String, savant_trading::memory::cusum::CusumChart> =
+            HashMap::new();
+        for pair in &active_pairs {
+            cusum_charts.insert(
+                pair.clone(),
+                savant_trading::memory::cusum::CusumChart::default_trading(),
+            );
+        }
+
+        let brier_predictions: Vec<(f64, bool)> = Vec::new();
+
+        let mut operator_rules: Vec<String> = Vec::new();
+        for (name, content) in &lessons {
+            if name.ends_with(".md") {
+                for line in content.lines() {
+                    let trimmed = line.trim();
+                    if !trimmed.is_empty() && !trimmed.starts_with('#') && !trimmed.starts_with('>') {
+                        operator_rules.push(trimmed.to_string());
+                    }
+                }
+            }
+        }
+        if !operator_rules.is_empty() {
+            info!("Loaded {} operator rules from vault", operator_rules.len());
+        }
+
+        if let Some(ref mem) = memory {
+            match mem.total_trades().await {
+                Ok(count) if count >= 20 => {
+                    info!("Running experience replay ({} trades in history)", count);
+                    if let Ok(losses) =
+                        savant_trading::memory::replay::query_high_conviction_losses(mem, 5).await
+                    {
+                        for (ep_id, pair, regime, reasoning) in &losses {
+                            let heuristic = format!(
+                                "HIGH conviction loss on {} in {} regime: {}",
+                                pair,
+                                regime,
+                                reasoning.chars().take(100).collect::<String>()
+                            );
+                            let _ = savant_trading::memory::replay::store_lesson(
+                                mem.pool(),
+                                ep_id,
+                                "high_conviction_loss",
+                                &heuristic,
+                            )
+                            .await;
+                        }
+                    }
+                }
+                _ => {
+                    info!("Not enough trades for experience replay (need 20+)");
+                }
+            }
+        }
+
+        let regime_detector = RegimeDetector::new(
+            config.strategy.regime.adx_period,
+            config.strategy.regime.adx_trending_threshold,
+            config.strategy.regime.adx_ranging_threshold,
+            config.strategy.regime.atr_volatility_multiplier,
+        );
+
+        let position_sizer =
+            PositionSizer::new(config.risk.max_risk_per_trade, config.risk.min_rr_ratio)
+                .with_full_deploy(config.trading.full_deploy)
+                .with_low_balance_rr(
+                    config.risk.min_rr_ratio_low_balance,
+                    config.risk.low_balance_threshold,
+                );
+
+        let circuit_breaker = CircuitBreaker::new(
+            config.risk.max_daily_loss,
+            config.risk.max_drawdown,
+            config.risk.max_positions,
+        )
+        .with_daily_loss_floor(config.risk.min_daily_loss_usd)
+        .with_drawdown_floor(config.risk.min_drawdown_usd);
+
+        let goplus_client = Some(savant_trading::security::goplus::GoPlusClient::new());
+
+        let interval_seconds = parse_timeframe(&config.trading.timeframe);
+
+        info!(
+            "Fetching initial data for {} pairs (parallel)...",
+            active_pairs.len()
+        );
+
+        let candle_router =
+            std::sync::Arc::new(savant_trading::data::sources::SourceRouter::new(vec![
+                Box::new(savant_trading::data::sources::kraken::KrakenFeed::new(
+                    &config.exchange.rest_url,
+                )),
+                Box::new(savant_trading::data::sources::okx::OkxSource::new()),
+                Box::new(savant_trading::data::sources::kucoin::KuCoinSource::new()),
+                Box::new(savant_trading::data::sources::gate::GateSource::new()),
+                Box::new(savant_trading::data::sources::cryptocompare::CryptoCompareSource::new()),
+                Box::new(savant_trading::data::sources::coingecko::CoinGeckoSource::new()),
+            ]));
+
+        let mut candle_futures = tokio::task::JoinSet::new();
+        for pair in &active_pairs {
+            let router = candle_router.clone();
+            let pair_clone = pair.clone();
+            let tf = config.trading.timeframe.clone();
+            candle_futures.spawn(async move {
+                let result = router
+                    .fetch_candles(&pair_clone, parse_timeframe_minutes(&tf), 200)
+                    .await;
+                (pair_clone, result)
+            });
+        }
+
+        while let Some(result) = candle_futures.join_next().await {
+            match result {
+                Ok((pair, Ok(mut candles))) => {
+                    if candles.len() > 1 {
+                        candles.pop();
+                    }
+                    if let Some(store) = market_stores.get_mut(&pair) {
+                        let count = candles.len();
+                        store.add_candles(candles);
+                        info!("Loaded {} historical candles for {}", count, pair);
+                    }
+                }
+                Ok((pair, Err(e))) => error!("Failed to fetch initial data for {}: {}", pair, e),
+                Err(e) => error!("Candle fetch task panicked: {}", e),
+            }
+        }
+        info!(
+            "Fetching initial market insight for {} pairs...",
+            active_pairs.len()
+        );
+        insight.refresh_multi(&active_pairs).await;
+        {
+            let mut shared_insight = shared.insight.write().await;
+            *shared_insight = insight.cached().clone();
+        }
+        info!("Initial market insight seeded to dashboard");
+
+        // WALLET SYNC
+        if let Some(ref mut ex) = executor {
+            let all_sync_pairs: Vec<String> = curated_pairs.iter().cloned().collect();
+            info!(
+                "Wallet sync: checking on-chain balances for {} pairs ({} config + {} discovered)...",
+                all_sync_pairs.len(),
+                config.trading.pairs.len(),
+                all_sync_pairs.len().saturating_sub(config.trading.pairs.len()),
+            );
+            let discrepancies = match tokio::time::timeout(
+                std::time::Duration::from_secs(30),
+                ex.sync_wallet_positions(&all_sync_pairs),
+            )
+            .await
+            {
+                Ok(d) => d,
+                Err(_) => {
+                    error!("Wallet sync timed out after 30s — continuing without sync");
+                    Vec::new()
+                }
+            };
+            for (pair, on_chain_qty, tracked_qty) in &discrepancies {
+                if *tracked_qty < 0.001 && *on_chain_qty > 0.001 {
+                    let existing_pos = portfolio.positions().values()
+                        .find(|p| p.pair == *pair)
+                        .cloned();
+
+                    if let Some(mut existing) = existing_pos {
+                        if existing.side == Side::Short {
+                            warn!(
+                                "WALLET SYNC: {} journal says SHORT but on-chain holds {:.6} tokens — forcing LONG",
+                                pair, on_chain_qty
+                            );
+                            existing.side = Side::Long;
+                            existing.stop_loss = existing.entry_price * 0.92;
+                            existing.take_profit_1 = existing.entry_price * 1.10;
+                            existing.take_profit_2 = existing.entry_price * 1.20;
+                            existing.take_profit_3 = existing.entry_price * 1.30;
+                        }
+                        let old_qty = existing.quantity;
+                        existing.quantity = *on_chain_qty;
+                        existing.current_price = market_stores
+                            .get(pair)
+                            .and_then(|s| s.last().map(|c| c.close))
+                            .unwrap_or(existing.current_price);
+                        existing.risk_amount = existing.entry_price * on_chain_qty;
+                        portfolio.positions_mut().insert(existing.id.clone(), existing.clone());
+                        if let Some(ref mut ex) = executor {
+                            let exec_id = format!("exec-{}", existing.id);
+                            ex.register_position(exec_id.clone(), existing.clone());
+                            executor_position_map.insert(existing.id.clone(), exec_id.clone());
+                        }
+                        if let Some(ref j) = journal {
+                            let _ = j.save_position(&existing).await;
+                        }
+                        info!(
+                            "WALLET SYNC: Updated {} quantity {:.6} → {:.6} (kept journal entry @ ${:.4})",
+                            pair, old_qty, on_chain_qty, existing.entry_price,
+                        );
+                        continue;
+                    }
+
+                    let market_price = market_stores
+                        .get(pair)
+                        .and_then(|s| s.last().map(|c| c.close))
+                        .unwrap_or(0.0);
+                    let entry_price = if market_price > 0.0 {
+                        market_price
+                    } else {
+                        if let Some(ref j) = journal {
+                            j.get_trades(1000)
+                                .await
+                                .unwrap_or_default()
+                                .iter()
+                                .rfind(|t| t.pair == *pair)
+                                .map(|t| t.entry_price)
+                                .unwrap_or(0.0)
+                        } else {
+                            0.0
+                        }
+                    };
+
+                    if entry_price <= 0.0 {
+                        error!("WALLET SYNC: Cannot recover {} — no valid entry price (market={:.4}). Skipping.",
+                            pair, market_price);
+                        shared
+                            .log_activity(
+                                savant_trading::core::shared::ActivityLevel::Error,
+                                pair,
+                                "WALLET SYNC FAILED: Cannot recover — no valid entry price",
+                            )
+                            .await;
+                        continue;
+                    }
+
+                    let recovery_pos = savant_trading::core::types::Position {
+                        id: format!("wallet-recovery-{}", pair.replace('/', "_").to_lowercase()),
+                        pair: pair.clone(),
+                        side: savant_trading::core::types::Side::Long,
+                        entry_price,
+                        current_price: market_price.max(entry_price),
+                        quantity: *on_chain_qty,
+                        stop_loss: entry_price * 0.85,
+                        take_profit_1: entry_price * 1.10,
+                        take_profit_2: entry_price * 1.20,
+                        take_profit_3: entry_price * 1.30,
+                        unrealized_pnl: 0.0,
+                        risk_amount: entry_price * on_chain_qty,
+                        strategy_name: "wallet_recovery".to_string(),
+                        scale_level: savant_trading::core::types::ScaleLevel::Full,
+                        opened_at: chrono::DateTime::from_timestamp(0, 0).unwrap_or_else(chrono::Utc::now),
+                    };
+                    portfolio
+                        .positions_mut()
+                        .insert(recovery_pos.id.clone(), recovery_pos.clone());
+                    if let Some(ref mut ex) = executor {
+                        let exec_id = format!("exec-{}", recovery_pos.id);
+                        ex.register_position(exec_id.clone(), recovery_pos.clone());
+                        executor_position_map.insert(recovery_pos.id.clone(), exec_id.clone());
+                        info!(
+                            "WALLET SYNC: Registered {} in DexTrader as {}",
+                            pair, exec_id
+                        );
+                    }
+                    if let Some(ref j) = journal {
+                        let _ = j.save_position(&recovery_pos).await;
+                    }
+                    warn!(
+                        "WALLET SYNC: Recovered {} — {:.6} tokens @ ${:.4} (source: market_price — no journal entry)",
+                        pair, on_chain_qty, entry_price,
+                    );
+                    shared
+                        .log_activity(
+                            savant_trading::core::shared::ActivityLevel::Warning,
+                            pair,
+                            &format!(
+                                "WALLET SYNC: Recovered {:.6} tokens @ ${:.4}",
+                                on_chain_qty, entry_price
+                            ),
+                        )
+                        .await;
+                } else if *on_chain_qty < 0.001 && *tracked_qty > 0.001 {
+                    if let Some(pos_id) = portfolio
+                        .positions()
+                        .iter()
+                        .find(|(_, p)| p.pair == *pair)
+                        .map(|(id, _)| id.clone())
+                    {
+                        portfolio.positions_mut().remove(&pos_id);
+                        if let Some(ref j) = journal {
+                            let _ = j.delete_position(&pos_id).await;
+                        }
+                        warn!(
+                            "WALLET SYNC: {} position gone from chain — removed ghost",
+                            pair
+                        );
+                        shared
+                            .log_activity(
+                                savant_trading::core::shared::ActivityLevel::Warning,
+                                pair,
+                                "WALLET SYNC: Position gone from chain — removed ghost",
+                            )
+                            .await;
+                    }
+                }
+            }
+            let short_ids: Vec<String> = portfolio.positions().iter()
+                .filter(|(_, p)| p.side == Side::Short)
+                .map(|(id, _)| id.clone())
+                .collect();
+            for id in &short_ids {
+                if let Some(p) = portfolio.positions_mut().get_mut(id) {
+                    warn!(
+                        "SIDE CORRECTION: {} — spot-only mode, forcing SHORT → LONG",
+                        p.pair
+                    );
+                    let pair = p.pair.clone();
+                    p.side = Side::Long;
+                    p.stop_loss = p.entry_price * 0.92;
+                    p.take_profit_1 = p.entry_price * 1.10;
+                    p.take_profit_2 = p.entry_price * 1.20;
+                    p.take_profit_3 = p.entry_price * 1.30;
+                    if let Some(ref j) = journal {
+                        let _ = j.save_position(p).await;
+                    }
+                    let corrected = p.clone();
+                    let corrected_id = id.clone();
+                    if let Some(ref mut ex) = executor {
+                        let exec_id = executor_position_map.get(&corrected_id)
+                            .cloned()
+                            .unwrap_or_else(|| format!("exec-{}", corrected_id));
+                        ex.register_position(exec_id.clone(), corrected);
+                        debug!("FID-094: Synced side correction to DexTrader: {} → {}", corrected_id, exec_id);
+                    }
+                    shared.log_activity(
+                        savant_trading::core::shared::ActivityLevel::Warning,
+                        &pair,
+                        "SIDE CORRECTION: spot-only mode, forced SHORT → LONG",
+                    ).await;
+                }
+            }
+            if discrepancies.is_empty() {
+                info!("Wallet sync: all positions reconciled with on-chain balances");
+            }
             portfolio.refresh_equity();
-            // Calculate equity from token values if still $0
-            if portfolio.account().equity < 0.01 {
+            portfolio.account_mut().open_positions = portfolio.positions().len();
+            if portfolio.account().equity < 0.01 && !portfolio.positions().is_empty() {
                 let token_value: f64 = portfolio.positions().values()
                     .map(|p| p.current_price * p.quantity)
                     .sum();
@@ -1288,125 +983,265 @@ pub async fn run(
                     info!("FID-109: Set equity to token value ${:.2}", token_value);
                 }
             }
-        }
-    }
-
-    // FID-109: FORCE shared state sync — runs ALWAYS,
-    // regardless of executor state. This ensures dashboard and AI see positions.
-    {
-        let mut sa = shared.account.write().await;
-        *sa = portfolio.account().clone();
-        let mut sp = shared.positions.write().await;
-        *sp = portfolio.positions().values().cloned().collect();
-        info!(
-            "FID-109: Shared state FORCE synced — {} positions, balance=${:.2}, equity=${:.2}, open={}",
-            sp.len(),
-            sa.balance,
-            sa.equity,
-            sa.open_positions,
-        );
-    }
-
-    // FID-061: Auto-apply tighter stops on wallet-recovered positions
-    // Runs AFTER wallet sync so recovered positions exist in PortfolioManager.
-    // FID-087 Bug G: Side-aware SL calculation. LONG: below entry. SHORT: above entry.
-    {
-        let stop_overrides: Vec<(String, f64)> = portfolio
-            .positions()
-            .values()
-            .filter(|p| p.strategy_name == "wallet_recovery")
-            .filter_map(|p| {
-                // Check if SL is at the default wallet-recovery value (15% from entry)
-                let default_sl = match p.side {
-                    Side::Long => p.entry_price * 0.85,
-                    Side::Short => p.entry_price * 1.15,
-                };
-                if (p.stop_loss - default_sl).abs() < 0.01 {
-                    let new_sl = match (p.pair.as_str(), p.side) {
-                        ("LINK/USD", Side::Long) => Some(7.00),
-                        ("LINK/USD", Side::Short) => Some(
-                            (p.entry_price * 1.08 * 100.0).round() / 100.0,
-                        ),
-                        ("WETH/USD", Side::Long) => Some(
-                            (p.entry_price * 0.92 * 100.0).round() / 100.0,
-                        ),
-                        ("WETH/USD", Side::Short) => Some(
-                            (p.entry_price * 1.08 * 100.0).round() / 100.0,
-                        ),
-                        _ => None,
-                    };
-                    new_sl.map(|sl| (p.pair.clone(), sl))
-                } else {
-                    None
-                }
-            })
-            .collect();
-
-        if !stop_overrides.is_empty() {
-            let mut overrides = shared.stop_overrides.write().await;
-            for (pair, new_stop) in &stop_overrides {
-                overrides.insert(pair.clone(), *new_stop);
-                info!("Auto-stop queued: {} → ${:.4}", pair, new_stop);
+            {
+                let mut shared_account = shared.account.write().await;
+                *shared_account = portfolio.account().clone();
+                let mut shared_positions = shared.positions.write().await;
+                *shared_positions = portfolio.positions().values().cloned().collect();
+            }
+            info!(
+                "Wallet sync complete: {} positions, balance=${:.2}, equity=${:.2}, open={}",
+                portfolio.positions().len(),
+                portfolio.account().balance,
+                portfolio.account().equity,
+                portfolio.account().open_positions,
+            );
+            let shared_pos_count = shared.positions.read().await.len();
+            let shared_open = shared.account.read().await.open_positions;
+            if shared_pos_count != portfolio.positions().len() || shared_open != portfolio.positions().len() {
+                warn!(
+                    "FID-109: Shared state mismatch — portfolio={} positions, shared_positions={}, shared_open={}. Forcing sync.",
+                    portfolio.positions().len(), shared_pos_count, shared_open
+                );
+                let mut sp = shared.positions.write().await;
+                *sp = portfolio.positions().values().cloned().collect();
+                let mut sa = shared.account.write().await;
+                *sa = portfolio.account().clone();
+            }
+            {
+                let mut curve = shared.equity_curve.write().await;
+                curve.push(serde_json::json!({
+                    "timestamp": chrono::Utc::now().to_rfc3339(),
+                    "equity": portfolio.account().equity,
+                    "balance": portfolio.account().balance,
+                }));
             }
         }
+
+        if let Some(ref ex) = executor {
+            let exec_positions = ex.open_positions();
+            if portfolio.positions().is_empty() && !exec_positions.is_empty() {
+                for pos in exec_positions {
+                    info!(
+                        "FID-109: Syncing executor position to portfolio: {} {} qty={:.6}",
+                        pos.pair, pos.side, pos.quantity
+                    );
+                    portfolio.positions_mut().insert(pos.id.clone(), pos.clone());
+                }
+                portfolio.account_mut().open_positions = portfolio.positions().len();
+                portfolio.refresh_equity();
+                if portfolio.account().equity < 0.01 {
+                    let token_value: f64 = portfolio.positions().values()
+                        .map(|p| p.current_price * p.quantity)
+                        .sum();
+                    if token_value > 0.0 {
+                        portfolio.account_mut().equity = token_value;
+                        info!("FID-109: Set equity to token value ${:.2}", token_value);
+                    }
+                }
+            }
+        }
+
+        {
+            let mut sa = shared.account.write().await;
+            *sa = portfolio.account().clone();
+            let mut sp = shared.positions.write().await;
+            *sp = portfolio.positions().values().cloned().collect();
+            info!(
+                "FID-109: Shared state FORCE synced — {} positions, balance=${:.2}, equity=${:.2}, open={}",
+                sp.len(),
+                sa.balance,
+                sa.equity,
+                sa.open_positions,
+            );
+        }
+
+        {
+            let stop_overrides: Vec<(String, f64)> = portfolio
+                .positions()
+                .values()
+                .filter(|p| p.strategy_name == "wallet_recovery")
+                .filter_map(|p| {
+                    let default_sl = match p.side {
+                        Side::Long => p.entry_price * 0.85,
+                        Side::Short => p.entry_price * 1.15,
+                    };
+                    if (p.stop_loss - default_sl).abs() < 0.01 {
+                        let new_sl = match (p.pair.as_str(), p.side) {
+                            ("LINK/USD", Side::Long) => Some(7.00),
+                            ("LINK/USD", Side::Short) => Some(
+                                (p.entry_price * 1.08 * 100.0).round() / 100.0,
+                            ),
+                            ("WETH/USD", Side::Long) => Some(
+                                (p.entry_price * 0.92 * 100.0).round() / 100.0,
+                            ),
+                            ("WETH/USD", Side::Short) => Some(
+                                (p.entry_price * 1.08 * 100.0).round() / 100.0,
+                            ),
+                            _ => None,
+                        };
+                        new_sl.map(|sl| (p.pair.clone(), sl))
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+
+            if !stop_overrides.is_empty() {
+                let mut overrides = shared.stop_overrides.write().await;
+                for (pair, new_stop) in &stop_overrides {
+                    overrides.insert(pair.clone(), *new_stop);
+                    info!("Auto-stop queued: {} → ${:.4}", pair, new_stop);
+                }
+            }
+        }
+
+        // WebSocket setup
+        let (ws_tx, ws_rx) = savant_trading::data::websocket::create_channel();
+        let ws_pairs: Vec<String> = config.trading.pairs.clone();
+        let ws_url = config.exchange.ws_url.clone();
+        tokio::spawn(async move {
+            savant_trading::data::websocket::connect(&ws_url, ws_pairs, ws_tx).await;
+        });
+
+        let ws_ticker_prices: HashMap<String, (f64, std::time::Instant)> = HashMap::new();
+        let ws_staleness: HashMap<String, u64> = HashMap::new();
+        let rest_fallback_at: Option<std::time::Instant> = None;
+        let ws_just_reconnected = false;
+
+        let dead_tokens: HashSet<String> = HashSet::new();
+        let permanent_dead: HashSet<String> = HashSet::new();
+        let candle_hash_cache: HashMap<String, u64> = HashMap::new();
+        let tick = 0u64;
+        let eval_in_progress = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let last_daily_reset: chrono::NaiveDate = chrono::Utc::now().date_naive();
+        let close_failure_cooldown: HashMap<String, std::time::Instant> = HashMap::new();
+        let consecutive_sl_count: HashMap<String, u32> = HashMap::new();
+        let sl_halt_until: HashMap<String, std::time::Instant> = HashMap::new();
+
+        Ok(Self {
+            config,
+            shared,
+            running,
+            candle_api,
+            active_pairs,
+            curated_pairs,
+            market_stores,
+            candle_router,
+            interval_seconds,
+            portfolio,
+            executor,
+            executor_position_map,
+            reconciliation_removed,
+            failure_tracker,
+            episode_store,
+            journal,
+            agent,
+            ctx_engine,
+            ctx_state,
+            decision_log,
+            insight,
+            event_bus,
+            vault_config,
+            vault_writer,
+            vault_watcher,
+            order_books,
+            memory,
+            cusum_charts,
+            brier_predictions,
+            operator_rules,
+            regime_detector,
+            position_sizer,
+            circuit_breaker,
+            goplus_client,
+            ws_rx,
+            ws_ticker_prices,
+            ws_staleness,
+            rest_fallback_at,
+            ws_just_reconnected,
+            dead_tokens,
+            permanent_dead,
+            candle_hash_cache,
+            tick,
+            eval_in_progress,
+            last_daily_reset,
+            close_failure_cooldown,
+            consecutive_sl_count,
+            sl_halt_until,
+        })
     }
+}
+
+pub async fn run(
+    config: AppConfig,
+    shared: savant_trading::core::shared::SharedEngineData,
+    _engine_running: std::sync::Arc<std::sync::atomic::AtomicBool>,
+) -> anyhow::Result<()> {
+    let state = EngineState::new(config, shared, _engine_running).await?;
+
+    // Destructure state into local variables (loop body unchanged)
+    let config = state.config;
+    let shared = state.shared;
+    let _candle_api = state.candle_api;
+    let active_pairs = state.active_pairs;
+    let curated_pairs = state.curated_pairs;
+    let mut market_stores = state.market_stores;
+    let mut portfolio = state.portfolio;
+    let mut executor = state.executor;
+    let mut reconciliation_removed = state.reconciliation_removed;
+    let mut executor_position_map = state.executor_position_map;
+    let mut failure_tracker = state.failure_tracker;
+    let mut episode_store = state.episode_store;
+    let journal = state.journal;
+    let mut agent = state.agent;
+    let mut ctx_engine = state.ctx_engine;
+    let mut ctx_state = state.ctx_state;
+    let mut decision_log = state.decision_log;
+    let mut insight = state.insight;
+    let event_bus = state.event_bus;
+    let vault_config = state.vault_config;
+    let vault_writer = state.vault_writer;
+    let _vault_watcher = state.vault_watcher;
+    let mut order_books = state.order_books;
+    let memory = state.memory;
+    let mut cusum_charts = state.cusum_charts;
+    let mut brier_predictions = state.brier_predictions;
+    let _operator_rules = state.operator_rules;
+    let regime_detector = state.regime_detector;
+    let position_sizer = state.position_sizer;
+    let circuit_breaker = state.circuit_breaker;
+    let goplus_client = state.goplus_client;
+    let interval_seconds = state.interval_seconds;
+    let candle_router = state.candle_router;
+    let mut ws_rx = state.ws_rx;
+    let mut ws_ticker_prices = state.ws_ticker_prices;
+    let mut ws_staleness = state.ws_staleness;
+    let mut rest_fallback_at = state.rest_fallback_at;
+    let mut ws_just_reconnected = state.ws_just_reconnected;
+    let mut dead_tokens = state.dead_tokens;
+    let permanent_dead = state.permanent_dead;
+    let mut candle_hash_cache = state.candle_hash_cache;
+    let mut tick = state.tick;
+    let eval_in_progress = state.eval_in_progress;
+    let mut last_daily_reset = state.last_daily_reset;
+    let mut close_failure_cooldown = state.close_failure_cooldown;
+    let mut consecutive_sl_count = state.consecutive_sl_count;
+    let mut sl_halt_until = state.sl_halt_until;
+
+    let autonomy = match config.ai.autonomy_level {
+        1 => AutonomyLevel::Suggest,
+        2 => AutonomyLevel::Confirm,
+        _ => AutonomyLevel::Autonomous,
+    };
 
     info!(
         "Starting main loop (interval: {}s, autonomy: {:?})...",
         interval_seconds, autonomy
     );
 
-    // SPRINT-2: Spawn WebSocket connection for real-time data
-    // Only subscribe to supported pairs (config pairs), not discovered tokens
-    let (ws_tx, mut ws_rx) = savant_trading::data::websocket::create_channel();
-    let ws_pairs: Vec<String> = config.trading.pairs.clone();
-    let ws_url = config.exchange.ws_url.clone();
-    tokio::spawn(async move {
-        savant_trading::data::websocket::connect(&ws_url, ws_pairs, ws_tx).await;
-    });
-
-    // Track latest WS ticker prices
-    // FID-081: Track WS price + timestamp for staleness detection
-    let mut ws_ticker_prices: HashMap<String, (f64, std::time::Instant)> = HashMap::new();
-    // Per-pair staleness tracker (seconds since last WS update)
-    let mut ws_staleness: HashMap<String, u64> = HashMap::new();
-    // REST fallback cooldown — only fire once per staleness event
-    let mut rest_fallback_at: Option<std::time::Instant> = None;
-    // WS reconnect flag — trigger REST fill on next cycle
-    let mut ws_just_reconnected = false;
-
-    // FID-046: Dead token cache — skip pairs that returned all-zero candles
-    let mut dead_tokens: std::collections::HashSet<String> = std::collections::HashSet::new();
-    // FID-093 C5: Permanent dead tokens — never cleared, never re-evaluated.
-    // These tokens have been permanently flagged as dead (scam, rug, zero liquidity).
-    let permanent_dead: std::collections::HashSet<String> = std::collections::HashSet::new();
-    // Add tokens here as they're discovered: permanent_dead.insert("SCAM/USD".to_string());
-
-    // FID-056 #2+#6: Candle hash cache — skip LLM eval if candle data unchanged since last cycle.
-    // Uses a simple hash of the last 5 close prices + volume to detect data staleness.
-    let mut candle_hash_cache: std::collections::HashMap<String, u64> =
-        std::collections::HashMap::new();
-
-    let mut tick = 0u64;
-
-    // FID-081: Prevent overlapping LLM evaluations.
-    // If a previous cycle's LLM call is still running, skip the new eval phase.
-    let eval_in_progress = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
-
-    // FID-093 D1: Track midnight reset independently of price updates
-    let mut last_daily_reset: chrono::NaiveDate = chrono::Utc::now().date_naive();
-
-    // FID-094 Fix 2: Close retry cooldown — prevents death loop.
-    // Tracks last failed close attempt per pair. Skip retry for 30 minutes.
-    let mut close_failure_cooldown: std::collections::HashMap<String, std::time::Instant> = std::collections::HashMap::new();
-    const CLOSE_COOLDOWN_SECS: u64 = 1800; // 30 minutes
-
-    // FID-094 Fix 4: Death loop detection — consecutive SL triggers per position.
-    // If 3+ consecutive SL fires without successful close, halt for 1 hour.
-    let mut consecutive_sl_count: std::collections::HashMap<String, u32> = std::collections::HashMap::new();
-    let mut sl_halt_until: std::collections::HashMap<String, std::time::Instant> = std::collections::HashMap::new();
+    const CLOSE_COOLDOWN_SECS: u64 = 1800;
     const SL_HALT_THRESHOLD: u32 = 3;
-    const _SL_HALT_SECS: u64 = 3600; // 1 hour — used for death loop detection
+    const _SL_HALT_SECS: u64 = 3600;
 
     loop {
         tick += 1;
@@ -4743,2472 +4578,4 @@ pub async fn run(
         // can interfere with sleep on Windows. Ctrl+C handled by OS.
         time::sleep(Duration::from_secs(interval_seconds)).await;
     }
-}
-
-/// Dry-run: make ONE AI call and print the full pipeline output.
-pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
-    let candle_api = CandleClient::new(&config.exchange.rest_url);
-    let pair = config
-        .trading
-        .pairs
-        .first()
-        .cloned()
-        .unwrap_or_else(|| "BTC/USD".to_string());
-
-    // 1. Fetch market data
-    println!("\n=== SAVANT DRY RUN ===");
-    println!("Pair: {}", pair);
-    println!(
-        "Time: {}",
-        chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC")
-    );
-
-    println!("\n--- MARKET DATA ---");
-    let mut candles = candle_api
-        .get_ohlc(
-            &pair,
-            parse_timeframe_minutes(&config.trading.timeframe),
-            None,
-        )
-        .await
-        .unwrap_or_default();
-    if candles.len() > 1 {
-        candles.pop();
-    }
-
-    if candles.is_empty() {
-        println!("ERROR: No candle data available");
-        return Ok(());
-    }
-
-    let indicators = savant_trading::data::indicators::IndicatorEngine::calculate_all(
-        &candles,
-        config.strategy.regime.adx_period,
-    );
-
-    let regime_detector = RegimeDetector::new(
-        config.strategy.regime.adx_period,
-        config.strategy.regime.adx_trending_threshold,
-        config.strategy.regime.adx_ranging_threshold,
-        config.strategy.regime.atr_volatility_multiplier,
-    );
-    let regime = regime_detector.detect(&indicators, &candles);
-
-    let profile = savant_trading::data::indicators::IndicatorEngine::volume_profile(
-        &candles,
-        config.strategy.mean_reversion.profile_periods.min(50),
-    );
-
-    if let Some(last) = candles.last() {
-        println!(
-            "Candle: O={:.2} H={:.2} L={:.2} C={:.2} V={:.2}",
-            last.open, last.high, last.low, last.close, last.volume
-        );
-    }
-    println!(
-        "Indicators: EMA_FAST={:?} EMA_SLOW={:?} RSI={:?} ATR={:?} ADX={:?} VWAP={:?}",
-        indicators.ema_fast,
-        indicators.ema_slow,
-        indicators.rsi,
-        indicators.atr,
-        indicators.adx,
-        indicators.vwap
-    );
-    println!("Regime: {:?}", regime);
-
-    // 2. Fetch insight
-    println!("\n--- INSIGHT ---");
-    let insight_config = InsightConfig {
-        funding_rate_enabled: config.insight.funding_rate_enabled,
-        liquidation_enabled: config.insight.liquidation_enabled,
-        fear_greed_enabled: config.insight.fear_greed_enabled,
-        btc_dominance_enabled: config.insight.btc_dominance_enabled,
-        exchange_flows_enabled: config.insight.exchange_flows_enabled,
-        news_sentiment_enabled: config.insight.news_sentiment_enabled,
-        rss_enabled: config.insight.rss_enabled,
-        rss_max_items: config.insight.rss_max_items,
-        onchain_enabled: config.insight.onchain_enabled,
-    };
-    let mut insight = InsightAggregator::new(insight_config);
-    let market_ctx = insight.refresh(&pair).await.clone();
-    println!("{}", market_ctx.summary());
-
-    // 3. Build context using the SAME path as the live engine
-    println!("\n--- KNOWLEDGE SELECTION ---");
-    let knowledge_base = load_knowledge_base();
-
-    let composer = PromptComposer::new(
-        &prompts::default_base_identity(),
-        include_str!("agent/prompts/risk_constraints.md"),
-        &format!(
-            "{}\n\n---\n\n{}",
-            include_str!("agent/prompts/strategy_knowledge.md"),
-            include_str!("agent/prompts/echo_rules.md")
-        ),
-        include_str!("agent/prompts/output_format.md"),
-    );
-
-    let portfolio = PortfolioManager::new(
-        config.trading.starting_balance,
-        config.trading.fee_rate,
-        config.trading.slippage_pct,
-    );
-    let ctx = FullContext {
-        candles: &candles,
-        indicators: &indicators,
-        regime,
-        volume_profile: Some(&profile),
-        market_context: &market_ctx,
-        positions: &[],
-        account: portfolio.account(),
-        pair: &pair,
-        recent_trades: None,
-        order_book_imbalance: None,
-        session: savant_trading::core::session::current_session(),
-        memory_context: None,
-        higher_tf_candles: vec![],
-        context_tags: savant_trading::agent::context_builder::generate_context_tags(&indicators),
-        live_price: None,
-        decision_log_context: None,
-        dex_price: None,
-    };
-
-    let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
-        &ctx,
-        &knowledge_base,
-        &composer,
-        3000, // Reduced for training speed — full 8000 used in live engine
-    );
-
-    println!(
-        "Conditions: {:?}",
-        savant_trading::agent::context_builder::determine_conditions_static(
-            regime,
-            market_ctx.sentiment.fear_greed_index,
-            market_ctx.funding.funding_rate,
-        )
-    );
-    println!("Context tags: {:?}", ctx.context_tags);
-    println!("System prompt: {} chars", system_prompt.len());
-    println!("User message: {} chars", user_message.len());
-
-    // Call LLM
-    println!("\n--- LLM CALL ---");
-    let provider = savant_trading::agent::provider::create_provider(&config.ai);
-    let messages = vec![savant_trading::agent::provider::Message {
-        role: "user".to_string(),
-        content: user_message,
-    }];
-
-    match provider.chat(&system_prompt, &messages).await {
-        Ok(response) => {
-            println!("\n--- LLM RESPONSE ---");
-            println!("{}", response);
-
-            // Parse decision
-            let current_price = candles.last().map(|c| c.close).unwrap_or(0.0);
-            match savant_trading::agent::decision_parser::parse_decision(
-                &response,
-                current_price,
-                config.ai.price_tolerance_pct,
-            ) {
-                Ok(decision) => {
-                    println!("\n--- PARSED DECISION ---");
-                    println!("Action: {:?}", decision.action);
-                    println!("Pair: {}", decision.pair);
-                    println!("Side: {:?}", decision.side);
-                    println!("Entry: {:.2}", decision.entry_price);
-                    println!("Stop Loss: {:.2}", decision.stop_loss);
-                    println!(
-                        "TP1: {:.2} | TP2: {:.2} | TP3: {:.2}",
-                        decision.take_profit_1, decision.take_profit_2, decision.take_profit_3
-                    );
-                    println!("Position Size: {:.1}%", decision.position_size_pct);
-                    println!("Confidence: {:.0}%", decision.confidence * 100.0);
-                    println!("R:R: {:.2}", decision.risk_reward);
-                    println!("Reasoning: {}", decision.reasoning);
-                    println!("Knowledge Sources: {:?}", decision.knowledge_sources);
-                }
-                Err(e) => {
-                    println!("\n--- PARSE ERROR ---");
-                    println!("Failed to parse LLM response: {}", e);
-                }
-            }
-        }
-        Err(e) => {
-            println!("\n--- LLM ERROR ---");
-            println!("Failed to call LLM: {}", e);
-        }
-    }
-
-    println!("\n=== DRY RUN COMPLETE ===");
-    Ok(())
-}
-
-/// FID-084: Live Situation Sandbox — test any model against current market data.
-/// Fetches live candles, insight, and positions — same prompt pipeline as live engine.
-/// Read-only: no state mutation, no API server, can run alongside active engine.
-pub async fn run_live_test(
-    config: AppConfig,
-    model_override: Option<String>,
-    pairs_override: Vec<String>,
-    show_prompt: bool,
-) -> anyhow::Result<()> {
-    let candle_api = CandleClient::new(&config.exchange.rest_url);
-    let pairs = if pairs_override.is_empty() {
-        config.trading.pairs.clone()
-    } else {
-        pairs_override
-    };
-
-    // Apply model override if specified
-    let mut config = config;
-    if let Some(ref model) = model_override {
-        config.ai.model = model.clone();
-    }
-
-    let est = savant_trading::core::console::est_now();
-    println!("\n=== LIVE SITUATION TEST ===");
-    println!("Model: {}", config.ai.model);
-    println!("Time: {}", est);
-    println!("Pairs: {}", pairs.join(", "));
-
-    // Load positions from dex_state.json (read-only)
-    let positions_path = std::path::Path::new("data/dex_state.json");
-    let positions: Vec<savant_trading::core::types::Position> = if positions_path.exists() {
-        let data = std::fs::read_to_string(positions_path).unwrap_or_default();
-        serde_json::from_str::<serde_json::Value>(&data)
-            .ok()
-            .and_then(|v| v.get("positions").cloned())
-            .and_then(|p| serde_json::from_value(p).ok())
-            .unwrap_or_default()
-    } else {
-        vec![]
-    };
-
-    let account_balance: f64 = if positions_path.exists() {
-        let data = std::fs::read_to_string(positions_path).unwrap_or_default();
-        serde_json::from_str::<serde_json::Value>(&data)
-            .ok()
-            .and_then(|v| v.get("balance").and_then(|b| b.as_f64()))
-            .unwrap_or(0.0)
-    } else {
-        0.0
-    };
-
-    println!("Positions: {} open", positions.len());
-    for pos in &positions {
-        println!("  {} {} @ {:.2} | SL: {:.2} | Qty: {:.6}", pos.pair, pos.side, pos.entry_price, pos.stop_loss, pos.quantity);
-    }
-    println!("Balance: ${:.2}", account_balance);
-
-    // Fetch candles for all pairs in parallel
-    println!("\n--- FETCHING LIVE DATA ---");
-    let interval = parse_timeframe_minutes(&config.trading.timeframe);
-
-    let candle_futures: Vec<_> = pairs
-        .iter()
-        .map(|pair| {
-            let api = candle_api.clone();
-            let p = pair.clone();
-            async move {
-                let mut candles = api.get_ohlc(&p, interval, None).await.unwrap_or_default();
-                if candles.len() > 1 { candles.pop(); }
-                (p, candles)
-            }
-        })
-        .collect();
-
-    let candle_results = futures_util::future::join_all(candle_futures).await;
-    let mut market_stores: std::collections::HashMap<String, Vec<Candle>> = std::collections::HashMap::new();
-    for (pair, candles) in candle_results {
-        if !candles.is_empty() {
-            println!("  {}: {} candles", pair, candles.len());
-            market_stores.insert(pair, candles);
-        }
-    }
-
-    // Fetch insight
-    let insight_config = InsightConfig {
-        funding_rate_enabled: config.insight.funding_rate_enabled,
-        liquidation_enabled: config.insight.liquidation_enabled,
-        fear_greed_enabled: config.insight.fear_greed_enabled,
-        btc_dominance_enabled: config.insight.btc_dominance_enabled,
-        exchange_flows_enabled: config.insight.exchange_flows_enabled,
-        news_sentiment_enabled: config.insight.news_sentiment_enabled,
-        rss_enabled: config.insight.rss_enabled,
-        rss_max_items: config.insight.rss_max_items,
-        onchain_enabled: config.insight.onchain_enabled,
-    };
-    let mut insight = InsightAggregator::new(insight_config);
-
-    // Build knowledge base + prompt composer (same as live engine)
-    let knowledge_base = load_knowledge_base();
-    let composer = PromptComposer::new(
-        &prompts::default_base_identity(),
-        include_str!("agent/prompts/risk_constraints.md"),
-        &format!(
-            "{}\n\n---\n\n{}",
-            include_str!("agent/prompts/strategy_knowledge.md"),
-            include_str!("agent/prompts/echo_rules.md")
-        ),
-        include_str!("agent/prompts/output_format.md"),
-    );
-
-    let portfolio = PortfolioManager::new(
-        config.trading.starting_balance,
-        config.trading.fee_rate,
-        config.trading.slippage_pct,
-    );
-
-    // Evaluate each pair — same prompt pipeline as live engine
-    let mut all_decisions = Vec::new();
-    let provider = savant_trading::agent::provider::create_provider(&config.ai);
-
-    for pair in &pairs {
-        let candles = match market_stores.get(pair) {
-            Some(c) if !c.is_empty() => c,
-            _ => {
-                println!("\n  {}: No candle data — skipping", pair);
-                continue;
-            }
-        };
-
-        let indicators = savant_trading::data::indicators::IndicatorEngine::calculate_all(
-            candles,
-            config.strategy.regime.adx_period,
-        );
-
-        let regime_detector = RegimeDetector::new(
-            config.strategy.regime.adx_period,
-            config.strategy.regime.adx_trending_threshold,
-            config.strategy.regime.adx_ranging_threshold,
-            config.strategy.regime.atr_volatility_multiplier,
-        );
-        let regime = regime_detector.detect(&indicators, candles);
-
-        let profile = savant_trading::data::indicators::IndicatorEngine::volume_profile(
-            candles,
-            config.strategy.mean_reversion.profile_periods.min(50),
-        );
-
-        let market_ctx = insight.refresh(pair).await.clone();
-
-        // Check if this pair has an open position
-        let pos_ref: Vec<savant_trading::core::types::Position> = positions
-            .iter()
-            .filter(|p| p.pair == *pair)
-            .cloned()
-            .collect();
-
-        let ctx = FullContext {
-            candles,
-            indicators: &indicators,
-            regime,
-            volume_profile: Some(&profile),
-            market_context: &market_ctx,
-            positions: &pos_ref,
-            account: portfolio.account(),
-            pair,
-            recent_trades: None,
-            order_book_imbalance: None,
-            session: savant_trading::core::session::current_session(),
-            memory_context: None,
-            higher_tf_candles: vec![],
-            context_tags: savant_trading::agent::context_builder::generate_context_tags(&indicators),
-            live_price: None,
-            decision_log_context: None,
-            dex_price: None,
-        };
-
-        let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
-            &ctx,
-            &knowledge_base,
-            &composer,
-            3000,
-        );
-
-        if show_prompt {
-            println!("\n  === PROMPT FOR {} ===", pair);
-            println!("  System: {} chars", system_prompt.len());
-            println!("  User: {}", user_message);
-        }
-
-        // Call LLM
-        let start = std::time::Instant::now();
-        let messages = vec![savant_trading::agent::provider::Message {
-            role: "user".to_string(),
-            content: user_message,
-        }];
-
-        match provider.chat(&system_prompt, &messages).await {
-            Ok(response) => {
-                let elapsed = start.elapsed();
-                println!("\n  === {} ({:.1}s) ===", pair, elapsed.as_secs_f64());
-                println!("  Raw: {}", response);
-
-                let current_price = candles.last().map(|c| c.close).unwrap_or(0.0);
-                match savant_trading::agent::decision_parser::parse_decision(
-                    &response,
-                    current_price,
-                    config.ai.price_tolerance_pct,
-                ) {
-                    Ok(decision) => {
-                        println!("  Action: {:?}", decision.action);
-                        println!("  Side: {:?}", decision.side);
-                        println!("  Confidence: {:.0}%", decision.confidence * 100.0);
-                        println!("  R:R: {:.2}", decision.risk_reward);
-                        println!("  Entry: {:.2} | Stop: {:.2}", decision.entry_price, decision.stop_loss);
-                        println!("  TP1: {:.2} | TP2: {:.2} | TP3: {:.2}", decision.take_profit_1, decision.take_profit_2, decision.take_profit_3);
-                        println!("  Reasoning: {}", decision.reasoning);
-                        all_decisions.push(decision);
-                    }
-                    Err(e) => {
-                        println!("  PARSE ERROR: {}", e);
-                    }
-                }
-            }
-            Err(e) => {
-                println!("\n  === {} ===", pair);
-                println!("  LLM ERROR: {}", e);
-            }
-        }
-    }
-
-    // Summary
-    println!("\n=== SUMMARY ===");
-    println!("Model: {}", config.ai.model);
-    println!("Pairs evaluated: {}", pairs.len());
-    println!("Decisions: {}", all_decisions.len());
-    for d in &all_decisions {
-        println!("  {} {:?} {:.0}% R:{:.2} — {}", d.pair, d.action, d.confidence * 100.0, d.risk_reward, &d.reasoning[..d.reasoning.len().min(80)]);
-    }
-
-    println!("\n=== LIVE TEST COMPLETE ===");
-    Ok(())
-}
-
-async fn fetch_and_cache(candle_api: &CandleClient, cache_path: &str) -> Vec<Candle> {
-    match candle_api.get_ohlc("BTC/USD", 5, None).await {
-        Ok(mut c) => {
-            if c.len() > 1 {
-                c.pop();
-            }
-            println!("Fetched {} real candles", c.len());
-            if let Ok(json) = serde_json::to_string(&c) {
-                let _ = std::fs::create_dir_all("data");
-                let _ = std::fs::write(cache_path, &json);
-                println!("Cached to {}", cache_path);
-            }
-            c
-        }
-        Err(e) => {
-            warn!("Candle fetch failed ({}), using synthetic fallback", e);
-            let gen_config = savant_trading::sandbox::generator::GeneratorConfig {
-                num_candles: 721,
-                interval_minutes: 5,
-                ..Default::default()
-            };
-            savant_trading::sandbox::generator::generate_candles(&gen_config)
-        }
-    }
-}
-
-/// Backup SQLite databases to rolling timestamped files.
-///
-/// Keeps the last `max_backups` files in `data/backups/`. Oldest files are
-/// deleted when the limit is exceeded.
-pub fn backup_databases(max_backups: u32) {
-    let backup_dir = std::path::Path::new("data/backups");
-    if let Err(e) = std::fs::create_dir_all(backup_dir) {
-        warn!("Failed to create backup directory: {}", e);
-        return;
-    }
-
-    let timestamp = chrono::Utc::now().format("%Y%m%d_%H%M%S");
-
-    // Backup memory.db
-    let src = std::path::Path::new("data/memory.db");
-    if src.exists() {
-        let dst = backup_dir.join(format!("memory_{}.db", timestamp));
-        if let Err(e) = std::fs::copy(src, &dst) {
-            warn!("Failed to backup memory.db: {}", e);
-        } else {
-            info!("Backed up memory.db → {}", dst.display());
-        }
-    }
-
-    // Backup test_memory.db
-    let src = std::path::Path::new("data/test_memory.db");
-    if src.exists() {
-        let dst = backup_dir.join(format!("test_memory_{}.db", timestamp));
-        if let Err(e) = std::fs::copy(src, &dst) {
-            warn!("Failed to backup test_memory.db: {}", e);
-        } else {
-            info!("Backed up test_memory.db → {}", dst.display());
-        }
-    }
-
-    // Rotate old backups
-    rotate_backups(backup_dir, "memory_", max_backups);
-    rotate_backups(backup_dir, "test_memory_", max_backups);
-}
-
-fn rotate_backups(dir: &std::path::Path, prefix: &str, max: u32) {
-    let mut files: Vec<_> = match std::fs::read_dir(dir) {
-        Ok(rd) => rd
-            .filter_map(|e| e.ok())
-            .filter(|e| e.file_name().to_string_lossy().starts_with(prefix))
-            .collect(),
-        Err(_) => return,
-    };
-
-    files.sort_by_key(|e| e.file_name());
-
-    while files.len() > max as usize {
-        if let Some(oldest) = files.first() {
-            let _ = std::fs::remove_file(oldest.path());
-            info!("Rotated old backup: {}", oldest.path().display());
-        }
-        files.remove(0);
-    }
-}
-
-/// Determine if an expected action string indicates a trade (Buy/Sell) vs Hold.
-///
-/// Scenarios use varied formats: "Buy (High Conviction)", "Hold / Take Profit",
-/// "Sell / Short (High Conviction)", "Hold / No Trade", etc.
-fn expected_is_trade(expected: &str) -> bool {
-    let lower = expected.to_lowercase();
-    // Hold indicators take precedence — "Hold / Take Profit" is still a hold
-    if lower.contains("hold") || lower.contains("no trade") {
-        return false;
-    }
-    lower.contains("buy")
-        || lower.contains("sell")
-        || lower.contains("short")
-        || lower.contains("add")
-}
-
-/// Training run result for convergence tracking.
-struct TrainingRunResult {
-    brier_score: f64,
-    action_count: u32,
-    #[allow(dead_code)]
-    hold_count: u32,
-    #[allow(dead_code)]
-    error_count: u32,
-    #[allow(dead_code)]
-    total: u32,
-    lessons_generated: u32,
-    metrics: Metrics,
-    #[allow(dead_code)]
-    starting_balance: f64,
-}
-
-/// Run a single training batch. Called by `run_training` in a loop.
-async fn run_training_batch(
-    config: &AppConfig,
-    scenarios: &[savant_trading::sandbox::scenarios::Scenario],
-    test_memory: &savant_trading::memory::episodic::EpisodicMemory,
-    model_override: Option<&str>,
-    managed_keys: bool,
-) -> anyhow::Result<TrainingRunResult> {
-    use savant_trading::sandbox::generator;
-
-    // Managed keys: create a temporary API key with spending limit
-    let _managed_key_hash: Option<String> = None;
-    let api_keys: Vec<String> = if managed_keys && config.ai.provider == "openrouter" {
-        let mgmt_key =
-            std::env::var(&config.ai.openrouter.management.management_key_env).unwrap_or_default();
-        if mgmt_key.is_empty() {
-            warn!("--managed-keys set but OPENROUTER_MANAGEMENT_KEY not found, falling back to env keys");
-            std::env::var("SANDBOX_API_KEYS")
-                .unwrap_or_else(|_| std::env::var(&config.ai.api_key_env).unwrap_or_default())
-                .split(',')
-                .map(|s| s.trim().to_string())
-                .filter(|s| !s.is_empty())
-                .collect()
-        } else {
-            let mgmt =
-                savant_trading::agent::openrouter_management::OpenRouterManagementClient::new(
-                    mgmt_key,
-                );
-            let model_name = model_override.unwrap_or(&config.ai.model);
-            let key_name = format!("savant-{}", chrono::Utc::now().format("%m%d-%H%M"));
-            match mgmt
-                .create_key(
-                    savant_trading::agent::openrouter_management::CreateKeyRequest {
-                        name: key_name.clone(),
-                        limit: Some(1.0), // $1 limit per test/training run
-                        ..Default::default()
-                    },
-                )
-                .await
-            {
-                Ok(created) => {
-                    info!(
-                        "Managed key created: {} (limit: $1.00, model: {})",
-                        key_name, model_name
-                    );
-                    // Store hash for cleanup
-                    // We can't use _managed_key_hash here because it's immutable
-                    // Store in a local var and handle cleanup after the function
-                    vec![created.key]
-                }
-                Err(e) => {
-                    warn!(
-                        "Failed to create managed key ({}), falling back to env keys",
-                        e
-                    );
-                    std::env::var("SANDBOX_API_KEYS")
-                        .unwrap_or_else(|_| {
-                            std::env::var(&config.ai.api_key_env).unwrap_or_default()
-                        })
-                        .split(',')
-                        .map(|s| s.trim().to_string())
-                        .filter(|s| !s.is_empty())
-                        .collect()
-                }
-            }
-        }
-    } else {
-        std::env::var("SANDBOX_API_KEYS")
-            .unwrap_or_else(|_| std::env::var(&config.ai.api_key_env).unwrap_or_default())
-            .split(',')
-            .map(|s| s.trim().to_string())
-            .filter(|s| !s.is_empty())
-            .collect()
-    };
-    if api_keys.is_empty() {
-        anyhow::bail!(
-            "No API keys. Set SANDBOX_API_KEYS or {} in .env",
-            config.ai.api_key_env
-        );
-    }
-
-    let knowledge_base = load_knowledge_base();
-    let composer = savant_trading::agent::prompts::PromptComposer::new(
-        &savant_trading::agent::prompts::default_base_identity(),
-        include_str!("agent/prompts/risk_constraints.md"),
-        &format!(
-            "{}\n\n---\n\n{}",
-            include_str!("agent/prompts/strategy_knowledge.md"),
-            include_str!("agent/prompts/echo_rules.md")
-        ),
-        include_str!("agent/prompts/output_format.md"),
-    );
-    let regime_detector = RegimeDetector::new(
-        config.strategy.regime.adx_period,
-        config.strategy.regime.adx_trending_threshold,
-        config.strategy.regime.adx_ranging_threshold,
-        config.strategy.regime.atr_volatility_multiplier,
-    );
-
-    let cache_path = "data/sandbox_candles.json";
-    let candle_api = CandleClient::new(&config.exchange.rest_url);
-    let real_candles = if std::path::Path::new(cache_path).exists() {
-        match std::fs::read_to_string(cache_path) {
-            Ok(json) => serde_json::from_str::<Vec<Candle>>(&json).unwrap_or_default(),
-            Err(_) => fetch_and_cache(&candle_api, cache_path).await,
-        }
-    } else {
-        fetch_and_cache(&candle_api, cache_path).await
-    };
-    if real_candles.is_empty() {
-        anyhow::bail!("No candle data available");
-    }
-
-    // Query existing memory context for 6th prompt layer
-    let total_trades = test_memory.total_trades().await.unwrap_or(0);
-    let min_trades = config.training.memory_context_min_trades;
-    let mut memory_ctx_str = if total_trades >= min_trades {
-        let ctx = savant_trading::memory::context::query_memory_context(
-            test_memory,
-            "BTC/USD",
-            "Trending",
-            "TestSession",
-        )
-        .await;
-        let formatted = savant_trading::memory::context::format_memory_prompt(&ctx);
-        if formatted.is_empty() {
-            None
-        } else {
-            Some(formatted)
-        }
-    } else {
-        info!(
-            "Memory: inactive ({} episodes, need {})",
-            total_trades, min_trades
-        );
-        None
-    };
-
-    // Append semantic patterns to memory context
-    if let Ok(patterns) =
-        savant_trading::memory::semantic::query_active_patterns(test_memory.pool(), 10).await
-    {
-        let patterns_str = savant_trading::memory::semantic::format_patterns_for_prompt(&patterns);
-        if !patterns_str.is_empty() {
-            memory_ctx_str = Some(match memory_ctx_str {
-                Some(existing) => format!("{}\n{}", existing, patterns_str),
-                None => patterns_str,
-            });
-        }
-    }
-
-    // Append anti-patterns to memory context
-    if let Ok(anti_patterns) =
-        savant_trading::memory::anti_pattern::detect_anti_patterns(test_memory.pool()).await
-    {
-        let ap_str =
-            savant_trading::memory::anti_pattern::format_anti_patterns_for_prompt(&anti_patterns);
-        if !ap_str.is_empty() {
-            memory_ctx_str = Some(match memory_ctx_str {
-                Some(existing) => format!("{}\n{}", existing, ap_str),
-                None => ap_str,
-            });
-        }
-    }
-
-    // PHASE 1: Build prompts
-    struct Prepared {
-        scenario_id: String,
-        scenario_name: String,
-        category: String,
-        expected_action: String,
-        system_prompt: String,
-        user_message: String,
-        current_price: f64,
-        regime: String,
-        indicators_snapshot: (Option<f64>, Option<f64>, Option<f64>),
-    }
-
-    let mut prepared: Vec<Prepared> = Vec::with_capacity(scenarios.len());
-    for scenario in scenarios {
-        let candles = match &scenario.candles_override {
-            Some(override_candles) => override_candles.clone(),
-            None => {
-                let mut c = real_candles.clone();
-                generator::apply_scenario(&mut c, &scenario.params);
-                c
-            }
-        };
-
-        let indicators = savant_trading::data::indicators::IndicatorEngine::calculate_all(
-            &candles,
-            config.strategy.regime.adx_period,
-        );
-        let regime = regime_detector.detect(&indicators, &candles);
-        let profile = savant_trading::data::indicators::IndicatorEngine::volume_profile(
-            &candles,
-            config.strategy.mean_reversion.profile_periods.min(50),
-        );
-
-        let mock = &scenario.mock_data;
-        let funding_annualized = mock.funding_rate * 365.0 * 3.0;
-        let market_ctx = savant_trading::insight::aggregator::MarketContext {
-            sentiment: savant_trading::insight::sentiment::SentimentData {
-                fear_greed_index: Some(mock.fear_greed_index as u32),
-                fear_greed_label: Some(mock.fear_greed_label.clone()),
-                btc_dominance: Some(mock.btc_dominance),
-                ..Default::default()
-            },
-            funding: savant_trading::insight::funding_rates::FundingData {
-                funding_rate: Some(mock.funding_rate),
-                funding_rate_annualized: Some(funding_annualized),
-                open_interest: Some(mock.open_interest),
-                ..Default::default()
-            },
-            onchain: savant_trading::insight::onchain::OnchainData {
-                mvrv: Some(mock.mvrv),
-                sopr: Some(mock.sopr),
-                nvt_signal: Some(mock.nvt_signal),
-                ..Default::default()
-            },
-            flows: savant_trading::insight::flows::FlowData {
-                block_height: Some(mock.block_height),
-                ..Default::default()
-            },
-            rss_items: mock
-                .news_headlines
-                .iter()
-                .map(|h| savant_trading::insight::rss::RssItem {
-                    title: h.clone(),
-                    link: String::new(),
-                    pub_date: None,
-                    description: h.clone(),
-                    categories: vec!["crypto".into()],
-                    source: "action-test".into(),
-                    relevance_score: 0.9,
-                })
-                .collect(),
-            ..Default::default()
-        };
-
-        let mut htf_candles: Vec<Candle> = Vec::new();
-        for chunk in candles.chunks(12) {
-            if chunk.is_empty() {
-                continue;
-            }
-            htf_candles.push(Candle {
-                timestamp: chunk[0].timestamp,
-                open: chunk[0].open,
-                high: chunk
-                    .iter()
-                    .map(|c| c.high)
-                    .fold(f64::NEG_INFINITY, f64::max),
-                low: chunk.iter().map(|c| c.low).fold(f64::INFINITY, f64::min),
-                close: chunk.last().map(|c| c.close).unwrap_or(0.0),
-                volume: chunk.iter().map(|c| c.volume).sum(),
-                pair: "BTC/USD".into(),
-            });
-        }
-
-        let session = if let Some(ref s) = mock.session_override {
-            match s.as_str() {
-                "Asian" => savant_trading::core::session::Session::Asian,
-                "European" => savant_trading::core::session::Session::European,
-                "US" => savant_trading::core::session::Session::UsEuOverlap,
-                "Late US" => savant_trading::core::session::Session::LateUs,
-                _ => savant_trading::core::session::current_session(),
-            }
-        } else {
-            savant_trading::core::session::current_session()
-        };
-
-        let portfolio = PortfolioManager::new(
-            config.trading.starting_balance,
-            config.trading.fee_rate,
-            config.trading.slippage_pct,
-        );
-        let ctx = FullContext {
-            candles: &candles,
-            indicators: &indicators,
-            regime,
-            volume_profile: Some(&profile),
-            market_context: &market_ctx,
-            positions: &[],
-            account: portfolio.account(),
-            pair: "BTC/USD",
-            recent_trades: None,
-            order_book_imbalance: Some(0.1),
-            session,
-            memory_context: memory_ctx_str.clone(),
-            higher_tf_candles: vec![("1h".into(), htf_candles)],
-            context_tags: savant_trading::agent::context_builder::generate_context_tags(
-                &indicators,
-            ),
-            live_price: None,
-            decision_log_context: None,
-            dex_price: None,
-        };
-
-        let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
-            &ctx,
-            &knowledge_base,
-            &composer,
-            config.ai.knowledge_token_budget,
-        );
-
-        prepared.push(Prepared {
-            scenario_id: scenario.id.clone(),
-            scenario_name: scenario.name.clone(),
-            category: scenario.category.clone(),
-            expected_action: scenario.expected_action.clone(),
-            system_prompt,
-            user_message,
-            current_price: candles.last().map(|c| c.close).unwrap_or(0.0),
-            regime: format!("{}", regime),
-            indicators_snapshot: (indicators.atr, indicators.adx, indicators.rsi),
-        });
-    }
-
-    // PHASE 2: LLM calls via streaming — optimized for throughput
-    let semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(20));
-    struct ScenarioResponse {
-        scenario_id: String,
-        scenario_name: String,
-        category: String,
-        expected_action: String,
-        regime: String,
-        indicators_snapshot: (Option<f64>, Option<f64>, Option<f64>),
-        response: Result<String, savant_trading::agent::provider::LlmError>,
-        current_price: f64,
-        latency_ms: u64,
-    }
-
-    let mut join_set = tokio::task::JoinSet::new();
-    for (idx, ps) in prepared.into_iter().enumerate() {
-        let key = api_keys[idx % api_keys.len()].clone();
-        let endpoint = config.ai.endpoint.clone();
-        let model = model_override
-            .map(|m| m.to_string())
-            .unwrap_or_else(|| config.ai.model.clone());
-        let sys = ps.system_prompt;
-        let usr = ps.user_message;
-        let sem = semaphore.clone();
-        join_set.spawn(async move {
-            let Ok(_permit) = sem.acquire().await else {
-                tracing::warn!("Semaphore closed, skipping scenario");
-                return ScenarioResponse {
-                    scenario_id: ps.scenario_id,
-                    scenario_name: ps.scenario_name,
-                    category: ps.category,
-                    expected_action: ps.expected_action,
-                    regime: ps.regime,
-                    indicators_snapshot: ps.indicators_snapshot,
-                    response: Err(savant_trading::agent::provider::LlmError::InvalidResponse(
-                        "Semaphore closed".into(),
-                    )),
-                    current_price: ps.current_price,
-                    latency_ms: 0,
-                };
-            };
-            let provider = savant_trading::agent::provider::LlmProvider::new(
-                savant_trading::agent::provider::LlmConfig {
-                    endpoint,
-                    model,
-                    api_key: key,
-                    max_tokens: 131072,
-                    temperature: 0.6,
-                    top_p: 0.95,
-                    timeout_secs: 300,
-                    extra_headers: vec![],
-                },
-            );
-            let messages = vec![savant_trading::agent::provider::Message {
-                role: "user".to_string(),
-                content: usr,
-            }];
-            let start = std::time::Instant::now();
-            let response = provider.chat(&sys, &messages).await;
-            ScenarioResponse {
-                scenario_id: ps.scenario_id,
-                scenario_name: ps.scenario_name,
-                category: ps.category,
-                expected_action: ps.expected_action,
-                regime: ps.regime,
-                indicators_snapshot: ps.indicators_snapshot,
-                response,
-                current_price: ps.current_price,
-                latency_ms: start.elapsed().as_millis() as u64,
-            }
-        });
-    }
-
-    let mut all_responses: Vec<ScenarioResponse> = Vec::new();
-    while let Some(result) = join_set.join_next().await {
-        if let Ok(sr) = result {
-            let status = match &sr.response {
-                Ok(_) => "OK".to_string(),
-                Err(e) => format!("ERR: {}", e),
-            };
-            println!(
-                "  [{}/{}] {} ({}) — {} — {}ms",
-                all_responses.len() + 1,
-                scenarios.len(),
-                sr.scenario_name,
-                sr.scenario_id,
-                status,
-                sr.latency_ms,
-            );
-            all_responses.push(sr);
-        }
-    }
-
-    // PHASE 3: Parse, capture episodes, collect stats
-    let mut brier_predictions: Vec<(f64, bool)> = Vec::new();
-    let mut category_edge: std::collections::HashMap<String, (u32, u32)> =
-        std::collections::HashMap::new();
-    let mut action_count = 0u32;
-    let mut hold_count = 0u32;
-    let mut error_count = 0u32;
-    let mut high_conviction_failures: Vec<(String, String, f64, String)> = Vec::new();
-    let mut trades: Vec<TradeRecord> = Vec::new();
-
-    for sr in &all_responses {
-        match &sr.response {
-            Ok(text) => {
-                match savant_trading::agent::decision_parser::parse_decision(
-                    text,
-                    sr.current_price,
-                    config.ai.price_tolerance_pct,
-                ) {
-                    Ok(decision) => {
-                        let agent_traded = decision.action
-                            != savant_trading::agent::decision_parser::TradeAction::Pass;
-                        let expected_traded = expected_is_trade(&sr.expected_action);
-                        let is_correct = agent_traded == expected_traded;
-                        let is_hold = !agent_traded;
-
-                        if is_hold {
-                            hold_count += 1;
-                        } else {
-                            action_count += 1;
-                        }
-
-                        // Track Brier predictions
-                        brier_predictions.push((decision.confidence, is_correct));
-
-                        // Track category edge
-                        let edge = category_edge.entry(sr.category.clone()).or_insert((0, 0));
-                        edge.1 += 1; // total
-                        if is_correct {
-                            edge.0 += 1;
-                        } // wins
-
-                        // Track high-conviction failures for auto-lessons
-                        if !is_correct && decision.confidence > 0.7 {
-                            high_conviction_failures.push((
-                                sr.scenario_id.clone(),
-                                sr.category.clone(),
-                                decision.confidence,
-                                format!(
-                                    "Expected {} but agent did {:?} {} | Reasoning: {}",
-                                    sr.expected_action,
-                                    decision.action,
-                                    decision.side,
-                                    &decision.reasoning.chars().take(200).collect::<String>()
-                                ),
-                            ));
-                        }
-
-                        // Capture episode to test memory DB
-                        let (atr, adx, rsi) = sr.indicators_snapshot;
-                        let snapshot = savant_trading::memory::episodic::MinimumViableSnapshot {
-                            pair: "BTC/USD".to_string(),
-                            action: format!("{:?}", decision.action),
-                            side: Some(format!("{}", decision.side)),
-                            entry_price: decision.entry_price,
-                            stop_loss: decision.stop_loss,
-                            take_profit_1: decision.take_profit_1,
-                            confidence: decision.confidence,
-                            reasoning: decision.reasoning.clone(),
-                            planned_rr: decision.risk_reward,
-                            regime: sr.regime.clone(),
-                            session: "TestSession".to_string(),
-                            funding_rate: None,
-                            funding_rate_annualized: None,
-                            fear_greed_index: None,
-                            fear_greed_label: None,
-                            order_book_imbalance: None,
-                            mvrv: None,
-                            sopr: None,
-                            nvt_signal: None,
-                            atr,
-                            adx,
-                            rsi,
-                            condition_tags: vec![sr.category.clone()],
-                            knowledge_units_used: vec![],
-                            thesis_summary: decision.reasoning.chars().take(200).collect(),
-                            invalidation_reasoning: format!("Stop at {:.4}", decision.stop_loss),
-                            pnl: None,
-                            pnl_pct: None,
-                            is_win: Some(is_correct),
-                            achieved_rr: None,
-                            status: if agent_traded {
-                                "test_action".to_string()
-                            } else {
-                                "test_hold".to_string()
-                            },
-                        };
-                        if let Err(e) = test_memory.capture_episode(&snapshot).await {
-                            warn!("Episode capture failed: {}", e);
-                        }
-
-                        // Calculate dollar P&L for this trade
-                        let risk = 5.0f64; // $5 fixed risk (10% of $50 starting)
-                        let trade_pnl = if is_correct {
-                            if agent_traded {
-                                risk * decision.risk_reward
-                            } else {
-                                0.0
-                            }
-                        } else {
-                            if agent_traded {
-                                -risk
-                            } else {
-                                0.0
-                            }
-                        };
-
-                        trades.push(TradeRecord {
-                            id: sr.scenario_id.clone(),
-                            pair: "BTC/USD".into(),
-                            side: decision.side,
-                            entry_price: decision.entry_price,
-                            exit_price: decision.entry_price,
-                            quantity: 1.0,
-                            pnl: trade_pnl,
-                            pnl_pct: trade_pnl / 50.0 * 100.0,
-                            fees: 0.0,
-                            strategy_name: sr.category.clone(),
-                            opened_at: chrono::Utc::now(),
-                            closed_at: chrono::Utc::now(),
-                            notes: String::new(),
-                            on_chain_verified: false,
-                            tx_hash: None,
-                        });
-
-                        println!(
-                            "  {} | {} | {:?} {} @ {:.2} | Conf: {:.0}% | R:R {:.1} | P&L ${:+.2} | {}",
-                            sr.scenario_name,
-                            if is_hold { "HOLD " } else { "TRADE" },
-                            decision.action,
-                            decision.side,
-                            decision.entry_price,
-                            decision.confidence * 100.0,
-                            decision.risk_reward,
-                            trade_pnl,
-                            &decision.reasoning.chars().take(120).collect::<String>(),
-                        );
-                    }
-                    Err(e) => {
-                        error_count += 1;
-                        println!("  {} | PARSE_ERR: {}", sr.scenario_name, e);
-                    }
-                }
-            }
-            Err(e) => {
-                error_count += 1;
-                println!("  {} | LLM_ERR: {}", sr.scenario_name, e);
-            }
-        }
-    }
-
-    // Compute P&L metrics from collected trades
-    let metrics = if !trades.is_empty() {
-        PerformanceMetrics::calculate(&trades)
-    } else {
-        Metrics::default()
-    };
-
-    // PHASE 4: Auto-generate lessons from high-conviction failures
-    let lessons_count = high_conviction_failures.len() as u32;
-    for (scen_id, category, confidence, reasoning) in &high_conviction_failures {
-        let heuristic = format!(
-            "HIGH conviction failure (conf {:.0}%) in {} scenario {}: {}",
-            confidence * 100.0,
-            category,
-            scen_id,
-            reasoning,
-        );
-        // Store lesson using the test memory pool directly
-        let _ = sqlx::query(
-            "INSERT OR IGNORE INTO experience_replay_lessons (lesson_id, timestamp, original_episode_id, error_type, heuristic) VALUES (?, ?, ?, ?, ?)"
-        )
-        .bind(uuid::Uuid::new_v4().to_string())
-        .bind(chrono::Utc::now().to_rfc3339())
-        .bind(scen_id)
-        .bind("high_conviction_failure")
-        .bind(&heuristic)
-        .execute(test_memory.pool())
-        .await;
-
-        // Project lesson to vault
-        let lesson_vault_config = VaultConfig::default();
-        if lesson_vault_config.enabled {
-            let lesson_vault = VaultWriter::new(lesson_vault_config);
-            let _ = lesson_vault.project_lesson(scen_id, "high_conviction_failure", &heuristic);
-        }
-    }
-    if lessons_count > 0 {
-        info!(
-            "Auto-generated {} lessons from high-conviction failures",
-            lessons_count
-        );
-    }
-
-    // PHASE 5: Print reports
-    let total = all_responses.len() as f64;
-    println!("\n{}", "=".repeat(80));
-    println!("ACTION TEST RESULTS — {} scenarios", all_responses.len());
-    println!("{}", "=".repeat(80));
-    println!(
-        "SUMMARY: {} total | {} actions ({:.0}%) | {} holds ({:.0}%) | {} errors ({:.0}%)",
-        all_responses.len(),
-        action_count,
-        action_count as f64 / total * 100.0,
-        hold_count,
-        hold_count as f64 / total * 100.0,
-        error_count,
-        error_count as f64 / total * 100.0,
-    );
-
-    // Brier Score
-    if !brier_predictions.is_empty() {
-        let brier = savant_trading::memory::calibration::calculate_brier_score(&brier_predictions);
-        println!("\n--- CALIBRATION ---");
-        println!(
-            "Brier Score: {:.4} (lower = better, perfect = 0, random = 1)",
-            brier.total
-        );
-        println!(
-            "Reliability: {:.4} | Resolution: {:.4} | Uncertainty: {:.4}",
-            brier.reliability, brier.resolution, brier.uncertainty
-        );
-
-        // Confidence distribution
-        let mut buckets: Vec<(String, u32, u32, f64)> = vec![
-            ("0-25%".into(), 0, 0, 0.0),
-            ("25-50%".into(), 0, 0, 0.0),
-            ("50-75%".into(), 0, 0, 0.0),
-            ("75-100%".into(), 0, 0, 0.0),
-        ];
-        for (conf, is_win) in &brier_predictions {
-            let bucket = if *conf < 0.25 {
-                0
-            } else if *conf < 0.50 {
-                1
-            } else if *conf < 0.75 {
-                2
-            } else {
-                3
-            };
-            buckets[bucket].1 += 1;
-            if *is_win {
-                buckets[bucket].2 += 1;
-            }
-            buckets[bucket].3 += conf;
-        }
-        println!("\n--- CONFIDENCE DISTRIBUTION ---");
-        println!("  Range    | Count | Accuracy | Avg Conf");
-        println!("  ---------|-------|----------|----------");
-        for (label, count, wins, conf_sum) in &buckets {
-            if *count > 0 {
-                println!(
-                    "  {:8} | {:5} | {:6.0}%  | {:6.0}%",
-                    label,
-                    count,
-                    *wins as f64 / *count as f64 * 100.0,
-                    conf_sum / *count as f64 * 100.0
-                );
-            }
-        }
-    }
-
-    // Category edge
-    if !category_edge.is_empty() {
-        println!("\n--- CATEGORY EDGE ---");
-        for (cat, (wins, total)) in &category_edge {
-            println!(
-                "  {}: {}/{} ({:.0}%)",
-                cat,
-                wins,
-                total,
-                *wins as f64 / *total as f64 * 100.0
-            );
-        }
-    }
-
-    // Isotonic Regression calibration — fit on this batch's predictions
-    if brier_predictions.len() >= 10 {
-        let calibrator =
-            savant_trading::memory::calibration::IsotonicCalibrator::fit(&brier_predictions);
-        println!("\n--- ISOTONIC CALIBRATION ---");
-        // Show calibration at key confidence levels
-        for raw in &[0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90] {
-            let calibrated = calibrator.calibrate(*raw);
-            println!(
-                "  Raw {:.0}% → Calibrated {:.0}%",
-                raw * 100.0,
-                calibrated * 100.0
-            );
-        }
-    }
-
-    // Four-factor causal attribution for losses
-    let mut causal_attributions: Vec<savant_trading::sandbox::feedback::CausalAttribution> =
-        Vec::new();
-    for sr in &all_responses {
-        if let Ok(text) = &sr.response {
-            if let Ok(decision) = savant_trading::agent::decision_parser::parse_decision(
-                text,
-                sr.current_price,
-                config.ai.price_tolerance_pct,
-            ) {
-                let agent_traded =
-                    decision.action != savant_trading::agent::decision_parser::TradeAction::Pass;
-                let expected_trade = sr.expected_action != "Hold / No Trade";
-                let is_correct = agent_traded == expected_trade;
-
-                if agent_traded && !is_correct {
-                    // Classify the loss
-                    let factor = if decision.confidence < 0.40 {
-                        savant_trading::sandbox::feedback::LossFactor::Process
-                    } else if sr.category.contains("Edge Case")
-                        || sr.category.contains("Volatility")
-                    {
-                        savant_trading::sandbox::feedback::LossFactor::Market
-                    } else if decision.reasoning.to_lowercase().contains("fomo")
-                        || decision.reasoning.to_lowercase().contains("revenge")
-                    {
-                        savant_trading::sandbox::feedback::LossFactor::Trader
-                    } else {
-                        savant_trading::sandbox::feedback::LossFactor::Setup
-                    };
-                    causal_attributions.push(
-                        savant_trading::sandbox::feedback::CausalAttribution {
-                            episode_id: sr.scenario_id.clone(),
-                            factor,
-                            explanation: decision.reasoning.chars().take(100).collect::<String>(),
-                            timestamp: chrono::Utc::now().to_rfc3339(),
-                        },
-                    );
-                }
-            }
-        }
-    }
-    if !causal_attributions.is_empty() {
-        println!("\n--- CAUSAL ATTRIBUTION ---");
-        let mut factor_counts = std::collections::HashMap::new();
-        for attr in &causal_attributions {
-            *factor_counts
-                .entry(format!("{}", attr.factor))
-                .or_insert(0u32) += 1;
-        }
-        for (factor, count) in &factor_counts {
-            println!("  {}: {} losses", factor, count);
-        }
-    }
-
-    let avg_latency: u64 = if !all_responses.is_empty() {
-        all_responses.iter().map(|r| r.latency_ms).sum::<u64>() / all_responses.len() as u64
-    } else {
-        0
-    };
-    println!("\nAvg latency: {}ms", avg_latency);
-    println!("Episodes captured: {}", brier_predictions.len());
-    println!("Lessons auto-generated: {}", lessons_count);
-
-    // Wallet report (matches SandboxMetrics::report_card format)
-    let pnl_pct = if metrics.total_trades > 0 {
-        metrics.total_pnl / 50.0 * 100.0
-    } else {
-        0.0
-    };
-    println!("\n═══════════════════════════════════════════");
-    println!("         TRAINING WALLET REPORT");
-    println!("═══════════════════════════════════════════");
-    println!("Starting Balance:  ${:.2}", 50.0);
-    println!("Final Balance:     ${:.2}", 50.0 + metrics.total_pnl);
-    println!(
-        "Total P&L:         ${:+.2} ({:+.2}%)",
-        metrics.total_pnl, pnl_pct
-    );
-    println!("Trades:            {} taken", metrics.total_trades);
-    println!(
-        "Win Rate:          {:.1}% ({}W / {}L)",
-        metrics.win_rate * 100.0,
-        metrics.wins,
-        metrics.losses
-    );
-    println!("Profit Factor:     {:.2}", metrics.profit_factor);
-    println!("Max Drawdown:      -{:.2}%", metrics.max_drawdown * 100.0);
-    println!("═══════════════════════════════════════════\n");
-    println!("{}\n", "=".repeat(80));
-
-    let brier_score = if !brier_predictions.is_empty() {
-        savant_trading::memory::calibration::calculate_brier_score(&brier_predictions).total
-    } else {
-        0.5
-    };
-
-    // PHASE 6: Post-batch wiring — consolidate, detect anti-patterns, update utility
-    // Each phase is wrapped in its own error boundary so a failure in one
-    // doesn't prevent the others from running.
-
-    // 6a. Semantic consolidation
-    match savant_trading::memory::semantic::consolidate(test_memory).await {
-        Ok(n) => println!("Semantic consolidation: {} patterns inserted/updated", n),
-        Err(e) => warn!("Semantic consolidation failed (non-fatal): {}", e),
-    }
-
-    // 6b. Anti-pattern detection
-    let mut anti_pattern_narratives: Vec<String> = Vec::new();
-    match savant_trading::memory::anti_pattern::detect_anti_patterns(test_memory.pool()).await {
-        Ok(aps) => {
-            if !aps.is_empty() {
-                println!("Anti-patterns detected: {}", aps.len());
-                for ap in &aps {
-                    println!("  - {}", ap.narrative);
-                    anti_pattern_narratives.push(ap.narrative.clone());
-                }
-            }
-        }
-        Err(e) => warn!("Anti-pattern detection failed (non-fatal): {}", e),
-    }
-
-    // 6b2. Vault wiring — project decisions, risk events, sandbox report
-    let vault_config = VaultConfig::default();
-    if vault_config.enabled {
-        let vault = VaultWriter::new(vault_config.clone());
-
-        // Project each parsed decision to vault
-        for sr in &all_responses {
-            if let Ok(text) = &sr.response {
-                if let Ok(decision) = savant_trading::agent::decision_parser::parse_decision(
-                    text,
-                    sr.current_price,
-                    config.ai.price_tolerance_pct,
-                ) {
-                    let _ = vault.project_decision(
-                        &decision.pair,
-                        &format!("{:?}", decision.action),
-                        decision.confidence,
-                        &decision.reasoning,
-                    );
-                }
-            }
-        }
-
-        // Project anti-patterns as risk events
-        if !anti_pattern_narratives.is_empty() {
-            let details = anti_pattern_narratives.join("\n- ");
-            let _ = vault.project_risk_event(
-                "anti_pattern",
-                &format!("Training batch anti-patterns:\n- {}", details),
-            );
-        }
-
-        // Project sandbox report
-        let report = format!(
-            "# Training Batch Report\n\n\
-             **Scenarios:** {}\n\
-             **Actions:** {} ({:.0}%)\n\
-             **Holds:** {} ({:.0}%)\n\
-             **Errors:** {}\n\
-             **Brier Score:** {:.4}\n\
-             **Lessons Generated:** {}\n\
-             **Anti-Patterns:** {}\n\n\
-             **Timestamp:** {}\n",
-            all_responses.len(),
-            action_count,
-            action_count as f64 / total * 100.0,
-            hold_count,
-            hold_count as f64 / total * 100.0,
-            error_count,
-            savant_trading::memory::calibration::calculate_brier_score(&brier_predictions).total,
-            lessons_count,
-            anti_pattern_narratives.len(),
-            chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC"),
-        );
-        let _ = vault.project_sandbox(&report);
-
-        // Project training session to vault
-        let session_summary = format!(
-            "# Training Session — {}\n\n\
-             **Scenarios:** {}\n\
-             **Actions:** {} ({:.0}%)\n\
-             **Holds:** {} ({:.0}%)\n\
-             **Errors:** {}\n\
-             **Brier Score:** {:.4}\n\
-             **Lessons:** {}\n\
-             **Anti-Patterns:** {}\n\
-             **Episodes in DB:** {}\n",
-            chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC"),
-            all_responses.len(),
-            action_count,
-            action_count as f64 / total * 100.0,
-            hold_count,
-            hold_count as f64 / total * 100.0,
-            error_count,
-            brier_score,
-            lessons_count,
-            anti_pattern_narratives.len(),
-            test_memory.total_trades().await.unwrap_or(0),
-        );
-        let session_id = format!("session_{}", chrono::Utc::now().format("%Y%m%d_%H%M%S"));
-        let _ = vault.project_session(&session_id, &session_summary);
-    }
-
-    // 6c. Knowledge utility update — actually update and persist scores
-    let lr = config.training.utility_learning_rate;
-    let mut kb = load_knowledge_base();
-    let mut utility_updates = 0u32;
-    for sr in &all_responses {
-        if let Ok(text) = &sr.response {
-            if let Ok(decision) = savant_trading::agent::decision_parser::parse_decision(
-                text,
-                sr.current_price,
-                config.ai.price_tolerance_pct,
-            ) {
-                let expected_traded = expected_is_trade(&sr.expected_action);
-                let agent_traded =
-                    decision.action != savant_trading::agent::decision_parser::TradeAction::Pass;
-                let is_correct = agent_traded == expected_traded;
-
-                // Update utility scores for knowledge units that were in context
-                // In absence of per-episode knowledge tracking, apply global signal
-                let delta = if is_correct { lr } else { -lr * 0.5 };
-                for unit in kb.units_mut() {
-                    // Boost/suppress based on tag overlap with decision reasoning
-                    if !decision.reasoning.is_empty() {
-                        let reasoning_lower = decision.reasoning.to_lowercase();
-                        let matches = unit
-                            .tags
-                            .iter()
-                            .any(|t| reasoning_lower.contains(&t.to_lowercase()));
-                        if matches {
-                            unit.utility_score = (unit.utility_score + delta).clamp(0.1, 5.0);
-                            utility_updates += 1;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if utility_updates > 0 {
-        let scores_path = std::path::Path::new("data/knowledge_utility.json");
-        if let Err(e) = kb.save_utility_scores(scores_path) {
-            warn!("Failed to save utility scores: {}", e);
-        } else {
-            println!(
-                "Knowledge utility: {} units updated, saved to {:?}",
-                utility_updates, scores_path
-            );
-        }
-    }
-
-    Ok(TrainingRunResult {
-        brier_score,
-        action_count,
-        hold_count,
-        error_count,
-        total: all_responses.len() as u32,
-        lessons_generated: lessons_count,
-        metrics,
-        starting_balance: 50.0,
-    })
-}
-
-/// Training mode: run scenarios in a loop until Brier score converges.
-#[allow(clippy::too_many_arguments)]
-pub async fn run_training(
-    config: AppConfig,
-    category_filter: Option<String>,
-    action_only: bool,
-    count_filter: Option<usize>,
-    full: bool,
-    historical: bool,
-    model_override: Option<String>,
-    managed_keys: bool,
-) -> anyhow::Result<()> {
-    let _managed_keys = managed_keys;
-    let _test_memory =
-        savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/test_memory.db").await?;
-
-    let test_memory =
-        savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/test_memory.db").await?;
-
-    let max_runs = if full { 20 } else { 5 };
-    let scenarios_per_run = 60;
-    let convergence_threshold = 0.02;
-    let mut brier_history: Vec<f64> = Vec::new();
-    let mut consecutive_small_deltas = 0u32;
-
-    // Backup databases before training starts
-    backup_databases(config.training.max_backups);
-
-    // If historical mode, pre-fetch and cache real market data
-    let historical_dataset = if historical {
-        info!("Historical training mode — fetching real market data...");
-        let candle_api =
-            savant_trading::data::candle_client::CandleClient::new(&config.exchange.rest_url);
-        match savant_trading::data::historical::get_historical(&candle_api, "BTC/USD", 5, 30).await
-        {
-            Ok(dataset) => {
-                info!(
-                    "Historical data ready: {} candles ({} days)",
-                    dataset.candles.len(),
-                    30
-                );
-                Some(dataset)
-            }
-            Err(e) => {
-                warn!("Historical fetch failed: {}. Falling back to synthetic.", e);
-                None
-            }
-        }
-    } else {
-        None
-    };
-
-    for run in 1..=max_runs {
-        // Generate UNIQUE random scenarios every run — no memorization
-        let mut scenarios =
-            savant_trading::sandbox::scenarios::generate_random_scenarios(scenarios_per_run);
-
-        // Apply count_filter BEFORE historical extend, so it always runs regardless
-        // of whether historical data is available.
-        if let Some(n) = count_filter {
-            scenarios.truncate(n);
-        }
-
-        // If historical data is available, inject real market context into scenarios
-        if let Some(ref dataset) = historical_dataset {
-            let raw_hist =
-                savant_trading::data::historical::generate_scenarios_from_history(dataset, 100, 50);
-            if !raw_hist.is_empty() {
-                let hist_scenarios: Vec<savant_trading::sandbox::scenarios::Scenario> = raw_hist
-                    .iter()
-                    .map(savant_trading::sandbox::scenarios::historical_to_scenario)
-                    .collect();
-                info!(
-                    "Historical: {} real market scenarios mixed with {} synthetic",
-                    hist_scenarios.len(),
-                    scenarios.len()
-                );
-                scenarios.extend(hist_scenarios);
-            }
-        }
-
-        if let Some(ref cat) = category_filter {
-            scenarios.retain(|s| s.category.to_lowercase().contains(&cat.to_lowercase()));
-        }
-        if action_only {
-            scenarios.retain(|s| {
-                let a = s.expected_action.to_lowercase();
-                a.contains("buy") || a.contains("sell")
-            });
-        }
-        // Note: count_filter already applied before historical extend above.
-        // This line is intentionally removed to avoid truncating historical scenarios.
-
-        println!("\n{}", "=".repeat(80));
-        println!(
-            "TRAINING RUN {}/{} — {} random scenarios",
-            run,
-            max_runs,
-            scenarios.len(),
-        );
-        println!("{}\n", "=".repeat(80));
-
-        if scenarios.is_empty() {
-            warn!("No scenarios generated. Stopping.");
-            break;
-        }
-
-        let result = run_training_batch(
-            &config,
-            &scenarios,
-            &test_memory,
-            model_override.as_deref(),
-            managed_keys,
-        )
-        .await?;
-        brier_history.push(result.brier_score);
-
-        println!(
-            "Run {} Brier: {:.4} | Actions: {} | Holds: {} | Lessons: {} | P&L ${:+.2}",
-            run,
-            result.brier_score,
-            result.action_count,
-            result.hold_count,
-            result.lessons_generated,
-            result.metrics.total_pnl,
-        );
-
-        // Convergence check
-        if brier_history.len() >= 2 {
-            let delta = (brier_history[brier_history.len() - 2] - result.brier_score).abs();
-            if delta < convergence_threshold {
-                consecutive_small_deltas += 1;
-            } else {
-                consecutive_small_deltas = 0;
-            }
-            if consecutive_small_deltas >= 3 {
-                println!(
-                    "\n*** CONVERGED — Brier delta < {} for 3 consecutive runs ***",
-                    convergence_threshold
-                );
-                println!("Final Brier: {:.4}", result.brier_score);
-                break;
-            }
-        }
-    }
-
-    // Final report
-    println!("\n{}", "=".repeat(80));
-    println!("TRAINING COMPLETE — {} runs", brier_history.len());
-    println!(
-        "Brier history: {:?}",
-        brier_history
-            .iter()
-            .map(|b| format!("{:.4}", b))
-            .collect::<Vec<_>>()
-    );
-    let total_episodes = test_memory.total_trades().await.unwrap_or(0);
-    println!("Total episodes in test DB: {}", total_episodes);
-
-    // Save knowledge utility scores for persistence across runs
-    let kb = load_knowledge_base();
-    let scores_path = std::path::Path::new("data/knowledge_utility.json");
-    if let Err(e) = kb.save_utility_scores(scores_path) {
-        warn!("Failed to save utility scores: {}", e);
-    } else {
-        println!("Knowledge utility scores saved to {:?}", scores_path);
-    }
-
-    println!("{}\n", "=".repeat(80));
-
-    Ok(())
-}
-
-/// Action test: run scenarios through the real AI brain using the EXACT same
-/// `build_context()` path as the live engine. Captures episodes to test_memory.db.
-pub async fn run_action_test(
-    config: AppConfig,
-    category_filter: Option<String>,
-    action_only: bool,
-    count_filter: Option<usize>,
-    model_override: Option<String>,
-    managed_keys: bool,
-) -> anyhow::Result<()> {
-    use savant_trading::sandbox::scenarios::load_all_scenarios;
-
-    let test_memory =
-        savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/test_memory.db").await?;
-
-    let mut scenarios = load_all_scenarios();
-    if let Some(ref cat) = category_filter {
-        scenarios.retain(|s| s.category.to_lowercase().contains(&cat.to_lowercase()));
-    }
-    if action_only {
-        scenarios.retain(|s| {
-            let a = s.expected_action.to_lowercase();
-            a.contains("buy") || a.contains("sell") || a.contains("trade")
-        });
-    }
-    if let Some(n) = count_filter {
-        scenarios.truncate(n);
-    }
-
-    let result = run_training_batch(
-        &config,
-        &scenarios,
-        &test_memory,
-        model_override.as_deref(),
-        managed_keys,
-    )
-    .await?;
-
-    let total_episodes = test_memory.total_trades().await.unwrap_or(0);
-    println!("Total episodes in test DB: {}", total_episodes);
-    println!(
-        "Brier: {:.4} | Actions: {} | Holds: {} | Lessons: {} | P&L ${:+.2}",
-        result.brier_score,
-        result.action_count,
-        result.hold_count,
-        result.lessons_generated,
-        result.metrics.total_pnl,
-    );
-
-    Ok(())
-}
-
-/// Sandbox: run all 50 scenarios through the real AI brain and grade every decision.
-pub async fn run_sandbox(
-    config: AppConfig,
-    model_override: Option<String>,
-    _managed_keys: bool,
-) -> anyhow::Result<()> {
-    use savant_trading::sandbox::feedback::analyze_failures;
-    use savant_trading::sandbox::generator::{self};
-    use savant_trading::sandbox::grader;
-    use savant_trading::sandbox::harness::{SandboxSummary, ScenarioResult};
-    use savant_trading::sandbox::report::{format_report_markdown, generate_report_card};
-    use savant_trading::sandbox::scenarios::load_all_scenarios;
-
-    let scenarios = load_all_scenarios();
-    println!("Loaded {} scenarios", scenarios.len());
-
-    // Setup AI — pool of providers for key rotation from env
-    let api_keys: Vec<String> = std::env::var("SANDBOX_API_KEYS")
-        .unwrap_or_else(|_| std::env::var(&config.ai.api_key_env).unwrap_or_default())
-        .split(',')
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
-        .collect();
-    if api_keys.is_empty() {
-        warn!(
-            "No API keys found. Set SANDBOX_API_KEYS (comma-separated) or {} in .env",
-            config.ai.api_key_env
-        );
-    }
-    let resolved_model = model_override
-        .clone()
-        .unwrap_or_else(|| config.ai.model.clone());
-    let mut byok_headers: Vec<(String, String)> = Vec::new();
-    if resolved_model.starts_with("google/") {
-        if let Ok(google_key) = std::env::var("GOOGLE_API_KEY") {
-            if !google_key.is_empty() {
-                byok_headers.push(("X-Provider-Api-Key".to_string(), google_key));
-            }
-        }
-    }
-    let providers: Vec<savant_trading::agent::provider::LlmProvider> = api_keys
-        .iter()
-        .map(|key| {
-            savant_trading::agent::provider::LlmProvider::new(
-                savant_trading::agent::provider::LlmConfig {
-                    endpoint: config.ai.endpoint.clone(),
-                    model: resolved_model.clone(),
-                    api_key: key.clone(),
-                    max_tokens: config.ai.max_tokens,
-                    temperature: config.ai.temperature,
-                    top_p: config.ai.top_p,
-                    timeout_secs: config.ai.timeout_secs,
-                    extra_headers: byok_headers.clone(),
-                },
-            )
-        })
-        .collect();
-    println!("AI pool: {} providers (key rotation)", providers.len());
-
-    let knowledge_base = load_knowledge_base();
-    let composer = savant_trading::agent::prompts::PromptComposer::new(
-        &savant_trading::agent::prompts::default_base_identity(),
-        include_str!("agent/prompts/risk_constraints.md"),
-        &format!(
-            "{}\n\n---\n\n{}",
-            include_str!("agent/prompts/strategy_knowledge.md"),
-            include_str!("agent/prompts/echo_rules.md")
-        ),
-        include_str!("agent/prompts/output_format.md"),
-    );
-
-    let regime_detector = RegimeDetector::new(
-        config.strategy.regime.adx_period,
-        config.strategy.regime.adx_trending_threshold,
-        config.strategy.regime.adx_ranging_threshold,
-        config.strategy.regime.atr_volatility_multiplier,
-    );
-
-    // ── Phase 1: Load candles (cache-first, then API) ───────
-    let cache_path = "data/sandbox_candles.json";
-    let candle_api_sandbox = CandleClient::new(&config.exchange.rest_url);
-    let real_candles = if std::path::Path::new(cache_path).exists() {
-        match std::fs::read_to_string(cache_path) {
-            Ok(json) => match serde_json::from_str::<Vec<Candle>>(&json) {
-                Ok(cached) => {
-                    println!(
-                        "Loaded {} candles from cache ({})",
-                        cached.len(),
-                        cache_path
-                    );
-                    cached
-                }
-                Err(e) => {
-                    warn!("Cache parse failed ({}), fetching from API", e);
-                    fetch_and_cache(&candle_api_sandbox, cache_path).await
-                }
-            },
-            Err(e) => {
-                warn!("Cache read failed ({}), fetching from API", e);
-                fetch_and_cache(&candle_api_sandbox, cache_path).await
-            }
-        }
-    } else {
-        println!("No cache found, fetching from API...");
-        fetch_and_cache(&candle_api_sandbox, cache_path).await
-    };
-
-    println!("Building prompts for {} scenarios...", scenarios.len());
-
-    struct PreparedScenario {
-        scenario_id: String,
-        scenario_name: String,
-        category: String,
-        difficulty: String,
-        expected_action: String,
-        system_prompt: String,
-        user_message: String,
-        current_price: f64,
-    }
-
-    let mut prepared: Vec<PreparedScenario> = Vec::with_capacity(scenarios.len());
-    for scenario in &scenarios {
-        let mut candles = real_candles.clone();
-        generator::apply_scenario(&mut candles, &scenario.params);
-
-        let indicators = savant_trading::data::indicators::IndicatorEngine::calculate_all(
-            &candles,
-            config.strategy.regime.adx_period,
-        );
-        let regime = regime_detector.detect(&indicators, &candles);
-        let profile = savant_trading::data::indicators::IndicatorEngine::volume_profile(
-            &candles,
-            config.strategy.mean_reversion.profile_periods.min(50),
-        );
-
-        let mock = &scenario.mock_data;
-        let funding_annualized = mock.funding_rate * 365.0 * 3.0;
-        let market_ctx = savant_trading::insight::aggregator::MarketContext {
-            sentiment: savant_trading::insight::sentiment::SentimentData {
-                fear_greed_index: Some(mock.fear_greed_index as u32),
-                fear_greed_label: Some(mock.fear_greed_label.clone()),
-                btc_dominance: Some(mock.btc_dominance),
-                ..Default::default()
-            },
-            funding: savant_trading::insight::funding_rates::FundingData {
-                funding_rate: Some(mock.funding_rate),
-                funding_rate_annualized: Some(funding_annualized),
-                open_interest: Some(mock.open_interest),
-                ..Default::default()
-            },
-            onchain: savant_trading::insight::onchain::OnchainData {
-                mvrv: Some(mock.mvrv),
-                sopr: Some(mock.sopr),
-                nvt_signal: Some(mock.nvt_signal),
-                ..Default::default()
-            },
-            flows: savant_trading::insight::flows::FlowData {
-                block_height: Some(mock.block_height),
-                ..Default::default()
-            },
-            rss_items: mock
-                .news_headlines
-                .iter()
-                .map(|h| savant_trading::insight::rss::RssItem {
-                    title: h.clone(),
-                    link: String::new(),
-                    pub_date: None,
-                    description: h.clone(),
-                    categories: vec!["crypto".into()],
-                    source: "sandbox-mock".into(),
-                    relevance_score: 0.9,
-                })
-                .collect(),
-            ..Default::default()
-        };
-
-        // Generate 1H higher-TF candles from 5m data (aggregate every 12)
-        let mut htf_candles: Vec<savant_trading::core::types::Candle> = Vec::new();
-        for chunk in candles.chunks(12) {
-            if chunk.is_empty() {
-                continue;
-            }
-            htf_candles.push(savant_trading::core::types::Candle {
-                timestamp: chunk[0].timestamp,
-                open: chunk[0].open,
-                high: chunk
-                    .iter()
-                    .map(|c| c.high)
-                    .fold(f64::NEG_INFINITY, f64::max),
-                low: chunk.iter().map(|c| c.low).fold(f64::INFINITY, f64::min),
-                close: chunk.last().map(|c| c.close).unwrap_or(0.0),
-                volume: chunk.iter().map(|c| c.volume).sum(),
-                pair: "BTC/USD".into(),
-            });
-        }
-        let higher_tf_candles = vec![("1h".into(), htf_candles)];
-
-        // Session override from mock data
-        let session = if let Some(ref override_str) = mock.session_override {
-            match override_str.as_str() {
-                "Asian" => savant_trading::core::session::Session::Asian,
-                "European" => savant_trading::core::session::Session::European,
-                "US" => savant_trading::core::session::Session::UsEuOverlap,
-                "Late US" => savant_trading::core::session::Session::LateUs,
-                _ => savant_trading::core::session::current_session(),
-            }
-        } else {
-            savant_trading::core::session::current_session()
-        };
-
-        let portfolio = PortfolioManager::new(
-            config.trading.starting_balance,
-            config.trading.fee_rate,
-            config.trading.slippage_pct,
-        );
-        let ctx = FullContext {
-            candles: &candles,
-            indicators: &indicators,
-            regime,
-            volume_profile: Some(&profile),
-            market_context: &market_ctx,
-            positions: &[],
-            account: portfolio.account(),
-            pair: "BTC/USD",
-            recent_trades: None,
-            order_book_imbalance: Some(0.2),
-            session,
-            memory_context: None,
-            higher_tf_candles,
-            context_tags: vec![],
-            live_price: None,
-            decision_log_context: None,
-            dex_price: None,
-        };
-
-        let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
-            &ctx,
-            &knowledge_base,
-            &composer,
-            config.ai.knowledge_token_budget,
-        );
-
-        let current_price = candles.last().map(|c| c.close).unwrap_or(0.0);
-
-        prepared.push(PreparedScenario {
-            scenario_id: scenario.id.clone(),
-            scenario_name: scenario.name.clone(),
-            category: scenario.category.clone(),
-            difficulty: scenario.difficulty.clone(),
-            expected_action: scenario.expected_action.clone(),
-            system_prompt,
-            user_message,
-            current_price,
-        });
-    }
-
-    // ── Phase 2: Fire LLM calls in parallel ──────────────────────
-    let max_concurrent = std::env::var("SANDBOX_CONCURRENCY")
-        .ok()
-        .and_then(|v| v.parse::<usize>().ok())
-        .unwrap_or(10);
-    println!(
-        "Sending {} scenarios to AI brain (max {} concurrent)...",
-        prepared.len(),
-        max_concurrent
-    );
-
-    let semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(max_concurrent));
-
-    struct ScenarioResponse {
-        scenario_id: String,
-        scenario_name: String,
-        category: String,
-        difficulty: String,
-        expected_action: String,
-        response: Result<String, savant_trading::agent::provider::LlmError>,
-        current_price: f64,
-    }
-
-    struct RetryData {
-        scenario_id: String,
-        system_prompt: String,
-        user_message: String,
-        current_price: f64,
-    }
-    let prepared_for_retry: Vec<RetryData> = prepared
-        .iter()
-        .map(|ps| RetryData {
-            scenario_id: ps.scenario_id.clone(),
-            system_prompt: ps.system_prompt.clone(),
-            user_message: ps.user_message.clone(),
-            current_price: ps.current_price,
-        })
-        .collect();
-
-    let mut join_set = tokio::task::JoinSet::new();
-    for (idx, ps) in prepared.into_iter().enumerate() {
-        let provider_config = providers[idx % providers.len()].config_clone();
-        let sys = ps.system_prompt;
-        let usr = ps.user_message;
-        let sem = semaphore.clone();
-        join_set.spawn(async move {
-            let Ok(_permit) = sem.acquire().await else {
-                tracing::warn!("Semaphore closed, skipping sandbox scenario");
-                return ScenarioResponse {
-                    scenario_id: String::new(),
-                    scenario_name: String::new(),
-                    category: String::new(),
-                    difficulty: String::new(),
-                    expected_action: String::new(),
-                    response: Err(savant_trading::agent::provider::LlmError::InvalidResponse(
-                        "Semaphore closed".into(),
-                    )),
-                    current_price: 0.0,
-                };
-            };
-            let local_provider = savant_trading::agent::provider::LlmProvider::new(provider_config);
-            let messages = vec![savant_trading::agent::provider::Message {
-                role: "user".to_string(),
-                content: usr,
-            }];
-            let response = local_provider.chat(&sys, &messages).await;
-            ScenarioResponse {
-                scenario_id: ps.scenario_id,
-                scenario_name: ps.scenario_name,
-                category: ps.category,
-                difficulty: ps.difficulty,
-                expected_action: ps.expected_action,
-                response,
-                current_price: ps.current_price,
-            }
-        });
-    }
-
-    let mut all_responses: Vec<ScenarioResponse> = Vec::new();
-    while let Some(result) = join_set.join_next().await {
-        match result {
-            Ok(sr) => {
-                let status = match &sr.response {
-                    Ok(_) => "OK".to_string(),
-                    Err(e) => {
-                        warn!("Scenario {} ERR: {}", sr.scenario_name, e);
-                        format!("ERR: {}", e)
-                    }
-                };
-                println!(
-                    "  [{}/{}] {} — {}",
-                    all_responses.len() + 1,
-                    scenarios.len(),
-                    sr.scenario_name,
-                    status
-                );
-                all_responses.push(sr);
-            }
-            Err(e) => warn!("Scenario task panicked: {}", e),
-        }
-    }
-
-    // ── Phase 2b: Retry rate-limited and transient failures ─────
-    let retryable = std::mem::take(&mut all_responses);
-    let (ok_responses, failed): (Vec<_>, Vec<_>) =
-        retryable.into_iter().partition(|sr| sr.response.is_ok());
-    let rate_limited: Vec<ScenarioResponse> = failed
-        .into_iter()
-        .filter(|sr| {
-            matches!(&sr.response, Err(savant_trading::agent::provider::LlmError::RateLimited(_)))
-                || matches!(&sr.response, Err(savant_trading::agent::provider::LlmError::Http(e))
-                    if e.contains("429") || e.contains("502") || e.contains("503") || e.contains("transient"))
-        })
-        .collect();
-
-    all_responses = ok_responses;
-
-    if !rate_limited.is_empty() {
-        println!(
-            "\n── Retrying {} rate-limited scenarios (concurrency=1, 5s delay) ──",
-            rate_limited.len()
-        );
-        let retry_provider = providers[0].config_clone();
-        for (i, sr) in rate_limited.into_iter().enumerate() {
-            if i > 0 {
-                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-            }
-            let local_provider =
-                savant_trading::agent::provider::LlmProvider::new(retry_provider.clone());
-            // Find the matching prepared scenario to get system/user prompts
-            let matching = prepared_for_retry
-                .iter()
-                .find(|p| p.scenario_id == sr.scenario_id);
-            let (retry_response, retry_price) = if let Some(ps) = matching {
-                let messages = vec![savant_trading::agent::provider::Message {
-                    role: "user".to_string(),
-                    content: ps.user_message.clone(),
-                }];
-                let resp = local_provider.chat(&ps.system_prompt, &messages).await;
-                (resp, ps.current_price)
-            } else {
-                (
-                    Err(savant_trading::agent::provider::LlmError::Http(
-                        "Scenario data not found for retry".into(),
-                    )),
-                    sr.current_price,
-                )
-            };
-            let retry_status = match &retry_response {
-                Ok(_) => "OK (retry)".to_string(),
-                Err(e) => format!("ERR (retry): {}", e),
-            };
-            println!(
-                "  [retry {}/{}] {} — {}",
-                i + 1,
-                scenarios.len(),
-                sr.scenario_name,
-                retry_status
-            );
-            all_responses.push(ScenarioResponse {
-                scenario_id: sr.scenario_id,
-                scenario_name: sr.scenario_name,
-                category: sr.category,
-                difficulty: sr.difficulty,
-                expected_action: sr.expected_action,
-                response: retry_response,
-                current_price: retry_price,
-            });
-        }
-    }
-
-    // ── Phase 3: Grade all responses ────────────────────────────
-    println!("Grading {} responses...", all_responses.len());
-
-    let mut results: Vec<ScenarioResult> = Vec::with_capacity(all_responses.len());
-    for sr in all_responses {
-        let start = std::time::Instant::now();
-
-        let (action_taken, grade) = match sr.response {
-            Ok(ref text) => {
-                match savant_trading::agent::decision_parser::parse_decision(
-                    text,
-                    sr.current_price,
-                    config.ai.price_tolerance_pct,
-                ) {
-                    Ok(decision) => {
-                        let action_str = format!("{:?}", decision.action);
-                        let t1 = grader::tier_1_compliance(
-                            &action_str,
-                            decision.stop_loss,
-                            decision.entry_price,
-                            decision.confidence,
-                            &decision.reasoning,
-                            &sr.expected_action,
-                        );
-                        let (tier_2, t2_details) = grader::tier_2_rr_score(
-                            decision.entry_price,
-                            decision.stop_loss,
-                            decision.take_profit_1,
-                            &action_str,
-                            &sr.expected_action,
-                        );
-                        let (tier_3, t3_rationale) = grader::tier_3_reasoning_score(
-                            &decision.reasoning,
-                            &sr.expected_action,
-                        );
-                        let total = grader::calculate_total(t1.0, tier_2, tier_3);
-
-                        (
-                            action_str,
-                            grader::Grade {
-                                tier_1_compliance: t1.0,
-                                tier_1_reason: t1.1,
-                                tier_2_rr_score: tier_2,
-                                tier_2_details: t2_details,
-                                tier_3_reasoning_score: tier_3,
-                                tier_3_rationale: t3_rationale,
-                                total_score: total,
-                            },
-                        )
-                    }
-                    Err(e) => (
-                        "ParseError".into(),
-                        grader::Grade {
-                            tier_1_compliance: false,
-                            tier_1_reason: Some(format!("Parse error: {}", e)),
-                            tier_2_rr_score: 0.0,
-                            tier_2_details: String::new(),
-                            tier_3_reasoning_score: 0.0,
-                            tier_3_rationale: String::new(),
-                            total_score: 0.0,
-                        },
-                    ),
-                }
-            }
-            Err(e) => (
-                "LLMError".into(),
-                grader::Grade {
-                    tier_1_compliance: false,
-                    tier_1_reason: Some(format!("LLM error: {}", e)),
-                    tier_2_rr_score: 0.0,
-                    tier_2_details: String::new(),
-                    tier_3_reasoning_score: 0.0,
-                    tier_3_rationale: String::new(),
-                    total_score: 0.0,
-                },
-            ),
-        };
-
-        let latency = start.elapsed().as_millis() as u64;
-        let pass_str = if grade.total_score >= 0.6 {
-            "PASS"
-        } else {
-            "FAIL"
-        };
-        println!(
-            "  {} | {} ({}) — {} | Score: {:.2} | T1: {} | T2: {:.2} | T3: {:.2}",
-            pass_str,
-            sr.scenario_name,
-            sr.scenario_id,
-            action_taken,
-            grade.total_score,
-            grade.tier_1_compliance,
-            grade.tier_2_rr_score,
-            grade.tier_3_reasoning_score,
-        );
-
-        results.push(ScenarioResult {
-            scenario_id: sr.scenario_id,
-            scenario_name: sr.scenario_name,
-            category: sr.category,
-            difficulty: sr.difficulty,
-            action_taken,
-            grade,
-            latency_ms: latency,
-        });
-    }
-
-    // 7. Generate report
-    let summary = SandboxSummary::from_results(results);
-    println!("\n{}", summary.report_card());
-
-    let report_card = generate_report_card(&summary);
-    let md = format_report_markdown(&report_card);
-    println!("\n{}", md);
-
-    // 7b. Wallet simulation
-    let wallet = savant_trading::sandbox::simulator::VirtualWallet::new(
-        config.trading.starting_balance,
-        config.trading.fee_rate,
-        config.trading.slippage_pct,
-    );
-    // Note: wallet simulation needs raw decisions + candle data.
-    // For now, use the graded results to count trades.
-    let wallet_metrics = wallet.metrics();
-    println!("\n{}", wallet_metrics.report_card());
-
-    // 7c. Run report
-    let run_report = savant_trading::sandbox::run_report::RunReport::generate(
-        &summary.results,
-        &wallet_metrics,
-        &wallet.trades,
-        savant_trading::sandbox::run_report::ConfigSnapshot {
-            pairs: config.trading.pairs.clone(),
-            timeframe: config.trading.timeframe.clone(),
-            model: config.ai.model.clone(),
-            concurrency: max_concurrent,
-            starting_balance: config.trading.starting_balance,
-        },
-        savant_trading::sandbox::run_report::KnowledgeStats {
-            total_units: load_knowledge_base().len(),
-            files_loaded: 10,
-        },
-    );
-    match run_report.write_to_disk("data") {
-        Ok(path) => println!("Run report written to {}", path),
-        Err(e) => warn!("Failed to write run report: {}", e),
-    }
-
-    // 8. Feedback analysis
-    let analysis = analyze_failures(&summary);
-    if !analysis.violated_rules.is_empty() {
-        println!("\n─── Failure Analysis ───────────────────");
-        for v in &analysis.violated_rules {
-            println!(
-                "  Rule: {} — violated {} times (scenarios: {:?})",
-                v.rule, v.violation_count, v.scenarios
-            );
-        }
-        for p in &analysis.patterns {
-            println!(
-                "  Pattern: {} — {} — {}",
-                p.pattern, p.frequency, p.suggestion
-            );
-        }
-    }
-
-    // 9. Write report to disk
-    let report_path = "data/sandbox_report.md";
-    if let Err(e) = std::fs::write(report_path, &md) {
-        warn!("Failed to write sandbox report: {}", e);
-    } else {
-        println!("\nReport written to {}", report_path);
-    }
-
-    println!("\n=== SANDBOX COMPLETE ===");
-    Ok(())
-}
-
-/// Pre-filter: does this pair have an actionable signal worth sending to LLM?
-/// Returns true if any indicator suggests a potential setup.
-#[allow(dead_code)]
-fn has_actionable_signal(
-    indicators: &savant_trading::core::types::IndicatorValues,
-    _regime: savant_trading::core::types::MarketRegime,
-    ob_imbalance: Option<f64>,
-    current_price: f64,          // NEW: needed for VWAP deviation check
-    current_volume: Option<f64>, // NEW: needed for volume spike check
-) -> bool {
-    // RSI extreme — oversold or overbought
-    if let Some(rsi) = indicators.rsi {
-        if !(30.0..=70.0).contains(&rsi) {
-            return true;
-        }
-    }
-
-    // ADX strong trend
-    if let Some(adx) = indicators.adx {
-        if adx > 25.0 {
-            return true;
-        }
-    }
-
-    // EMA crossover (fast vs slow)
-    if let (Some(fast), Some(slow)) = (indicators.ema_fast, indicators.ema_slow) {
-        let spread_pct = ((fast - slow) / slow).abs() * 100.0f64;
-        if spread_pct > 0.5 {
-            return true;
-        }
-    }
-
-    // Order book imbalance
-    if let Some(obi) = ob_imbalance {
-        if obi.abs() > 0.3 {
-            return true;
-        }
-    }
-
-    // VWAP deviation (WIRED - FID-021: was dead code)
-    if let (Some(vwap), Some(atr)) = (indicators.vwap, indicators.atr) {
-        if atr > 0.0 && ((current_price - vwap) / atr).abs() > 1.0 {
-            return true;
-        }
-    }
-
-    // NOTE: Trending regime gate removed (FID-021: redundant with ADX > 25)
-
-    // Volume spike (NEW - FID-021)
-    if let (Some(vol), Some(vsma)) = (current_volume, indicators.volume_sma) {
-        if vsma > 0.0 && vol / vsma > 1.5 {
-            return true;
-        }
-    }
-
-    false
-}
-
-/// Verify token safety before buying — checks 24h volume and holder count
-/// via Blockscout API. Rejects dead coins (< $1M volume) and honeypots (< 5000 holders).
-async fn verify_token_safety(token_address: &str) -> Result<(f64, u64), String> {
-    let client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(10))
-        .build()
-        .map_err(|e| format!("HTTP client: {}", e))?;
-
-    let url = format!(
-        "https://arbitrum.blockscout.com/api/v2/tokens/{}",
-        token_address
-    );
-
-    let resp = client
-        .get(&url)
-        .send()
-        .await
-        .map_err(|e| format!("Blockscout error: {}", e))?;
-
-    if !resp.status().is_success() {
-        return Err(format!("Blockscout returned {}", resp.status()));
-    }
-
-    let json: serde_json::Value = resp
-        .json()
-        .await
-        .map_err(|e| format!("Blockscout parse error: {}", e))?;
-
-    let volume = json["volume_24h"]
-        .as_str()
-        .unwrap_or("0")
-        .parse::<f64>()
-        .unwrap_or(0.0);
-    let holders = json["holders_count"]
-        .as_str()
-        .unwrap_or("0")
-        .parse::<u64>()
-        .unwrap_or(0);
-
-    Ok((volume, holders))
 }

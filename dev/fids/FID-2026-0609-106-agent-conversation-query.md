@@ -3,7 +3,7 @@
 **ID:** FID-2026-0609-106
 **Created:** 2026-06-09 22:10
 **Severity:** high
-**Status:** pending-approval
+**Status:** open
 **Scope:** src/agent/, src/api/, dashboard/src/components/
 
 ---

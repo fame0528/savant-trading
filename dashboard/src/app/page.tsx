@@ -254,7 +254,7 @@ export default function Dashboard() {
           <span className="text-[10px] tracking-[3px] uppercase text-[var(--dim)] mb-6">Autonomous Trading Agent</span>
           <div className="flex items-center gap-2 text-[var(--dim)] text-[11px] font-mono">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--red)] shadow-[0_0_6px_var(--red)] animate-pulse" />
-            <span>Disconnected from engine — data may be stale. Retrying...</span>
+            <span>The engine is not currently running. Restart the engine to continue.</span>
           </div>
         </div>
       )}
