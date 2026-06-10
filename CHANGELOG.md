@@ -4,6 +4,53 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.12.9] — 2026-06-09
+
+### Added — FID-093: Dashboard Tabbed Terminal with Command Bridge
+
+The dashboard terminal is no longer a read-only log viewer. It now has two tabs:
+
+**Logs tab** (existing): read-only stream of engine output — unchanged.
+**Command tab** (new): bidirectional channel for sending commands to the agent and receiving responses.
+
+**13 operator commands:**
+- `override_close` — Force-close a position by pair name
+- `override_stop` — Set stop-loss for a position
+- `inject_context` — Inject operator message into next LLM evaluation
+- `query` — Ask the agent a question (one-shot LLM call)
+- `explain` — Explain last decision for a pair
+- `set_autonomy` — Change autonomy level (autonomous/confirm/suggest)
+- `approve` — Approve pending action (confirm/suggest mode)
+- `pause` — Halt all trading
+- `resume` — Resume trading
+- `status` — Get current engine/agent state
+- `feedback` — Operator verdict on a trade
+- `watch` — Add pair to evaluation list for N cycles
+- `undo` — Reverse the last command
+
+**Natural language support:**
+- `close weth` → override_close for WETH/USD
+- `status` → status
+- `pause` → pause
+- `set stop link 7.50` → override_stop for LINK/USD at 7.50
+- `what's happening with btc` → explain for BTC/USD
+
+**Security:**
+- inject_context: 500-char limit, 5/cycle rate limit, command injection rejection
+- query: 3/5min rate limit, 30s timeout
+- All commands: 10-minute TTL, bounded queue (100), auth required
+
+**Frontend:**
+- Tabbed terminal with Logs and Command tabs
+- Ctrl+L (Logs), Ctrl+K (Command) keyboard shortcuts
+- Command history with arrow keys (last 50)
+- Color-coded response cards (green/red/yellow/blue)
+- Connection status indicator
+
+### Build & Test
+
+- 273 tests passing (9 new from commands module), 0 clippy warnings
+
 ## [0.12.8] — 2026-06-09
 
 ### Fixed — FID-105: 0x API Swap Direction Reversal (Critical)

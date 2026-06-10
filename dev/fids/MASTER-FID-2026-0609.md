@@ -3,7 +3,7 @@
 **ID:** MASTER-FID-2026-0609
 **Created:** 2026-06-09 19:00
 **Updated:** 2026-06-09 20:00
-**Status:** active (1 item remaining — FID-093: Tabbed terminal)
+**Status:** active (FID-095: Terminal advanced features remaining)
 **Scope:** All FIDs consolidated, validated against v0.12.7 codebase
 
 ---
@@ -15,7 +15,7 @@
 | FID-089 | Engine trigger stale price + balance query zero | merged-into-master | ❌ No (dup of 091) |
 | FID-090 | Codebase file limit violation (300-line) | analyzed | ❌ No |
 | FID-091 | Balance query zero + missing pair eval + age reset | ✅ fixed | Yes (v0.12.7) |
-| FID-093 | Dashboard terminal → tabbed command bridge | analyzed | ❌ No |
+| FID-093 | Dashboard terminal → tabbed command bridge | ✅ fixed | Yes (v0.12.9) |
 | FID-095 | Terminal advanced features (deferred) | deferred | ❌ No (depends on 093) |
 | FID-097 | Circuit breaker + position resurrection | ✅ fixed | Yes (v0.12.4) |
 | FID-098 | Episodic memory feedback loop | ✅ fixed | Yes (v0.12.5) |
