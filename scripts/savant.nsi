@@ -38,7 +38,7 @@ VIAddVersionKey "ProductName" "Savant Trading Engine"
 VIAddVersionKey "ProductVersion" "${VERSION}"
 VIAddVersionKey "FileVersion" "${VERSION}"
 VIAddVersionKey "FileDescription" "AI-native autonomous crypto trading system"
-VIAddVersionKey "LegalCopyright" "2026 Savant Trading"
+VIAddVersionKey "LegalCopyright" "2026 Spencer Howell"
 VIAddVersionKey "CompanyName" "Savant Trading"
 VIAddVersionKey "OriginalFilename" "SavantTrading-${VERSION}-Setup.exe"
 
