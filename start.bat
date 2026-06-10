@@ -7,6 +7,15 @@ echo   Building + starting engine + dashboard...
 echo  ========================================
 echo.
 cd /d "%~dp0"
+:: Load environment variables from .env (GITHUB_TOKEN for gh CLI, etc.)
+if exist .env (
+    for /f "usebackq tokens=1,* delims==" %%a in (`.env`) do (
+        set "%%a=%%b"
+    )
+    echo  .env loaded.
+) else (
+    echo  WARNING: .env not found. API keys may be missing.
+)
 :: Kill stale processes holding port 3000
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":3000 " ^| findstr "LISTENING"') do (
     echo  Killing stale process on port 3000 [PID %%a]...

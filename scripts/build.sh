@@ -106,6 +106,17 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
+# ── Load .env ──────────────────────────────────────────────────────
+if [[ -f "${PROJECT_ROOT}/.env" ]]; then
+    set -a
+    # shellcheck disable=SC1091
+    source <(grep -v '^#' "${PROJECT_ROOT}/.env" | grep '=')
+    set +a
+    ok ".env loaded (GITHUB_TOKEN=${GITHUB_TOKEN:+set})"
+else
+    warn ".env not found — API keys may be missing."
+fi
+
 # ── Pre-flight checks ─────────────────────────────────────────────
 header "Pre-flight Checks"
 
