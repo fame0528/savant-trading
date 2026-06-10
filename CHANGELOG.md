@@ -4,6 +4,42 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.12.9] — 2026-06-10
+
+### Added — FID-108: DEX Execution Reliability (9 Changes)
+
+1. **Enhanced pre-flight diagnostics** — Structured logging for why swaps fail
+2. **Error categorization** — Transient/Permanent/UserFixable classification
+3. **FailureTracker** — Blacklists tokens after 5 permanent failures in 60 min
+4. **execute_with_retry()** — Tries next pair in queue on failure
+5. **Gas buffer increase** — 2x→2.5x with 750K floor for Permit2 calldata
+6. **Circuit breaker fix** — Only blocks Buy/Sell, not management actions (ADJUST_STOP/CLOSE)
+7. **Session penalty** — -10% confidence during deep Asian (02:00-05:59 UTC)
+8. **Spread filter** — Configurable bps threshold (default 30)
+9. **Token address resolution** — Blockscout API lookup for unknown tokens
+
+### Added — FID-109: Chain-First Architecture
+
+1. **Phantom detection fix** — Checks on-chain token balances before clearing positions
+2. **Wallet sync fix** — Includes discovered pairs (not just static config)
+3. **Shared state sync** — Forces dashboard update after wallet recovery
+4. **Executor-to-portfolio sync** — Copies DexTrader positions to PortfolioManager
+5. **Slippage fix** — Increased from 15 bps to 30 bps for 0x Gasless API compatibility
+
+### Fixed
+
+- Circuit breaker blocking ADJUST_STOP when max positions reached
+- Phantom detection clearing real positions on restart
+- Wallet sync missing discovered pairs (STG/USD etc.)
+- Dashboard showing 0 positions despite on-chain holdings
+- Slippage too tight for 0x Gasless API (15 bps → 30 bps)
+
+### Changed
+
+- `slippage_pct`: 0.0015 → 0.0030 (30 bps minimum for Gasless API)
+- `spread_filter_bps`: 30.0 (new config field)
+- `session_penalty_deep_asian`: 0.90 (new config field)
+
 ## [0.12.9] — 2026-06-09
 
 ### Added — FID-093: Dashboard Tabbed Terminal with Command Bridge

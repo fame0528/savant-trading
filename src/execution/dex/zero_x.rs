@@ -545,10 +545,11 @@ impl DexBackend for ZeroXBackend {
             data.to_string()
         };
 
-        // Gas buffer: Permit2 calldata with signature prefix can be very large (2000+ bytes).
-        // 0x API gas estimates are often low. Use 2x buffer with a hard floor of 500K.
-        let gas_with_buffer = ((gas as f64) * 2.0) as u64;
-        let gas_with_buffer = gas_with_buffer.max(500_000);
+        // FID-108: Gas buffer increase — Permit2 calldata with signature prefix can be
+        // very large (2000+ bytes). 0x API gas estimates are often low.
+        // Use 2.5x buffer with a hard floor of 750K.
+        let gas_with_buffer = ((gas as f64) * 2.5) as u64;
+        let gas_with_buffer = gas_with_buffer.max(750_000);
 
         Ok(SwapTx {
             to: to.to_string(),
@@ -1137,7 +1138,7 @@ mod tests {
         assert_eq!(swap_tx.to, "0xdef1c0ded9bec7f1a1670819833240f027b25eff");
         assert_eq!(swap_tx.data, "0xabc123");
         assert_eq!(swap_tx.value, "0");
-        assert_eq!(swap_tx.gas, 500000); // 250000 * 2.0 = 500000 (2x buffer)
+        assert_eq!(swap_tx.gas, 750000); // 250000 * 2.5 = 625000 < 750000 floor (FID-108)
         assert_eq!(swap_tx.gas_price, "100000000");
     }
 

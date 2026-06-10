@@ -25,6 +25,230 @@ use alloy_core::primitives::{Address, U256};
 use k256::ecdsa::{RecoveryId, Signature, SigningKey};
 use sha3::{Digest, Keccak256};
 
+// ---------------------------------------------------------------------------
+// FID-108: Error categorization + failure tracking
+// ---------------------------------------------------------------------------
+
+/// Categorizes execution errors for retry vs blacklist decisions.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ErrorCategory {
+    /// RPC timeout, nonce collision, network error — safe to retry.
+    Transient,
+    /// Token dead, honeypot, no liquidity — blacklist after repeated failures.
+    Permanent,
+    /// Insufficient balance, wrong network — alert user, don't retry.
+    UserFixable,
+}
+
+impl std::fmt::Display for ErrorCategory {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Transient => write!(f, "Transient"),
+            Self::Permanent => write!(f, "Permanent"),
+            Self::UserFixable => write!(f, "UserFixable"),
+        }
+    }
+}
+
+/// Classify an execution error into a category for retry logic.
+pub fn categorize_error(err: &ExecutionError) -> ErrorCategory {
+    let msg = err.to_string().to_lowercase();
+
+    // User-fixable first (highest priority — don't retry these)
+    if msg.contains("insufficient balance")
+        || msg.contains("insufficient funds")
+        || msg.contains("balance is $")
+        || msg.contains("fund wallet")
+    {
+        return ErrorCategory::UserFixable;
+    }
+
+    // Permanent failures (blacklist after repeated occurrences)
+    if msg.contains("no liquidity")
+        || msg.contains("liquidityavailable")
+        || msg.contains("dust output")
+        || msg.contains("honeypot")
+        || msg.contains("spread")
+        || msg.contains("direction reversal")
+    {
+        return ErrorCategory::Permanent;
+    }
+
+    // Transient failures (safe to retry)
+    if msg.contains("timeout")
+        || msg.contains("timed out")
+        || msg.contains("network")
+        || msg.contains("econnreset")
+        || msg.contains("nonce")
+        || msg.contains("max fee per gas")
+        || msg.contains("replacement transaction underpriced")
+        || msg.contains("429")
+        || msg.contains("502")
+        || msg.contains("503")
+    {
+        return ErrorCategory::Transient;
+    }
+
+    // Default: treat as transient (safe to retry)
+    ErrorCategory::Transient
+}
+
+/// A single failure record for a token.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FailureRecord {
+    pub reason: String,
+    pub category: ErrorCategory,
+    pub timestamp: chrono::DateTime<chrono::Utc>,
+}
+
+/// Tracks execution failures per token for blacklisting decisions.
+/// Thread-safe: wrapped in `Arc<RwLock<>>` by the engine.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct FailureTracker {
+    /// Token symbol → list of failure records.
+    failures: HashMap<String, Vec<FailureRecord>>,
+}
+
+impl FailureTracker {
+    pub fn new() -> Self {
+        Self {
+            failures: HashMap::new(),
+        }
+    }
+
+    /// Record a failure for a token.
+    pub fn record_failure(&mut self, token: &str, reason: &str, category: &ErrorCategory) {
+        let record = FailureRecord {
+            reason: reason.to_string(),
+            category: category.clone(),
+            timestamp: chrono::Utc::now(),
+        };
+        self.failures
+            .entry(token.to_uppercase())
+            .or_default()
+            .push(record);
+    }
+
+    /// Check if a token is blacklisted (≥5 permanent failures in last 60 min).
+    pub fn is_blacklisted(&self, token: &str) -> bool {
+        let cutoff = chrono::Utc::now() - chrono::Duration::minutes(60);
+        if let Some(records) = self.failures.get(&token.to_uppercase()) {
+            let recent_permanent = records
+                .iter()
+                .filter(|r| r.category == ErrorCategory::Permanent && r.timestamp > cutoff)
+                .count();
+            return recent_permanent >= 5;
+        }
+        false
+    }
+
+    /// Get remaining blacklist duration for a token (if blacklisted).
+    pub fn blacklist_remaining(&self, token: &str) -> Option<chrono::Duration> {
+        if !self.is_blacklisted(token) {
+            return None;
+        }
+        if let Some(records) = self.failures.get(&token.to_uppercase()) {
+            if let Some(last) = records
+                .iter()
+                .filter(|r| r.category == ErrorCategory::Permanent)
+                .max_by_key(|r| r.timestamp)
+            {
+                let remaining = chrono::Duration::minutes(60)
+                    - (chrono::Utc::now() - last.timestamp);
+                if remaining > chrono::Duration::zero() {
+                    return Some(remaining);
+                }
+            }
+        }
+        None
+    }
+
+    /// Get total failure count for a token (all categories, last 60 min).
+    pub fn failure_count(&self, token: &str) -> usize {
+        let cutoff = chrono::Utc::now() - chrono::Duration::minutes(60);
+        self.failures
+            .get(&token.to_uppercase())
+            .map(|records| records.iter().filter(|r| r.timestamp > cutoff).count())
+            .unwrap_or(0)
+    }
+
+    /// Purge old records (older than 24 hours) to prevent unbounded growth.
+    pub fn purge_old(&mut self) {
+        let cutoff = chrono::Utc::now() - chrono::Duration::hours(24);
+        for records in self.failures.values_mut() {
+            records.retain(|r| r.timestamp > cutoff);
+        }
+        self.failures.retain(|_, records| !records.is_empty());
+    }
+}
+
+/// Diagnose why a pre-flight `eth_call` reverted.
+/// Returns a structured reason string and recommended action.
+pub fn diagnose_preflight_failure(
+    err_str: &str,
+    src_token: &TokenInfo,
+    dst_token: &TokenInfo,
+    gas_limit: u64,
+) -> (String, String) {
+    let err_lower = err_str.to_lowercase();
+
+    if err_lower.contains("out of gas") || err_lower.contains("gas required exceeds allowance") {
+        return (
+            "Out of gas".into(),
+            format!("Increase gas buffer (current: {})", gas_limit),
+        );
+    }
+
+    if err_lower.contains("execution reverted") {
+        // Check if it's a Permit2 issue
+        if err_lower.contains("permit2") || err_lower.contains("permit") {
+            return (
+                "Permit2 signature mismatch".into(),
+                "Re-approve token for Permit2 and retry".into(),
+            );
+        }
+
+        // Check for arithmetic overflow (Panic(0x11))
+        if err_lower.contains("panic(0x11)") || err_lower.contains("overflow") {
+            return (
+                "Arithmetic overflow — bad amount".into(),
+                format!(
+                    "Check amount_wei calculation for {}/{}",
+                    src_token.symbol, dst_token.symbol
+                ),
+            );
+        }
+
+        // Generic revert — likely no liquidity or token restrictions
+        return (
+            "No liquidity or token restrictions".into(),
+            format!(
+                "Token {} may be dead/honeypot — blacklist if repeated",
+                src_token.symbol
+            ),
+        );
+    }
+
+    if err_lower.contains("nonce") {
+        return (
+            "Nonce collision".into(),
+            "Refresh nonce and retry".into(),
+        );
+    }
+
+    if err_lower.contains("max fee per gas") || err_lower.contains("underpriced") {
+        return (
+            "Gas price too low".into(),
+            "Increase gas price buffer".into(),
+        );
+    }
+
+    (
+        "Unknown error".into(),
+        format!("Review error: {}", err_str),
+    )
+}
+
 /// Minimal transaction receipt for on-chain verification.
 pub struct TxReceipt {
     pub status: u64,
@@ -365,28 +589,89 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         // Reconcile: if tracked balance drifted significantly from actual on-chain balance,
         // the tracked positions are likely phantom (from reverted swaps that were recorded
         // as successful). Clear them to prevent the engine from managing non-existent positions.
+        // FID-108: Don't clear if positions have on-chain token balances (capital is deployed).
         let drift = (balance_before_sync - trader.balance).abs();
         if drift > 1.0 && !trader.positions.is_empty() {
-            warn!(
-                "PHANTOM POSITIONS DETECTED: balance drift ${:.2} with {} tracked positions. \
-                 Clearing all positions to reconcile with on-chain state.",
-                drift,
-                trader.positions.len()
-            );
-            trader.positions.clear();
-            trader.save_state().ok();
+            // Check if any position has on-chain tokens — if so, drift is expected
+            // (capital is deployed into tokens, not sitting as USDC).
+            let mut has_on_chain_tokens = false;
+            for pos in trader.positions.values() {
+                let (_, dst_token) = match resolve_pair_on_chain(
+                    &pos.pair,
+                    pos.side,
+                    trader.chain_id,
+                ) {
+                    Ok(tokens) => tokens,
+                    Err(_) => continue,
+                };
+                if !dst_token.address.is_empty() {
+                    if let Some(qty) = trader
+                        .query_token_balance(&dst_token.address, dst_token.decimals)
+                        .await
+                    {
+                        if qty > 0.0001 {
+                            has_on_chain_tokens = true;
+                            info!(
+                                "Balance drift ${:.2} but {} has {:.8} on-chain tokens — not phantom",
+                                drift, dst_token.symbol, qty
+                            );
+                            break;
+                        }
+                    }
+                }
+            }
+            if !has_on_chain_tokens {
+                warn!(
+                    "PHANTOM POSITIONS DETECTED: balance drift ${:.2} with {} tracked positions \
+                     AND zero on-chain token balances. Clearing positions.",
+                    drift,
+                    trader.positions.len()
+                );
+                trader.positions.clear();
+                trader.save_state().ok();
+            }
         }
 
         // Additional check: if positions exist but no trades have ever completed,
+        // AND the on-chain balance for the position's token is zero,
         // the positions are likely phantom from reverted swaps.
+        // FID-108: Don't clear positions if on-chain balance confirms they exist.
         if !trader.positions.is_empty() && trader.closed_trades.is_empty() {
-            warn!(
-                "PHANTOM POSITIONS DETECTED: {} positions tracked but zero completed trades. \
-                 Clearing positions — likely from reverted swaps.",
-                trader.positions.len()
-            );
-            trader.positions.clear();
-            trader.save_state().ok();
+            let mut all_phantom = true;
+            for pos in trader.positions.values() {
+                let (_, dst_token) = match resolve_pair_on_chain(
+                    &pos.pair,
+                    pos.side,
+                    trader.chain_id,
+                ) {
+                    Ok(tokens) => tokens,
+                    Err(_) => continue,
+                };
+                if !dst_token.address.is_empty() {
+                    if let Some(on_chain_qty) = trader
+                        .query_token_balance(&dst_token.address, dst_token.decimals)
+                        .await
+                    {
+                        if on_chain_qty > 0.0001 {
+                            all_phantom = false;
+                            info!(
+                                "Position {} confirmed on-chain: {} has {:.8} tokens",
+                                pos.pair, dst_token.symbol, on_chain_qty
+                            );
+                            break;
+                        }
+                    }
+                }
+            }
+            if all_phantom {
+                warn!(
+                    "PHANTOM POSITIONS DETECTED: {} positions tracked but zero completed trades \
+                     AND zero on-chain balances. Clearing positions — likely from reverted swaps.",
+                    trader.positions.len()
+                );
+                trader.positions.clear();
+                trader.save_state().ok();
+            }
         }
 
         info!(
@@ -482,6 +767,70 @@ impl<B: DexBackend + 'static> DexTrader<B> {
     /// Get the number of pending retries.
     pub fn pending_retries(&self) -> usize {
         self.retry_queue.len()
+    }
+
+    // ---- FID-108: Execute with retry across multiple pairs ----
+
+    /// Try to execute a trade across a queue of (pair, side, confidence) tuples.
+    /// Returns the first successful order, or an error if all pairs fail.
+    /// Records failures in the failure tracker for blacklisting.
+    pub async fn execute_with_retry(
+        &mut self,
+        queue: &[(String, Side, f64)],
+        failure_tracker: &mut FailureTracker,
+    ) -> Result<(Order, String), ExecutionError> {
+        let mut last_err = None;
+        for (i, (pair, side, _confidence)) in queue.iter().enumerate() {
+            // Check blacklist before attempting
+            let base = pair.split('/').next().unwrap_or(pair);
+            if failure_tracker.is_blacklisted(base) {
+                let remaining = failure_tracker
+                    .blacklist_remaining(base)
+                    .map(|d| format!("{}min", d.num_minutes()))
+                    .unwrap_or_else(|| "unknown".into());
+                tracing::debug!(
+                    "FID-108: Skipping blacklisted {} ({} remaining)",
+                    base,
+                    remaining
+                );
+                continue;
+            }
+
+            match self.place_order(pair, *side, 0.0, None).await {
+                Ok(order) => {
+                    info!(
+                        "FID-108: Trade executed on {} ({}/{})",
+                        pair,
+                        i + 1,
+                        queue.len()
+                    );
+                    return Ok((order, pair.clone()));
+                }
+                Err(e) => {
+                    let category = categorize_error(&e);
+                    warn!(
+                        "FID-108: Execution failed for {}: {} | category={} | trying next ({}/{})",
+                        pair,
+                        e,
+                        category,
+                        i + 1,
+                        queue.len()
+                    );
+                    failure_tracker.record_failure(base, &e.to_string(), &category);
+                    last_err = Some(e);
+                }
+            }
+        }
+
+        // Purge old failure records to prevent unbounded growth
+        failure_tracker.purge_old();
+
+        Err(last_err.unwrap_or_else(|| {
+            ExecutionError::Other(format!(
+                "All {} pairs in queue skipped/blacklisted",
+                queue.len()
+            ))
+        }))
     }
 
     // ---- JSON-RPC ----
@@ -668,14 +1017,30 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             }
             Err(e) => {
                 let err_str = e.to_string();
+                // FID-108: Structured diagnosis of pre-flight failure
+                let (reason, action) = diagnose_preflight_failure(
+                    &err_str,
+                    &TokenInfo {
+                        symbol: "pre-flight".into(),
+                        address: format!("{:#x}", to),
+                        decimals: 18,
+                        chain_id: self.chain_id,
+                    },
+                    &TokenInfo {
+                        symbol: "unknown".into(),
+                        address: String::new(),
+                        decimals: 18,
+                        chain_id: self.chain_id,
+                    },
+                    gas_limit,
+                );
                 warn!(
-                    "PRE-FLIGHT FAILED: eth_call reverted — {} | \
-                     This likely means bad Permit2 signature, insufficient gas, or no liquidity. Aborting broadcast.",
-                    err_str
+                    "PRE-FLIGHT FAILED: eth_call reverted — {} | reason={} | action={} | gas={}",
+                    err_str, reason, action, gas_limit
                 );
                 return Err(ExecutionError::Other(format!(
-                    "Pre-flight simulation reverted: {}",
-                    err_str
+                    "Pre-flight simulation reverted: {} (reason: {}, action: {})",
+                    err_str, reason, action
                 )));
             }
         }

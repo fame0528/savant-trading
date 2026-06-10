@@ -11,7 +11,8 @@ chain_id = 42161
 rpc_url = "https://arb1.arbitrum.io/rpc"
 wallet_key_env = "WALLET_PRIVATE_KEY"
 api_key_env = "ZEROEX_API_KEY"
-slippage_pct = 0.005
+# FID-109: Slippage 30 bps minimum for 0x Gasless API compatibility
+slippage_pct = 0.0030
 
 # Multi-chain configuration (FID-045)
 # Each chain has its own RPC, gas token, and slippage settings.
@@ -72,6 +73,9 @@ pairs = [
     "LINK/USD", "UNI/USD", "AAVE/USD", "PEPE/USD",
     # Tier 3: DeFi with good Arbitrum presence
     "PENDLE/USD", "COMP/USD", "LDO/USD",
+    # Tier 4: High-volatility scalping targets (added for 24/7 opportunity coverage)
+    "CRV/USD", "RENDER/USD", "FET/USD", "DOT/USD",
+    "ENA/USD", "MAGIC/USD", "GNS/USD", "JOE/USD",
 ]
 # Full deploy mode: concentrate all capital into single best-conviction trade.
 # When balance is low, spreading across pairs wastes capital on gas friction.
@@ -81,41 +85,51 @@ full_deploy = true
 # on Arbitrum via 0x API — they don't have Arbitrum token addresses.
 # Set to true to scan all Kraken USD pairs for opportunity
 # WARNING: Scans 455+ pairs, takes 15+ minutes per cycle. Only enable if needed.
-scan_all_pairs = false
+scan_all_pairs = true
+# Safety filters for scan_all_pairs mode
+# Minimum 24h volume in USD — filters out scamcoins and illiquid garbage
+min_volume_24h_usd = 1500000.0
+# Minimum token price in USD — filters out micro-cap trash
+min_price_usd = 0.001
+# Symbols to always exclude (case-insensitive)
+blacklisted_symbols = []
 timeframe = "5m"
 timeframes = ["5m", "1h", "4h", "1d"]
 base_currency = "USD"
 starting_balance = 30.0
 database_url = "sqlite:data/savant.db"
-# DEX costs: 0x spread (~0.15-0.30%) + slippage (~0.05-0.50%)
+# DEX costs: 0x spread (~0.15%) + Uniswap v3 fee (~0.05%) + slippage (~0.05%)
 # Gas on Arbitrum is negligible at ~$0.025/swap
-fee_rate = 0.001
-slippage_pct = 0.005
+# FID-109: Slippage 30 bps minimum for 0x Gasless API compatibility
+fee_rate = 0.0005
+slippage_pct = 0.0030
 
 [risk]
-max_risk_per_trade = 0.20
-# Position allocation — how much of the bankroll goes into each trade
-# At $30 with full_deploy: 100% of capital into single best-conviction trade
-# Safety comes from stop losses + daily loss + drawdown limits, not from shrinking positions
+max_risk_per_trade = 0.005
+# Position allocation — scalping: 0.5% risk per trade, full deploy at low balance
+# At $25 with full_deploy: 100% of capital, stop at 0.5%
 dynamic_risk_tiers = [
-    { balance = 500.0, risk_pct = 1.00 },    # Full deploy at low balance — 100% of capital into best trade
-    { balance = 5000.0, risk_pct = 0.10 },    # 5 positions × 10% = 50% deployed
-    { balance = 50000.0, risk_pct = 0.05 },   # 5 positions × 5% = 25% deployed
-    { balance = 999999.0, risk_pct = 0.02 },  # 5 positions × 2% = 10% deployed
+    { balance = 500.0, risk_pct = 0.005 },    # 0.5% risk per trade at low balance
+    { balance = 5000.0, risk_pct = 0.003 },   # 0.3% risk per trade
+    { balance = 50000.0, risk_pct = 0.002 },  # 0.2% risk per trade
+    { balance = 999999.0, risk_pct = 0.001 }, # 0.1% risk per trade
 ]
-# Dynamic safety nets — scale to balance, never too tight to trade
-# At $25: daily_loss=$5 min, drawdown=$10 min. Survivable but allows trading.
-# At $500: daily_loss=$50, drawdown=$100. Meaningful protection.
+# Dynamic safety nets — scalping: tighter limits, faster halts
+# At $25: daily_loss=$1.25, drawdown=$2.50. Quick stop on bad days.
 max_daily_loss = 0.05
 max_drawdown = 0.10
-min_daily_loss_usd = 5.0    # Floor: don't halt on $0.50 loss at tiny balances
-min_drawdown_usd = 10.0     # Floor: don't halt on $1 drawdown at tiny balances
-max_positions = 3
-# Dynamic R:R — relax slightly at very low balances to allow first trade
+min_daily_loss_usd = 1.25    # Floor: 5% of $25
+min_drawdown_usd = 2.50      # Floor: 10% of $25
+max_positions = 1
+# Dynamic R:R — scalping needs 1.5:1 minimum
 min_rr_ratio = 1.5
 min_rr_ratio_low_balance = 1.2  # When balance < $50, accept tighter R:R
 low_balance_threshold = 50.0    # Below this, use relaxed R:R
-# Spread filter — reject trades where spread > 30bps (FID-035)
+# Spread filter — reject trades where spread > 25bps (scalping)
+spread_filter_bps = 30.0
+# FID-108: Session liquidity penalty — deep Asian session has 42% less depth
+# Multiplier applied to LLM confidence during low-liquidity hours
+session_penalty_deep_asian = 0.90
 # Risk buckets for correlation cap (FID-035)
 # Max 1 open position from meme bucket at any time
 [risk.buckets]

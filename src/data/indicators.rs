@@ -577,6 +577,16 @@ impl IndicatorEngine {
             1.0
         };
 
+        // Debug: log volume data for troubleshooting
+        if volumes[n - 1] < 0.001 && vol_sma20 > 0.0 {
+            tracing::warn!(
+                "VolRatio=0: last_vol={:.6}, sma20={:.6}, last_5_vols={:?}",
+                volumes[n - 1],
+                vol_sma20,
+                &volumes[n - 5..n]
+            );
+        }
+
         Some((z_score, annualized_vol, trend_score, volume_ratio))
     }
 }

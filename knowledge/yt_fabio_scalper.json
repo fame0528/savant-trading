@@ -13,7 +13,8 @@
       "drawdown-limit",
       "daily-risk",
       "max-loss",
-      "risk-cap"
+      "risk-cap",
+      "scalp"
     ]
   },
   {
@@ -29,7 +30,8 @@
     "tags": [
       "capital-requirement",
       "account-size",
-      "scaling"
+      "scaling",
+      "scalp"
     ]
   },
   {
@@ -45,7 +47,8 @@
       "loss-containment",
       "asymmetry",
       "risk-reward",
-      "win-vs-loss-size"
+      "win-vs-loss-size",
+      "scalp"
     ]
   },
   {
@@ -62,7 +65,8 @@
       "win-rate",
       "average-win",
       "average-loss",
-      "trade-statistics"
+      "trade-statistics",
+      "scalp"
     ]
   },
   {
@@ -77,7 +81,8 @@
     "tags": [
       "cumulative-loss",
       "consolidation-risk",
-      "stop-loss-cost"
+      "stop-loss-cost",
+      "scalp"
     ]
   },
   {
@@ -93,7 +98,8 @@
       "ny-opening",
       "session-timing",
       "patience",
-      "stability"
+      "stability",
+      "scalp"
     ]
   },
   {
@@ -111,7 +117,8 @@
       "chart-type",
       "new-york-open",
       "40-tick",
-      "clarity"
+      "clarity",
+      "scalp"
     ]
   },
   {
@@ -128,7 +135,8 @@
       "aaa-setup",
       "value-area-low",
       "value-area-high",
-      "momentum-breakout"
+      "momentum-breakout",
+      "scalp"
     ]
   },
   {
@@ -146,7 +154,8 @@
       "aggressive-orders",
       "passive-orders",
       "big-trades",
-      "support"
+      "support",
+      "scalp"
     ]
   },
   {
@@ -163,7 +172,8 @@
       "buy-stop",
       "absorption-confirmation",
       "scaling-in",
-      "cancellation"
+      "cancellation",
+      "scalp"
     ]
   },
   {
@@ -179,7 +189,8 @@
       "scaling-in",
       "position-sizing",
       "dynamic-risk",
-      "contract-addition"
+      "contract-addition",
+      "scalp"
     ]
   },
   {
@@ -195,7 +206,8 @@
       "stop-to-zero",
       "breakeven",
       "risk-removal",
-      "first-minute"
+      "first-minute",
+      "scalp"
     ]
   },
   {
@@ -213,7 +225,8 @@
       "cancellation",
       "poc",
       "discipline",
-      "failure-acceptance"
+      "failure-acceptance",
+      "scalp"
     ]
   },
   {
@@ -229,7 +242,8 @@
       "value-area-low-break",
       "consolidation-signal",
       "bullish-structure",
-      "trend-failure"
+      "trend-failure",
+      "scalp"
     ]
   },
   {
@@ -245,7 +259,8 @@
       "trailing-stop",
       "partial-profit",
       "round-numbers",
-      "psychological-level"
+      "psychological-level",
+      "scalp"
     ]
   },
   {
@@ -261,7 +276,8 @@
       "aggressive-buyers",
       "aggressive-sellers",
       "continuation-signal",
-      "squeeze"
+      "squeeze",
+      "scalp"
     ]
   },
   {
@@ -278,7 +294,8 @@
       "stop-placement",
       "aggressive-sellers-level",
       "trapped-traders",
-      "liquidation"
+      "liquidation",
+      "scalp"
     ]
   },
   {
@@ -294,7 +311,8 @@
       "liquidation-cascade",
       "short-covering",
       "expansion",
-      "absorption-at-highs"
+      "absorption-at-highs",
+      "scalp"
     ]
   },
   {
@@ -312,7 +330,8 @@
       "session-distribution",
       "poc",
       "value-area",
-      "first-move"
+      "first-move",
+      "scalp"
     ]
   },
   {
@@ -328,7 +347,8 @@
       "profile-plotting",
       "momentum-vs-compression",
       "point-a-to-b",
-      "range-trading"
+      "range-trading",
+      "scalp"
     ]
   },
   {
@@ -346,7 +366,8 @@
       "congestion",
       "post-expansion",
       "commission-cost",
-      "discipline"
+      "discipline",
+      "scalp"
     ]
   },
   {
@@ -362,7 +383,8 @@
       "consolidation-walkaway",
       "profit-target",
       "time-waste",
-      "std-dev"
+      "std-dev",
+      "scalp"
     ]
   },
   {
@@ -380,7 +402,8 @@
       "buy-stop",
       "tight-stop",
       "speed",
-      "simultaneous-management"
+      "simultaneous-management",
+      "scalp"
     ]
   },
   {
@@ -396,7 +419,8 @@
       "cumulative-delta",
       "fighting-auction",
       "no-edge",
-      "ambiguous-pressure"
+      "ambiguous-pressure",
+      "scalp"
     ]
   },
   {
@@ -412,7 +436,8 @@
       "orb",
       "opening-range-breakout",
       "range-breakout",
-      "80-percent-rule"
+      "80-percent-rule",
+      "scalp"
     ]
   },
   {
@@ -429,7 +454,8 @@
       "volume-concentration",
       "rebalance",
       "reaccumulation",
-      "value-area-low-retest"
+      "value-area-low-retest",
+      "scalp"
     ]
   },
   {
@@ -446,7 +472,8 @@
       "power-hour",
       "immediate-expansion",
       "rebalance",
-      "730-900-pattern"
+      "730-900-pattern",
+      "scalp"
     ]
   },
   {
@@ -462,7 +489,8 @@
       "buy-wall",
       "passive-orders",
       "institutional-support",
-      "protected-trades"
+      "protected-trades",
+      "scalp"
     ]
   },
   {
@@ -478,7 +506,8 @@
       "three-stops-rule",
       "max-loss-trades",
       "stop-trading",
-      "survival"
+      "survival",
+      "scalp"
     ]
   },
   {
@@ -494,7 +523,8 @@
       "equity-peak",
       "maximum-drawdown",
       "two-tier-protection",
-      "giveback-prevention"
+      "giveback-prevention",
+      "scalp"
     ]
   },
   {
@@ -510,7 +540,8 @@
       "profit-cushion",
       "risk-profit-not-capital",
       "build-first",
-      "cushion-trading"
+      "cushion-trading",
+      "scalp"
     ]
   },
   {
@@ -526,7 +557,8 @@
       "drawdown-clarity",
       "decision-degradation",
       "cushion-importance",
-      "mental-edge"
+      "mental-edge",
+      "scalp"
     ]
   },
   {
@@ -542,7 +574,8 @@
       "management-risk-reward",
       "floating-profit",
       "dynamic-rr",
-      "take-profit-logic"
+      "take-profit-logic",
+      "scalp"
     ]
   },
   {
@@ -557,7 +590,8 @@
     "tags": [
       "no-1-1-trades",
       "asymmetric-reward",
-      "scalping-rr"
+      "scalping-rr",
+      "scalp"
     ]
   },
   {
@@ -573,7 +607,8 @@
       "hyperscalping",
       "real-time-engagement",
       "microstructure",
-      "active-management"
+      "active-management",
+      "scalp"
     ]
   },
   {
@@ -589,7 +624,8 @@
       "boxing-match",
       "probability-shift",
       "battle-analysis",
-      "wait-for-confirmation"
+      "wait-for-confirmation",
+      "scalp"
     ]
   },
   {
@@ -605,7 +641,8 @@
       "failed-auction",
       "liquidity-wall",
       "repeated-absorption",
-      "range-bound"
+      "range-bound",
+      "scalp"
     ]
   },
   {
@@ -621,7 +658,8 @@
       "elastic-band",
       "reaccumulation",
       "market-breathing",
-      "post-expansion-wait"
+      "post-expansion-wait",
+      "scalp"
     ]
   },
   {
@@ -637,7 +675,8 @@
       "statistical-impossibility",
       "win-rate-vs-rr",
       "balance",
-      "no-ego"
+      "no-ego",
+      "scalp"
     ]
   },
   {
@@ -653,7 +692,8 @@
       "alternative-model",
       "1-1-rr",
       "75-percent-wr",
-      "consistent-equity"
+      "consistent-equity",
+      "scalp"
     ]
   },
   {
@@ -669,7 +709,8 @@
       "70-percent-stationary",
       "market-statistics",
       "contingency-planning",
-      "robust-strategy"
+      "robust-strategy",
+      "scalp"
     ]
   },
   {
@@ -685,7 +726,8 @@
       "order-flow-vs-price-action",
       "causality",
       "complete-picture",
-      "both-tools"
+      "both-tools",
+      "scalp"
     ]
   },
   {
@@ -701,7 +743,8 @@
       "order-flow-learning",
       "absorption-mechanics",
       "aggressive-vs-passive",
-      "understanding-why"
+      "understanding-why",
+      "scalp"
     ]
   },
   {
@@ -717,7 +760,8 @@
       "order-flow-metaphor",
       "visibility",
       "market-microstructure",
-      "behind-the-curtain"
+      "behind-the-curtain",
+      "scalp"
     ]
   },
   {
@@ -733,7 +777,8 @@
       "order-flow-advantage",
       "limit-order-trap",
       "liquidity-wall-protection",
-      "counter-intuitive"
+      "counter-intuitive",
+      "scalp"
     ]
   },
   {
@@ -749,7 +794,8 @@
       "options-sentiment",
       "confirmation-tool",
       "bullish-options",
-      "complementary-data"
+      "complementary-data",
+      "scalp"
     ]
   },
   {
@@ -765,7 +811,8 @@
       "big-trade-threshold",
       "30-contracts",
       "20-contracts-london",
-      "institutional-activity"
+      "institutional-activity",
+      "scalp"
     ]
   },
   {
@@ -781,7 +828,8 @@
       "hollow-candles",
       "visual-clarity",
       "candlestick-template",
-      "visibility"
+      "visibility",
+      "scalp"
     ]
   },
   {
@@ -798,7 +846,8 @@
       "discretionary",
       "practice-based",
       "no-indicator",
-      "reps"
+      "reps",
+      "scalp"
     ]
   },
   {
@@ -815,7 +864,8 @@
       "fast-decision",
       "scalping-personality",
       "low-ego",
-      "instant-direction-change"
+      "instant-direction-change",
+      "scalp"
     ]
   },
   {
@@ -832,7 +882,8 @@
       "health-first",
       "edge-is-brain",
       "focus-required",
-      "miss-one-session"
+      "miss-one-session",
+      "scalp"
     ]
   },
   {
@@ -848,7 +899,8 @@
       "no-ego-trading",
       "rule-respect",
       "screenshot-reminder",
-      "edge-protection"
+      "edge-protection",
+      "scalp"
     ]
   },
   {
@@ -864,7 +916,8 @@
       "walk-away-at-target",
       "close-platform",
       "no-look-back",
-      "tomorrow-another-day"
+      "tomorrow-another-day",
+      "scalp"
     ]
   },
   {
@@ -880,7 +933,8 @@
       "four-screens",
       "execution-speed",
       "professional-setup",
-      "infrastructure"
+      "infrastructure",
+      "scalp"
     ]
   },
   {
@@ -897,7 +951,8 @@
       "tweet-events",
       "liquidity-disappearance",
       "slippage-risk",
-      "cfd-risk"
+      "cfd-risk",
+      "scalp"
     ]
   },
   {
@@ -913,7 +968,8 @@
       "vwap-rejection",
       "90-percent-rejection",
       "std-dev-10-percent",
-      "mean-reversion-vwap"
+      "mean-reversion-vwap",
+      "scalp"
     ]
   },
   {
@@ -930,7 +986,8 @@
       "25-40-million",
       "nasdaq-capacity",
       "sp-correlation",
-      "liquidity-limits"
+      "liquidity-limits",
+      "scalp"
     ]
   },
   {
@@ -947,7 +1004,8 @@
       "patience",
       "pre-capital-work",
       "measure-first",
-      "anti-gambling"
+      "anti-gambling",
+      "scalp"
     ]
   },
   {
@@ -963,7 +1021,8 @@
       "drawdown-focus",
       "not-returns",
       "drawdown-metric",
-      "risk-ruin-prevention"
+      "risk-ruin-prevention",
+      "scalp"
     ]
   },
   {
@@ -980,7 +1039,8 @@
       "python-analysis",
       "machine-learning",
       "data-driven",
-      "profit-factor"
+      "profit-factor",
+      "scalp"
     ]
   },
   {
@@ -997,7 +1057,8 @@
       "day-removal",
       "data-informed-exclusions",
       "friday-removal",
-      "wednesday-removal"
+      "wednesday-removal",
+      "scalp"
     ]
   },
   {
@@ -1013,7 +1074,8 @@
       "edge-decay",
       "systematic-vs-discretionary",
       "hybrid-approach",
-      "adapt-to-conditions"
+      "adapt-to-conditions",
+      "scalp"
     ]
   },
   {
@@ -1029,7 +1091,8 @@
       "diversify-by-edge",
       "separate-accounts",
       "portfolio-gaussian",
-      "model-isolation"
+      "model-isolation",
+      "scalp"
     ]
   },
   {
@@ -1045,7 +1108,8 @@
       "performance-benchmarking",
       "80-100-percent-yearly",
       "world-cup-comparison",
-      "private-fund"
+      "private-fund",
+      "scalp"
     ]
   },
   {
@@ -1061,7 +1125,8 @@
       "volume-price-confluence",
       "validation",
       "volume-confirmation",
-      "no-spike-chasing"
+      "no-spike-chasing",
+      "scalp"
     ]
   },
   {
@@ -1077,7 +1142,8 @@
       "market-specific-rhythm",
       "nasdaq-vs-dax",
       "gold-different",
-      "instrument-timing"
+      "instrument-timing",
+      "scalp"
     ]
   },
   {
@@ -1093,7 +1159,8 @@
       "real-vs-demonstration",
       "walk-away-in-reality",
       "no-debate",
-      "profit-done"
+      "profit-done",
+      "scalp"
     ]
   },
   {
@@ -1109,7 +1176,8 @@
       "reaccumulation-patience",
       "two-hour-wait",
       "pattern-completion",
-      "market-tells-you"
+      "market-tells-you",
+      "scalp"
     ]
   },
   {
@@ -1125,7 +1193,8 @@
       "passive-buy-orders",
       "aggressive-sell-pressure",
       "absorption-reveals-passive",
-      "order-flow-core"
+      "order-flow-core",
+      "scalp"
     ]
   },
   {
@@ -1142,7 +1211,8 @@
       "not-magic-tool",
       "pattern-recognition",
       "time-investment",
-      "no-shortcut"
+      "no-shortcut",
+      "scalp"
     ]
   },
   {
@@ -1158,7 +1228,8 @@
       "starting-capital",
       "crypto-cycles",
       "on-chain-analysis",
-      "bull-run-leverage"
+      "bull-run-leverage",
+      "scalp"
     ]
   },
   {
@@ -1174,7 +1245,8 @@
       "dollar-allocation",
       "always-be-working",
       "halving-cycles",
-      "exponential-growth"
+      "exponential-growth",
+      "scalp"
     ]
   },
   {
@@ -1190,7 +1262,8 @@
       "scalping-as-income",
       "long-term-compounding",
       "arbitrage-engine",
-      "ecosystem-approach"
+      "ecosystem-approach",
+      "scalp"
     ]
   },
   {
@@ -1207,7 +1280,8 @@
       "80-percent-yearly",
       "zero-dte",
       "low-time-commitment",
-      "statistical-models"
+      "statistical-models",
+      "scalp"
     ]
   },
   {
@@ -1224,7 +1298,8 @@
       "legal-insider-information",
       "stock-picking",
       "earnings-gap-model",
-      "four-sub-models"
+      "four-sub-models",
+      "scalp"
     ]
   },
   {
@@ -1240,7 +1315,8 @@
       "realistic-expectations",
       "small-account-myth",
       "get-rich-slow",
-      "risk-management-first"
+      "risk-management-first",
+      "scalp"
     ]
   },
   {
@@ -1257,7 +1333,8 @@
       "lifestyle-sacrifice",
       "obsessive-bodybuilder",
       "no-partying",
-      "scheduling-required"
+      "scheduling-required",
+      "scalp"
     ]
   },
   {
@@ -1273,7 +1350,8 @@
       "mechanical-barrier",
       "trailing-drawdown",
       "platform-lockout",
-      "revenge-trading-prevention"
+      "revenge-trading-prevention",
+      "scalp"
     ]
   },
   {
@@ -1289,7 +1367,8 @@
       "forex-volume-useless",
       "intermarket-analysis",
       "eurusd-gbpusd-correlation",
-      "absorption-on-price"
+      "absorption-on-price",
+      "scalp"
     ]
   },
   {
@@ -1305,7 +1384,8 @@
       "imbalance",
       "rebalance-nature",
       "reaccumulation-model",
-      "momentum-continuation"
+      "momentum-continuation",
+      "scalp"
     ]
   },
   {
@@ -1322,7 +1402,8 @@
       "systematic-backtesting",
       "polygon",
       "9-years-data",
-      "subjective-bias"
+      "subjective-bias",
+      "scalp"
     ]
   },
   {
@@ -1338,7 +1419,8 @@
       "quant-edge-decay",
       "20-systems-4-broke",
       "hybrid-approach",
-      "ml-on-discretionary"
+      "ml-on-discretionary",
+      "scalp"
     ]
   },
   {
@@ -1354,7 +1436,8 @@
       "mentor-selection",
       "family-office-mentor",
       "order-flow-self-taught",
-      "watch-trade-demo-method"
+      "watch-trade-demo-method",
+      "scalp"
     ]
   },
   {
@@ -1371,7 +1454,8 @@
       "99-percent-want-easy",
       "industry-expectation-problem",
       "gym-analogy",
-      "no-shortcut"
+      "no-shortcut",
+      "scalp"
     ]
   },
   {
@@ -1387,7 +1471,8 @@
       "protection-levels",
       "compression-range",
       "tight-range-high-potential",
-      "coiling-effect"
+      "coiling-effect",
+      "scalp"
     ]
   },
   {
@@ -1403,7 +1488,8 @@
       "dynamic-risk",
       "cancel-and-reassess",
       "speed-of-adaptation",
-      "real-time-decisions"
+      "real-time-decisions",
+      "scalp"
     ]
   },
   {
@@ -1420,7 +1506,8 @@
       "60k-week",
       "4-wins-1-loss",
       "daily-to-weekly",
-      "profit-rhythm"
+      "profit-rhythm",
+      "scalp"
     ]
   }
 ]

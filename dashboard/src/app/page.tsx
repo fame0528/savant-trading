@@ -593,7 +593,7 @@ export default function Dashboard() {
                 {portfolio?.monitoring_mode ? "Monitoring — LLM not active while fully deployed" : "Waiting for first AI cycle…"}
               </p>
             ) : (
-              decisions.slice(0, 10).map((d, i) => {
+              decisions.map((d, i) => {
                 const a = d.action.toUpperCase();
                 const conf = d.confidence * 100;
                 const age = Date.now() - new Date(d.timestamp).getTime();

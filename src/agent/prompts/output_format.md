@@ -28,9 +28,7 @@ Single pair:
     "order_type": "LIMIT" | "MARKET",
     "entry_price": 0.0,
     "stop_loss": 0.0,
-    "take_profit_1": 0.0,
-    "take_profit_2": 0.0,
-    "take_profit_3": 0.0,
+    "take_profit": 0.0,
     "position_size_pct": 0.0,
     "confidence": 0.0,
     "reasoning": "Your reasoning here — cite specific data points and knowledge sources",
@@ -75,12 +73,12 @@ Field Rules:
 - order_type: LIMIT for maker orders (preferred), MARKET for taker orders (use only in crisis)
 - entry_price: exact entry price (must be near current market price)
 - stop_loss: exact stop loss price (mandatory for BUY/SELL/ADJUST_STOP)
-- take_profit_1/2/3: three take-profit levels (TP1 nearest, TP3 farthest)
+- take_profit: single take-profit level (0.8-1.2% above entry for longs, below for shorts)
 - position_size_pct: percentage of portfolio to allocate (0-100)
-- confidence: 0.0 to 1.0 — be honest, don't inflate. Below 0.40 = automatically downgraded to HOLD for NEW ENTRIES ONLY. ADJUST_STOP and CLOSE are NOT gated by confidence. For HOLD decisions on existing positions, set confidence to your conviction in the HOLD thesis, NOT 0.0. A confidence of 0.0 means "no conviction" which contradicts holding the position. If you're holding, you believe it will recover — express that as a score.
+- confidence: 0.0 to 1.0 — be honest, don't inflate. Below 0.40 = automatically downgraded to HOLD for NEW ENTRIES ONLY. ADJUST_STOP and CLOSE are NOT gated by confidence. For HOLD decisions on existing positions, set confidence to your conviction in the HOLD thesis, NOT 0.0.
 - reasoning: cite specific data, indicators, and knowledge sources
 - knowledge_sources: list of knowledge unit IDs that informed your decision
-- risk_reward: calculated R:R ratio. Formula: |take_profit_1 - entry_price| / |entry_price - stop_loss|. Do NOT leave at 0.0.
+- risk_reward: calculated R:R ratio. Formula: |take_profit - entry_price| / |entry_price - stop_loss|. Do NOT leave at 0.0.
 
 For HOLD decisions, set all prices to 0.0, position_size_pct to 0.0, and order_type to LIMIT. But ONLY if position_audit confirms no management triggers are active AND would_initiate_new_long_at_current_price is TRUE.
 </output_format>

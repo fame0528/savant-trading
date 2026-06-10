@@ -174,32 +174,9 @@ pub fn default_base_identity() -> String {
     include_str!("soul.md").to_string()
 }
 
-/// Default output format prompt.
+/// Default output format — loaded from output_format.md at compile time.
 pub fn default_output_format() -> String {
-    r#"## Required Output Format
-
-Respond with ONLY a JSON object (no markdown, no explanation before/after):
-
-```json
-{
-    "action": "BUY" | "SELL" | "HOLD" | "CLOSE" | "ADJUST_STOP",
-    "pair": "BTC/USD",
-    "side": "Long" | "Short",
-    "entry_price": 0.0,
-    "stop_loss": 0.0,
-    "take_profit_1": 0.0,
-    "take_profit_2": 0.0,
-    "take_profit_3": 0.0,
-    "position_size_pct": 0.0,
-    "confidence": 0.0,
-    "reasoning": "Your reasoning here",
-    "knowledge_sources": ["source-id-001"],
-    "risk_reward": 0.0
-}
-```
-
-For HOLD decisions, set all prices to 0.0 and position_size_pct to 0.0."#
-        .to_string()
+    include_str!("prompts/output_format.md").to_string()
 }
 
 impl KnowledgeUnit {

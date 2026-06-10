@@ -165,19 +165,22 @@ impl KnowledgeBase {
                 let utility_mult = 1.0 + self.units[idx].utility_score.max(0.01).log2();
 
                 // FID-059: Source-based tier multiplier.
-                // YouTube interview knowledge (crypto-native, fast execution) gets 2.0x.
-                // Institutional book knowledge (hedge fund, conservative) gets 0.8x.
-                // This ensures the prompt is dominated by aggressive crypto knowledge.
+                // Scalping-specific knowledge gets 5.0x boost — DOMINANT, always in prompt.
+                // YouTube interview knowledge (crypto-native, fast execution) gets 1.5x.
+                // Institutional book knowledge (hedge fund, conservative) gets 0.5x.
                 let source = self.units[idx].source.to_lowercase();
-                let tier_mult = if source.starts_with("youtube") || source.starts_with("yt_") {
-                    2.0
+                let has_scalping_tag = self.units[idx].tags.iter().any(|t| t.contains("scalp"));
+                let tier_mult = if has_scalping_tag {
+                    5.0
+                } else if source.starts_with("youtube") || source.starts_with("yt_") {
+                    1.5
                 } else if source.contains("wyckoff")
                     || source.contains("elder")
                     || source.contains("turtle")
                     || source.contains("bulkowski")
                     || source.contains("vpa")
                 {
-                    0.8
+                    0.5
                 } else {
                     1.0
                 };

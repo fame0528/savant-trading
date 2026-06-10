@@ -255,6 +255,15 @@ impl CandleClient {
     }
 
     pub async fn discover_usd_pairs(&self) -> Result<Vec<String>, DataError> {
+        self.discover_safe_usd_pairs(500_000.0, 0.001, &[]).await
+    }
+
+    pub async fn discover_safe_usd_pairs(
+        &self,
+        min_volume_24h: f64,
+        min_price: f64,
+        blacklisted: &[String],
+    ) -> Result<Vec<String>, DataError> {
         let url = format!("{}/0/public/AssetPairs", self.rest_url);
         let resp = self
             .client
@@ -273,7 +282,7 @@ impl CandleClient {
             .as_object()
             .ok_or_else(|| DataError::ParseError("Missing result".into()))?;
 
-        let mut pairs: Vec<String> = Vec::new();
+        let mut raw_pairs: Vec<String> = Vec::new();
         for (_key, val) in result {
             let base = match val["base"].as_str() {
                 Some(b) => b,
@@ -289,14 +298,92 @@ impl CandleClient {
             let clean_base = base.trim_start_matches('X').trim_start_matches('Z');
             let clean_quote = quote.trim_start_matches('X').trim_start_matches('Z');
             if clean_quote == "USD" || quote == "ZUSD" {
-                pairs.push(format!("{}/USD", clean_base));
+                raw_pairs.push(clean_base.to_string());
             }
         }
 
-        pairs.sort();
-        pairs.dedup();
-        info!("Discovered {} USD pairs", pairs.len());
-        Ok(pairs)
+        raw_pairs.sort();
+        raw_pairs.dedup();
+
+        if raw_pairs.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        // Batch ticker fetch — Kraken accepts up to 20 pairs per call
+        let blacklist_lower: Vec<String> = blacklisted.iter().map(|s| s.to_lowercase()).collect();
+        let mut safe_pairs = Vec::new();
+
+        for chunk in raw_pairs.chunks(20) {
+            let api_names: Vec<String> = chunk
+                .iter()
+                .map(|s| Self::to_api_pair(&format!("{}/USD", s)))
+                .collect();
+            let ticker_url = format!("{}/0/public/Ticker", self.rest_url);
+            let ticker_resp = self
+                .client
+                .get(&ticker_url)
+                .query(&[("pair", api_names.join(","))])
+                .send()
+                .await
+                .map_err(|e| DataError::HttpError(e.to_string()))?;
+
+            let ticker_body: serde_json::Value = ticker_resp
+                .json()
+                .await
+                .map_err(|e| DataError::ParseError(e.to_string()))?;
+
+            let ticker_result = match ticker_body["result"].as_object() {
+                Some(r) => r,
+                None => continue,
+            };
+
+            for (api_name, val) in ticker_result {
+                // v[1] = 24h volume, c[0] = last price
+                let volume = val["v"][1]
+                    .as_str()
+                    .and_then(|s| s.parse::<f64>().ok())
+                    .unwrap_or(0.0);
+                let price = val["c"][0]
+                    .as_str()
+                    .and_then(|s| s.parse::<f64>().ok())
+                    .unwrap_or(0.0);
+
+                // Find the matching base symbol from raw_pairs
+                let base_sym = chunk.iter().find(|s| {
+                    let api_pair = Self::to_api_pair(&format!("{}/USD", s));
+                    api_pair == *api_name
+                });
+                let base_sym = match base_sym {
+                    Some(s) => s,
+                    None => continue,
+                };
+
+                // Filter: blacklist
+                if blacklist_lower.iter().any(|b| b == &base_sym.to_lowercase()) {
+                    continue;
+                }
+                // Filter: volume
+                if volume < min_volume_24h {
+                    continue;
+                }
+                // Filter: price
+                if price < min_price {
+                    continue;
+                }
+
+                safe_pairs.push(format!("{}/USD", base_sym));
+            }
+        }
+
+        safe_pairs.sort();
+        info!(
+            "Safe pair discovery: {} pairs passed (min_vol=${:.0}, min_price=${:.4}, {} blacklisted)",
+            safe_pairs.len(),
+            min_volume_24h,
+            min_price,
+            blacklisted.len()
+        );
+        Ok(safe_pairs)
     }
 }
 

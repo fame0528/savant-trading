@@ -355,6 +355,18 @@ fn default_warn_context_guard() -> u32 {
 fn default_decision_log_max_entries() -> usize {
     500
 }
+fn default_min_volume_24h() -> f64 {
+    1_500_000.0
+}
+fn default_min_price_usd() -> f64 {
+    0.001
+}
+fn default_spread_filter_bps() -> f64 {
+    30.0
+}
+fn default_session_penalty() -> f64 {
+    0.90
+}
 fn default_sgdr_epoch_length() -> usize {
     288
 }
@@ -464,6 +476,12 @@ impl Default for DexConfig {
 pub struct TradingConfig {
     pub pairs: Vec<String>,
     pub scan_all_pairs: bool,
+    #[serde(default = "default_min_volume_24h")]
+    pub min_volume_24h_usd: f64,
+    #[serde(default = "default_min_price_usd")]
+    pub min_price_usd: f64,
+    #[serde(default)]
+    pub blacklisted_symbols: Vec<String>,
     pub timeframe: String,
     pub timeframes: Vec<String>,
     pub base_currency: String,
@@ -473,6 +491,10 @@ pub struct TradingConfig {
     pub slippage_pct: f64,
     #[serde(default)]
     pub full_deploy: bool,
+    #[serde(default = "default_spread_filter_bps")]
+    pub spread_filter_bps: f64,
+    #[serde(default = "default_session_penalty")]
+    pub session_penalty_deep_asian: f64,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -615,6 +637,9 @@ impl Default for AppConfig {
             trading: TradingConfig {
                 pairs: vec!["BTC/USD".into(), "ETH/USD".into()],
                 scan_all_pairs: false,
+                min_volume_24h_usd: 1_500_000.0,
+                min_price_usd: 0.001,
+                blacklisted_symbols: vec![],
                 timeframe: "5m".into(),
                 timeframes: vec!["5m".into(), "1h".into(), "4h".into()],
                 base_currency: "USD".into(),
@@ -623,6 +648,8 @@ impl Default for AppConfig {
                 fee_rate: 0.0026,
                 slippage_pct: 0.0005,
                 full_deploy: false,
+                spread_filter_bps: 30.0,
+                session_penalty_deep_asian: 0.90,
             },
             risk: RiskConfig {
                 max_risk_per_trade: 0.20,

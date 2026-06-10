@@ -1,4 +1,4 @@
-use chrono::Utc;
+use chrono::{Timelike, Utc};
 use std::collections::{HashMap, HashSet};
 use std::time::Duration;
 use tokio::time;
@@ -274,11 +274,18 @@ pub async fn run(
 
     let candle_api = CandleClient::new(&config.exchange.rest_url);
 
-    // SPRINT-3: Scan all pairs — discover USD pairs from API
+    // SPRINT-3: Scan all pairs — discover USD pairs from API with safety filters
     let active_pairs = if config.trading.scan_all_pairs {
-        match candle_api.discover_usd_pairs().await {
+        match candle_api
+            .discover_safe_usd_pairs(
+                config.trading.min_volume_24h_usd,
+                config.trading.min_price_usd,
+                &config.trading.blacklisted_symbols,
+            )
+            .await
+        {
             Ok(discovered) => {
-                info!("Scan mode: discovered {} pairs", discovered.len());
+                info!("Scan mode: discovered {} safe pairs", discovered.len());
                 discovered
             }
             Err(e) => {
@@ -294,9 +301,20 @@ pub async fn run(
     };
 
     // Token DB: load ALL static Arbitrum addresses for resolution (needed by 0x API)
-    // but ONLY create pairs from the curated config list (FID-052: Arbitrum trap fix)
-    let curated_pairs: std::collections::HashSet<String> =
+    // When scan_all_pairs is true, discovered pairs are also curated (FID-052 fix)
+    let mut curated_pairs: std::collections::HashSet<String> =
         config.trading.pairs.iter().cloned().collect();
+    if config.trading.scan_all_pairs {
+        for p in &active_pairs {
+            curated_pairs.insert(p.clone());
+        }
+        info!(
+            "Curated pairs: {} (config {} + discovered {})",
+            curated_pairs.len(),
+            config.trading.pairs.len(),
+            active_pairs.len()
+        );
+    }
     if config.mode.live_execution {
         let mut all_token_entries: Vec<(String, String, u8)> = Vec::new();
         for &(sym, addr, dec) in savant_trading::execution::dex::ARBITRUM_TOKENS {
@@ -432,6 +450,9 @@ pub async fn run(
 
     // Declared early so journal positions can be registered in DexTrader during load.
     let mut executor_position_map: HashMap<String, String> = HashMap::new();
+
+    // FID-108: Failure tracker for blacklisting tokens that repeatedly fail execution.
+    let mut failure_tracker = savant_trading::execution::dex::trader::FailureTracker::new();
 
     // FID-098: Maps pair-action-tick → episode_id for outcome updates when trades closes.
     // Worst case: 10 pairs × 5 min × 60 min = 20 entries/hour, negligible memory.
@@ -653,20 +674,13 @@ pub async fn run(
 
     let composer = PromptComposer::new(
         &prompts::default_base_identity(),
-        &format!(
-            "Max risk per trade: {}% | Max daily loss: {}% | Max drawdown: {}% | Max positions: {} | Min R:R: {}",
-            config.risk.max_risk_per_trade * 100.0,
-            config.risk.max_daily_loss * 100.0,
-            config.risk.max_drawdown * 100.0,
-            config.risk.max_positions,
-            config.risk.min_rr_ratio,
-        ),
+        include_str!("agent/prompts/risk_constraints.md"),
         &format!(
             "{}\n\n---\n\n{}",
             include_str!("agent/prompts/strategy_knowledge.md"),
             include_str!("agent/prompts/echo_rules.md")
         ),
-        &prompts::default_output_format(),
+        include_str!("agent/prompts/output_format.md"),
     );
 
     let autonomy = match config.ai.autonomy_level {
@@ -973,13 +987,18 @@ pub async fn run(
     // FID-061: executor_position_map declared before journal load so recovered
     // positions can be registered in DexTrader.
     if let Some(ref mut ex) = executor {
+        // FID-108: Include discovered pairs in wallet sync, not just static config pairs.
+        // Otherwise, positions opened on discovered pairs (e.g. STG/USD) are never recovered.
+        let all_sync_pairs: Vec<String> = curated_pairs.iter().cloned().collect();
         info!(
-            "Wallet sync: checking on-chain balances for {} pairs...",
-            config.trading.pairs.len()
+            "Wallet sync: checking on-chain balances for {} pairs ({} config + {} discovered)...",
+            all_sync_pairs.len(),
+            config.trading.pairs.len(),
+            all_sync_pairs.len().saturating_sub(config.trading.pairs.len()),
         );
         let discrepancies = match tokio::time::timeout(
             std::time::Duration::from_secs(30),
-            ex.sync_wallet_positions(&config.trading.pairs),
+            ex.sync_wallet_positions(&all_sync_pairs),
         )
         .await
         {
@@ -1195,7 +1214,19 @@ pub async fn run(
             info!("Wallet sync: all positions reconciled with on-chain balances");
         }
         portfolio.refresh_equity();
-        // Sync to shared state so dashboard and AI see correct balance/equity
+        // FID-108: Update open_positions count BEFORE shared state sync
+        portfolio.account_mut().open_positions = portfolio.positions().len();
+        // FID-109: Calculate equity from token values if portfolio shows $0
+        if portfolio.account().equity < 0.01 && !portfolio.positions().is_empty() {
+            let token_value: f64 = portfolio.positions().values()
+                .map(|p| p.current_price * p.quantity)
+                .sum();
+            if token_value > 0.0 {
+                portfolio.account_mut().equity = token_value;
+                info!("FID-109: Set equity to token value ${:.2}", token_value);
+            }
+        }
+        // FID-109: Sync to shared state so dashboard and AI see correct balance/equity
         {
             let mut shared_account = shared.account.write().await;
             *shared_account = portfolio.account().clone();
@@ -1203,11 +1234,25 @@ pub async fn run(
             *shared_positions = portfolio.positions().values().cloned().collect();
         }
         info!(
-            "Wallet sync complete: {} positions, balance=${:.2}, equity=${:.2}",
+            "Wallet sync complete: {} positions, balance=${:.2}, equity=${:.2}, open={}",
             portfolio.positions().len(),
             portfolio.account().balance,
-            portfolio.account().equity
+            portfolio.account().equity,
+            portfolio.account().open_positions,
         );
+        // FID-109: Verify shared state is correct
+        let shared_pos_count = shared.positions.read().await.len();
+        let shared_open = shared.account.read().await.open_positions;
+        if shared_pos_count != portfolio.positions().len() || shared_open != portfolio.positions().len() {
+            warn!(
+                "FID-109: Shared state mismatch — portfolio={} positions, shared_positions={}, shared_open={}. Forcing sync.",
+                portfolio.positions().len(), shared_pos_count, shared_open
+            );
+            let mut sp = shared.positions.write().await;
+            *sp = portfolio.positions().values().cloned().collect();
+            let mut sa = shared.account.write().await;
+            *sa = portfolio.account().clone();
+        }
         // Seed equity curve AFTER wallet sync so it captures recovered positions
         {
             let mut curve = shared.equity_curve.write().await;
@@ -1217,6 +1262,49 @@ pub async fn run(
                 "balance": portfolio.account().balance,
             }));
         }
+    }
+
+    // FID-109: If portfolio is empty but executor has positions (from dex_state.json),
+    // copy them to portfolio so dashboard and AI see them.
+    if let Some(ref ex) = executor {
+        let exec_positions = ex.open_positions();
+        if portfolio.positions().is_empty() && !exec_positions.is_empty() {
+            for pos in exec_positions {
+                info!(
+                    "FID-109: Syncing executor position to portfolio: {} {} qty={:.6}",
+                    pos.pair, pos.side, pos.quantity
+                );
+                portfolio.positions_mut().insert(pos.id.clone(), pos.clone());
+            }
+            portfolio.account_mut().open_positions = portfolio.positions().len();
+            portfolio.refresh_equity();
+            // Calculate equity from token values if still $0
+            if portfolio.account().equity < 0.01 {
+                let token_value: f64 = portfolio.positions().values()
+                    .map(|p| p.current_price * p.quantity)
+                    .sum();
+                if token_value > 0.0 {
+                    portfolio.account_mut().equity = token_value;
+                    info!("FID-109: Set equity to token value ${:.2}", token_value);
+                }
+            }
+        }
+    }
+
+    // FID-109: FORCE shared state sync — runs ALWAYS,
+    // regardless of executor state. This ensures dashboard and AI see positions.
+    {
+        let mut sa = shared.account.write().await;
+        *sa = portfolio.account().clone();
+        let mut sp = shared.positions.write().await;
+        *sp = portfolio.positions().values().cloned().collect();
+        info!(
+            "FID-109: Shared state FORCE synced — {} positions, balance=${:.2}, equity=${:.2}, open={}",
+            sp.len(),
+            sa.balance,
+            sa.equity,
+            sa.open_positions,
+        );
     }
 
     // FID-061: Auto-apply tighter stops on wallet-recovered positions
@@ -1657,8 +1745,8 @@ pub async fn run(
                     }
                     deduped
                 };
-                if unique_closes.len() < 5 {
-                    // 200 candles with < 5 unique close prices = dead or illiquid
+                if unique_closes.len() < 2 {
+                    // 200 candles with < 2 unique close prices = truly dead
                     dead_tokens.insert(pair.to_string());
                     continue;
                 }
@@ -1724,7 +1812,8 @@ pub async fn run(
                 // adjust stops based on price action even without technical signals.
                 // EXCEPTION (FID-063): In hunt mode, always evaluate — the LLM uses knowledge
                 // units + on-chain data, not just technical indicators.
-                if !has_position && !hunt_mode {
+                // EXCEPTION: scan_all_pairs mode — $0 LLM cost, let the agent evaluate everything.
+                if !has_position && !hunt_mode && !config.trading.scan_all_pairs {
                     let rsi = indicators.rsi.unwrap_or(50.0);
                     let adx = indicators.adx.unwrap_or(0.0);
                     let ema_fast = indicators.ema_fast.unwrap_or(0.0);
@@ -2672,6 +2761,40 @@ pub async fn run(
 
                     buy_sell_count += 1;
 
+                    // FID-108: Session liquidity penalty
+                    let hour = Utc::now().hour();
+                    let session_mult = match hour {
+                        2..=5 => config.trading.session_penalty_deep_asian,
+                        6..=8 => 0.95,
+                        13..=17 => 1.05,
+                        _ => 1.0,
+                    };
+                    if session_mult != 1.0 {
+                        let original = decision.confidence;
+                        decision.confidence *= session_mult;
+                        tracing::debug!(
+                            "FID-108: Session penalty {:.0}% → {:.0}% (hour={}, mult={})",
+                            original * 100.0,
+                            decision.confidence * 100.0,
+                            hour,
+                            session_mult
+                        );
+                    }
+
+                    // FID-108: Check blacklist before execution
+                    let base_sym = decision.pair.split('/').next().unwrap_or(&decision.pair);
+                    if failure_tracker.is_blacklisted(base_sym) {
+                        let remaining = failure_tracker
+                            .blacklist_remaining(base_sym)
+                            .map(|d| format!("{}min", d.num_minutes()))
+                            .unwrap_or_else(|| "unknown".into());
+                        warn!(
+                            "FID-108: Skipping blacklisted {} ({} remaining)",
+                            base_sym, remaining
+                        );
+                        continue;
+                    }
+
                     // FID-072: Calculate actual R:R from prices for comparison with LLM's claim
                     let actual_rr = if decision.entry_price > 0.0 && decision.stop_loss > 0.0 && decision.take_profit_1 > 0.0 {
                         let risk = (decision.entry_price - decision.stop_loss).abs();
@@ -2694,17 +2817,32 @@ pub async fn run(
                         decision.action
                     );
                     if matches!(autonomy, AutonomyLevel::Autonomous) {
-                        match circuit_breaker.check(portfolio.account()) {
-                            CircuitBreakerResult::Triggered(reason) => {
-                                log_circuit!("CIRCUIT BREAKER", "{} — {}", decision.pair, reason);
-                                let _ = std::fs::write(
-                                    "savant.blocked",
-                                    format!("{}\nReason: {}\n", Utc::now().to_rfc3339(), reason),
-                                );
-                                error!("CIRCUIT BREAKER TRIGGERED — wrote savant.blocked.");
+                        use savant_trading::agent::decision_parser::TradeAction;
+
+                        // FID-108: Circuit breaker only blocks NEW positions (Buy/Sell),
+                        // not management actions (Close/AdjustStop) on existing positions.
+                        let needs_circuit_check = matches!(
+                            decision.action,
+                            TradeAction::Buy | TradeAction::Sell
+                        );
+                        let circuit_ok = if needs_circuit_check {
+                            match circuit_breaker.check(portfolio.account()) {
+                                CircuitBreakerResult::Triggered(reason) => {
+                                    log_circuit!("CIRCUIT BREAKER", "{} — {}", decision.pair, reason);
+                                    let _ = std::fs::write(
+                                        "savant.blocked",
+                                        format!("{}\nReason: {}\n", Utc::now().to_rfc3339(), reason),
+                                    );
+                                    error!("CIRCUIT BREAKER TRIGGERED — wrote savant.blocked.");
+                                    false
+                                }
+                                CircuitBreakerResult::Ok => true,
                             }
-                            CircuitBreakerResult::Ok => {
-                                use savant_trading::agent::decision_parser::TradeAction;
+                        } else {
+                            true // Management actions always allowed
+                        };
+
+                        if circuit_ok {
 
                                 match decision.action {
                                     TradeAction::Sell | TradeAction::Close => {
@@ -3320,7 +3458,13 @@ pub async fn run(
                                                             TradingEvent::PositionOpened(pos),
                                                         );
                                                     }
-                                                    Err(e) => error!("AI order failed: {}", e),
+                                                    // FID-108: Record failure in tracker
+                                                    Err(e) => {
+                                                        let category = savant_trading::execution::dex::trader::categorize_error(&e);
+                                                        let base = decision.pair.split('/').next().unwrap_or(&decision.pair);
+                                                        failure_tracker.record_failure(base, &e.to_string(), &category);
+                                                        error!("AI order failed: {} | category={}", e, category);
+                                                    }
                                                 }
                                             }
                                         } else {
@@ -3390,7 +3534,6 @@ pub async fn run(
                                         }
                                     }
                                 }
-                            }
                         }
                     }
                 }
@@ -4677,20 +4820,13 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
 
     let composer = PromptComposer::new(
         &prompts::default_base_identity(),
-        &format!(
-            "Max risk per trade: {}% | Max daily loss: {}% | Max drawdown: {}% | Max positions: {} | Min R:R: {}",
-            config.risk.max_risk_per_trade * 100.0,
-            config.risk.max_daily_loss * 100.0,
-            config.risk.max_drawdown * 100.0,
-            config.risk.max_positions,
-            config.risk.min_rr_ratio,
-        ),
+        include_str!("agent/prompts/risk_constraints.md"),
         &format!(
             "{}\n\n---\n\n{}",
             include_str!("agent/prompts/strategy_knowledge.md"),
             include_str!("agent/prompts/echo_rules.md")
         ),
-        &prompts::default_output_format(),
+        include_str!("agent/prompts/output_format.md"),
     );
 
     let portfolio = PortfolioManager::new(
@@ -4891,20 +5027,13 @@ pub async fn run_live_test(
     let knowledge_base = load_knowledge_base();
     let composer = PromptComposer::new(
         &prompts::default_base_identity(),
-        &format!(
-            "Max risk per trade: {}% | Max daily loss: {}% | Max drawdown: {}% | Max positions: {} | Min R:R: {}",
-            config.risk.max_risk_per_trade * 100.0,
-            config.risk.max_daily_loss * 100.0,
-            config.risk.max_drawdown * 100.0,
-            config.risk.max_positions,
-            config.risk.min_rr_ratio,
-        ),
+        include_str!("agent/prompts/risk_constraints.md"),
         &format!(
             "{}\n\n---\n\n{}",
             include_str!("agent/prompts/strategy_knowledge.md"),
             include_str!("agent/prompts/echo_rules.md")
         ),
-        &prompts::default_output_format(),
+        include_str!("agent/prompts/output_format.md"),
     );
 
     let portfolio = PortfolioManager::new(
@@ -5242,20 +5371,13 @@ async fn run_training_batch(
     let knowledge_base = load_knowledge_base();
     let composer = savant_trading::agent::prompts::PromptComposer::new(
         &savant_trading::agent::prompts::default_base_identity(),
-        &format!(
-            "Max risk per trade: {}% | Max daily loss: {}% | Max drawdown: {}% | Max positions: {} | Min R:R: {}",
-            config.risk.max_risk_per_trade * 100.0,
-            config.risk.max_daily_loss * 100.0,
-            config.risk.max_drawdown * 100.0,
-            config.risk.max_positions,
-            config.risk.min_rr_ratio,
-        ),
+        include_str!("agent/prompts/risk_constraints.md"),
         &format!(
             "{}\n\n---\n\n{}",
             include_str!("agent/prompts/strategy_knowledge.md"),
             include_str!("agent/prompts/echo_rules.md")
         ),
-        &savant_trading::agent::prompts::default_output_format(),
+        include_str!("agent/prompts/output_format.md"),
     );
     let regime_detector = RegimeDetector::new(
         config.strategy.regime.adx_period,
@@ -6429,20 +6551,13 @@ pub async fn run_sandbox(
     let knowledge_base = load_knowledge_base();
     let composer = savant_trading::agent::prompts::PromptComposer::new(
         &savant_trading::agent::prompts::default_base_identity(),
-        &format!(
-            "Max risk per trade: {}% | Max daily loss: {}% | Max drawdown: {}% | Max positions: {} | Min R:R: {}",
-            config.risk.max_risk_per_trade * 100.0,
-            config.risk.max_daily_loss * 100.0,
-            config.risk.max_drawdown * 100.0,
-            config.risk.max_positions,
-            config.risk.min_rr_ratio,
-        ),
+        include_str!("agent/prompts/risk_constraints.md"),
         &format!(
             "{}\n\n---\n\n{}",
             include_str!("agent/prompts/strategy_knowledge.md"),
             include_str!("agent/prompts/echo_rules.md")
         ),
-        &savant_trading::agent::prompts::default_output_format(),
+        include_str!("agent/prompts/output_format.md"),
     );
 
     let regime_detector = RegimeDetector::new(

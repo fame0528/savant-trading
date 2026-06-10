@@ -42,8 +42,11 @@ pub struct TradeDecision {
     pub order_type: String,
     pub entry_price: f64,
     pub stop_loss: f64,
+    #[serde(alias = "take_profit")]
     pub take_profit_1: f64,
+    #[serde(default)]
     pub take_profit_2: f64,
+    #[serde(default)]
     pub take_profit_3: f64,
     pub position_size_pct: f64,
     pub confidence: f64,
