@@ -307,6 +307,31 @@ pub async fn run(
             "Token DB: {} Arbitrum addresses loaded for resolution",
             all_token_entries.len()
         );
+        // P1-1d: Discover additional Arbitrum tokens from Blockscout
+        match savant_trading::data::token_discovery::discover_tokens(1_000_000.0, 500, 100).await {
+            Ok(discovered) => {
+                let mut discovered_entries: Vec<(String, String, u8)> = Vec::new();
+                for token in &discovered {
+                    if !curated_pairs.contains(&format!("{}/USD", token.symbol)) {
+                        discovered_entries.push((
+                            token.symbol.clone(),
+                            token.address.clone(),
+                            token.decimals,
+                        ));
+                    }
+                }
+                if !discovered_entries.is_empty() {
+                    savant_trading::execution::dex::extend_token_db(&discovered_entries);
+                    info!("Token discovery: {} discovered → {} new pairs added to DB",
+                        discovered.len(), discovered_entries.len());
+                } else {
+                    info!("Token discovery: {} discovered — all already in curated list", discovered.len());
+                }
+            }
+            Err(e) => {
+                warn!("Token discovery failed ({}), continuing with static DB only", e);
+            }
+        }
     }
     info!("Active pairs ({}): {:?}", active_pairs.len(), active_pairs);
 
@@ -1065,7 +1090,8 @@ pub async fn run(
                     risk_amount: entry_price * on_chain_qty,
                     strategy_name: "wallet_recovery".to_string(),
                     scale_level: savant_trading::core::types::ScaleLevel::Full,
-                    opened_at: chrono::Utc::now(),
+                    // P0-1c: Epoch-0 sentinel for wallet recovery — dashboard shows "unknown"
+                    opened_at: chrono::DateTime::from_timestamp(0, 0).unwrap_or_else(chrono::Utc::now),
                 };
                 portfolio
                     .positions_mut()
@@ -1704,15 +1730,49 @@ pub async fn run(
                     let ema_fast = indicators.ema_fast.unwrap_or(0.0);
                     let ema_slow = indicators.ema_slow.unwrap_or(0.0);
 
+                    // P1-3c: Dynamic ADX threshold — lower in bear markets
+                    let fg = insight.cached().sentiment.fear_greed_index.unwrap_or(50) as f64;
+                    let adx_threshold = (25.0 - ((50.0 - fg).max(0.0) / 30.0 * 7.0)).clamp(18.0, 25.0);
                     let rsi_signal = !(30.0..=70.0).contains(&rsi);
-                    let trend_signal = adx > 25.0;
+                    let trend_signal = adx > adx_threshold;
                     let ema_cross = (ema_fast > 0.0 && ema_slow > 0.0)
                         && ((ema_fast > ema_slow
                             && candle_data.last().map(|c| c.close).unwrap_or(0.0) > ema_fast)
                             || (ema_fast < ema_slow
                                 && candle_data.last().map(|c| c.close).unwrap_or(0.0) < ema_fast));
+                    // P1-2c: Volume spike as 4th pre-scoring signal
+                    let volume_spike = indicators.volume_sma.is_some_and(|sma| {
+                        sma > 0.0 && candle_data.last().is_some_and(|c| c.volume > sma * 1.5)
+                    });
+                    // P1-3b: Bollinger Band Squeeze — BB inside Keltner Channels
+                    let bb_squeeze = if candle_data.len() >= 20 {
+                        let last20: Vec<f64> = candle_data.iter().rev().take(20).map(|c| c.close).collect();
+                        let sma20 = last20.iter().sum::<f64>() / last20.len() as f64;
+                        let variance = last20.iter().map(|c| (c - sma20).powi(2)).sum::<f64>() / last20.len() as f64;
+                        let stddev = variance.sqrt();
+                        let bb_upper = sma20 + 2.0 * stddev;
+                        let bb_lower = sma20 - 2.0 * stddev;
+                        // Keltner: EMA(20) ± 1.5 * ATR(14)
+                        let ema20 = sma20; // Simplified: use SMA as EMA approximation for squeeze detection
+                        let atr14: f64 = if candle_data.len() >= 14 {
+                            let recent: Vec<&Candle> = candle_data.iter().rev().take(14).collect();
+                            let tr_sum: f64 = recent.windows(2).map(|w| {
+                                let high = w[0].high;
+                                let low = w[0].low;
+                                let prev_close = w[1].close;
+                                let tr1 = high - low;
+                                let tr2 = (high - prev_close).abs();
+                                let tr3 = (low - prev_close).abs();
+                                tr1.max(tr2).max(tr3)
+                            }).sum();
+                            tr_sum / 14.0
+                        } else { 0.0 };
+                        let keltner_upper = ema20 + 1.5 * atr14;
+                        let keltner_lower = ema20 - 1.5 * atr14;
+                        bb_upper < keltner_upper && bb_lower > keltner_lower
+                    } else { false };
 
-                    if !rsi_signal && !trend_signal && !ema_cross {
+                    if !rsi_signal && !trend_signal && !ema_cross && !volume_spike && !bb_squeeze {
                         continue;
                     }
                 }
@@ -3013,6 +3073,32 @@ pub async fn run(
                                         );
 
                                         if let Some(mut ps) = ps {
+                                            // P1-3a: Compute TP2/TP3 from ATR
+                                            let atr = market_stores
+                                                .get(&decision.pair)
+                                                .and_then(|s| {
+                                                    let closes: Vec<f64> = s.candles().iter().rev().take(14).map(|c| c.close).collect();
+                                                    if closes.len() < 14 { return None; }
+                                                    let mean = closes.iter().sum::<f64>() / closes.len() as f64;
+                                                    let variance = closes.iter().map(|c| (c - mean).powi(2)).sum::<f64>() / closes.len() as f64;
+                                                    Some(variance.sqrt())
+                                                });
+                                            if let Some(atr_val) = atr {
+                                                let (tp2, tp3) = match decision.side {
+                                                    Side::Long => (
+                                                        decision.take_profit_1 + atr_val * 1.0,
+                                                        decision.take_profit_1 + atr_val * 2.0,
+                                                    ),
+                                                    Side::Short => (
+                                                        decision.take_profit_1 - atr_val * 1.0,
+                                                        decision.take_profit_1 - atr_val * 2.0,
+                                                    ),
+                                                };
+                                                decision.take_profit_2 = tp2;
+                                                decision.take_profit_3 = tp3;
+                                                info!("FID-102: TP2/TP3 from ATR for {}: TP2={:.4} TP3={:.4} (ATR={:.4})",
+                                                    decision.pair, tp2, tp3, atr_val);
+                                            }
                                             let session =
                                                 savant_trading::core::session::current_session();
                                             let session_mult = session.position_size_multiplier();

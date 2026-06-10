@@ -481,7 +481,7 @@ fn extract_from_freeform(text: &str) -> Option<TradeDecision> {
             take_profit_2: 0.0,
             take_profit_3: 0.0,
             position_size_pct: 0.0,
-            confidence: 0.5,
+            confidence: 0.0,
             reasoning: text.chars().take(500).collect(),
             order_type: "market".to_string(),
             knowledge_sources: vec![],
@@ -832,7 +832,7 @@ fn partial_extract(json: &str) -> Option<TradeDecision> {
         confidence: value
             .get("confidence")
             .and_then(|v| v.as_f64())
-            .unwrap_or(0.5),
+            .unwrap_or(0.0),
         reasoning: value
             .get("reasoning")
             .and_then(|v| v.as_str())

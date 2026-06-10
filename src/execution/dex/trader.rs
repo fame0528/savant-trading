@@ -165,6 +165,9 @@ pub struct DexTrader<B: DexBackend> {
     retry_queue: Vec<RetrySwap>,
     /// Maximum retries per swap before giving up.
     max_retries: u32,
+    // ---- Balance cache (P0-1a) ----
+    /// Last known on-chain balance per token address — used as fallback when query returns 0.
+    balance_cache: HashMap<String, f64>,
 }
 
 /// A pending swap in the retry queue.
@@ -243,6 +246,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             gas_halted: false,
             retry_queue: Vec::new(),
             max_retries: 3,
+            balance_cache: HashMap::new(),
         };
 
         // FID-018: Load persisted state on startup (crash recovery)
@@ -1164,14 +1168,31 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
         // FID-074 Fix 3: Query actual on-chain balance and use min(close_qty, on_chain).
         // FID-103 Fix 10: Warn when balance query fails (fallback to requested qty).
+        // P0-1a: Use startup balance cache as additional fallback.
         let on_chain_balance = match self
             .query_token_balance(&src_token.address, src_token.decimals)
             .await
         {
-            Some(b) if b > 0.0001 => b,
+            Some(b) if b > 0.0001 => {
+                // P0-1a: Update cache with fresh balance
+                self.balance_cache.insert(src_token.address.clone(), b);
+                b
+            }
             _ => {
-                warn!("FID-103: Balance query failed for {} — using requested qty as fallback", pos.pair);
-                close_qty
+                // Query returned 0 or failed — try cache
+                if let Some(&cached) = self.balance_cache.get(&src_token.address) {
+                    if cached > 0.0001 {
+                        warn!("P0-1a: Balance query for {} returned 0/err — using cached balance {:.8}",
+                            src_token.symbol, cached);
+                        cached
+                    } else {
+                        warn!("FID-103: Balance query failed for {} — using requested qty as fallback", pos.pair);
+                        close_qty
+                    }
+                } else {
+                    warn!("FID-103: Balance query failed for {} — using requested qty as fallback", pos.pair);
+                    close_qty
+                }
             }
         };
         let actual_close_qty = close_qty.min(on_chain_balance);
@@ -1738,6 +1759,8 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
                     let bal: f64 = wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
                     if bal > 0.0001 {
                         info!("On-chain {} balance: {:.8}", sym, bal);
+                        // P0-1a: Cache the balance for fallback during close
+                        self.balance_cache.insert(token_addr.clone(), bal);
                     }
                 }
             }
