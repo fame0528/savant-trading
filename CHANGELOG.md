@@ -4,6 +4,20 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.12.8] — 2026-06-09
+
+### Fixed — FID-105: 0x API Swap Direction Reversal (Critical)
+
+The 0x API `/quote` endpoint returned calldata for the opposite swap direction. When closing a LONG AAVE position (selling AAVE for USDC), the API returned a route that **bought AAVE with USDC** instead. The engine signed and broadcast it without checking direction. Result: wallet lost USDC, gained more AAVE.
+
+**Fix:** Added `verify_swap_direction()` that parses ERC-20 Transfer events from the transaction receipt after confirmation. Verifies that `src_token` was sent from the wallet and `dst_token` was received. If direction is reversed, the trade is rejected with an error.
+
+**Also:** `sign_and_send` now returns `(tx_hash, TxReceipt)` tuple so callers can inspect receipt data.
+
+### Build & Test
+
+- 264 tests passing, 0 clippy warnings
+
 ## [0.12.7] — 2026-06-09
 
 ### Fixed — Master FID: P0-1 Balance + P1-1 Parser + P1-2 Bear Market + P1-3 Gemini Priority 1
