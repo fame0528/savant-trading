@@ -14,16 +14,16 @@
 |-----|-------|--------|-------------|
 | FID-089 | Engine trigger stale price + balance query zero | merged-into-master | ❌ No (dup of 091) |
 | FID-090 | Codebase file limit violation (300-line) | analyzed | ❌ No |
-| FID-091 | Balance query zero + missing pair eval + age reset | merged-into-master | ❌ No |
+| FID-091 | Balance query zero + missing pair eval + age reset | ✅ fixed | Yes (v0.12.7) |
 | FID-093 | Dashboard terminal → tabbed command bridge | analyzed | ❌ No |
 | FID-095 | Terminal advanced features (deferred) | deferred | ❌ No (depends on 093) |
 | FID-097 | Circuit breaker + position resurrection | ✅ fixed | Yes (v0.12.4) |
 | FID-098 | Episodic memory feedback loop | ✅ fixed | Yes (v0.12.5) |
-| FID-100 | Parser bugs + token discovery wiring | created | ❌ No |
-| FID-101 | R:R auto-adjust + bear market filter | created | ❌ No |
-| FID-102 | Gemini Priority 1 (ATR TP, BB squeeze, dynamic ADX) | created | ❌ No |
-| FID-103 | DEX price authoritative (salvaged) | analyzed | ⚠️ Partial (plumbing done, live data pending) |
-| FID-104 | On-chain execution failures (R:R adjust + gasless chainId) | ✅ fixed | Yes (v0.12.7) |
+| FID-100 | Parser bugs + token discovery wiring | ✅ fixed | Yes (v0.12.7) |
+| FID-101 | R:R auto-adjust + bear market filter | ✅ fixed | Yes (v0.12.7) |
+| FID-102 | Gemini Priority 1 (ATR TP, BB squeeze, dynamic ADX) | ✅ fixed | Yes (v0.12.7) |
+| FID-103 | DEX price authoritative (salvaged) | ✅ fixed | Yes (v0.12.6) |
+| FID-104 | On-chain execution failures | ✅ fixed | Yes (v0.12.7) |
 
 ---
 

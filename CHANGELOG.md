@@ -6,19 +6,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.12.7] — 2026-06-09
 
-### Fixed — FID-104: Critical On-Chain Execution Failures
+### Fixed — Master FID: P0-1 Balance + P1-1 Parser + P1-2 Bear Market + P1-3 Gemini Priority 1
 
-Two bugs causing trades to fail on-chain:
+**P0-1: Balance Query Zero + Missing Pair Eval + Age Reset**
+- Added `balance_cache` to DexTrader — caches last known on-chain balance per token during `sync_balance`, used as fallback when `query_token_balance` returns 0 during close
+- Batch pair count validation already implemented (logs missing pairs at engine.rs:2136)
+- Wallet recovery `opened_at` now uses epoch-0 sentinel (timestamp 0) instead of `Utc::now()` — dashboard shows "unknown" for recovered positions
 
-**R:R Auto-Adjust (engine.rs):** Position sizer rejected trades when actual R:R < min_rr (e.g., COMP/USD: claimed 1.5, actual 1.0). The sizer returned `None` and the engine just logged the rejection — no retry. **Fix:** Auto-extend `take_profit_1` to meet minimum R:R before sizer check. Also updates `decision.risk_reward` for log consistency.
+**P1-1: Parser Bugs + Token Discovery**
+- `partial_extract` now extracts `side` from JSON instead of hardcoding `Side::Long`
+- `partial_extract` confidence default changed from `unwrap_or(0.5)` to `unwrap_or(0.0)` — broken JSON no longer bypasses 0.40 confidence floor
+- `extract_from_freeform` Pass/Hold confidence changed from 0.5 to 0.0
+- `discover_tokens()` wired into engine.rs startup — discovers Arbitrum tokens from Blockscout and adds to token DB
 
-**Gasless API chainId (zero_x.rs):** The 0x Gasless API `/submit` endpoint requires `chainId` as a top-level integer field (OpenAPI spec: `required: [chainId, trade]`). Our code omitted it → HTTP 400 "Expected number, received nan". **Fix:** Added `chainId` to the submit body.
+**P1-2: Bear Market Pre-Scoring Filter**
+- ADX threshold lowered from 25.0 to 20.0 in pre-scoring filter
+- Added volume spike as 4th pre-scoring signal (volume > 1.5x volume_sma)
+
+**P1-3: Gemini Priority 1 — ATR TP, BB Squeeze, Dynamic ADX**
+- TP2/TP3 computed from ATR in engine BUY path (TP2 = TP1 + ATR*1.0, TP3 = TP1 + ATR*2.0)
+- Bollinger Band Squeeze detection added to pre-scoring (BB inside Keltner Channels)
+- Dynamic ADX threshold: scales from 25 (F&G=50) to 18 (F&G≤20) using linear interpolation
 
 ### Chores
 
 - Archived all resolved FIDs into `dev/fids/archive/2026-0609-cleanup/`
 - `dev/fids/` now contains only `MASTER-FID-2026-0609.md`
-- Updated Master FID to v0.12.7 with FID-104 marked fixed
+- Updated Master FID with all fixes marked complete
 
 ### Build & Test
 
