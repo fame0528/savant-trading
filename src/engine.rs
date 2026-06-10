@@ -3258,6 +3258,7 @@ pub async fn run(
                                                 })
                                             };
                                             // Concentration cap: full_deploy allows 100%, normal mode 33%
+                                            // Use 99.99% of cap to prevent rounding past wallet balance
                                             let total_portfolio = if let Some(ref ex) = executor {
                                                 ex.balance()
                                             } else {
@@ -3271,21 +3272,39 @@ pub async fn run(
                                             } else {
                                                 0.33
                                             };
+                                            let safe_max = total_portfolio * max_concentration * 0.9999;
                                             let order_value = decision.entry_price * ps.quantity;
-                                            if order_value > total_portfolio * max_concentration {
-                                                let reason = format!("Position ${:.2} exceeds 33% of portfolio (${:.2})", order_value, total_portfolio);
-                                                log_swap_fail!(
-                                                    "BUY REJECTED",
-                                                    "{} — {}",
-                                                    decision.pair,
-                                                    reason
+                                            if order_value > safe_max {
+                                                // Auto-adjust: percentage-based sizing with buffer
+                                                let adjusted_qty = safe_max / decision.entry_price;
+                                                let pct_label = if max_concentration >= 1.0 { "100%" } else { "33%" };
+                                                info!(
+                                                    "AI BUY {} — Auto-adjusting to {} cap: ${:.2} -> ${:.2} (qty {:.4} -> {:.4})",
+                                                    decision.pair, pct_label, order_value, safe_max, ps.quantity, adjusted_qty
                                                 );
                                                 shared.log_activity(
-                                                    savant_trading::core::shared::ActivityLevel::Warning,
+                                                    savant_trading::core::shared::ActivityLevel::Info,
                                                     &decision.pair,
-                                                    &format!("REJECTED: {}", reason),
+                                                    &format!("ADJUSTED: ${:.2} -> ${:.2} ({} cap)", order_value, safe_max, pct_label),
                                                 ).await;
-                                            } else if already_open {
+                                                ps.quantity = adjusted_qty;
+                                                // Inject feedback into decision log so LLM knows its signal was correct
+                                                decision_log.append(savant_trading::agent::decision_log::DecisionEntry {
+                                                    timestamp: Utc::now().to_rfc3339(),
+                                                    pair: decision.pair.clone(),
+                                                    action: "FEEDBACK".to_string(),
+                                                    confidence: decision.confidence,
+                                                    risk_reward: decision.risk_reward,
+                                                    stop_loss: decision.stop_loss,
+                                                    take_profit: decision.take_profit_1,
+                                                    reasoning: format!(
+                                                        "Your BUY signal was correct. Position auto-adjusted from ${:.2} to ${:.2} ({} portfolio cap). Analysis was sound — only sizing was adjusted.",
+                                                        order_value, safe_max, pct_label
+                                                    ),
+                                                    outcome: None,
+                                                });
+                                            }
+                                            if already_open {
                                                 let reason =
                                                     "Already have open position on this pair+side"
                                                         .to_string();

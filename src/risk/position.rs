@@ -171,7 +171,7 @@ impl PositionSizer {
         }
         let cost = entry * quantity;
         if cost > account.balance {
-            quantity = (account.balance * 0.99) / entry;
+            quantity = (account.balance * 0.9999) / entry;
         }
 
         if quantity <= 0.0 {
