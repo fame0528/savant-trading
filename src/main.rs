@@ -986,7 +986,7 @@ async fn close_all_positions(
                     .sign_and_send(token_addr, &approve_bytes, U256::ZERO, 60000)
                     .await
                 {
-                    Ok(hash) => {
+                    Ok((hash, _receipt)) => {
                         println!("    Approve TX: {}", hash);
                         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                     }
@@ -1023,7 +1023,7 @@ async fn close_all_positions(
                         .sign_and_send(swap_to, &swap_data, swap_value, swap_tx.gas)
                         .await
                     {
-                        Ok(tx_hash) => {
+                        Ok((tx_hash, _receipt)) => {
                             println!("    TX: {}", tx_hash);
                             tokio::time::sleep(std::time::Duration::from_secs(10)).await;
 
@@ -1054,7 +1054,7 @@ async fn close_all_positions(
                                     approve_data.trim_start_matches("0x"),
                                 )
                                 .unwrap_or_default();
-                                if let Ok(hash) = trader
+                                if let Ok((hash, _receipt)) = trader
                                     .sign_and_send(token_addr, &approve_bytes, U256::ZERO, 60000)
                                     .await
                                 {
@@ -1083,7 +1083,7 @@ async fn close_all_positions(
                                                 )
                                                 .await
                                             {
-                                                Ok(retry_hash) => {
+                                                Ok((retry_hash, _receipt)) => {
                                                     println!("    Retry TX: {}", retry_hash);
                                                     tokio::time::sleep(
                                                         std::time::Duration::from_secs(10),

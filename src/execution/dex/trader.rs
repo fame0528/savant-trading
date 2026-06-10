@@ -26,9 +26,107 @@ use k256::ecdsa::{RecoveryId, Signature, SigningKey};
 use sha3::{Digest, Keccak256};
 
 /// Minimal transaction receipt for on-chain verification.
-struct TxReceipt {
-    status: u64,
-    gas_used: u64,
+pub struct TxReceipt {
+    pub status: u64,
+    pub gas_used: u64,
+    /// FID-105: Raw receipt JSON for swap direction verification
+    pub raw: Option<serde_json::Value>,
+}
+
+/// FID-105: Verify that the swap moved tokens in the expected direction.
+/// Checks that src_token was sent FROM the wallet and dst_token was sent TO the wallet.
+/// This catches the case where the 0x API returns calldata for the opposite direction
+/// (e.g., buying AAVE with USDC instead of selling AAVE for USDC).
+fn verify_swap_direction(
+    receipt: &TxReceipt,
+    src_token: &TokenInfo,
+    dst_token: &TokenInfo,
+    wallet_addr: &str,
+) -> Result<(), ExecutionError> {
+    let raw = receipt.raw.as_ref().ok_or_else(|| {
+        ExecutionError::Other("TxReceipt missing raw data for direction verification".into())
+    })?;
+
+    let logs = raw["logs"].as_array().ok_or_else(|| {
+        ExecutionError::Other("TxReceipt missing logs array".into())
+    })?;
+
+    // ERC-20 Transfer event topic0
+    let transfer_topic = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+    let wallet_lower = wallet_addr.to_lowercase();
+
+    let mut src_sent_from_wallet = false;
+    let mut dst_received_by_wallet = false;
+
+    for log in logs {
+        let topics = match log["topics"].as_array() {
+            Some(t) if t.len() >= 3 => t,
+            _ => continue,
+        };
+
+        // Check if this is a Transfer event
+        if topics[0].as_str() != Some(transfer_topic) {
+            continue;
+        }
+
+        let from_addr = topics[1].as_str().unwrap_or("").to_lowercase();
+        // Strip padding from address (topic is 32 bytes, address is 20 bytes)
+        let from_addr = if from_addr.len() > 40 {
+            format!("0x{}", &from_addr[from_addr.len() - 40..])
+        } else {
+            from_addr
+        };
+
+        let to_addr = topics[2].as_str().unwrap_or("").to_lowercase();
+        let to_addr = if to_addr.len() > 40 {
+            format!("0x{}", &to_addr[to_addr.len() - 40..])
+        } else {
+            to_addr
+        };
+
+        let log_addr = log["address"].as_str().unwrap_or("").to_lowercase();
+
+        // Check if this log is for src_token or dst_token
+        let is_src = !src_token.address.is_empty() && log_addr == src_token.address.to_lowercase();
+        let is_dst = !dst_token.address.is_empty() && log_addr == dst_token.address.to_lowercase();
+
+        if is_src && from_addr == wallet_lower {
+            src_sent_from_wallet = true;
+        }
+        if is_dst && to_addr == wallet_lower {
+            dst_received_by_wallet = true;
+        }
+    }
+
+    if !src_sent_from_wallet && !dst_received_by_wallet {
+        // Neither token moved from/to wallet — might be an internal transfer through executor
+        // This is acceptable for 0x Permit2 swaps where the executor holds the tokens
+        tracing::debug!("FID-105: No direct wallet transfers found (executor-based swap)");
+        return Ok(());
+    }
+
+    if src_sent_from_wallet && !dst_received_by_wallet {
+        // src left wallet but dst didn't arrive — check if dst went to executor
+        tracing::warn!("FID-105: src_token left wallet but dst_token not received — possible direction reversal");
+        return Err(ExecutionError::Other(format!(
+            "Swap direction reversal detected: {} left wallet but {} not received. \
+             The DEX API may have returned calldata for the opposite direction.",
+            src_token.symbol, dst_token.symbol
+        )));
+    }
+
+    if !src_sent_from_wallet && dst_received_by_wallet {
+        // dst arrived but src didn't leave — this is a buy, not a sell
+        tracing::warn!("FID-105: dst_token received but src_token not sent — possible direction reversal");
+        return Err(ExecutionError::Other(format!(
+            "Swap direction reversal detected: {} received but {} not sent. \
+             The DEX API may have returned calldata for the opposite direction.",
+            dst_token.symbol, src_token.symbol
+        )));
+    }
+
+    tracing::debug!("FID-105: Swap direction verified: {} sent, {} received", src_token.symbol, dst_token.symbol);
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------
@@ -495,14 +593,14 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
     // ---- Transaction signing & broadcasting ----
 
-    /// Sign and broadcast an EIP-1559 transaction. Returns the tx hash.
+    /// Sign and broadcast an EIP-1559 transaction. Returns the tx hash and full receipt.
     pub async fn sign_and_send(
         &self,
         to: Address,
         data: &[u8],
         value: U256,
         gas_limit: u64,
-    ) -> Result<String, ExecutionError> {
+    ) -> Result<(String, TxReceipt), ExecutionError> {
         let nonce = self.get_nonce().await?;
         let (priority_fee, max_fee) = self.get_gas_prices().await?;
 
@@ -604,6 +702,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                 tx_hash
             )));
         }
+
         log_swap_ok!(
             "SWAP",
             "Confirmed on-chain: {} (gas={})",
@@ -611,7 +710,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             receipt.gas_used
         );
 
-        Ok(tx_hash)
+        Ok((tx_hash, receipt))
     }
 
     /// Poll for transaction receipt with exponential backoff.
@@ -645,7 +744,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                         16,
                     )
                     .unwrap_or(0);
-                    return Ok(TxReceipt { status, gas_used });
+                    return Ok(TxReceipt { status, gas_used, raw: Some(val.clone()) });
                 }
                 Err(e) => {
                     if attempt < max_attempts - 1 {
@@ -722,7 +821,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             dst_token: dst_id,
             amount: amount_wei.to_string(),
             slippage: self.slippage_pct,
-            from: wallet_addr,
+            from: wallet_addr.clone(),
             chain_id: self.chain_id,
             sell_entire_balance: false,
         };
@@ -877,7 +976,9 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             );
             let result = self.sign_and_send(to, &data, value, gas_limit).await;
             match result {
-                Ok(hash) => {
+                Ok((hash, receipt)) => {
+                    // FID-105: Verify the swap moved tokens in the expected direction.
+                    verify_swap_direction(&receipt, src_token, dst_token, &wallet_addr)?;
                     log_swap_ok!("BROADCAST", "OK: {}", hash);
                     return Ok(hash);
                 }
@@ -989,7 +1090,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             .map_err(|e| ExecutionError::Other(format!("Invalid approve calldata: {}", e)))?;
 
         // Use a reasonable gas limit for approve (typically ~45K on Arbitrum)
-        let tx_hash = self
+        let (tx_hash, _receipt) = self
             .sign_and_send(token_addr, &approve_bytes, U256::ZERO, 100_000)
             .await?;
         info!(
