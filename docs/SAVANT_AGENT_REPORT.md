@@ -346,7 +346,7 @@ An agent that runs 24/7/365, learns from every decision, evolves its own strateg
 - **API:** Axum REST server with 16 endpoints + CORS
 - **Version:** 0.4.3
 - **Tests:** 127 passing, zero clippy warnings
-- **License:** MIT
+- **License:** Proprietary — All Rights Reserved
 
 ---
 
