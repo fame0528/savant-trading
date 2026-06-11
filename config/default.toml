@@ -113,6 +113,21 @@ eviction_threshold = 5
 # Re-check evicted pairs every N cycles (default 300 = ~25 hours)
 revival_check_cycles = 300
 
+# FID-120: Dynamic token database — self-updating address resolution
+[token_store]
+# Enable persistent token store + periodic discovery
+enabled = true
+# Re-discover token addresses every N cycles (default 10 = ~50 min)
+discovery_interval_cycles = 10
+# Minimum 24h volume (USD) for discovered tokens
+min_volume_usd = 1000000.0
+# Minimum holder count for discovered tokens
+min_holders = 500
+# Validate new addresses via 0x /price endpoint before adding
+validate_via_0x = true
+# Path to persistent token store (JSON)
+persist_path = "data/tokens.json"
+
 [risk]
 max_risk_per_trade = 0.005
 # Position allocation — scalping: 0.5% risk per trade, full deploy at low balance

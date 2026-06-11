@@ -4,6 +4,22 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.13.8] — 2026-06-11
+
+### Added — FID-120: Dynamic Token Database
+
+Persistent, self-updating token address store replaces the static 238-entry ARBITRUM_TOKENS array.
+
+- **Persistent store** (`data/tokens.json`): seeded from static ARBITRUM_TOKENS on first run, survives restarts
+- **Periodic Blockscout refresh**: every 10 cycles (~50 min), queries for new tokens above volume/holder thresholds
+- **Atomic writes**: temp file + rename prevents corruption on crash
+- **Startup merge**: discovered tokens at startup are merged into persistent store immediately
+- **Config-driven**: `[token_store]` section in config/default.toml controls interval, thresholds, persist path
+- Files: `config/default.toml`, `src/core/config.rs`, `src/data/token_discovery.rs`, `src/engine/mod.rs`
+
+### Build & Test
+- 298 tests passing, 0 clippy warnings
+
 ## [0.13.7] — 2026-06-11
 
 ### Fixed — FID-113: PnL Tracking — Fee Estimate Underreporting

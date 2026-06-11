@@ -1,18 +1,19 @@
 # MASTER-FID — FID Tracker
 
 **Last updated:** 2026-06-11
-**Active FIDs:** 2
-**Recently Completed:** 4 (FID-113, FID-118, FID-119)
-**Archived FIDs:** 130
+**Active FIDs:** 3
+**Recently Completed:** 5 (FID-113, FID-118, FID-119, FID-120)
+**Archived FIDs:** 133
 
 ---
 
-## Active FIDs (2)
+## Active FIDs (3)
 
 | ID | Title | Status | Severity |
 |---|---|---|---|
 | FID-106 | FID-2026-0609-106: Agent Conversation & Query System | open | high |
 | FID-110 | FID-2026-0610-110: Engine Monolith Decomposition — engine.rs (7,214 lines) | partially-complete (Sessions 1-4 done, 5-7 deferred to future session) | critical |
+| FID-120 | FID-2026-0611-120: Dynamic Token Database — self-updating persistent address store | implemented | high |
 
 ## Recently Completed (4)
 
@@ -49,4 +50,4 @@
 | FID-116 | FID-116: Chain-Only Truth — Eliminate All Hardcoded & Stale Data | closed |
 | FID-117 | FID-2026-0610-117: Journal as Single Source of Truth | closed |
 
-Total archived: 130
+Total archived: 133

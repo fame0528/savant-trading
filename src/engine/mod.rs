@@ -132,6 +132,9 @@ struct EngineState {
     pairs_revived: u32,
     last_discovery_tick: u64,
     last_revival_check_tick: u64,
+
+    // FID-120: Persistent token store
+    token_store_entries: Vec<savant_trading::data::token_discovery::TokenStoreEntry>,
 }
 
 impl EngineState {
@@ -198,18 +201,36 @@ impl EngineState {
                 active_pairs.len()
             );
         }
+        // FID-120: Persistent token store — initialized before live_execution check
+        // so it's always in scope for EngineState construction.
+        let mut token_store_entries: Vec<savant_trading::data::token_discovery::TokenStoreEntry> = Vec::new();
+
         if config.mode.live_execution {
-            let mut all_token_entries: Vec<(String, String, u8)> = Vec::new();
-            for &(sym, addr, dec) in savant_trading::execution::dex::ARBITRUM_TOKENS {
-                all_token_entries.push((sym.to_string(), addr.to_string(), dec));
-            }
-            savant_trading::execution::dex::extend_token_db(&all_token_entries);
+            // FID-120: Seed persistent token store from static ARBITRUM_TOKENS on first run,
+            // then load from persistent store. The store is the source of truth.
+            let persist_path = &config.trading.token_store.persist_path;
+            token_store_entries = savant_trading::data::token_discovery::seed_token_store_from_static(
+                persist_path,
+                savant_trading::execution::dex::ARBITRUM_TOKENS,
+                config.exchange.dex.chain_id,
+            );
+            // Extend token DB from persistent store (superset of static + discovered)
+            let store_entries: Vec<(String, String, u8)> = token_store_entries
+                .iter()
+                .map(|e| (e.symbol.clone(), e.address.clone(), e.decimals))
+                .collect();
+            savant_trading::execution::dex::extend_token_db(&store_entries);
             info!(
-                "Token DB: {} Arbitrum addresses loaded for resolution",
-                all_token_entries.len()
+                "FID-120 Token DB: {} entries loaded from persistent store ({})",
+                store_entries.len(), persist_path
             );
             // P1-1d: Discover additional Arbitrum tokens from Blockscout
-            match savant_trading::data::token_discovery::discover_tokens(1_000_000.0, 500, 100).await {
+            // FID-120: Merge newly discovered tokens into persistent store
+            match savant_trading::data::token_discovery::discover_tokens(
+                config.trading.token_store.min_volume_usd,
+                config.trading.token_store.min_holders,
+                100,
+            ).await {
                 Ok(discovered) => {
                     let mut discovered_entries: Vec<(String, String, u8)> = Vec::new();
                     for token in &discovered {
@@ -228,9 +249,63 @@ impl EngineState {
                     } else {
                         info!("Token discovery: {} discovered — all already in curated list", discovered.len());
                     }
+                    // FID-120: Merge discovered tokens into persistent store
+                    // FID-121: Gate through 0x validation when enabled
+                    let now = chrono::Utc::now().to_rfc3339();
+                    let known: std::collections::HashSet<String> = token_store_entries
+                        .iter()
+                        .map(|e| e.symbol.to_uppercase())
+                        .collect();
+                    let zerox_key_startup = std::env::var(&config.exchange.dex.api_key_env).ok()
+                        .filter(|k| !k.is_empty());
+                    let mut new_from_discovery = 0usize;
+                    let startup_validate = config.trading.token_store.validate_via_0x && zerox_key_startup.is_some();
+                    for token in &discovered {
+                        if !known.contains(&token.symbol.to_uppercase()) {
+                            // FID-121: Cap validation to bound startup latency
+                            if startup_validate && new_from_discovery >= savant_trading::data::token_discovery::MAX_VALIDATIONS_PER_CYCLE {
+                                break;
+                            }
+                            // FID-121: Validate via 0x before persisting
+                            if startup_validate {
+                                if let Some(ref key) = zerox_key_startup {
+                                    match savant_trading::data::token_discovery::validate_token_liquidity(
+                                        &token.address, config.exchange.dex.chain_id, key,
+                                    ).await {
+                                        Ok(false) => continue,
+                                        Err(e) => warn!("FID-121 startup: 0x validation failed for {}: {}", token.symbol, e),
+                                        _ => {}
+                                    }
+                                    // Rate limit: 250ms between 0x API calls
+                                    tokio::time::sleep(std::time::Duration::from_millis(
+                                        savant_trading::data::token_discovery::VALIDATION_RATE_LIMIT_MS
+                                    )).await;
+                                }
+                            }
+                            token_store_entries.push(
+                                savant_trading::data::token_discovery::TokenStoreEntry {
+                                    symbol: token.symbol.to_uppercase(),
+                                    address: token.address.clone(),
+                                    decimals: token.decimals,
+                                    chain_id: config.exchange.dex.chain_id,
+                                    source: if startup_validate { "0x_validated".into() } else { "blockscout_startup".into() },
+                                    discovered_at: now.clone(),
+                                },
+                            );
+                            new_from_discovery += 1;
+                        }
+                    }
+                    if new_from_discovery > 0 {
+                        if let Err(e) = savant_trading::data::token_discovery::save_token_store(persist_path, &token_store_entries) {
+                            warn!("FID-120: Failed to persist startup discoveries: {}", e);
+                        } else {
+                            info!("FID-120: Merged {} startup discoveries into persistent store (total: {})",
+                                new_from_discovery, token_store_entries.len());
+                        }
+                    }
                 }
                 Err(e) => {
-                    warn!("Token discovery failed ({}), continuing with static DB only", e);
+                    warn!("Token discovery failed ({}), continuing with persistent store only", e);
                 }
             }
         }
@@ -1288,6 +1363,7 @@ impl EngineState {
             pairs_revived,
             last_discovery_tick,
             last_revival_check_tick,
+            token_store_entries,
         })
     }
 }
@@ -1382,6 +1458,7 @@ pub async fn run(
     let mut pairs_revived = state.pairs_revived;
     let mut last_discovery_tick = state.last_discovery_tick;
     let mut last_revival_check_tick = state.last_revival_check_tick;
+    let mut token_store_entries = state.token_store_entries;
     let _jury_key_manager = state.jury_key_manager;
     let mut jury_pool = state.jury_pool;
 
@@ -1686,6 +1763,40 @@ pub async fn run(
                         );
                     }
                 }
+            }
+        }
+
+        // FID-120: Periodic token store refresh — query Blockscout for new tokens
+        // FID-121: 0x liquidity validation gate when validate_via_0x is enabled
+        if config.trading.token_store.enabled
+            && tick.is_multiple_of(config.trading.token_store.discovery_interval_cycles)
+            && config.mode.live_execution
+        {
+            let zerox_api_key = std::env::var(&config.exchange.dex.api_key_env).ok()
+                .filter(|k| !k.is_empty());
+            let (added, total) = savant_trading::data::token_discovery::refresh_token_store(
+                &config.trading.token_store.persist_path,
+                &mut token_store_entries,
+                config.trading.token_store.min_volume_usd,
+                config.trading.token_store.min_holders,
+                config.trading.token_store.validate_via_0x,
+                zerox_api_key.as_deref(),
+                config.exchange.dex.chain_id,
+            )
+            .await;
+            if added > 0 {
+                // Extend token DB with newly discovered tokens
+                let new_entries: Vec<(String, String, u8)> = token_store_entries
+                    .iter()
+                    .rev()
+                    .take(added)
+                    .map(|e| (e.symbol.clone(), e.address.clone(), e.decimals))
+                    .collect();
+                savant_trading::execution::dex::extend_token_db(&new_entries);
+                info!(
+                    "FID-120 REFRESH: {} new tokens added to DB (store total: {})",
+                    added, total
+                );
             }
         }
 

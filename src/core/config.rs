@@ -501,6 +501,55 @@ fn default_ttl_indicators_ms() -> u64 {
     3_600_000
 }
 
+/// FID-120: Dynamic token database configuration.
+#[derive(Debug, Clone, Deserialize)]
+pub struct TokenStoreConfig {
+    /// Enable persistent token store + periodic discovery
+    #[serde(default = "default_true")]
+    pub enabled: bool,
+    /// Re-discover token addresses every N cycles (default 10 = ~50 min)
+    #[serde(default = "default_token_discovery_interval")]
+    pub discovery_interval_cycles: u64,
+    /// Minimum 24h volume (USD) for discovered tokens
+    #[serde(default = "default_token_min_volume")]
+    pub min_volume_usd: f64,
+    /// Minimum holder count for discovered tokens
+    #[serde(default = "default_token_min_holders")]
+    pub min_holders: u64,
+    /// Validate new addresses via 0x /price endpoint before adding
+    #[serde(default = "default_true")]
+    pub validate_via_0x: bool,
+    /// Path to persistent token store (JSON)
+    #[serde(default = "default_token_persist_path")]
+    pub persist_path: String,
+}
+
+impl Default for TokenStoreConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_true(),
+            discovery_interval_cycles: default_token_discovery_interval(),
+            min_volume_usd: default_token_min_volume(),
+            min_holders: default_token_min_holders(),
+            validate_via_0x: true,
+            persist_path: default_token_persist_path(),
+        }
+    }
+}
+
+fn default_token_discovery_interval() -> u64 {
+    10
+}
+fn default_token_min_volume() -> f64 {
+    1_000_000.0
+}
+fn default_token_min_holders() -> u64 {
+    500
+}
+fn default_token_persist_path() -> String {
+    "data/tokens.json".into()
+}
+
 /// FID-118: Pair health rotation configuration.
 #[derive(Debug, Clone, Deserialize)]
 pub struct PairRotationConfig {
@@ -634,6 +683,9 @@ pub struct TradingConfig {
     pub session_penalty_deep_asian: f64,
     #[serde(default)]
     pub pair_rotation: PairRotationConfig,
+    /// FID-120: Dynamic token database
+    #[serde(default)]
+    pub token_store: TokenStoreConfig,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -790,6 +842,7 @@ impl Default for AppConfig {
                 spread_filter_bps: 30.0,
                 session_penalty_deep_asian: 0.90,
                 pair_rotation: PairRotationConfig::default(),
+                token_store: TokenStoreConfig::default(),
             },
             risk: RiskConfig {
                 max_risk_per_trade: 0.20,
