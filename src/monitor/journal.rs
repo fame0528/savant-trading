@@ -103,6 +103,19 @@ impl TradeJournal {
         .execute(&pool)
         .await?;
 
+        // FID-117: Key-value settings for derived financial data.
+        // Replaces JSON snapshot files with a single authoritative store.
+        sqlx::query(
+            r#"
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            )
+            "#,
+        )
+        .execute(&pool)
+        .await?;
+
         info!("Trade journal initialized");
         Ok(Self { pool })
     }
@@ -322,6 +335,55 @@ impl TradeJournal {
             }));
         }
         Ok(snapshots)
+    }
+
+    // ── Settings (FID-117: single source of truth for derived values) ───
+
+    /// Read a setting value by key. Returns None if not set.
+    pub async fn get_setting(&self, key: &str) -> Result<Option<String>, sqlx::Error> {
+        let row = sqlx::query("SELECT value FROM settings WHERE key = ?")
+            .bind(key)
+            .fetch_optional(&self.pool)
+            .await?;
+        Ok(row.map(|r| r.get::<String, _>("value")))
+    }
+
+    /// Write a setting value. Overwrites if key already exists.
+    pub async fn set_setting(&self, key: &str, value: &str) -> Result<(), sqlx::Error> {
+        sqlx::query("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)")
+            .bind(key)
+            .bind(value)
+            .execute(&self.pool)
+            .await?;
+        Ok(())
+    }
+
+    /// Get the starting equity recorded at first boot. Returns None if never set.
+    pub async fn get_starting_equity(&self) -> Result<Option<f64>, sqlx::Error> {
+        match self.get_setting("starting_equity").await? {
+            Some(val) => Ok(val.parse::<f64>().ok()),
+            None => Ok(None),
+        }
+    }
+
+    /// Record starting equity. Only writes if not already set (first boot).
+    pub async fn ensure_starting_equity(&self, equity: f64) -> Result<bool, sqlx::Error> {
+        if self.get_starting_equity().await?.is_some() {
+            return Ok(false); // already recorded
+        }
+        self.set_setting("starting_equity", &format!("{:.6}", equity))
+            .await?;
+        info!("Journal: recorded starting_equity = ${:.2}", equity);
+        Ok(true)
+    }
+
+    /// Get the peak equity from all recorded snapshots.
+    /// Returns 0.0 if no snapshots exist.
+    pub async fn get_peak_equity(&self) -> Result<f64, sqlx::Error> {
+        let row = sqlx::query("SELECT MAX(equity) as peak FROM equity_snapshots")
+            .fetch_one(&self.pool)
+            .await?;
+        Ok(row.get::<Option<f64>, _>("peak").unwrap_or(0.0))
     }
 
     pub async fn get_trades(&self, limit: i64) -> Result<Vec<TradeRecord>, sqlx::Error> {

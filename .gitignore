@@ -91,3 +91,5 @@ nul
 # LLM dumps (too large for repo)
 docs/*llms-full.md
 docs/hero-llms-full.md
+data/starting_balance.json
+data/starting_equity.json

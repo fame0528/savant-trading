@@ -934,6 +934,28 @@ impl EngineState {
                     }
                 }
             }
+
+            // FID-116 GAP FIX: If on-chain has MORE tokens than tracked, update position qty.
+            // Handles: tokens acquired outside engine, airdrops, or under-counted positions.
+            {
+                for (pair, on_chain_qty, tracked_qty) in &discrepancies {
+                    if *on_chain_qty > *tracked_qty + 0.001 && *tracked_qty > 0.001 {
+                        if let Some(existing) = portfolio.positions_mut().values_mut()
+                            .find(|p| p.pair == *pair)
+                        {
+                            let old_qty = existing.quantity;
+                            existing.quantity = *on_chain_qty;
+                            existing.risk_amount = existing.entry_price * on_chain_qty;
+                            info!(
+                                "FID-116 GAP: {} qty {:.4} -> {:.4} (on-chain has more)",
+                                pair, old_qty, on_chain_qty
+                            );
+                        }
+                    }
+            // FID-116: Refresh equity after gap fix updates position quantities
+            portfolio.refresh_equity();
+                }
+            }
             let short_ids: Vec<String> = portfolio.positions().iter()
                 .filter(|(_, p)| p.side == Side::Short)
                 .map(|(id, _)| id.clone())
@@ -1042,19 +1064,67 @@ impl EngineState {
             }
         }
 
-        {
-            let mut sa = shared.account.write().await;
-            *sa = portfolio.account().clone();
-            let mut sp = shared.positions.write().await;
-            *sp = portfolio.positions().values().cloned().collect();
-            info!(
-                "FID-109: Shared state FORCE synced — {} positions, balance=${:.2}, equity=${:.2}, open={}",
-                sp.len(),
-                sa.balance,
-                sa.equity,
-                sa.open_positions,
-            );
+        // FID-117: Clean up orphaned JSON snapshot files from before FID-117.
+        // These files are no longer read or written — journal is the source of truth.
+        let _ = std::fs::remove_file("data/starting_equity.json");
+        let _ = std::fs::remove_file("data/starting_balance.json");
+
+        // FID-117: Record starting equity to journal (replaces JSON snapshot files).
+        // The journal is the single historical source of truth. Chain is current truth.
+
+        // FID-117: Load peak_equity from journal snapshots (survives restarts).
+        // Without this, peak_equity resets to current equity on every boot,
+        // corrupting drawdown tracking.
+        if let Some(ref j) = journal {
+            match j.get_peak_equity().await {
+                Ok(peak) if peak > 0.0 => {
+                    portfolio.account_mut().peak_equity = peak;
+                    info!("FID-117: Restored peak_equity = ${:.2} from journal", peak);
+                }
+                Ok(_) => {
+                    info!("FID-117: No equity snapshots yet, peak_equity starts at current");
+                }
+                Err(e) => warn!("FID-117: Failed to load peak_equity: {}", e),
+            }
         }
+        {
+            let usdc_balance = portfolio.account().balance;
+            let mut token_values = 0.0f64;
+            for pos in portfolio.positions().values() {
+                token_values += pos.current_price * pos.quantity;
+            }
+            let starting_equity = usdc_balance + token_values;
+
+            if let Some(ref j) = journal {
+                match j.ensure_starting_equity(starting_equity).await {
+                    Ok(true) => info!(
+                        "FID-117: Recorded starting_equity = ${:.2} (USDC: ${:.2}, tokens: ${:.2})",
+                        starting_equity, usdc_balance, token_values
+                    ),
+                    Ok(false) => {
+                        if let Ok(Some(saved)) = j.get_starting_equity().await {
+                            info!("FID-117: Loaded starting_equity = ${:.2} from journal", saved);
+                        }
+                    }
+                    Err(e) => warn!("FID-117: Failed to record starting_equity: {}", e),
+                }
+            }
+
+            // Initialize shared state from journal (authoritative) or calculation (fallback)
+            let se = if let Some(ref j) = journal {
+                j.get_starting_equity().await.ok().flatten().unwrap_or(starting_equity)
+            } else {
+                starting_equity
+            };
+            {
+                let mut shared_se = shared.starting_equity.write().await;
+                *shared_se = se;
+            }
+            *shared.chain_equity.write().await = portfolio.account().equity;
+        }
+
+        // FID-117: Record starting equity to journal on first startup.
+        // Uses on-chain equity (USDC + all token values) not stale portfolio equity.
 
         {
             let stop_overrides: Vec<(String, f64)> = portfolio
@@ -4163,6 +4233,8 @@ pub async fn run(
                 let mut sa = shared.account.write().await;
                 *sa = portfolio.account().clone();
                 debug!("Balance synced from executor: ${:.2}", executor_balance);
+                // FID-117: Update chain_equity from portfolio
+                *shared.chain_equity.write().await = portfolio.account().equity;
             }
 
             // FID-096 Fix 1: On-chain token balance reconciliation.

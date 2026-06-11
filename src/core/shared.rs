@@ -35,6 +35,12 @@ pub struct SharedEngineData {
     pub wallet_address: Arc<RwLock<String>>,
     /// FID-103: DEX prices from 0x /price responses. Pair → (price, timestamp).
     pub dex_prices: Arc<RwLock<HashMap<String, (f64, std::time::Instant)>>>,
+    /// FID-116: On-chain verified equity — USDC + all token balances at market prices.
+    /// Updated every cycle from portfolio.account().equity.
+    pub chain_equity: Arc<RwLock<f64>>,
+    /// FID-117: Starting equity recorded at first boot, stored in journal.
+    /// Single source of truth for P&L calculation. Never changes after first boot.
+    pub starting_equity: Arc<RwLock<f64>>,
     // ---- FID-093: Command bridge fields ----
     /// Operator commands queued for the engine to drain each cycle.
     pub pending_commands: Arc<RwLock<VecDeque<crate::agent::commands::PendingCommand>>>,
@@ -126,6 +132,8 @@ impl SharedEngineData {
             price_staleness_secs: Arc::new(RwLock::new(0)),
             wallet_address: Arc::new(RwLock::new(String::new())),
             dex_prices: Arc::new(RwLock::new(HashMap::new())),
+            chain_equity: Arc::new(RwLock::new(0.0)),
+            starting_equity: Arc::new(RwLock::new(0.0)),
             // FID-093: Command bridge fields
             pending_commands: Arc::new(RwLock::new(VecDeque::new())),
             autonomy_override: Arc::new(RwLock::new(None)),

@@ -3,6 +3,57 @@
 All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+n## [0.13.2] — 2026-06-10
+
+### Fixed — FID-111: Position-Pair Injection (Held Positions Invisible to LLM)
+
+Positions loaded from journal or wallet-recovery can reference pairs not in the discovery list. These pairs never get evaluated by the LLM and are missing from AI Decisions. After position loading, any pair with an open position not in active_pairs is added to active_pairs + curated_pairs, gets a MarketDataStore, and has historical candles fetched at startup.
+
+### Fixed — FID-112: Final Side Correction (SHORT Positions Surviving Into Portfolio)
+
+The executor-to-portfolio sync path bypasses the wallet-sync side correction, reintroducing SHORT positions into the portfolio and dashboard. Added FINAL SIDE CORRECTION block before shared state sync that forces all remaining SHORT positions to LONG with corrected TP/SL, re-registers in DexTrader, saves to journal, and logs activity.
+
+### Changed — FID-117: Journal as Single Source of Truth (Eliminated JSON Snapshot Files)
+
+The system used JSON snapshot files (`data/starting_equity.json`, `data/starting_balance.json`) to persist starting equity across restarts. These files were stale, error-prone, and the root cause of multiple financial reporting bugs. FID-117 eliminates them entirely.
+
+**Architecture:** Two sources of truth — chain (current state) + SQLite journal (historical). Everything else derived at query time.
+
+**Changes:**
+- `src/monitor/journal.rs` — Added `settings` table (key-value SQLite store) + 5 methods: `get_setting`, `set_setting`, `get_starting_equity`, `ensure_starting_equity` (idempotent — only writes on first boot), `get_peak_equity` (MAX from equity_snapshots)
+- `src/core/shared.rs` — Added `starting_equity: Arc<RwLock<f64>>` to SharedEngineData
+- `src/engine/mod.rs` — Orphaned JSON file cleanup at startup. FID-117 snapshot: calculates equity = USDC + token values, records to journal on first boot, loads into shared state. Peak equity restored from journal MAX(equity_snapshots) on restart. Simplified chain_equity sync. Removed all stale FID-116 JSON file code.
+- `src/api/mod.rs` — `get_session` reads starting_equity from `shared.starting_equity` (3 lines) instead of reading JSON file (15 lines of file I/O)
+
+### Fixed — FID-116: Chain-Only Truth (Stale Data Causing $25+ Losses)
+
+The system had 5 competing sources of truth for financial data (config, snapshots, journal, portfolio, chain), producing contradictory numbers that caused incorrect position sizing, wrong profit display, phantom trades, and real money loss. Dashboard showed -$10.27 loss when wallet was actually up +$5.62 (+29%).
+
+**Root causes fixed:**
+- `set_balance()` reset `peak_equity` to raw USDC balance, corrupting drawdown tracking
+- `starting_balance` hardcoded $30 from config when actual on-chain was $19.35
+- FID-115 snapshot captured stale portfolio equity (missing 10.71 STG "ghost capital")
+- `sync_balance()` ran every 15 min — stale equity for up to 15 min after swaps
+- Wallet sync ignored `on_chain_qty > tracked_qty` gap — loose tokens invisible to equity
+
+**Changes:**
+- `src/execution/portfolio.rs` — `set_balance()` preserves `peak_equity`, sets `equity = balance` as safe intermediate
+- `src/core/shared.rs` — Added `chain_equity: Arc<RwLock<f64>>` to SharedEngineData for dashboard-wide true equity
+- `src/api/mod.rs` — `get_portfolio` uses `chain_equity` when available; `get_session` reads from `data/starting_equity.json` and uses chain_equity for PnL
+- `src/engine/mod.rs` — (a) FID-116 snapshot: calculates true on-chain equity (USDC + all token positions × price) at first boot, saves to `data/starting_equity.json`. (b) `chain_equity` updated after periodic `sync_balance`. (c) Wallet sync gap fix: updates position qty when `on_chain_qty > tracked_qty` + calls `refresh_equity()` after
+- `.gitignore` — Both `data/starting_balance.json` and `data/starting_equity.json` listed
+
+### Changed
+
+- `src/engine/mod.rs` — Added FID-111 position-pair injection block (~60 lines)
+- `src/engine/mod.rs` — Added FID-112 FINAL SIDE CORRECTION block (~40 lines)
+- `src/engine/mod.rs` — Made `active_pairs` mutable (line 149)
+- `src/engine/mod.rs` — Added FID-116 snapshot, chain_equity sync, and gap fix (~70 lines)
+
+### Build & Test
+
+- 273 tests passing, 0 clippy warnings
+- Engine compiled successfully with all fixes
 
 ## [0.13.1] — 2026-06-10
 

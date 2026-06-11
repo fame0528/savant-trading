@@ -441,6 +441,17 @@
 
 <!-- Add new entries above this line -->
 
+## Session 2026-06-10: FID-111, FID-112, FID-113 — Position Side + Pair Injection
+
+**Key Learnings:**
+
+- **Defense-in-depth is critical for invariant enforcement.** The wallet-sync side-correction was correct but incomplete — it only caught positions present at that point in the startup sequence. A final gate before shared state sync catches ALL paths including executor-to-portfolio re-add. Three layers of SHORT-to-LONG correction now exist: wallet-sync (line 944), wallet-sync post-loop (line 968), and FINAL (line 1057).
+- **Journal-loaded positions can reference pairs not in config.** Any position with an open trade MUST be in the active scanning set, regardless of how it was loaded. The stale-removal block removes positions not in config.trading.pairs, but wallet recovery can add them back. FID-111 handles all remaining cases.
+- **The executor-to-portfolio sync is a double-edged sword.** It's useful for recovering positions from DexTrader's tracker, but it can reintroduce bugs that earlier safety layers fixed. When the stale-removal block deletes a position from portfolio but DexTrader still tracks it, the executor-to-portfolio sync adds it back with the ORIGINAL side (SHORT) from the DB. This is the root cause of FID-112.
+- **ECHO Protocol compliance prevents cascading failures.** FIDs, Perfection Loop, session summaries, and CHANGELOG updates are not optional — they prevent the exact pattern documented in LEARNINGS.md where rushing fixes without FIDs creates cascading failures (see Session 2026-06-08: FID-087).
+- **Law 1 (Read 0-EOF) applies to protocol files too.** Not reading ECHO.md and AGENTS.md before starting work violated the most fundamental law. The protocol exists to prevent exactly the kind of disorganized work that happened this session.
+- **PnL tracking gap is systemic.** The 0.1% fee estimate was carried over from the original Kraken config. DEX LP fees are 0.3% on Uniswap v3. Config drift between CEX and DEX assumptions causes silent PnL miscalculation. FID-113 identified this but fix is deferred.
+
 ## Session 2026-06-03-1500: Merge Strategy, 0x API Fix, /dev Cleanup
 
 **Key Learnings:**

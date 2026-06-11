@@ -249,7 +249,7 @@ export default function Dashboard() {
       {/* ── Connection Overlay ── */}
       {!online && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--bg)]/90 backdrop-blur-sm">
-          <Image src="/savant.png" alt="SAVANT" width={64} height={64} className="rounded-lg mb-4 opacity-50" />
+          <Image src="/savant.png" alt="SAVANT" width={256} height={256} className="rounded-lg mb-4 opacity-50" />
           <span className="text-xl font-extrabold tracking-[8px] bg-gradient-to-r from-white/50 to-[var(--cyan)]/50 bg-clip-text text-transparent mb-2">SAVANT</span>
           <span className="text-[10px] tracking-[3px] uppercase text-[var(--dim)] mb-6">Autonomous Trading Agent</span>
           <div className="flex items-center gap-2 text-[var(--dim)] text-[11px] font-mono">

@@ -191,9 +191,11 @@ async fn get_portfolio(State(state): State<AppState>) -> Json<ApiResponse<serde_
     let hunt = *state.shared.hunt_mode.read().await;
     let monitoring = *state.shared.monitoring_mode.read().await;
     let staleness = *state.shared.price_staleness_secs.read().await;
+    // FID-116: Use chain_equity as the true on-chain portfolio value.
+    let chain_eq = *state.shared.chain_equity.read().await;
     Json(ApiResponse::ok(serde_json::json!({
         "balance": account.balance,
-        "equity": account.equity,
+        "equity": if chain_eq > 0.0 { chain_eq } else { account.equity },
         "drawdown_pct": account.drawdown_pct,
         "daily_pnl": account.daily_pnl,
         "unrealized_pnl": account.unrealized_pnl,
@@ -274,7 +276,22 @@ async fn get_trades(State(state): State<AppState>) -> Json<ApiResponse<Vec<serde
 
 async fn get_decisions(State(state): State<AppState>) -> Json<ApiResponse<Vec<DecisionRecord>>> {
     let decisions = state.shared.decisions.read().await;
-    let items: Vec<DecisionRecord> = decisions.iter().rev().take(20).cloned().collect();
+    // FID-114: Pin non-PASS decisions at top so actionable signals (BUY/SELL/CLOSE/ADJUST)
+    // are always visible even when batch evaluation produces 40+ PASS decisions.
+    let non_pass: Vec<DecisionRecord> = decisions.iter()
+        .rev()
+        .filter(|d| !d.action.eq_ignore_ascii_case("Pass"))
+        .take(10)
+        .cloned()
+        .collect();
+    let pass: Vec<DecisionRecord> = decisions.iter()
+        .rev()
+        .filter(|d| d.action.eq_ignore_ascii_case("Pass"))
+        .take(20_usize.saturating_sub(non_pass.len()))
+        .cloned()
+        .collect();
+    let mut items = non_pass;
+    items.extend(pass);
     Json(ApiResponse::ok(items))
 }
 
@@ -387,16 +404,22 @@ async fn get_session(State(state): State<AppState>) -> Json<ApiResponse<serde_js
     let trades = state.shared.closed_trades.read().await;
     let decisions = state.shared.decisions.read().await;
     let account = state.shared.account.read().await;
-    let starting = state.config.trading.starting_balance;
+    // FID-117: Starting equity from journal (single source of truth).
+    // Recorded once at first boot, stored in SQLite settings table.
+    // Falls back to config only if journal has no entry yet.
+    let starting = {
+        let se = *state.shared.starting_equity.read().await;
+        if se > 0.01 { se } else { state.config.trading.starting_balance }
+    };
 
-    // Count ALL trades for win/loss — historical journal trades don't have
-    // on_chain_verified flag (DB schema lacks the column), but they were
-    // recorded by close_position() which does on-chain verification.
+    // Count ALL trades for win/loss
     let wins = trades.iter().filter(|t| t.pnl > 0.0).count();
     let total = trades.len();
 
-    // Use on-chain equity minus starting balance as true PnL.
-    let true_pnl = account.equity - starting;
+    // FID-116: Use chain_equity for true PnL (not stale portfolio equity).
+    let chain_eq = *state.shared.chain_equity.read().await;
+    let current_equity = if chain_eq > 0.0 { chain_eq } else { account.equity };
+    let true_pnl = current_equity - starting;
 
     Json(ApiResponse::ok(serde_json::json!({
         "total_trades": total,
@@ -407,7 +430,7 @@ async fn get_session(State(state): State<AppState>) -> Json<ApiResponse<serde_js
         "total_pnl": true_pnl,
         "total_decisions": decisions.len(),
         "balance": account.balance,
-        "equity": account.equity,
+        "equity": current_equity,
         "starting_balance": starting,
     })))
 }
