@@ -1,4 +1,4 @@
-# SAVANT TRADING v0.13.2
+# SAVANT TRADING v0.13.3
 
 <!-- markdownlint-disable MD033 -->
 <div align="center">
@@ -11,7 +11,7 @@ No KYC. No CEX. Arbitrum on-chain swaps via 0x API — powered by 6,676+ knowled
 
 **Model-agnostic:** Any OpenAI-compatible LLM via [OpenRouter](https://openrouter.ai/). Default: [Owl Alpha](https://openrouter.ai/openrouter/owl-alpha) (free, 1M context, 2.25T weekly tokens). Previously tested with MiMo v2.5 Pro.
 
-[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![0x](https://img.shields.io/badge/0x-DEX-%23000000?style=flat-square&logo=ethereum&logoColor=%2300fbff)](https://0x.org/)[![Arbitrum](https://img.shields.io/badge/Arbitrum-L2-%23000000?style=flat-square&logo=arbitrum&logoColor=%2300fbff)](https://arbitrum.io/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-LLM-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/)[![Version](https://img.shields.io/badge/Version-0.13.2-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-Proprietary-%23000000?style=flat-square&logo=lock&logoColor=%2300fbff)](LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![0x](https://img.shields.io/badge/0x-DEX-%23000000?style=flat-square&logo=ethereum&logoColor=%2300fbff)](https://0x.org/)[![Arbitrum](https://img.shields.io/badge/Arbitrum-L2-%23000000?style=flat-square&logo=arbitrum&logoColor=%2300fbff)](https://arbitrum.io/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-LLM-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/)[![Version](https://img.shields.io/badge/Version-0.13.3-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-Proprietary-%23000000?style=flat-square&logo=lock&logoColor=%2300fbff)](LICENSE)
 
 </div>
 
@@ -416,8 +416,8 @@ All development follows the [Savant Protocol](https://github.com/fame0528/savant
 ### Findings
 
 Bugs and improvements tracked via FIDs:
-- Active FIDs: FID-106 through FID-117 (FID-111 Position-Pair Injection, FID-112 Side Correction, FID-116 Chain-Only Truth, FID-117 Journal as Single Source of Truth)
-- 121+ archived FIDs
+- Active FIDs: FID-106, FID-110, FID-113 (3 remaining)
+- 129 archived FIDs
 
 ---
 

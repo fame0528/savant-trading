@@ -47,7 +47,7 @@ const fmt = {
   },
 };
 
-const pnlClass = (v: number) => (v >= 0 ? "text-[var(--green)]" : "text-[var(--red)]");
+const pnlClass = (v: number) => (v >= 0 ? "text-(--green)" : "text-(--red)");
 
 function Icon({ name, className = "" }: { name: string; className?: string }) {
   return <i className={`fa-solid ${name} ${className}`} />;
@@ -55,19 +55,19 @@ function Icon({ name, className = "" }: { name: string; className?: string }) {
 
 function KPI({ icon, label, value, sub, color }: { icon: string; label: string; value: string; sub?: string; color?: string }) {
   return (
-    <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md p-2 flex flex-col justify-center">
+    <div className="bg-(--panel) border border-(--line) backdrop-blur-md p-2 flex flex-col justify-center">
       <div className="flex items-center gap-1.5 mb-1">
-        <Icon name={icon} className={`text-[9px] ${color ?? "text-[var(--dim)]"}`} />
-        <p className="text-[9px] tracking-[1.5px] uppercase text-[var(--dim)]">{label}</p>
+        <Icon name={icon} className={`text-[9px] ${color ?? "text-(--dim)"}`} />
+        <p className="text-[9px] tracking-[1.5px] uppercase text-(--dim)">{label}</p>
       </div>
       <p className="text-xl font-bold font-mono tabular-nums leading-tight">{value}</p>
-      {sub && <p className="text-[10px] mt-0.5 text-[var(--dim)]">{sub}</p>}
+      {sub && <p className="text-[10px] mt-0.5 text-(--dim)">{sub}</p>}
     </div>
   );
 }
 
 function FearGauge({ value }: { value: number | null }) {
-  if (value == null) return <div className="text-[var(--dimmer)] text-xs"><Icon name="fa-chart-simple" className="mr-1" />No data</div>;
+  if (value == null) return <div className="text-(--dimmer) text-xs"><Icon name="fa-chart-simple" className="mr-1" />No data</div>;
   const frac = Math.max(0, Math.min(100, value)) / 100;
   const hue = frac * 120;
   return (
@@ -84,7 +84,7 @@ function FearGauge({ value }: { value: number | null }) {
 function MetricRow({ icon, label, value, color }: { icon: string; label: string; value: React.ReactNode; color?: string }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5">
+      <span className="text-[10px] text-(--dim) flex items-center gap-1.5">
         <Icon name={icon} className="text-[7px]" />{label}
       </span>
       <span className={`text-[13px] font-mono font-semibold ${color ?? ""}`}>{value}</span>
@@ -100,7 +100,7 @@ function RiskBar({ icon, label, value, max, tooltip }: { icon: string; label: st
       <div className="cursor-help">
         <ProgressBar aria-label={label} size="md" value={pct} color={color}>
           <Label>
-            <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5">
+            <span className="text-[10px] text-(--dim) flex items-center gap-1.5">
               <Icon name={icon} className="text-[7px]" />{label}
             </span>
           </Label>
@@ -123,7 +123,7 @@ function CopyButton({ text, title }: { text: () => string; title?: string }) {
   return (
     <button
       onClick={() => navigator.clipboard.writeText(text())}
-      className="inline-flex items-center justify-center text-[var(--dim)] hover:text-[var(--cyan)] transition-colors cursor-pointer leading-none"
+      className="inline-flex items-center justify-center text-(--dim) hover:text-(--cyan) transition-colors cursor-pointer leading-none"
       title={title ?? "Copy to clipboard"}
     >
       <Icon name="fa-copy" className="text-[9px]" />
@@ -133,10 +133,10 @@ function CopyButton({ text, title }: { text: () => string; title?: string }) {
 
 function SectionHeader({ icon, title, tag, tagColor, onCopy }: { icon: string; title: string; tag?: string; tagColor?: string; onCopy?: () => string }) {
   return (
-    <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-[var(--line)]">
-      <span className="inline-flex items-center"><Icon name={icon} className="text-[var(--dim)] text-[10px]" /></span>
-      <span className="text-[10px] tracking-[2px] uppercase font-semibold text-[var(--dim)] leading-none">{title}</span>
-      {tag && <span className={`ml-auto text-[9px] font-bold leading-none ${tagColor ?? "text-[var(--cyan)]"}`}>{tag}</span>}
+    <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-(--line)">
+      <span className="inline-flex items-center"><Icon name={icon} className="text-(--dim) text-[10px]" /></span>
+      <span className="text-[10px] tracking-[2px] uppercase font-semibold text-(--dim) leading-none">{title}</span>
+      {tag && <span className={`ml-auto text-[9px] font-bold leading-none ${tagColor ?? "text-(--cyan)"}`}>{tag}</span>}
       {onCopy && <span className="ml-auto inline-flex items-center"><CopyButton text={onCopy} title={`Copy ${title.toLowerCase()}`} /></span>}
     </div>
   );
@@ -234,7 +234,7 @@ export default function Dashboard() {
   return (
     <div className="h-screen w-screen flex flex-col p-1.5 gap-1.5 overflow-hidden">
       <Toaster position="bottom-right" gutter={12} containerStyle={{ bottom: 16, right: 16 }} toastOptions={{
-        className: "!bg-[var(--panel-solid)] !text-[var(--txt)] !border !border-[var(--line)] !text-xs !font-mono",
+        className: "!bg-[var(--panel-solid)] !text-(--txt) !border !border-(--line) !text-xs !font-mono",
         duration: 4000,
         removeDelay: 500,
         success: {
@@ -248,24 +248,24 @@ export default function Dashboard() {
 
       {/* ── Connection Overlay ── */}
       {!online && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--bg)]/90 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-(--bg)/90 backdrop-blur-sm">
           <Image src="/savant.png" alt="SAVANT" width={256} height={256} className="rounded-lg mb-4 opacity-50" />
-          <span className="text-xl font-extrabold tracking-[8px] bg-gradient-to-r from-white/50 to-[var(--cyan)]/50 bg-clip-text text-transparent mb-2">SAVANT</span>
-          <span className="text-[10px] tracking-[3px] uppercase text-[var(--dim)] mb-6">Autonomous Trading Agent</span>
-          <div className="flex items-center gap-2 text-[var(--dim)] text-[11px] font-mono">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--red)] shadow-[0_0_6px_var(--red)] animate-pulse" />
+          <span className="text-xl font-extrabold tracking-[8px] bg-linear-to-r from-white/50 to-(--cyan)/50 bg-clip-text text-transparent mb-2">SAVANT</span>
+          <span className="text-[10px] tracking-[3px] uppercase text-(--dim) mb-6">Autonomous Trading Agent</span>
+          <div className="flex items-center gap-2 text-(--dim) text-[11px] font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-(--red) shadow-[0_0_6px_var(--red)] animate-pulse" />
             <span>The engine is not currently running. Restart the engine to continue.</span>
           </div>
         </div>
       )}
 
       {/* ── Header ── */}
-      <div className="flex items-center gap-3 bg-gradient-to-b from-[rgba(20,24,40,0.7)] to-[rgba(12,14,24,0.5)] border border-[var(--line)] backdrop-blur-xl px-3 py-1.5 shrink-0">
+      <div className="flex items-center gap-3 bg-linear-to-b from-[rgba(20,24,40,0.7)] to-[rgba(12,14,24,0.5)] border border-(--line) backdrop-blur-xl px-3 py-1.5 shrink-0">
         <Image src="/savant.png" alt="SAVANT" width={36} height={36} className="rounded" />
-        <span className="text-base font-extrabold tracking-[6px] bg-gradient-to-r from-white to-[var(--cyan)] bg-clip-text text-transparent">SAVANT</span>
-        <span className="text-[9px] tracking-[3px] uppercase text-[var(--dim)]">Autonomous Trading Agent</span>
+        <span className="text-base font-extrabold tracking-[6px] bg-linear-to-r from-white to-(--cyan) bg-clip-text text-transparent">SAVANT</span>
+        <span className="text-[9px] tracking-[3px] uppercase text-(--dim)">Autonomous Trading Agent</span>
         <span className={`inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase ${
-          live ? "border-[var(--cyan)]/30 bg-[var(--cyan)]/10 text-[var(--cyan)]" : "border-[var(--amber)]/30 bg-[var(--amber)]/10 text-[var(--amber)]"
+          live ? "border-(--cyan)/30 bg-(--cyan)/10 text-(--cyan)" : "border-(--amber)/30 bg-(--amber)/10 text-(--amber)"
         }`}>
           <Icon name={live ? "fa-satellite-dish" : "fa-moon"} className="text-[8px]" />
           {status?.mode ?? "—"} · {status?.running ? "RUNNING" : "IDLE"}
@@ -289,12 +289,12 @@ export default function Dashboard() {
           </span>
         )}
         <div className="flex-1" />
-        <div className="flex gap-4 items-center text-[10px] text-[var(--dim)]">
-          <span className="flex items-center gap-1"><Icon name="fa-microchip" className="text-[8px]" /> <b className="text-[var(--txt)]">{config?.model ?? "—"}</b></span>
-          <span className="flex items-center gap-1"><Icon name="fa-clock" className="text-[8px]" /> <b className="text-[var(--txt)]">{fmt.uptime(status?.uptime_seconds ?? 0)}</b></span>
-          <span className="flex items-center gap-1"><Icon name="fa-layer-group" className="text-[8px]" /> <b className="text-[var(--txt)]">{status?.pairs?.length ?? 0}</b></span>
+        <div className="flex gap-4 items-center text-[10px] text-(--dim)">
+          <span className="flex items-center gap-1"><Icon name="fa-microchip" className="text-[8px]" /> <b className="text-(--txt)">{config?.model ?? "—"}</b></span>
+          <span className="flex items-center gap-1"><Icon name="fa-clock" className="text-[8px]" /> <b className="text-(--txt)">{fmt.uptime(status?.uptime_seconds ?? 0)}</b></span>
+          <span className="flex items-center gap-1"><Icon name="fa-layer-group" className="text-[8px]" /> <b className="text-(--txt)">{status?.pairs?.length ?? 0}</b></span>
           <span className="flex items-center gap-1.5">
-            <span className={`w-1.5 h-1.5 rounded-full ${online ? "bg-[var(--green)] shadow-[0_0_8px_var(--green)]" : "bg-[var(--red)] shadow-[0_0_6px_var(--red)]"}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${online ? "bg-(--green) shadow-[0_0_8px_var(--green)]" : "bg-(--red) shadow-[0_0_6px_var(--red)]"}`} />
             <Icon name={online ? "fa-link" : "fa-link-slash"} className="text-[8px]" />
             {online ? "connected" : "offline"}
           </span>
@@ -304,50 +304,50 @@ export default function Dashboard() {
       {/* ── News Ticker ── */}
       <Ticker speed={50}>
         {insight?.trending_coins?.slice(0, 8).map((c, i) => (
-          <span key={`t-${i}`} className="text-[9px] flex items-center gap-1 text-[var(--cyan)]"><Icon name="fa-fire" className="text-[7px]" />{c}</span>
+          <span key={`t-${i}`} className="text-[9px] flex items-center gap-1 text-(--cyan)"><Icon name="fa-fire" className="text-[7px]" />{c}</span>
         ))}
         <span className="text-[9px] flex items-center gap-1.5">
           <Icon name={(insight?.fear_greed ?? 50) < 30 ? "fa-arrow-trend-down" : (insight?.fear_greed ?? 50) > 70 ? "fa-arrow-trend-up" : "fa-minus"} className="text-[7px]" />
-          <span className="text-[var(--amber)]">F&amp;G: {insight?.fear_greed ?? "—"}</span>
-          <span className="text-[var(--dim)]">({insight?.fear_greed_label ?? "—"})</span>
+          <span className="text-(--amber)">F&amp;G: {insight?.fear_greed ?? "—"}</span>
+          <span className="text-(--dim)">({insight?.fear_greed_label ?? "—"})</span>
         </span>
         <span className="text-[9px] flex items-center gap-1.5">
-          <Icon name={(insight?.funding_rate ?? 0) < 0 ? "fa-arrow-up" : "fa-arrow-down"} className={`text-[7px] ${(insight?.funding_rate ?? 0) < 0 ? "text-[var(--green)]" : "text-[var(--red)]"}`} />
-          <span className="text-[var(--dim)]">Funding:</span>
-          <span className={`font-mono ${(insight?.funding_rate ?? 0) < -0.005 ? "text-[var(--green)]" : (insight?.funding_rate ?? 0) > 0.005 ? "text-[var(--red)]" : "text-[var(--dim)]"}`}>{insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"}</span>
+          <Icon name={(insight?.funding_rate ?? 0) < 0 ? "fa-arrow-up" : "fa-arrow-down"} className={`text-[7px] ${(insight?.funding_rate ?? 0) < 0 ? "text-(--green)" : "text-(--red)"}`} />
+          <span className="text-(--dim)">Funding:</span>
+          <span className={`font-mono ${(insight?.funding_rate ?? 0) < -0.005 ? "text-(--green)" : (insight?.funding_rate ?? 0) > 0.005 ? "text-(--red)" : "text-(--dim)"}`}>{insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"}</span>
         </span>
         <span className="text-[9px] flex items-center gap-1.5">
-          <Icon name="fa-bitcoin-sign" className="text-[7px] text-[var(--dim)]" />
-          <span className="text-[var(--dim)]">BTC Dom:</span>
-          <span className="font-mono text-[var(--txt)]">{insight?.btc_dominance?.toFixed(1) ?? "—"}%</span>
+          <Icon name="fa-bitcoin-sign" className="text-[7px] text-(--dim)" />
+          <span className="text-(--dim)">BTC Dom:</span>
+          <span className="font-mono text-(--txt)">{insight?.btc_dominance?.toFixed(1) ?? "—"}%</span>
         </span>
         <span className="text-[9px] flex items-center gap-1.5">
-          <Icon name="fa-cube" className="text-[7px] text-[var(--dim)]" />
-          <span className="text-[var(--dim)]">Block:</span>
-          <span className="font-mono text-[var(--txt)]">{insight?.block_height?.toLocaleString() ?? "—"}</span>
+          <Icon name="fa-cube" className="text-[7px] text-(--dim)" />
+          <span className="text-(--dim)">Block:</span>
+          <span className="font-mono text-(--txt)">{insight?.block_height?.toLocaleString() ?? "—"}</span>
         </span>
         <span className="text-[9px] flex items-center gap-1.5">
-          <Icon name="fa-newspaper" className="text-[7px] text-[var(--dim)]" />
-          <span className="text-[var(--dim)]">News:</span>
-          <span className="font-mono text-[var(--txt)]">{insight?.rss_items ?? 0}</span>
+          <Icon name="fa-newspaper" className="text-[7px] text-(--dim)" />
+          <span className="text-(--dim)">News:</span>
+          <span className="font-mono text-(--txt)">{insight?.rss_items ?? 0}</span>
         </span>
         {positions.map((p) => (
           <span key={`pos-${p.id}`} className="text-[9px] flex items-center gap-1.5">
-            <Icon name={p.side === "Long" ? "fa-arrow-trend-up" : "fa-arrow-trend-down"} className={`text-[7px] ${(p.unrealized_pnl ?? 0) >= 0 ? "text-[var(--green)]" : "text-[var(--red)]"}`} />
-            <span className="text-[var(--txt)] font-semibold">{p.pair.split("/")[0]}</span>
-            <span className="font-mono text-[var(--dim)]">{fmt.price(p.current_price)}</span>
-            <span className={`font-mono ${(p.unrealized_pnl ?? 0) >= 0 ? "text-[var(--green)]" : "text-[var(--red)]"}`}>{fmt.pct(p.entry_price ? ((p.side === "Long" ? (p.current_price - p.entry_price) : (p.entry_price - p.current_price)) / p.entry_price * 100) : 0)}</span>
+            <Icon name={p.side === "Long" ? "fa-arrow-trend-up" : "fa-arrow-trend-down"} className={`text-[7px] ${(p.unrealized_pnl ?? 0) >= 0 ? "text-(--green)" : "text-(--red)"}`} />
+            <span className="text-(--txt) font-semibold">{p.pair.split("/")[0]}</span>
+            <span className="font-mono text-(--dim)">{fmt.price(p.current_price)}</span>
+            <span className={`font-mono ${(p.unrealized_pnl ?? 0) >= 0 ? "text-(--green)" : "text-(--red)"}`}>{fmt.pct(p.entry_price ? ((p.side === "Long" ? (p.current_price - p.entry_price) : (p.entry_price - p.current_price)) / p.entry_price * 100) : 0)}</span>
           </span>
         ))}
       </Ticker>
 
       {/* ── KPI Bar ── */}
       <div className="grid grid-cols-6 gap-1.5 shrink-0">
-        <KPI icon="fa-wallet" label="Portfolio Value" value={fmt.usd(eq)} color="text-[var(--cyan)]" />
+        <KPI icon="fa-wallet" label="Portfolio Value" value={fmt.usd(eq)} color="text-(--cyan)" />
         <KPI icon="fa-bank" label="Cash Balance" value={fmt.usd(portfolio?.balance ?? 0)} sub="USD available" />
         <KPI icon="fa-sack-dollar" label="Profit" value={fmt.usd(session?.total_pnl ?? 0)} sub={`${fmt.usd(session?.starting_balance ?? 30)} invested → ${fmt.usd(portfolio?.equity ?? 0)} on-chain`} color={pnlClass(session?.total_pnl ?? 0)} />
-        <KPI icon="fa-bullseye" label="Win Rate" value={`${((session?.win_rate ?? 0) * 100).toFixed(0)}%`} sub={`${session?.wins ?? 0}W / ${session?.losses ?? 0}L`} color="text-[var(--green)]" />
-        <KPI icon="fa-rotate" label="Trades Today" value={`${portfolio?.trades_today ?? 0}`} sub={`${session?.total_trades ?? 0} total`} color="text-[var(--violet)]" />
+        <KPI icon="fa-bullseye" label="Win Rate" value={`${((session?.win_rate ?? 0) * 100).toFixed(0)}%`} sub={`${session?.wins ?? 0}W / ${session?.losses ?? 0}L`} color="text-(--green)" />
+        <KPI icon="fa-rotate" label="Trades Today" value={`${portfolio?.trades_today ?? 0}`} sub={`${session?.total_trades ?? 0} total`} color="text-(--violet)" />
         <KPI icon="fa-layer-group" label="Positions" value={`${positions.length} / ${risk?.max_positions ?? 3}`} sub={positions.length > 0 ? positions.map(p => p.pair.split("/")[0]).join(", ") : "none open"} />
       </div>
 
@@ -355,14 +355,14 @@ export default function Dashboard() {
       <div className="flex-1 grid grid-cols-[1.6fr_1fr_1fr] grid-rows-[1.2fr_1fr_1fr] gap-1.5 min-h-0">
 
         {/* Row 1: Equity | Performance | Market Insight */}
-        <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
+        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-chart-area" title="Equity Curve" tag="live" />
           <ErrorBoundary label="Equity Curve">
             <EquityChart data={state.equity} />
           </ErrorBoundary>
         </div>
 
-        <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
+        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-gauge-high" title="Performance" onCopy={() => copyFormatters.performance(session)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-2">
             <div className="flex items-center justify-between">
@@ -376,27 +376,27 @@ export default function Dashboard() {
                   <Chip.Label>{session?.losses ?? 0}L</Chip.Label>
                 </Chip>
               </div>
-              <span className={`font-mono font-bold text-[13px] ${((session?.win_rate ?? 0) >= 0.5) ? "text-[var(--green)]" : "text-[var(--red)]"}`}>
+              <span className={`font-mono font-bold text-[13px] ${((session?.win_rate ?? 0) >= 0.5) ? "text-(--green)" : "text-(--red)"}`}>
                 {((session?.win_rate ?? 0) * 100).toFixed(0)}%
               </span>
             </div>
-            <ProgressBarRoot className="h-1.5 rounded bg-[var(--red)] overflow-hidden">
-              <ProgressBarFill className="h-full bg-[var(--green)] rounded" style={{ width: `${(session?.wins ?? 0) / ((session?.wins ?? 0) + (session?.losses ?? 0) || 1) * 100}%` }} />
+            <ProgressBarRoot className="h-1.5 rounded bg-(--red) overflow-hidden">
+              <ProgressBarFill className="h-full bg-(--green) rounded" style={{ width: `${(session?.wins ?? 0) / ((session?.wins ?? 0) + (session?.losses ?? 0) || 1) * 100}%` }} />
             </ProgressBarRoot>
             <Separator className="my-1" />
             <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
               <MetricRow icon="fa-brain" label="Decisions" value={session?.total_decisions ?? decisions.length} />
               <MetricRow icon="fa-right-left" label="Trades" value={portfolio?.trades_today ?? 0} />
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5"><Icon name="fa-shield-halved" className="text-[7px]" />Conf cap</span>
+                <span className="text-[10px] text-(--dim) flex items-center gap-1.5"><Icon name="fa-shield-halved" className="text-[7px]" />Conf cap</span>
                 <Chip size="sm" variant="soft" color={(memory?.confidence_cap ?? "") === "LOW" ? "success" : (memory?.confidence_cap ?? "") === "HIGH" ? "danger" : "accent"}>
                   <Chip.Label>{memory?.confidence_cap ?? "—"}</Chip.Label>
                 </Chip>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5"><Icon name="fa-crosshairs" className="text-[7px]" />Brier</span>
+                <span className="text-[10px] text-(--dim) flex items-center gap-1.5"><Icon name="fa-crosshairs" className="text-[7px]" />Brier</span>
                 <Tooltip delay={300}>
-                  <span className={`text-[13px] font-mono font-semibold cursor-help ${(() => { const b = memory?.brier_score; if (b == null) return "text-[var(--dim)]"; return b < 0.20 ? "text-[var(--green)]" : b < 0.30 ? "text-[var(--amber)]" : "text-[var(--red)]"; })()}`}>
+                  <span className={`text-[13px] font-mono font-semibold cursor-help ${(() => { const b = memory?.brier_score; if (b == null) return "text-(--dim)"; return b < 0.20 ? "text-(--green)" : b < 0.30 ? "text-(--amber)" : "text-(--red)"; })()}`}>
                     {memory?.brier_score?.toFixed(3) ?? "—"}
                   </span>
                   <Tooltip.Content showArrow>
@@ -405,7 +405,7 @@ export default function Dashboard() {
                 </Tooltip>
               </div>
               <div className="flex items-center justify-between col-span-2">
-                <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5"><Icon name="fa-wave-square" className="text-[7px]" />CUSUM</span>
+                <span className="text-[10px] text-(--dim) flex items-center gap-1.5"><Icon name="fa-wave-square" className="text-[7px]" />CUSUM</span>
                 <Tooltip delay={300}>
                   <Chip size="sm" variant="soft" color={String(memory?.cusum_status ?? "").toLowerCase().includes("positive") ? "success" : String(memory?.cusum_status ?? "").toLowerCase().includes("negative") ? "danger" : "default"}>
                     <Chip.Label>{memory?.cusum_status ?? "—"}</Chip.Label>
@@ -437,22 +437,22 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
+        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-globe" title="Market Insight" onCopy={() => copyFormatters.marketInsight(insight)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             <div className="flex items-center gap-2.5 mb-2">
               <div className="text-center shrink-0">
                 <FearGauge value={insight?.fear_greed ?? null} />
-                <p className="text-[8px] tracking-[1px] text-[var(--dim)] flex items-center justify-center gap-1"><Icon name="fa-face-grimace" className="text-[7px]" />FEAR &amp; GREED</p>
+                <p className="text-[8px] tracking-[1px] text-(--dim) flex items-center justify-center gap-1"><Icon name="fa-face-grimace" className="text-[7px]" />FEAR &amp; GREED</p>
               </div>
               <div className="flex-1 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5"><Icon name="fa-heart-pulse" className="text-[7px]" />Sentiment</span>
+                  <span className="text-[10px] text-(--dim) flex items-center gap-1.5"><Icon name="fa-heart-pulse" className="text-[7px]" />Sentiment</span>
                   <Chip size="sm" variant="soft" color={(() => { const fg = insight?.fear_greed; if (fg == null) return "default"; return fg <= 25 ? "danger" : fg <= 45 ? "warning" : fg <= 55 ? "default" : fg <= 75 ? "success" : "danger"; })()}>
                     <Chip.Label>{insight?.fear_greed_label ?? "—"}</Chip.Label>
                   </Chip>
                 </div>
-                <MetricRow icon="fa-faucet-drip" label="Funding" value={insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"} color={(() => { const f = insight?.funding_rate; if (f == null) return ""; return f < -0.01 ? "text-[var(--green)]" : f > 0.01 ? "text-[var(--red)]" : "text-[var(--dim)]"; })()} />
+                <MetricRow icon="fa-faucet-drip" label="Funding" value={insight?.funding_rate != null ? (insight.funding_rate * 100).toFixed(4) + "%" : "—"} color={(() => { const f = insight?.funding_rate; if (f == null) return ""; return f < -0.01 ? "text-(--green)" : f > 0.01 ? "text-(--red)" : "text-(--dim)"; })()} />
                 <MetricRow icon="fa-bitcoin-sign" label="BTC dom" value={`${insight?.btc_dominance?.toFixed(1) ?? "—"}%`} />
                 <MetricRow icon="fa-cube" label="Block" value={insight?.block_height?.toLocaleString() ?? "—"} />
                 <MetricRow icon="fa-newspaper" label="News" value={insight?.rss_items ?? 0} />
@@ -471,11 +471,11 @@ export default function Dashboard() {
         </div>
 
         {/* Row 2: Positions | Risk | Decisions */}
-        <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
+        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-briefcase" title="Open Positions" tag={`${positions.length}`} onCopy={() => copyFormatters.positions(positions)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {positions.length === 0 ? (
-              <p className="text-[var(--dimmer)] text-xs text-center py-4 flex items-center justify-center gap-1.5">
+              <p className="text-(--dimmer) text-xs text-center py-4 flex items-center justify-center gap-1.5">
                 <Icon name="fa-inbox" />No open positions
               </p>
             ) : (
@@ -487,11 +487,11 @@ export default function Dashboard() {
                 const span = hi - lo || 1;
                 const at = (v: number) => Math.max(0, Math.min(100, ((v - lo) / span) * 100));
                 return (
-                  <div key={p.id} className="border border-[var(--line)] p-2 mb-1.5 bg-[rgba(8,10,18,0.6)]">
+                  <div key={p.id} className="border border-(--line) p-2 mb-1.5 bg-[rgba(8,10,18,0.6)]">
                     <div className="flex justify-between items-center mb-1.5">
                       <div className="flex items-center gap-1.5">
                         <span className="font-bold text-white text-xs">{p.pair}</span>
-                        <span className={`text-[8px] px-1 py-0.5 rounded flex items-center gap-0.5 ${p.side === "Long" ? "text-[var(--green)] bg-[var(--green)]/10" : "text-[var(--red)] bg-[var(--red)]/10"}`}>
+                        <span className={`text-[8px] px-1 py-0.5 rounded flex items-center gap-0.5 ${p.side === "Long" ? "text-(--green) bg-(--green)/10" : "text-(--red) bg-(--red)/10"}`}>
                           <Icon name={p.side === "Long" ? "fa-arrow-up" : "fa-arrow-down"} className="text-[6px]" />{p.side}
                         </span>
                       </div>
@@ -500,10 +500,10 @@ export default function Dashboard() {
                         {p.dex_price && p.current_price > 0 && (
                           <span className={`text-[8px] px-1 py-0.5 rounded ${
                             Math.abs((p.dex_price.price - p.current_price) / p.current_price * 100) > 2
-                              ? "text-[var(--red)] bg-[var(--red)]/10"
+                              ? "text-(--red) bg-(--red)/10"
                               : Math.abs((p.dex_price.price - p.current_price) / p.current_price * 100) > 0.5
-                              ? "text-[var(--amber)] bg-[var(--amber)]/10"
-                              : "text-[var(--green)] bg-[var(--green)]/10"
+                              ? "text-(--amber) bg-(--amber)/10"
+                              : "text-(--green) bg-(--green)/10"
                           }`}>
                             {((p.dex_price.price - p.current_price) / p.current_price * 100).toFixed(1)}% spread
                           </span>
@@ -514,23 +514,23 @@ export default function Dashboard() {
                               fetch(`/api/positions/${p.pair.replace("/", "-")}/close`, { method: "POST" });
                             }
                           }}
-                          className="text-[8px] text-[var(--dim)] hover:text-[var(--red)] transition-colors cursor-pointer px-1"
+                          className="text-[8px] text-(--dim) hover:text-(--red) transition-colors cursor-pointer px-1"
                           title="Close position"
                         >
                           <Icon name="fa-xmark" className="text-[8px]" />
                         </button>
                       </div>
                     </div>
-                    <div className="relative h-1 rounded-full bg-gradient-to-r from-[var(--red)]/50 via-[var(--dim)]/20 to-[var(--green)]/50 mb-1">
-                      <div className="absolute -top-0.5 w-0.5 h-2 bg-[var(--red)]" style={{ left: `${at(p.stop_loss)}%` }} />
-                      <div className="absolute -top-0.5 w-0.5 h-2 bg-[var(--dim)]" style={{ left: `${at(p.entry_price)}%` }} />
-                      <div className="absolute -top-0.5 w-0.5 h-2 bg-[var(--green)]" style={{ left: `${at(p.take_profit_1)}%` }} />
+                    <div className="relative h-1 rounded-full bg-linear-to-r from-(--red)/50 via-(--dim)/20 to-(--green)/50 mb-1">
+                      <div className="absolute -top-0.5 w-0.5 h-2 bg-(--red)" style={{ left: `${at(p.stop_loss)}%` }} />
+                      <div className="absolute -top-0.5 w-0.5 h-2 bg-(--dim)" style={{ left: `${at(p.entry_price)}%` }} />
+                      <div className="absolute -top-0.5 w-0.5 h-2 bg-(--green)" style={{ left: `${at(p.take_profit_1)}%` }} />
                       <div className="absolute -top-1 w-[2px] h-3 bg-white shadow-[0_0_6px_#fff]" style={{ left: `${at(p.current_price)}%` }} />
                     </div>
-                    <div className="flex justify-between text-[8px] text-[var(--dimmer)]">
-                      <span className="text-[var(--red)] flex items-center gap-0.5"><Icon name="fa-shield" className="text-[6px]" />SL {fmt.price(p.stop_loss)}</span>
+                    <div className="flex justify-between text-[8px] text-(--dimmer)">
+                      <span className="text-(--red) flex items-center gap-0.5"><Icon name="fa-shield" className="text-[6px]" />SL {fmt.price(p.stop_loss)}</span>
                       <span>entry {fmt.price(p.entry_price)}</span>
-                      <span className="text-[var(--green)] flex items-center gap-0.5">TP {fmt.price(p.take_profit_1)} <Icon name="fa-flag-checkered" className="text-[6px]" /></span>
+                      <span className="text-(--green) flex items-center gap-0.5">TP {fmt.price(p.take_profit_1)} <Icon name="fa-flag-checkered" className="text-[6px]" /></span>
                     </div>
                     <div className="grid grid-cols-4 gap-1 mt-1">
                       <MetricRow icon="fa-eye" label="Now" value={fmt.price(p.current_price)} />
@@ -549,11 +549,11 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
+        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-shield-halved" title="Risk Controls" onCopy={() => copyFormatters.risk(risk)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5"><Icon name="fa-bolt" className="text-[7px]" />Circuit breaker</span>
+              <span className="text-[10px] text-(--dim) flex items-center gap-1.5"><Icon name="fa-bolt" className="text-[7px]" />Circuit breaker</span>
               <Chip size="sm" variant="soft" color={risk?.circuit_breaker === "OK" ? "success" : "danger"}>
                 <i className={`fa-solid ${risk?.circuit_breaker === "OK" ? "fa-check" : "fa-triangle-exclamation"} text-[7px] mr-0.5`} />
                 <Chip.Label>{risk?.circuit_breaker ?? "OK"}</Chip.Label>
@@ -566,7 +566,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-x-3 gap-y-1">
               <MetricRow icon="fa-percent" label="Risk/trade" value={`${((risk?.max_risk_per_trade ?? 0) * 100).toFixed(0)}%`} />
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-[var(--dim)] flex items-center gap-1.5"><Icon name="fa-book-open" className="text-[7px]" />Replays</span>
+                <span className="text-[10px] text-(--dim) flex items-center gap-1.5"><Icon name="fa-book-open" className="text-[7px]" />Replays</span>
                 <Chip size="sm" variant="soft" color="accent">
                   <Chip.Label>{memory?.replay_lesson_count ?? 0}</Chip.Label>
                 </Chip>
@@ -575,7 +575,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
+        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-robot" title="AI Decisions" tag={(() => {
             if (decisions.length === 0) return "live";
             const last = new Date(decisions[0].timestamp).getTime();
@@ -588,7 +588,7 @@ export default function Dashboard() {
           })()} onCopy={() => copyFormatters.decisions(decisions)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {decisions.length === 0 ? (
-              <p className="text-[var(--dimmer)] text-xs text-center py-4 flex items-center justify-center gap-1.5">
+              <p className="text-(--dimmer) text-xs text-center py-4 flex items-center justify-center gap-1.5">
                 <Icon name={portfolio?.monitoring_mode ? "fa-eye" : "fa-spinner fa-spin"} />
                 {portfolio?.monitoring_mode ? "Monitoring — LLM not active while fully deployed" : "Waiting for first AI cycle…"}
               </p>
@@ -599,15 +599,15 @@ export default function Dashboard() {
                 const age = Date.now() - new Date(d.timestamp).getTime();
                 const isStale = age > 30 * 60 * 1000; // 30 min
                 return (
-                  <div key={i} className={`border-l-2 border-[var(--line2)] pl-2 py-1 mb-1 ${isStale ? "opacity-50" : ""}`}>
+                  <div key={i} className={`border-l-2 border-(--line2) pl-2 py-1 mb-1 ${isStale ? "opacity-50" : ""}`}>
                     <div className="flex items-center gap-1.5">
                       <span className="font-semibold text-[11px]">{d.pair}</span>
-                      <span className="text-[8px] text-[var(--dimmer)]">{dayjs(d.timestamp).fromNow(true)}</span>
+                      <span className="text-[8px] text-(--dimmer)">{dayjs(d.timestamp).fromNow(true)}</span>
                       <span className={`text-[8px] px-1 py-0.5 rounded font-bold flex items-center gap-0.5 ${
-                        a === "BUY" ? "text-[var(--green)] bg-[var(--green)]/10" :
-                        a === "SELL" || a === "CLOSE" ? "text-[var(--red)] bg-[var(--red)]/10" :
-                        a === "ADJUST" || a === "ADJUSTSTOP" ? "text-[var(--amber)] bg-[var(--amber)]/10" :
-                        "text-[var(--dim)] bg-white/5"
+                        a === "BUY" ? "text-(--green) bg-(--green)/10" :
+                        a === "SELL" || a === "CLOSE" ? "text-(--red) bg-(--red)/10" :
+                        a === "ADJUST" || a === "ADJUSTSTOP" ? "text-(--amber) bg-(--amber)/10" :
+                        "text-(--dim) bg-white/5"
                       }`}>
                         <Icon name={a === "BUY" ? "fa-circle-arrow-up" : a === "SELL" || a === "CLOSE" ? "fa-circle-arrow-down" : a === "ADJUST" || a === "ADJUSTSTOP" ? "fa-sliders" : "fa-minus"} className="text-[6px]" />
                         {a.replace("_", " ")}
@@ -617,9 +617,9 @@ export default function Dashboard() {
                           <ProgressBar.Fill />
                         </ProgressBar.Track>
                       </ProgressBar>
-                      <span className={`text-[9px] font-mono font-bold ${conf >= 67 ? "text-[var(--green)]" : conf >= 34 ? "text-[var(--amber)]" : "text-[var(--red)]"}`}>{conf.toFixed(0)}%</span>
+                      <span className={`text-[9px] font-mono font-bold ${conf >= 67 ? "text-(--green)" : conf >= 34 ? "text-(--amber)" : "text-(--red)"}`}>{conf.toFixed(0)}%</span>
                     </div>
-                    <p className="text-[9px] text-[var(--dim)] mt-0.5 break-words">{d.reasoning}</p>
+                    <p className="text-[9px] text-(--dim) mt-0.5 wrap-break-word">{d.reasoning}</p>
                   </div>
                 );
               })
@@ -628,10 +628,10 @@ export default function Dashboard() {
         </div>
 
         {/* Row 3: Console | Activity | Trades */}
-        <div className="bg-[#0a0c14] border border-[var(--line)] flex flex-col overflow-hidden">
-          <div className="flex items-center gap-2 px-3 py-1.5 border-b border-[var(--line)]">
-            <i className="fa-solid fa-terminal text-[var(--dim)] text-[9px]" />
-            <span className="text-[10px] text-[var(--dim)] tracking-wider font-mono leading-none">savant — terminal</span>
+        <div className="bg-[#0a0c14] border border-(--line) flex flex-col overflow-hidden">
+          <div className="flex items-center gap-2 px-3 py-1.5 border-b border-(--line)">
+            <i className="fa-solid fa-terminal text-(--dim) text-[9px]" />
+            <span className="text-[10px] text-(--dim) tracking-wider font-mono leading-none">savant — terminal</span>
             <div className="flex-1" />
             <CopyButton text={() => {
               try {
@@ -648,9 +648,9 @@ export default function Dashboard() {
                 return lines.join("\n") || "No terminal output";
               } catch { return "Could not read terminal"; }
             }} title="Copy terminal output" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[var(--green)]/80"></span>
-            <span className="w-2.5 h-2.5 rounded-full bg-[var(--amber)]/80"></span>
-            <span className="w-2.5 h-2.5 rounded-full bg-[var(--red)]/80"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-(--green)/80"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-(--amber)/80"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-(--red)/80"></span>
           </div>
           <div className="flex-1 min-h-0">
             <ErrorBoundary label="Terminal">
@@ -659,25 +659,25 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-[var(--line)]">
-            <Icon name="fa-timeline" className="text-[var(--dim)] text-[10px]" />
-            <span className="text-[10px] tracking-[2px] uppercase font-semibold text-[var(--dim)]">Activity</span>
-            <span className="ml-auto text-[9px] font-bold text-[var(--cyan)]">{activity.length}</span>
+        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
+          <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-(--line)">
+            <Icon name="fa-timeline" className="text-(--dim) text-[10px]" />
+            <span className="text-[10px] tracking-[2px] uppercase font-semibold text-(--dim)">Activity</span>
+            <span className="ml-auto text-[9px] font-bold text-(--cyan)">{activity.length}</span>
             <span className="inline-flex items-center">
               <CopyButton text={() => copyFormatters.activity(activity)} title="Copy activity log" />
             </span>
           </div>
           <div className="flex-1 px-3 pb-2 overflow-y-auto font-mono text-[10px]">
             {activity.length === 0 ? (
-              <p className="text-[var(--dimmer)] text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No activity yet.</p>
+              <p className="text-(--dimmer) text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No activity yet.</p>
             ) : (
               [...activity].reverse().slice(0, 30).map((e, i) => (
-                <div key={i} className={`flex gap-2 py-px border-b border-white/[0.02] whitespace-nowrap ${
-                  e.level === "Trade" ? "text-[var(--green)]" : e.level === "Decision" ? "text-[var(--violet)]" : e.level === "Warning" || e.level === "Error" ? "text-[var(--red)]" : e.level === "Thinking" ? "text-[var(--amber)]" : "text-[var(--txt)]"
+                <div key={i} className={`flex gap-2 py-px border-b border-white/2 whitespace-nowrap ${
+                  e.level === "Trade" ? "text-(--green)" : e.level === "Decision" ? "text-(--violet)" : e.level === "Warning" || e.level === "Error" ? "text-(--red)" : e.level === "Thinking" ? "text-(--amber)" : "text-(--txt)"
                 }`}>
-                  <span className="text-[var(--dimmer)] shrink-0">{formatTime12h(e.timestamp)}</span>
-                  <span className="text-[var(--cyan)] shrink-0 w-[60px] overflow-hidden text-ellipsis">{e.pair}</span>
+                  <span className="text-(--dimmer) shrink-0">{formatTime12h(e.timestamp)}</span>
+                  <span className="text-(--cyan) shrink-0 w-[60px] overflow-hidden text-ellipsis">{e.pair}</span>
                   <span className="overflow-hidden text-ellipsis">{e.message}</span>
                 </div>
               ))
@@ -685,18 +685,18 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-[var(--panel)] border border-[var(--line)] backdrop-blur-md flex flex-col overflow-hidden">
-          <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-[var(--line)]">
-            <span className="inline-flex items-center"><Icon name="fa-receipt" className="text-[var(--dim)] text-[10px]" /></span>
-            <span className="text-[10px] tracking-[2px] uppercase font-semibold text-[var(--dim)] leading-none">Closed Trades</span>
-            <span className="ml-auto text-[9px] font-bold leading-none text-[var(--cyan)]">{trades.length}</span>
+        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
+          <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-(--line)">
+            <span className="inline-flex items-center"><Icon name="fa-receipt" className="text-(--dim) text-[10px]" /></span>
+            <span className="text-[10px] tracking-[2px] uppercase font-semibold text-(--dim) leading-none">Closed Trades</span>
+            <span className="ml-auto text-[9px] font-bold leading-none text-(--cyan)">{trades.length}</span>
             <span className="ml-auto inline-flex items-center">
               <CopyButton text={() => copyFormatters.trades(trades)} title="Copy closed trades" />
             </span>
             {trades.length > 0 && (
               <button
                 onClick={() => downloadTradesCSV(trades)}
-                className="inline-flex items-center justify-center text-[var(--dim)] hover:text-[var(--cyan)] transition-colors cursor-pointer leading-none"
+                className="inline-flex items-center justify-center text-(--dim) hover:text-(--cyan) transition-colors cursor-pointer leading-none"
                 title="Download CSV"
               >
                 <Icon name="fa-download" className="text-[9px]" />
@@ -705,11 +705,11 @@ export default function Dashboard() {
           </div>
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {trades.length === 0 ? (
-              <p className="text-[var(--dimmer)] text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No closed trades yet.</p>
+              <p className="text-(--dimmer) text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No closed trades yet.</p>
             ) : (
               <table className="w-full text-[10px]">
                 <thead>
-                  <tr className="text-[var(--dimmer)] text-left">
+                  <tr className="text-(--dimmer) text-left">
                     <th className="py-0.5 pr-2"><Icon name="fa-hashtag" className="mr-0.5 text-[7px]" />PAIR</th>
                     <th className="py-0.5 pr-2"><Icon name="fa-arrow-right-arrow-left" className="mr-0.5 text-[7px]" />SIDE</th>
                     <th className="py-0.5 pr-2"><Icon name="fa-door-open" className="mr-0.5 text-[7px]" />ENTRY</th>
@@ -720,7 +720,7 @@ export default function Dashboard() {
                 </thead>
                 <tbody>
                   {trades.slice(0, 10).map((t) => (
-                    <tr key={t.id} className="border-t border-white/[0.03] even:bg-white/[0.015]">
+                    <tr key={t.id} className="border-t border-white/3 even:bg-white/1.5">
                       <td className="py-0.5 pr-2 font-semibold">{t.pair}</td>
                       <td className={`py-0.5 pr-2 ${pnlClass(t.side === "Long" ? 1 : -1)}`}>
                         <span className="flex items-center gap-0.5"><Icon name={t.side === "Long" ? "fa-arrow-up" : "fa-arrow-down"} className="text-[7px]" />{t.side}</span>

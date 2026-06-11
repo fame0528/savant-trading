@@ -3,7 +3,19 @@
 All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-n## [0.13.2] — 2026-06-10
+n## [0.13.3] — 2026-06-11
+
+### Fixed
+
+- **FID-117 Timing Fix:** Fixed brace mismatch in engine — FID-117 starting equity snapshot was inside `if sync_balance()` where `journal` didn't exist yet. Added missing closing braces for sync_balance and executor blocks. Moved recording code to correct location (after journal init, before wallet recovery). Fixes dashboard doubling portfolio balance ($42.35 instead of $22.72).
+
+### Changed
+
+- **Tailwind v4 Canonical Classes:** Updated 117 lines in dashboard to v4 syntax (`text-[var(--dim)]` → `text-(--dim)`, `bg-gradient-to-r` → `bg-linear-to-r`, etc.)
+- **FID Lifecycle Cleanup:** Archived 6 completed FIDs (111, 112, 114, 115, 116, 117) to `dev/fids/archive/`. Created `dev/fids/MASTER-FID.md` tracking file. 3 active FIDs remain.
+- **Stale starting_equity deleted** from SQLite journal so engine recalculates correctly on next boot.
+
+## [0.13.2] — 2026-06-10
 
 ### Fixed — FID-111: Position-Pair Injection (Held Positions Invisible to LLM)
 
