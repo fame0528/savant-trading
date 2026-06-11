@@ -1,1 +1,0 @@
-# FastAPI Trading Dashboard Backend
