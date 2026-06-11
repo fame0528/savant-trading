@@ -104,8 +104,12 @@ impl ContextEngine {
         // KBar features (compact statistical summary)
         if let Some((z, vol, trend, vol_ratio)) = IndicatorEngine::kbar_features(ctx.candles) {
             msg.push_str(&format!(
-                "### KBar Features\nz-score: {:.2} | AnnVol: {:.4} | Trend: {:.4} | VolRatio: {:.2}\n\n",
-                z, vol, trend, vol_ratio
+        "### KBar Features\nz-score: {:.2} | AnnVol: {:.4} | Trend: {:.4} | VolRatio: {:.2}{}\n\n",
+        z, vol, trend, vol_ratio,
+        ctx.indicators.volume_sma.map_or_else(
+            String::new,
+            |v| format!(" (avg_vol: ${:.0})", v),
+        )
             ));
         }
 

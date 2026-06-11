@@ -16,6 +16,15 @@ use async_trait::async_trait;
 
 pub struct GeckoTerminalSource {
     client: reqwest::Client,
+    /// Tracks the timestamp of the last API request for rate limiting.
+    /// GeckoTerminal free tier: 30 req/min. We enforce a minimum interval
+    /// between requests to stay safely under the limit.
+    /// Tracks the timestamp of the last API request for rate limiting.
+    /// Uses tokio::sync::Mutex so the lock is held across the sleep,
+    /// serializing concurrent requests from parallel candle fetch tasks.
+    last_request: tokio::sync::Mutex<Option<std::time::Instant>>,
+    /// Minimum interval between requests (default: 2.1s = ~28 req/min).
+    min_interval: std::time::Duration,
 }
 
 impl GeckoTerminalSource {
@@ -25,7 +34,24 @@ impl GeckoTerminalSource {
                 .timeout(std::time::Duration::from_secs(15))
                 .build()
                 .unwrap_or_else(|_| reqwest::Client::new()),
+            last_request: tokio::sync::Mutex::new(None),
+            min_interval: std::time::Duration::from_millis(2100),
         }
+    }
+
+    /// Wait if needed to respect the rate limit before making a request.
+    /// Holds the tokio mutex across the sleep to serialize concurrent callers,
+    /// preventing parallel JoinSet tasks from all firing simultaneously.
+    async fn rate_limit(&self) {
+        let mut guard = self.last_request.lock().await;
+        let now = std::time::Instant::now();
+        if let Some(last) = *guard {
+            let elapsed = now.duration_since(last);
+            if elapsed < self.min_interval {
+                tokio::time::sleep(self.min_interval - elapsed).await;
+            }
+        }
+        guard.replace(std::time::Instant::now());
     }
 
     /// Get the token address for a pair from our token database.
@@ -65,6 +91,9 @@ impl CandleSource for GeckoTerminalSource {
             .token_address(pair)
             .ok_or_else(|| ExecutionError::Other(format!("No token address for {} in DB", pair)))?;
 
+        // Rate limit: wait if needed to stay under 30 req/min
+        self.rate_limit().await;
+
         // Step 1: Get pool address from token
         let pools_url = format!(
             "https://api.geckoterminal.com/api/v2/networks/arbitrum/tokens/{}/pools?page=1&sort=h24_volume_usd_desc",
@@ -102,6 +131,9 @@ impl CandleSource for GeckoTerminalSource {
         let pool_address = pools[0]["id"]
             .as_str()
             .ok_or_else(|| ExecutionError::Other("GeckoTerminal: pool id missing".into()))?;
+
+        // Rate limit again before second API call
+        self.rate_limit().await;
 
         // Step 2: Get OHLCV from pool
         let tf_str = match timeframe_minutes {

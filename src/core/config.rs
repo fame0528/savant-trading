@@ -216,6 +216,107 @@ impl Default for NvidiaConfig {
     }
 }
 
+/// Regime-specific jury sizes (FID-114 Phase 6).
+#[derive(Debug, Clone, Deserialize)]
+pub struct RegimeSizes {
+    #[serde(default = "default_regime_size_trending")]
+    pub trending: usize,
+    #[serde(default = "default_regime_size_ranging")]
+    pub ranging: usize,
+    #[serde(default = "default_regime_size_volatile")]
+    pub volatile: usize,
+}
+
+impl Default for RegimeSizes {
+    fn default() -> Self {
+        Self {
+            trending: default_regime_size_trending(),
+            ranging: default_regime_size_ranging(),
+            volatile: default_regime_size_volatile(),
+        }
+    }
+}
+
+/// Jury system configuration (FID-114: Model Jury).
+#[derive(Debug, Clone, Deserialize)]
+pub struct JuryConfig {
+    #[serde(default = "default_true")]
+    pub enabled: bool,
+    #[serde(default = "default_jury_size")]
+    pub jury_size: usize,
+    #[serde(default = "default_jury_model")]
+    pub model: String,
+    #[serde(default = "default_quorum_pct")]
+    pub quorum_pct: f64,
+    #[serde(default = "default_jury_timeout_secs")]
+    pub timeout_secs: u64,
+    #[serde(default = "default_max_consecutive_failures")]
+    pub max_consecutive_failures: u32,
+    #[serde(default = "default_key_prefix")]
+    pub key_prefix: String,
+    #[serde(default = "default_true")]
+    pub cleanup_keys_on_shutdown: bool,
+    #[serde(default)]
+    pub regime_sizes: RegimeSizes,
+}
+
+impl Default for JuryConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            jury_size: default_jury_size(),
+            model: default_jury_model(),
+            quorum_pct: default_quorum_pct(),
+            timeout_secs: default_jury_timeout_secs(),
+            max_consecutive_failures: default_max_consecutive_failures(),
+            key_prefix: default_key_prefix(),
+            cleanup_keys_on_shutdown: true,
+            regime_sizes: RegimeSizes::default(),
+        }
+    }
+}
+
+impl JuryConfig {
+    /// Get the jury size for a specific market regime.
+    pub fn size_for_regime(&self, regime: &str) -> usize {
+        match regime.to_lowercase().as_str() {
+            "trending" => self.regime_sizes.trending,
+            "ranging" => self.regime_sizes.ranging,
+            "volatile" | "highvol" | "high_vol" => self.regime_sizes.volatile,
+            _ => self.jury_size,
+        }
+    }
+}
+
+fn default_regime_size_trending() -> usize {
+    6
+}
+fn default_regime_size_ranging() -> usize {
+    10
+}
+fn default_regime_size_volatile() -> usize {
+    10
+}
+
+fn default_jury_size() -> usize {
+    10
+}
+fn default_jury_model() -> String {
+    "openrouter/free".into()
+}
+fn default_quorum_pct() -> f64 {
+    0.6
+}
+fn default_jury_timeout_secs() -> u64 {
+    45
+}
+fn default_max_consecutive_failures() -> u32 {
+    3
+}
+fn default_key_prefix() -> String {
+    "savant-jury".into()
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct AiConfig {
     pub provider: String,
@@ -238,6 +339,8 @@ pub struct AiConfig {
     pub openrouter: OpenRouterConfig,
     #[serde(default)]
     pub nvidia: NvidiaConfig,
+    #[serde(default)]
+    pub jury: JuryConfig,
 }
 
 /// Context management configuration (FID-085).
@@ -398,6 +501,40 @@ fn default_ttl_indicators_ms() -> u64 {
     3_600_000
 }
 
+/// FID-118: Pair health rotation configuration.
+#[derive(Debug, Clone, Deserialize)]
+pub struct PairRotationConfig {
+    /// Re-discover new pairs every N cycles (default 60 = ~3 hours at 5m intervals)
+    #[serde(default = "default_rotation_interval")]
+    pub interval_cycles: u64,
+    /// Permanently evict pair after N consecutive dead cycles (default 5)
+    #[serde(default = "default_eviction_threshold")]
+    pub eviction_threshold: u32,
+    /// Re-check evicted pairs every N cycles (default 300 = ~25 hours)
+    #[serde(default = "default_revival_check_cycles")]
+    pub revival_check_cycles: u64,
+}
+
+impl Default for PairRotationConfig {
+    fn default() -> Self {
+        Self {
+            interval_cycles: default_rotation_interval(),
+            eviction_threshold: default_eviction_threshold(),
+            revival_check_cycles: default_revival_check_cycles(),
+        }
+    }
+}
+
+fn default_rotation_interval() -> u64 {
+    60
+}
+fn default_eviction_threshold() -> u32 {
+    5
+}
+fn default_revival_check_cycles() -> u64 {
+    300
+}
+
 fn default_true() -> bool {
     true
 }
@@ -495,6 +632,8 @@ pub struct TradingConfig {
     pub spread_filter_bps: f64,
     #[serde(default = "default_session_penalty")]
     pub session_penalty_deep_asian: f64,
+    #[serde(default)]
+    pub pair_rotation: PairRotationConfig,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -650,6 +789,7 @@ impl Default for AppConfig {
                 full_deploy: false,
                 spread_filter_bps: 30.0,
                 session_penalty_deep_asian: 0.90,
+                pair_rotation: PairRotationConfig::default(),
             },
             risk: RiskConfig {
                 max_risk_per_trade: 0.20,
@@ -718,6 +858,7 @@ impl Default for AppConfig {
                 timeout_secs: 300,
                 openrouter: OpenRouterConfig::default(),
                 nvidia: NvidiaConfig::default(),
+                jury: JuryConfig::default(),
             },
             context: ContextConfig::default(),
             insight: InsightConfig {

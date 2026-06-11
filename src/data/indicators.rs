@@ -569,19 +569,28 @@ impl IndicatorEngine {
         }
         let trend_score = if xx_sum > 0.0 { xy_sum / xx_sum } else { 0.0 };
 
-        // Volume ratio: current volume vs SMA20 volume
+        // Volume ratio: 3-candle average volume vs SMA20 volume (FID-119)
+        // Using single last candle causes VolRatio=0 for pairs where the most
+        // recent 5m candle has no trades (common on Kraken altcoins). Averaging
+        // the last 3 candles smooths out individual zero-volume periods while
+        // remaining responsive to recent volume changes.
         let vol_sma20: f64 = volumes[n - 20..].iter().sum::<f64>() / 20.0;
+        let recent_vol = if n >= 3 {
+            (volumes[n - 1] + volumes[n - 2] + volumes[n - 3]) / 3.0
+        } else {
+            volumes[n - 1]
+        };
         let volume_ratio = if vol_sma20 > 0.0 {
-            volumes[n - 1] / vol_sma20
+            recent_vol / vol_sma20
         } else {
             1.0
         };
 
-        // Debug: log volume data for troubleshooting
-        if volumes[n - 1] < 0.001 && vol_sma20 > 0.0 {
+        // Debug: log when 3-candle avg is still near zero (truly dead pair)
+        if recent_vol < 0.001 && vol_sma20 > 0.0 {
             tracing::warn!(
-                "VolRatio=0: last_vol={:.6}, sma20={:.6}, last_5_vols={:?}",
-                volumes[n - 1],
+                "VolRatio=0: recent_3avg={:.6}, sma20={:.6}, last_5_vols={:?}",
+                recent_vol,
                 vol_sma20,
                 &volumes[n - 5..n]
             );

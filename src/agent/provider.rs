@@ -256,7 +256,7 @@ impl LlmProvider {
         Self::parse_non_streaming(resp).await
     }
 
-    fn build_body(&self, system: &str, messages: &[Message], stream: bool) -> serde_json::Value {
+    pub(crate) fn build_body(&self, system: &str, messages: &[Message], stream: bool) -> serde_json::Value {
         // FID-085: Check model capabilities for cache_control support
         let caps = crate::agent::provider_caps::ModelCapabilities::for_model(&self.config.model);
 
@@ -396,7 +396,7 @@ impl LlmProvider {
         )))
     }
 
-    async fn parse_non_streaming(resp: reqwest::Response) -> Result<String, LlmError> {
+    pub(crate) async fn parse_non_streaming(resp: reqwest::Response) -> Result<String, LlmError> {
         let json: serde_json::Value = resp
             .json()
             .await
@@ -490,5 +490,96 @@ impl LlmProvider {
                 "Empty stream response".to_string(),
             ))
         }
+    }
+
+    /// Chat with model/key/timeout override — used by the Model Jury system.
+    ///
+    /// Creates a temporary reqwest::Client with the specified timeout,
+    /// overrides the model and API key, and optionally strips cache_control
+    /// for free models that don't support it.
+    pub async fn chat_with_override(
+        &self,
+        system: &str,
+        messages: &[Message],
+        model: &str,
+        api_key: &str,
+        timeout_secs: u64,
+        no_cache: bool,
+    ) -> Result<String, LlmError> {
+        let mut body = self.build_body(system, messages, false);
+        body["model"] = serde_json::Value::String(model.to_string());
+
+        // Strip cache_control for free models (they don't support it)
+        if no_cache {
+            if let Some(sys_msg) = body["messages"].get_mut(0) {
+                if let Some(obj) = sys_msg.as_object_mut() {
+                    obj.remove("cache_control");
+                }
+            }
+        }
+
+        // Create temporary client with jury-specific timeout
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(timeout_secs))
+            .build()
+            .unwrap_or_else(|_| reqwest::Client::new());
+
+        let max_attempts = 3u32;
+        let mut last_err = String::new();
+
+        for attempt in 0..max_attempts {
+            let url = format!("{}/chat/completions", self.config.endpoint);
+            let mut req_builder = client
+                .post(&url)
+                .header("Content-Type", "application/json")
+                .header("Authorization", format!("Bearer {}", api_key));
+            for (name, value) in &self.config.extra_headers {
+                req_builder = req_builder.header(name.as_str(), value.as_str());
+            }
+
+            let resp = match req_builder.json(&body).send().await {
+                Ok(r) => r,
+                Err(e) => {
+                    last_err = format!("{}", e);
+                    if attempt < max_attempts - 1 {
+                        let wait = 2u64.pow(attempt + 1);
+                        tracing::warn!(
+                            "jury request failed (attempt {}/{}): {}. Retrying in {}s...",
+                            attempt + 1, max_attempts, last_err, wait
+                        );
+                        tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
+                        continue;
+                    }
+                    return Err(LlmError::Http(last_err));
+                }
+            };
+
+            let status = resp.status();
+            if status == 429 || status == 502 || status == 503 || status == 529 {
+                last_err = format!("HTTP {} (transient)", status);
+                if attempt < max_attempts - 1 {
+                    let wait = 2u64.pow(attempt + 1);
+                    tracing::warn!(
+                        "jury HTTP {} (attempt {}/{}). Retrying in {}s...",
+                        status, attempt + 1, max_attempts, wait
+                    );
+                    tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
+                    continue;
+                }
+                let text = resp.text().await.unwrap_or_default();
+                return Err(LlmError::Http(format!("HTTP {}: {}", status, text)));
+            }
+            if !status.is_success() {
+                let text = resp.text().await.unwrap_or_default();
+                return Err(LlmError::Http(format!("HTTP {}: {}", status, text)));
+            }
+
+            return Self::parse_non_streaming(resp).await;
+        }
+
+        Err(LlmError::Http(format!(
+            "All {} jury attempts failed: {}",
+            max_attempts, last_err
+        )))
     }
 }

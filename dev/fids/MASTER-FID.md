@@ -1,18 +1,26 @@
 # MASTER-FID — FID Tracker
 
-**Last updated:** 2026-06-11 00:54
-**Active FIDs:** 3
-**Archived FIDs:** 129
+**Last updated:** 2026-06-11
+**Active FIDs:** 2
+**Recently Completed:** 4 (FID-113, FID-118, FID-119)
+**Archived FIDs:** 130
 
 ---
 
-## Active FIDs (3)
+## Active FIDs (2)
 
 | ID | Title | Status | Severity |
 |---|---|---|---|
 | FID-106 | FID-2026-0609-106: Agent Conversation & Query System | open | high |
 | FID-110 | FID-2026-0610-110: Engine Monolith Decomposition — engine.rs (7,214 lines) | partially-complete (Sessions 1-4 done, 5-7 deferred to future session) | critical |
-| FID-113 | FID-2026-0610-113: PnL Tracking — Closed Trade PnL Underreports Actual Costs | analyzed | medium |
+
+## Recently Completed (4)
+
+| ID | Title | Status | Severity |
+|---|---|---|---|
+| FID-113 | FID-2026-0610-113: PnL Tracking — Closed Trade PnL Underreports Actual Costs | fixed (v0.13.7) | medium |
+| FID-118 | FID-2026-0611-118: Pair Health Rotation — Evict Dead, Evaluate Live, Always Scan | implemented (v0.13.5) | high |
+| FID-119 | FID-2026-0611-119: VolRatio=0 "No Volume" Misdiagnosis + Frontend Decisions Cap | fixed (v0.13.6) | critical |
 
 ---
 
@@ -36,9 +44,9 @@
 | FID-109 | FID-2026-0610-109: Chain-First Architecture + Dashboard Sync | closed |
 | FID-111 | FID-111: Position-Pair Injection — Held Positions Invisible to LLM | closed |
 | FID-112 | FID-112: Final Side Correction — SHORT Positions Surviving Into Portfolio | closed |
-| FID-114 | FID-114: AI Decisions Panel Missing Non-PASS Decisions | closed |
+| FID-114 | FID-2026-0611-114: Model Jury — Multi-Model Adversarial Decision System (all 9 phases complete) | closed |
 | FID-115 | FID-115: Starting Balance Hardcoded From Config Instead of Chain Data | closed |
 | FID-116 | FID-116: Chain-Only Truth — Eliminate All Hardcoded & Stale Data | closed |
 | FID-117 | FID-2026-0610-117: Journal as Single Source of Truth | closed |
 
-Total archived: 129
+Total archived: 130

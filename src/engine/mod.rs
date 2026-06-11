@@ -20,6 +20,8 @@ use savant_trading::agent::context_builder::FullContext;
 use savant_trading::agent::context_engine::ContextEngine;
 use savant_trading::agent::context_state::ContextState;
 use savant_trading::agent::decision_log::DecisionLog;
+use savant_trading::agent::jury::JuryKeyManager;
+use savant_trading::agent::jury::{JuryPool, JuryJudge};
 use savant_trading::agent::openrouter_management::OpenRouterManagementClient;
 use savant_trading::agent::orchestrator::{AgentConfig, AgentOrchestrator, AutonomyLevel};
 use savant_trading::agent::prompts::{self, PromptComposer};
@@ -78,6 +80,8 @@ struct EngineState {
     ctx_engine: ContextEngine,
     ctx_state: ContextState,
     decision_log: DecisionLog,
+    jury_key_manager: Option<JuryKeyManager>,
+    jury_pool: Option<JuryPool>,
 
     // Monitoring
     insight: InsightAggregator,
@@ -120,6 +124,14 @@ struct EngineState {
     close_failure_cooldown: HashMap<String, std::time::Instant>,
     consecutive_sl_count: HashMap<String, u32>,
     sl_halt_until: HashMap<String, std::time::Instant>,
+
+    // FID-118: Pair health rotation
+    dead_streaks: HashMap<String, u32>,
+    pairs_evicted: u32,
+    pairs_discovered: u32,
+    pairs_revived: u32,
+    last_discovery_tick: u64,
+    last_revival_check_tick: u64,
 }
 
 impl EngineState {
@@ -512,6 +524,7 @@ impl EngineState {
         };
 
         let provider = create_provider(&config.ai);
+        let jury_provider_config = provider.config_clone();
 
         let agent_config = AgentConfig {
             autonomy_level: autonomy,
@@ -570,6 +583,55 @@ impl EngineState {
             }
         }
 
+        // FID-114: Initialize jury key manager for Model Jury system
+        let mut jury_key_manager: Option<JuryKeyManager> = None;
+        if config.ai.provider == "openrouter" && config.ai.jury.enabled {
+            let mgmt_key_env = &config.ai.openrouter.management.management_key_env;
+            if let Ok(mgmt_key) = std::env::var(mgmt_key_env) {
+                if !mgmt_key.is_empty() {
+                    let client = OpenRouterManagementClient::with_endpoint(
+                        mgmt_key,
+                        &config.ai.openrouter.management.endpoint,
+                    );
+                    let jkm = JuryKeyManager::new(client, config.ai.jury.clone());
+                    match jkm.initialize().await {
+                        Ok(count) => {
+                            info!("FID-114: JuryKeyManager initialized with {} keys", count);
+                            jury_key_manager = Some(jkm);
+                        }
+                        Err(e) => {
+                            warn!("FID-114: JuryKeyManager init failed ({}). Jury system disabled.", e);
+                        }
+                    }
+                }
+            }
+        }
+
+        // FID-114 Phase 6: Initialize JuryPool for parallel model evaluation
+        let mut jury_pool: Option<JuryPool> = None;
+        if jury_key_manager.is_some() {
+            let jp = JuryPool::new(
+                jury_provider_config.clone(),
+                JuryKeyManager::new(
+                    OpenRouterManagementClient::with_endpoint(
+                        std::env::var(&config.ai.openrouter.management.management_key_env)
+                            .unwrap_or_default(),
+                        &config.ai.openrouter.management.endpoint,
+                    ),
+                    config.ai.jury.clone(),
+                ),
+                config.ai.jury.clone(),
+            );
+            match jp.initialize().await {
+                Ok(count) => {
+                    info!("FID-114 Phase 6: JuryPool initialized with {} keys", count);
+                    jury_pool = Some(jp);
+                }
+                Err(e) => {
+                    warn!("FID-114 Phase 6: JuryPool init failed ({}). Jury disabled.", e);
+                }
+            }
+        }
         let insight_config = InsightConfig {
             funding_rate_enabled: config.insight.funding_rate_enabled,
             liquidation_enabled: config.insight.liquidation_enabled,
@@ -726,6 +788,9 @@ impl EngineState {
                 Box::new(savant_trading::data::sources::gate::GateSource::new()),
                 Box::new(savant_trading::data::sources::cryptocompare::CryptoCompareSource::new()),
                 Box::new(savant_trading::data::sources::coingecko::CoinGeckoSource::new()),
+                // FID-118: GeckoTerminal as last-resort source for DEX-only tokens.
+                // Only tried when all 6 CEX sources fail (might_have checks token DB).
+                Box::new(savant_trading::data::sources::geckoterminal::GeckoTerminalSource::new()),
             ]));
 
         let mut candle_futures = tokio::task::JoinSet::new();
@@ -1158,6 +1223,14 @@ impl EngineState {
         let consecutive_sl_count: HashMap<String, u32> = HashMap::new();
         let sl_halt_until: HashMap<String, std::time::Instant> = HashMap::new();
 
+        // FID-118: Pair health rotation tracking
+        let dead_streaks: HashMap<String, u32> = HashMap::new();
+        let pairs_evicted: u32 = 0;
+        let pairs_discovered: u32 = 0;
+        let pairs_revived: u32 = 0;
+        let last_discovery_tick: u64 = 0;
+        let last_revival_check_tick: u64 = 0;
+
         Ok(Self {
             config,
             shared,
@@ -1179,6 +1252,8 @@ impl EngineState {
             ctx_engine,
             ctx_state,
             decision_log,
+            jury_key_manager,
+            jury_pool,
             insight,
             event_bus,
             vault_config,
@@ -1207,7 +1282,42 @@ impl EngineState {
             close_failure_cooldown,
             consecutive_sl_count,
             sl_halt_until,
+            dead_streaks,
+            pairs_evicted,
+            pairs_discovered,
+            pairs_revived,
+            last_discovery_tick,
+            last_revival_check_tick,
         })
+    }
+}
+
+/// FID-118: Track dead streak and evict if threshold reached.
+/// Returns true if the pair was permanently evicted.
+#[inline]
+fn track_dead_streak(
+    pair: &str,
+    dead_streaks: &mut HashMap<String, u32>,
+    permanent_dead: &mut HashSet<String>,
+    pairs_evicted: &mut u32,
+    threshold: u32,
+) -> bool {
+    *dead_streaks.entry(pair.to_string()).or_insert(0) += 1;
+    let streak = *dead_streaks.get(pair).unwrap_or(&0);
+    if streak >= threshold {
+        dead_streaks.remove(pair);
+        // Guard: only log + count on first eviction (prevents duplicates
+        // when same pair hits multiple dead_tokens.insert() sites in one cycle)
+        if permanent_dead.insert(pair.to_string()) {
+            *pairs_evicted += 1;
+            info!(
+                "FID-118 EVICTED: {} after {} consecutive dead cycles",
+                pair, streak
+            );
+        }
+        true
+    } else {
+        false
     }
 }
 
@@ -1221,8 +1331,8 @@ pub async fn run(
     // Destructure state into local variables (loop body unchanged)
     let config = state.config;
     let shared = state.shared;
-    let _candle_api = state.candle_api;
-    let active_pairs = state.active_pairs;
+    let candle_api = state.candle_api;
+    let mut active_pairs = state.active_pairs;
     let curated_pairs = state.curated_pairs;
     let mut market_stores = state.market_stores;
     let mut portfolio = state.portfolio;
@@ -1258,7 +1368,7 @@ pub async fn run(
     let mut rest_fallback_at = state.rest_fallback_at;
     let mut ws_just_reconnected = state.ws_just_reconnected;
     let mut dead_tokens = state.dead_tokens;
-    let permanent_dead = state.permanent_dead;
+    let mut permanent_dead = state.permanent_dead;
     let mut candle_hash_cache = state.candle_hash_cache;
     let mut tick = state.tick;
     let eval_in_progress = state.eval_in_progress;
@@ -1266,6 +1376,14 @@ pub async fn run(
     let mut close_failure_cooldown = state.close_failure_cooldown;
     let mut consecutive_sl_count = state.consecutive_sl_count;
     let mut sl_halt_until = state.sl_halt_until;
+    let mut dead_streaks = state.dead_streaks;
+    let mut pairs_evicted = state.pairs_evicted;
+    let mut pairs_discovered = state.pairs_discovered;
+    let mut pairs_revived = state.pairs_revived;
+    let mut last_discovery_tick = state.last_discovery_tick;
+    let mut last_revival_check_tick = state.last_revival_check_tick;
+    let _jury_key_manager = state.jury_key_manager;
+    let mut jury_pool = state.jury_pool;
 
     let autonomy = match config.ai.autonomy_level {
         1 => AutonomyLevel::Suggest,
@@ -1474,9 +1592,101 @@ pub async fn run(
         let recent_trades = portfolio.closed_trades().to_vec();
         let current_session = savant_trading::core::session::current_session();
 
-        // FID-046: Retry dead tokens every 10 cycles
+        // FID-046: Retry dead tokens every 10 cycles.
+        // FID-118: dead_tokens.clear() retries temporarily-skipped pairs,
+        // but dead_streaks persists — a pair that's dead again gets its
+        // streak incremented toward permanent eviction.
         if tick.is_multiple_of(10) {
             dead_tokens.clear();
+        }
+
+        // FID-118: Periodic re-discovery of new pairs (default every 60 cycles = ~3 hours)
+        if tick.saturating_sub(last_discovery_tick) >= config.trading.pair_rotation.interval_cycles && config.trading.scan_all_pairs {
+            last_discovery_tick = tick;
+            match candle_api
+                .discover_safe_usd_pairs(
+                    config.trading.min_volume_24h_usd,
+                    config.trading.min_price_usd,
+                    &config.trading.blacklisted_symbols,
+                )
+                .await
+            {
+                Ok(discovered) => {
+                    let before = active_pairs.len();
+                    for p in &discovered {
+                        if !active_pairs.contains(p)
+                            && !permanent_dead.contains(p.as_str())
+                        {
+                            active_pairs.push(p.clone());
+                            // Create market data store for new pair
+                            market_stores.insert(
+                                p.clone(),
+                                MarketDataStore::new(
+                                    p,
+                                    config.strategy.mean_reversion.profile_periods + 100,
+                                ),
+                            );
+                            pairs_discovered += 1;
+                        }
+                    }
+                    let added = active_pairs.len() - before;
+                    if added > 0 {
+                        info!(
+                            "FID-118 RE-DISCOVERY: {} new pairs added, watchlist now {}",
+                            added,
+                            active_pairs.len()
+                        );
+                    }
+                }
+                Err(e) => {
+                    warn!("FID-118 re-discovery failed: {}", e);
+                }
+            }
+        }
+
+        // FID-118: Periodic revival check — re-check evicted pairs (default every 300 cycles = ~25 hours)
+        // Cap at 5 pairs per cycle to bound main-loop latency.
+        // Uses JoinSet for parallel HTTP requests instead of sequential .await.
+        if tick.saturating_sub(last_revival_check_tick) >= config.trading.pair_rotation.revival_check_cycles && !permanent_dead.is_empty() {
+            last_revival_check_tick = tick;
+            const MAX_REVIVAL_PER_CYCLE: usize = 5;
+            let evicted: Vec<String> = permanent_dead
+                .iter()
+                .take(MAX_REVIVAL_PER_CYCLE)
+                .cloned()
+                .collect();
+            let tf_minutes = parse_timeframe_minutes(&config.trading.timeframe);
+            let mut revival_futures = tokio::task::JoinSet::new();
+            for pair in &evicted {
+                let router = candle_router.clone();
+                let pair_clone = pair.clone();
+                revival_futures.spawn(async move {
+                    let result = router.fetch_candles(&pair_clone, tf_minutes, 200).await;
+                    (pair_clone, result)
+                });
+            }
+            while let Some(result) = revival_futures.join_next().await {
+                if let Ok((pair, Ok(candles))) = result {
+                    if candles.iter().any(|c| c.close > 0.0) {
+                        // Pair has live data again — revive it
+                        permanent_dead.remove(pair.as_str());
+                        active_pairs.push(pair.clone());
+                        market_stores.insert(
+                            pair.clone(),
+                            MarketDataStore::new(
+                                &pair,
+                                config.strategy.mean_reversion.profile_periods + 100,
+                            ),
+                        );
+                        dead_streaks.remove(pair.as_str());
+                        pairs_revived += 1;
+                        info!(
+                            "FID-118 REVIVED: {} — back in watchlist (has candle data)",
+                            pair
+                        );
+                    }
+                }
+            }
         }
 
         // FID-056 #1: When fully deployed (no deployable capital), skip
@@ -1537,6 +1747,7 @@ pub async fn run(
             *mm = fully_deployed;
         }
 
+        // FID-118: Prune evicted pairs from active_pairs
         for pair in &active_pairs {
             // FID-092: ALWAYS evaluate all pairs, even when fully deployed.
             // The agent must see all charts for opportunity cost awareness.
@@ -1571,6 +1782,8 @@ pub async fn run(
                 // Pre-filter: Skip tokens not in curated pairs (FID-052)
                 if config.mode.live_execution && !curated_pairs.contains(pair) {
                     dead_tokens.insert(pair.to_string());
+                    // FID-118: Track dead streak for permanent eviction
+                    track_dead_streak(pair, &mut dead_streaks, &mut permanent_dead, &mut pairs_evicted, config.trading.pair_rotation.eviction_threshold);
                     continue;
                 }
 
@@ -1585,6 +1798,8 @@ pub async fn run(
                 if nonzero_pct < 0.3 {
                     if nonzero_count == 0 {
                         dead_tokens.insert(pair.to_string());
+                        // FID-118: Track dead streak for permanent eviction
+                        track_dead_streak(pair, &mut dead_streaks, &mut permanent_dead, &mut pairs_evicted, config.trading.pair_rotation.eviction_threshold);
                     }
                     continue;
                 }
@@ -1604,6 +1819,8 @@ pub async fn run(
                     .all(|c| c.open == c.close && c.high == c.low && c.volume <= 0.0);
                 if all_dead {
                     dead_tokens.insert(pair.to_string());
+                    // FID-118: Track dead streak for permanent eviction
+                    track_dead_streak(pair, &mut dead_streaks, &mut permanent_dead, &mut pairs_evicted, config.trading.pair_rotation.eviction_threshold);
                     continue;
                 }
                 // DEX safety: reject tokens with near-zero price diversity
@@ -1622,6 +1839,8 @@ pub async fn run(
                 if unique_closes.len() < 2 {
                     // 200 candles with < 2 unique close prices = truly dead
                     dead_tokens.insert(pair.to_string());
+                    // FID-118: Track dead streak for permanent eviction
+                    track_dead_streak(pair, &mut dead_streaks, &mut permanent_dead, &mut pairs_evicted, config.trading.pair_rotation.eviction_threshold);
                     continue;
                 }
 
@@ -1883,6 +2102,9 @@ pub async fn run(
 
                 ctx_state.increment_cycle();
 
+                // FID-118: Reset dead streak — pair has live candles and passed all filters
+                dead_streaks.remove(pair.as_str());
+
                 pair_data_vec.push(PairData {
                     pair: pair.clone(),
                     indicators,
@@ -1892,6 +2114,29 @@ pub async fn run(
                     user_message,
                 });
             }
+        }
+
+        // FID-118: Prune evicted pairs from active_pairs after iteration
+        if !permanent_dead.is_empty() {
+            let before = active_pairs.len();
+            active_pairs.retain(|p| !permanent_dead.contains(p.as_str()));
+            let pruned = before - active_pairs.len();
+            if pruned > 0 {
+                info!("FID-118: Pruned {} evicted pairs, watchlist now {}", pruned, active_pairs.len());
+            }
+        }
+
+        // FID-118: Log pair health summary every 10 cycles
+        if tick.is_multiple_of(10) {
+            let dead_count = dead_tokens.len();
+            let evicted_count = permanent_dead.len();
+            let alive_count = active_pairs.len();
+            info!(
+                "FID-118 PAIR HEALTH: {} alive, {} temp-dead, {} evicted | discovered={} revived={} evicted_total={} | streaks tracked={}",
+                alive_count, dead_count, evicted_count,
+                pairs_discovered, pairs_revived, pairs_evicted,
+                dead_streaks.len()
+            );
         }
 
         // === PHASE 2: Send all LLM calls in parallel via streaming ===
@@ -2049,6 +2294,51 @@ pub async fn run(
                         "BATCH CLEANED (first 300): {}",
                         &cleaned[..cleaned.len().min(300)]
                     );
+
+                // FID-114 Phase 8: Jury overlay — shadow mode evaluation
+                // Run jury on the batch response, log results for comparison.
+                // In shadow mode, batch decisions are ALWAYS used for execution.
+                if let Some(ref mut jp) = jury_pool {
+                    let regime = current_session.name();
+                    let jury_result = jp.evaluate(&cleaned, savant_trading::core::types::MarketRegime::Ranging).await;
+                    if jury_result.quorum_met {
+                        let judge = JuryJudge::new(
+                            agent.provider_clone(),
+                            config.ai.price_tolerance_pct,
+                        );
+                        let current_price = 1_000_000.0; // Shadow mode: bypass price validation
+                        match judge.judge(&cleaned, &jury_result, current_price).await {
+                            Ok(judgment) => {
+                                info!(
+                                    "FID-114 JURY SHADOW: verdicts={} consensus={:.0}% action={:?} dissent={}",
+                                    judgment.jury_size_used,
+                                    judgment.consensus_strength * 100.0,
+                                    judgment.decision.action,
+                                    judgment.dissent_analysis
+                                );
+                                shared.log_activity(
+                                    savant_trading::core::shared::ActivityLevel::Decision,
+                                    "JURY",
+                                    &format!(
+                                        "Shadow: {} verdicts, {:.0}% consensus, {:?}",
+                                        judgment.jury_size_used,
+                                        judgment.consensus_strength * 100.0,
+                                        judgment.decision.action
+                                    ),
+                                ).await;
+                            }
+                            Err(e) => {
+                                warn!("FID-114 JURY: Judge failed ({}), using batch decisions", e);
+                            }
+                        }
+                    } else {
+                        warn!(
+                            "FID-114 JURY: Quorum not met ({}/{} verdicts), using batch decisions",
+                            jury_result.verdicts.len(),
+                            config.ai.jury.size_for_regime(regime)
+                        );
+                    }
+                }
 
                     // Try to parse as JSON array — handles MiMo returning individual
                     // objects with text between them instead of a clean array
@@ -2307,7 +2597,7 @@ pub async fn run(
                             decision.confidence,
                             &decision.reasoning,
                         ) {
-                            Ok(()) => log_vault!("VAULT", "Saved {}", decision.pair),
+    Ok(()) => log_vault!("VAULT", "Saved {}", decision.pair),
                             Err(e) => log_warn!("VAULT", "Failed {}: {}", decision.pair, e),
                         }
                     }
@@ -4619,4 +4909,30 @@ pub async fn run(
         // can interfere with sleep on Windows. Ctrl+C handled by OS.
         time::sleep(Duration::from_secs(interval_seconds)).await;
     }
+
+    #[allow(unreachable_code)]
+    // FID-114 Phase 9: Flush jury metrics to disk on shutdown
+    if let Some(ref jp) = jury_pool {
+        let metrics = jp.metrics();
+        let metrics_json = serde_json::json!({
+            "total_evaluations": metrics.total_evaluations,
+            "quorum_failures": metrics.quorum_failures,
+            "total_verdicts": metrics.total_verdicts,
+            "total_failures": metrics.total_failures,
+            "total_latency_ms": metrics.total_latency_ms,
+            "timestamp": chrono::Utc::now().to_rfc3339(),
+        });
+        if let Err(e) = std::fs::write(
+            "dev/logs/jury-metrics.json",
+            serde_json::to_string_pretty(&metrics_json).unwrap_or_default(),
+        ) {
+            tracing::warn!("Failed to flush jury metrics: {}", e);
+        } else {
+            tracing::info!("Jury metrics flushed to dev/logs/jury-metrics.json");
+        }
+        jp.key_manager().cleanup_all().await;
+    }
+
+    #[allow(unreachable_code)]
+    Ok(())
 }

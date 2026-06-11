@@ -1,0 +1,98 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from .base_account import BaseAccount, Position, Transaction
+
+
+@dataclass
+class PolymarketAccount(BaseAccount[Position, Transaction]):
+    positions: Dict[str, Position] = field(default_factory=dict)
+    transactions: List[Transaction] = field(default_factory=list)
+
+    def get_positions(self) -> Dict[str, Position]:
+        return {
+            ticker: pos for ticker, pos in self.positions.items() if pos.quantity > 0.01
+        }
+
+    def get_position(self, ticker: str) -> Optional[Position]:
+        return self.positions.get(ticker)
+
+    def _get_position_value(self, ticker: str) -> float:
+        position = self.positions.get(ticker)
+        return position.market_value if position else 0.0
+
+    def update_position_price(self, ticker: str, current_price: float) -> None:
+        if ticker in self.positions:
+            self.positions[ticker].current_price = current_price
+
+    def apply_allocation(
+        self,
+        target_allocations: Dict[str, float],
+        price_map: Optional[Dict[str, float]] = None,
+        metadata_map: Optional[Dict[str, Dict[str, Any]]] = None,
+    ) -> None:
+        if not price_map:
+            price_map = {
+                ticker: pos.current_price for ticker, pos in self.positions.items()
+            }
+
+        # Update existing positions with latest prices
+        for ticker, pos in self.positions.items():
+            if ticker in price_map:
+                pos.current_price = price_map[ticker]
+
+        total_value = self.get_total_value()
+        self.cash_balance = total_value
+        self.positions.clear()
+
+        # Build new positions from allocations
+        for ticker, target_ratio in target_allocations.items():
+            if ticker == "CASH" or target_ratio <= 0:
+                continue
+
+            price = price_map.get(ticker)
+            if price is None or price <= 0:
+                continue
+
+            target_value = total_value * target_ratio
+            quantity = target_value / price
+            url = metadata_map.get(ticker, {}).get("url") if metadata_map else None
+
+            self.positions[ticker] = Position(
+                symbol=ticker,
+                quantity=quantity,
+                average_price=price,
+                current_price=price,
+                url=url,
+            )
+            self.cash_balance -= target_value
+
+        self.last_rebalance = datetime.now().isoformat()
+        print(self.positions)
+
+    def get_market_type(self) -> str:
+        return "polymarket"
+
+    def serialize_positions(self) -> Dict[str, Any]:
+        serialized_positions = {}
+        for symbol, position in self.positions.items():
+            pos_dict = {
+                "symbol": position.symbol,
+                "quantity": position.quantity,
+                "average_price": position.average_price,
+                "current_price": position.current_price,
+            }
+            if position.url:
+                pos_dict["url"] = position.url
+            serialized_positions[symbol] = pos_dict
+        return serialized_positions
+
+    def _update_market_data(self) -> None:
+        pass
+
+
+def create_polymarket_account(initial_cash: float = 500.0) -> PolymarketAccount:
+    return PolymarketAccount(initial_cash=initial_cash, cash_balance=initial_cash)

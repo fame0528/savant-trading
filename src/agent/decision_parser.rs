@@ -617,7 +617,7 @@ fn extract_confidence(text: &str) -> Option<f64> {
 }
 
 /// Extract JSON from a response that may contain markdown code blocks.
-fn extract_json(response: &str) -> &str {
+pub(crate) fn extract_json(response: &str) -> &str {
     let trimmed = response.trim();
 
     // Check for ```json ... ``` wrapper
@@ -693,7 +693,7 @@ fn normalize_llm_json(json: &str) -> String {
 }
 
 /// Manual JSON repair — fix truncated strings, unclosed brackets, trailing commas.
-fn repair_json_string(json: &str) -> String {
+pub(crate) fn repair_json_string(json: &str) -> String {
     let mut s = json.to_string();
 
     // Fix: unclosed string at end (truncated response)

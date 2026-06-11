@@ -13,6 +13,7 @@ pub mod context_engine;
 pub mod context_state;
 pub mod decision_log;
 pub mod decision_parser;
+pub mod jury;
 pub mod knowledge;
 pub mod openrouter_management;
 pub mod orchestrator;

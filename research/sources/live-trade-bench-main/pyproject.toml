@@ -1,0 +1,76 @@
+[tool.poetry]
+name = "live-trade-bench"
+version = "0.0.1"
+description = "Live evaluation of trading agents"
+authors = ["Haofei Yu <yuhaofei44@gmail.com>"]
+license = "PolyForm-Noncommercial-1.0.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = ">=0.110,<0.117"
+uvicorn = "^0.29.0"
+yfinance = "^0.2.37"
+finnhub-python = "^2.4.20"
+python-dotenv = "^1.0.1"
+requests = "^2.31.0"
+beautifulsoup4 = "^4.12.3"
+praw = "^7.7.1"
+fasteners = "^0.19"
+apscheduler = "*"
+tenacity = "^8.2.0"
+litellm = "*"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4.3.0"
+nbmake = "^1.5.0"
+types-setuptools = "^80.9.0.20250809"
+ruff = "^0.12.3"
+commitizen = "^3.14.1"
+
+# Removed black and isort since we're using ruff
+[tool.poetry.group.test.dependencies]
+pytest = "^8.1.1"
+pytest-asyncio = "*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+ignore_missing_imports = true
+check_untyped_defs = true
+follow_imports = "normal"
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+
+[tool.codespell]
+ignore-words-list = "dout, te, indicies, astroid"
+skip = ["data"]
+
+[tool.isort]
+profile = "black"
+use_parentheses = true
+skip_gitignore = true
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+line_length = 88
+
+[tool.black]
+line-length = 88
+target-version = ['py37', 'py38', 'py39', 'py310']
+
+[tool.ruff]
+line-length = 88
+fix = true
+target-version = "py310"
+
+[tool.ruff.format]
+indent-style = "space"

@@ -104,6 +104,15 @@ database_url = "sqlite:data/savant.db"
 fee_rate = 0.0005
 slippage_pct = 0.0030
 
+# FID-118: Pair health rotation
+[trading.pair_rotation]
+# Re-discover new pairs every N cycles (default 60 = ~3 hours at 5m intervals)
+interval_cycles = 60
+# Permanently evict pair after N consecutive dead cycles (default 5 = ~25 min)
+eviction_threshold = 5
+# Re-check evicted pairs every N cycles (default 300 = ~25 hours)
+revival_check_cycles = 300
+
 [risk]
 max_risk_per_trade = 0.005
 # Position allocation — scalping: 0.5% risk per trade, full deploy at low balance
@@ -117,7 +126,7 @@ dynamic_risk_tiers = [
 # Dynamic safety nets — scalping: tighter limits, faster halts
 # At $25: daily_loss=$1.25, drawdown=$2.50. Quick stop on bad days.
 max_daily_loss = 0.05
-max_drawdown = 0.10
+max_drawdown = 0.99  # Disabled — AI agent trades on data, not emotions. Re-enable if needed.
 min_daily_loss_usd = 1.25    # Floor: 5% of $25
 min_drawdown_usd = 2.50      # Floor: 10% of $25
 max_positions = 1
@@ -189,6 +198,16 @@ api_key_env = "OPENROUTER_API_KEY"
 referer = "https://github.com/fame0528/savant-trading"
 # Your app name — shown in OpenRouter dashboard attribution
 title = "Savant Trading Engine"
+
+[ai.jury]
+enabled = true
+jury_size = 10
+model = "openrouter/free"
+quorum_pct = 0.6
+timeout_secs = 45
+max_consecutive_failures = 3
+key_prefix = "savant-jury"
+cleanup_keys_on_shutdown = true
 
 [ai.openrouter.management]
 # Management API key (created on OpenRouter dashboard, used for admin operations only)

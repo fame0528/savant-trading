@@ -1859,7 +1859,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             Side::Long => (exit_price - pos.entry_price) * actual_close_qty,
             Side::Short => (pos.entry_price - exit_price) * actual_close_qty,
         };
-        let fee_est = exit_price * actual_close_qty * 0.001;
+        let fee_est = exit_price * actual_close_qty * 0.003; // FID-113: 0.3% Uniswap v3 LP fee (was 0.1%)
         let pnl = gross_pnl - fee_est;
         self.balance = usdc_balance_before + verified_proceeds;
 
@@ -2005,7 +2005,7 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
             },
         );
 
-        self.balance -= order_value * 1.001;
+        self.balance -= order_value * 1.003; // FID-113: 0.3% Uniswap v3 LP fee (was 0.1%)
 
         Ok(Order {
             id: format!("dex-{}-{}", self.order_counter, tx_hash),

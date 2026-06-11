@@ -278,16 +278,19 @@ async fn get_decisions(State(state): State<AppState>) -> Json<ApiResponse<Vec<De
     let decisions = state.shared.decisions.read().await;
     // FID-114: Pin non-PASS decisions at top so actionable signals (BUY/SELL/CLOSE/ADJUST)
     // are always visible even when batch evaluation produces 40+ PASS decisions.
+    // FID-119: Raised from 20 to 50 for scan_all_pairs mode (53 pairs max)
+    const MAX_DECISIONS: usize = 50;
+    const MAX_NON_PASS: usize = 15;
     let non_pass: Vec<DecisionRecord> = decisions.iter()
         .rev()
         .filter(|d| !d.action.eq_ignore_ascii_case("Pass"))
-        .take(10)
+        .take(MAX_NON_PASS)
         .cloned()
         .collect();
     let pass: Vec<DecisionRecord> = decisions.iter()
         .rev()
         .filter(|d| d.action.eq_ignore_ascii_case("Pass"))
-        .take(20_usize.saturating_sub(non_pass.len()))
+        .take(MAX_DECISIONS.saturating_sub(non_pass.len()))
         .cloned()
         .collect();
     let mut items = non_pass;

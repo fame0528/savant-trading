@@ -3,7 +3,108 @@
 All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-n## [0.13.3] — 2026-06-11
+
+## [0.13.7] — 2026-06-11
+
+### Fixed — FID-113: PnL Tracking — Fee Estimate Underreporting
+
+Closed trade PnL underreported actual costs because `fee_est` used 0.1% (old Kraken assumption) instead of the actual 0.3% Uniswap v3 LP fee. Dashboard showed -$0.13 closed trade PnL but -$10.37 actual loss — the $10.24 gap was untracked DEX execution costs.
+
+1. **Close path fee estimate** (`src/execution/dex/trader.rs:1862`): `fee_est = exit_price * actual_close_qty * 0.001` → `0.003` (0.3% LP fee)
+2. **Buy path fee deduction** (`src/execution/dex/trader.rs:2008`): `self.balance -= order_value * 1.001` → `1.003` (matching 0.3% on entry)
+
+**Note:** Gas costs (~$0.025/swap on Arbitrum) are still untracked — would require refactoring `execute_swap` to return `TxReceipt`. The 0.3% LP fee is the dominant cost component.
+
+**Files changed:** `src/execution/dex/trader.rs`
+
+### Changed
+- Version bump: 0.13.5 → 0.13.7 (includes FID-118 v0.13.5 + FID-119 v0.13.6 + FID-113 v0.13.7)
+- MASTER-FID updated: FID-113→fixed, FID-118→implemented, FID-119→fixed, active FIDs reduced from 4 to 2
+
+### Build & Test
+- 298 tests passing, 0 clippy warnings
+
+## [0.13.6] — 2026-06-11
+
+### Fixed — FID-119: VolRatio=0 "No Volume" Misdiagnosis + Frontend Decisions Cap
+
+Three fixes addressing why 27/40 pairs showed "VolRatio 0.00 — no volume" and the LLM said HOLD for every pair.
+
+1. **VolRatio 3-candle average** (`src/data/indicators.rs`): Changed from single last candle (`volumes[n-1] / vol_sma20`) to averaging last 3 candles (`(volumes[n-1] + volumes[n-2] + volumes[n-3]) / 3.0 / vol_sma20`). Single candle was frequently 0 for Kraken altcoins (no trades in that exact 5m window), even though 20-candle SMA showed healthy 100k+ volume.
+2. **Decisions API cap raised** (`src/api/mod.rs`): `MAX_DECISIONS` from 20→50, `MAX_NON_PASS` from 10→15. Named constants replace magic numbers. Fixes frontend hiding 20 of 40 evaluated pairs.
+3. **Absolute volume in LLM context** (`src/agent/context_engine.rs`): Injected `volume_sma` absolute value into KBar features line. Format: `VolRatio: 0.15 (avg_vol: $102417)`. LLM can now distinguish micro-caps with low baseline volume from healthy pairs with quiet last candles.
+
+**Files changed:** `src/data/indicators.rs`, `src/api/mod.rs`, `src/agent/context_engine.rs`
+
+### Build & Test
+- 298 tests passing, 0 clippy warnings
+
+## [0.13.5] — 2026-06-11
+
+### Implemented — FID-118: Pair Health Rotation (Steps 1-7)
+Eviction system that removes dead pairs from the watchlist and periodically re-discovers new ones.
+
+**Steps 1-2: GeckoTerminal candle source + rate limiter**
+- Added `GeckoTerminalSource` as 7th (last-resort) source in `SourceRouter` for DEX-only tokens
+- `tokio::sync::Mutex`-based rate limiter: 2.1s minimum interval (~28 req/min, safely under 30/min API limit)
+- Mutex held across sleep to properly serialize concurrent requests from parallel JoinSet tasks
+
+**Steps 3-4: Dead streak tracking + permanent eviction**
+- `track_dead_streak()` helper function: increments streak counter, permanently evicts at configurable threshold (default 5 cycles)
+- Eviction logic at all 4 `dead_tokens.insert()` sites (curated_pairs, zero candles, all_dead, unique_closes)
+- Dead streaks persist across `dead_tokens.clear()` cycles — a pair that's repeatedly dead accumulates streak toward eviction
+- Dead streak reset for pairs that survive a cycle with live data
+
+**Steps 5-6: Periodic re-discovery + revival**
+- Re-discovery every 60 cycles (~3 hours): calls `discover_safe_usd_pairs()`, merges new pairs, creates MarketDataStore
+- Revival check every 300 cycles (~25 hours): tries `fetch_candles()` for evicted pairs, revives if live data found
+- Both intervals configurable via `[trading]` config
+
+**Step 7: Config + health logging**
+- `PairRotationConfig` struct in `config.rs` with serde defaults (interval_cycles=60, eviction_threshold=5, revival_check_cycles=300)
+- Wired to engine loop replacing hardcoded magic numbers (60, 300, 5)
+- Health summary logged every 10 cycles: alive/temp-dead/evicted counts, discovery/revival/eviction totals
+- Post-iteration pruning of evicted pairs from `active_pairs`
+
+**Files changed:** `src/data/sources/geckoterminal.rs`, `src/engine/mod.rs`, `src/core/config.rs`, `config/default.toml`
+
+## [0.13.4] — 2026-06-11
+
+### Added — FID-114: Model Jury — Multi-Model Adversarial Decision System (All 9 Phases)
+
+A parallel multi-model evaluation system where N independent "jury" LLMs evaluate the same market data, a judge synthesizes verdicts into a final decision, and the result is compared against the primary agent's batch output in shadow mode.
+
+**Phase 1 — Config:** `JuryConfig` with `RegimeSizes` (trending: 6, ranging: 10, volatile: 10 jury members). `[ai.jury]` section in `config/default.toml`.
+
+**Phase 2 — Data Structures:** `JuryVerdict` (action, confidence, risk_reward, stop_loss, take_profit_1, evidence_quality, reasoning), `JuryResult` (verdicts, quorum_met, consensus), `JuryJudgment` (synthesized TradeDecision + consensus strength + dissent analysis).
+
+**Phase 3 — Key Management:** `JuryKeyManager` — lifecycle for disposable OpenRouter API keys (`$1` limit each). Create/acquire/record_success/record_failure/cleanup_all. Keys rotate round-robin, quarantine after 3 consecutive failures.
+
+**Phase 4 — Provider Enhancement:** `LlmProvider::chat_with_override()` — per-call timeout, API key override, cache_control stripping, 3-attempt retry with exponential backoff. `extract_json()` and `repair_json_string()` promoted to `pub(crate)`.
+
+**Phase 5 — Verdict Parser:** 6-pass `parse_verdict()` (strict JSON → repair → partial from raw → partial from repaired → freeform regex → last-resort strip). `normalize_verdict()` aliases, `parse_fraction()` for "7/10" format. 12 unit tests.
+
+**Phase 6 — Jury Pool:** `JuryPool` with parallel evaluation via `JoinSet`. Per-spawn `LlmProvider`, double timeout protection (outer `tokio::time::timeout` + inner client), round-robin key acquisition. 7 unit tests.
+
+**Phase 7 — Judge:** `JuryJudge` synthesizes verdicts via LLM into a single `TradeDecision`. `calculate_consensus()`, `analyze_dissent()`, `fallback_majority_vote()` when Judge LLM fails. 6 unit tests.
+
+**Phase 8 — Engine Integration:** Shadow mode evaluation after batch LLM call. Jury runs on batch response, logs verdict count + consensus + action for comparison. Batch decisions always used for execution.
+
+**Phase 9 — Metrics + Cleanup:** Jury metrics flushed to `dev/logs/jury-metrics.json` on shutdown. `cleanup_all()` deletes temporary jury API keys.
+
+**New files:** `src/agent/jury/mod.rs`, `src/agent/jury/key_manager.rs`, `src/agent/jury/verdict_parser.rs`, `src/agent/jury/pool.rs`, `src/agent/jury/judge.rs`, `src/agent/prompts/jury_member.md`, `src/agent/prompts/jury_judge.md`
+
+**Modified files:** `src/core/config.rs`, `src/agent/provider.rs`, `src/agent/decision_parser.rs`, `src/agent/mod.rs`, `src/engine/mod.rs`
+
+### Added — FID-118: Pair Health Rotation Analysis
+
+- **FID-118 created and Perfection Loop completed** — Identifies the static watchlist problem (dead pairs re-evaluated forever) and missing GeckoTerminal candle source. Full analysis with 7 RED issues, GREEN fixes, 5 additional suggestions. Ready for implementation.
+
+### Build & Test
+
+- 298 tests passing (292 lib + 4 doc + 2 integration), 0 clippy warnings
+
+## [0.13.3] — 2026-06-11
 
 ### Fixed
 
