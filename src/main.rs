@@ -23,6 +23,9 @@ struct TestArgs {
     historical: bool,
     model: Option<String>,
     managed_keys: bool,
+    endpoint: Option<String>,
+    api_key_env: Option<String>,
+    save_responses: bool,
 }
 
 fn parse_test_args(args: &[String]) -> TestArgs {
@@ -56,6 +59,17 @@ fn parse_test_args(args: &[String]) -> TestArgs {
             }
             "--managed-keys" => {
                 ta.managed_keys = true;
+            }
+            "--endpoint" => {
+                i += 1;
+                ta.endpoint = args.get(i).cloned();
+            }
+            "--api-key-env" => {
+                i += 1;
+                ta.api_key_env = args.get(i).cloned();
+            }
+            "--save-responses" => {
+                ta.save_responses = true;
             }
             _ => {}
         }
@@ -202,7 +216,15 @@ async fn main() -> anyhow::Result<()> {
             let ta = parse_test_args(&args);
             if ta.sandbox {
                 info!("=== SAVANT SANDBOX ===");
-                return engine::run_sandbox(config, ta.model, ta.managed_keys).await;
+                return engine::run_sandbox(
+                    config,
+                    ta.model,
+                    ta.managed_keys,
+                    ta.endpoint,
+                    ta.api_key_env,
+                    ta.save_responses,
+                )
+                .await;
             }
             // Check for --train flag
             if args.iter().any(|a| a == "--train") {
@@ -216,6 +238,7 @@ async fn main() -> anyhow::Result<()> {
                     ta.historical,
                     ta.model,
                     ta.managed_keys,
+                    ta.save_responses,
                 )
                 .await;
             }

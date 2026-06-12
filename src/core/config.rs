@@ -13,6 +13,8 @@ pub struct AppConfig {
     pub mode: ModeConfig,
     pub ai: AiConfig,
     #[serde(default)]
+    pub sandbox: SandboxConfig,
+    #[serde(default)]
     pub context: ContextConfig,
     pub insight: InsightConfig,
     #[serde(default)]
@@ -216,6 +218,36 @@ impl Default for NvidiaConfig {
     }
 }
 
+fn default_tokenrouter_endpoint() -> String {
+    "https://api.tokenrouter.com/v1".into()
+}
+fn default_tokenrouter_api_key_env() -> String {
+    "TOKEN_ROUTER_API_KEY".into()
+}
+fn default_tokenrouter_model() -> String {
+    "MiniMax-M3".into()
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct TokenRouterConfig {
+    #[serde(default = "default_tokenrouter_endpoint")]
+    pub endpoint: String,
+    #[serde(default = "default_tokenrouter_api_key_env")]
+    pub api_key_env: String,
+    #[serde(default = "default_tokenrouter_model")]
+    pub model: String,
+}
+
+impl Default for TokenRouterConfig {
+    fn default() -> Self {
+        Self {
+            endpoint: default_tokenrouter_endpoint(),
+            api_key_env: default_tokenrouter_api_key_env(),
+            model: default_tokenrouter_model(),
+        }
+    }
+}
+
 /// Regime-specific jury sizes (FID-114 Phase 6).
 #[derive(Debug, Clone, Deserialize)]
 pub struct RegimeSizes {
@@ -339,6 +371,8 @@ pub struct AiConfig {
     pub openrouter: OpenRouterConfig,
     #[serde(default)]
     pub nvidia: NvidiaConfig,
+    #[serde(default)]
+    pub tokenrouter: TokenRouterConfig,
     #[serde(default)]
     pub jury: JuryConfig,
 }
@@ -588,6 +622,46 @@ fn default_true() -> bool {
     true
 }
 
+// ── Sandbox config (FID-123) ─────────────────────────────────────────
+
+fn default_sandbox_endpoint() -> String {
+    "https://openrouter.ai/api/v1".into()
+}
+fn default_sandbox_api_key_env() -> String {
+    "OPENROUTER_API_KEY".into()
+}
+fn default_sandbox_model() -> String {
+    "openrouter/owl-alpha".into()
+}
+
+/// Sandbox provider configuration (FID-123).
+///
+/// Completely independent from `[ai]` — allows testing different
+/// models/providers in the sandbox while the engine runs in production.
+/// Falls back to `[ai]` fields when not configured.
+#[derive(Debug, Clone, Deserialize)]
+pub struct SandboxConfig {
+    #[serde(default = "default_sandbox_endpoint")]
+    pub endpoint: String,
+    #[serde(default = "default_sandbox_api_key_env")]
+    pub api_key_env: String,
+    #[serde(default = "default_sandbox_model")]
+    pub model: String,
+    #[serde(default)]
+    pub management: OpenRouterManagementConfig,
+}
+
+impl Default for SandboxConfig {
+    fn default() -> Self {
+        Self {
+            endpoint: default_sandbox_endpoint(),
+            api_key_env: default_sandbox_api_key_env(),
+            model: default_sandbox_model(),
+            management: OpenRouterManagementConfig::default(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct InsightConfig {
     pub funding_rate_enabled: bool,
@@ -803,10 +877,10 @@ impl AppConfig {
         }
         // Validate AI provider
         match self.ai.provider.as_str() {
-            "opengateway" | "openrouter" | "nvidia" | "ollama" => {}
+            "opengateway" | "openrouter" | "nvidia" | "ollama" | "tokenrouter" => {}
             other => {
                 return Err(ConfigError::ValidationError(format!(
-                    "Invalid ai.provider '{}': must be 'opengateway', 'openrouter', 'nvidia', or 'ollama'",
+                    "Invalid ai.provider '{}': must be 'opengateway', 'openrouter', 'nvidia', 'ollama', or 'tokenrouter'",
                     other
                 )));
             }
@@ -911,8 +985,10 @@ impl Default for AppConfig {
                 timeout_secs: 300,
                 openrouter: OpenRouterConfig::default(),
                 nvidia: NvidiaConfig::default(),
+                tokenrouter: TokenRouterConfig::default(),
                 jury: JuryConfig::default(),
             },
+            sandbox: SandboxConfig::default(),
             context: ContextConfig::default(),
             insight: InsightConfig {
                 funding_rate_enabled: true,

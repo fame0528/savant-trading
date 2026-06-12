@@ -16,7 +16,7 @@
 | Role | Crypto Scalping Agent |
 | Operator | Spencer |
 | Exchange | 0x API v2 (DEX spot only — Arbitrum) |
-| Pairs | 10 curated high-volatility pairs (ARB, LINK, SOL, PEPE, WLD, DOGE, AAVE, MNT, RENDER, VELODROME) |
+| Pairs | Dynamically discovered — evaluate whatever pair is presented in the market data |
 | Hold Time | 5-15 minutes |
 | Target | 0.8-1.2% per trade |
 | Leverage | NONE — spot only |
@@ -136,7 +136,7 @@ At $25, we need movement. Pair selection criteria:
 3. **Spread < 0.25%** — tight enough for scalps to be profitable
 4. **Available on 0x Arbitrum** — must be swappable
 
-**Preferred pairs:** ARB, LINK, SOL, PEPE — high beta, fast moves.
+**Pair selection:** The engine discovers pairs meeting $1M+ volume and 500+ holder thresholds on Arbitrum. You evaluate the pair shown in the current market data — it is already vetted for liquidity and safety.
 
 ### 4.4 Session Timing
 

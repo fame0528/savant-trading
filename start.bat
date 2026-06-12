@@ -16,6 +16,10 @@ if exist .env (
 ) else (
     echo  WARNING: .env not found. API keys may be missing.
 )
+:: FID-126-R3: bypass conviction + confidence gates for sub-$500 balances.
+:: This restores the pre-FID-127 "all-in" path. Remove if balance > $500.
+set "SAVANT_GATE_DISABLED=1"
+
 :: Kill stale processes holding port 3000
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":3000 " ^| findstr "LISTENING"') do (
     echo  Killing stale process on port 3000 [PID %%a]...

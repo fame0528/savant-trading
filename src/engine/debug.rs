@@ -135,6 +135,7 @@ pub async fn dry_run(config: AppConfig) -> anyhow::Result<()> {
         live_price: None,
         decision_log_context: None,
         dex_price: None,
+        active_pairs: Some(std::slice::from_ref(&pair)),
     };
 
     let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
@@ -383,6 +384,7 @@ pub async fn run_live_test(
             live_price: None,
             decision_log_context: None,
             dex_price: None,
+            active_pairs: Some(&pairs),
         };
 
         let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(

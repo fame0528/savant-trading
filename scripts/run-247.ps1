@@ -90,6 +90,13 @@ Log "=== PHASE 3: LIVE PAPER TRADING ===" $trainLog
 Log "Switching to live paper trading..." $trainLog
 Log "Engine log: $engineLog" $trainLog
 
+# FID-126-R3: Bypass conviction gate + confidence floor for sub-$500 balances.
+# User's reality: $24 live balance (down from $50, lost half to broken bot).
+# All-in path: one trade, full balance, no conviction threshold.
+# This restores pre-FID-127 behavior. Remove if balance > $500.
+$env:SAVANT_GATE_DISABLED = "1"
+Log "FID-126-R3: SAVANT_GATE_DISABLED=1 (bypass conviction + confidence gates for sub-$500 balance)" $trainLog
+
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Green
 Write-Host "  Training complete. Starting live engine." -ForegroundColor Green

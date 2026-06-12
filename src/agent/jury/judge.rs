@@ -313,6 +313,11 @@ impl JuryJudge {
                 mandated_action: String::new(),
                 mandated_stop_price: 0.0,
                 would_initiate_new_long: None,
+                // FID-126: default conviction fields (jury fallback path)
+                conviction_score: 0.0,
+                sizing_multiplier: 0.5,
+                regime_label: decision_parser::RegimeLabel::default(),
+                trigger_weights: decision_parser::TriggerWeights::default(),
             },
             consensus_strength: consensus,
             dissent_analysis: self.analyze_dissent(jury_result),

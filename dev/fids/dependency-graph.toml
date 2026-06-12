@@ -1,0 +1,115 @@
+# FID Dependency Graph
+# =====================
+# Machine-readable dependency graph for the FID-126-136 plan (Gemini Deep Research).
+# Validated by scripts/check_release_readiness.py (per FID-136 spec).
+#
+# Format: each FID declares its required FIDs in `dependencies` and the FIDs that
+# depend on it in `blocks`. Severity is critical/high/medium/low.
+# Status is open/implemented/done/archived.
+
+[fid-126]
+title = "Conviction-Weighted Threshold System"
+phase = 1
+status = "open"
+dependencies = []
+blocks = ["fid-127", "fid-130", "fid-132", "fid-133", "fid-134", "fid-135"]
+severity = "critical"
+
+[fid-127]
+title = "Conviction-Weighted Position Sizing (Rust)"
+phase = 2
+status = "open"
+dependencies = ["fid-126"]
+blocks = ["fid-134", "fid-135"]
+severity = "high"
+
+[fid-128]
+title = "Sandbox Jump-Diffusion Synthetic Data"
+phase = 3
+status = "open"
+dependencies = []
+blocks = ["fid-133", "fid-134"]
+severity = "high"
+
+[fid-129]
+title = "Remove Deep Asian Session Penalty"
+phase = 3
+status = "open"
+dependencies = []
+blocks = ["fid-134"]
+severity = "medium"
+
+[fid-130]
+title = "Counterfactual Grader (OPE + Brier + ECE + HTC)"
+phase = 2
+status = "open"
+dependencies = ["fid-126"]
+blocks = ["fid-133"]
+severity = "critical"
+
+[fid-131]
+title = "Knowledge Unit Absolute-Language Scrub"
+phase = 1
+status = "open"
+dependencies = []
+blocks = []
+severity = "critical"
+
+[fid-132]
+title = "10-Point Checklist -> Evaluation Matrix"
+phase = 1
+status = "open"
+dependencies = ["fid-126"]
+blocks = ["fid-135"]
+severity = "high"
+
+[fid-133]
+title = "A/B Test Harness for Prompt Comparison"
+phase = 2
+status = "open"
+dependencies = ["fid-126", "fid-128", "fid-130"]
+blocks = []
+severity = "high"
+
+[fid-134]
+title = "20 Adversarial Scenarios"
+phase = 3
+status = "open"
+dependencies = ["fid-126", "fid-127", "fid-128", "fid-129", "fid-132"]
+blocks = []
+severity = "high"
+
+[fid-135]
+title = "Checklist Modifier Calibration Loop"
+phase = 2
+status = "open"
+dependencies = ["fid-126", "fid-127", "fid-132"]
+blocks = []
+severity = "medium"
+
+[fid-136]
+title = "Release Coordination & Dependency Tracking"
+phase = 2
+status = "open"
+dependencies = ["fid-126", "fid-127", "fid-128", "fid-129", "fid-130", "fid-131", "fid-132", "fid-133", "fid-134", "fid-135"]
+blocks = []
+severity = "medium"
+
+# Schema for future FID additions:
+# [fid-NNN]
+# title = "..."
+# phase = 1|2|3
+# status = "open|implemented|done|archived"
+# dependencies = ["fid-XXX", ...]
+# blocks = ["fid-YYY", ...]
+# severity = "critical|high|medium|low"
+
+# Phase distribution (as of 2026-06-12):
+# Phase 1 (no engine change): 126, 131, 132
+# Phase 2 (Rust engine + new modules): 127, 130, 133, 135, 136
+# Phase 3 (data + risk + sandbox): 128, 129, 134
+
+# Release sequence (per FID-136 spec):
+# v0.14.0: Phase 1 FIDs (126, 131, 132)
+# v0.15.0: Phase 2 FIDs (127, 130, 133, 135, 136)
+# v0.16.0: Phase 3 FIDs (128, 129, 134)

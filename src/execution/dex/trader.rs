@@ -1152,6 +1152,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         src_token: &TokenInfo,
         dst_token: &TokenInfo,
         amount_wei: &str,
+        sell_entire_balance: bool,
     ) -> Result<String, ExecutionError> {
         // FID-018: Halt if ETH gas too low
         if self.gas_halted {
@@ -1188,7 +1189,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             slippage: self.slippage_pct,
             from: wallet_addr.clone(),
             chain_id: self.chain_id,
-            sell_entire_balance: false,
+            sell_entire_balance,
         };
 
         log_swap!(
@@ -1669,6 +1670,17 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             );
         }
         let qty_wei = amount_to_wei(actual_close_qty, src_token.decimals);
+        // Close rounding fix: apply 0.01% haircut to prevent f64→wei rounding
+        // from exceeding on-chain balance (causes 0x to return 0 output / gasless INSUFFICIENT_BALANCE)
+        let wei_val: u128 = match qty_wei.parse() {
+            Ok(v) => v,
+            Err(e) => {
+                warn!("Close wei parse failed for {}: {} — qty_wei={}", pos.pair, e, qty_wei);
+                0
+            }
+        };
+        let safe_wei = (wei_val * 9999) / 10000;
+        let qty_wei = safe_wei.to_string();
 
         // FID-094 Fix 5: Zero-amount swap guard — don't call 0x with 0 amount
         if actual_close_qty < 0.0001 || qty_wei == "0" {
@@ -1724,7 +1736,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
         let usdc_balance_before = self.balance;
 
-        let tx_hash = match self.execute_swap(&src_token, &dst_token, &qty_wei).await {
+        let tx_hash = match self.execute_swap(&src_token, &dst_token, &qty_wei, true).await {
             Ok(hash) => hash,
             Err(e) if e.to_string().contains("Dust output") => {
                 warn!(
@@ -1976,7 +1988,7 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         }
 
         let tx_hash = self
-            .execute_swap(&src_token, &dst_token, &amount_wei)
+            .execute_swap(&src_token, &dst_token, &amount_wei, false)
             .await?;
 
         info!("DEX filled: {} | tx={}", pair, tx_hash);

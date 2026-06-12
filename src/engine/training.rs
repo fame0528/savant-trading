@@ -30,7 +30,7 @@ async fn fetch_and_cache(candle_api: &CandleClient, cache_path: &str) -> Vec<Can
         Err(e) => {
             warn!("Candle fetch failed ({}), using synthetic fallback", e);
             let gen_config = savant_trading::sandbox::generator::GeneratorConfig {
-                num_candles: 721,
+                num_candles: 200, // FID-126: 200 candles (17h) for sharper indicators
                 interval_minutes: 5,
                 ..Default::default()
             };
@@ -99,6 +99,132 @@ fn rotate_backups(dir: &std::path::Path, prefix: &str, max: u32) {
     }
 }
 
+/// A single raw LLM response entry for diagnostic persistence.
+#[derive(serde::Serialize)]
+struct RawResponseEntry {
+    scenario_id: String,
+    scenario_name: String,
+    category: String,
+    difficulty: String,
+    expected_action: String,
+    current_price: f64,
+    raw_response: Option<String>,
+    error: Option<String>,
+    latency_ms: u64,
+}
+
+/// Module-level diagnostic response for `save_raw_responses`.
+/// Both `run_training_batch` and `run_sandbox` define local
+/// `ScenarioResponse` types — this shared struct normalizes the
+/// fields needed for raw response persistence.
+///
+/// Uses `Option<String>` for the response to avoid requiring
+/// `LlmError: Clone` (it doesn't derive it).
+struct DiagnosticResponse {
+    scenario_id: String,
+    scenario_name: String,
+    category: String,
+    difficulty: String,
+    expected_action: String,
+    current_price: f64,
+    raw_response: Option<String>,
+    error: Option<String>,
+    latency_ms: u64,
+}
+
+/// Save raw LLM responses to disk for diagnostic inspection.
+///
+/// Creates a timestamped directory under `data/sandbox_responses/` and writes
+/// one JSON file per scenario plus an index file for quick filtering.
+fn save_raw_responses(
+    responses: &[DiagnosticResponse],
+    tag: &str,
+    model: &str,
+    endpoint: &str,
+) {
+    use std::io::Write;
+
+    let timestamp = chrono::Utc::now().format("%Y-%m-%d_%H-%M-%S");
+    let dir = format!("data/sandbox_responses/{}_{}", tag, timestamp);
+    if let Err(e) = std::fs::create_dir_all(&dir) {
+        warn!("Failed to create response directory {}: {}", dir, e);
+        return;
+    }
+
+    // Write individual response files
+    for sr in responses {
+        let entry = RawResponseEntry {
+            scenario_id: sr.scenario_id.clone(),
+            scenario_name: sr.scenario_name.clone(),
+            category: sr.category.clone(),
+            difficulty: sr.difficulty.clone(),
+            expected_action: sr.expected_action.clone(),
+            current_price: sr.current_price,
+            raw_response: sr.raw_response.clone(),
+            error: sr.error.clone(),
+            latency_ms: sr.latency_ms,
+        };
+        let filename = format!("{}/{}.json", dir, sr.scenario_id);
+        if let Ok(json) = serde_json::to_string_pretty(&entry) {
+            if let Err(e) = std::fs::write(&filename, &json) {
+                warn!("Failed to write {}: {}", filename, e);
+            }
+        }
+    }
+
+    // Write index file
+    let index: Vec<serde_json::Value> = responses
+        .iter()
+        .map(|sr| {
+            let action = match sr.raw_response.as_deref() {
+                Some(text) => {
+                    match savant_trading::agent::decision_parser::parse_decision(
+                        text,
+                        sr.current_price,
+                        10.0,
+                    ) {
+                        Ok(d) => format!("{:?}", d.action),
+                        Err(_) => "ParseError".to_string(),
+                    }
+                }
+                None => "LLMError".to_string(),
+            };
+            serde_json::json!({
+                "id": sr.scenario_id,
+                "name": sr.scenario_name,
+                "expected": sr.expected_action,
+                "action": action,
+            })
+        })
+        .collect();
+
+    let index_path = format!("{}/index.json", dir);
+    if let Ok(json) = serde_json::to_string_pretty(&index) {
+        let mut f = match std::fs::File::create(&index_path) {
+            Ok(f) => f,
+            Err(e) => {
+                warn!("Failed to create {}: {}", index_path, e);
+                return;
+            }
+        };
+        let _ = f.write_all(json.as_bytes());
+    }
+
+    // Write metadata file
+    let metadata = serde_json::json!({
+        "model": model,
+        "endpoint": endpoint,
+        "scenario_count": responses.len(),
+        "timestamp": timestamp.to_string(),
+    });
+    let meta_path = format!("{}/metadata.json", dir);
+    if let Ok(json) = serde_json::to_string_pretty(&metadata) {
+        let _ = std::fs::write(&meta_path, &json);
+    }
+
+    println!("\nRaw responses saved to {}/", dir);
+}
+
 /// Determine if an expected action string indicates a trade (Buy/Sell) vs Hold.
 ///
 /// Scenarios use varied formats: "Buy (High Conviction)", "Hold / Take Profit",
@@ -138,6 +264,7 @@ async fn run_training_batch(
     test_memory: &savant_trading::memory::episodic::EpisodicMemory,
     model_override: Option<&str>,
     managed_keys: bool,
+    save_responses: bool,
 ) -> anyhow::Result<TrainingRunResult> {
     use savant_trading::sandbox::generator;
 
@@ -392,11 +519,23 @@ async fn run_training_batch(
                 "Asian" => savant_trading::core::session::Session::Asian,
                 "European" => savant_trading::core::session::Session::European,
                 "US" => savant_trading::core::session::Session::UsEuOverlap,
+                "UsEuOverlap" => savant_trading::core::session::Session::UsEuOverlap,
+                "DeepAsian" => savant_trading::core::session::Session::DeepAsian,
                 "Late US" => savant_trading::core::session::Session::LateUs,
                 _ => savant_trading::core::session::current_session(),
             }
         } else {
-            savant_trading::core::session::current_session()
+            // FID-126: Default to best-liquidity session for trade scenarios.
+            // Without this, all scenarios get Deep Asian penalties when run at night.
+            let expects_trade = scenario.expected_action.to_lowercase().contains("buy")
+                || scenario.expected_action.to_lowercase().contains("sell")
+                || scenario.expected_action.to_lowercase().contains("short")
+                || scenario.expected_action.to_lowercase().contains("close");
+            if expects_trade {
+                savant_trading::core::session::Session::UsEuOverlap
+            } else {
+                savant_trading::core::session::current_session()
+            }
         };
 
         let portfolio = PortfolioManager::new(
@@ -424,6 +563,7 @@ async fn run_training_batch(
             live_price: None,
             decision_log_context: None,
             dex_price: None,
+            active_pairs: Some(&["BTC/USD".to_string()]),
         };
 
         let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
@@ -537,6 +677,28 @@ async fn run_training_batch(
             );
             all_responses.push(sr);
         }
+    }
+
+    // PHASE 2c: Save raw responses for diagnostic inspection
+    if save_responses {
+        let resolved_model = model_override.unwrap_or(&config.ai.model);
+        let diagnostic: Vec<DiagnosticResponse> = all_responses.iter().map(|sr| DiagnosticResponse {
+            scenario_id: sr.scenario_id.clone(),
+            scenario_name: sr.scenario_name.clone(),
+            category: sr.category.clone(),
+            difficulty: String::new(),
+            expected_action: sr.expected_action.clone(),
+            current_price: sr.current_price,
+            raw_response: sr.response.as_ref().ok().cloned(),
+            error: sr.response.as_ref().err().map(|e| e.to_string()),
+            latency_ms: sr.latency_ms,
+        }).collect();
+        save_raw_responses(
+            &diagnostic,
+            "training",
+            resolved_model,
+            &config.ai.endpoint,
+        );
     }
 
     // PHASE 3: Parse, capture episodes, collect stats
@@ -1086,6 +1248,7 @@ pub async fn run_training(
     historical: bool,
     model_override: Option<String>,
     managed_keys: bool,
+    save_responses: bool,
 ) -> anyhow::Result<()> {
     let _managed_keys = managed_keys;
     let _test_memory =
@@ -1180,6 +1343,7 @@ pub async fn run_training(
             &test_memory,
             model_override.as_deref(),
             managed_keys,
+            save_responses,
         )
         .await?;
         brier_history.push(result.brier_score);
@@ -1272,6 +1436,7 @@ pub async fn run_action_test(
         &test_memory,
         model_override.as_deref(),
         managed_keys,
+        false,
     )
     .await?;
 
@@ -1294,6 +1459,9 @@ pub async fn run_sandbox(
     config: AppConfig,
     model_override: Option<String>,
     _managed_keys: bool,
+    endpoint_override: Option<String>,
+    api_key_env_override: Option<String>,
+    save_responses: bool,
 ) -> anyhow::Result<()> {
     use savant_trading::sandbox::feedback::analyze_failures;
     use savant_trading::sandbox::generator::{self};
@@ -1305,21 +1473,33 @@ pub async fn run_sandbox(
     let scenarios = load_all_scenarios();
     println!("Loaded {} scenarios", scenarios.len());
 
+    // FID-123: Resolve sandbox provider from [sandbox] config + CLI overrides.
+    // Falls back to [ai] fields when [sandbox] is not configured.
+    let sandbox_endpoint = endpoint_override
+        .as_deref()
+        .unwrap_or(&config.sandbox.endpoint);
+    let sandbox_api_key_env = api_key_env_override
+        .as_deref()
+        .unwrap_or(&config.sandbox.api_key_env);
+    let resolved_model = model_override
+        .clone()
+        .unwrap_or_else(|| config.sandbox.model.clone());
+
+    println!("Sandbox provider: endpoint={} model={} key_env={}",
+        sandbox_endpoint, resolved_model, sandbox_api_key_env);
+
     let api_keys: Vec<String> = std::env::var("SANDBOX_API_KEYS")
-        .unwrap_or_else(|_| std::env::var(&config.ai.api_key_env).unwrap_or_default())
+        .unwrap_or_else(|_| std::env::var(sandbox_api_key_env).unwrap_or_default())
         .split(',')
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty())
         .collect();
     if api_keys.is_empty() {
-        warn!(
+        anyhow::bail!(
             "No API keys found. Set SANDBOX_API_KEYS (comma-separated) or {} in .env",
-            config.ai.api_key_env
+            sandbox_api_key_env
         );
     }
-    let resolved_model = model_override
-        .clone()
-        .unwrap_or_else(|| config.ai.model.clone());
     let mut byok_headers: Vec<(String, String)> = Vec::new();
     if resolved_model.starts_with("google/") {
         if let Ok(google_key) = std::env::var("GOOGLE_API_KEY") {
@@ -1333,7 +1513,7 @@ pub async fn run_sandbox(
         .map(|key| {
             savant_trading::agent::provider::LlmProvider::new(
                 savant_trading::agent::provider::LlmConfig {
-                    endpoint: config.ai.endpoint.clone(),
+                    endpoint: sandbox_endpoint.to_string(),
                     model: resolved_model.clone(),
                     api_key: key.clone(),
                     max_tokens: config.ai.max_tokens,
@@ -1488,11 +1668,21 @@ pub async fn run_sandbox(
                 "Asian" => savant_trading::core::session::Session::Asian,
                 "European" => savant_trading::core::session::Session::European,
                 "US" => savant_trading::core::session::Session::UsEuOverlap,
+                "UsEuOverlap" => savant_trading::core::session::Session::UsEuOverlap,
+                "DeepAsian" => savant_trading::core::session::Session::DeepAsian,
                 "Late US" => savant_trading::core::session::Session::LateUs,
                 _ => savant_trading::core::session::current_session(),
             }
         } else {
-            savant_trading::core::session::current_session()
+            let expects_trade = scenario.expected_action.to_lowercase().contains("buy")
+                || scenario.expected_action.to_lowercase().contains("sell")
+                || scenario.expected_action.to_lowercase().contains("short")
+                || scenario.expected_action.to_lowercase().contains("close");
+            if expects_trade {
+                savant_trading::core::session::Session::UsEuOverlap
+            } else {
+                savant_trading::core::session::current_session()
+            }
         };
 
         let portfolio = PortfolioManager::new(
@@ -1518,6 +1708,7 @@ pub async fn run_sandbox(
             live_price: None,
             decision_log_context: None,
             dex_price: None,
+            active_pairs: Some(&["BTC/USD".to_string()]),
         };
 
         let (system_prompt, user_message) = savant_trading::agent::context_builder::build_context(
@@ -1711,6 +1902,27 @@ pub async fn run_sandbox(
         }
     }
 
+    // Phase 2c: Save raw responses for diagnostic inspection
+    if save_responses {
+        let diagnostic: Vec<DiagnosticResponse> = all_responses.iter().map(|sr| DiagnosticResponse {
+            scenario_id: sr.scenario_id.clone(),
+            scenario_name: sr.scenario_name.clone(),
+            category: sr.category.clone(),
+            difficulty: sr.difficulty.clone(),
+            expected_action: sr.expected_action.clone(),
+            current_price: sr.current_price,
+            raw_response: sr.response.as_ref().ok().cloned(),
+            error: sr.response.as_ref().err().map(|e| e.to_string()),
+            latency_ms: 0,
+        }).collect();
+        save_raw_responses(
+            &diagnostic,
+            "sandbox",
+            &resolved_model,
+            sandbox_endpoint,
+        );
+    }
+
     // Phase 3: Grade all responses
     println!("Grading {} responses...", all_responses.len());
 
@@ -1843,7 +2055,7 @@ pub async fn run_sandbox(
         savant_trading::sandbox::run_report::ConfigSnapshot {
             pairs: config.trading.pairs.clone(),
             timeframe: config.trading.timeframe.clone(),
-            model: config.ai.model.clone(),
+            model: resolved_model.clone(),
             concurrency: max_concurrent,
             starting_balance: config.trading.starting_balance,
         },

@@ -4,7 +4,77 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.13.9] — 2026-06-12
+
+### Fixed — FID-137: Close-Rounding Bug — f64→wei Overflow Prevents Position Exit
+Overnight run (2026-06-12) left 262.54 ARB stranded in the wallet (~$22) because `close_position_internal()` produced a `qty_wei` value 48 wei above the actual on-chain balance. The 0x API returned 0 output (dust rejection), and the gasless fallback returned `INSUFFICIENT_BALANCE`. The bot was stuck in a loop: every cycle it tried to close ARB, every cycle it failed, and the `close_failure_cooldown` suppressed retries for 5 minutes — repeating indefinitely.
+
+- **`execute_swap()` parameter** (`src/execution/dex/trader.rs`): Added `sell_entire_balance: bool` parameter; propagated to internal `SwapParams` (was hardcoded `false`). Close path passes `true`, open path passes `false`.
+- **Wei safety haircut** (`src/execution/dex/trader.rs:close_position_internal`): Applied `(wei_val * 9999) / 10000` after `amount_to_wei()` to ensure computed wei is always slightly below on-chain balance, preventing the 0x API from rejecting the quote.
+- **`match qty_wei.parse()` warning**: Replaced silent `unwrap_or(0)` with `match` + `warn!()` on parse failure.
+- **Files changed:** `src/execution/dex/trader.rs` (15 insertions, 3 deletions, ~0.3% of 4,700-line file)
+
+### Fixed — FID-125: Dynamic Pair List (soul.md Stale Pair Fix)
+
+`soul.md` hardcoded "10 curated high-volatility pairs (ARB, LINK, SOL, PEPE, WLD, DOGE, AAVE, MNT, RENDER, VELODROME)" but the engine dynamically discovers pairs via Blockscout token discovery (FID-120), `discover_safe_usd_pairs()`, and `token_store` — growing to 18+ active pairs at runtime. The model read the stale list and refused to trade pairs like BTC/USD that ARE in the active watchlist. This was the **primary root cause** of the 57/60 HOLD divergence pattern discovered in the M3 sandbox raw response capture (FID-124).
+
+**Changes:**
+- **`src/agent/soul.md`** — Replaced hardcoded pair list with dynamic language: "The engine dynamically discovers tokens meeting $1M+ volume and 500+ holder thresholds. You evaluate the pair shown in the current market data."
+- **`src/agent/context_builder.rs`** — Added `active_pairs: Option<&'a [String]>` to `FullContext`. Injects "## Active Trading Universe" section into the user message with the list of active pairs and "already vetted for liquidity and safety. Evaluate it."
+- **`src/engine/mod.rs`** — Passes live `active_pairs` to `FullContext` in the main evaluation loop.
+- **`src/engine/debug.rs`** — Passes `active_pairs` to both `FullContext` sites (dry_run + run_live_test).
+- **`src/engine/training.rs`** — Passes `active_pairs: Some(&["BTC/USD"])` in sandbox/training `FullContext` sites.
+
+**Bugfix:** Also fixed pre-existing `prepared.push()` missing struct name (`Prepared`) in `run_training_batch()`.
+
+### Added — FID-124: Sandbox Raw Response Capture
+
+Raw LLM response persistence for diagnostic inspection. Enables the iterative observe-fix cycle needed to diagnose the reasoning-action divergence identified in the M3 sandbox run (40/58 passed, 17/18 failures were "Missed trade: expected Buy/Sell").
+
+- **`DiagnosticResponse`** (`src/engine/training.rs`): Shared module-level struct for raw response capture. Uses `Option<String>` fields (not `Result<String, LlmError>`) to avoid `Clone` requirement on `LlmError`.
+- **`save_raw_responses()`** (`src/engine/training.rs`): Writes per-scenario JSON files to `data/sandbox_responses/{tag}_{timestamp}/` plus `index.json` and `metadata.json`.
+- **Phase 2c in `run_sandbox()`**: Saves raw responses after LLM calls complete, before grading.
+- **Phase 2c in `run_training_batch()`**: Same capture for training batch runs.
+- **`--save-responses` CLI flag** (`src/main.rs`): Opt-in flag on `--test --sandbox` and `--test --train` paths.
+- **`run_training()` signature**: Added `save_responses: bool` parameter, forwarded to `run_training_batch()`.
+
+**Files changed:** `src/engine/training.rs`, `src/main.rs`
+
+### Added — FID-123: Sandbox Multi-Provider Support
+
+Sandbox and training functions decoupled from the engine's `[ai]` config. The sandbox now has its own `[sandbox]` config section, allowing MiniMax M3 via TokenRouter to be tested while owl-alpha runs in production via OpenRouter — without modifying the live engine config.
+
+- **`SandboxConfig`** (`src/core/config.rs`): New config struct with `endpoint`, `model`, `api_key_env`, `management` fields. `#[serde(default)]` on `AppConfig.sandbox` ensures backwards compatibility with existing configs.
+- **`[sandbox]` section** (`config/default.toml`): Points at TokenRouter/MiniMax M3 by default. Falls back to `[ai]` if section is missing.
+- **CLI overrides** (`src/main.rs`): `--endpoint` and `--api-key-env` flags added for quick provider switching without config edits.
+- **`run_sandbox()` refactor** (`src/engine/training.rs`): Resolves provider from `[sandbox]` config with CLI override precedence: `CLI --endpoint > [sandbox].endpoint > default`.
+- **Report audit trail**: Sandbox report header now logs endpoint + model + key_env for multi-provider run traceability.
+
+### Added — FID-122: TokenRouter Provider Integration
+
+TokenRouter (tokenrouter.com) added as a first-class LLM provider for accessing MiniMax M3 via their free promotional tier. MiniMax M3 outperforms owl-alpha: 2x throughput (34 vs 19 tok/s), 18% lower latency (2.71s vs 3.28s), 2x max output (512K vs 262K tokens), fp8 quantization.
+
+- **`TokenRouterConfig`** (`src/core/config.rs`): New config struct with `endpoint`, `model`, `api_key_env` fields. Follows `NvidiaConfig` pattern.
+- **`create_provider()` arm** (`src/agent/provider.rs`): `"tokenrouter"` match arm constructs `LlmConfig` from `TokenRouterConfig` sub-section.
+- **`minimax/minimax-m3` capabilities** (`src/agent/provider_caps.rs`): Registered with reasoning_split handling (same as m1-80k), 1.05M context window, 512K max output.
+- **Config** (`config/default.toml`): `[ai.tokenrouter]` section with `endpoint = "https://api.tokenrouter.com/v1"`, `model = "minimax/minimax-m3"`, `api_key_env = "TOKENROUTER_API_KEY"`.
+- **Validation** (`src/core/config.rs`): `"tokenrouter"` added to allowed `ai.provider` values.
+
+### Build & Test
+- 299 tests passing, 0 clippy warnings
+
 ## [0.13.8] — 2026-06-11
+
+### Added — FID-121: 0x Liquidity Validation Gate for Token Store
+
+Per-Blockscout-discovered tokens are now validated against 0x `/price` before persistence. Without this gate, tokens with zero 0x routing (untradeable honeypots, dead pools, no Arbitrum liquidity) get added to the persistent token store and waste evaluation cycles. Fixes a previously dead `validate_via_0x` config flag.
+
+- **`validate_token_liquidity()`** (`src/data/token_discovery.rs`): Standalone async function. Queries 0x `/price` with 1 USDC → token sell. Returns `Ok(true)` if `liquidityAvailable=true` and `buyAmount != "0"`. 10s timeout, 200ms rate limiting, capped at 20 new tokens per refresh cycle.
+- **`refresh_token_store()`** (`src/data/token_discovery.rs`): Signature updated to `validate_via_0x: bool, api_key: Option<&str>`. When `validate_via_0x=true` and key is present, each new token is validated before persistence; failed/errored tokens are skipped with debug log.
+- **Engine startup** (`src/engine/mod.rs`): Reads `ZEROX_API_KEY` from `config.exchange.dex.api_key_env` and passes to `refresh_token_store()` in both startup and periodic loop. Graceful fallback to no-validation when key missing.
+- **Graceful degradation** (`src/data/token_discovery.rs`): On 0x API downtime, the token is still added with a warning (the 0x check is an optimization, not a hard gate; the real trading path has its own liquidity check at execution time).
+
+**Files changed:** `src/data/token_discovery.rs`, `src/core/config.rs`, `src/engine/mod.rs`, `config/default.toml`
 
 ### Added — FID-120: Dynamic Token Database
 

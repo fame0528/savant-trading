@@ -441,6 +441,42 @@
 
 <!-- Add new entries above this line -->
 
+## Session 2026-06-12 14:31–15:00: ECHO Bootstrap + FID Reconciliation + v0.13.9 Push
+
+**Key Learnings:**
+
+- **Read ECHO.md fully before any work session.** ECHO is the source of truth for the protocol. Skipping it (as in earlier sessions) led to a fragmented /dev folder. Law 1 (Read 0-EOF) is non-negotiable even for protocol files.
+
+- **Forward-drafting CHANGELOG sections is a hazard.** The CHANGELOG had v0.13.10 and v0.13.11 sections that were never pushed. When CHANGELOG and version reality diverge, audit is impossible. **Rule:** CHANGELOG entry is created AT push time, not before. The last push determines the next version, not the other way around.
+
+- **FID folder wreck is a bookkeeping failure, not an ideas failure.** The 11 fragmented FIDs (126-136) are well-grounded — they came from Gemini Deep Research prompts documented in `research/prompt-sandbox-reasoning-action-divergence.md`. The structure broke when 11 FIDs were created in one batch on 2026-06-12 with no implementation follow-up. **Rule:** Don't open more FIDs than the team can ship in 1 week.
+
+- **Working tree state is the ground truth, not committed state.** When 22 files are modified and 30+ untracked, that's the actual project state. The committed v0.13.8 is just the last checkpoint, not the current truth. **Rule:** Audit `git diff --stat` and `git ls-files --others` at the start of any session, not just `git log`.
+
+- **The 0-trades problem was a rounding error, not an engine filter.** The audit at `dev/audits/fid-126-verification-2026-06-12.md` §5.3 hypothesized engine-side filters were the binding constraint. It was actually a f64→wei overflow in `close_position_internal()` — `262,540,979,419,345,780,736` vs on-chain `262,540,979,419,345,732,548` (48 wei too much). The 0x API returned 0 output (dust), gasless returned INSUFFICIENT_BALANCE. **Lesson:** Always check the on-chain reality before assuming engine filters. The audit's hypothesis was wrong; the user knew.
+
+- **FID-137 (close-rounding fix) is the canonical pattern for floating-point vs integer conversions.** Use `sellEntireBalance=true` to let the 0x API use actual on-chain balance, AND apply a 0.01% wei haircut `(wei_val * 9999) / 10000` as defense-in-depth. FID-074 (LEARNINGS.md Session 2026-06-07) had identified this issue and applied `min(requested, available)` on f64 — but f64→wei round-trip reintroduced the error. Fix must operate at the wei level, not the f64 level.
+
+- **Conceptual vs physical FID merging.** The 11 fragmented FIDs (126-136) can be "merged" two ways: physically rewriting 5 new files combining 2-3 originals each, OR conceptually grouping them in MASTER-FID.md while leaving the originals as reference. Conceptual merge (chosen) is lighter touch and achieves the user's goal of clear bookkeeping. The 11 originals stay in `dev/fids/` as reference material for the 5 merged work streams.
+
+- **`SAVANT_GATE_DISABLED=1` env-var bypass is a tactical fix, not a permanent solution.** Session 03:00 added this to restore the pre-FID-127 "all-in at $24 balance" behavior. The bypass is invisible when unset, so it's safe in production. **Cleanup task:** remove the bypass after FID-126 audit R1-R5 are addressed (conviction gate strengthening).
+
+- **3-layer enforcement for over-strict LLM behavior.** Prompt (schema forces evaluation) + parser (overrides HOLD when trigger active) + engine (independent trigger calculation as weak-model fallback). Any single layer can be bypassed by a creative LLM; all three together are robust. This is from FID-088 (LEARNINGS.md).
+
+- **The 11 FID consolidation in MASTER-FID groups by purpose, not by file:**
+  - MS-1: Multi-Provider LLM Infrastructure (122, 123) — both shipped in v0.13.9
+  - MS-2: Conviction-Weighted Decision System (126, 127, 132) — partial, audit showed 1/4 hard targets
+  - MS-3: Sandbox Data Realism (128, 134) — spec only
+  - MS-4: Prompt & Knowledge Hygiene (129, 131) — partial, KU scrub done
+  - MS-5: Sandbox Evaluation Suite (130, 133, 135) — spec only
+  - + 3 individuals (106, 110, 136)
+
+- **Cargo build --release can fail with "Access is denied" when another process holds the binary.** This is NOT a code error — it's a Windows file handle issue. The overnight bot (savant.exe) was still running. lib clippy + lib tests are sufficient verification (Law 3 satisfied) when release build is blocked. **Pattern:** Check `Get-Process savant-trading` before retrying release build.
+
+- **Per ECHO release workflow, the version is determined by the last PUSH, not the last code change.** v0.13.8 was the last push. Everything in the working tree (FIDs 121-125, 137) ships as v0.13.9. Skipping v0.13.10/v0.13.11 in CHANGELOG is correct (those were forward-drafts, not real releases).
+
+<!-- Add new entries above this line -->
+
 ## Session 2026-06-10: FID-111, FID-112, FID-113 — Position Side + Pair Injection
 
 **Key Learnings:**

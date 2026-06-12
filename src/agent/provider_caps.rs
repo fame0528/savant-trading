@@ -53,7 +53,7 @@ impl ModelCapabilities {
             },
         );
 
-        // MiniMax: reasoning split
+        // MiniMax M1: reasoning split
         m.insert(
             "minimax/minimax-m1-80k".to_string(),
             ModelCapabilities {
@@ -63,6 +63,22 @@ impl ModelCapabilities {
                 structured_method: "json_mode".to_string(),
                 supports_cache_control: false,
                 notes: vec!["Reasoning split: content and reasoning are in separate fields".to_string()],
+            },
+        );
+
+        // MiniMax M3: reasoning split (same as M1, 1M context, 512K output)
+        m.insert(
+            "MiniMax-M3".to_string(),
+            ModelCapabilities {
+                model_id: "MiniMax-M3".to_string(),
+                supports_tool_choice: true,
+                requires_reasoning_roundtrip: true,
+                structured_method: "json_mode".to_string(),
+                supports_cache_control: false,
+                notes: vec![
+                    "Reasoning split: content and reasoning are in separate fields".to_string(),
+                    "1.05M context window, 512K max output".to_string(),
+                ],
             },
         );
 

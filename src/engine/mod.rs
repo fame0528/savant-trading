@@ -39,7 +39,7 @@ use savant_trading::insight::aggregator::{InsightAggregator, InsightConfig};
 use savant_trading::monitor::journal::TradeJournal;
 use savant_trading::monitor::metrics::PerformanceMetrics;
 use savant_trading::risk::circuit_breaker::{CircuitBreaker, CircuitBreakerResult};
-use savant_trading::risk::position::PositionSizer;
+use savant_trading::risk::position::{PositionSize, PositionSizer};
 use savant_trading::strategy::regime::RegimeDetector;
 use savant_trading::vault::config::VaultConfig;
 use savant_trading::vault::watcher::VaultWatcher;
@@ -2169,6 +2169,8 @@ pub async fn run(
                         Some(decision_log_ctx)
                     },
                     dex_price: None,
+                    // FID-125: Inject active pair list so the model knows its trading universe
+                    active_pairs: Some(&active_pairs),
                 };
 
                 // Step 1: Select knowledge units and clone to release borrow on agent
@@ -3024,9 +3026,13 @@ pub async fn run(
                         }
                     }
 
-                    // Skip execution for Hold decisions
+                    // DIAGNOSTIC (Phase 3 RED): trace skip-execution branch
                     if decision.action == savant_trading::agent::decision_parser::TradeAction::Pass
                     {
+                        tracing::info!(
+                            "ENGINE_SKIP_EXEC decision.action=Pass pair={} confidence={:.3} conviction={:.3} pass_confident_threshold=0.25",
+                            decision.pair, decision.confidence, decision.conviction_score
+                        );
                         if decision.confidence >= 0.25 {
                             pass_confident = true;
                         }
@@ -3485,7 +3491,28 @@ pub async fn run(
                                             decision.side,
                                         );
 
-                                        if let Some(mut ps) = ps {
+                                        // DIAGNOSTIC (Phase 3 RED): trace position sizing result
+                                        match &ps {
+                                            Some(PositionSize::Sized { quantity: q, risk_amount: r, rr_ratio: rr }) => {
+                                                tracing::info!(
+                                                    "POSITION_SIZED pair={} side={:?} qty={:.6} risk=${:.4} rr={:.2} entry={:.4} stop={:.4}",
+                                                    decision.pair, decision.side, q, r, rr, decision.entry_price, decision.stop_loss
+                                                );
+                                            }
+                                            Some(PositionSize::Refused { reason }) => {
+                                                tracing::info!(
+                                                    "POSITION_REFUSED pair={} side={:?} reason={:?} entry={:.4} stop={:.4}",
+                                                    decision.pair, decision.side, reason, decision.entry_price, decision.stop_loss
+                                                );
+                                            }
+                                            None => {
+                                                tracing::info!(
+                                                    "POSITION_NONE pair={} side={:?} entry={:.4} stop={:.4} tp1={:.4}",
+                                                    decision.pair, decision.side, decision.entry_price, decision.stop_loss, decision.take_profit_1
+                                                );
+                                            }
+                                        }
+                                        if let Some(PositionSize::Sized { mut quantity, mut risk_amount, .. }) = ps {
                                             // P1-3a: Compute TP2/TP3 from ATR
                                             let atr = market_stores
                                                 .get(&decision.pair)
@@ -3516,8 +3543,8 @@ pub async fn run(
                                                 savant_trading::core::session::current_session();
                                             let session_mult = session.position_size_multiplier();
                                             if session_mult != 1.0 {
-                                                ps.quantity *= session_mult;
-                                                ps.risk_amount *= session_mult;
+                                                quantity *= session_mult;
+                                                risk_amount *= session_mult;
                                             }
 
                                             // Duplicate guard: skip if already have open position on this pair+side
@@ -3548,21 +3575,21 @@ pub async fn run(
                                                 0.33
                                             };
                                             let safe_max = total_portfolio * max_concentration * 0.9999;
-                                            let order_value = decision.entry_price * ps.quantity;
+                                            let order_value = decision.entry_price * quantity;
                                             if order_value > safe_max {
                                                 // Auto-adjust: percentage-based sizing with buffer
                                                 let adjusted_qty = safe_max / decision.entry_price;
                                                 let pct_label = if max_concentration >= 1.0 { "100%" } else { "33%" };
                                                 info!(
                                                     "AI BUY {} — Auto-adjusting to {} cap: ${:.2} -> ${:.2} (qty {:.4} -> {:.4})",
-                                                    decision.pair, pct_label, order_value, safe_max, ps.quantity, adjusted_qty
+                                                    decision.pair, pct_label, order_value, safe_max, quantity, adjusted_qty
                                                 );
                                                 shared.log_activity(
                                                     savant_trading::core::shared::ActivityLevel::Info,
                                                     &decision.pair,
                                                     &format!("ADJUSTED: ${:.2} -> ${:.2} ({} cap)", order_value, safe_max, pct_label),
                                                 ).await;
-                                                ps.quantity = adjusted_qty;
+                                                quantity = adjusted_qty;
                                                 // Inject feedback into decision log so LLM knows its signal was correct
                                                 decision_log.append(savant_trading::agent::decision_log::DecisionEntry {
                                                     timestamp: Utc::now().to_rfc3339(),
@@ -3604,7 +3631,7 @@ pub async fn run(
                                                         ex.place_order(
                                                             &decision.pair,
                                                             decision.side,
-                                                            ps.quantity,
+                                                            quantity,
                                                             Some(decision.entry_price),
                                                         ),
                                                     )
@@ -3627,7 +3654,7 @@ pub async fn run(
                                                         .place_order(
                                                             &decision.pair,
                                                             decision.side,
-                                                            ps.quantity,
+                                                            quantity,
                                                             Some(decision.entry_price),
                                                         )
                                                         .await
@@ -3641,13 +3668,13 @@ pub async fn run(
                                                             side: decision.side,
                                                             entry_price: decision.entry_price,
                                                             current_price: decision.entry_price,
-                                                            quantity: ps.quantity,
+                                                            quantity: quantity,
                                                             stop_loss: decision.stop_loss,
                                                             take_profit_1: decision.take_profit_1,
                                                             take_profit_2: decision.take_profit_2,
                                                             take_profit_3: decision.take_profit_3,
                                                             unrealized_pnl: 0.0,
-                                                            risk_amount: ps.risk_amount,
+                                                            risk_amount: risk_amount,
                                                             strategy_name: "ai-agent".to_string(),
                                                             opened_at: chrono::Utc::now(),
                                                             scale_level: ScaleLevel::Full,
@@ -3702,8 +3729,8 @@ pub async fn run(
                                                             "entry_price": decision.entry_price,
                                                             "stop_loss": decision.stop_loss,
                                                             "take_profit_1": decision.take_profit_1,
-                                                            "quantity": ps.quantity,
-                                                            "risk_amount": ps.risk_amount,
+                                                            "quantity": quantity,
+                                                            "risk_amount": risk_amount,
                                                             "confidence": decision.confidence,
                                                             "risk_reward": decision.risk_reward,
                                                         });
@@ -3719,7 +3746,7 @@ pub async fn run(
 
                                                         log_trade!("OPENED", "{} {:?} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4} TP2: {:.4} TP3: {:.4} | Risk: ${:.2} | Scale: 50%→TP1, 30%→TP2, 20%→TP3",
                                                             decision.side, decision.action, decision.entry_price,
-                                                            ps.quantity, decision.stop_loss, decision.take_profit_1, decision.take_profit_2, decision.take_profit_3, ps.risk_amount);
+                                                            quantity, decision.stop_loss, decision.take_profit_1, decision.take_profit_2, decision.take_profit_3, risk_amount);
 
                                                         // Persist to DB instantly
                                                         if let Some(ref j) = journal {
@@ -3731,7 +3758,7 @@ pub async fn run(
                                                             let _ = j.record_activity("Trade", &pos.pair,
                                                                 &format!("OPENED {} {} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4}",
                                                                     decision.side, decision.pair, decision.entry_price,
-                                                                    ps.quantity, decision.stop_loss, decision.take_profit_1)).await;
+                                                                    quantity, decision.stop_loss, decision.take_profit_1)).await;
                                                         }
 
                                                         // Update shared state immediately

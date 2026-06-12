@@ -228,7 +228,7 @@ pub fn apply_scenario(candles: &mut [Candle], params: &ScenarioParams) {
     // Apply trend bias
     match &params.trend {
         TrendDirection::Bull(strength) => {
-            let drift = 0.0001 * strength;
+            let drift = 0.0005 * strength; // FID-126: 5x drift for stronger ADX signals
             for (i, candle) in candles.iter_mut().enumerate() {
                 let factor = 1.0 + drift * i as f64;
                 candle.open *= factor;
@@ -238,7 +238,7 @@ pub fn apply_scenario(candles: &mut [Candle], params: &ScenarioParams) {
             }
         }
         TrendDirection::Bear(strength) => {
-            let drift = -0.0001 * strength;
+            let drift = -0.0005 * strength; // FID-126: 5x drift for stronger ADX signals
             for (i, candle) in candles.iter_mut().enumerate() {
                 let factor = 1.0 + drift * i as f64;
                 candle.open *= factor;
@@ -277,6 +277,20 @@ pub fn apply_scenario(candles: &mut [Candle], params: &ScenarioParams) {
             }
         }
         VolatilityRegime::Normal => {}
+    }
+
+    // FID-126: Inject volume spikes in last 10 candles for trade scenarios.
+    // Without this, volume ratio stays near 1.0x (never hits 1.5x threshold).
+    if !matches!(params.trend, TrendDirection::Sideways) && candles.len() >= 10 {
+        // Calculate average volume across all candles
+        let avg_vol: f64 = candles.iter().map(|c| c.volume).sum::<f64>() / candles.len() as f64;
+        if avg_vol > 0.0 {
+            // Inject 2.5x volume spike in last 10 candles
+            let spike_start = candles.len().saturating_sub(10);
+            for candle in candles.iter_mut().skip(spike_start) {
+                candle.volume = avg_vol * 2.5;
+            }
+        }
     }
 }
 

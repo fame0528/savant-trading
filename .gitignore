@@ -15,6 +15,7 @@ dev/baselines/
 # Keep active FIDs and LEARNINGS.md tracked
 !dev/fids/*.md
 !dev/LEARNINGS.md
+!dev/session-summaries/*.md
 
 # === Session logs (huge, do not track) ===
 session-ses_*.md
@@ -94,3 +95,22 @@ docs/*llms-full.md
 docs/hero-llms-full.md
 data/starting_balance.json
 data/starting_equity.json
+
+# === Kilo session tooling (transient dev artifacts) ===
+dev/kilo-*.mjs
+dev/mock-upstream.mjs
+dev/test-stripper.mjs
+start-kilo-stripper.bat
+test-debug.bat
+test-env.bat
+
+# === Windows env-var-as-filename artifacts (defensive) ===
+%*
+*"-*-*".md  # literal quoted-filename pattern (e.g. "Foo Bar.md")
+
+# === Session training/sandbox run logs ===
+scripts/logs/
+training_*.log
+
+# === Third-party research clones (large, regenerated on demand) ===
+research/repos/

@@ -84,6 +84,10 @@ impl CircuitBreaker {
                 self.daily_loss_floor_usd,
                 self.max_daily_loss_pct * 100.0
             );
+            tracing::info!(
+                "CIRCUIT_BREAKER_TRIPPED daily_loss=${:.2} ({:.2}%) floor=${:.2} max_pct={:.2}%",
+                daily_loss_dollars, daily_loss_pct * 100.0, self.daily_loss_floor_usd, self.max_daily_loss_pct * 100.0
+            );
             return CircuitBreakerResult::Triggered(format!(
                 "Daily loss limit: ${:.2} ({:.2}%)",
                 daily_loss_dollars,

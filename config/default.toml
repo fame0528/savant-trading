@@ -236,6 +236,31 @@ endpoint = "https://integrate.api.nvidia.com/v1"
 model = "deepseek-ai/deepseek-v4-flash"
 api_key_env = "NVIDIA_API_KEY"
 
+# TokenRouter configuration (only used when provider = "tokenrouter")
+# OpenAI-compatible gateway: https://api.tokenrouter.com/v1
+# Supports MiniMax M3 (1M context, 512K output, 34 tok/s)
+[ai.tokenrouter]
+endpoint = "https://api.tokenrouter.com/v1"
+model = "MiniMax-M3"
+api_key_env = "TOKEN_ROUTER_API_KEY"
+
+# Sandbox configuration (FID-123) — independent from [ai]
+# Allows testing different models/providers while the engine runs in production.
+# Falls back to [ai] fields when not configured.
+#
+# Usage:
+#   cargo run --release -- --test --sandbox
+#   cargo run --release -- --test --sandbox --model minimax/minimax-m3
+#   cargo run --release -- --test --sandbox --endpoint https://api.tokenrouter.com/v1 --api-key-env TOKENROUTER_API_KEY
+[sandbox]
+endpoint = "https://api.tokenrouter.com/v1"
+model = "MiniMax-M3"
+api_key_env = "TOKEN_ROUTER_API_KEY"
+
+[sandbox.management]
+management_key_env = "OPENROUTER_MANAGEMENT_KEY"
+endpoint = "https://openrouter.ai/api/v1/keys"
+
 [insight]
 funding_rate_enabled = true
 liquidation_enabled = true

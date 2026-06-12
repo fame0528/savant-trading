@@ -112,6 +112,22 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                 vec![],
             )
         }
+        "tokenrouter" => {
+            let tr = &ai_cfg.tokenrouter;
+            (
+                LlmConfig {
+                    endpoint: tr.endpoint.clone(),
+                    model: tr.model.clone(),
+                    api_key: std::env::var(&tr.api_key_env).unwrap_or_default(),
+                    max_tokens: ai_cfg.max_tokens,
+                    temperature: ai_cfg.temperature,
+                    top_p: ai_cfg.top_p,
+                    timeout_secs: ai_cfg.timeout_secs,
+                    extra_headers: vec![],
+                },
+                vec![],
+            )
+        }
         _ => (
             LlmConfig {
                 endpoint: ai_cfg.endpoint.clone(),

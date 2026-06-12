@@ -164,22 +164,45 @@ impl KnowledgeBase {
                 // units that correlate with losses get suppressed.
                 let utility_mult = 1.0 + self.units[idx].utility_score.max(0.01).log2();
 
-                // FID-059: Source-based tier multiplier.
+                // FID-059 + FID-126: Source-based tier multiplier.
                 // Scalping-specific knowledge gets 5.0x boost — DOMINANT, always in prompt.
+                // Crypto-native knowledge (Glassnode, Binance, CryptoNative topic) gets 2.0x.
                 // YouTube interview knowledge (crypto-native, fast execution) gets 1.5x.
-                // Institutional book knowledge (hedge fund, conservative) gets 0.5x.
+                // Institutional book knowledge (stock/swing trading) gets 0.5x.
+                //   Penalty list: Wyckoff, Elder, Turtle, Bulkowski, VPA,
+                //     Murphy, Coulling, Minervini, Tharp, Graham, Schwager,
+                //     Edwards-Magee, books-merged, knowledge-execution-build
                 let source = self.units[idx].source.to_lowercase();
                 let has_scalping_tag = self.units[idx].tags.iter().any(|t| t.contains("scalp"));
-                let tier_mult = if has_scalping_tag {
-                    5.0
-                } else if source.starts_with("youtube") || source.starts_with("yt_") {
-                    1.5
-                } else if source.contains("wyckoff")
+                let is_crypto_native = source.contains("glassnode")
+                    || source.contains("binance")
+                    || source.contains("coingecko")
+                    || self.units[idx].topic == KnowledgeTopic::CryptoNative;
+                let is_institutional = source.contains("wyckoff")
                     || source.contains("elder")
                     || source.contains("turtle")
                     || source.contains("bulkowski")
                     || source.contains("vpa")
-                {
+                    || source.contains("murphy")
+                    || source.contains("coulling")
+                    || source.contains("minervini")
+                    || source.contains("tharp")
+                    || source.contains("graham")
+                    || source.contains("schwager")
+                    || source.contains("edwards-magee")
+                    || source.contains("books-merged")
+                    || source.contains("knowledge-execution-build")
+                    || source.contains("irrational-exuberance")
+                    || source.contains("option-volatility")
+                    || source.contains("alchemy-finance")
+                    || source.contains("when-genius-failed");
+                let tier_mult = if has_scalping_tag {
+                    5.0
+                } else if is_crypto_native {
+                    2.0
+                } else if source.starts_with("youtube") || source.starts_with("yt_") {
+                    1.5
+                } else if is_institutional {
                     0.5
                 } else {
                     1.0

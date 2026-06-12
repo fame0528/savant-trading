@@ -36,6 +36,8 @@ pub struct FullContext<'a> {
     pub decision_log_context: Option<String>,
     /// FID-103: DEX price from 0x — actual execution price on Arbitrum.
     pub dex_price: Option<f64>,
+    /// FID-125: Dynamic pair list — injected so the model knows which pairs are tradeable.
+    pub active_pairs: Option<&'a [String]>,
 }
 
 /// Build the system prompt and user message for the LLM.
@@ -519,6 +521,15 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
         if !log_ctx.is_empty() {
             msg.push_str("\n## Recent Decision Log\n");
             msg.push_str(log_ctx);
+        }
+    }
+
+    // FID-125: Inject active pair list so the model knows its trading universe
+    if let Some(pairs) = ctx.active_pairs {
+        if !pairs.is_empty() {
+            msg.push_str(&format!("\n## Active Trading Universe ({} pairs)\n", pairs.len()));
+            msg.push_str(&pairs.join(", "));
+            msg.push_str("\nThe pair shown above is already vetted for liquidity and safety. Evaluate it.");
         }
     }
 

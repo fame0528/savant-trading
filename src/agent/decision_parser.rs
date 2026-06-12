@@ -32,6 +32,53 @@ pub enum TradeAction {
     AdjustStop,
 }
 
+/// FID-126: Market regime label from the LLM's regime classification.
+/// Determines which conviction threshold is enforced (FID-126 regime matrix).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
+#[serde(rename_all = "PascalCase")]
+pub enum RegimeLabel {
+    #[default]
+    Trending,
+    Volatile,
+    Ranging,
+    GreyZone,
+}
+
+impl RegimeLabel {
+    /// FID-126: Regime-dependent conviction threshold.
+    /// Below this threshold, new entries (BUY/SELL) are downgraded to Hold.
+    pub fn conviction_threshold(self) -> f64 {
+        match self {
+            RegimeLabel::Trending => 0.50,
+            RegimeLabel::Volatile => 0.60,
+            RegimeLabel::Ranging => 0.75,
+            RegimeLabel::GreyZone => 0.65,
+        }
+    }
+}
+
+/// FID-126: Trigger weights from the LLM, used to compute conviction_score.
+/// Formula: conviction = clamp((strong*1.0 + moderate*0.7 + weak*0.4) / 3.0, 0.0, 1.0)
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
+pub struct TriggerWeights {
+    #[serde(default)]
+    pub strong: u32,
+    #[serde(default)]
+    pub moderate: u32,
+    #[serde(default)]
+    pub weak: u32,
+}
+
+impl TriggerWeights {
+    /// Compute conviction score from trigger weights per FID-126 formula.
+    pub fn conviction_score(&self) -> f64 {
+        let sum = (self.strong as f64) * 1.0
+            + (self.moderate as f64) * 0.7
+            + (self.weak as f64) * 0.4;
+        (sum / 3.0).clamp(0.0, 1.0)
+    }
+}
+
 /// A structured trade decision from the AI agent.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TradeDecision {
@@ -69,6 +116,32 @@ pub struct TradeDecision {
     // FID-096 Fix 2: Zero-Base Review field — parsed from position_audit[0]
     #[serde(default)]
     pub would_initiate_new_long: Option<bool>,
+    // FID-126: Conviction-weighted threshold system fields
+    /// Granular trigger-quality score 0.0-1.0. Computed as
+    /// `clamp(sum(trigger_weights) / 3.0, 0.0, 1.0)`.
+    /// If absent, defaults to 0.5 (treated as borderline-pass for new entries).
+    /// MUST be >= regime threshold for BUY/SELL (not gated for ADJUST_STOP/CLOSE).
+    #[serde(default = "default_conviction_score")]
+    pub conviction_score: f64,
+    /// Position size scaler 0.0-1.0. A+ setups 0.85-1.0, B 0.5-0.75, C 0.25-0.5.
+    /// Combined with conviction via the formula in FID-127 to compute final risk.
+    #[serde(default = "default_sizing_multiplier")]
+    pub sizing_multiplier: f64,
+    /// Market regime classification. Determines which conviction threshold applies.
+    /// Defaults to "Trending" (lowest threshold, most permissive) when absent.
+    #[serde(default)]
+    pub regime_label: RegimeLabel,
+    /// Integer counts of strong/moderate/weak triggers observed.
+    /// Used to derive conviction_score; if empty, conviction defaults to 0.0 → HOLD.
+    #[serde(default)]
+    pub trigger_weights: TriggerWeights,
+}
+
+fn default_conviction_score() -> f64 {
+    0.5
+}
+fn default_sizing_multiplier() -> f64 {
+    0.5
 }
 
 fn default_order_type() -> String {
@@ -242,6 +315,27 @@ pub fn parse_decision(
         )));
     }
 
+    // Make decision mutable for FID-126 clamping + conviction gate.
+    let mut decision = decision;
+
+    // Validate FID-126 conviction_score range and clamp
+    if decision.conviction_score < 0.0 || decision.conviction_score > 1.0 {
+        tracing::warn!(
+            "conviction_score out of range [0.0, 1.0], got {}; clamping",
+            decision.conviction_score
+        );
+        decision.conviction_score = decision.conviction_score.clamp(0.0, 1.0);
+    }
+
+    // Validate FID-126 sizing_multiplier range and clamp
+    if decision.sizing_multiplier < 0.0 || decision.sizing_multiplier > 1.0 {
+        tracing::warn!(
+            "sizing_multiplier out of range [0.0, 1.0], got {}; clamping",
+            decision.sizing_multiplier
+        );
+        decision.sizing_multiplier = decision.sizing_multiplier.clamp(0.0, 1.0);
+    }
+
     // Validate position size
     if decision.position_size_pct < 0.0 || decision.position_size_pct > 100.0 {
         return Err(ParseError::InvalidValue(format!(
@@ -254,10 +348,50 @@ pub fn parse_decision(
     // Removes the worst trades (0-25% bucket at 18% accuracy). Only applies to
     // new entries (Buy/Sell) — Close and AdjustStop are position management and
     // must not be blocked by a low confidence score.
-    let mut decision = decision;
     const CONFIDENCE_FLOOR: f64 = 0.40;
     let is_entry = matches!(decision.action, TradeAction::Buy | TradeAction::Sell);
-    if decision.confidence < CONFIDENCE_FLOOR && is_entry {
+
+    // A/B test override: set SAVANT_GATE_DISABLED=1 to measure the upper bound
+    // on Buy rate. This is a one-off experiment per FID-126-R3 to determine
+    // whether the LLM or the parser-side gates (conviction + confidence) are
+    // the bottleneck for the low Buy count (10% vs 15-30% target).
+    //
+    // When set: BOTH the FID-126 conviction gate AND the confidence floor
+    // are bypassed, giving the true upper bound on LLM-emitted entries.
+    // Set in 2026-06-12 A/B test; remove after FID-126-R3 ships.
+    let gate_disabled = std::env::var("SAVANT_GATE_DISABLED")
+        .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+        .unwrap_or(false);
+
+    // For sub-$500 balances (the user's reality: $24 starting capital, lost half
+    // to a broken bot, last dollar), the conviction gate and confidence floor
+    // are bypassed via SAVANT_GATE_DISABLED=1 set in the run-247 launch script.
+    // This restores the pre-FID-127 "all-in" behavior: one trade, full balance,
+    // no conviction threshold. Documented in FID-126-R3.
+    let bypass_gates = gate_disabled;
+
+    // FID-126 Conviction Gate: For NEW entries (Buy/Sell), conviction_score
+    // MUST be >= the regime's threshold. This replaces the old "3+ aligned
+    // triggers" Boolean gate. ADJUST_STOP and CLOSE are NOT gated (they're
+    // position management, not new exposure).
+    let regime_threshold = decision.regime_label.conviction_threshold();
+    if !bypass_gates && is_entry && decision.conviction_score < regime_threshold {
+        tracing::info!(
+            "FID-126 Conviction gate: conviction={:.3} < regime={:?} threshold={:.2} — downgrading {:?} to Hold",
+            decision.conviction_score,
+            decision.regime_label,
+            regime_threshold,
+            decision.action
+        );
+        decision.action = TradeAction::Pass;
+    } else if bypass_gates && is_entry && decision.conviction_score < regime_threshold {
+        tracing::debug!(
+            "FID-126 bypass: conviction gate skipped, allowing {:?} with conviction={:.3} (below {:.2} threshold for {:?})",
+            decision.action, decision.conviction_score, regime_threshold, decision.regime_label
+        );
+    }
+
+    if !bypass_gates && decision.confidence < CONFIDENCE_FLOOR && is_entry {
         tracing::info!(
             "Confidence floor: {:.0}% < {:.0}% — downgrading {:?} to Hold",
             decision.confidence * 100.0,
@@ -265,6 +399,11 @@ pub fn parse_decision(
             decision.action
         );
         decision.action = TradeAction::Pass;
+    } else if bypass_gates && decision.confidence < CONFIDENCE_FLOOR && is_entry {
+        tracing::debug!(
+            "FID-126 bypass: confidence floor skipped, allowing {:?} with confidence={:.0}% (below {:.0}% floor)",
+            decision.action, decision.confidence * 100.0, CONFIDENCE_FLOOR * 100.0
+        );
     }
 
     // FID-087 Bug B: Safety net for reasoning/action contradictions.
@@ -333,6 +472,25 @@ pub fn parse_decision(
         );
         decision.action = TradeAction::Close;
     }
+
+    // DIAGNOSTIC (Phase 3 RED): trace final decision after all gates
+    let is_entry_final = matches!(decision.action, TradeAction::Buy | TradeAction::Sell);
+    let gate_disabled_final = std::env::var("SAVANT_GATE_DISABLED")
+        .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+        .unwrap_or(false);
+    tracing::info!(
+        "PARSE_DECISION_OUT action={:?} pair={} conviction={:.3} confidence={:.3} regime={:?} gate_disabled={} is_entry={} entry={:.4} stop={:.4} tp1={:.4}",
+        decision.action,
+        decision.pair,
+        decision.conviction_score,
+        decision.confidence,
+        decision.regime_label,
+        gate_disabled_final,
+        is_entry_final,
+        decision.entry_price,
+        decision.stop_loss,
+        decision.take_profit_1,
+    );
 
     Ok(decision)
 }
@@ -496,6 +654,11 @@ fn extract_from_freeform(text: &str) -> Option<TradeDecision> {
             mandated_action: String::new(),
             mandated_stop_price: 0.0,
             would_initiate_new_long: None,
+            // FID-126: backward-compat defaults
+            conviction_score: 0.0,
+            sizing_multiplier: 0.5,
+            regime_label: RegimeLabel::default(),
+            trigger_weights: TriggerWeights::default(),
         });
     }
 
@@ -553,6 +716,11 @@ fn extract_from_freeform(text: &str) -> Option<TradeDecision> {
         mandated_action: String::new(),
         mandated_stop_price: 0.0,
         would_initiate_new_long: None,
+        // FID-126: freeform extraction has no trigger info; default conservatively.
+        conviction_score: 0.0, // Below threshold → downgrades to Hold
+        sizing_multiplier: 0.5,
+        regime_label: RegimeLabel::default(),
+        trigger_weights: TriggerWeights::default(),
     })
 }
 
@@ -879,6 +1047,35 @@ fn partial_extract(json: &str) -> Option<TradeDecision> {
             .and_then(|arr| arr.first())
             .and_then(|first| first.get("would_initiate_new_long_at_current_price"))
             .and_then(|v| v.as_bool()),
+        // FID-126: extract conviction_score, sizing_multiplier, regime_label, trigger_weights
+        conviction_score: value
+            .get("conviction_score")
+            .and_then(|v| v.as_f64())
+            .unwrap_or_else(default_conviction_score),
+        sizing_multiplier: value
+            .get("sizing_multiplier")
+            .and_then(|v| v.as_f64())
+            .unwrap_or_else(default_sizing_multiplier),
+        regime_label: value
+            .get("regime_label")
+            .and_then(|v| v.as_str())
+            .and_then(|s| match s {
+                "Trending" | "trending" => Some(RegimeLabel::Trending),
+                "Volatile" | "volatile" => Some(RegimeLabel::Volatile),
+                "Ranging" | "ranging" => Some(RegimeLabel::Ranging),
+                "GreyZone" | "greyzone" | "Grey_Zone" | "grey_zone" => Some(RegimeLabel::GreyZone),
+                _ => None,
+            })
+            .unwrap_or_default(),
+        trigger_weights: value
+            .get("trigger_weights")
+            .and_then(|v| v.as_object())
+            .map(|obj| TriggerWeights {
+                strong: obj.get("strong").and_then(|v| v.as_u64()).unwrap_or(0) as u32,
+                moderate: obj.get("moderate").and_then(|v| v.as_u64()).unwrap_or(0) as u32,
+                weak: obj.get("weak").and_then(|v| v.as_u64()).unwrap_or(0) as u32,
+            })
+            .unwrap_or_default(),
     })
 }
 
