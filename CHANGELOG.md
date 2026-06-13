@@ -4,6 +4,20 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+### Added � Circuit Breaker Clear-Block (v0.14.0)
+
+**Problem:** When the circuit breaker tripped (daily loss, drawdown, etc.), the engine wrote a  file and refused to start on next boot. There was no way to clear the block without manual file deletion, and no way to distinguish which trigger caused the block.
+
+**Solution:**
+- Added  endpoint to delete  via API
+- Added  and  fields to  response
+- Added ENGINE BLOCKED banner with Clear Block button and trigger type display in dashboard
+- Circuit breaker now writes trigger type (, , , , , ) into 
+- Midnight UTC auto-clear only deletes the block file for  triggers (drawdown and other persistent blocks survive across days)
+- Backwards-compatible: old block files without  line are treated as daily_loss
+
+**Files changed:** , , , 
+
 ## [0.14.0] — 2026-06-12
 
 ### Fixed — FID-138: M3 Thinking Leakage — Chain-of-Thought Suppression (critical)
