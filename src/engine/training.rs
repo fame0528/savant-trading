@@ -600,6 +600,12 @@ async fn run_training_batch(
         latency_ms: u64,
     }
 
+    let ai_max_tokens = config.ai.max_tokens;
+    let ai_temperature = config.ai.temperature;
+    let ai_top_p = config.ai.top_p;
+    let ai_timeout_secs = config.ai.timeout_secs;
+    let ai_disable_thinking = config.ai.disable_thinking;
+
     let mut join_set = tokio::task::JoinSet::new();
     for (idx, ps) in prepared.into_iter().enumerate() {
         let key = api_keys[idx % api_keys.len()].clone();
@@ -632,11 +638,14 @@ async fn run_training_batch(
                     endpoint,
                     model,
                     api_key: key,
-                    max_tokens: 131072,
-                    temperature: 0.6,
-                    top_p: 0.95,
-                    timeout_secs: 300,
+                    // training/action-test uses ai config, not sandbox.
+                    // Only run_sandbox uses sandbox-specific max_tokens/disable_thinking.
+                    max_tokens: ai_max_tokens,
+                    temperature: ai_temperature,
+                    top_p: ai_top_p,
+                    timeout_secs: ai_timeout_secs,
                     extra_headers: vec![],
+                    disable_thinking: ai_disable_thinking,
                 },
             );
             let messages = vec![savant_trading::agent::provider::Message {
@@ -1516,11 +1525,12 @@ pub async fn run_sandbox(
                     endpoint: sandbox_endpoint.to_string(),
                     model: resolved_model.clone(),
                     api_key: key.clone(),
-                    max_tokens: config.ai.max_tokens,
-                    temperature: config.ai.temperature,
-                    top_p: config.ai.top_p,
-                    timeout_secs: config.ai.timeout_secs,
+                    max_tokens: config.sandbox.max_tokens,
+                    temperature: config.sandbox.temperature,
+                    top_p: config.sandbox.top_p,
+                    timeout_secs: config.sandbox.timeout_secs,
                     extra_headers: byok_headers.clone(),
+                    disable_thinking: config.sandbox.disable_thinking,
                 },
             )
         })

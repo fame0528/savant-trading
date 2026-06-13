@@ -14,6 +14,7 @@ use chrono::{Timelike, Utc};
 use std::collections::{HashMap, HashSet};
 use std::time::Duration;
 use tokio::time;
+
 use tracing::{debug, error, info, warn};
 
 use savant_trading::agent::context_builder::FullContext;
@@ -80,7 +81,6 @@ struct EngineState {
     ctx_engine: ContextEngine,
     ctx_state: ContextState,
     decision_log: DecisionLog,
-    jury_key_manager: Option<JuryKeyManager>,
     jury_pool: Option<JuryPool>,
 
     // Monitoring
@@ -624,7 +624,7 @@ impl EngineState {
             autonomy, config.ai.provider, ctx_engine.encoding_mode()
         );
 
-        if config.ai.provider == "openrouter" {
+        {
             let mgmt_key_env = &config.ai.openrouter.management.management_key_env;
             if let Ok(mgmt_key) = std::env::var(mgmt_key_env) {
                 if !mgmt_key.is_empty() {
@@ -639,10 +639,10 @@ impl EngineState {
                                 keys.len()
                             );
                             for key in &keys {
-                                if key.limit > 0.0 && key.limit_remaining < key.limit * 0.1 {
+                                if key.limit.unwrap_or(0.0) > 0.0 && key.limit_remaining.unwrap_or(0.0) < key.limit.unwrap_or(0.0) * 0.1 {
                                     warn!(
                                         "OpenRouter key '{}' is approaching limit: {:.0}/{:.0} credits remaining",
-                                        key.name, key.limit_remaining, key.limit
+                                        key.name.as_deref().unwrap_or("?"), key.limit_remaining.unwrap_or(0.0), key.limit.unwrap_or(0.0)
                                     );
                                 }
                             }
@@ -658,35 +658,53 @@ impl EngineState {
             }
         }
 
-        // FID-114: Initialize jury key manager for Model Jury system
-        let mut jury_key_manager: Option<JuryKeyManager> = None;
-        if config.ai.provider == "openrouter" && config.ai.jury.enabled {
-            let mgmt_key_env = &config.ai.openrouter.management.management_key_env;
-            if let Ok(mgmt_key) = std::env::var(mgmt_key_env) {
-                if !mgmt_key.is_empty() {
-                    let client = OpenRouterManagementClient::with_endpoint(
-                        mgmt_key,
-                        &config.ai.openrouter.management.endpoint,
-                    );
-                    let jkm = JuryKeyManager::new(client, config.ai.jury.clone());
-                    match jkm.initialize().await {
-                        Ok(count) => {
-                            info!("FID-114: JuryKeyManager initialized with {} keys", count);
-                            jury_key_manager = Some(jkm);
-                        }
-                        Err(e) => {
-                            warn!("FID-114: JuryKeyManager init failed ({}). Jury system disabled.", e);
-                        }
-                    }
-                }
-            }
-        }
-
         // FID-114 Phase 6: Initialize JuryPool for parallel model evaluation
+        // FID-147: Two-config jury wiring — M3 control (juror 0) + OpenRouter free (1..N)
+        // NOTE: JuryPool::initialize() creates its own JuryKeyManager internally.
+        // Do NOT create a standalone JuryKeyManager here — that would double-init
+        // and create 20 keys per boot (10 from standalone + 10 from pool).
         let mut jury_pool: Option<JuryPool> = None;
-        if jury_key_manager.is_some() {
+        if config.ai.jury.enabled {
+            // M3 control: same LlmConfig as the main agent (M3/TokenRouter).
+            let provider_config_m3 = jury_provider_config.clone();
+
+            // OpenRouter free: dedicated config pointing at openrouter.ai/api/v1.
+            // Each juror uses a management-provisioned key, so api_key here is empty.
+            let provider_config_openrouter = savant_trading::agent::provider::LlmConfig {
+                endpoint: config.ai.openrouter.endpoint.clone(),
+                model: "openrouter/auto".to_string(), // overridden per-juror
+                api_key: String::new(),               // overridden per-juror
+                max_tokens: config.ai.max_tokens,
+                temperature: config.ai.temperature,
+                top_p: config.ai.top_p,
+                timeout_secs: config.ai.timeout_secs,
+                extra_headers: vec![
+                    (
+                        "HTTP-Referer".to_string(),
+                        config.ai.openrouter.referer.clone(),
+                    ),
+                    (
+                        "X-OpenRouter-Title".to_string(),
+                        config.ai.openrouter.title.clone(),
+                    ),
+                ],
+                disable_thinking: config.ai.disable_thinking,
+            };
+
+            // M3 control API key: from TOKEN_ROUTER_API_KEY env var.
+            let m3_api_key = std::env::var(&config.ai.tokenrouter.api_key_env)
+                .unwrap_or_default();
+            if m3_api_key.is_empty() {
+                warn!(
+                    "FID-147: {} not set — M3 control juror will fail to authenticate",
+                    config.ai.tokenrouter.api_key_env
+                );
+            }
+
             let jp = JuryPool::new(
-                jury_provider_config.clone(),
+                provider_config_m3,
+                provider_config_openrouter,
+                m3_api_key,
                 JuryKeyManager::new(
                     OpenRouterManagementClient::with_endpoint(
                         std::env::var(&config.ai.openrouter.management.management_key_env)
@@ -699,7 +717,11 @@ impl EngineState {
             );
             match jp.initialize().await {
                 Ok(count) => {
-                    info!("FID-114 Phase 6: JuryPool initialized with {} keys", count);
+                    info!(
+                        "FID-114 Phase 6: JuryPool initialized with {} keys (FID-147: 1 M3 control + {} free jurors)",
+                        count,
+                        config.ai.jury.jury_size.saturating_sub(1)
+                    );
                     jury_pool = Some(jp);
                 }
                 Err(e) => {
@@ -1327,7 +1349,6 @@ impl EngineState {
             ctx_engine,
             ctx_state,
             decision_log,
-            jury_key_manager,
             jury_pool,
             insight,
             event_bus,
@@ -1459,7 +1480,6 @@ pub async fn run(
     let mut last_discovery_tick = state.last_discovery_tick;
     let mut last_revival_check_tick = state.last_revival_check_tick;
     let mut token_store_entries = state.token_store_entries;
-    let _jury_key_manager = state.jury_key_manager;
     let mut jury_pool = state.jury_pool;
 
     let autonomy = match config.ai.autonomy_level {
@@ -2251,6 +2271,10 @@ pub async fn run(
                 dead_streaks.len()
             );
         }
+        // Flush jury metrics to disk every 10 cycles
+        if let Some(ref jp) = jury_pool {
+            jp.flush_metrics();
+        }
 
         // === PHASE 2: Send all LLM calls in parallel via streaming ===
         // FID-073 Issue 2: Skip if previous eval still running
@@ -2439,6 +2463,17 @@ pub async fn run(
                                         judgment.decision.action
                                     ),
                                 ).await;
+                                // FID-146: Reset veto flag at start of every detection pass.
+                                // FID-146: Jury veto detection — use consensus_strength as dissent proxy.
+                                if config.ai.jury.jury_veto_enabled
+                                    && matches!(judgment.decision.action, savant_trading::agent::decision_parser::TradeAction::Buy | savant_trading::agent::decision_parser::TradeAction::Sell)
+                                {
+                                    let dissent_threshold = 1.0 - config.ai.jury.jury_veto_threshold;
+                                    if judgment.consensus_strength < dissent_threshold {
+                                        warn!("FID-146 JURY VETO: consensus={:.0}% < threshold={:.0}%", judgment.consensus_strength * 100.0, dissent_threshold * 100.0);
+                                        savant_trading::jury_state::FID_146_JURY_VETO.store(true, std::sync::atomic::Ordering::Relaxed);
+                                    }
+                                }
                             }
                             Err(e) => {
                                 warn!("FID-114 JURY: Judge failed ({}), using batch decisions", e);
@@ -2640,6 +2675,17 @@ pub async fn run(
                     );
 
                     // Log ALL decisions including Hold (CRIT-2)
+                        // FID-146: Reset veto flag at start of every per-pair evaluation block.
+                        // Prevents flag leak across cycles when jury block is skipped (quorum not met, Err).
+                        savant_trading::jury_state::clear_veto();
+                        // FID-146: Jury veto override — if jury supermajority disagreed with primary
+                        // Buy/Sell, override this pair's decision to Pass. Reset flag after firing.
+                        if savant_trading::jury_state::FID_146_JURY_VETO.load(std::sync::atomic::Ordering::Relaxed)
+                            && matches!(decision.action, savant_trading::agent::decision_parser::TradeAction::Buy | savant_trading::agent::decision_parser::TradeAction::Sell)
+                        {
+                            warn!("FID-146 JURY VETO OVERRIDE: {} {:?} -> Pass", decision.pair, decision.action);
+                            decision.action = savant_trading::agent::decision_parser::TradeAction::Pass;
+                        }
                     let decision_record = savant_trading::core::shared::DecisionRecord {
                         timestamp: Utc::now().to_rfc3339(),
                         pair: decision.pair.clone(),
@@ -2652,6 +2698,7 @@ pub async fn run(
                         take_profit_3: decision.take_profit_3,
                         confidence: decision.confidence,
                         reasoning: decision.reasoning.clone(),
+            execution_status: None,
                     };
                     shared.push_decision(decision_record);
 
@@ -5068,7 +5115,7 @@ pub async fn run(
         } else {
             tracing::info!("Jury metrics flushed to dev/logs/jury-metrics.json");
         }
-        jp.key_manager().cleanup_all().await;
+        // Key cleanup handled by JuryKeyManager::drop() — no explicit call needed here.
     }
 
     #[allow(unreachable_code)]

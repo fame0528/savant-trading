@@ -352,6 +352,82 @@ pub async fn validate_token_liquidity(
     Ok(true)
 }
 
+/// Resolve a single token's contract address on a given chain via Blockscout search API.
+/// Returns `None` if the token doesn't exist on the chain or the API call fails.
+pub async fn resolve_token_address(
+    symbol: &str,
+    chain_id: u64,
+) -> Option<(String, u8)> {
+    // Blockscout instances per chain
+    let blockscout_url = match chain_id {
+        42161 => "https://arbitrum.blockscout.com",
+        1 => "https://eth.blockscout.com",
+        8453 => "https://base.blockscout.com",
+        10 => "https://optimism.blockscout.com",
+        _ => return None,
+    };
+
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(10))
+        .build()
+        .unwrap_or_else(|_| reqwest::Client::new());
+
+    let url = format!(
+        "{}/api/v2/tokens?type=ERC-20&q={}&limit=10",
+        blockscout_url, symbol
+    );
+
+    let resp = match client.get(&url).send().await {
+        Ok(r) => r,
+        Err(e) => {
+            debug!("resolve_token_address: Blockscout HTTP error for {}: {}", symbol, e);
+            return None;
+        }
+    };
+
+    if !resp.status().is_success() {
+        debug!("resolve_token_address: Blockscout returned {} for {}", resp.status(), symbol);
+        return None;
+    }
+
+    let json: serde_json::Value = match resp.json().await {
+        Ok(j) => j,
+        Err(e) => {
+            debug!("resolve_token_address: JSON parse error for {}: {}", symbol, e);
+            return None;
+        }
+    };
+
+    let items = json["items"].as_array()?;
+
+    // Find exact symbol match (case-insensitive)
+    let upper = symbol.to_uppercase();
+    for item in items {
+        let item_symbol = item["symbol"].as_str().unwrap_or("").to_uppercase();
+        if item_symbol == upper {
+            let address = item["address_hash"].as_str().unwrap_or("").to_string();
+            let decimals = item["decimals"]
+                .as_str()
+                .unwrap_or("18")
+                .parse::<u8>()
+                .unwrap_or(18);
+
+            if address.is_empty() {
+                continue;
+            }
+
+            info!(
+                "FID-142: Resolved {} → {} (chain={}, dec={})",
+                symbol, address, chain_id, decimals
+            );
+            return Some((address, decimals));
+        }
+    }
+
+    debug!("resolve_token_address: no exact match for {} on chain {}", symbol, chain_id);
+    None
+}
+
 /// Periodic discovery: re-query Blockscout and merge new tokens into the store.
 /// Returns (new_entries_added, total_store_size).
 ///

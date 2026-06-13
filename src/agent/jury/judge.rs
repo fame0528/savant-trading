@@ -77,7 +77,29 @@ impl JuryJudge {
                     current_price,
                     self.price_tolerance_pct,
                 ) {
-                    Ok(decision) => {
+                    Ok(mut decision) => {
+                        // FID-148d: Clamp hallucinated entry_price to current_price.
+                        // Free models sometimes emit wildly wrong prices (e.g., 95 for BTC at 100K).
+                        // Use a wide tolerance (20%) to only catch truly hallucinated prices,
+                        // not legitimate limit entries near current price.
+                        if decision.action == TradeAction::Buy || decision.action == TradeAction::Sell {
+                            let max_deviation = current_price * 0.20; // 20% tolerance
+                            if (decision.entry_price - current_price).abs() > max_deviation {
+                                warn!(
+                                    "Judge: hallucinated entry_price={:.4} vs current={:.4} (>20% deviation). Clamping.",
+                                    decision.entry_price, current_price
+                                );
+                                // Preserve the original SL *distance* and recalculate relative to clamped entry
+                                let sl_distance = (decision.stop_loss - decision.entry_price).abs();
+                                decision.entry_price = current_price;
+                                decision.stop_loss = if decision.action == TradeAction::Buy {
+                                    current_price - sl_distance
+                                } else {
+                                    current_price + sl_distance
+                                };
+                            }
+                        }
+
                         let consensus = self.calculate_consensus(jury_result);
                         let dissent = self.analyze_dissent(jury_result);
 

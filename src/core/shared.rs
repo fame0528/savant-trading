@@ -79,6 +79,10 @@ pub struct DecisionRecord {
     pub take_profit_3: f64,
     pub confidence: f64,
     pub reasoning: String,
+    /// Set when execution rejects the decision (e.g. no DEX liquidity).
+    /// Dashboard shows a red "REJECTED" badge when this is Some.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub execution_status: Option<String>,
 }
 
 /// Severity level for activity log entries.
@@ -172,6 +176,22 @@ impl SharedEngineData {
                 decisions.push(record);
                 if decisions.len() > 100 {
                     decisions.drain(0..50);
+                }
+            }
+            Err(_) => {
+                // Lock held — skip rather than stall
+            }
+        }
+    }
+
+    /// Annotate the most recent decision for a pair with an execution status.
+    /// Used when liquidity checks reject a BUY/SELL after the decision was already pushed.
+    pub fn update_decision_status(&self, pair: &str, status: &str) {
+        match self.decisions.try_write() {
+            Ok(mut decisions) => {
+                // Find the most recent decision for this pair (reverse search)
+                if let Some(record) = decisions.iter_mut().rev().find(|d| d.pair == pair) {
+                    record.execution_status = Some(status.to_string());
                 }
             }
             Err(_) => {

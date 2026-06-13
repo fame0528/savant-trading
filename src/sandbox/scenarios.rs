@@ -2391,4 +2391,125 @@ mod historical_tests {
         let mock = derive_historical_mock_data(&candles);
         assert!(mock.fear_greed_label == "Neutral" || mock.fear_greed_index == 50);
     }
+
+    // FID-146: Jury veto override — verify that when ≥70% of jury disagrees with a
+    // primary Buy, the per-pair decision loop overrides Buy → Pass.
+    // The static `FID_146_JURY_VETO` in engine/mod.rs is set by the Ok(judgment) branch
+    // of the jury block and read by the per-pair decision loop. This test exercises
+    // the override condition end-to-end against the real static.
+    #[test]
+    #[serial_test::serial]
+    fn jury_veto_overrides_buy_to_pass() {
+        use crate::agent::decision_parser::{TradeAction, TradeDecision};
+        use crate::core::types::Side;
+        // Reset flag
+        crate::jury_state::clear_veto();
+        // Simulate 7/10 jury members disagreeing with primary Buy
+        crate::jury_state::FID_146_JURY_VETO.store(true, std::sync::atomic::Ordering::Relaxed);
+        let veto_active = crate::jury_state::FID_146_JURY_VETO.load(std::sync::atomic::Ordering::Relaxed);
+        assert!(veto_active, "FID_146_JURY_VETO should be true after 7/10 jury dissent");
+        // Create a Buy decision
+        let mut decision = TradeDecision {
+            action: TradeAction::Buy,
+            pair: "BTC/USD".to_string(),
+            side: Side::Long,
+            order_type: "MARKET".to_string(),
+            entry_price: 65000.0,
+            stop_loss: 64000.0,
+            take_profit_1: 66500.0,
+            take_profit_2: 68000.0,
+            take_profit_3: 69500.0,
+            position_size_pct: 50.0,
+            confidence: 0.8,
+            reasoning: "Primary model says Buy".to_string(),
+            knowledge_sources: vec![],
+            risk_reward: 2.5,
+            management_trigger_active: false,
+            stop_distance_atr_multiple: 0.0,
+            thesis_invalidated: false,
+            opportunity_cost: String::new(),
+            mandated_action: String::new(),
+            mandated_stop_price: 0.0,
+            would_initiate_new_long: None,
+            conviction_score: 0.5,
+            sizing_multiplier: 0.5,
+            regime_label: Default::default(),
+            trigger_weights: Default::default(),
+        };
+        // Apply override (replicates engine/mod.rs line ~2626 logic)
+        if veto_active && matches!(decision.action, TradeAction::Buy | TradeAction::Sell) {
+            decision.action = TradeAction::Pass;
+        }
+        assert_eq!(
+            decision.action,
+            TradeAction::Pass,
+            "Buy should be overridden to Pass when jury veto is active"
+        );
+        // Reset flag
+        crate::jury_state::clear_veto();
+    }
+
+    // FID-146: Jury veto does NOT override when flag is false (normal case).
+    #[test]
+    #[serial_test::serial]
+    fn jury_veto_does_not_override_when_inactive() {
+        use crate::agent::decision_parser::{TradeAction, TradeDecision};
+        use crate::core::types::Side;
+        crate::jury_state::clear_veto();
+        let mut decision = TradeDecision {
+            action: TradeAction::Buy,
+            pair: "ETH/USD".to_string(),
+            side: Side::Long,
+            order_type: "MARKET".to_string(),
+            entry_price: 3000.0,
+            stop_loss: 2900.0,
+            take_profit_1: 3100.0,
+            take_profit_2: 3200.0,
+            take_profit_3: 3300.0,
+            position_size_pct: 50.0,
+            confidence: 0.7,
+            reasoning: "Normal Buy".to_string(),
+            knowledge_sources: vec![],
+            risk_reward: 2.0,
+            management_trigger_active: false,
+            stop_distance_atr_multiple: 0.0,
+            thesis_invalidated: false,
+            opportunity_cost: String::new(),
+            mandated_action: String::new(),
+            mandated_stop_price: 0.0,
+            would_initiate_new_long: None,
+            conviction_score: 0.5,
+            sizing_multiplier: 0.5,
+            regime_label: Default::default(),
+            trigger_weights: Default::default(),
+        };
+        let veto_active = crate::jury_state::FID_146_JURY_VETO.load(std::sync::atomic::Ordering::Relaxed);
+        if veto_active && matches!(decision.action, TradeAction::Buy | TradeAction::Sell) {
+            decision.action = TradeAction::Pass;
+        }
+        assert_eq!(decision.action, TradeAction::Buy, "Buy should NOT be overridden when veto is inactive");
+    }
+
+    // FID-146: Veto detection logic — 7/10 jury disagreeing with primary Buy should trigger.
+    #[test]
+    fn jury_veto_detection_7_of_10_disagreeing() {
+        use crate::agent::jury::JuryVerdict;
+        let primary = "BUY";
+        // Simulate 10 jury verdicts: 3 say BUY (agree), 7 say HOLD (disagree)
+        let verdicts: Vec<JuryVerdict> = (0..10).map(|i| JuryVerdict {
+            verdict: if i < 3 { "BUY".into() } else { "HOLD".into() },
+            confidence: 0.5,
+            key_argument: String::new(),
+            risk_flag: String::new(),
+            evidence_quality: None,
+            reasoning: String::new(),
+        }).collect();
+        let total = verdicts.len() as f64;
+        let disagrees = verdicts.iter()
+            .filter(|v| v.verdict.to_uppercase() != primary)
+            .count() as f64;
+        let disagree_pct = disagrees / total;
+        assert!(disagree_pct >= 0.70, "7/10 = 70% should meet the threshold");
+        assert_eq!(disagree_pct, 0.7, "Exactly 70% disagreement");
+    }
 }

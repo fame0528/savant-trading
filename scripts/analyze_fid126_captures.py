@@ -8,14 +8,29 @@ and trigger_weights from the raw LLM response text, then computes:
 - Regime distribution
 - Anti-pattern compliance (count of conviction=0.50 or 0.65)
 - Trigger weight distribution
+
+Usage:
+    python scripts/analyze_fid126_captures.py                          # auto-detect latest
+    python scripts/analyze_fid126_captures.py --capture-dir <PATH>    # specific dir
+    python scripts/analyze_fid126_captures.py <PATH>                  # positional
 """
+import argparse
 import json
 import re
 import sys
 from collections import Counter
 from pathlib import Path
 
-CAPTURE_DIR = Path("data/sandbox_responses/sandbox_2026-06-12_06-02-44")
+
+def find_latest_capture_dir() -> Path:
+    """Auto-detect the most recent sandbox_responses/sandbox_YYYY-MM-DD_HH-MM-SS dir."""
+    base = Path("data/sandbox_responses")
+    if not base.exists():
+        return None
+    candidates = sorted([d for d in base.iterdir() if d.is_dir() and d.name.startswith("sandbox_")])
+    if not candidates:
+        return None
+    return candidates[-1]
 
 
 def extract_decision_json(raw: str) -> dict | None:
@@ -78,6 +93,31 @@ def extract_decision_json(raw: str) -> dict | None:
 
 
 def main():
+    parser = argparse.ArgumentParser(description="FID-126 verification metrics")
+    parser.add_argument(
+        "capture_dir_pos",
+        nargs="?",
+        default=None,
+        help="Capture directory (positional, optional)",
+    )
+    parser.add_argument(
+        "--capture-dir",
+        default=None,
+        help="Capture directory (named, optional)",
+    )
+    args = parser.parse_args()
+
+    if args.capture_dir:
+        CAPTURE_DIR = Path(args.capture_dir)
+    elif args.capture_dir_pos:
+        CAPTURE_DIR = Path(args.capture_dir_pos)
+    else:
+        CAPTURE_DIR = find_latest_capture_dir()
+        if CAPTURE_DIR is None:
+            print("ERROR: No capture directory found in data/sandbox_responses/")
+            sys.exit(1)
+        print(f"Auto-detected latest capture dir: {CAPTURE_DIR}\n")
+
     if not CAPTURE_DIR.exists():
         print(f"ERROR: {CAPTURE_DIR} does not exist")
         sys.exit(1)
@@ -182,7 +222,7 @@ def main():
     n_parse_fail = actions.get("PARSE_FAIL", 0)
 
     print("=" * 70)
-    print("FID-126 VERIFICATION METRICS — M3 SANDBOX RUN 2026-06-12_06-02-44")
+    print(f"FID-126 VERIFICATION METRICS — M3 SANDBOX RUN {CAPTURE_DIR.name}")
     print("=" * 70)
     print(f"\nTotal scenarios:         {n}")
     print(f"Parsed successfully:     {n_parsed}")

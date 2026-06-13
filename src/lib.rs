@@ -23,6 +23,7 @@ pub mod core;
 pub mod data;
 pub mod execution;
 pub mod insight;
+pub mod jury_state;
 pub mod memory;
 pub mod monitor;
 pub mod risk;

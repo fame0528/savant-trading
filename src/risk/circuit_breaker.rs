@@ -156,6 +156,36 @@ impl CircuitBreaker {
 
         CircuitBreakerResult::Ok
     }
+
+    /// FID-146: Per-trade loss check — fire breaker if a single trade loses > 5% of equity.
+    /// Returns Triggered with a descriptive reason. Dollar floor of $1.00 prevents
+    /// micro-accounts ($20 equity) from tripping on a $1.10 loss that's only 5.5%.
+    pub fn check_per_trade_loss(&self, pnl: f64, equity: f64) -> CircuitBreakerResult {
+        // Only check losses (positive PnL = win, no trip)
+        if pnl >= 0.0 || equity <= 0.0 {
+            return CircuitBreakerResult::Ok;
+        }
+        let loss_pct = -pnl / equity;
+        let loss_dollars = -pnl;
+        // 5% loss threshold with $1.00 dollar floor for micro-accounts
+        // FID-146: 5% threshold. Floor lowered from $1.00 to $0.50 so it actually trips
+        // for micro-accounts (5% of $15 = $0.75; with $1.00 floor, a $0.80 loss wouldn't trip).
+        const PER_TRADE_LOSS_PCT: f64 = 0.05;
+        const PER_TRADE_LOSS_FLOOR_USD: f64 = 0.50;
+        if loss_pct > PER_TRADE_LOSS_PCT && loss_dollars >= PER_TRADE_LOSS_FLOOR_USD {
+            warn!(
+                "Circuit breaker: per-trade loss ${:.2} ({:.2}%) exceeds 5% limit (equity=${:.2})",
+                loss_dollars, loss_pct * 100.0, equity
+            );
+            return CircuitBreakerResult::Triggered(format!(
+                "Per-trade loss: ${:.2} ({:.2}%) exceeds 5% limit (equity=${:.2})",
+                loss_dollars,
+                loss_pct * 100.0,
+                equity
+            ));
+        }
+        CircuitBreakerResult::Ok
+    }
 }
 
 pub enum CircuitBreakerResult {

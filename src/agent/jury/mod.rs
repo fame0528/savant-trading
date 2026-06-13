@@ -1,8 +1,13 @@
 //! Jury module — multi-model adversarial decision system (FID-114).
 //!
-//! Uses the OpenRouter Management API to create ephemeral child API keys,
-//! each hitting the `openrouter/free` endpoint for random model diversity.
-//! Owl Alpha acts as the Judge, synthesizing all jury verdicts.
+//! Uses the OpenRouter Management API to create ephemeral child API keys.
+//! Each jury member gets a distinct model slug (Gemma, Llama, Nemotron, Qwen,
+//! etc.) for architectural diversity. Owl Alpha (or the primary trading model)
+//! acts as the Judge, synthesizing all jury verdicts.
+//!
+//! **FID-143 (MS-3):** Jury members always use the OpenRouter endpoint
+//! (regardless of primary provider) since keys are OpenRouter-issued.
+//! The Judge uses the primary trading model.
 
 pub mod judge;
 pub mod key_manager;

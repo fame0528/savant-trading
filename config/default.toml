@@ -185,10 +185,21 @@ atr_volatility_multiplier = 1.5
 live_execution = true
 
 [ai]
-provider = "openrouter"
-endpoint = "https://openrouter.ai/api/v1"
-model = "openrouter/owl-alpha"
-api_key_env = "OPENROUTER_API_KEY"
+# **FID-138 (M3):** Switched from openrouter/owl-alpha to TokenRouter/MiniMax-M3
+# for the free M3 trial week. disable_thinking=true skips chain-of-thought.
+# max_tokens=4096 constrains reasoning budget.
+#
+# To switch back to owl-alpha:
+#   provider = "openrouter"
+#   endpoint = "https://openrouter.ai/api/v1"
+#   model = "openrouter/owl-alpha"
+#   api_key_env = "OPENROUTER_API_KEY"
+#   max_tokens = 8192
+#   disable_thinking = false
+provider = "tokenrouter"
+endpoint = "https://api.tokenrouter.com/v1"
+model = "MiniMax-M3"
+api_key_env = "TOKEN_ROUTER_API_KEY"
 autonomy_level = 3
 max_decisions_per_hour = 20
 # Expanded to use more of the 1M context window (FID-015)
@@ -200,9 +211,14 @@ max_retries = 3
 temperature = 0.6
 # Nucleus sampling — limits token pool to top 95% probability mass
 top_p = 0.95
-max_tokens = 8192
+# Constrain thinking budget for M3: 4096 forces concise JSON action blocks.
+# M3 will exhaust the full budget on chain-of-thought if not constrained.
+max_tokens = 4096
 # Reasoning model needs room for chain-of-thought (FID-015)
 timeout_secs = 300
+# FID-138: Disable chain-of-thought reasoning for M3.
+# Gets the final decision JSON without the <think> preamble.
+disable_thinking = true
 
 # OpenRouter-specific configuration (only used when provider = "openrouter")
 [ai.openrouter]
@@ -217,12 +233,20 @@ title = "Savant Trading Engine"
 [ai.jury]
 enabled = true
 jury_size = 10
-model = "openrouter/free"
+# openrouter/free is a router that selects free models at random from all
+# available free models on OpenRouter (24 models across NVIDIA, OpenInference,
+# Venice, Google, etc.). The router handles provider assignment automatically.
+# Juror 0 is always the M3 control group (uses provider_config_m3, not this list).
+models = [
+  "openrouter/free",
+]
 quorum_pct = 0.6
 timeout_secs = 45
 max_consecutive_failures = 3
 key_prefix = "savant-jury"
 cleanup_keys_on_shutdown = true
+jury_veto_enabled = true
+jury_veto_threshold = 0.70
 
 [ai.openrouter.management]
 # Management API key (created on OpenRouter dashboard, used for admin operations only)
@@ -248,6 +272,10 @@ api_key_env = "TOKEN_ROUTER_API_KEY"
 # Allows testing different models/providers while the engine runs in production.
 # Falls back to [ai] fields when not configured.
 #
+# **FID-138 (M3 thinking leak):** max_tokens=4096 constrains reasoning models
+# (MiniMax M3) so they don't exhaust the budget on chain-of-thought.
+# disable_thinking=true skips the reasoning phase entirely for M3.
+#
 # Usage:
 #   cargo run --release -- --test --sandbox
 #   cargo run --release -- --test --sandbox --model minimax/minimax-m3
@@ -256,6 +284,16 @@ api_key_env = "TOKEN_ROUTER_API_KEY"
 endpoint = "https://api.tokenrouter.com/v1"
 model = "MiniMax-M3"
 api_key_env = "TOKEN_ROUTER_API_KEY"
+# Constrain thinking budget: M3 will exhaust 131K tokens on chain-of-thought.
+# 8192 gives M3 room to compute conviction scores without triggering think blocks.
+# 4096 was too tight — M3 couldn't compute trigger weights and defaulted to 0.0.
+max_tokens = 8192
+temperature = 0.6
+top_p = 0.95
+timeout_secs = 300
+# Skip chain-of-thought entirely for M3 (reasoning consumed by model internally).
+# Gets the final decision JSON without the <think> preamble.
+disable_thinking = true
 
 [sandbox.management]
 management_key_env = "OPENROUTER_MANAGEMENT_KEY"

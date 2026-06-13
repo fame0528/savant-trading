@@ -270,14 +270,24 @@ impl Default for RegimeSizes {
 }
 
 /// Jury system configuration (FID-114: Model Jury).
+///
+/// **FID-143 (MS-3):** `model` replaced with `models` (Vec) to assign a specific
+/// model slug to each jury member. This guarantees provider diversity — each
+/// juror gets a different free model (Gemma, Llama, Nemotron, Qwen, etc.) plus
+/// one M3 control group member. Falls back to `model` string (legacy compat).
 #[derive(Debug, Clone, Deserialize)]
 pub struct JuryConfig {
     #[serde(default = "default_true")]
     pub enabled: bool,
     #[serde(default = "default_jury_size")]
     pub jury_size: usize,
+    /// Deprecated: use `models` instead. Kept for backward compat.
     #[serde(default = "default_jury_model")]
     pub model: String,
+    /// Per-juror model slugs. Juror i uses models[i % models.len()].
+    /// When empty, falls back to `model` for all jurors (legacy behavior).
+    #[serde(default)]
+    pub models: Vec<String>,
     #[serde(default = "default_quorum_pct")]
     pub quorum_pct: f64,
     #[serde(default = "default_jury_timeout_secs")]
@@ -290,6 +300,16 @@ pub struct JuryConfig {
     pub cleanup_keys_on_shutdown: bool,
     #[serde(default)]
     pub regime_sizes: RegimeSizes,
+    /// FID-146: If true, jury can veto primary model's Buy/Sell when 70%+ disagrees.
+    #[serde(default = "default_true")]
+    pub jury_veto_enabled: bool,
+    /// FID-146: Fraction of jury that must disagree to trigger veto (0.0-1.0).
+    #[serde(default = "default_jury_veto_threshold")]
+    pub jury_veto_threshold: f64,
+}
+
+fn default_jury_veto_threshold() -> f64 {
+    0.70
 }
 
 impl Default for JuryConfig {
@@ -298,12 +318,27 @@ impl Default for JuryConfig {
             enabled: true,
             jury_size: default_jury_size(),
             model: default_jury_model(),
+            models: default_jury_models(),
             quorum_pct: default_quorum_pct(),
             timeout_secs: default_jury_timeout_secs(),
             max_consecutive_failures: default_max_consecutive_failures(),
             key_prefix: default_key_prefix(),
             cleanup_keys_on_shutdown: true,
             regime_sizes: RegimeSizes::default(),
+            jury_veto_enabled: true,
+            jury_veto_threshold: default_jury_veto_threshold(),
+        }
+    }
+}
+
+impl JuryConfig {
+    /// Get the model slug for juror index `i`.
+    /// Uses `models[i % models.len()]` when populated; falls back to `model`.
+    pub fn model_for_juror(&self, i: usize) -> String {
+        if self.models.is_empty() {
+            self.model.clone()
+        } else {
+            self.models[i % self.models.len()].clone()
         }
     }
 }
@@ -336,6 +371,23 @@ fn default_jury_size() -> usize {
 fn default_jury_model() -> String {
     "openrouter/free".into()
 }
+
+/// FID-143 (MS-3): 9 diverse free models + 1 M3 control group.
+/// Ensures jury diversity — each juror gets a different architecture/provider.
+fn default_jury_models() -> Vec<String> {
+    vec![
+        "google/gemma-4-26b-a4b-it:free".into(),
+        "google/gemma-4-31b-it:free".into(),
+        "meta-llama/llama-3.2-3b-instruct:free".into(),
+        "meta-llama/llama-3.3-70b-instruct:free".into(),
+        "nvidia/nemotron-3-super-120b-a12b:free".into(),
+        "nvidia/nemotron-3-ultra-550b-a55b:free".into(),
+        "qwen/qwen3-coder:free".into(),
+        "qwen/qwen3-next-80b-a3b-instruct:free".into(),
+        "openai/gpt-oss-120b:free".into(),
+        "minimax/minimax-m3".into(),
+    ]
+}
 fn default_quorum_pct() -> f64 {
     0.6
 }
@@ -367,6 +419,11 @@ pub struct AiConfig {
     pub top_p: f64,
     #[serde(default = "default_timeout_secs")]
     pub timeout_secs: u64,
+    /// FID-138: Disable chain-of-thought reasoning for models that support it.
+    /// When true, adds `"thinking": {"type": "disabled"}` to the request body.
+    /// Only effective for reasoning models (MiniMax M3, DeepSeek R1, etc.).
+    #[serde(default)]
+    pub disable_thinking: bool,
     #[serde(default)]
     pub openrouter: OpenRouterConfig,
     #[serde(default)]
@@ -633,12 +690,26 @@ fn default_sandbox_api_key_env() -> String {
 fn default_sandbox_model() -> String {
     "openrouter/owl-alpha".into()
 }
+fn default_sandbox_max_tokens() -> u32 {
+    4096
+}
+fn default_sandbox_temperature() -> f64 {
+    0.6
+}
+fn default_sandbox_top_p() -> f64 {
+    0.95
+}
 
 /// Sandbox provider configuration (FID-123).
 ///
 /// Completely independent from `[ai]` — allows testing different
 /// models/providers in the sandbox while the engine runs in production.
 /// Falls back to `[ai]` fields when not configured.
+///
+/// **FID-138 (M3 thinking leak):** Added `max_tokens`, `temperature`,
+/// `top_p`, `timeout_secs`, and `disable_thinking` fields so the sandbox
+/// can constrain reasoning models (MiniMax M3) that exhaust token budgets
+/// on chain-of-thought before emitting the action JSON.
 #[derive(Debug, Clone, Deserialize)]
 pub struct SandboxConfig {
     #[serde(default = "default_sandbox_endpoint")]
@@ -647,6 +718,23 @@ pub struct SandboxConfig {
     pub api_key_env: String,
     #[serde(default = "default_sandbox_model")]
     pub model: String,
+    /// Max output tokens (total, including reasoning). Default 4096.
+    /// Lower for reasoning models (M3) to force concise output.
+    #[serde(default = "default_sandbox_max_tokens")]
+    pub max_tokens: u32,
+    /// Temperature for sandbox LLM calls.
+    #[serde(default = "default_sandbox_temperature")]
+    pub temperature: f64,
+    /// Top-p for sandbox LLM calls.
+    #[serde(default = "default_sandbox_top_p")]
+    pub top_p: f64,
+    /// Timeout in seconds for sandbox LLM calls.
+    #[serde(default = "default_timeout_secs")]
+    pub timeout_secs: u64,
+    /// Disable chain-of-thought reasoning for models that support it (MiniMax M3).
+    /// When true, adds `"thinking": {"type": "disabled"}` to the request body.
+    #[serde(default)]
+    pub disable_thinking: bool,
     #[serde(default)]
     pub management: OpenRouterManagementConfig,
 }
@@ -657,6 +745,11 @@ impl Default for SandboxConfig {
             endpoint: default_sandbox_endpoint(),
             api_key_env: default_sandbox_api_key_env(),
             model: default_sandbox_model(),
+            max_tokens: default_sandbox_max_tokens(),
+            temperature: default_sandbox_temperature(),
+            top_p: default_sandbox_top_p(),
+            timeout_secs: default_timeout_secs(),
+            disable_thinking: false,
             management: OpenRouterManagementConfig::default(),
         }
     }
@@ -983,6 +1076,7 @@ impl Default for AppConfig {
                 top_p: 0.95,
                 max_tokens: 131072,
                 timeout_secs: 300,
+                disable_thinking: false,
                 openrouter: OpenRouterConfig::default(),
                 nvidia: NvidiaConfig::default(),
                 tokenrouter: TokenRouterConfig::default(),

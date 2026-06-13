@@ -441,6 +441,43 @@
 
 <!-- Add new entries above this line -->
 
+## Session 2026-06-12 15:00–22:00: FID-138 — M3 Thinking Leakage (Chain-of-Thought Suppression)
+
+**Key Learnings:**
+
+- **Reasoning models need explicit thinking suppression at the API level.** The `thinking: {type: "disabled"}` parameter is MiniMax-native and must be injected into the request body — it cannot be controlled via prompt instructions alone. M3 wraps all output in `<think>...</think>` XML tags containing chain-of-thought reasoning, exhausting the token budget before emitting the JSON action block.
+- **Provider adapters may strip unknown config fields.** Kilo's native minimax provider ignores `extraBody` from config.json. Always verify with `kilo debug config` that overrides are actually resolved. The built-in TokenRouter provider can be overridden via its `baseURL` setting — not by creating a custom provider (which fails auth) or overriding the minimax provider (which strips extraBody).
+- **Dependency hell with bleeding-edge Python.** LiteLLM proxy failed because Python 3.14 is too new for `orjson` (PyO3 maxes at 3.13). Node.js proxy (zero dependencies, built-in `http`/`https` modules) was the pragmatic alternative — ~30 lines of code vs a Python ecosystem dependency chain.
+- **Port cleanup on Windows needs `powershell Stop-Process`.** `kill -9` in bash on Windows doesn't reliably kill Node.js processes. Use `powershell -Command "Stop-Process -Id <PID> -Force"` instead.
+- **Config propagation is more important than config existence.** Adding `disable_thinking` to `AiConfig` wasn't enough — it also needed wiring through `create_provider()` (5 branches), `run_training_batch()`, and `Default for AppConfig`. Each indirection is a failure point. Law 4 (reachability) caught the training batch hardcoded `false`.
+- **Session caching defeats config changes.** Kilo cached the old provider connection (straight to TokenRouter) even after config changes. Required a full restart (not `--continue`) to pick up the new proxy routing.
+- **Multi-provider architecture is defense-in-depth.** All 5 provider branches (openrouter, nvidia, ollama, tokenrouter, other) in `create_provider()` kept intact. The sandbox path independently reads `[sandbox]` config; the live bot reads `[ai]` config. Switching models is a config change, not a code change.
+- **Two-layer M3 defense:** (1) `thinking: {type: "disabled"}` in the API request body stops reasoning server-side, (2) `max_tokens: 4096` constrains output if the disable is ignored. The sandbox verified 0% parse errors (was 13%) with 60/60 scenarios producing clean JSON.
+- **Kilo's `--thinking=false` flag hides display but doesn't stop server-side waste.** The model still spends tokens on `<think>` blocks — they're just hidden from the UI. Server-side suppression requires request-body injection, which Kilo's minimax adapter doesn't support. The Node.js proxy (`m3-proxy.js`) is the pragmatic fix.
+- **`start.bat` integration keeps the proxy alive.** The proxy auto-starts with the engine via `m3-proxy.bat` (port check + .env key loading + minimized window). Without this, the proxy dies on terminal close and Kilo reverts to thinking-block leakage.
+
+## Session 2026-06-12 22:45: FID-139 — Batch Parsing Gap (Missing Pairs Invisible)
+
+**Key Learnings:**
+
+- **LLMs omit pairs they have no opinion on from batch JSON arrays.** M3 returned ~18/35 pairs in the batch response — it only includes pairs with meaningful setups. The remaining ~17 pairs are silently omitted, and the parser has no fallback to create Pass decisions for them. This is a model behavior pattern, not a parser bug.
+- **Batch completeness is a safety property, not an optimization.** If the dashboard only shows 18/35 scanned pairs, the user loses trust in the bot. Every queued pair must produce a decision record, even if the model says nothing. The fix: default missing pairs to Pass so all pairs are visible.
+- **`serde_json::json!` macro is the cleanest way to construct default JSON in Rust.** No manual string building, no intermediate struct construction — just declare the JSON shape and serialize. Works seamlessly with the existing `parse_decision()` pipeline.
+- **Sed insertion on 275K-line files requires precise line targeting.** The `sed -i 'NUMBERa\...'` pattern works reliably when you know the exact line number. Backup before sed is essential — `cp file.bak file`. Clean up backup after verification.
+- **Test drift from threshold changes is a real hazard.** When conviction thresholds were lowered from 0.30 to 0.20, the `conviction_gate_blocks_low_conviction` test broke because its 0.20 conviction_score now equals the threshold. The fix (0.19) is minimal and preserves the test's intent.
+
+
+## Session 2026-06-12 23:00: FID-140 — Prompt Threshold Inconsistency (M3 Reads Stale Values)
+
+**Key Learnings:**
+
+- **A single prompt file can contain 5 contradictory threshold tables from 3 tuning iterations.** `strategy_knowledge.md` had: (1) matrix table at 0.30/0.40/0.40/0.40, (2) CRITICAL warning at 0.20/0.25/0.25/0.25, (3) stale rationale text referencing 0.40, (4) REGIME-SPECIFIC BEHAVIOR at 0.50/0.60/0.75/0.65, (5) few-shot example at 0.50. M3 read different values in different scenarios — ONC-001 used 0.75, COR-001 used 0.50, TRD-005 used 0.40. No consistent behavior possible.
+- **Unifying thresholds can INCREASE self-censorship.** The prompt fix gave M3 a single, clear threshold (0.20/0.25) to self-censor against. Before the fix, contradictory values sometimes let a trade through. After unification, M3 consistently passes on 90% of scenarios. The BUY count went DOWN from 12 to 6. **Lesson:** a model with "default-to-hold" bias will self-censor at ANY threshold — the prompt fix is necessary but insufficient.
+- **The CRITICAL warning must not name stale values.** The original warning said "Ranging = 0.25 (was 0.75 — IGNORE 0.75)" — but 0.75 no longer appeared anywhere in the prompt. By explicitly mentioning it, you plant it in M3"s context. The fix: "Ranging = 0.25" with NO parenthetical reference to stale values. If a value is not in the prompt, don"t mention it.
+- **ADX boundary overlap creates regime ambiguity.** Original had Ranging ADX < 20 and GreyZone 18-26. ADX 19 matched BOTH. Fixed to Ranging ADX < 18, GreyZone 18-26 (non-overlapping).
+- **Parser override must handle zero-priced Pass decisions.** Pass decisions have `entry_price=0.0` and `confidence=0.0`. The original override required `confidence > 0.0 && entry_price > 0.0`, which means it could NEVER fire on a Pass decision. Fixed: removed both guards, default entry_price to current_price with 0.5% stop / 0.8% TP when overriding.
+- **The "default-to-hold" bias is structural, not threshold-dependent.** M3 passes on 90% of scenarios regardless of threshold value (0.20, 0.30, or 0.50 — same result). The parser override is the only backstop. Next step: either make the override more aggressive or accept M3"s conservative nature with 25% failure rate.
+- **Sandbox failure rate improvement was 3pp (28% → 25%), not the predicted 10-13pp.** The prediction assumed M3"s self-censorship would drop when it used correct thresholds. It didn"t — M3 self-censors at any threshold. The prompt fix was a necessary cleanup (removed contradictions) but not a sufficient fix for the pass rate.
 ## Session 2026-06-12 14:31–15:00: ECHO Bootstrap + FID Reconciliation + v0.13.9 Push
 
 **Key Learnings:**
@@ -576,3 +613,19 @@
 - `episode_store: HashMap<String, String>` declared at line ~413, populated at capture site (~2380), consumed at 3 close paths (lines ~2800, ~3869, ~4221)
 - `decision_log_context` added to `FullContext` struct, populated at line ~1787, injected into prompt at `context_builder.rs:504`
 - `context_for_pair(pair, 3, 2)` — 3 same-pair entries, 2 cross-pair entries with outcomes
+
+## Session 2026-06-12 23:30: FID-142 — Token Resolution → 0x Liquidity Failures
+
+**Key Learnings:**
+
+- **0x does NOT resolve symbols — it requires contract addresses.** The "enterprise token resolution" comment in `execute_swap()` claiming "0x accepts both addresses and symbols natively" was wrong. Calling `GET /price?buyToken=GIGA` returns `INPUT_INVALID`. The symbol-fallback code was dead — it had never been tested against the live API. Always test API assumptions against the real endpoint before writing code that depends on them.
+- **Blockscout search API is the cleanest symbol→address resolver for EVM chains.** `GET /api/v2/tokens?q=SYMBOL` returns exact matches with contract addresses, decimals, and holder counts. No API key required, works across Arbitrum/Ethereum/Base/Optimism. This is better than maintaining static token address databases.
+- **The pre-resolution pattern (resolve once at startup, cache forever) beats the lazy-resolution pattern (resolve on first use).** By resolving all missing addresses at engine startup and persisting to the token store, every subsequent token lookup is O(1) in-memory. Lazy resolution would add latency to every first-time token evaluation and risk race conditions.
+- **ETH→WETH and BTC→WBTC mappings must be applied BEFORE checking lookup_token().** `resolve_pair_on_chain` does this mapping, but raw curated pair symbols don't. Without the mapping, "ETH" appears as "missing" even though WETH exists in the DB — causing unnecessary API calls.
+- **Blockscout rate limits are real.** Without a 250ms delay between calls, sequential symbol searches can trigger 429 responses. The same `VALIDATION_RATE_LIMIT_MS` constant used for 0x applies to Blockscout.
+- **GIGA is Solana-only** — it has no EVM contract at all. The bot correctly cannot trade it via 0x. The "not found on chain" log makes this clear. Tokens from CoinGecko candle sources may not exist on the trading chain.
+- **PUMP exists on Arbitrum but has no 0x DEX liquidity** — address resolution and liquidity availability are separate concerns. The fix correctly handles both: resolve the address first, then let the existing liquidity check gate execution.
+- **The persistent token store wiring to lookup_token() already worked.** The 200 tokens in data/tokens.json were correctly loaded into TOKEN_EXTENSIONS at startup and found by lookup_token(). The gap was only for tokens NOT in the store — there was no fallback resolution path. The pre-resolution step fills this gap.
+
+**Files changed:** `src/data/token_discovery.rs`, `src/engine/mod.rs`, `src/execution/dex/trader.rs`
+**Tests:** 308/308 passing | **cargo check:** clean

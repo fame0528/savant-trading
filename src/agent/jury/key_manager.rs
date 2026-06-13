@@ -84,9 +84,18 @@ impl JuryKeyManager {
                 .await
             {
                 Ok(created) => {
+                    let key_preview = if created.key.len() > 12 {
+                        format!("{}...{}", &created.key[..8], &created.key[created.key.len()-4..])
+                    } else {
+                        created.key.clone()
+                    };
+                    tracing::debug!(
+                        "Jury key [{}] created: key_preview={}, hash={}",
+                        i, key_preview, created.data.hash.as_deref().unwrap_or("unknown")
+                    );
                     keys.push(JuryKey {
                         api_key: created.key,
-                        hash: created.data.hash,
+                        hash: created.data.hash.unwrap_or_default(),
                         label,
                         consecutive_failures: Arc::new(AtomicU32::new(0)),
                     });
@@ -153,7 +162,8 @@ impl JuryKeyManager {
         }
     }
 
-    /// Delete all jury keys. Called on shutdown.
+    /// Delete all jury keys. Called on shutdown (or by Drop impl).
+    #[allow(dead_code)] // Called by Drop impl; also available for manual/testing cleanup
     pub async fn cleanup_all(&self) {
         let keys = self.keys.lock().await;
         for key in keys.iter() {
@@ -172,7 +182,7 @@ impl JuryKeyManager {
             Ok(existing) => {
                 let orphaned: Vec<_> = existing
                     .iter()
-                    .filter(|k| k.name.starts_with(prefix))
+                    .filter(|k| k.name.as_deref().unwrap_or("").starts_with(prefix))
                     .collect();
                 if !orphaned.is_empty() {
                     info!(
@@ -180,8 +190,8 @@ impl JuryKeyManager {
                         orphaned.len()
                     );
                     for key in &orphaned {
-                        if let Err(e) = self.client.delete_key(&key.hash).await {
-                            warn!("Failed to delete orphaned key '{}': {}", key.name, e);
+                        if let Err(e) = self.client.delete_key(key.hash.as_deref().unwrap_or("")).await {
+                            warn!("Failed to delete orphaned key '{}': {}", key.name.as_deref().unwrap_or("?"), e);
                         }
                     }
                 }
@@ -202,5 +212,50 @@ impl JuryKeyManager {
     #[allow(dead_code)] // Phase 2: used for health checks
     pub async fn has_keys(&self) -> bool {
         !self.keys.lock().await.is_empty()
+    }
+}
+
+/// Best-effort key cleanup on drop (Ctrl+C, panic, normal exit).
+/// The runtime may already be shutting down, so we try block_on and
+/// fall back to a warning if it fails. Startup orphan cleanup catches
+/// any keys we miss here.
+impl Drop for JuryKeyManager {
+    fn drop(&mut self) {
+        // Try to take the keys out of the Arc<Mutex> without async.
+        // try_lock() is non-async and will fail if another thread holds the lock.
+        let keys = match self.keys.try_lock() {
+            Ok(guard) => guard.clone(),
+            Err(_) => {
+                warn!("JuryKeyManager::drop: mutex locked, cannot cleanup keys");
+                return;
+            }
+        };
+        if keys.is_empty() {
+            return;
+        }
+        // Attempt async cleanup via the tokio runtime. If the runtime is
+        // already shut down (e.g. Ctrl+C), this fails and we log a warning.
+        // Startup orphan cleanup (cleanup_orphaned_keys) catches any misses.
+        match tokio::runtime::Handle::try_current() {
+            Ok(handle) => {
+                let client = &self.client;
+                let _ = handle.block_on(async {
+                    for key in &keys {
+                        if let Err(e) = client.delete_key(&key.hash).await {
+                            warn!("Drop: failed to delete jury key '{}': {}", key.label, e);
+                        } else {
+                            info!("Drop: deleted jury key: {}", key.label);
+                        }
+                    }
+                    info!("Drop: jury key cleanup complete: {} keys deleted", keys.len());
+                });
+            }
+            Err(_) => {
+                warn!(
+                    "JuryKeyManager::drop: no tokio runtime — {} jury keys will be cleaned up on next startup",
+                    keys.len()
+                );
+            }
+        }
     }
 }

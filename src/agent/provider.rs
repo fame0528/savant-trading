@@ -18,6 +18,10 @@ pub struct LlmConfig {
     pub top_p: f64,
     pub timeout_secs: u64,
     pub extra_headers: Vec<(String, String)>,
+    /// FID-138: Disable chain-of-thought reasoning for models that support it.
+    /// When true, adds `"thinking": {"type": "disabled"}` to the request body.
+    /// Only effective for reasoning models (MiniMax M3, DeepSeek R1, etc.).
+    pub disable_thinking: bool,
 }
 
 impl Default for LlmConfig {
@@ -31,6 +35,7 @@ impl Default for LlmConfig {
             top_p: 0.95,
             timeout_secs: 300,
             extra_headers: vec![],
+            disable_thinking: false,
         }
     }
 }
@@ -76,6 +81,7 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                     top_p: ai_cfg.top_p,
                     timeout_secs: ai_cfg.timeout_secs,
                     extra_headers: vec![],
+                    disable_thinking: ai_cfg.disable_thinking,
                 },
                 vec![
                     ("HTTP-Referer".to_string(), or.referer.clone()),
@@ -83,17 +89,17 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                 ],
             )
         }
-        "ollama" => (
-            LlmConfig {
-                endpoint: "http://localhost:11434/v1".to_string(),
-                model: ai_cfg.model.clone(),
-                api_key: String::new(),
-                max_tokens: ai_cfg.max_tokens,
-                temperature: ai_cfg.temperature,
-                top_p: ai_cfg.top_p,
-                timeout_secs: ai_cfg.timeout_secs.max(300),
-                extra_headers: vec![],
-            },
+        "ollama" => (                LlmConfig {
+                    endpoint: "http://localhost:11434/v1".to_string(),
+                    model: ai_cfg.model.clone(),
+                    api_key: String::new(),
+                    max_tokens: ai_cfg.max_tokens,
+                    temperature: ai_cfg.temperature,
+                    top_p: ai_cfg.top_p,
+                    timeout_secs: ai_cfg.timeout_secs.max(300),
+                    extra_headers: vec![],
+                    disable_thinking: ai_cfg.disable_thinking,
+                },
             vec![],
         ),
         "nvidia" => {
@@ -108,6 +114,7 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                     top_p: ai_cfg.top_p,
                     timeout_secs: ai_cfg.timeout_secs,
                     extra_headers: vec![],
+                    disable_thinking: ai_cfg.disable_thinking,
                 },
                 vec![],
             )
@@ -124,21 +131,22 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                     top_p: ai_cfg.top_p,
                     timeout_secs: ai_cfg.timeout_secs,
                     extra_headers: vec![],
+                    disable_thinking: ai_cfg.disable_thinking,
                 },
                 vec![],
             )
         }
-        _ => (
-            LlmConfig {
-                endpoint: ai_cfg.endpoint.clone(),
-                model: ai_cfg.model.clone(),
-                api_key: std::env::var(&ai_cfg.api_key_env).unwrap_or_default(),
-                max_tokens: ai_cfg.max_tokens,
-                temperature: ai_cfg.temperature,
-                top_p: ai_cfg.top_p,
-                timeout_secs: ai_cfg.timeout_secs,
-                extra_headers: vec![],
-            },
+        _ => (                LlmConfig {
+                    endpoint: ai_cfg.endpoint.clone(),
+                    model: ai_cfg.model.clone(),
+                    api_key: std::env::var(&ai_cfg.api_key_env).unwrap_or_default(),
+                    max_tokens: ai_cfg.max_tokens,
+                    temperature: ai_cfg.temperature,
+                    top_p: ai_cfg.top_p,
+                    timeout_secs: ai_cfg.timeout_secs,
+                    extra_headers: vec![],
+                    disable_thinking: ai_cfg.disable_thinking,
+                },
             vec![],
         ),
     };
@@ -301,14 +309,34 @@ impl LlmProvider {
             }));
         }
 
-        serde_json::json!({
+        let mut body = serde_json::json!({
             "model": self.config.model,
             "messages": all_messages,
             "max_tokens": self.config.max_tokens,
             "temperature": self.config.temperature,
             "top_p": self.config.top_p,
             "stream": stream,
-        })
+        });
+
+        // FID-138: Disable chain-of-thought for reasoning models (MiniMax M3, etc.)
+        // that exhaust the token budget on <think> blocks before emitting JSON.
+        if self.config.disable_thinking {
+            let model_lower = self.config.model.to_lowercase();
+            let is_reasoning_model = model_lower.contains("m3")
+                || model_lower.contains("minimax")
+                || model_lower.contains("m1")
+                || model_lower.contains("deepseek-r1")
+                || model_lower.contains("qwq");
+            if is_reasoning_model {
+                body["thinking"] = serde_json::json!({"type": "disabled"});
+                tracing::debug!(
+                    "FID-138: thinking disabled for reasoning model {}",
+                    self.config.model
+                );
+            }
+        }
+
+        body
     }
 
     async fn send_request(&self, body: &serde_json::Value) -> Result<reqwest::Response, LlmError> {
@@ -434,9 +462,25 @@ impl LlmProvider {
             .and_then(|c| c.get(0))
             .and_then(|c| c.get("message"))
             .and_then(|m| {
-                m.get("content")
+                let content_str = m.get("content")
                     .and_then(|c| c.as_str())
-                    .filter(|s| !s.is_empty())
+                    .filter(|s| !s.is_empty());
+                // FID-138: If content is empty but reasoning is present, the model
+                // may have exhausted its token budget on chain-of-thought.
+                // Log a warning but still fall back to reasoning for backward compat
+                // with models (like old mimo v2.5 pro) that output in the reasoning field.
+                // The real fix is disable_thinking + reduced max_tokens at the provider level.
+                if content_str.is_none() {
+                    if let Some(reasoning) = m.get("reasoning").and_then(|r| r.as_str()) {
+                        if !reasoning.is_empty() {
+                            tracing::warn!(
+                                "FID-138: content empty, falling back to reasoning field ({} chars). Consider disable_thinking=true.",
+                                reasoning.len()
+                            );
+                        }
+                    }
+                }
+                content_str
                     .or_else(|| m.get("reasoning").and_then(|r| r.as_str()))
             })
             .ok_or_else(|| {

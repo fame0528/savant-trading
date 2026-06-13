@@ -1811,41 +1811,76 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             "data": call_data
         }, "latest"]);
 
-        let verified_proceeds = match self.rpc_call("eth_call", call_params).await {
-            Ok(result) => {
-                if let Some(hex) = result.as_str() {
-                    let usdc_wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
-                        .unwrap_or(U256::ZERO);
-                    let divisor = 10f64.powi(usdc_dec as i32);
-                    let usdc_after: f64 =
-                        usdc_wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
-                    let gained = usdc_after - usdc_balance_before;
-                    if gained <= 0.0 {
-                        return Err(ExecutionError::Other(format!(
-                            "Close tx {} succeeded but delivered ${:.2} USDC (before=${:.2}, after=${:.2}). \
-                             Position stays open. Tokens may be stranded.",
-                            tx_hash, gained, usdc_balance_before, usdc_after
-                        )));
+        // FID-146: Retry USDC verification 3x with backoff. On final failure OR dust
+        // return ($0 USDC), trust the on-chain close tx (status=1, tx_hash confirmed)
+        // and return 0.0 — the position will be removed with breakeven PnL. This prevents
+        // phantom positions when RPC is flaky or when a swap returns dust.
+        let verified_proceeds: f64 = {
+            let mut last_err: Option<String> = None;
+            let mut proceeds: f64 = 0.0;
+            let mut verified = false;
+            for attempt in 1..=3u32 {
+                match self.rpc_call("eth_call", call_params.clone()).await {
+                    Ok(rpc_result) => {
+                        if let Some(hex) = rpc_result.as_str() {
+                            let usdc_wei = U256::from_str_radix(hex.trim_start_matches("0x"), 16)
+                                .unwrap_or(U256::ZERO);
+                            let divisor = 10f64.powi(usdc_dec as i32);
+                            let usdc_after: f64 =
+                                usdc_wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
+                            let gained = usdc_after - usdc_balance_before;
+                            if gained <= 0.0 {
+                                // Dust return — close succeeded on-chain but delivered $0.
+                                // This is the CATASTOPHIC case. Trust the close, log error,
+                                // return 0.0 so position gets removed with breakeven PnL.
+                                error!(
+                                    "FID-146: Close tx {} delivered ${:.2} USDC (dust return). \
+                                     Trusting on-chain close, removing position with breakeven PnL. \
+                                     Tokens may be stranded — check wallet.",
+                                    tx_hash, gained
+                                );
+                                proceeds = 0.0;
+                                verified = false;
+                                break;
+                            }
+                            if attempt > 1 {
+                                info!("FID-146: USDC verification succeeded on attempt {}/3", attempt);
+                            }
+                            info!(
+                                "On-chain verified: {} close delivered ${:.2} USDC (before=${:.2}, after=${:.2})",
+                                pos.pair, gained, usdc_balance_before, usdc_after
+                            );
+                            proceeds = gained;
+                            verified = true;
+                            break;
+                        } else {
+                            last_err = Some("USDC balance parse failed (non-string result)".into());
+                        }
                     }
-                    info!(
-                        "On-chain verified: {} close delivered ${:.2} USDC (before=${:.2}, after=${:.2})",
-                        pos.pair, gained, usdc_balance_before, usdc_after
+                    Err(e) => {
+                        last_err = Some(format!("RPC call failed: {}", e));
+                    }
+                }
+                if attempt < 3 {
+                    warn!(
+                        "FID-146: USDC verification attempt {}/3 failed: {}. Retrying in 500ms...",
+                        attempt,
+                        last_err.as_deref().unwrap_or("unknown")
                     );
-                    gained
-                } else {
-                    warn!("Could not parse USDC balance for close verification — using estimate");
-                    pos.entry_price * actual_close_qty
-                        + (pos.current_price - pos.entry_price) * actual_close_qty
+                    tokio::time::sleep(std::time::Duration::from_millis(500)).await;
                 }
             }
-            Err(e) => {
-                warn!(
-                    "Failed to verify USDC balance after close: {} — using estimate",
-                    e
+            if !verified {
+                error!(
+                    "FID-146: USDC verification FAILED after 3 attempts for {} close (tx={}). \
+                     Trusting on-chain close, removing position with breakeven PnL. \
+                     Last error: {}",
+                    pos.pair,
+                    tx_hash,
+                    last_err.as_deref().unwrap_or("unknown")
                 );
-                pos.entry_price * actual_close_qty
-                    + (pos.current_price - pos.entry_price) * actual_close_qty
             }
+            proceeds
         };
 
         // FID-074: For partial close, reduce qty instead of removing position
@@ -1862,8 +1897,15 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         );
 
         // FID-103 Fix 6: Use actual DEX execution price for PnL
+        // FID-146: If verification failed (verified_proceeds=0), use breakeven exit_price
+        // (pos.entry_price) to avoid fabricating a huge loss. Position is still removed
+        // because the swap was confirmed on-chain.
         let exit_price = if actual_close_qty > 0.0001 {
-            verified_proceeds / actual_close_qty
+            if verified_proceeds > 0.0001 {
+                verified_proceeds / actual_close_qty
+            } else {
+                pos.entry_price // breakeven assumption when verification failed
+            }
         } else {
             pos.current_price
         };
@@ -1892,7 +1934,16 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             strategy_name: pos.strategy_name.clone(),
             opened_at: pos.opened_at,
             closed_at: Utc::now(),
-            notes: format!("DEX close via {} — on-chain verified", self.backend.name()),
+            // FID-146: Audit trail — mark trades where USDC verification failed
+            // so the operator can audit phantom PnL records after the fact.
+            notes: if verified_proceeds <= 0.0001 {
+                format!(
+                    "FID-146: verification FAILED (3 retries) — PnL assumed breakeven. tx={}",
+                    tx_hash
+                )
+            } else {
+                format!("DEX close via {} — on-chain verified", self.backend.name())
+            },
             on_chain_verified: true,
             tx_hash: Some(tx_hash.clone()),
         });

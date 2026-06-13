@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-06-12
 **Active work streams:** 5 merged + 3 individual = 8
-**Recently Completed:** 10 (6 in v0.13.9, 4 in prior versions)
+**Recently Completed:** 12 (6 in v0.13.9, 4 in prior versions, 2 in v0.14.0)
 **Archived FIDs:** 141
 
 ---
@@ -31,10 +31,15 @@ The 11 open FIDs (FID-126 through FID-136) overlap thematically and have depende
 
 ---
 
-## Recently Completed (10, in v0.13.9 or prior)
+## Recently Completed (12, 10 in v0.13.9 or prior + 2 in v0.14.0)
 
 | ID | Title | Version | Severity |
 |---|---|---|---|
+| FID-138 | M3 Thinking Leakage — Chain-of-Thought Suppression | v0.14.0 | critical |
+| FID-139 | Batch Parsing Gap — Missing Pairs Invisible in Dashboard | v0.14.0 | high |
+| FID-140 | Prompt Threshold Inconsistency — M3 Reads Stale Values | v0.14.0 | critical |
+| FID-141 | Live Buy Failures — Dashboard Sort + Rejection Annotation | v0.14.0 | high |
+| FID-142 | Token Resolution → 0x Liquidity Failures | v0.14.0 | critical |
 | FID-121 | 0x Liquidity Validation Gate | v0.13.8 (CHANGELOG fix in v0.13.9) | medium |
 | FID-122 | TokenRouter Provider Integration | v0.13.9 | medium |
 | FID-123 | Sandbox Multi-Provider Support | v0.13.9 | high |
@@ -58,6 +63,7 @@ The 11 open FIDs (FID-126 through FID-136) overlap thematically and have depende
 | FID-124 (sandbox raw capture) | ✅ | fixed | clippy+test clean |
 | FID-125 (dynamic pair list) | ✅ | done | clippy+test clean |
 | FID-137 (close rounding) | ✅ | fixed | 299/299 tests pass + on-chain verified |
+| FID-138 (M3 thinking leakage) | ✅ | fixed | 60/60 sandbox scenarios, 0% parse errors, 308/308 tests |
 | FID-126 (conviction thresholds) | 🟡 prompts modified | partial pass (1/4 hard targets per `dev/audits/fid-126-verification-2026-06-12.md`) | audit by earlier Buffy (Opus-class) |
 | FID-127 (conviction sizing) | 🟡 parser + position.rs | implemented but bypassed by `SAVANT_GATE_DISABLED=1` | session 03:00 |
 | FID-128 (jump-diffusion) | ❌ not started | spec only | n/a |

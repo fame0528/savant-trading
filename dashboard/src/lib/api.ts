@@ -75,6 +75,7 @@ export interface DecisionRecord {
   take_profit_3: number;
   confidence: number;
   reasoning: string;
+  execution_status?: string | null;
 }
 
 export interface MarketInsight {

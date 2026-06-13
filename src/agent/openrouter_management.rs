@@ -45,25 +45,40 @@ pub enum ManagementError {
 /// Full key information returned by all management endpoints.
 #[derive(Debug, Clone, Deserialize)]
 pub struct ApiKeyInfo {
-    pub created_at: String,
-    pub updated_at: String,
-    pub hash: String,
-    pub label: String,
-    pub name: String,
+    #[serde(default)]
+    pub created_at: Option<String>,
+    #[serde(default)]
+    pub updated_at: Option<String>,
+    #[serde(default)]
+    pub hash: Option<String>,
+    #[serde(default)]
+    pub label: Option<String>,
+    #[serde(default)]
+    pub name: Option<String>,
     pub disabled: bool,
-    pub limit: f64,
-    pub limit_remaining: f64,
+    #[serde(default)]
+    pub limit: Option<f64>,
+    #[serde(default)]
+    pub limit_remaining: Option<f64>,
     pub limit_reset: Option<String>,
     #[serde(default)]
     pub include_byok_in_limit: bool,
-    pub usage: f64,
-    pub usage_daily: f64,
-    pub usage_weekly: f64,
-    pub usage_monthly: f64,
-    pub byok_usage: f64,
-    pub byok_usage_daily: f64,
-    pub byok_usage_weekly: f64,
-    pub byok_usage_monthly: f64,
+    #[serde(default)]
+    pub usage: Option<f64>,
+    #[serde(default)]
+    pub usage_daily: Option<f64>,
+    #[serde(default)]
+    pub usage_weekly: Option<f64>,
+    #[serde(default)]
+    pub usage_monthly: Option<f64>,
+    #[serde(default)]
+    pub byok_usage: Option<f64>,
+    #[serde(default)]
+    pub byok_usage_daily: Option<f64>,
+    #[serde(default)]
+    pub byok_usage_weekly: Option<f64>,
+    #[serde(default)]
+    pub byok_usage_monthly: Option<f64>,
 }
 
 /// Response from `POST /api/v1/keys` — includes the raw key string.
@@ -165,6 +180,7 @@ impl OpenRouterManagementClient {
             ManagementError::InvalidResponse(format!("create_key serialize: {}", e))
         })?;
         let resp = self.post(&self.base_url, body).await?;
+
         serde_json::from_value(resp)
             .map_err(|e| ManagementError::InvalidResponse(format!("create_key parse: {}", e)))
     }

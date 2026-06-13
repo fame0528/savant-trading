@@ -4,6 +4,88 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.14.0] — 2026-06-12
+
+### Fixed — FID-138: M3 Thinking Leakage — Chain-of-Thought Suppression (critical)
+
+MiniMax M3 exhausted the full 131K token budget on `<think>` chain-of-thought blocks before emitting JSON action output. In the sandbox, this caused a 13% parse-failure rate. In Kilo CLI, every response was prefixed with `` blocks.
+
+**Sandbox fix (provider-level):**
+- Added `disable_thinking: bool` to `LlmConfig` (`src/agent/provider.rs`)
+- `build_body()` injects `"thinking": {"type": "disabled"}` for reasoning models (M3, M1, DeepSeek R1, QwQ)
+- `parse_non_streaming()` warns when content is empty but reasoning is present (FID-138 diagnostic)
+- Added `max_tokens`, `temperature`, `top_p`, `timeout_secs`, `disable_thinking` to `SandboxConfig` (`src/core/config.rs`)
+- `run_sandbox()` uses sandbox config params independently from `[ai]`
+- `run_training_batch()` clones sandbox config values pre-spawn for borrow safety
+
+**Live bot fix (config-level):**
+- Added `disable_thinking: bool` to `AiConfig` (`src/core/config.rs`) + `Default` impl
+- Wired `ai_cfg.disable_thinking` through all 5 `create_provider()` branches (`src/agent/provider.rs`)
+- `run_training_batch()` uses `config.ai.disable_thinking` instead of hardcoded `false` (`src/engine/training.rs`)
+- Switched `[ai]` config from openrouter/owl-alpha to tokenrouter/MiniMax-M3 (`config/default.toml`)
+- `max_tokens: 4096`, `disable_thinking: true` for M3
+
+**Kilo CLI fix (proxy-based):**
+- Created `m3-proxy.js` — zero-dependency Node.js proxy on `localhost:4000` that injects `thinking: {type: "disabled"}` into every request before forwarding to TokenRouter
+- `.kilo/kilo.json` overrides built-in TokenRouter provider's `baseURL` to route through proxy
+- `m3-proxy.bat` — Windows auto-start launcher with port check + .env key loading
+- Integrated proxy launch into `start.bat`
+
+**Verification:**
+- Sandbox: 60/60 scenarios, 0% parse errors, 0 thinking leakage (was 13% failure)
+- Kilo CLI: Clean response with zero `<think>` blocks
+- 308/308 tests passing
+- Multi-provider preserved: openrouter, nvidia, ollama, tokenrouter paths intact in `create_provider()`
+
+**Files changed:** `src/agent/provider.rs`, `src/core/config.rs`, `src/engine/training.rs`, `config/default.toml`, `.kilo/kilo.json`, `m3-proxy.js`, `m3-proxy.bat`, `start.bat`
+
+### Fixed — FID-139: Batch Parsing Gap — Missing Pairs Invisible in Dashboard (high)
+
+Live bot queued 35 pairs for LLM evaluation but dashboard only showed 18-19. M3's batch JSON response omitted pairs without clear signals (~17/35), and the parser logged a warning but created no decision records for them. Missing pairs were silently invisible.
+
+**Fix:** After batch JSON parsing, for any pair in `price_map` that M3 omitted from the response, a default Pass `DecisionRecord` is generated and pushed to `shared.decisions`. All 35 pairs now appear in the dashboard AI Decisions panel.
+
+**Files changed:** `src/engine/mod.rs`, `src/agent/decision_parser.rs` (test fix)
+
+### Fixed — FID-140: Prompt Threshold Inconsistency — M3 Reads Stale Values (critical)
+
+`strategy_knowledge.md` contained **five contradictory sets of conviction thresholds** from three separate tuning iterations (0.20/0.25 in CRITICAL warning, 0.30/0.40 in matrix table, 0.50/0.60/0.75/0.65 in REGIME-SPECIFIC BEHAVIOR, 0.50 in few-shot example). M3 read different thresholds in different scenarios, producing 81% Pass rate.
+
+**Prompt fix:**
+- Unified ALL thresholds to 0.20/0.25/0.25/0.25 (matching parser exactly)
+- Moved threshold table to VERY TOP with CRITICAL warning first thing M3 reads
+- Deleted stale rationale paragraphs ("Why Ranging is now 0.40", "Why Volatile needs MORE")
+- Fixed few-shot example: 0.50 → 0.20
+- Fixed ADX boundaries: Ranging ADX < 18, GreyZone 18-26 (no overlap at ADX 19)
+- Cleaned CRITICAL warning (no longer plants stale 0.75/0.65 values)
+- Updated conviction computation example to reference 0.20/0.25 thresholds
+
+**Parser fix (Hold→Buy override):**
+- Removed `confidence > 0.0 && entry_price > 0.0` guards — Pass decisions set both to 0.0, blocking the override entirely
+- Override now fires whenever conviction >= regime threshold, regardless of self-reported confidence
+- Defaults `entry_price` to `current_price` with 0.5% stop / 0.8% TP when overriding
+- Defaults `side = Side::Long` when overriding Pass→Buy
+
+**Sandbox results:** 45/15 passed (25% failure), 6 Buys, 0 sell, 0 parse errors. Prompt unified but M3's "default-to-hold" bias persists — passes on 90% of scenarios regardless of threshold value. Necessary cleanup but insufficient to fix pass rate alone.
+
+**Files changed:** `src/agent/prompts/strategy_knowledge.md`, `src/agent/decision_parser.rs`
+
+### Fixed — FID-141: Live Buy Failures — Dashboard Sort + Rejection Annotation (high)
+
+### Fixed — FID-142: Token Resolution → 0x Liquidity Failures (critical)
+
+Live bot produced 2 Buy signals that were rejected by 0x with `liquidityAvailable: false` because token addresses were empty. Root cause: tokens not in the static `ARBITRUM_TOKENS` database (GIGA, PUMP, +28 others) had no address resolution path. The existing symbol-fallback code in `execute_swap()` was dead — 0x rejects symbols with `INPUT_INVALID`, it requires contract addresses.
+
+**Fix:** Added `resolve_token_address()` to `token_discovery.rs` that queries Blockscout search API by symbol. Added pre-resolution step at engine startup that iterates curated pairs, finds missing addresses, and resolves them via Blockscout. Includes ETH→WETH/BTC→WBTC mapping, dedup, and 250ms rate limiting. Cleaned up the dead symbol-fallback code in `trader.rs`.
+
+Live bot produced 2 Buy signals (GIGA/USD 55%, PUMP/USD 50%) but dashboard showed them unsorted (PUMP 50% above GIGA 55%). Both buys failed at 0x liquidity check with no visible rejection feedback — users saw BUY badges with confidence bars but no indication trades were rejected. Root cause: tokens missing from ARBITRUM_TOKENS database, causing empty addresses → 0x returns liquidityAvailable: false.
+
+**Fix 1 — Dashboard sort:** AI Decisions panel now sorted by confidence % descending via [...decisions].sort((a, b) => b.confidence - a.confidence) before rendering.
+
+**Fix 2 — Rejection annotation:** Added execution_status: Option<String> to DecisionRecord struct. Engine calls shared.update_decision_status() at 0x liquidity rejection point, setting status to "No DEX liquidity". Dashboard shows red "REJECTED" badge with fa-circle-xmark icon instead of the BUY action badge.
+
+**Files changed:** dashboard/src/app/page.tsx, dashboard/src/lib/api.ts, src/core/shared.rs, src/engine/mod.rs, dev/fids/FID-2026-0612-141-live-buy-failures.md
+
 ## [0.13.9] — 2026-06-12
 
 ### Fixed — FID-137: Close-Rounding Bug — f64→wei Overflow Prevents Position Exit

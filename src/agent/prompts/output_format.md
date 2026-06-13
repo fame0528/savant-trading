@@ -75,7 +75,7 @@ Field Rules:
   4. If your reasoning recommends exiting — even at breakeven or small loss — the action MUST be CLOSE, not HOLD.
   5. HOLD means "take no action and keep the position open." Do NOT use HOLD when you want to exit.
   6. ADJUST_STOP is your primary risk management tool. Use it proactively when stops are too wide or profit needs protection.
-  7. For NEW entries (BUY/SELL), the conviction_score MUST be >= the regime threshold (Trending 0.50, Volatile 0.60, Ranging 0.75, GreyZone 0.65). If below threshold, action MUST be HOLD. This is FID-126: the conviction gate replaces the old "3+ aligned triggers" Boolean.
+  7. For NEW entries (BUY/SELL), the conviction_score MUST be >= the regime threshold (Trending 0.30, Volatile 0.40, Ranging 0.40, GreyZone 0.40). If below threshold, action MUST be HOLD. This is FID-126: the conviction gate replaces the old "3+ aligned triggers" Boolean.
 
 - pair: must match a configured trading pair
 - side: Long for BUY, Short for SELL
@@ -84,10 +84,10 @@ Field Rules:
 - stop_loss: exact stop loss price (mandatory for BUY/SELL/ADJUST_STOP)
 - take_profit: single take-profit level (0.8-1.2% above entry for longs, below for shorts)
 - position_size_pct: percentage of portfolio to allocate (0-100)
-- confidence: 0.0 to 1.0 — be honest, don't inflate. Below 0.40 = automatically downgraded to HOLD for NEW ENTRIES ONLY. ADJUST_STOP and CLOSE are NOT gated by confidence. For HOLD decisions on existing positions, set confidence to your conviction in the HOLD thesis, NOT 0.0.
+- confidence: 0.0 to 1.0 — be honest, don't inflate. Below 0.0 = automatically downgraded to HOLD for NEW ENTRIES ONLY. ADJUST_STOP and CLOSE are NOT gated by confidence. For HOLD decisions on existing positions, set confidence to your conviction in the HOLD thesis, NOT 0.0.
 
-- conviction_score (FID-126): 0.0 to 1.0 — granular trigger-quality score. Computed as clamp(sum(trigger_weights) / 3.0, 0.0, 1.0). Trigger weights: strong=1.0, moderate=0.7, weak=0.4. MUST vary across scenarios (std dev > 0.15); defaulting to 0.50 or 0.65 is a calibration failure.
-  - For NEW entries: MUST be >= regime threshold (Trending 0.50, Volatile 0.60, Ranging 0.75, GreyZone 0.65). If below, action MUST be HOLD.
+- conviction_score (FID-126): 0.0 to 1.0 — granular trigger-quality score. Computed as clamp(sum(trigger_weights) / 3.0, 0.0, 1.0). Trigger weights: strong=1.0, moderate=0.65, weak=0.3. MUST vary across scenarios (std dev > 0.15); defaulting to 0.50 or 0.65 is a calibration failure.
+  - For NEW entries: MUST be >= regime threshold (Trending 0.30, Volatile 0.40, Ranging 0.40, GreyZone 0.40). If below, action MUST be HOLD.
   - For management actions (ADJUST_STOP, CLOSE): NOT gated by conviction threshold.
   - If you cannot compute, output 0.0 and select PASS/HOLD.
 
@@ -95,7 +95,7 @@ Field Rules:
 
 - regime_label (FID-126): MUST be one of "Trending", "Volatile", "Ranging", "GreyZone". Determines which conviction threshold is enforced. GreyZone requires a regime-disambiguating trigger (range-boundary break or trend-continuation higher-high).
 
-- trigger_weights (FID-126): REQUIRED for BUY/SELL decisions. Object with integer counts of strong/moderate/weak triggers observed. Example: {"strong": 1, "moderate": 1, "weak": 1} sums to 2.1/3.0 = 0.70 conviction. If empty, the conviction is 0.0 and action MUST be HOLD.
+- trigger_weights (FID-126): REQUIRED for BUY/SELL decisions. Object with integer counts of strong/moderate/weak triggers observed. Example: {"strong": 1, "moderate": 1, "weak": 1} sums to (1.0+0.65+0.3)/3.0 = 0.65 conviction. If empty, the conviction is 0.0 and action MUST be HOLD.
 
 - reasoning: cite specific data, indicators, and knowledge sources
 - knowledge_sources: list of knowledge unit IDs that informed your decision

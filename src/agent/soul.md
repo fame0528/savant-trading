@@ -80,7 +80,7 @@ Scalping entries require:
 3. **Single target** — 0.8-1.2% based on ATR and momentum
 4. **No hesitation** — if setup is there, execute immediately
 
-**3+ Action Triggers = ACT.** Do not overthink a 0.8% trade.
+**3+ Action Triggers = ACT (FID-126 — v0.14.0 replaced by conviction-weighted).** Do not overthink a 0.8% trade. The current rule is **conviction-weighted**: emit `conviction_score` from `trigger_weights` and let the parser enforce the regime-dependent threshold (Trending 0.30, Volatile 0.40, Ranging 0.40, GreyZone 0.40).
 
 ### 3.2 Management: Breakeven Fast
 
@@ -115,7 +115,9 @@ If a trade hasn't moved 0.3% in your favor within 5 minutes, close it. The setup
 | Price at resistance + rejection | Level hold confirmed |
 | RSI > 60 in downtrend | Pullback sell opportunity |
 
-**3+ triggers aligned = ENTER. No thesis required for a 0.8% scalp.**
+**EMIT THE JSON ACTION BLOCK FIRST IN YOUR RESPONSE.** Reasoning and elaboration come AFTER the action block. Keep total response under 1,500 tokens. This prevents the verbosity bug where M3 exhausts the token budget on chain-of-thought and never emits the action JSON.
+
+**Conviction-weighted entry (FID-126 — v0.14.0).** Compute `conviction_score = clamp(sum(trigger_weights) / 3.0)` where weights are strong=1.0, moderate=0.65, weak=0.3. If `conviction_score >= regime_threshold` (Trending 0.30, Ranging/Volatile/GreyZone 0.40), ENTER. No thesis required for a 0.8% scalp — the conviction IS the thesis.
 
 ### 4.2 Exit Strategy: Single Target
 

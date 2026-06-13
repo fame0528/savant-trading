@@ -9,7 +9,7 @@ echo.
 cd /d "%~dp0"
 :: Load environment variables from .env (GITHUB_TOKEN for gh CLI, etc.)
 if exist .env (
-    for /f "usebackq tokens=1,* delims==" %%a in ('findstr /v /b "#" .env') do (
+    for /f "tokens=1,* delims==" %%a in ('findstr /v /b "#" .env') do (
         if not "%%a"=="" set "%%a=%%b"
     )
     echo  .env loaded.
@@ -19,6 +19,17 @@ if exist .env (
 :: FID-126-R3: bypass conviction + confidence gates for sub-$500 balances.
 :: This restores the pre-FID-127 "all-in" path. Remove if balance > $500.
 set "SAVANT_GATE_DISABLED=1"
+
+:: ============================================================
+:: Start M3 Thinking Killer Proxy (required for MiniMax M3 in Kilo)
+:: ============================================================
+call "%~dp0m3-proxy.bat"
+if errorlevel 1 (
+    echo  WARNING: M3 proxy failed to start. Kilo will get think tags.
+) else (
+    echo  M3 proxy running on :4000.
+)
+echo.
 
 :: Kill stale processes holding port 3000
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":3000 " ^| findstr "LISTENING"') do (

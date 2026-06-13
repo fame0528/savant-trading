@@ -580,11 +580,12 @@ export default function Dashboard() {
             if (decisions.length === 0) return "live";
             const last = new Date(decisions[0].timestamp).getTime();
             const elapsed = Date.now() - last;
-            const interval = 5 * 60 * 1000; // 5 min cycle (was 15m with paid model)
-            const remaining = Math.max(0, interval - elapsed);
-            if (remaining === 0) return `${dayjs(decisions[0].timestamp).fromNow(true)} ago · next cycle soon`;
+            const interval = 5 * 60 * 1000; // 5 min cycle
+            const remaining = Math.max(0, interval - elapsed % interval);
+            const ageStr = dayjs(decisions[0].timestamp).fromNow(true);
+            if (remaining === 0) return `${ageStr} ago · awaiting next cycle`;
             const mins = Math.ceil(remaining / 60000);
-            return `${dayjs(decisions[0].timestamp).fromNow(true)} ago · next in ${mins}m`;
+            return `${ageStr} ago · next in ~${mins}m`;
           })()} onCopy={() => copyFormatters.decisions(decisions)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto">
             {decisions.length === 0 ? (
@@ -593,7 +594,7 @@ export default function Dashboard() {
                 {portfolio?.monitoring_mode ? "Monitoring — LLM not active while fully deployed" : "Waiting for first AI cycle…"}
               </p>
             ) : (
-              decisions.map((d, i) => {
+              [...decisions].sort((a, b) => b.confidence - a.confidence).map((d, i) => {
                 const a = d.action.toUpperCase();
                 const conf = d.confidence * 100;
                 const age = Date.now() - new Date(d.timestamp).getTime();
@@ -604,13 +605,14 @@ export default function Dashboard() {
                       <span className="font-semibold text-[11px]">{d.pair}</span>
                       <span className="text-[8px] text-(--dimmer)">{dayjs(d.timestamp).fromNow(true)}</span>
                       <span className={`text-[8px] px-1 py-0.5 rounded font-bold flex items-center gap-0.5 ${
+                        d.execution_status ? "text-(--red) bg-(--red)/10" :
                         a === "BUY" ? "text-(--green) bg-(--green)/10" :
                         a === "SELL" || a === "CLOSE" ? "text-(--red) bg-(--red)/10" :
                         a === "ADJUST" || a === "ADJUSTSTOP" ? "text-(--amber) bg-(--amber)/10" :
                         "text-(--dim) bg-white/5"
                       }`}>
-                        <Icon name={a === "BUY" ? "fa-circle-arrow-up" : a === "SELL" || a === "CLOSE" ? "fa-circle-arrow-down" : a === "ADJUST" || a === "ADJUSTSTOP" ? "fa-sliders" : "fa-minus"} className="text-[6px]" />
-                        {a.replace("_", " ")}
+                        <Icon name={d.execution_status ? "fa-circle-xmark" : a === "BUY" ? "fa-circle-arrow-up" : a === "SELL" || a === "CLOSE" ? "fa-circle-arrow-down" : a === "ADJUST" || a === "ADJUSTSTOP" ? "fa-sliders" : "fa-minus"} className="text-[6px]" />
+                        {d.execution_status ? "REJECTED" : a.replace("_", " ")}
                       </span>
                       <ProgressBar aria-label="Confidence" size="sm" value={conf} color={conf >= 67 ? "success" : conf >= 34 ? "warning" : "danger"} className="flex-1">
                         <ProgressBar.Track>
