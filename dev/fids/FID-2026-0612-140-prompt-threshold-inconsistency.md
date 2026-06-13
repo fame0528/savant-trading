@@ -1,6 +1,6 @@
 # FID-140: Prompt Threshold Inconsistency — M3 Reads Stale Values, Produces 81% Pass Rate
 
-**Created:** 2026-06-12 23:05 | **Severity:** critical | **Status:** Created
+**Created:** 2026-06-12 23:05 | **Severity:** critical | **Status:** verified
 
 ## RED Phase — Issue Catalog
 

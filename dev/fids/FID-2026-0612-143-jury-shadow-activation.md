@@ -1,6 +1,6 @@
 # FID-143: Jury Shadow Mode Activation + 9-Free/1-M3 Model Split
 
-**Status:** PRESENTING for approval
+**Status:** verified
 **Severity:** high (jury configured as enabled but never initializes — zero data collected)
 **Date:** 2026-06-12
 **Version:** v0.14.0-target

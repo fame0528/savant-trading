@@ -169,8 +169,8 @@ GoPlus also accepts token addresses. If a token isn't in the local DB, we could 
 
 ## Verification
 
-- [ ] `cargo check` passes
-- [ ] `cargo test` passes (308 tests)
-- [ ] Manual 0x /price API call with symbol "GIGA" on Arbitrum confirms liquidityAvailable
-- [ ] Manual 0x /price API call with symbol "PUMP" on Arbitrum confirms liquidityAvailable
-- [ ] If symbol lookup fails (token is Solana-native), documented as expected behavior
+- [x] `cargo check` passes
+- [x] `cargo test` passes (308 tests)
+- [x] Manual 0x /price API call with symbol "GIGA" on Arbitrum confirms liquidityAvailable
+- [x] Manual 0x /price API call with symbol "PUMP" on Arbitrum confirms liquidityAvailable
+- [x] If symbol lookup fails (token is Solana-native), documented as expected behavior

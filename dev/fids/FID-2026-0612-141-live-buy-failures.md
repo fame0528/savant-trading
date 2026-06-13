@@ -60,7 +60,7 @@ This is the FID-140 structural issue — M3 self-censors. Not fixed here. Separa
 
 ## AUDIT Phase
 
-- [ ] Dashboard sort: verify decisions render in descending % order
-- [ ] Liquidity annotation: verify rejected buys show inline in dashboard
-- [ ] `cargo check` + `npm run build` (dashboard)
-- [ ] Code review
+- [x] Dashboard sort: verify decisions render in descending % order
+- [x] Liquidity annotation: verify rejected buys show inline in dashboard
+- [x] `cargo check` + `npm run build` (dashboard)
+- [x] Code review
