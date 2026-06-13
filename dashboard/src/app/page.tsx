@@ -552,6 +552,49 @@ export default function Dashboard() {
         <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
           <SectionHeader icon="fa-shield-halved" title="Risk Controls" onCopy={() => copyFormatters.risk(risk)} />
           <div className="flex-1 px-3 pb-2 overflow-y-auto space-y-2">
+            {risk?.blocked && (() => {
+              const triggerMatch = risk.block_reason?.match(/^Trigger:\s*(.+)$/m);
+              const triggerType = triggerMatch?.[1]?.trim();
+              const reasonOnly = risk.block_reason?.replace(/^.*?Reason:\s*/m, '').trim() || risk.block_reason;
+              const isDailyLoss = triggerType === 'daily_loss';
+              return (
+                <div className="rounded border border-(--red)/30 bg-(--red)/5 p-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] text-(--red) font-bold"><Icon name="fa-ban" className="text-[7px] mr-0.5" />ENGINE BLOCKED</span>
+                      {triggerType && (
+                        <Chip size="sm" variant="soft" color={isDailyLoss ? 'warning' : 'danger'}>
+                          <Chip.Label>{triggerType.replace(/_/g, ' ')}</Chip.Label>
+                        </Chip>
+                      )}
+                      {isDailyLoss && (
+                        <span className="text-[8px] text-(--amber) italic">auto-clears at midnight</span>
+                      )}
+                    </div>
+                    <button
+                      onClick={async () => {
+                        if (window.confirm("Clear the block file? The engine will resume trading.")) {
+                          const { api } = await import("@/lib/api");
+                          const result = await api.clearBlock();
+                          if (result?.cleared) {
+                            toast.success("Block cleared — engine will resume", { icon: "✅" });
+                            state.refresh();
+                          } else {
+                            toast.error(result?.message ?? "Failed to clear block", { icon: "❌" });
+                          }
+                        }
+                      }}
+                      className="text-[9px] px-2 py-0.5 rounded border border-(--red)/30 bg-(--red)/10 text-(--red) hover:bg-(--red)/20 transition-colors cursor-pointer font-bold"
+                    >
+                      <Icon name="fa-unlock" className="text-[8px] mr-0.5" />Clear Block
+                    </button>
+                  </div>
+                  {reasonOnly && (
+                    <p className="text-[9px] text-(--dim) font-mono mt-1">{reasonOnly}</p>
+                  )}
+                </div>
+              );
+            })()}
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-(--dim) flex items-center gap-1.5"><Icon name="fa-bolt" className="text-[7px]" />Circuit breaker</span>
               <Chip size="sm" variant="soft" color={risk?.circuit_breaker === "OK" ? "success" : "danger"}>

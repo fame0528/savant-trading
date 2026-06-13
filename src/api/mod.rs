@@ -127,6 +127,7 @@ pub async fn start_server(
         .route("/api/knowledge", get(get_knowledge))
         .route("/api/knowledge/{topic}", get(get_knowledge_by_topic))
         .route("/api/risk", get(get_risk))
+        .route("/api/risk/clear-block", post(clear_block))
         .route("/api/session", get(get_session))
         .route("/api/activity", get(get_activity))
         .route("/api/memory", get(get_memory))
@@ -391,8 +392,18 @@ async fn get_risk(State(state): State<AppState>) -> Json<ApiResponse<serde_json:
         "OK"
     };
 
+    let block_path = "savant.blocked";
+    let blocked = std::path::Path::new(block_path).exists();
+    let block_reason = if blocked {
+        std::fs::read_to_string(block_path).unwrap_or_default()
+    } else {
+        String::new()
+    };
+
     Json(ApiResponse::ok(serde_json::json!({
         "circuit_breaker": circuit_status,
+        "blocked": blocked,
+        "block_reason": block_reason,
         "daily_loss_pct": if account.equity > 0.0 { account.daily_pnl / account.equity } else { 0.0 },
         "drawdown_pct": account.drawdown_pct,
         "open_positions": positions.len(),
@@ -401,6 +412,34 @@ async fn get_risk(State(state): State<AppState>) -> Json<ApiResponse<serde_json:
         "max_daily_loss": config.risk.max_daily_loss,
         "max_drawdown": config.risk.max_drawdown,
     })))
+}
+
+/// POST /api/risk/clear-block — delete savant.blocked to unblock the engine.
+async fn clear_block(State(_state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
+    let block_path = "savant.blocked";
+    if !std::path::Path::new(block_path).exists() {
+        return Json(ApiResponse::ok(serde_json::json!({
+            "cleared": false,
+            "message": "No block file exists — engine is not blocked",
+        })));
+    }
+    match std::fs::remove_file(block_path) {
+        Ok(()) => {
+            info!("Cleared savant.blocked via API");
+            Json(ApiResponse::ok(serde_json::json!({
+                "cleared": true,
+                "message": "Block file deleted. Restart the engine to resume trading.",
+            })))
+        }
+        Err(e) => {
+            warn!("Failed to delete savant.blocked: {}", e);
+            Json(ApiResponse {
+                data: serde_json::json!({"cleared": false}),
+                error: Some(format!("Failed to delete block file: {}", e)),
+                timestamp: chrono::Utc::now().to_rfc3339(),
+            })
+        }
+    }
 }
 
 async fn get_session(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {

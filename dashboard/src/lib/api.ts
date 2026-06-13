@@ -93,6 +93,8 @@ export interface MarketInsight {
 
 export interface RiskData {
   circuit_breaker: string;
+  blocked: boolean;
+  block_reason: string;
   drawdown_pct: number;
   max_drawdown: number;
   daily_loss_pct: number;
@@ -145,6 +147,17 @@ async function get<T>(path: string): Promise<T | null> {
   }
 }
 
+async function post<T>(path: string): Promise<T | null> {
+  try {
+    const res = await fetch(`${API_BASE}${path}`, { method: "POST", cache: "no-store" });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.data ?? json;
+  } catch {
+    return null;
+  }
+}
+
 export const api = {
   getStatus: () => get<EngineStatus>("/status"),
   getPortfolio: () => get<Portfolio>("/portfolio"),
@@ -158,6 +171,7 @@ export const api = {
   getMemory: () => get<MemoryData>("/memory"),
   getEquity: () => get<EquitySnapshot[]>("/equity"),
   getConfig: () => get<ConfigData>("/config"),
+  clearBlock: () => post<{ cleared: boolean; message: string }>("/risk/clear-block"),
 };
 
 export interface EquitySnapshot {

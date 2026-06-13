@@ -1512,6 +1512,23 @@ pub async fn run(
                 acct.daily_pnl = 0.0;
                 acct.trades_today = 0;
                 last_daily_reset = today;
+                // Auto-clear savant.blocked at midnight — but ONLY for daily_loss triggers.
+                // Drawdown and other persistent blocks survive across days.
+                let block_path = "savant.blocked";
+                if std::path::Path::new(block_path).exists() {
+                    let contents = std::fs::read_to_string(block_path).unwrap_or_default();
+                    let is_daily_loss = contents.contains("Trigger: daily_loss")
+                        || (!contents.contains("Trigger:") && contents.contains("Daily loss"));
+                    if is_daily_loss {
+                        if let Err(e) = std::fs::remove_file(block_path) {
+                            warn!("Failed to auto-clear savant.blocked at midnight: {}", e);
+                        } else {
+                            info!("Auto-cleared daily_loss block at midnight UTC — engine unblocked for new day");
+                        }
+                    } else {
+                        info!("savant.blocked is NOT a daily_loss trigger — keeping block file overnight");
+                    }
+                }
             }
         }
 
@@ -3157,9 +3174,27 @@ pub async fn run(
                             match circuit_breaker.check(portfolio.account()) {
                                 CircuitBreakerResult::Triggered(reason) => {
                                     log_circuit!("CIRCUIT BREAKER", "{} — {}", decision.pair, reason);
+                                    // Classify trigger type for midnight auto-clear logic.
+                                    // daily_loss blocks auto-clear at midnight UTC (PnL resets).
+                                    // drawdown/max_positions/heat/spread blocks persist until manual clear.
+                                    let trigger_type = if reason.contains("Daily loss") {
+                                        "daily_loss"
+                                    } else if reason.contains("drawdown") {
+                                        "drawdown"
+                                    } else if reason.contains("Max positions") {
+                                        "max_positions"
+                                    } else if reason.contains("heat") {
+                                        "portfolio_heat"
+                                    } else if reason.contains("Spread") {
+                                        "spread"
+                                    } else if reason.contains("Per-trade") {
+                                        "per_trade_loss"
+                                    } else {
+                                        "unknown"
+                                    };
                                     let _ = std::fs::write(
                                         "savant.blocked",
-                                        format!("{}\nReason: {}\n", Utc::now().to_rfc3339(), reason),
+                                        format!("{}\nTrigger: {}\nReason: {}\n", Utc::now().to_rfc3339(), trigger_type, reason),
                                     );
                                     error!("CIRCUIT BREAKER TRIGGERED — wrote savant.blocked.");
                                     false
