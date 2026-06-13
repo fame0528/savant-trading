@@ -97,6 +97,12 @@ Knowledge Base ────────┤                       │
 - **eth_call dry-run** — Simulates transaction on-chain before broadcasting
 - **Receipt verification** — Confirms swap succeeded on-chain before recording position
 
+### Jury System (FID-114)
+- **Multi-model consensus** — 10 parallel LLM jurors (M3 control + openrouter/free) evaluate every trade decision independently
+- **Quorum gating** — 60% quorum required; dissents are logged and displayed in the dashboard
+- **OpenRouter free tier** — jurors use free models via OpenRouter auto-routing; zero marginal cost per decision
+- **Key management** — automated API key lifecycle (create on boot, cleanup on shutdown via Drop)
+- **Metrics persistence** — jury metrics flushed to  every 10 cycles and on engine shutdown
 ### Infrastructure
 - **Paper trading** — Full simulation for testing strategies
 - **Backtesting** — Historical validation with walk-forward optimization

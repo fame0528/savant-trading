@@ -883,3 +883,22 @@ knowledge/extracted/
 ---
 
 > **Note:** The 168 book files (forex, stocks, TA, psychology, systems, crypto) have already been parsed and distilled into ~6,676 structured knowledge units across 43 JSON files (10 primary + 33 backup). The `extracted/` directory is empty because extraction was done programmatically into JSON rather than plain-text dumps. The `extract_books.py` script targets 17 forex PDFs for plain-text output; `generate_forex_knowledge.py` generates forex-derived knowledge units. The knowledge base also incorporates ~365 non-book sources (AI bot research, exchange API docs, on-chain analytics from Glassnode/CryptoQuant, DeFi protocols, online courses, trader interviews) that provide the crypto-native edge beyond traditional trading literature.
+
+## Sniper Trading Knowledge (George Angell)
+
+Source:  (1,091 lines)
+
+### Core Concepts
+- **Market is not random** — price tips its hand via time-and-price symmetry, support/resistance, and pattern recognition
+- **Percentage game** — success comes from discipline, risk management, and reading market signals, not from being right every time
+- **LSS System** (Long, Sell, Sell Short) — framework for directional bias based on 3-day cycle positioning
+- **Taylor 3-Day Cycle** (George Douglas Taylor) — rhythm of market moves: Day 1 (setup), Day 2 (move), Day 3 (exhaustion)
+- **Fibonacci retracements** — key levels for entry/exit sizing (38.2%, 50%, 61.8%)
+- **Rule of 3** — three consecutive attempts at a level often precede a breakout or reversal
+
+### Key Takeaways for Savant
+- **Time-price symmetry** — combine time-based cycle analysis with price-based support/resistance for higher-probability entries
+- **Risk first** — many traders fail because they don't manage losses; respect the stop-loss
+- **Discipline over prediction** — the edge is in execution and position management, not in calling tops/bottoms
+- **Know when to be cautious vs bold** — scale size based on conviction and cycle position
+- **Get out before exhaustion** — don't ride moves to zero; take profits at predefined targets

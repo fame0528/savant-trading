@@ -39,9 +39,13 @@ fail()    { echo -e "${RED}[FAIL]${NC}  $*"; exit 1; }
 header()  { echo -e "\n${BOLD}━━━ $* ━━━${NC}"; }
 
 # ── Load .env ──────────────────────────────────────────────────────
+# Filter out comments, blank lines, and lines where the variable name starts
+# with a digit (bash can't source VAR assignments like 0X_API_KEY=...).
+# We only need GITHUB_TOKEN from .env for the gh CLI.
 if [[ -f "${PROJECT_ROOT}/.env" ]]; then
     set -a
-    source <(grep -v '^#' "${PROJECT_ROOT}/.env" | grep '=')
+    # shellcheck disable=SC1091
+    source <(grep -v '^#' "${PROJECT_ROOT}/.env" | grep '=' | grep -E '^[A-Za-z_]')
     set +a
 fi
 
