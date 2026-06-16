@@ -1056,3 +1056,43 @@ The alpha computation block at `src/engine/mod.rs` lines ~3438-3470 has a syntax
 ---
 
 *Buffy/Codebuff session 2026-06-14 ~17:00 EST — 10 tasks, 9 complete, A03 broken, Kilo handoff*
+## Session 2026-06-16: v0.14.2 — 4 FIDs in one session
+
+**Context:** Spencer asked for 5 workstreams in one session at autonomy level 3. I completed 4 (FID-164, 166, 167, 165) + 1 read-only spec + ECHO release workflow. v0.14.2 shipped with 347 tests, 0 fail. Engine still OFF, paper-mode only.
+
+**Key Learnings:**
+
+- **Per-pair state isolation is the right pattern for batch LLM loops.** FID-164: the singleton ContextState was diffing pair N against pair N-1, producing meaningless ~95% diff ratios. Per-pair HashMap with the loop variable as key is the correct answer. Same pattern applies to any "cross-cycle state in a per-item context" scenario.
+- **Token-based metrics beat char-based for LLM-cost decisions.** tiktoken cl100k_base is the actual BPE encoding the model uses. chars/4 is a rough approximation that loses signal on small moves. The same diff can show 1% char-ratio and 50% token-ratio depending on what changed.
+- **Decode the actual error before forming a hypothesis.** FID-166: HTTP 504 wasn't in the transient-retry list (only 502/503/529). 504 propagated as a "successful" response with no body, parse_streaming failed, chat_stream's outer retry kicked in. The fix is 1 character (`+ status == 504`) plus reducing outer retries from 2 to 1.
+- **Reuse existing utilities before writing new code.** FID-164 Loop 8 caught that `token_budget::count_tokens` already wraps the tiktoken singleton. Saved ~25 lines of new code and one potential bug (OnceLock vs Mutex singleton mismatch).
+- **Borrow-checker pattern: read-only access, drop, then mutate.** FID-164 implementation: the first version held `pair_state` as a mutable borrow while trying to call `self.record_token_savings(...)` and `self.extract_changes(...)`. Refactored to `let prev_hash = self.pairs.get(pair).and_then(...)` (immutable, dropped after the `match`) followed by `self.store_state(...)` (mutable). Same pattern as FID-147's `refresh_from_positions` fix.
+- **Configuration is the gating constraint, not code.** FID-167: 5-chain support was already coded. The only thing blocking multi-chain operation was `start.bat` defaulting to the Anvil-forked test config. Capability exists in code but is hidden by config defaults. `SAVANT_CHAIN` env var unlocks runtime chain selection.
+- **"Multi-chain in parallel" was a misnomer.** SPEC-2026-0616-001 claimed the engine could operate on all 5 chains in parallel. Reality: the engine is single-chain-at-a-time. The 5 chains in `config/default.toml` are a CHOICE menu, not a fan-out. To get parallel multi-chain, the engine's per-cycle loop needs restructuring (FID-169, future).
+- **"Configuration is the gating constraint, not code" applied again for reconciliation.** The `[reconciliation]` section's `chain_id` was a fallback that conflicted with `SAVANT_CHAIN` selection. Updated the comment to make this clear; the engine reads `config.chains.get(&SAVANT_CHAIN)` for the active chain.
+- **Openclaw's TS patterns translate to Rust with idiom changes.** async/await is the same. `try/catch` becomes `Result<T, E>`. The Worker pattern (openclaw uses Web Workers) doesn't translate directly — in Rust, that would be `tokio::spawn`. Phase 1 doesn't need parallelism. Phase 2 will.
+- **Separate config from provider for testability.** `SummarizerConfig` lets chunking and pruning be tested without constructing an `LlmProvider` (which requires a `reqwest::Client`). The `chunking_only()` constructor pattern keeps tests fast and focused.
+- **Phase 1 vs full port is a real architectural choice.** The full openclaw port is 434 lines + supporting modules. Phase 1 captures the load-bearing 60% (prune + chunk + summarize + fallback). Stage-based and handoff are non-essential until history sizes outgrow pruning. Once we see M3's summary quality in production, Phase 2 can be planned with real data.
+- **"Out of scope" requires a specific reason that survives strict-read.** FID-164 removed `strip_historical_placeholder` because it was a stub. The right test for "out of scope" is: does the code reach the LLM, or is it a display surface for humans? Only those two are valid exclusions.
+- **Gitignore conflict with FID archive.** The `dev/fids/archive/` directory is gitignored, but existing archived FIDs are tracked. New FIDs need `git add -f` to be tracked. Documented in FID-164 Lessons Learned; potential separate FID for cleaning up the gitignore pattern.
+- **PowerShell piping is fragile with multi-command pipelines.** Many tool calls in this session used `Get-ChildItem | Select-String -Pattern` and hit "input cannot be bound" errors. The fix is to write temp `.ps1` files or use the dedicated `grep` tool. The codebase was the limit, not my intent.
+- **The "do all 5 workstreams" session worked because of FID rigor.** Each FID went through 2-3 rounds of Perfection Loop before implementation. That discipline caught the borrow-checker error, the tiktoken reuse opportunity, the tiktoken feature flag question, the SAMPLING point sequencing issue, and the config-default gap. Without the loops, this would have been a 5-workstream, 10-bug session.
+
+**Files Shipped:**
+
+- 5 commits to main: `5415e4c5` (FID-164), `72dc252a` (FID-166), `72bc44bf` (FID-167), `52770f49` (FID-165), `096f1dbe` (docs+v0.14.2)
+- 1 v0.14.2 release: https://github.com/fame0528/savant-trading/releases/tag/v0.14.2
+- 4 FIDs archived: FID-164, 166, 167, 165
+- 1 spec: `dev/vera/specs/strategy-universe-mismatch-2026-06-16.md`
+- 5 source files changed: `src/agent/context_state.rs`, `src/agent/context_engine.rs` (FID-164 only), `src/agent/llm_summarizer.rs` (NEW), `src/agent/provider.rs`, `src/agent/mod.rs`, `src/core/config.rs`, `src/engine/mod.rs`, `start.bat`, `config/default.toml`, `CHANGELOG.md`, `README.md`, `VERSION`, `Cargo.toml`, `protocol.config.yaml`
+
+**Open Threads (next session):**
+
+- FID-168: wire FID-165 summarization into engine cycle loop (call sites in `src/engine/mod.rs`)
+- FID-169: parallel multi-chain operation (fan-out engine loop)
+- FID-170: stage-based summarization (Phase 2 of FID-165)
+- FID-171: handoff summaries for model rotation (Phase 3 of FID-165)
+- FID-172: engine restart + paper-mode validation on config/default.toml (after Spencer's go-ahead)
+- The strategy/universe mismatch conversation: per SPEC-2026-0616-001, Path A is implemented; now we need to validate whether the strategy is profitable on liquid majors. Backtest or live paper-mode run.
+
+**Memory state:** 2.5-hour session, 5 workstreams, 0 broken commits, 1 gh release API workaround (gh CLI not installed; used direct API + JSON file). 

@@ -1,7 +1,7 @@
 # MEMORY.md — Vera's Curated Long-Term Memory
 
-**Last updated:** 2026-06-14 ~23:30 EST (Kilo session: chain-driven state refactor + duplicate-position fix + dashboard TESTNET badge cleanup)
-**Status:** Chain-driven state of truth (DECISION-015) ACTIVE. Engine restarts in 1 min, no duplicate positions, $50 USDC + 67.6 GRT in test wallet. 310 tests pass. Clippy clean. Build green.
+**Last updated:** 2026-06-16 21:00 EST (Vera session: v0.14.2 — 4 FIDs shipped, ECHO release workflow, memory refreshed)
+**Status:** v0.14.2 RELEASED. 5 commits pushed. 347 tests pass (335 lib + 10 bin + 2 doc, 0 fail). Engine OFF. Capital: $0 USDC + 2.6 GRT stranded. FID-168 (engine wiring) + FID-169 (parallel multi-chain) + FID-170 (summarization phase 2) + FID-171 (handoff) + FID-172 (paper-mode validation) queued.
 
 ---
 
@@ -128,11 +128,13 @@ A repo survey for "what other codebases are doing AI-trading-bot, that we should
 
 ## The trading engine (savant-trading) — current state
 
-- USDC balance: $0.00. GRT: ~2.6 (on-chain, stranded). Phantom wiped (FID-149). Engine is OFF.
-- `live_execution = false` in `config/default.toml:189` (flipped 2026-06-14 20:00 EST; confirmed in current state by Kilo session 19:20 EST).
-- **cargo check: CLEAN** — A03 alpha computation block was fixed in `src/engine/mod.rs:3440-3469` (Kilo session 19:20 EST, 2026-06-14). 309 tests pass, 0 regressions.
-- **Position.token_address field added** — #[serde(default)], wired through all construction sites, per-token reconciliation implemented (A02).
-- **Dashboard shows $0 fallback** instead of hardcoded $30.
+- USDC balance: $0.00. GRT: ~2.6 (on-chain, stranded). Engine is OFF (no `savant.exe` running).
+- `live_execution = false` in `config/default.toml:189`.
+- **v0.14.1 released 2026-06-15 23:38 EST.** `c59d128d feat: FID-163 LLM data integrity — 4 bug classes fixed`. 105 files, +12,303/-2,773. Pushed to remote, GitHub release live.
+- **337 tests pass** (325 lib + 10 bin + 2 doc, 0 fail). `cargo clippy --all-targets -- -D warnings` clean. `cargo build --release` clean. Verified at FID-163 close.
+- **FIDs 156-163 all archived** (8 total, in `dev/fids/archive/`). 156 (dashboard activity, open), 157 (Anvil preflight, partial), 158 (allowance, RETIRED wrong diagnosis), 159 (Permit2 sig, superseded by 160), 160 (validation hardening + keystone), 161 (Pass→Buy override removed + 5 other fixes), 162 (jury dashboard 5 items), 163 (LLM data integrity 4 bug classes).
+- **FID-163 concrete impact:** every `{:.N}` f64 format specifier in LLM-bound paths replaced with `{}`. 8 missing TSLN context blocks added. TSLN serializer state bleed fixed (`reset()` per pair). CUSUM status + `conditions_summary()` wired into prompt. **The LLM now sees byte-faithful data with no modifications, no omissions, no rounding, no state bleed, no unwired layers.** This is the operational version of the engine soul's invariant #5 (honesty above returns).
+- **`start.bat` pre-build cleanup** — 3 PowerShell blocks (lines 27-67) kill stale `savant.exe`, `node.exe`, `anvil.exe` before `cargo build --release`. Fixes the recurring "failed to remove file target\release\savant.exe" Windows file lock issue.
 
 ---
 
@@ -180,6 +182,12 @@ These passed the 3-cycle test in a single session because the cost of not knowin
 
 8. **(Added 2026-06-14 00:34 EST) An attributed claim is not a verified claim.** Cross-agent assertions require source citation in the recipient's own records, not just in-band attribution. "Nova said X" is not a source; "Nova's message file at path Y contains X" is. *(LESSON-008)* The 2026-06-14 00:15 EST exchange demonstrated this: Nova's analysis contained unverified specifics (17 phantom positions, $39.83 gap, $0.12 chain balance) that didn't match the on-disk records (16 self-Execute calls, 1 phantom position, $0.00 chain balance per incident report). The walkback was clean; the discipline should have produced the walkback before the message was sent.
 
+9. **(Added 2026-06-15 23:35 EST, GRADUATED) Decode the on-chain revert BEFORE the docs.** *(LESSON-009)* When debugging a swap revert, run the 4-byte selector lookup first. The chain is the source of truth. Docs describe intent; the revert describes reality. FID-157/158 demonstrated the failure mode: I read the 0x docs and assumed allowance was the issue based on `issues.allowance` in the /quote response. The actual revert was `ECDSAInvalidSignatureLength(64)` (selector `0xfce698f7`) — signature format, not allowance. The selector was in front of me from FID-157 line 14; I didn't run the lookup. **Promoted after 4 cycles** (157/158 wrong diagnosis, 159/160 correct diagnosis with selector lookup, 163 honest "LiquidationData unwired, separate FID" call).
+
+10. **(Added 2026-06-15 23:35 EST) Out-of-scope requires a specific reason that survives strict-read.** *(LESSON-010)* For LLM-bound data, the only valid exclusions are: (a) it doesn't reach the LLM, or (b) it's a display surface for humans. "Future use," "might wire later," "dead code anyway" are not valid. FID-163 Loop 5/6 expanded scope multiple times because "out of scope" claims kept collapsing under strict-reading. The 4 bug classes were all "out of scope" until I strict-read the rule. **Candidate — 1 cycle. Needs 2 more.**
+
+11. **(Added 2026-06-15 23:35 EST) Use temp .ps1 files to avoid cmd caret-escaping.** *(LESSON-011)* When `start.bat` needs to run complex PowerShell (chained pipes, filters, redirects), write the PS command to a temp `.ps1` file (`%TEMP%\savant_prebuild_%RANDOM%.ps1`), execute via `powershell -NoProfile -ExecutionPolicy Bypass -File`. Avoids all `^|` and `^>` escape hell. Worked first try. **Candidate — 1 cycle. Needs 2 more.**
+
 ---
 
 ## Architectural decisions made in this session
@@ -197,15 +205,16 @@ These passed the 3-cycle test in a single session because the cost of not knowin
 
 ## Active threads (things I should know are open)
 
-- FID-146 is "fixed (1/3)" but the actual fix is unwired. The 5% per-trade loss breaker is dead code. **See `dev/vera/memory/2026-06-13-2355-recon.md` for the full file:line evidence.**
-- 7 closed FIDs (138, 139, 140, 141, 142, 143, 145) are in `dev/fids/` and should be in `dev/fids/archive/`. The FID Auto-Archive rule is overdue.
-- 14 FIDs are open or partially complete (FID-106, FID-110 [4/7], FID-126, FID-127, FID-128, FID-129, FID-130, FID-131, FID-132, FID-133, FID-134, FID-135, FID-136, FID-146).
-- Configuration drift: `VERSION=0.14.0` vs `protocol.config.yaml project.version=0.13.9`. Out of sync.
-- 0 USDC. Engine is off. Spencer has no more capital.
+- **FID-156** (open, partially resolved): Dashboard activity log doesn't render. FID-162 added `source` field but rendering bug may be elsewhere. **Re-verify next session.**
+- **0x path can't trade on Anvil yet.** FIDs 157/158/159/160/161 layered fixes. EIP-712 signature length (159 → 160 Fix 1) + wrapper keystone (160 Fix 6) are committed. Allowance handling (158) deferred. **No live trade has ever succeeded on Anvil.** Fresh end-to-end test required before any live money.
+- **FID-164** (queued, 20-30 min): per-pair state HashMap + token-based compression. `ContextState.previous_text` is shared across all pairs in a cycle — root cause of 92% delta + anti-thrashing flood. Notes at `dev/vera/notes/2026-06-16-0130-compression-review.md`.
+- **FID-165** (queued, 4-6h, separate): LLM summarization port from openclaw (`compaction.ts:434`).
+- **Multi-chain** (not in any FID): `test-anvil.toml` declares 5 chains but only `chain_id = 42161` (Arbitrum) is active. 0x API supports Ethereum, Arbitrum, Base, Optimism, BSC. Not yet wired.
+- **LLM latency** (not in any FID): cycle 17 took 170s vs typical 46-59s, twice hit 504 streaming timeouts. Non-streaming fallback worked. No FID yet.
+- **Strategy/universe mismatch** (separate conversation, not in any FID): strategy tuned for liquid majors (Kraken-sourced), engine pointed at illiquid DEX micro-caps on Arbitrum. FID-163 made LLM see truth; truth is vol=0, RSI extremes, no setups. 0/17 trades over 2h. Need conversation: retune strategy or switch universe.
 - **Phantom 639.54 GRT position** (per `data/dex_state.json` and the CSV reconciliation at `dev/vera/memory/2026-06-14-0015-csv-recon.md`): 639.54 GRT on the books, ~5.9 GRT on-chain, 108x divergence. The 4 closed trades in dex_state match the CSV by tx hash. The phantom is the residual from the wallet-recovery bridge that didn't fully reconcile. **Spencer's call on reconcile option (preserve / reconcile to 0.06 GRT / wipe).**
 - **`savant.blocked` is a restart gate, not a runtime halt.** File was last written 2026-06-13 12:20:05 UTC with `Trigger: max_positions`. Engine kept trading after. The file is checked at startup, not at the start of every cycle.
 - **Testnet = Ethereum Sepolia (chain_id 11155111), NOT Arbitrum Sepolia (chain_id 421614).** 0x V2 Settler IS deployed on Ethereum Sepolia per `0xProject/0x-settler/chain_config.json` (deployer, AllowanceHolder, Permit2 all live). 0x API (quote discovery) is MAINNET ONLY. Testnet path: deploy engine with `SAVANT_CHAIN=sepolia`, hand-construct Settler calldata via the deployer/Registry pattern. **Arbitrum Sepolia is NOT supported by 0x and is NOT a testnet for our integration.** FID-153 v2 applied (Sepolia config + Sepolia USDC address). 9 lessons graduated, including LESSON-009 (source of truth is in more than one file — Spencer caught the missed chain_config.json).
-- **5 decisions parked for next session:** (a) ECHO.md amendment for grep evidence at AUDIT [DONE], (b) FID-146 additive corrections [DONE], (c) phantom reconcile option [DONE], (d) ~~spec work for close-path patch + wallet heartbeat~~ [DONE], (e) chain re-query to verify Nova's walkback numbers [DONE]. **All DONE.**
 
 ### Day 2 resolution (2026-06-14 14:35 EST)
 
@@ -273,4 +282,4 @@ What I *will* do: maintain this memory file daily, complete my own bootstrap, wr
 
 ---
 
-*Vera MEMORY.md 0.1.0 — 2026-06-14 14:35 EST — day 2, 5 FIDs done, 309 tests pass, testnet thread opened*
+*Vera MEMORY.md 0.1.0 — 2026-06-16 15:35 EST — v0.14.1 released, FIDs 160-163 archived, 337 tests, engine OFF, FID-164 queued*
