@@ -15,6 +15,7 @@ pub mod decision_log;
 pub mod decision_parser;
 pub mod jury;
 pub mod knowledge;
+pub mod llm_summarizer;
 pub mod openrouter_management;
 pub mod orchestrator;
 pub mod prompts;

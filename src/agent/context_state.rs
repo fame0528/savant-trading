@@ -9,6 +9,7 @@
 //! fixed-fraction threshold. Per-pair anti-thrashing uses the pair's own history, not
 //! interleaved history from 30 pairs.
 
+use crate::agent::llm_summarizer::{LlmSummarizer, SummaryContext};
 use crate::agent::token_budget::count_tokens;
 use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
@@ -27,7 +28,7 @@ pub enum DeltaResult {
 }
 
 /// Data block with TTL for pruning.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct DataBlock {
     pub content: String,
     pub created_at: Instant,
@@ -73,7 +74,7 @@ struct TokenDiff {
     ratio: f64,
 }
 
-/// Cross-cycle context state (FID-085 Phases 3 + 5, FID-164 per-pair).
+/// Cross-cycle context state (FID-085 Phases 3 + 5, FID-164 per-pair, FID-165 summarization).
 pub struct ContextState {
     /// Per-pair compression state (FID-164)
     pairs: HashMap<String, PairState>,
@@ -87,6 +88,9 @@ pub struct ContextState {
     soft_trim_ratio: f64,
     /// Hard clear ratio (0.50 = 50%)
     hard_clear_ratio: f64,
+    /// FID-165: cumulative history summary. Updated periodically via
+    /// `summarize_history` to keep prompt sizes bounded.
+    summary_ctx: SummaryContext,
 }
 
 impl ContextState {
@@ -98,6 +102,7 @@ impl ContextState {
             data_blocks: Vec::new(),
             soft_trim_ratio,
             hard_clear_ratio,
+            summary_ctx: SummaryContext::default(),
         }
     }
 
@@ -295,6 +300,51 @@ impl ContextState {
     /// Get the per-pair cycle count (telemetry).
     pub fn pair_cycle_count(&self, pair: &str) -> u64 {
         self.pairs.get(pair).map(|s| s.cycle_count).unwrap_or(0)
+    }
+
+    // ---- FID-165: history pruning and summarization ----
+
+    /// Trim the oldest data blocks until total tokens fit within target share of
+    /// the context window. Returns the number of blocks removed. The removed
+    /// blocks are NOT returned (caller should have already snapshotted them if
+    /// they want to summarize).
+    ///
+    /// This is a wrapper around `LlmSummarizer::prune_for_context_share` that
+    /// operates on the `data_blocks` field of `ContextState`.
+    pub fn prune_old_blocks(
+        &mut self,
+        target_share: f64,
+        context_window: usize,
+    ) -> usize {
+        let summarizer = LlmSummarizer::chunking_only();
+        summarizer.prune_for_context_share(&mut self.data_blocks, target_share, context_window)
+    }
+
+    /// Get the current summary (if any). The summary is a string describing
+    /// pruned blocks, suitable for inclusion in the LLM prompt.
+    pub fn current_summary(&self) -> Option<&str> {
+        self.summary_ctx.summary.as_deref()
+    }
+
+    /// Get the full summary context (for telemetry and dashboard).
+    pub fn summary_context(&self) -> &SummaryContext {
+        &self.summary_ctx
+    }
+
+    /// Get a snapshot of the data blocks (for summarization callers).
+    pub fn data_blocks_snapshot(&self) -> Vec<DataBlock> {
+        self.data_blocks.clone()
+    }
+
+    /// Update the summary with a new value. The summary is stored in-memory
+    /// only (FID-165 limitation; v0.15.0 will persist to data/context_summary.json).
+    pub fn update_summary(&mut self, new_summary: String, current_token_count: usize) {
+        self.summary_ctx.update(new_summary, current_token_count);
+    }
+
+    /// Get the current data blocks' total token count.
+    pub fn data_blocks_token_count(&self) -> usize {
+        self.data_blocks.iter().map(|b| count_tokens(&b.content)).sum()
     }
 
     // ---- Private helpers ----
