@@ -2104,7 +2104,9 @@ pub async fn run(
                 
                 // Step 2: Compose prompt and build user message (mutable borrow of agent)
                 let system_prompt = agent.composer_mut().compose(&knowledge_refs);
-                let user_message = ctx_engine.build_user_message_for(&ctx);
+                // FID-168: pass the cumulative historical summary (if any) into the user message.
+                let historical_summary = ctx_state.current_summary();
+                let user_message = ctx_engine.build_user_message_for(&ctx, historical_summary);
 
                 // FID-085: Delta-compression for observability ONLY.
                 // Always send the full prompt to the LLM — never strip context.
@@ -2764,6 +2766,17 @@ pub async fn run(
                                 .await;
                         }
                     }
+
+                    // FID-168: record this decision as a cycle_snapshot DataBlock
+                    // for history summarization. One line per pair, ~30 chars.
+                    let snapshot_line = format!(
+                        "[{}] {} | {} | conf {:.0}%",
+                        chrono::Utc::now().format("%Y-%m-%d %H:%M:%S"),
+                        decision.pair,
+                        action_label,
+                        decision.confidence * 100.0,
+                    );
+                    ctx_state.add_cycle_snapshot(snapshot_line);
 
                     // Log to vault
                     if vault_config.enabled {
@@ -5207,6 +5220,30 @@ pub async fn run(
 
         // FID-164: log cumulative token savings for this cycle, reset for next.
         ctx_state.end_cycle();
+
+        // FID-168: prune old context blocks and summarize via M3.
+        // target_share defaults to 0.3 (30% of context window). context_window
+        // is a rough proxy based on context_window_candles (each candle ≈ 10 tokens).
+        let context_window_tokens = config.ai.context_window_candles * 10;
+        let removed = ctx_state.prune_old_blocks(
+            config.context.history_summarization_target_share,
+            context_window_tokens,
+        );
+        if removed > 0 {
+            // Build summarizer from the agent's LLM provider.
+            let summarizer = savant_trading::agent::llm_summarizer::LlmSummarizer::new(
+                agent.provider_clone(),
+            );
+            match ctx_state.summarize_history(&summarizer).await {
+                Ok(()) => log_phase!(
+                    "CONTEXT",
+                    "Pruned {} blocks, summarized (current_token_count={})",
+                    removed,
+                    ctx_state.data_blocks_token_count()
+                ),
+                Err(e) => log_warn!("CONTEXT", "Pruned {} blocks, summary failed: {}", removed, e),
+            }
+        }
 
         // FID-082 Fix 4: Use time::sleep only — tokio::select! with ctrl_c
         // can interfere with sleep on Windows. Ctrl+C handled by OS.

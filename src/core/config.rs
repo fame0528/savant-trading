@@ -458,6 +458,11 @@ pub struct ContextConfig {
     /// per-pair anti-thrashing (skip if last 2 cycles saved < this many tokens each).
     #[serde(default = "default_delta_compression_min_token_savings")]
     pub delta_compression_min_token_savings: usize,
+    /// FID-168: target fraction of context window to keep as active data blocks.
+    /// When data_blocks total exceeds this share, oldest are pruned and summarized.
+    /// 0.30 means 30% of context window stays active; 70% is pruned/summarized.
+    #[serde(default = "default_history_summarization_target_share")]
+    pub history_summarization_target_share: f64,
     /// Hard minimum context window (tokens) — warn if model is below this
     #[serde(default = "default_min_context_guard")]
     pub min_context_guard: u32,
@@ -515,6 +520,7 @@ impl Default for ContextConfig {
             encoding_mode: default_encoding_mode(),
             brain_cache_ttl: default_brain_cache_ttl(),
             delta_compression_min_token_savings: default_delta_compression_min_token_savings(),
+            history_summarization_target_share: default_history_summarization_target_share(),
             min_context_guard: default_min_context_guard(),
             warn_context_guard: default_warn_context_guard(),
             decision_log_max_entries: default_decision_log_max_entries(),
@@ -542,6 +548,9 @@ fn default_brain_cache_ttl() -> u64 {
 }
 fn default_delta_compression_min_token_savings() -> usize {
     50
+}
+fn default_history_summarization_target_share() -> f64 {
+    0.3
 }
 fn default_min_context_guard() -> u32 {
     4096

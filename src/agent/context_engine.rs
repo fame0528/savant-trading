@@ -50,7 +50,7 @@ impl ContextEngine {
 
         let knowledge_refs: Vec<&KnowledgeUnit> = knowledge_units.to_vec();
         let system_prompt = composer.compose(&knowledge_refs);
-        let user_message = self.build_user_message(ctx);
+        let user_message = self.build_user_message(ctx, None);
 
         // FID-085 Item 4: Exact BPE token counting via tiktoken-rs
         let (_, _, token_count) = token_budget::count_prompt_tokens(&system_prompt, &user_message);
@@ -68,13 +68,23 @@ impl ContextEngine {
     }
 
     /// Build the user message for a given context (public for split-call pattern).
-    pub fn build_user_message_for(&mut self, ctx: &FullContext) -> String {
-        self.build_user_message(ctx)
+    /// `historical_summary` is the FID-168 cumulative summary of past cycles (if any).
+    /// It's prepended to the message as a "## Historical Summary" block.
+    pub fn build_user_message_for(
+        &mut self,
+        ctx: &FullContext,
+        historical_summary: Option<&str>,
+    ) -> String {
+        self.build_user_message(ctx, historical_summary)
     }
 
-    fn build_user_message(&mut self, ctx: &FullContext) -> String {
+    fn build_user_message(
+        &mut self,
+        ctx: &FullContext,
+        historical_summary: Option<&str>,
+    ) -> String {
         match self.config.encoding_mode.as_str() {
-            "tsln" => self.build_tsln_message(ctx),
+            "tsln" => self.build_tsln_message(ctx, historical_summary),
             mode => {
                 tracing::warn!(
                     "ContextEngine: encoding_mode='{}' — using legacy JSON path. \
@@ -86,7 +96,11 @@ impl ContextEngine {
         }
     }
 
-    fn build_tsln_message(&mut self, ctx: &FullContext) -> String {
+    fn build_tsln_message(
+        &mut self,
+        ctx: &FullContext,
+        historical_summary: Option<&str>,
+    ) -> String {
         // FID-163 Part B: Reset TSLN serializer state per pair.
         // A single TslnSerializer instance is reused across all 30 pairs in a cycle;
         // without this reset, last_close from pair A bleeds into pair B's first
@@ -95,6 +109,16 @@ impl ContextEngine {
 
         let mut msg = String::new();
         msg.push_str(&format!("## Current Market Data — {}\n\n", ctx.pair));
+
+        // FID-168: prepend the historical summary (if any) as a separate block.
+        // The LLM sees a clearly-labeled "Historical Summary" before the live data.
+        if let Some(summary) = historical_summary {
+            if !summary.is_empty() {
+                msg.push_str("## Historical Summary (from past cycles)\n\n");
+                msg.push_str(summary);
+                msg.push_str("\n\n---\n\n");
+            }
+        }
 
         // ZigZag pivots (compact structural analysis)
         let pivots = IndicatorEngine::zigzag_pivots(ctx.candles, 14);

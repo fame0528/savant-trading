@@ -347,6 +347,44 @@ impl ContextState {
         self.data_blocks.iter().map(|b| count_tokens(&b.content)).sum()
     }
 
+    /// FID-168: add a per-cycle snapshot (one line per pair decision) as a DataBlock.
+    /// The block TTL is 24 hours, block_type is "cycle_snapshot".
+    pub fn add_cycle_snapshot(&mut self, content: String) {
+        use std::time::Duration;
+        self.data_blocks.push(DataBlock {
+            content,
+            created_at: Instant::now(),
+            ttl: Duration::from_secs(86400), // 24 hours
+            block_type: "cycle_snapshot".to_string(),
+        });
+    }
+
+    /// FID-168: summarize the pruned history via the LLM. Stores the result in
+    /// `summary_ctx`. Returns Ok(()) on success (or no-op when no blocks to summarize),
+    /// Err on summarization failure.
+    pub async fn summarize_history(
+        &mut self,
+        summarizer: &LlmSummarizer,
+    ) -> Result<(), String> {
+        if self.data_blocks.is_empty() {
+            return Ok(());
+        }
+        let snapshot = self.data_blocks.clone();
+        match summarizer.summarize(&snapshot).await {
+            Ok(s) => {
+                let token_count = self.data_blocks_token_count();
+                self.summary_ctx.update(s, token_count);
+                debug!(
+                    "FID-168: summary updated, current_token_count={}, summary_len={}",
+                    token_count,
+                    self.summary_ctx.summary.as_ref().map(|s| s.len()).unwrap_or(0)
+                );
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
+    }
+
     // ---- Private helpers ----
 
     fn store_state(&mut self, pair: &str, text: &str, hash: u64, token_count: usize) {
@@ -603,5 +641,54 @@ mod tests {
         state.increment_cycle();
         state.increment_cycle();
         assert_eq!(state.cycle_count(), 2);
+    }
+
+    // ---- FID-168 tests ----
+
+    #[test]
+    fn add_cycle_snapshot_adds_data_block() {
+        let mut state = ContextState::new(0.30, 0.50);
+        assert_eq!(state.data_blocks.len(), 0);
+        state.add_cycle_snapshot("[2026-06-16] BTC/USD | PASS | conf 0%".to_string());
+        state.add_cycle_snapshot("[2026-06-16] ETH/USD | PASS | conf 0%".to_string());
+        assert_eq!(state.data_blocks.len(), 2);
+        assert_eq!(state.data_blocks[0].block_type, "cycle_snapshot");
+        assert!(state.data_blocks[0].content.contains("BTC/USD"));
+    }
+
+    #[test]
+    fn summary_skipped_when_no_overflow() {
+        let mut state = ContextState::new(0.30, 0.50);
+        // Add 5 small blocks. Total ~150 tokens. Target 30% of 10000 = 3000 tokens. Way under.
+        for i in 0..5 {
+            state.add_cycle_snapshot(format!("snapshot {}", i));
+        }
+        assert!(state.current_summary().is_none());
+        // prune_old_blocks returns 0 when under budget
+        let removed = state.prune_old_blocks(0.30, 10000);
+        assert_eq!(removed, 0);
+    }
+
+    #[test]
+    fn prune_and_summarize_fires_when_target_exceeded() {
+        let mut state = ContextState::new(0.30, 0.50);
+        // Add 100 large blocks. Each ~500 tokens. Total ~50000. Target 30% of 1000 = 300.
+        for i in 0..100 {
+            state.add_cycle_snapshot(format!("{} ", i).repeat(500));
+        }
+        // First, prune — should remove ~98 blocks to fit within 300 tokens.
+        let removed = state.prune_old_blocks(0.30, 1000);
+        assert!(removed > 0, "expected some blocks pruned, got {}", removed);
+        // After pruning, blocks remaining should be small.
+        let remaining_tokens = state.data_blocks_token_count();
+        assert!(remaining_tokens <= 1000, "tokens after prune {} exceed budget 1000", remaining_tokens);
+    }
+
+    #[test]
+    fn current_summary_accessor() {
+        let mut state = ContextState::new(0.30, 0.50);
+        assert!(state.current_summary().is_none());
+        state.update_summary("Test summary content".to_string(), 100);
+        assert_eq!(state.current_summary(), Some("Test summary content"));
     }
 }
