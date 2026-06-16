@@ -8,6 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Housekeeping
 
+- **FID-168 archived** (2026-06-16 18:50 EST): Wire FID-165 Summarization into Engine Cycle Loop. Per-pair cycle_snapshot DataBlock added; end-of-cycle prune (30% target) + summarize via M3; historical summary prepended to per-pair user message. 4 new tests, 351 total passing.
+- **FID-172 archived** (2026-06-16 19:00 EST): Engine Restart + Paper-Mode Validation Spec. Pre-flight verified (M3 proxy running, .env keys, live_execution=false). Actual start.bat invocation is Spencer's action; FID becomes a validation spec. Engine startup is documented as Spencer's call.
+- **FID-170 archived** (2026-06-16 20:35 EST): Stage-Based Summarization (Phase 2 of FID-165). Port of openclaw's summarizeInStages. Splits history into N stages, summarizes each, merges via final LLM call. 4 new tests, 355 total passing.
+- **FID-171 archived** (2026-06-16 21:10 EST): Handoff Summaries (Phase 3 of FID-165). Port of openclaw's summarizeForHandoff, trading-specific. For multi-model rotation in v0.15.0. 2 new tests, 357 total passing.
+
+### What Shipped (v0.14.3) — 4 FIDs, 10 new tests, 357 total tests passing
+
+- **FID-168 (Wire FID-165 Summarization into Engine Cycle Loop)** — Engine now records per-pair cycle_snapshot DataBlocks after each parse_decision. At end of each cycle, prunes old blocks (when total exceeds 30% of context window) and summarizes via M3. Historical summary prepended to per-pair user message as "## Historical Summary" block. The LLM now sees cross-cycle continuity.
+- **FID-172 (Engine Restart + Paper-Mode Validation Spec)** — Pre-flight verified. Engine startup is Spencer's action; FID becomes a validation spec. Spencer runs `start.bat` to launch the engine on `config/default.toml` with `SAVANT_CHAIN=ethereum`. Validation report (cycles, decisions, errors) goes back to Vera.
+- **FID-170 (Stage-Based Summarization)** — Port of openclaw's `summarizeInStages`. Splits history into N stages, summarizes each, merges via final LLM call with trading-specific merge instructions. Opt-in API.
+- **FID-171 (Handoff Summaries)** — Port of openclaw's `summarizeForHandoff`. Trading-specific handoff briefing for model rotation. Opt-in API for v0.15.0 multi-model rotation.
+
+## [Unreleased] — 2026-06-16
+
+### Housekeeping
+
 - **FID-164 archived** (2026-06-16 16:35 EST): Per-Pair ContextState + Token-Based Compression. Per-pair state isolation, tiktoken-based detection, adaptive threshold, per-pair anti-thrashing, `end_cycle()` cumulative telemetry. 5 new tests + 4 refactored. 341 total passing.
 - **FID-166 archived** (2026-06-16 17:30 EST): LLM Latency — 504 Streaming Timeout Cycle Penalty. HTTP 504 added to transient-retry list. `chat_stream` outer retries 2?1. New `streaming_timeout_secs: u64 = 60` field. 0 new tests, 341 still passing.
 - **FID-167 archived** (2026-06-16 19:00 EST): Multi-Chain Enable (Path A from SPEC-2026-0616-001). `start.bat` default config switched to `config/default.toml`. New `SAVANT_CHAIN` env var (default: ethereum). 0 new tests, 341 still passing.
