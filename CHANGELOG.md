@@ -4,6 +4,15 @@ All notable changes to Savant Trading will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — 2026-06-16
+
+### Housekeeping
+
+- **FID-164 archived** (2026-06-16 16:35 EST): Per-Pair ContextState + Token-Based Compression. Per-pair state isolation, tiktoken-based detection, adaptive threshold, per-pair anti-thrashing, `end_cycle()` cumulative telemetry. 5 new tests + 4 refactored. 341 total passing.
+- **FID-166 archived** (2026-06-16 17:30 EST): LLM Latency — 504 Streaming Timeout Cycle Penalty. HTTP 504 added to transient-retry list. `chat_stream` outer retries 2?1. New `streaming_timeout_secs: u64 = 60` field. 0 new tests, 341 still passing.
+- **FID-167 archived** (2026-06-16 19:00 EST): Multi-Chain Enable (Path A from SPEC-2026-0616-001). `start.bat` default config switched to `config/default.toml`. New `SAVANT_CHAIN` env var (default: ethereum). 0 new tests, 341 still passing.
+- **FID-165 archived** (2026-06-16 20:30 EST): LLM Summarization Phase 1 — Foundation (prune + chunk + summarize + fallback, ported from openclaw). 6 new tests, 347 total passing.
+
 ## [Unreleased] — 2026-06-15
 
 ### Housekeeping
@@ -12,6 +21,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **FID-161 archived** (2026-06-15 20:57 EST): Action Override Chain, RPC Fragility, Dashboard Contradiction — ? VERIFIED, 6/6 issues fixed, 316 tests passing.
 - **FID-162 archived** (2026-06-15 21:08 EST): Jury System Dashboard Visibility — IMPLEMENTED + VERIFIED, 5 items shipped, no deferrals.
 - **FID-163 archived** (2026-06-15 23:32 EST): LLM Data Integrity — 4 classes of bugs fixed: precision rounding, missing context blocks, TSLN state bleed, unwired data layers. 9 new tests, 337 total passing.
+
+### What Shipped (v0.14.2) — 4 FIDs, 11 new tests, 347 total tests passing
+
+- **FID-164 (Per-Pair ContextState + Token-Based Compression)** — Singleton `ContextState` was diffing pair N's user message against pair N-1's, producing meaningless ~95% diff ratios. Anti-thrashing then correctly concluded "useless" from the corrupted data. Fix: per-pair `HashMap<String, PairState>`, tiktoken-based detection, adaptive threshold, per-pair anti-thrashing, `end_cycle()` cumulative telemetry.
+- **FID-166 (LLM Latency — 504 Streaming Timeout)** — Cycle 17 took 170s due to M3 streaming stalling and HTTP 504 from OpenRouter. 504 was not in the transient-retry list. Fix: 504 added to retry list, `chat_stream` outer retries 2?1, new `streaming_timeout_secs: u64 = 60` with separate `streaming_client: reqwest::Client`.
+- **FID-167 (Multi-Chain Enable)** — Engine was stuck on test-anvil.toml (Anvil-forked Arbitrum micro-caps). 5-chain support in `config/default.toml` was already coded. Fix: `start.bat` default switched to `default.toml`, new `SAVANT_CHAIN=ethereum` env var.
+- **FID-165 (LLM Summarization Phase 1)** — Port from openclaw `compaction.ts`. 4 functions: `chunk_by_max_tokens`, `prune_for_context_share`, `summarize_chunks`, `summarize_with_fallback`. Stage-based and handoff deferred to v0.15.0.
 
 ### Fixed — LLM Data Integrity (FID-163)
 
