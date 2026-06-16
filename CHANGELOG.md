@@ -2,7 +2,88 @@
 
 All notable changes to Savant Trading will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [Unreleased] — 2026-06-15
+
+### Housekeeping
+
+- **FID-160 archived** (2026-06-15 20:57 EST): Execution Validation Hardening (Quote/Permit2) — IMPLEMENTED v4, 39 lines across 5 files, all call-graph-verified.
+- **FID-161 archived** (2026-06-15 20:57 EST): Action Override Chain, RPC Fragility, Dashboard Contradiction — ? VERIFIED, 6/6 issues fixed, 316 tests passing.
+- **FID-162 archived** (2026-06-15 21:08 EST): Jury System Dashboard Visibility — IMPLEMENTED + VERIFIED, 5 items shipped, no deferrals.
+- **FID-163 archived** (2026-06-15 23:32 EST): LLM Data Integrity — 4 classes of bugs fixed: precision rounding, missing context blocks, TSLN state bleed, unwired data layers. 9 new tests, 337 total passing.
+
+### Fixed — LLM Data Integrity (FID-163)
+
+The LLM was making decisions on modified, corrupted, or missing data. Four classes of bugs found:
+
+1. **Precision-destroying rounding** — `{}` format specifiers truncated sub-cent moves, sub-percent values, and all derived indicators. A token at $0.0091 moving to $0.0101 (a real 10% move) was rendered to the LLM as `0.01 ? 0.01` — no movement visible. LLM concluded "flat market" from the lie.
+
+2. **Missing context blocks** — The TSLN encoding path (active) was supposed to be a drop-in replacement for the legacy JSON path (FID-085), but it never inherited 8 of the context blocks the legacy path injects: higher-timeframe candles, volume profile, on-chain analytics, recent news, recent trade history, memory context, decision log context, active trading universe. Per Spencer: "if it's not getting the exact data we intended for it to get, it's cutting its legs off before even looking at numbers."
+
+3. **TSLN serializer state bleed** — A single `TslnSerializer` instance was reused across all 30 pairs in a cycle. The `last_close` and `base_timestamp` from pair A carried into pair B's first candle, producing silently corrupted differential encodings. The first candle of a $0.01 token following a $50,000 BTC candle would have O/H/L diffs of `$-49999.99` — wrong by a factor of 5 million.
+
+4. **Unwired data layers** — `CusumChart::status()` (LLM was being denied the edge decay alert system), `MarketContext::conditions_summary()` (the SOUL.md §XIII action triggers), and the dead `cusum_alerts` field. All wired or fixed in this FID.
+
+### What Shipped (FID-163)
+
+- **9 files modified, 9 new tests, 337 total tests passing, 0 clippy warnings, 0 build errors**
+- **All `{:.N}` f64 format specifiers in LLM-bound paths replaced with `{}`** — byte-faithful data the LLM sees
+- **`format_diff` zero-collapse threshold `abs < 0.001` replaced with `v == 0.0`** — sub-threshold diffs no longer collapsed to "+0"
+- **TSLN serializer `reset()` called per pair** — fixes state-bleed
+- **8 new context blocks added to TSLN path** — full parity with legacy JSON path
+- **CUSUM status wired into memory context** — LLM now sees edge decay alerts
+- **conditions_summary() called in TSLN path** — LLM gets SOUL.md §XIII action triggers
+
+### Files Changed (FID-163)
+
+- `src/core/tsln.rs` — 5 format specifier changes + 6 new tests
+- `src/agent/context_engine.rs` — 7 format specifier changes + 8 new context blocks + per-pair reset
+- `src/agent/context_builder.rs` — 16 format specifier changes (legacy path)
+- `src/agent/decision_log.rs` — 3 format specifier changes + 1 test updated
+- `src/insight/aggregator.rs` — 9 format specifier changes + 1 new test
+- `src/memory/context.rs` — 5 format specifier changes + CUSUM plumbing + 1 new test
+- `src/memory/anti_pattern.rs` — 9 format specifier changes
+- `src/memory/semantic.rs` — 4 format specifier changes
+- `src/memory/cusum.rs` — 3 format specifier changes + 1 new test
+- `src/engine/mod.rs` — pass CUSUM to query_memory_context
+- `src/engine/training.rs` — pass None to query_memory_context
+
+### Verification (FID-163)
+
+- 325 lib tests + 10 bin tests + 2 doc tests = 337 total, 0 failed
+- `cargo clippy --all-targets -- -D warnings` — zero warnings
+- `cargo build --release` — clean
+
+### AUDIT (FID-151) — call-graph reachability
+
+All wired. Zero dead code. Zero unwired functions.
+
+## [0.14.1] — 2026-06-14
+
+### Added â€” Anvil Fork Testnet Support (FID-153)
+
+Safe local testing environment using Foundry Anvil forking Arbitrum One. Prefunds wallet with 10 ETH + $50 USDC. All on-chain transactions go to the fork â€” real wallet untouched.
+
+- **--config CLI flag** (src/main.rs): Override config file path. Stripped from args before subcommand matching. Also wired into emergency_liquidate() and print_help().
+- **config/test-anvil.toml**: Test config pointing all RPC URLs to localhost:8545. live_execution=true, starting_balance=50.0.
+- **scripts/prefund_wallet.sh**: Starts Anvil with setsid (survives bash exit), prefunds wallet with 10 ETH + 50 USDC.
+- **start.bat SAVANT_CONFIG**: Env var override for config path. Defaults to config/test-anvil.toml.
+
+### Fixed â€” Reconciliation Wallet Address Empty
+
+Wallet reconciliation was reading WALLET_ADDRESS from a nonexistent env var, causing empty wallet address error every cycle. Changed to read from shared.wallet_address (derived from private key at startup).
+
+### Fixed â€” Broken default.toml Section Headers
+
+The [trading] and [token_store] section headers were accidentally removed. Restored both sections.
+
+### Build and Test
+
+- 315 tests passing, 0 clippy warnings
+- Engine verified on Anvil fork: reconciliation, LLM decisions, candle fetching all operational
+
+---
 
 ### Added — Circuit Breaker Clear-Block (v0.14.0)
 

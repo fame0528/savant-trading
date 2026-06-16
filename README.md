@@ -1,4 +1,4 @@
-# SAVANT TRADING v0.14.0
+# SAVANT TRADING v0.14.1
 
 <!-- markdownlint-disable MD033 -->
 <div align="center">
@@ -7,11 +7,11 @@
 
 **AI-Native Autonomous DEX Trading Engine**
 
-No KYC. No CEX. Arbitrum on-chain swaps via 0x API — powered by 6,676+ knowledge units from 168 source books and 548 curated sources.
+No KYC. No CEX. Arbitrum on-chain swaps via 0x API — powered by 6,676+ knowledge units from 168 source books and 548 curated sources. Anvil fork testnet for safe experimentation.
 
 **Model-agnostic:** Any OpenAI-compatible LLM via [OpenRouter](https://openrouter.ai/). Default: [Owl Alpha](https://openrouter.ai/openrouter/owl-alpha) (free, 1M context, 2.25T weekly tokens). Previously tested with MiMo v2.5 Pro.
 
-[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![0x](https://img.shields.io/badge/0x-DEX-%23000000?style=flat-square&logo=ethereum&logoColor=%2300fbff)](https://0x.org/)[![Arbitrum](https://img.shields.io/badge/Arbitrum-L2-%23000000?style=flat-square&logo=arbitrum&logoColor=%2300fbff)](https://arbitrum.io/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-LLM-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/)[![Version](https://img.shields.io/badge/Version-0.14.0-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-Proprietary-%23000000?style=flat-square&logo=lock&logoColor=%2300fbff)](LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-2021-%23000000?style=flat-square&logo=rust&logoColor=%2300fbff)](https://www.rust-lang.org/)[![0x](https://img.shields.io/badge/0x-DEX-%23000000?style=flat-square&logo=ethereum&logoColor=%2300fbff)](https://0x.org/)[![Arbitrum](https://img.shields.io/badge/Arbitrum-L2-%23000000?style=flat-square&logo=arbitrum&logoColor=%2300fbff)](https://arbitrum.io/)[![OpenRouter](https://img.shields.io/badge/OpenRouter-LLM-%23000000?style=flat-square&logo=openai&logoColor=%2300fbff)](https://openrouter.ai/)[![Version](https://img.shields.io/badge/Version-0.14.1-%23000000?style=flat-square&logo=semver&logoColor=%2300fbff)](https://github.com/fame0528/savant-trading/releases)[![License](https://img.shields.io/badge/License-Proprietary-%23000000?style=flat-square&logo=lock&logoColor=%2300fbff)](LICENSE)
 
 </div>
 
@@ -210,7 +210,7 @@ KRAKEN_API_SECRET=your_secret
 
 ## Configuration
 
-All settings in `config/default.toml`:
+All settings in `config/default.toml`. Use `--config <path>` to override (or set `SAVANT_CONFIG` env var in `start.bat`).
 
 ```toml
 [exchange]
@@ -293,6 +293,9 @@ enabled = true
 ```bash
 # Engine + API + Dashboard (single command — recommended)
 cargo run --release serve
+
+# Custom config (e.g. Anvil fork testnet)
+cargo run --release -- --config config/test-anvil.toml serve
 
 # Engine + API only (no dashboard)
 cargo run --release
@@ -408,7 +411,7 @@ The risk layer is **independent of the AI brain** — the agent cannot override 
 
 ```bash
 cargo build
-cargo test # 299 tests
+cargo test # 337 tests
 cargo clippy -- -D warnings
 ```
 
@@ -422,8 +425,9 @@ All development follows the [Savant Protocol](https://github.com/fame0528/savant
 ### Findings
 
 Bugs and improvements tracked via FIDs:
-- Active FIDs: 14 (see [MASTER-FID.md](dev/fids/MASTER-FID.md))
-- 139 archived FIDs
+
+- Active FIDs: 0 (see [MASTER-FID.md](dev/fids/MASTER-FID.md))
+- 177 archived FIDs
 
 ---
 
