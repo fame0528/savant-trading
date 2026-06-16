@@ -10,6 +10,14 @@ interface TerminalPanelProps {
   className?: string;
 }
 
+// FID-161: Module-level ref so the copy button in page.tsx can access
+// the xterm Terminal API instead of scraping the DOM (which copies
+// the entire scrollback buffer instead of visible content).
+let _globalTerminal: Terminal | null = null;
+export function getGlobalTerminal(): Terminal | null {
+  return _globalTerminal;
+}
+
 export default function TerminalPanel({ className }: TerminalPanelProps) {
   const termRef = useRef<HTMLDivElement>(null);
   const terminal = useRef<Terminal | null>(null);
@@ -97,6 +105,7 @@ export default function TerminalPanel({ className }: TerminalPanelProps) {
 
     terminal.current = term;
     fitAddon.current = fit;
+    _globalTerminal = term;
 
     term.onData((data) => {
       if (ws.current?.readyState === WebSocket.OPEN) {
@@ -119,6 +128,7 @@ export default function TerminalPanel({ className }: TerminalPanelProps) {
       observer.disconnect();
       if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
       ws.current?.close();
+      _globalTerminal = null;
       term.dispose();
     };
   }, [connect]);

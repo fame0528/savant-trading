@@ -167,7 +167,7 @@ The Perfection Loop is a Finite State Machine with mandatory transitions:
 |-------|----------------|---------|----------------|
 | **RED** | Start of loop | Identify ALL failures and issues | All issues cataloged |
 | **GREEN** | RED complete | Fix issues with MINIMAL changes | All fixes applied |
-| **AUDIT** | GREEN complete | Double-audit: verify change with two independent methods (e.g. static analysis + runtime tests). Self-reporting is prohibited — evidence must come from tool output. | Audit passes/fails |
+| **AUDIT** | GREEN complete | Double-audit: verify change with two independent methods (e.g. static analysis + runtime tests). Self-reporting is prohibited — evidence must come from tool output. **For any FID that adds a new `pub fn` or new config field, the AUDIT phase MUST include `grep -rn <symbol> crates/ src/` (or workspace equivalent). The grep output MUST be pasted into the FID's Perfection Loop section. Zero production callers of a function OR zero readers of a config field = FID rejected from `fixed`/`closed`/`verified` status. Re-enter GREEN.** *(Amended 2026-06-14, FID-151. Codifies LESSON-001.)* | Audit passes/fails |
 | **SELF-CORRECT** | AUDIT failed | Address audit findings | Corrections applied |
 | **COMPLETE** | AUDIT passed | Document results | Loop ends |
 
@@ -187,6 +187,19 @@ The Perfection Loop is a Finite State Machine with mandatory transitions:
 | User explicitly requests to ship | → Proceed to COMPLETE state (Final Certification) |
 | 5 iterations reached without convergence | → Flag for review (possible architecture smell) |
 | Diminishing returns detected | → Recommend ship |
+
+### Cross-Agent Claim Rule *(amended 2026-06-14, FID-151)*
+
+In multi-agent sessions, an agent may receive a claim attributed to another agent (e.g., a forwarded message, a relay of an analysis, a citation in a session summary). **The attribution is not a source.** "Nova said X" is not a source; "Nova's message file at path Y contains X" is. The recipient owes the operator the discipline of treating attributed claims as hypotheses, not facts, until the substance is verifiable in the recipient's own records.
+
+**Operational rules for FIDs that contain or cite cross-agent claims:**
+
+1. The FID must cite the source path of any external claim, not just the attribution.
+2. Specific numbers or facts sourced from another agent's analysis must be traceable to a record the FID author can grep, read, or query independently.
+3. If the substance of a cross-agent claim is not verifiable in the recipient's records, the FID must flag the gap, not act on the attribution.
+4. Numbers that cannot be verified must be tagged "unverified" in-band, or rejected, never cited as facts.
+
+This rule is the inter-agent version of the AUDIT phase's call-graph reachability requirement. The AUDIT phase requires evidence of *wiring* for code; the cross-agent rule requires evidence of *sourcing* for facts. *(Codifies LESSON-008.)*
 
 ---
 

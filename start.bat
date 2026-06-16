@@ -16,9 +16,55 @@ if exist .env (
 ) else (
     echo  WARNING: .env not found. API keys may be missing.
 )
+:: Config override: set SAVANT_CONFIG env var to use a custom config file.
+:: Example: set SAVANT_CONFIG=config\test-anvil.toml
+if not defined SAVANT_CONFIG set "SAVANT_CONFIG=config\test-anvil.toml"
+
 :: FID-126-R3: bypass conviction + confidence gates for sub-$500 balances.
 :: This restores the pre-FID-127 "all-in" path. Remove if balance > $500.
 set "SAVANT_GATE_DISABLED=1"
+
+:: ============================================================
+:: PRE-BUILD CLEANUP (FID-163)
+:: Kill stale processes that would otherwise hold the release
+:: binary open and block `cargo build --release` with
+:: "failed to remove file target\release\savant.exe".
+:: Scoped by .exe name + path filter so we never kill cargo
+:: itself or unrelated processes.
+:: ============================================================
+echo  Pre-build cleanup...
+echo.
+
+:: Helper: run a PowerShell command and capture stdout lines.
+:: Avoids cmd caret-escaping nightmares by writing the PS
+:: command to a temp .ps1 file, executing it, reading output.
+set "PS_TEMP=%TEMP%\savant_prebuild_%RANDOM%.ps1"
+set "PS_OUT=%TEMP%\savant_prebuild_%RANDOM%.txt"
+
+:: 1. Kill any running engine binary (the file cargo wants to overwrite).
+::    Scoped to this project's target\release path to avoid touching
+::    other dev directories that may have a savant.exe of their own.
+> "%PS_TEMP%" echo Get-Process -Name savant -ErrorAction SilentlyContinue ^| Where-Object { $_.Path -like '*savant-trading*' } ^| ForEach-Object { taskkill /F /PID $_.Id 2^>$null ; Write-Output ("Killed engine PID " + $_.Id) }
+powershell -NoProfile -ExecutionPolicy Bypass -File "%PS_TEMP%" 2>nul
+del "%PS_TEMP%" 2>nul
+
+:: 2. Kill stale dashboard dev server AND M3 proxy (both are node.exe).
+::    We accept killing all node.exe here because there are no other
+::    intentional node processes for this project.
+> "%PS_TEMP%" echo Get-Process -Name node -ErrorAction SilentlyContinue ^| ForEach-Object { taskkill /F /PID $_.Id 2^>$null ; Write-Output ("Killed node PID " + $_.Id) }
+powershell -NoProfile -ExecutionPolicy Bypass -File "%PS_TEMP%" 2>nul
+del "%PS_TEMP%" 2>nul
+
+:: 3. Kill stale Anvil fork. We will restart it via start-anvil.bat
+::    below so a fresh prefund tx lands on a known state.
+> "%PS_TEMP%" echo Get-Process -Name anvil -ErrorAction SilentlyContinue ^| ForEach-Object { taskkill /F /PID $_.Id 2^>$null ; Write-Output ("Killed Anvil PID " + $_.Id) }
+powershell -NoProfile -ExecutionPolicy Bypass -File "%PS_TEMP%" 2>nul
+del "%PS_TEMP%" 2>nul
+set "PS_TEMP="
+set "PS_OUT="
+
+:: Give Windows a moment to release the file locks.
+timeout /t 2 /nobreak >nul
 
 :: ============================================================
 :: Start M3 Thinking Killer Proxy (required for MiniMax M3 in Kilo)
@@ -31,12 +77,31 @@ if errorlevel 1 (
 )
 echo.
 
-:: Kill stale processes holding port 3000
+:: ============================================================
+:: Auto-start Anvil fork if not running (self-recovery).
+:: Only runs for test-anvil.toml — mainnet configs don't need Anvil.
+:: ============================================================
+echo %SAVANT_CONFIG% | findstr /i "anvil" >nul
+if %errorlevel% equ 0 (
+    call "%~dp0start-anvil.bat"
+    if errorlevel 1 (
+        echo  WARNING: Anvil failed to start. Engine will retry RPC but may hang.
+    )
+)
+echo.
+
+:: Kill stale processes holding port 3000 (deduplicated — was
+:: printing the same PID twice due to a for-loop bug).
+set "KILLED_3000="
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":3000 " ^| findstr "LISTENING"') do (
-    echo  Killing stale process on port 3000 [PID %%a]...
-    taskkill /F /PID %%a >nul 2>&1
+    if not defined KILLED_3000 (
+        echo  Killing stale process on port 3000 [PID %%a]...
+        taskkill /F /PID %%a >nul 2>&1
+        set "KILLED_3000=1"
+    )
 )
 timeout /t 2 /nobreak >nul
+
 echo  Building Rust engine...
 echo.
 cargo build --release 2>&1
@@ -62,7 +127,7 @@ cd ..
 echo.
 echo  Both builds complete. Starting engine + dashboard...
 echo.
-target\release\savant.exe serve
+target\release\savant.exe --config "%SAVANT_CONFIG%" serve
 echo.
 echo  Engine stopped. Press any key to exit.
 pause >nul

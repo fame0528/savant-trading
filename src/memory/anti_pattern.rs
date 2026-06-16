@@ -86,7 +86,7 @@ async fn detect_regime_anti_patterns(pool: &SqlitePool) -> Result<Vec<AntiPatter
                 win_rate,
                 profit_factor,
                 narrative: format!(
-                    "ANTI-PATTERN: In {} regime, your historical win rate is {:.0}% (PF: {:.2}, N={}). \
+                    "ANTI-PATTERN: In {} regime, your historical win rate is {}% (PF: {}, N={}). \
                      Reduce conviction or avoid entries unless offset by strong confirming signals.",
                     regime, win_rate * 100.0, profit_factor, sample_size
                 ),
@@ -137,7 +137,7 @@ async fn detect_conviction_anti_patterns(
                 win_rate,
                 profit_factor,
                 narrative: format!(
-                    "ANTI-PATTERN: {} conviction trades have {:.0}% win rate (PF: {:.2}, N={}). \
+                    "ANTI-PATTERN: {} conviction trades have {}% win rate (PF: {}, N={}). \
                      Reduce position sizing at this conviction level.",
                     conviction,
                     win_rate * 100.0,
@@ -195,7 +195,7 @@ async fn detect_category_anti_patterns(pool: &SqlitePool) -> Result<Vec<AntiPatt
                 win_rate,
                 profit_factor,
                 narrative: format!(
-                    "ANTI-PATTERN: {} scenarios yield {:.0}% win rate (PF: {:.2}, N={}). \
+                    "ANTI-PATTERN: {} scenarios yield {}% win rate (PF: {}, N={}). \
                      Apply stricter filters or avoid entries in {} setups.",
                     category,
                     win_rate * 100.0,

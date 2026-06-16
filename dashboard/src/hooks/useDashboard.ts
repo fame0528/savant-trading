@@ -15,6 +15,8 @@ import type {
   ActivityEntry,
   ConfigData,
   EquitySnapshot,
+  JuryStateSnapshot,
+  JuryCycleRecord,
 } from "@/lib/api";
 
 export interface DashboardState {
@@ -30,6 +32,9 @@ export interface DashboardState {
   memory: MemoryData | null;
   config: ConfigData | null;
   equity: EquitySnapshot[];
+  // FID-162: Jury observability
+  juryStatus: JuryStateSnapshot | null;
+  juryRecent: JuryCycleRecord[];
   online: boolean;
   lastUpdate: Date | null;
 }
@@ -47,6 +52,8 @@ const EMPTY: DashboardState = {
   memory: null,
   config: null,
   equity: [],
+  juryStatus: null,
+  juryRecent: [],
   online: false,
   lastUpdate: null,
 };
@@ -55,21 +62,26 @@ export function useDashboard(pollMs = 4000) {
   const [state, setState] = useState<DashboardState>(EMPTY);
 
   const refresh = useCallback(async () => {
-    const [status, portfolio, positions, trades, decisions, activity, insight, risk, session, memory, config, equity] =
-      await Promise.all([
-        api.getStatus(),
-        api.getPortfolio(),
-        api.getPositions(),
-        api.getTrades(),
-        api.getDecisions(),
-        api.getActivity(),
-        api.getInsight(),
-        api.getRisk(),
-        api.getSession(),
-        api.getMemory(),
-        api.getConfig(),
-        api.getEquity(),
-      ]);
+    const [
+      status, portfolio, positions, trades, decisions, activity, insight, risk, session, memory, config, equity,
+      // FID-162: jury fetches
+      juryStatus, juryRecent,
+    ] = await Promise.all([
+      api.getStatus(),
+      api.getPortfolio(),
+      api.getPositions(),
+      api.getTrades(),
+      api.getDecisions(),
+      api.getActivity(),
+      api.getInsight(),
+      api.getRisk(),
+      api.getSession(),
+      api.getMemory(),
+      api.getConfig(),
+      api.getEquity(),
+      api.getJuryStatus(),
+      api.getJuryRecent(),
+    ]);
 
     setState({
       status,
@@ -84,6 +96,8 @@ export function useDashboard(pollMs = 4000) {
       memory,
       config,
       equity: equity ?? [],
+      juryStatus,
+      juryRecent: juryRecent ?? [],
       online: !!status,
       lastUpdate: new Date(),
     });

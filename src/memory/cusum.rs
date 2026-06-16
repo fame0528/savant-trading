@@ -88,12 +88,12 @@ impl CusumChart {
     /// Get status string for display.
     pub fn status(&self) -> String {
         if self.is_decaying() {
-            format!("DECAY (S-={:.2})", self.lower_sum)
+            format!("DECAY (S-={})", self.lower_sum)
         } else if self.is_improving() {
-            format!("IMPROVING (S+={:.2})", self.upper_sum)
+            format!("IMPROVING (S+={})", self.upper_sum)
         } else {
             format!(
-                "STABLE (S+={:.2}, S-={:.2})",
+                "STABLE (S+={}, S-={})",
                 self.upper_sum, self.lower_sum
             )
         }
@@ -143,5 +143,18 @@ mod tests {
     fn status_display() {
         let chart = CusumChart::new(1.5, 0.5, 5.0);
         assert!(chart.status().contains("STABLE"));
+    }
+
+    // === FID-163: Precision preservation test ===
+
+    #[test]
+    fn status_preserves_precision() {
+        // S+ = 1.234567890123 — old {:.2} would render as "1.23" (lost 7 significant digits).
+        // New {} Display must preserve the full f64 value.
+        let mut chart = CusumChart::new(1.5, 0.5, 5.0);
+        chart.upper_sum = 1.234567890123;
+        let s = chart.status();
+        assert!(s.contains("1.234567890123"),
+                "status() should preserve full precision, got: {}", s);
     }
 }

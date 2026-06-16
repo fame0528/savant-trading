@@ -236,7 +236,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
     // Latest candle
     if let Some(last) = ctx.candles.last() {
         msg.push_str(&format!(
-            "Latest Candle: O={:.2} H={:.2} L={:.2} C={:.2} V={:.2}\n",
+            "Latest Candle: O={} H={} L={} C={} V={}\n",
             last.open, last.high, last.low, last.close, last.volume
         ));
         msg.push_str(
@@ -247,21 +247,21 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
     // FID-103 Fix 3: DEX price as authoritative when available
     if let Some(dex) = ctx.dex_price {
         msg.push_str(&format!(
-            "**LIVE PRICE (0x DEX Arbitrum): ${:.4}** — This is the actual execution price. Use this for ALL price calculations.\n",
+            "**LIVE PRICE (0x DEX Arbitrum): ${}** — This is the actual execution price. Use this for ALL price calculations.\n",
             dex
         ));
         if let Some(kraken) = ctx.live_price {
             let spread_pct = ((dex - kraken) / kraken * 100.0).abs();
             if spread_pct > 0.5 {
                 msg.push_str(&format!(
-                    "SPREAD WARNING: DEX/Kraken = {:.2}% — entry may differ from chart (Kraken=${:.4}).\n",
+                    "SPREAD WARNING: DEX/Kraken = {}% — entry may differ from chart (Kraken=${}).\n",
                     spread_pct, kraken
                 ));
             }
         }
     } else if let Some(live) = ctx.live_price {
         msg.push_str(&format!(
-            "**LIVE PRICE (Kraken — DEX unavailable): ${:.4}**\n",
+            "**LIVE PRICE (Kraken — DEX unavailable): ${}**\n",
             live
         ));
     }
@@ -274,7 +274,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
         msg.push_str(&format!("\n### {} Timeframe ({})\n", tf, ctx.pair));
         if let Some(last) = tf_candles.last() {
             msg.push_str(&format!(
-                "Latest {} Candle: O={:.2} H={:.2} L={:.2} C={:.2} V={:.2}\n",
+                "Latest {} Candle: O={} H={} L={} C={} V={}\n",
                 tf, last.open, last.high, last.low, last.close, last.volume
             ));
         }
@@ -288,7 +288,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
                 .fold(f64::NEG_INFINITY, f64::max);
             let low20 = recent20.iter().map(|c| c.low).fold(f64::INFINITY, f64::min);
             msg.push_str(&format!(
-                "{} 20-bar range: {:.2}–{:.2} | Avg Vol: {:.2}\n",
+                "{} 20-bar range: {}–{} | Avg Vol: {}\n",
                 tf, low20, high20, avg_vol
             ));
         }
@@ -298,7 +298,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
     let gk_str = ctx
         .indicators
         .garman_klass
-        .map(|g| format!("{:.2}", g))
+        .map(|g| format!("{}", g))
         .unwrap_or_else(|| "N/A".to_string());
     msg.push_str(&format!(
         "Indicators: EMA_FAST={:?} EMA_SLOW={:?} RSI={:?} ATR={:?} ADX={:?} VWAP={:?} GarmanKlass={}\n",
@@ -320,7 +320,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
     // Volume profile
     if let Some(vp) = ctx.volume_profile {
         msg.push_str(&format!(
-            "Volume Profile: POC={:.2} VAH={:.2} VAL={:.2}\n",
+            "Volume Profile: POC={} VAH={} VAL={}\n",
             vp.poc_price, vp.value_area_high, vp.value_area_low
         ));
     }
@@ -335,7 +335,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
             "balanced"
         };
         msg.push_str(&format!(
-            "Order Book Imbalance (Kraken CEX — not DEX): {:+.2} ({})\n",
+            "Order Book Imbalance (Kraken CEX — not DEX): {:+} ({})\n",
             imbalance, pressure
         ));
     }
@@ -385,7 +385,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
             } else {
                 "CAPITULATION (strong buy)"
             };
-            msg.push_str(&format!("MVRV: {:.2} — {}\n", mvrv, state));
+            msg.push_str(&format!("MVRV: {} — {}\n", mvrv, state));
         }
         if let Some(sopr) = oc.sopr {
             let state = if sopr > 1.0 {
@@ -393,10 +393,10 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
             } else {
                 "Loss realization (capitulation)"
             };
-            msg.push_str(&format!("SOPR: {:.4} — {}\n", sopr, state));
+            msg.push_str(&format!("SOPR: {} — {}\n", sopr, state));
         }
         if let Some(nvt) = oc.nvt_signal {
-            msg.push_str(&format!("NVT Signal: {:.2}\n", nvt));
+            msg.push_str(&format!("NVT Signal: {}\n", nvt));
         }
     }
 
@@ -413,7 +413,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
         msg.push_str("\n## Open Positions\n");
         for pos in ctx.positions {
             msg.push_str(&format!(
-                "- {} {} @ {:.2} | SL: {:.2} | TP1: {:.2} | PnL: {:.2}\n",
+                "- {} {} @ {} | SL: {} | TP1: {} | PnL: {}\n",
                 pos.pair,
                 pos.side,
                 pos.entry_price,
@@ -429,7 +429,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
     let equity = ctx.account.equity;
     let is_hunt_mode = equity < 500.0 && idle_capital > 5.0;
     msg.push_str(&format!(
-        "\n## Account\nBalance: ${:.2} | Equity: ${:.2} | DD: {:.1}% | Open: {} / {}\n",
+        "\n## Account\nBalance: ${} | Equity: ${} | DD: {}% | Open: {} / {}\n",
         idle_capital,
         equity,
         ctx.account.drawdown_pct * 100.0,
@@ -441,7 +441,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
     }
     if is_hunt_mode {
         msg.push_str(&format!(
-            "**HUNT MODE:** ${:.2} idle capital. Under $500 — aggressively scan for high-conviction entries. \
+            "**HUNT MODE:** ${} idle capital. Under $500 — aggressively scan for high-conviction entries. \
             Capital velocity > capital preservation. Deploy into the best available setup. \
             If current positions have room to add, consider expanding. If new setups exist, take them.\n",
             idle_capital
@@ -482,7 +482,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
 
             for (i, trade) in trades.iter().take(10).enumerate() {
                 msg.push_str(&format!(
-                    "{}. {} {} @ {:.2} → {:.2} | PnL: ${:.2} ({:.1}%) | {}\n",
+                    "{}. {} {} @ {} → {} | PnL: ${} ({}%) | {}\n",
                     i + 1,
                     trade.pair,
                     if trade.pnl > 0.0 { "WIN" } else { "LOSS" },
@@ -494,7 +494,7 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
                 ));
             }
             msg.push_str(&format!(
-                "\nSummary: {}W/{}L ({:.0}% WR) | Avg Win: ${:.2} | Avg Loss: ${:.2} | PF: {:.2}\n",
+                "\nSummary: {}W/{}L ({}% WR) | Avg Win: ${} | Avg Loss: ${} | PF: {}\n",
                 wins,
                 losses,
                 if wins + losses > 0 {

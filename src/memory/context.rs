@@ -3,6 +3,7 @@
 //! Queries episodic memory at decision time and formats results
 //! for injection into the AI prompt.
 
+use crate::memory::cusum::CusumChart;
 use crate::memory::episodic::EpisodicMemory;
 
 /// Memory context formatted for AI prompt injection.
@@ -27,11 +28,16 @@ pub struct MemoryContext {
 }
 
 /// Query memory context for a specific pair/regime/session combination.
+///
+/// The optional `cusum` parameter, when provided, populates `cusum_alerts`
+/// with the CUSUM chart's status string so the LLM sees edge decay alerts.
+/// FID-163 Part D.
 pub async fn query_memory_context(
     memory: &EpisodicMemory,
     pair: &str,
     regime: &str,
     _session: &str,
+    cusum: Option<&CusumChart>,
 ) -> MemoryContext {
     let total_trades = memory.total_trades().await.unwrap_or(0);
 
@@ -50,13 +56,18 @@ pub async fn query_memory_context(
         ctx.pair_win_rate = Some(wr);
     }
 
+    // CUSUM edge-decay alert (FID-163 Part D)
+    if let Some(chart) = cusum {
+        ctx.cusum_alerts.push(chart.status());
+    }
+
     // Recent episodes
     if let Ok(episodes) = memory.recent_episodes(pair, 3).await {
         for ep in &episodes {
             let result = if ep.status == "closed" {
                 match ep.is_win {
-                    Some(true) => format!("WIN (+{:.1}R)", ep.achieved_rr.unwrap_or(0.0)),
-                    Some(false) => format!("LOSS (-{:.1}R)", ep.achieved_rr.unwrap_or(0.0).abs()),
+                    Some(true) => format!("WIN (+{}R)", ep.achieved_rr.unwrap_or(0.0)),
+                    Some(false) => format!("LOSS (-{}R)", ep.achieved_rr.unwrap_or(0.0).abs()),
                     None => "OPEN".to_string(),
                 }
             } else {
@@ -93,20 +104,20 @@ pub fn format_memory_prompt(ctx: &MemoryContext) -> String {
             "NEGATIVE EDGE — reduce conviction"
         };
         msg.push_str(&format!(
-            "Win rate in this regime: {:.0}% ({})\n",
+            "Win rate in this regime: {}% ({})\n",
             wr * 100.0,
             label
         ));
     }
 
     if let Some(wr) = ctx.pair_win_rate {
-        msg.push_str(&format!("Win rate on this pair: {:.0}%\n", wr * 100.0));
+        msg.push_str(&format!("Win rate on this pair: {}%\n", wr * 100.0));
     }
 
     // Confidence penalty
     if ctx.confidence_penalty > 0.0 {
         msg.push_str(&format!(
-            "Confidence penalty: -{:.0}% (calibration adjustment)\n",
+            "Confidence penalty: -{}% (calibration adjustment)\n",
             ctx.confidence_penalty * 100.0
         ));
     }
@@ -136,4 +147,22 @@ pub fn format_memory_prompt(ctx: &MemoryContext) -> String {
     }
 
     msg
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn memory_prompt_preserves_win_rate_precision() {
+        // wr = 0.54321 should render as 54.321% (not 54% with old {:.0}).
+        let ctx = MemoryContext {
+            total_trades: 100,
+            regime_session_win_rate: Some(0.54321),
+            ..Default::default()
+        };
+        let prompt = format_memory_prompt(&ctx);
+        assert!(prompt.contains("54.321"),
+                "win rate 0.54321 should render as 54.321%, got prompt:\n{}", prompt);
+    }
 }

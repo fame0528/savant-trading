@@ -69,6 +69,12 @@ pub struct SwapTx {
     pub gas: u64,
     /// Gas price in wei (for display / fallback).
     pub gas_price: String,
+    /// FID-160: Expected buy amount from API response (smallest unit, decimal string).
+    /// Used for post-quote validation — rejects swaps where API returns zero output.
+    pub buy_amount: Option<String>,
+    /// FID-160: Sell amount from API response (smallest unit, decimal string).
+    /// Used for price impact computation in validation.
+    pub sell_amount: Option<String>,
 }
 
 /// Resolved token metadata on a given chain.
@@ -119,6 +125,8 @@ pub struct LiquidityCheck {
 pub fn usdc_address_for_chain(chain_id: u64) -> Option<&'static str> {
     match chain_id {
         42161 => Some("0xaf88d065e77c8cC2239327C5EDb3A432268e5831"), // Arbitrum native USDC
+        421614 => Some("0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"), // Arbitrum Sepolia test USDC (Circle)
+        11155111 => Some("0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"), // Ethereum Sepolia test USDC (Circle bridged; same address as Arbitrum Sepolia)
         8453 => Some("0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"),  // Base native USDC
         10 => Some("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"),    // Optimism native USDC
         56 => Some("0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d"),    // BSC USDC (18 decimals!)

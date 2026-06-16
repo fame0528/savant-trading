@@ -13,6 +13,8 @@ use crate::agent::openrouter_management::{
 };
 use crate::core::config::JuryConfig;
 
+use super::pool::JuryKeyHealth;
+
 /// Errors from jury key management.
 #[derive(Debug, thiserror::Error)]
 pub enum JuryKeyError {
@@ -213,6 +215,31 @@ impl JuryKeyManager {
     pub async fn has_keys(&self) -> bool {
         !self.keys.lock().await.is_empty()
     }
+
+    /// FID-162: Classify keys by health. Healthy = failures < max_consecutive_failures.
+    /// Rotating = at threshold (one more failure will trigger delete+create).
+    /// last_rotation_at = ISO8601 timestamp of the most recent key hitting the threshold.
+    pub async fn key_health(&self) -> JuryKeyHealth {
+        let keys = self.keys.lock().await;
+        let mut healthy = 0usize;
+        let mut rotating = 0usize;
+        let mut last_rotation_at: Option<String> = None;
+        for k in keys.iter() {
+            let f = k.consecutive_failures.load(Ordering::Relaxed);
+            if f >= self.config.max_consecutive_failures {
+                rotating += 1;
+                last_rotation_at = Some(chrono::Utc::now().to_rfc3339());
+            } else {
+                healthy += 1;
+            }
+        }
+        JuryKeyHealth {
+            total: keys.len(),
+            healthy,
+            rotating,
+            last_rotation_at,
+        }
+    }
 }
 
 /// Best-effort key cleanup on drop (Ctrl+C, panic, normal exit).
@@ -239,7 +266,7 @@ impl Drop for JuryKeyManager {
         match tokio::runtime::Handle::try_current() {
             Ok(handle) => {
                 let client = &self.client;
-                let _ = handle.block_on(async {
+                handle.block_on(async {
                     for key in &keys {
                         if let Err(e) = client.delete_key(&key.hash).await {
                             warn!("Drop: failed to delete jury key '{}': {}", key.label, e);

@@ -6,6 +6,8 @@ import type {
   DecisionRecord,
   TradeRecord,
   ActivityEntry,
+  JuryStateSnapshot,
+  JuryCycleRecord,
 } from "./api";
 
 const line = (label: string, value: string | number | null | undefined) =>
@@ -75,7 +77,51 @@ export const copyFormatters = {
     a.length === 0
       ? "No activity"
       : a
-          .map((e) => `[${e.timestamp}] [${e.level}] ${e.pair}: ${e.message}`)
+          .map((e) => {
+            const src = e.source ? `[${e.source}] ` : "";
+            return `[${e.timestamp}] [${e.level}] ${src}${e.pair}: ${e.message}`;
+          })
+          .join("\n"),
+
+  // FID-162: Jury status snapshot
+  jury: (j: JuryStateSnapshot | null) =>
+    j
+      ? [
+          "Jury Status",
+          line("Source", j.source),
+          line("Enabled", j.enabled ? "yes" : "no"),
+          line("Jury size", j.jury_size),
+          line("M3 control", j.m3_control_active ? "active" : "off"),
+          line("Free models", j.free_models_used.join(", ") || "—"),
+          line("Veto enabled", j.veto_enabled ? "yes" : "no"),
+          line("Veto threshold", j.veto_threshold),
+          line("Regime sizes", `T:${j.regime_sizes.trending} R:${j.regime_sizes.ranging} V:${j.regime_sizes.volatile}`),
+          line("Evaluations", j.cumulative.total_evaluations),
+          line("Quorum failures", j.cumulative.quorum_failures),
+          line("Total verdicts", j.cumulative.total_verdicts),
+          line("Total failures", j.cumulative.total_failures),
+          line("Avg latency", `${Math.round(j.cumulative.total_latency_ms / Math.max(1, j.cumulative.total_evaluations))}ms`),
+          line("Key health", `${j.key_health.healthy}/${j.key_health.total} healthy, ${j.key_health.rotating} rotating`),
+          line("M3 calls", j.estimated_m3_calls),
+          line("Free model calls", j.estimated_free_model_calls),
+          line("Veto flag now", j.veto_flag_active_now ? "ACTIVE" : "clear"),
+          line("Last cycle", j.last_cycle_at ?? "never"),
+        ].join("\n")
+      : "Jury: no data",
+
+  juryRecent: (c: JuryCycleRecord[]) =>
+    c.length === 0
+      ? "No jury cycles recorded"
+      : c
+          .map((cy) => {
+            const v = cy.verdict_breakdown;
+            const veto = cy.veto_detected
+              ? cy.veto_enforced
+                ? ` VETO ENFORCED[${cy.veto_enforced_pairs.join(",")}]`
+                : " VETO DETECTED"
+              : "";
+            return `#${cy.cycle_id} ${cy.timestamp} | ${v.buy}B/${v.sell}S/${v.hold}H/${v.failed}F | consensus ${(cy.consensus_strength * 100).toFixed(0)}% | ${cy.consensus_action}${cy.judge_action ? ` (judge: ${cy.judge_action})` : ""}${veto}`;
+          })
           .join("\n"),
 };
 

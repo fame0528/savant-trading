@@ -232,6 +232,9 @@ impl DexBackend for InchBackend {
             value: value.to_string(),
             gas,
             gas_price,
+            // FID-160: 1inch doesn't return buyAmount/sellAmount in swap response
+            buy_amount: None,
+            sell_amount: None,
         })
     }
 }

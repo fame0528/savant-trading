@@ -727,6 +727,7 @@ mod tests {
             strategy_name: "test".to_string(),
             opened_at: Utc::now(),
             scale_level: ScaleLevel::Full,
+            token_address: String::new(),
         }
     }
 

@@ -68,24 +68,24 @@ impl MarketContext {
         }
 
         if let Some(dom) = self.sentiment.btc_dominance {
-            parts.push(format!("BTC Dominance: {:.1}%", dom));
+            parts.push(format!("BTC Dominance: {}%", dom));
         }
 
         if let Some(fr) = self.funding.funding_rate {
             let annualized = self
                 .funding
                 .funding_rate_annualized
-                .map(|a| format!(" | Annualized: {:.2}%", a * 100.0))
+                .map(|a| format!(" | Annualized: {}%", a * 100.0))
                 .unwrap_or_default();
             parts.push(format!(
-                "Funding Rate: {:.4}% (per-8hr){}",
+                "Funding Rate: {}% (per-8hr){}",
                 fr * 100.0,
                 annualized
             ));
         }
 
         if let Some(oi) = self.funding.open_interest {
-            parts.push(format!("OI: {:.0}", oi));
+            parts.push(format!("OI: {}", oi));
         }
 
         if let Some(height) = self.flows.block_height {
@@ -93,11 +93,11 @@ impl MarketContext {
         }
 
         if let Some(mvrv) = self.onchain.mvrv {
-            parts.push(format!("MVRV: {:.2}", mvrv));
+            parts.push(format!("MVRV: {}", mvrv));
         }
 
         if let Some(sopr) = self.onchain.sopr {
-            parts.push(format!("SOPR: {:.4}", sopr));
+            parts.push(format!("SOPR: {}", sopr));
         }
 
         if !self.rss_items.is_empty() {
@@ -158,7 +158,7 @@ impl MarketContext {
             } else {
                 "extreme euphoria — historically precedes major corrections"
             };
-            lines.push(format!("- On-chain MVRV: {:.2} — {}", mvrv, assessment));
+            lines.push(format!("- On-chain MVRV: {} — {}", mvrv, assessment));
         }
 
         if let Some(sopr) = self.onchain.sopr {
@@ -171,7 +171,7 @@ impl MarketContext {
             } else {
                 "heavy profit realization — potential distribution"
             };
-            lines.push(format!("- SOPR: {:.4} — {}", sopr, assessment));
+            lines.push(format!("- SOPR: {} — {}", sopr, assessment));
         }
 
         // Funding
@@ -188,7 +188,7 @@ impl MarketContext {
             } else {
                 "extremely overleveraged shorts — squeeze setup, watch for long entries"
             };
-            lines.push(format!("- Funding: {:.4}% — {}", pct, assessment));
+            lines.push(format!("- Funding: {}% — {}", pct, assessment));
         }
 
         // Liquidation risk
@@ -453,5 +453,18 @@ mod tests {
         assert!(config.onchain_enabled);
         assert!(config.rss_enabled);
         assert_eq!(config.rss_max_items, 10);
+    }
+
+    // === FID-163: Precision preservation test ===
+
+    #[test]
+    fn summary_preserves_funding_rate_precision() {
+        // funding_rate=0.000123456789 → multiplied by 100 = 0.0123456789%
+        // Old {:.4} would render as "0.0123%". New {} must preserve all 10 digits.
+        let mut ctx = MarketContext::default();
+        ctx.funding.funding_rate = Some(0.000123456789);
+        let summary = ctx.summary();
+        assert!(summary.contains("0.0123456789"),
+                "summary should preserve full funding rate precision, got: {}", summary);
     }
 }

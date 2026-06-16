@@ -4,8 +4,12 @@
 //! from the JuryKeyManager. Collects results, checks quorum, and returns
 //! a JuryResult for the Judge to synthesize.
 
+use std::collections::VecDeque;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
+use serde::{Deserialize, Serialize};
 use tracing::{info, warn};
 
 use crate::agent::jury::verdict_parser;
@@ -13,6 +17,7 @@ use crate::agent::jury::{JuryKeyManager, JuryResult};
 use crate::agent::provider::{LlmConfig, LlmProvider, Message};
 use crate::core::config::JuryConfig;
 use crate::core::types::MarketRegime;
+use crate::jury_state;
 
 /// Jury Pool — manages parallel jury member evaluations.
 ///
@@ -41,10 +46,18 @@ pub struct JuryPool {
     jury_system_prompt: String,
     /// Accumulated metrics.
     metrics: JuryPoolMetrics,
+    /// Monotonic cycle counter (FID-162).
+    cycle_id: AtomicU64,
+    /// M3 control juror call count (free, visibility only — per Spencer 2026-06-15).
+    m3_calls: AtomicU64,
+    /// Free OpenRouter model call count (always $0).
+    free_model_calls: AtomicU64,
+    /// Ring buffer of recent cycle records (FID-162, capped at 50).
+    recent_cycles: Mutex<VecDeque<JuryCycleRecord>>,
 }
 
 /// Lightweight metrics tracking for the jury pool.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct JuryPoolMetrics {
     pub total_evaluations: u64,
     pub quorum_failures: u64,
@@ -53,13 +66,62 @@ pub struct JuryPoolMetrics {
     pub total_latency_ms: u64,
 }
 
+/// FID-162: Key health classification for dashboard visibility.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct JuryKeyHealth {
+    pub total: usize,
+    pub healthy: usize, // consecutive_failures < max_consecutive_failures
+    pub rotating: usize, // >= max_consecutive_failures
+    pub last_rotation_at: Option<String>, // ISO8601
+}
+
+/// FID-162: Verdict breakdown per cycle.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct VerdictBreakdown {
+    pub buy: usize,
+    pub sell: usize,
+    pub hold: usize,
+    pub failed: usize,
+}
+
+/// FID-162: Per-juror detail within a cycle record.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JurorRecord {
+    pub juror_id: usize, // 0 = M3 control, 1..N = free
+    pub model_slug: String,
+    pub verdict: String, // "BUY" | "SELL" | "HOLD" | "PARSE_FAIL" | "TIMEOUT"
+    pub confidence: f64,
+    pub key_argument: String,
+    pub risk_flag: String,
+    pub parse_status: String, // "ok" | "repaired" | "partial" | "freeform" | "failed"
+    pub latency_ms: u64,
+}
+
+/// FID-162: Full per-cycle record exposed via /api/jury/recent.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JuryCycleRecord {
+    pub cycle_id: u64,
+    pub timestamp: String, // ISO8601
+    pub verdict_breakdown: VerdictBreakdown,
+    pub consensus_strength: f64, // 0.0-1.0
+    pub consensus_action: String, // "BUY" | "SELL" | "HOLD" | ""
+    pub quorum_met: bool,
+    pub failed_count: usize,
+    pub latency_ms: u64,
+    pub primary_action: Option<String>, // None if cycle skipped
+    pub judge_action: Option<String>,
+    pub primary_judge_agreed: Option<bool>,
+    /// FID-162 (Spencer option b): tracked independently of enforced.
+    pub veto_detected: bool,
+    pub veto_enforced: bool,
+    pub veto_enforced_pairs: Vec<String>, // cleared per cycle
+    pub per_juror: Vec<JurorRecord>,
+}
+
+const RECENT_CYCLES_CAP: usize = 50;
+
 impl JuryPool {
     /// Create a new jury pool. Does NOT create keys — call `initialize()` first.
-    ///
-    /// **FID-147:** Pass TWO LlmConfigs + the M3 API key:
-    /// - `provider_config_m3` — for juror 0 (M3 control). Endpoint = M3/TokenRouter.
-    /// - `provider_config_openrouter` — for jurors 1..N. Endpoint = openrouter.ai.
-    /// - `m3_api_key` — TOKEN_ROUTER_API_KEY value, used to authenticate juror 0.
     pub fn new(
         provider_config_m3: LlmConfig,
         provider_config_openrouter: LlmConfig,
@@ -81,6 +143,10 @@ impl JuryPool {
             config,
             jury_system_prompt,
             metrics: JuryPoolMetrics::default(),
+            cycle_id: AtomicU64::new(0),
+            m3_calls: AtomicU64::new(0),
+            free_model_calls: AtomicU64::new(0),
+            recent_cycles: Mutex::new(VecDeque::with_capacity(RECENT_CYCLES_CAP)),
         }
     }
 
@@ -97,6 +163,67 @@ impl JuryPool {
     /// Get accumulated metrics.
     pub fn metrics(&self) -> &JuryPoolMetrics {
         &self.metrics
+    }
+
+    /// Get current cycle_id counter (monotonic).
+    pub fn next_cycle_id(&self) -> u64 {
+        self.cycle_id.fetch_add(1, Ordering::Relaxed)
+    }
+
+    /// Total M3 control juror calls.
+    pub fn m3_calls(&self) -> u64 {
+        self.m3_calls.load(Ordering::Relaxed)
+    }
+
+    /// Total free-model juror calls.
+    pub fn free_model_calls(&self) -> u64 {
+        self.free_model_calls.load(Ordering::Relaxed)
+    }
+
+    /// Current live veto flag (from atomic).
+    pub fn veto_flag_active(&self) -> bool {
+        jury_state::is_vetoed()
+    }
+
+    /// Append a cycle record. Evicts oldest if at cap. FID-162.
+    pub fn add_cycle_record(&self, mut record: JuryCycleRecord) {
+        record.cycle_id = self.cycle_id.fetch_add(1, Ordering::Relaxed);
+        if let Ok(mut buf) = self.recent_cycles.lock() {
+            if buf.len() >= RECENT_CYCLES_CAP {
+                buf.pop_front();
+            }
+            buf.push_back(record);
+        }
+    }
+
+    /// Snapshot of the recent cycles ring buffer (cloned, oldest first).
+    pub fn recent_cycles(&self) -> Vec<JuryCycleRecord> {
+        self.recent_cycles
+            .lock()
+            .map(|buf| buf.iter().cloned().collect())
+            .unwrap_or_default()
+    }
+
+    /// Lookup a single cycle record by id.
+    pub fn cycle_by_id(&self, id: u64) -> Option<JuryCycleRecord> {
+        self.recent_cycles
+            .lock()
+            .ok()
+            .and_then(|buf| buf.iter().find(|c| c.cycle_id == id).cloned())
+    }
+
+    /// FID-162: Record that a jury veto was enforced for `pair` in the current cycle.
+    /// Updates the most-recent cycle record's `veto_enforced` and `veto_enforced_pairs`.
+    /// Called from the per-pair override block in `engine/mod.rs`.
+    pub fn record_veto_override(&self, pair: &str) {
+        if let Ok(mut buf) = self.recent_cycles.lock() {
+            if let Some(last) = buf.back_mut() {
+                last.veto_enforced = true;
+                if !last.veto_enforced_pairs.iter().any(|p| p == pair) {
+                    last.veto_enforced_pairs.push(pair.to_string());
+                }
+            }
+        }
     }
 
     /// Flush jury metrics to `dev/logs/jury-metrics.json`.
@@ -160,6 +287,13 @@ impl JuryPool {
             // FID-147: Juror 0 is the M3 control — uses M3 config + M3 key (no management).
             // Jurors 1..N are free — use OpenRouter config + management-provisioned keys.
             let is_m3_control = juror_idx == 0;
+
+            // FID-162: count M3 vs free-model calls (free, visibility only).
+            if is_m3_control {
+                self.m3_calls.fetch_add(1, Ordering::Relaxed);
+            } else {
+                self.free_model_calls.fetch_add(1, Ordering::Relaxed);
+            }
 
             let (provider, model, api_key, key_label, key_hash) = if is_m3_control {
                 let provider = LlmProvider::new(self.provider_config_m3.clone());

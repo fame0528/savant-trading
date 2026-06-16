@@ -192,7 +192,7 @@ impl ContextState {
 
     /// Historical data stripping (FID-085 Phase 3, Item 13).
     /// Replaces old data with summary placeholder.
-    pub fn strip_historical(&self, text: &str, max_age_cycles: u64) -> String {
+    pub fn strip_historical_placeholder(&self, text: &str, max_age_cycles: u64) -> String {
         if self.cycle_count <= max_age_cycles {
             return text.to_string();
         }
@@ -310,7 +310,7 @@ mod tests {
     fn soft_trim_no_change_under_threshold() {
         let state = ContextState::new(0.30, 0.50);
         let text = "short text";
-        let trimmed = state.soft_trim(&text, 10000);
+        let trimmed = state.soft_trim(text, 10000);
         assert_eq!(trimmed, text);
     }
 

@@ -71,11 +71,7 @@ pub async fn start_server(
         config: config.clone(),
         engine_status: Arc::new(RwLock::new(EngineStatus {
             running: false,
-            mode: if !config.mode.live_execution {
-                "PAPER".to_string()
-            } else {
-                "LIVE".to_string()
-            },
+            mode: compute_engine_mode(&config),
             uptime_seconds: 0,
             pairs: config.trading.pairs.clone(),
             autonomy_level: config.ai.autonomy_level,
@@ -142,6 +138,10 @@ pub async fn start_server(
         .route("/api/terminal", get(terminal_ws))
         .route("/api/terminal/cmd", get(terminal_cmd_ws))
         .route("/api/agent/command", post(agent_command_rest))
+        // FID-162: Jury observability endpoints
+        .route("/api/jury/status", get(get_jury_status))
+        .route("/api/jury/recent", get(get_jury_recent))
+        .route("/api/jury/verdicts/{cycle_id}", get(get_jury_verdicts))
         .with_state(state)
         .layer(cors)
         .layer(middleware::from_fn(auth_middleware))
@@ -484,15 +484,56 @@ async fn get_activity(State(state): State<AppState>) -> Json<ApiResponse<Vec<ser
         .rev()
         .take(100)
         .map(|e| {
-            serde_json::json!({
+            // FID-162: include source field for dashboard chip rendering.
+            let mut obj = serde_json::json!({
                 "timestamp": e.timestamp,
                 "level": format!("{:?}", e.level),
                 "pair": e.pair,
                 "message": e.message,
-            })
+            });
+            if let Some(ref s) = e.source {
+                obj["source"] = serde_json::Value::String(s.clone());
+            }
+            obj
         })
         .collect();
     Json(ApiResponse::ok(items))
+}
+
+// FID-162: Jury observability handlers.
+
+async fn get_jury_status(
+    State(state): State<AppState>,
+) -> Json<ApiResponse<savant_trading::core::shared::JuryStateSnapshot>> {
+    let snap = state.shared.jury_state.read().await.clone();
+    Json(ApiResponse::ok(snap))
+}
+
+async fn get_jury_recent(
+    State(state): State<AppState>,
+) -> Json<ApiResponse<Vec<savant_trading::agent::jury::JuryCycleRecord>>> {
+    let recent = state.shared.jury_recent.read().await;
+    let cycles: Vec<savant_trading::agent::jury::JuryCycleRecord> = recent.iter().cloned().collect();
+    Json(ApiResponse::ok(cycles))
+}
+
+async fn get_jury_verdicts(
+    State(state): State<AppState>,
+    Path(cycle_id): Path<u64>,
+) -> Json<ApiResponse<serde_json::Value>> {
+    let recent = state.shared.jury_recent.read().await;
+    match recent.iter().find(|c| c.cycle_id == cycle_id) {
+        Some(c) => Json(ApiResponse::ok(serde_json::to_value(c).unwrap_or_default())),
+        None => Json(ApiResponse {
+            data: serde_json::Value::Null,
+            error: Some(format!(
+                "cycle {} not in ring buffer (last {} cycles)",
+                cycle_id,
+                recent.len()
+            )),
+            timestamp: chrono::Utc::now().to_rfc3339(),
+        }),
+    }
 }
 
 async fn get_memory(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
@@ -1259,8 +1300,8 @@ async fn handle_command(
         }
 
         OperatorCommand::Query { message: _ } => {
-            // Query makes a one-shot LLM call — for now return a placeholder
-            CommandResponse::success("Query received — LLM query not yet wired")
+            // FID-A01: LLM query not yet wired — return honest error, not fake success
+            CommandResponse::error("LLM query not yet wired — see FID-A01")
         }
     }
 }
@@ -1287,6 +1328,40 @@ async fn handle_command_inner(
         }
         _ => savant_trading::agent::commands::CommandResponse::success("Undo executed"),
     }
+}
+
+/// Compute the engine's effective operating mode for the API/dashboard.
+///
+/// Three-state result:
+/// - "PAPER" — `live_execution` is false (no real transactions ever)
+/// - "TESTNET" — `live_execution` is true BUT RPC points to a local fork
+///   (Anvil at 127.0.0.1:8545, hardhat, or ganache). Real txs go
+///   to the fork's prefunded test wallet — no mainnet funds at risk.
+/// - "LIVE" — `live_execution` is true AND RPC points to a real public chain.
+///
+/// This is the safety check the dashboard needs. Without it, the top bar would
+/// show "LIVE · RUNNING" while trades execute against Anvil, which is the same
+/// visual signal as real-money mainnet execution.
+fn compute_engine_mode(config: &savant_trading::core::config::AppConfig) -> String {
+    if !config.mode.live_execution {
+        return "PAPER".to_string();
+    }
+    // Check the active chain's RPC URL for local-fork markers.
+    // SAVANT_CHAIN env var (default "arbitrum") selects which chain config to use.
+    let active_chain_name = std::env::var("SAVANT_CHAIN").unwrap_or_else(|_| "arbitrum".to_string());
+    if let Some(chain_cfg) = config.chains.get(&active_chain_name) {
+        let rpc = chain_cfg.rpc_url.to_lowercase();
+        // Local-fork markers: 127.0.0.1, localhost, hardhat, anvil, ganache.
+        if rpc.contains("127.0.0.1")
+            || rpc.contains("localhost")
+            || rpc.contains("anvil")
+            || rpc.contains("hardhat")
+            || rpc.contains("ganache")
+        {
+            return "TESTNET".to_string();
+        }
+    }
+    "LIVE".to_string()
 }
 
 #[cfg(test)]
@@ -1323,6 +1398,40 @@ mod tests {
         assert!(std::sync::Arc::strong_count(&shared.account) >= 1);
     }
 
+    /// Regression test: dashboard must report TESTNET (not LIVE) when the
+    /// engine is configured for live_execution=true but pointed at a local
+    /// Anvil/Hardhat fork. Before this fix, the top bar showed "LIVE" even
+    /// when trades were executing against a prefunded test wallet.
+    #[test]
+    fn engine_mode_reports_testnet_for_local_rpc() {
+        let mut cfg = savant_trading::core::config::AppConfig::default();
+        cfg.mode.live_execution = true;
+        let mut chains = std::collections::HashMap::new();
+        chains.insert(
+            "test_anvil".to_string(),
+            savant_trading::core::config::ChainEntry {
+                chain_id: 42161,
+                name: "Test Anvil".to_string(),
+                rpc_url: "http://127.0.0.1:8545".to_string(),
+                native_token: "ETH".to_string(),
+                min_gas_native: 0.002,
+                slippage_pct: 0.5,
+                enabled: true,
+            },
+        );
+        cfg.chains = chains;
+        std::env::set_var("SAVANT_CHAIN", "test_anvil");
+        assert_eq!(compute_engine_mode(&cfg), "TESTNET");
+        std::env::remove_var("SAVANT_CHAIN");
+    }
+
+    #[test]
+    fn engine_mode_reports_paper_when_not_live() {
+        let mut cfg = savant_trading::core::config::AppConfig::default();
+        cfg.mode.live_execution = false;
+        assert_eq!(compute_engine_mode(&cfg), "PAPER");
+    }
+
     #[test]
     fn rate_limiter_window_resets() {
         let mut limiter = RateLimiter {
@@ -1339,5 +1448,75 @@ mod tests {
         }
 
         assert_eq!(limiter.count, 0);
+    }
+
+    // ---- FID-162: Jury endpoint tests ----
+
+    #[tokio::test]
+    async fn jury_status_returns_default_when_engine_off() {
+        let shared = SharedEngineData::new();
+        let snap = shared.jury_state.read().await.clone();
+        // Default snapshot is "disabled" (engine never started, so source is "disabled").
+        assert_eq!(snap.source, "disabled");
+        assert!(!snap.enabled);
+        assert_eq!(snap.cumulative.total_evaluations, 0);
+    }
+
+    #[tokio::test]
+    async fn jury_recent_empty_when_never_ran() {
+        let shared = SharedEngineData::new();
+        let recent = shared.jury_recent.read().await;
+        assert_eq!(recent.len(), 0);
+    }
+
+    #[test]
+    fn jury_state_snapshot_serializes_with_source_field() {
+        let snap = savant_trading::core::shared::JuryStateSnapshot::default();
+        let json = serde_json::to_string(&snap).unwrap();
+        assert!(json.contains("\"source\""));
+        assert!(json.contains("\"disabled\""));
+        assert!(json.contains("\"cumulative\""));
+        assert!(json.contains("\"key_health\""));
+        assert!(json.contains("\"veto_flag_active_now\""));
+    }
+
+    #[test]
+    fn jury_cycle_record_round_trip() {
+        let record = savant_trading::agent::jury::JuryCycleRecord {
+            cycle_id: 42,
+            timestamp: "2026-06-15T20:00:00Z".to_string(),
+            verdict_breakdown: savant_trading::agent::jury::VerdictBreakdown { buy: 3, sell: 2, hold: 5, failed: 0 },
+            consensus_strength: 0.65,
+            consensus_action: "HOLD".to_string(),
+            quorum_met: true,
+            failed_count: 0,
+            latency_ms: 4100,
+            primary_action: Some("BUY".to_string()),
+            judge_action: Some("HOLD".to_string()),
+            primary_judge_agreed: Some(false),
+            veto_detected: true,
+            veto_enforced: true,
+            veto_enforced_pairs: vec!["BTC/USD".to_string()],
+            per_juror: vec![savant_trading::agent::jury::JurorRecord {
+                juror_id: 0,
+                model_slug: "minimax/m3".to_string(),
+                verdict: "BUY".to_string(),
+                confidence: 0.7,
+                key_argument: "test".to_string(),
+                risk_flag: "test".to_string(),
+                parse_status: "ok".to_string(),
+                latency_ms: 1200,
+            }],
+        };
+        let json = serde_json::to_string(&record).unwrap();
+        assert!(json.contains("\"cycle_id\":42"));
+        assert!(json.contains("\"veto_detected\":true"));
+        assert!(json.contains("\"veto_enforced\":true"));
+        assert!(json.contains("BTC/USD"));
+        assert!(json.contains("minimax/m3"));
+        // Round-trip
+        let parsed: savant_trading::agent::jury::JuryCycleRecord = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.cycle_id, 42);
+        assert_eq!(parsed.veto_enforced_pairs, vec!["BTC/USD".to_string()]);
     }
 }

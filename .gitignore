@@ -6,6 +6,15 @@
 credentials.json
 API-KEYS.md
 
+# === Runtime state ===
+savant.blocked
+m3-proxy.log
+litellm.log
+litellm_config.yaml
+m3-proxy.bat
+m3-proxy.js
+proxy_callbacks.py
+
 # === Agent runtime state ===
 dev/session-summaries/
 dev/fids/archive/
@@ -28,6 +37,7 @@ session-ses_*.md
 
 # === Data (runtime-generated) ===
 /data/
+/data/backup-*/
 /data/kraken_ticks/
 *.db
 *.db-shm
@@ -84,6 +94,7 @@ nul
 # === IDE ===
 .vscode/
 .idea/
+.kilo/
 *.swp
 *.swo
 *~

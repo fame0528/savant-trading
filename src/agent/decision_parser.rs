@@ -151,6 +151,12 @@ pub struct TradeDecision {
     /// Used to derive conviction_score; if empty, conviction defaults to 0.0 → HOLD.
     #[serde(default)]
     pub trigger_weights: TriggerWeights,
+    /// FID-161: Tracks WHY the action was changed from the LLM's original response.
+    /// None = LLM's original action (no override). Some = the override that fired.
+    /// Values: "conviction_gate", "confidence_floor", "close_signal",
+    /// "management_trigger", "thesis_invalidation", "zero_base_review", "jury_veto".
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub override_source: Option<String>,
 }
 
 fn default_conviction_score() -> f64 {
@@ -294,6 +300,7 @@ pub fn parse_decision(
                                             sizing_multiplier: 0.5,
                                             regime_label: RegimeLabel::default(),
                                             trigger_weights: TriggerWeights::default(),
+                                            override_source: None,
                                         });
                                     }
                                     tracing::debug!(
@@ -474,6 +481,7 @@ pub fn parse_decision(
             decision.action
         );
         decision.action = TradeAction::Pass;
+        decision.override_source = Some("conviction_gate".to_string());
     } else if bypass_gates && is_entry && decision.conviction_score < regime_threshold {
         tracing::debug!(
             "FID-126 bypass: conviction gate skipped, allowing {:?} with conviction={:.3} (below {:.2} threshold for {:?})",
@@ -487,8 +495,8 @@ pub fn parse_decision(
             decision.confidence * 100.0,
             CONFIDENCE_FLOOR * 100.0,
             decision.action
-        );
-        decision.action = TradeAction::Pass;
+        );            decision.action = TradeAction::Pass;
+            decision.override_source = Some("confidence_floor".to_string());
     } else if bypass_gates && decision.confidence < CONFIDENCE_FLOOR && is_entry {
         tracing::debug!(
             "FID-126 bypass: confidence floor skipped, allowing {:?} with confidence={:.0}% (below {:.0}% floor)",
@@ -512,53 +520,19 @@ pub fn parse_decision(
                 decision.action, decision.pair
             );
             decision.action = TradeAction::Close;
+            decision.override_source = Some("close_signal".to_string());
         }
     }
 
-    // v0.14.0 (MS-2): "Hold → Buy" conviction override (FID-126 tier-2).
-    // Rationale: M3 sandbox 2026-06-12_20-13-28 showed that even with
-    // conviction >= regime_threshold, the model emits HOLD/Pass for ~60% of
-    // scenarios — the model's "default-to-hold" bias overrides the conviction
-    // framework. The parser now flips the action to Buy when conviction passes
-    // the regime threshold AND reasoning doesn't explicitly hold/pass/exit
-    // AND no management trigger is active. This is the structural fix for
-    // the BUY rate verdict (target 15-30%, was 10-11%).
-    if matches!(decision.action, TradeAction::Pass) {
-        let regime_threshold = decision.regime_label.conviction_threshold();
-        let conviction_passes = decision.conviction_score >= regime_threshold;
-        let reasoning_lower = decision.reasoning.to_lowercase();
-        // Explicit HOLD/PASS/EXIT signals in reasoning that should NOT be overridden.
-        // Conservative: only override when reasoning does NOT contain these.
-        let explicit_hold_signals = [
-            "hold", "wait", "no trade", "no entry", "skip", "stay", "maintain",
-            "do not enter", "don't enter", "flat", "no action",
-        ];
-        let has_explicit_hold = explicit_hold_signals
-            .iter()
-            .any(|s| reasoning_lower.contains(s));
-        // Management triggers also block (these are for existing position mgmt)
-        // v0.14.0 (FID-140): Removed confidence > 0.0 && entry_price > 0.0 guards.
-        // Pass decisions set both to 0.0, which blocked the override entirely.
-        // Conviction score alone is the binding gate — the override fires
-        // whenever conviction >= regime threshold and no explicit hold signal.
-        if conviction_passes && !has_explicit_hold && !decision.management_trigger_active
-        {
-            tracing::warn!(
-                "FID-126 conviction override: conviction={:.3} >= regime={:?} threshold={:.2} but action=Pass/Hold. \
-                 No explicit HOLD/exit signal. Overriding to Buy. Pair: {}",
-                decision.conviction_score, decision.regime_label, regime_threshold, decision.pair
-            );
-            decision.action = TradeAction::Buy;
-            decision.side = Side::Long; // FID-140: override always goes Long
-            // FID-140: Pass decisions have entry_price=0.0 and stop_loss=0.0.
-            // Default to current market price so downstream engine has valid prices.
-            if decision.entry_price <= 0.0 {
-                decision.entry_price = current_price;
-                decision.stop_loss = current_price * 0.995; // 0.5% stop
-                decision.take_profit_1 = current_price * 1.008; // 0.8% TP
-            }
-        }
-    }
+    // FID-161: Pass→Buy conviction override REMOVED.
+    // The v0.14.0 (MS-2) "Hold → Buy" override (lines 518-560) forced
+    // Pass→Buy when conviction >= threshold and reasoning didn't contain
+    // exact keywords from a narrow list. This created an asymmetric risk
+    // ratchet — the ONLY override that increased exposure. Every other
+    // override is protective (Buy→Pass, Pass→Close). The keyword list
+    // was a sieve: "No long in downtrend" slipped through because
+    // "no long" wasn't in the list. On 2026-06-15, 9 pairs were flipped
+    // to Buy against the LLM's explicit judgment. See FID-161.
 
     // FID-088: Management trigger enforcement.
     // If the LLM's own position_audit flagged a management trigger but the
@@ -580,6 +554,7 @@ pub fn parse_decision(
                 decision.mandated_action, decision.action, new_action, decision.pair
             );
             decision.action = new_action;
+            decision.override_source = Some("management_trigger".to_string());
             // If mandated_stop_price is set and action is ADJUST_STOP, use it
             if decision.mandated_stop_price > 0.0 && matches!(decision.action, TradeAction::AdjustStop) {
                 decision.stop_loss = decision.mandated_stop_price;
@@ -595,6 +570,7 @@ pub fn parse_decision(
             decision.action, decision.pair
         );
         decision.action = TradeAction::Close;
+        decision.override_source = Some("thesis_invalidation".to_string());
     }
 
     // FID-096 Fix 2: Zero-Base Review enforcement.
@@ -606,6 +582,7 @@ pub fn parse_decision(
             decision.action, decision.pair
         );
         decision.action = TradeAction::Close;
+        decision.override_source = Some("zero_base_review".to_string());
     }
 
     // DIAGNOSTIC (Phase 3 RED): trace final decision after all gates
@@ -794,6 +771,7 @@ fn extract_from_freeform(text: &str) -> Option<TradeDecision> {
             sizing_multiplier: 0.5,
             regime_label: RegimeLabel::default(),
             trigger_weights: TriggerWeights::default(),
+            override_source: None,
         });
     }
 
@@ -856,6 +834,7 @@ fn extract_from_freeform(text: &str) -> Option<TradeDecision> {
         sizing_multiplier: 0.5,
         regime_label: RegimeLabel::default(),
         trigger_weights: TriggerWeights::default(),
+        override_source: None,
     })
 }
 
@@ -1211,6 +1190,7 @@ fn partial_extract(json: &str) -> Option<TradeDecision> {
                 weak: obj.get("weak").and_then(|v| v.as_u64()).unwrap_or(0) as u32,
             })
             .unwrap_or_default(),
+        override_source: None,
     })
 }
 
@@ -1463,5 +1443,63 @@ Some extra reasoning text that leaked into the response..."#;
             result.err()
         );
         assert_eq!(result.unwrap().action, TradeAction::Pass);
+    }
+
+    #[test]
+    fn pass_not_overridden_to_buy() {
+        // FID-161: Pass decisions with high conviction and bearish reasoning
+        // MUST stay as Pass. The Pass->Buy override was removed.
+        // Simulates the exact pattern from the 2026-06-15 live test:
+        // LLM returns Pass with conviction 0.30, reasoning says "bearish downtrend no long".
+        let json = serde_json::json!({
+            "action": "Pass",
+            "pair": "SEI/USD",
+            "side": "Long",
+            "entry_price": 0.0,
+            "stop_loss": 0.0,
+            "take_profit_1": 0.0,
+            "take_profit_2": 0.0,
+            "take_profit_3": 0.0,
+            "position_size_pct": 0.0,
+            "confidence": 0.0,
+            "conviction_score": 0.30,
+            "regime_label": "Trending",
+            "trigger_weights": {"strong": 0, "moderate": 1, "weak": 1},
+            "reasoning": "SEI strong downtrend, EMA_F < EMA_S, RSI 34. Bearish. ADVERSE TREND. No long entry in downtrend.",
+            "knowledge_sources": [],
+            "risk_reward": 0.0
+        });
+
+        // FID-161: Pass→Buy override was removed entirely.
+        // Pass must stay Pass regardless of SAVANT_GATE_DISABLED or conviction.
+        let decision = parse_decision(&json.to_string(), 0.0537, 10.0).unwrap();
+        assert_eq!(
+            decision.action,
+            TradeAction::Pass,
+            "FID-161: Pass decision with high conviction and bearish reasoning must stay Pass"
+        );
+    }
+
+    #[test]
+    fn pass_with_keyword_skip_stays_pass() {
+        // Additional safety: Pass must stay Pass after FID-161.
+        let json = serde_json::json!({
+            "action": "Pass",
+            "pair": "GRT/USD",
+            "side": "Long",
+            "entry_price": 0.0,
+            "stop_loss": 0.0,
+            "take_profit_1": 0.0,
+            "position_size_pct": 0.0,
+            "confidence": 0.0,
+            "conviction_score": 0.45,
+            "regime_label": "Trending",
+            "reasoning": "GRT trending down. Skip.",
+            "knowledge_sources": [],
+            "risk_reward": 0.0
+        });
+
+        let decision = parse_decision(&json.to_string(), 0.15, 10.0).unwrap();
+        assert_eq!(decision.action, TradeAction::Pass);
     }
 }

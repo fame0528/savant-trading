@@ -377,6 +377,7 @@ async fn run_training_batch(
             "BTC/USD",
             "Trending",
             "TestSession",
+            None,
         )
         .await;
         let formatted = savant_trading::memory::context::format_memory_prompt(&ctx);

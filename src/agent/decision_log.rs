@@ -89,13 +89,13 @@ impl DecisionLog {
             msg.push_str("### Recent Decisions (This Pair)\n");
             for entry in &same {
                 msg.push_str(&format!(
-                    "- [{}] {} {} (conf={:.0}%, R:R={:.1}) — {}\n",
+                    "- [{}] {} {} (conf={}%, R:R={}) — {}\n",
                     entry.timestamp, entry.pair, entry.action,
                     entry.confidence * 100.0, entry.risk_reward, entry.reasoning,
                 ));
                 if let Some(ref out) = entry.outcome {
                     msg.push_str(&format!(
-                        "  → Return: {:.2}% | Reflection: {}\n",
+                        "  → Return: {}% | Reflection: {}\n",
                         out.raw_return_pct, out.reflection,
                     ));
                 }
@@ -107,7 +107,7 @@ impl DecisionLog {
             for entry in &cross {
                 if let Some(ref out) = entry.outcome {
                     msg.push_str(&format!(
-                        "- [{}] {}: {} → {:.2}% — {}\n",
+                        "- [{}] {}: {} → {}% — {}\n",
                         entry.timestamp, entry.pair, entry.action,
                         out.raw_return_pct, out.reflection,
                     ));
@@ -218,7 +218,7 @@ mod tests {
             reflection: "Good entry timing".to_string(),
         });
         let ctx = log.context_for_pair("BTC/USD", 5, 5);
-        assert!(ctx.contains("3.50%"));
+        assert!(ctx.contains("3.5%"));
         assert!(ctx.contains("Good entry timing"));
         let _ = fs::remove_file(&path);
     }

@@ -76,6 +76,7 @@ export interface DecisionRecord {
   confidence: number;
   reasoning: string;
   execution_status?: string | null;
+  override_source?: string | null;
 }
 
 export interface MarketInsight {
@@ -126,8 +127,78 @@ export interface MemoryData {
 export interface ActivityEntry {
   timestamp: string;
   level: string;
+  // FID-162: subsystem source tag (JURY, RISK, EXEC, LLM, RECON, VAULT, MEM, ENGINE)
+  source?: string | null;
   pair: string;
   message: string;
+}
+
+// FID-162: Jury observability types
+
+export interface VerdictBreakdown {
+  buy: number;
+  sell: number;
+  hold: number;
+  failed: number;
+}
+
+export interface JurorRecord {
+  juror_id: number;
+  model_slug: string;
+  verdict: string;
+  confidence: number;
+  key_argument: string;
+  risk_flag: string;
+  parse_status: string;
+  latency_ms: number;
+}
+
+export interface JuryCycleRecord {
+  cycle_id: number;
+  timestamp: string;
+  verdict_breakdown: VerdictBreakdown;
+  consensus_strength: number;
+  consensus_action: string;
+  quorum_met: boolean;
+  failed_count: number;
+  latency_ms: number;
+  primary_action: string | null;
+  judge_action: string | null;
+  primary_judge_agreed: boolean | null;
+  veto_detected: boolean;
+  veto_enforced: boolean;
+  veto_enforced_pairs: string[];
+  per_juror: JurorRecord[];
+}
+
+export interface JuryKeyHealth {
+  total: number;
+  healthy: number;
+  rotating: number;
+  last_rotation_at: string | null;
+}
+
+export interface JuryStateSnapshot {
+  enabled: boolean;
+  jury_size: number;
+  m3_control_active: boolean;
+  free_models_used: string[];
+  veto_enabled: boolean;
+  veto_threshold: number;
+  regime_sizes: { trending: number; ranging: number; volatile: number };
+  cumulative: {
+    total_evaluations: number;
+    quorum_failures: number;
+    total_verdicts: number;
+    total_failures: number;
+    total_latency_ms: number;
+  };
+  key_health: JuryKeyHealth;
+  estimated_m3_calls: number;
+  estimated_free_model_calls: number;
+  veto_flag_active_now: boolean;
+  last_cycle_at: string | null;
+  source: "live" | "stale" | "never_ran" | "engine_off" | "disabled";
 }
 
 export interface ConfigData {
@@ -172,6 +243,10 @@ export const api = {
   getEquity: () => get<EquitySnapshot[]>("/equity"),
   getConfig: () => get<ConfigData>("/config"),
   clearBlock: () => post<{ cleared: boolean; message: string }>("/risk/clear-block"),
+  // FID-162: Jury observability
+  getJuryStatus: () => get<JuryStateSnapshot>("/jury/status"),
+  getJuryRecent: () => get<JuryCycleRecord[]>("/jury/recent"),
+  getJuryVerdicts: (cycleId: number) => get<JuryCycleRecord>(`/jury/verdicts/${cycleId}`),
 };
 
 export interface EquitySnapshot {

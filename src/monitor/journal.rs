@@ -179,6 +179,7 @@ impl TradeJournal {
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
                 .with_timezone(&chrono::Utc);
 
+            let token_address: String = row.try_get("token_address").unwrap_or_default();
             positions.push(Position {
                 id: row.get("id"),
                 pair: row.get("pair"),
@@ -204,6 +205,7 @@ impl TradeJournal {
                     _ => ScaleLevel::Full,
                 },
                 opened_at,
+                token_address,
             });
         }
 
@@ -366,10 +368,28 @@ impl TradeJournal {
         }
     }
 
-    /// Record starting equity. Only writes if not already set (first boot).
+    /// Record starting equity. Writes on first boot OR when the on-chain
+    /// balance differs from the recorded value (config change, fork switch, etc).
+    /// Returns true if a new value was written.
     pub async fn ensure_starting_equity(&self, equity: f64) -> Result<bool, sqlx::Error> {
-        if self.get_starting_equity().await?.is_some() {
-            return Ok(false); // already recorded
+        if let Some(existing) = self.get_starting_equity().await? {
+            // Allow overwrite only when the balance has INCREASED by more than
+            // 50% — catches config/fork switches ($30->$50 = 67%) but NOT
+            // normal P&L drift ($50->$55 = 10%) and NOT catastrophic losses
+            // ($50->$20 would be a decrease, not an increase — don't erase loss history).
+            if equity > existing {
+                let pct_change = if existing > 0.0 { (equity - existing) / existing } else { 1.0 };
+                if pct_change > 0.5 {
+                    self.set_setting("starting_equity", &format!("{:.6}", equity))
+                        .await?;
+                    info!(
+                        "Journal: updated starting_equity ${:.2} -> ${:.2} (+{:.1}% increase — config/fork switch)",
+                        existing, equity, pct_change * 100.0
+                    );
+                    return Ok(true);
+                }
+            }
+            return Ok(false); // value matches or decreased — no update needed
         }
         self.set_setting("starting_equity", &format!("{:.6}", equity))
             .await?;

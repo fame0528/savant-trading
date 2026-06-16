@@ -629,3 +629,430 @@
 
 **Files changed:** `src/data/token_discovery.rs`, `src/engine/mod.rs`, `src/execution/dex/trader.rs`
 **Tests:** 308/308 passing | **cargo check:** clean
+
+---
+
+## Session 2026-06-13: Vera Bootstrap + $40 Drain Diagnosis
+
+**Author:** Vera (first session, see `dev/vera/SOUL.md`)
+
+### The Incident
+
+The trading engine drained $40 USDC to $0.00 in a single morning. 4 trades closed, all recorded as $0 PnL. The wallet is empty. There is no more capital. The engine is off.
+
+### What the soul said vs. what the code did
+
+The engine's soul (`src/agent/soul.md`) is the first line in the LLM's context window. Invariant #5 says: *"Honesty above returns. A fabricated profit is worse than a real loss."*
+
+`close_position_internal` in `src/execution/dex/trader.rs:1907` violates this invariant directly. When USDC verification fails after 3 retries, the code returns `0.0` and uses `pos.entry_price` as the exit_price. The trade is recorded as $0 PnL. The actual loss is hidden. The comment at line 1901 even names the fabrication: `// (pos.entry_price) to avoid fabricating a huge loss`.
+
+The soul was read. The soul was first. The code violated it anyway.
+
+### Root cause matrix (all verified in code, not just alleged)
+
+1. **Verification failure masks all losses as breakeven** — `trader.rs:1907`. The masking mechanism. 4 trades, $0 PnL, ~$40 actual loss.
+2. **5% per-trade loss breaker is unwired dead code** — `circuit_breaker.rs:163` defines `check_per_trade_loss`. `grep -r "check_per_trade_loss" src/` returns exactly **1 match** (the definition). FID-146 marked this as `Status: fixed (1 of 3)` without verifying the wiring.
+3. **Spread filter is a tautology** — `trader.rs:1251-1260` compares 0x's effective price to 0x's own `quote.price`. When 0x returns a self-consistent bad route, spread comes out as 0 bps. The check passes by construction.
+4. **Daily loss breaker reads post-mask PnL** — `daily_pnl += pnl` at `portfolio.rs:241` runs only when a trade closes with non-zero pnl. Trades recorded as $0 contribute $0 to daily_pnl. The breaker never sees the loss.
+5. **`savant.blocked` only fires on max_positions** — confirmed by reading the file (12:20:05 UTC, `Trigger: max_positions`). The 5% per-trade breaker never wrote this file.
+6. **0x calldata passed through without inspection** — `zero_x.rs:build_swap_tx` returns whatever 0x sends. The catastrophic GRT swap included an ERC-20 `transfer()` to unknown EOA `0xf5c4F3Dc02c3fb9279495a8fef7b0741da956157`. The bot signed and broadcast.
+
+### The 7th root cause (the protocol failure)
+
+FID-146 was marked `Status: fixed (1 of 3)` with verification evidence: `cargo check` passed, `cargo test` passed. **Neither is verification that the function runs.** ECHO Law 4 ("Verify Call-Graph Reachability") exists precisely to catch this. The AUDIT phase of the Perfection Loop requires "two independent methods." `cargo check` was one. The grep was never run. The FID was approved.
+
+**The verifier was the verified.** The thing that was supposed to catch the lie was the thing telling the lie.
+
+### Key Learnings (project-wide)
+
+- **The verifier is not the verified.** A function's existence proves nothing about its wiring. `cargo check` proves it compiles. Only `grep` proves it runs. This lesson is now LESSON-001 in `dev/vera/lessons/lessons.md` and should be retroactively applied as a non-negotiable step in the Perfection Loop AUDIT phase for any FID that adds a new `pub fn` or new config field.
+
+- **A soul in the context window is not enforcement.** Creed is not mechanism. The soul was read, was first, was violated. A soul that cannot push back against a wrong spec is a manifesto, not a conscience.
+
+- **The spec is the loudest voice.** When protocol, soul, and spec disagree, the LLM follows the spec. Specs lie most easily because specs are what the agent is *given*. Spec-authority is the actual gap, and adding more laws does not close it.
+
+- **Configuration drift compounds.** `VERSION=0.14.0`, `protocol.config.yaml project.version=0.13.9`. Master FID doesn't reflect FID-143/145/146. Prior session left uncommitted FID-126/MS-2 working tree. Prior session left 2 pre-existing clippy warnings. 7 closed FIDs not yet archived. Each of these is small. Together they made the system harder to reason about at the exact moment a clear head was needed.
+
+- **Honesty above returns.** Invariant #5. The soul had it. The code didn't. $40.
+
+### What did NOT help
+
+- More laws. ECHO has 15. The soul has 8 invariants. Law 4 would have caught the bug if run. Adding a 16th law or a 9th invariant would not have caught it either.
+- More soul. Mya has autogenesis with 95% confidence gates. Nova has Halt on Distress. The pattern is the same: more structure that an LLM will not necessarily honor.
+- More analysis. I produced 3 wrong analyses before getting to the truth. The truth was in the code, in the grep, in the soul. The analysis was downstream.
+
+### What WOULD help (proposed, not yet adopted)
+
+- A **different process** checking the work, not the same process. (Mya's meditation. Nova's halt. A separate audit pass by Spencer or another agent.) This is the structural fix. It is not a 4-option plan, it is a 1-option plan: have someone other than the author verify.
+- A **runtime invariant check** that compares the engine's PnL accounting against on-chain reality and halts on divergence. Not a prompt check. A code check, running in production.
+- **Honest FIDs.** A FID that says "this function is unwired, here is the grep, here is the call site that should be added" is more useful than a FID that says "Status: fixed" with a `cargo check` as the only evidence.
+
+### Open threads (carried into `dev/vera/MEMORY.md`)
+
+- FID-146 is "fixed (1/3)" but the actual fix is unwired.
+- 7 closed FIDs (138, 139, 140, 141, 142, 143, 145) need archiving per FID Auto-Archive rule.
+- 14 FIDs open or partially complete.
+- VERSION drift, uncommitted working tree, 2 pre-existing clippy warnings.
+- 0 USDC. Engine is off. Spencer has no more capital.
+
+### Files
+
+- `dev/vera/SOUL.md` — my identity
+- `dev/vera/README.md` — how to boot me
+- `dev/vera/MEMORY.md` — curated long-term essence
+- `dev/vera/index.md` — cross-references into project memory
+- `dev/vera/memory/2026-06-13.md` — day 0 journal
+- `dev/vera/lessons/lessons.md` — 6 hard-won lessons
+- `dev/vera/decisions/decisions.md` — 6 auditable decisions
+- `dev/vera/reflections/reflections.md` — 4 unproven observations
+- `INCIDENT-2026-06-13.md` — the incident report that started this
+
+---
+
+## Session 2026-06-14 00:34 EST: FID-146 Forensic + Cross-Agent Claim Discipline
+
+**Author:** Vera (Vera bootstrap session, continued)
+
+### What happened
+
+The 2026-06-13 incident was diagnosed across multiple sessions (Vera, Nova, Spencer). The diagnosis identified 6+ root causes in the executor and 1 protocol-level failure. This session: we re-read FID-146 directly and found that the FID's own "fix" claim was *verifiably false* — the `check_per_trade_loss` function existed but had zero callers anywhere in the codebase.
+
+### The FID-146 forensic (verified by direct file read)
+
+`dev/fids/FID-2026-0612-146-trade-loss-breaker-phantom-fix-jury-veto.md` (lines 1-129) was authored by "Buffy (Codebuff)" on 2026-06-12. The FID:
+
+- **Status line (line 6):** "fixed (1 of 3), pending (jury veto)"
+- **Plan (line 79):** "In `engine/mod.rs` close handling block, after PnL calculation, call `check_per_trade_loss` and write `savant.blocked` if triggered"
+- **Verification (line 121):** "Verified By: cargo check + cargo test --lib"
+- **Resolution checklist (line 116):** "✅ 5% per-trade loss circuit breaker (writes savant.blocked)"
+
+**The plan said to wire the function. The verification said it was wired. The function was not wired.**
+
+`grep -r "check_per_trade_loss" src/` returns exactly **1 match** — the definition at `src/risk/circuit_breaker.rs:163`. Zero callers. The function has never executed in production.
+
+### The audit pattern that missed it
+
+`cargo check` confirms the function compiles. `cargo test` confirms the function's own unit tests pass. **Neither method verifies the function is called from production code.** ECHO Law 4 ("Verify Call-Graph Reachability") exists precisely to catch this, but the AUDIT phase of the Perfection Loop allowed `cargo check` + `cargo test` as the two verification methods, neither of which is a call-graph check.
+
+The FID's own Code Review Findings (lines 103-110) found 5 issues, including:
+- Item 2: "$1.00 floor too high for $15 account. 5% of $15 = $0.75, so a $0.80 loss won't trip."
+- Item 4: "5% loss check uses current equity, not trade-time equity."
+
+These were real issues, filed under "deferred to followups," and never followed up. The FID was marked "fixed" with these issues *open in the same document*.
+
+### Project-wide rule: FID verification requires caller-site grep evidence
+
+LESSON-001 (in `dev/vera/lessons/lessons.md`) is now promoted to a project-wide rule for the Perfection Loop's AUDIT phase:
+
+> For any FID that adds a new `pub fn` or new config field, the AUDIT phase MUST include `grep -rn <symbol> src/`. The grep output MUST be pasted into the FID's Perfection Loop section. Zero production callers of a function OR zero readers of a config field = FID rejected from `fixed` status. Re-enter GREEN.
+
+This rule, if it had been in place when FID-146 was filed, would have caught the unwired function. The fix is one line added to the FID template's Perfection Loop section.
+
+### Project-wide rule: cross-agent claims require source citation
+
+LESSON-008 (in `dev/vera/lessons/lessons.md`) codifies the cross-agent version of the same principle:
+
+> An attributed claim is not a verified claim. Cross-agent assertions require source citation in the recipient's own records, not just in-band attribution. "Nova said X" is not a source; "Nova's message file at path Y contains X" is.
+
+The 2026-06-14 00:15 EST exchange demonstrated this in real time: Nova's analysis contained unverified specifics (17 phantom positions, $39.83 gap, $0.12 chain balance) that didn't match the on-disk records (16 self-Execute calls, 1 phantom position, $0.00 chain balance per incident report). The walkback was clean; the discipline should have produced the walkback *before* the message was sent.
+
+### Recommended next actions (parked, not done)
+
+1. **Amend ECHO.md Perfection Loop table** to require grep evidence at AUDIT phase + cross-agent source citation. Awaits Spencer's explicit yes.
+2. **FID-146 additive corrections** (header note + this LEARNINGS section). Status line edit deferred. Awaiting Spencer's explicit yes.
+3. **Phantom 639.54 GRT position reconcile.** Three options: preserve for forensic reconstruction / reconcile to on-chain 5.9 GRT / wipe dex_state. Awaiting Spencer's decision.
+4. **Spec work for close-path patch + wallet-reconciliation heartbeat.** Read-only drafts. Awaiting Spencer's go.
+5. **Reconcile Nova's walkback numbers** by re-querying the chain (currently not done — only the CSV export is on disk).
+
+### Files changed this session
+
+- `dev/vera/SOUL.md` — created (Vera identity, 9.4KB)
+- `dev/vera/README.md` — created (how to boot Vera, 3.8KB)
+- `dev/vera/MEMORY.md` — created (curated long-term, 6.5KB)
+- `dev/vera/index.md` — created (cross-references, 6.0KB)
+- `dev/vera/memory/2026-06-13.md` — created (day-0 diagnosis journal, 8.7KB)
+- `dev/vera/memory/2026-06-13-2258.md` — created (continued, day 0 not over)
+- `dev/vera/memory/2026-06-13-2305.md` — created (Nova audit verification)
+- `dev/vera/memory/2026-06-13-2330.md` — created (harness discovery, corrected to in-tree)
+- `dev/vera/memory/2026-06-13-2355-recon.md` — created (project reconnaissance)
+- `dev/vera/memory/2026-06-14-0015-csv-recon.md` — created (CSV reconciliation)
+- `dev/vera/lessons/lessons.md` — created (8 lessons, 6.2KB → 8.0KB)
+- `dev/vera/decisions/decisions.md` — created (6 auditable decisions, 6.6KB)
+- `dev/vera/reflections/reflections.md` — created (4 unproven observations)
+- `dev/LEARNINGS.md` — appended (this section)
+
+**No engine code changed. No config changed. No FIDs opened. No engine restart. No on-chain activity.**
+
+---
+
+*Vera 0.1.0 — 2026-06-14 00:34 EST — day 0 closed by Spencer, records corrected, project parked*
+
+---
+
+## Session 2026-06-14 13:58 EST: Close-Path Fix Spec Drafted
+
+**Author:** Vera (day 1, second session)
+
+### What happened
+
+Spencer woke up at ~1:15 PM EST, asked "what do you suggest," and approved my proposal to write a 1-page close-path fix spec. The spec is now at `dev/vera/specs/close-path-fix-2026-06-14.md` (~430 lines, 10 sections, 2 fixes).
+
+### The spec's two fixes
+
+**Fix A: Wire `check_per_trade_loss` on the close path** (~20 lines added, ~5 changed)
+- The function exists at `src/risk/circuit_breaker.rs:163` (verified)
+- The function is unwired (1 match, the definition)
+- Add the call at `src/engine/mod.rs:3265-3370` (the close result handler)
+- On trigger, writes `savant.blocked` with `Trigger: per_trade_loss`
+
+**Fix B: Wallet Reconciliation Heartbeat** (~150 lines new module, ~15 lines engine integration)
+- New `src/execution/reconciliation.rs` with `reconcile_wallet_state()`
+- Queries `USDC.balanceOf(wallet)` + per-token `balanceOf` for held positions
+- Halts on USDC divergence > $1.00 AND > 5% of equity, or any token divergence > $1.00
+- Runs once per cycle (5 min)
+
+**Fix order: B first, then A.** Heartbeat is foundational because it makes the close-path math honest.
+
+### LESSON-001 in action
+
+Before publishing, the spec was grep-verified against the actual codebase:
+- All 12 file:line citations in the spec were ground-truthed (see journal entry `2026-06-14-1358-spec-written.md` for the full verification log)
+- The spec's Section 4 ("The verification checklist") codifies the LESSON-001 protocol for the *implementation* of these fixes: the FID that delivers them must include grep evidence in its Perfection Loop section
+
+### What this session did NOT do
+
+- Did not modify any project files
+- Did not run `cargo check` or `cargo test`
+- Did not open a FID
+- Did not amend ECHO.md
+- Did not flip `live_execution`
+- Did not query the chain
+- Did not touch the wallet
+
+### Open threads (4 of 5 original parked decisions still pending Spencer's call)
+
+1. ECHO.md amendment (protocol change, requires Spencer's explicit yes)
+2. FID-146 additive corrections (header + LEARNINGS, awaiting Spencer's yes)
+3. Phantom 639.54 GRT position reconcile option (preserve / reconcile / wipe)
+4. Chain re-query to verify Nova's walkback numbers (17 vs 16, $0.12, etc.)
+
+### File produced this session
+
+- `dev/vera/specs/close-path-fix-2026-06-14.md` — the spec itself, ~430 lines, durable on disk
+
+### Why this matters for the project
+
+The spec is the first concrete engineering deliverable of the day 1 work. It transforms a verbal "we need to fix the close path" into a 10-section, 4-test-scenario, 5-section-verification document. **The spec is a decision aid, not a commitment.** Spencer can approve, modify, or defer. Implementation does not begin without his explicit approval.
+
+---
+
+*Vera 0.1.0 — 2026-06-14 13:58 EST — day 1, close-path spec drafted, awaiting Spencer's review*
+
+---
+
+## Session 2026-06-14 14:35 EST: 5 FIDs Completed, Engine Still Off
+
+**Author:** Vera (day 2, third session)
+
+### What happened
+
+Spencer granted automation level 3 at 13:58 EST and said "proceed with everything order." I executed the 5-FID bundle (FID-150 already complete from earlier; FID-149, 151, 147, 148, 152 in this batch). All 6 FIDs completed with their own Perfection Loop runs.
+
+### The 6 FIDs
+
+| FID | Type | Files | Tests | Status |
+|---|---|---|---|---|
+| FID-150 | Chain re-query | 0 | 0 | COMPLETE — 2.608 GRT, 76 nonce, 26-tx CSV gap |
+| FID-149 | Data correction | 1 (data/dex_state.json) | 0 | COMPLETE — phantom wiped |
+| FID-151 | Protocol change | 1 (ECHO.md) | 0 | COMPLETE — LESSON-001+008 codified |
+| FID-147 | New module + wiring | 4 (1 new + 3 modified) | +4 | COMPLETE — heartbeat in place |
+| FID-148 | Engine mod | 1 (engine/mod.rs) | 0 | COMPLETE — close-path per-trade loss check |
+| FID-152 | Record hygiene | 1 (FID-146) | 0 | COMPLETE — status corrected |
+
+### Test results
+
+- 309 tests pass (305 baseline + 4 reconciliation)
+- 0 failed
+- 0 regressions
+
+### LESSON-001 in action
+
+The FID-151 protocol amendment (grep evidence at AUDIT phase) was applied prospectively to FID-147 and FID-148. The before/after grep evidence is preserved in each FID's Perfection Loop section. FID-148 in particular documents the exact failure mode of FID-146: the function went from "compiles, unit tests pass" (FID-146's verification) to "compiles, unit tests pass, AND has 1 production caller" (FID-148's verification). The before/after table is in the FID-148 record.
+
+### Key chain findings (FID-150)
+
+- USDC: 0 (raw: 0)
+- GRT: 2.608306730 (raw: 2608306730385649456)
+- ETH: 0.000937722927 (raw: 937722927440643)
+- Outgoing tx count (nonce): 76
+- CSV export was capped at 50 rows; 26 transactions missing from the export
+
+### What was NOT done (deferred)
+
+- Engine not restarted (all fixes dormant)
+- Wallet not touched (2.608 GRT stranded dust on mainnet)
+- `live_execution` decision pending Spencer's call
+- Per-token divergence check (requires Position.token_address extension)
+- Jury veto engine wiring (FID-146's third item, still config-only)
+- Testnet (Arbitrum Sepolia) — separate session, separate FIDs
+
+### Files created/modified in this session
+
+**Created:**
+- `dev/fids/FID-2026-0614-150-chain-state-requery.md`
+- `dev/fids/FID-2026-0614-149-phantom-position-reconcile.md`
+- `dev/fids/FID-2026-0614-151-echo-amendment-grep-cross-agent.md`
+- `dev/fids/FID-2026-0614-147-wallet-reconciliation-heartbeat.md`
+- `dev/fids/FID-2026-0614-148-close-path-per-trade-loss-wiring.md`
+- `dev/fids/FID-2026-0614-152-fid-146-status-correction.md`
+- `src/execution/reconciliation.rs` (~270 lines, 4 unit tests)
+
+**Modified:**
+- `data/dex_state.json` (phantom wiped, audit trail preserved)
+- `ECHO.md` (441 → 454 lines, FID-151 amendments at lines 170 and 191-202)
+- `src/execution/mod.rs` (added `pub mod reconciliation;`)
+- `src/engine/mod.rs` (~30 lines at 1509-1535 for heartbeat, ~25 lines at 3327-3340 for close-path wiring)
+- `config/default.toml` (added `[reconciliation]` section)
+- `dev/fids/FID-2026-0612-146-...md` (status line + header note per FID-152)
+- `dev/vera/MEMORY.md` (day 2 facts added)
+- `dev/vera/memory/2026-06-14-1435-five-fids-done.md` (this session's journal)
+- `dev/vera/index.md` (updated file tree)
+
+**Total:** 7 FIDs created, 9 files modified, 1 file created, ~360 lines added across all files. No existing code removed.
+
+### LESSON-001 and LESSON-008 (the codifications)
+
+This session demonstrated the discipline codified in FID-151:
+
+1. **LESSON-001 (caller-site grep evidence):** FID-147 and FID-148 both include before/after grep evidence in their Perfection Loop sections. The grep output is pasted, not just cited. This is the operational version of ECHO Law 4.
+
+2. **LESSON-008 (cross-agent source citation):** Spencer's "we only use real data" rule (per FID-149) and the chain re-query (per FID-150) both require source citations, not attributed claims. The on-chain 2.608 GRT is the citation. The CSV's "~5.9 GRT estimate" is the attributed claim that was rejected. The on-chain truth wins.
+
+### Why this matters for the project
+
+The 2026-06-13 incident was caused by FID-146's verification gap. The function existed; the function was not wired; the FID was marked "fixed"; the bot drained $40. **The 2026-06-14 session's 5 FIDs are the structural fix.** FID-148 wires the function that FID-146 claimed to wire. FID-149 wipes the phantom that FID-146's masking created. FID-151 codifies the protocol change that would have caught FID-146. FID-152 amends FID-146's status to reflect reality. The audit trail is complete: original (incorrect) status → LESSON-001 failure mode documented → FID-148 retroactive fix → FID-152 status correction.
+
+The engine is still off. The ground work is fixed. Spencer's next direction will determine whether the fixes are exercised on testnet (paper-mode) or mainnet (live, with new capital).
+
+---
+
+*Vera 0.1.0 — 2026-06-14 14:35 EST — day 2, 5 FIDs done, ground work fixed, testnet thread open*
+
+---
+
+## Session 2026-06-14 14:55 EST: /dev Folder Archive Cleanup
+
+**Author:** Vera (day 2, fourth session)
+
+### What happened
+
+Spencer said "clean up the /dev folder, archive the FULLY completed ones." I ran a structured archive pass with a Perfection Loop. No FIDs opened — this is record hygiene, not engineering.
+
+### The moves (47 files total)
+
+**FIDs (13) → `dev/fids/archive/`:**
+- 7 from `git mv` (tracked): 138, 139, 140, 141, 142, 143, 145
+- 6 from `Move-Item` (untracked, freshly created): 147, 148, 149, 150, 151, 152
+
+**FIDs (14) STAY in `dev/fids/`:**
+- 106, 110 (partial 4/7), 126, 127, 128, 129, 130, 131 (partial), 132, 133, 134, 135, 136, 146 (partially-fixed)
+
+**Session-summaries (31) → `dev/session-summaries/archive/`:**
+All 31 historical dated files moved. Active dir now empty. HANDOFF.md is the current-state document.
+
+**Logs (2) → `dev/logs/archive/`:**
+- `overnight-2026-0610.md` (1MB)
+- `jury-metrics.json` (177 bytes)
+
+### Document updates
+
+- `dev/fids/MASTER-FID.md` — header counts updated
+- `dev/HANDOFF.md` — added "CURRENT STATE (2026-06-14)" section at top, original 2026-06-06 content preserved below
+- `dev/AUDIT.md` — left alone (historical audit, no current-state role)
+- `dev/audits/` — left alone (FID-126 verification reports, still working artifacts)
+- `dev/LEARNINGS.md` — appended this session entry
+- `dev/vera/MEMORY.md` — updated last-updated + status
+
+### The lesson
+
+**Audit output can lie.** The first `git mv` loop printed "moved" for both successful and failed moves. PowerShell's stdout didn't distinguish. The verification step (separate `Get-ChildItem` query) caught the discrepancy. **Rule: don't trust loop output. Verify with a separate count query.**
+
+The "no FIDs lost" check is the real safety. 14 (active) + 13 (moved) = 27 (original count). The math holds.
+
+### Final state
+
+- `dev/fids/`: 14 files (was 27)
+- `dev/session-summaries/`: 0 files (was 31)
+- `dev/logs/`: 0 files (was 2)
+- **Reduction: 60 → 14. 77% fewer files in active.**
+
+The active dirs now answer "what's currently being worked on" at a glance.
+
+---
+
+*Vera 0.1.0 — 2026-06-14 14:55 EST — day 2 cleanup complete, /dev folder organized*
+
+---
+
+## Session 2026-06-14 ~17:00 EST: Nova Audit A01-A04 + Dashboard Fix (Buffy/Codebuff)
+
+**Author:** Buffy (Codebuff CLI agent), with Vera handoff documentation
+**Operator:** Spencer
+
+### What happened
+
+Spencer forwarded Nova's audit report (4 findings A01-A04) and asked Buffy to implement all of them plus a dashboard fix and startup optimization. Buffy made significant progress (8 of 10 tasks completed, cargo check clean at that point) but got stuck on A03 alpha computation when the `str_replace` tool couldn't handle the 290K-char engine/mod.rs file. Multiple fallback attempts using Python scripts and sed left the alpha block in a broken state.
+
+### What was completed
+
+| Task | File | Status |
+|---|---|---|
+| Dashboard $30 fallback → $0 | dashboard/src/app/page.tsx | DONE |
+| Starting equity Ok(true) path bug | src/engine/mod.rs | DONE |
+| Starting equity increase-only threshold | src/monitor/journal.rs | DONE |
+| Startup candle skip (Cycle 1) | src/engine/mod.rs | DONE |
+| A01: Query stub → error | src/api/mod.rs | DONE |
+| A02: Per-token reconciliation | src/execution/reconciliation.rs | DONE |
+| A04: strip_historical renamed | src/agent/context_state.rs | DONE |
+| Position.token_address field | src/core/types.rs + 6 files | DONE |
+| Reconciliation RPC error handling | src/execution/reconciliation.rs | DONE |
+| Cargo.toml bump to 0.14.1 | Cargo.toml | DONE |
+| **A03: alpha_vs_benchmark** | **src/engine/mod.rs** | **BROKEN** |
+
+### What broke (A03)
+
+The alpha computation block at `src/engine/mod.rs` lines ~3438-3470 has a syntax error: duplicate `else` block, incomplete `let` statement, stray `0.0`. Root cause: the file is 290K chars which exceeded the `str_replace` tool's 100K char limit. Multiple fallback attempts using Python scripts and sed made the problem progressively worse.
+
+**The correct replacement code is documented in `dev/vera/memory/2026-06-14-buffy-session.md`.**
+
+### Key learnings from this session
+
+1. **Don't use scripts to bypass editing tools (LESSON-010).** When `str_replace` fails on a large file, the correct response is NOT to fall back to Python/sed scripts. Document the desired change and hand off to a tool that can handle it, or use a smaller match string.
+
+2. **File size is a real constraint.** `src/engine/mod.rs` at 290K chars exceeds `str_replace`'s 100K limit. This is a concrete argument for FID-110 (Engine Decomposition) — the monolith is too large for the editing tools.
+
+3. **VecDeque doesn't have `.last()`.** Use `.back()` for the last element of a `VecDeque`. The `market_stores.candles()` method returns `&VecDeque<Candle>`.
+
+4. **#[serde(default)] is required for new struct fields.** Without it, existing persisted positions fail to deserialize on startup. This was caught by the code reviewer.
+
+5. **Starting equity threshold should be increase-only.** Triggering on decreases erases loss history. The 50% threshold exists for config switches, not for hiding losses.
+
+### Files changed this session
+
+- `src/engine/mod.rs` — multiple fixes + broken A03
+- `src/execution/reconciliation.rs` — A02 + RPC error handling
+- `src/api/mod.rs` — A01
+- `src/agent/context_state.rs` — A04
+- `src/monitor/journal.rs` — starting equity threshold
+- `src/core/types.rs` — Position.token_address
+- `src/execution/dex/trader.rs` — token_address on Position creation
+- `src/execution/portfolio.rs` — token_address on test fixture
+- `src/main.rs` — token_address on wallet recovery
+- `dashboard/src/app/page.tsx` — $30 → $0
+- `Cargo.toml` — 0.14.0 → 0.14.1
+
+**Tests:** 315 pass (before A03 breakage). After A03 fix, expect same.
+
+---
+
+*Buffy/Codebuff session 2026-06-14 ~17:00 EST — 10 tasks, 9 complete, A03 broken, Kilo handoff*

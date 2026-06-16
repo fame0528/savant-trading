@@ -1,8 +1,29 @@
 # HANDOFF.md — Session Compaction Document
 
 **Generated:** 2026-06-06 04:05 EST
-**Version:** 0.10.2
-**Branch:** main (latest commit: ed0a002)
+**Version:** 0.14.1
+**Branch:** main
+**Last updated:** 2026-06-14 20:00 EST (release prep)
+
+---
+
+## CURRENT STATE (2026-06-14, post-incident, post-archive-cleanup)
+
+> **This document's original content (below the line) describes the state on 2026-06-06 and is preserved as a historical record. The current state is significantly different.**
+
+- **Engine status:** Can be started with `start.bat`. Defaults to Anvil fork testnet config (`config\test-anvil.toml`). Use `set SAVANT_CONFIG=config\default.toml` for production.
+- **Wallet (Arbitrum One, `0x543CA...`):** USDC = 0, GRT = 2.608306730 (stranded dust, ~$0.05), ETH = 0.000937. No real trading capital.
+- **Anvil Fork (port 8545):** Prefunded with 10 ETH + 50 USDC + 2.608 GRT. Use `scripts/prefund_wallet.sh` to restart.
+- **`live_execution` config flag:** `false` in `config/default.toml`, `true` in `config/test-anvil.toml`.
+- **The 2026-06-13 incident:** 4 trades closed with masked $0 PnL. ~$40 lost. Root cause: FID-146's "5% per-trade loss breaker" was marked "fixed" but had zero production callers.
+- **Structural fixes applied (2026-06-14):** FID-147 (heartbeat), FID-148 (close-path per-trade loss wiring), FID-149 (phantom wipe), FID-150 (chain re-query), FID-151 (ECHO.md amendment), FID-152 (FID-146 status correction). All 6 FIDs moved to `dev/fids/archive/`.
+- **Test results:** 315 tests pass (309 baseline + 4 reconciliation + 2 doc), 0 regressions. `cargo check` clean.
+- **Active FIDs:** 14 (open or partially-complete). All in `dev/fids/`. See `MASTER-FID.md` for the current count.
+- **Session-summaries:** all 31 historical sessions moved to `dev/session-summaries/archive/`. Active dir is empty. `HANDOFF.md` is the current-state document.
+- **Logs:** 2 historical logs moved to `dev/logs/archive/`. Active dir is empty.
+- **Vera memory:** `dev/vera/` contains 15 files (SOUL, README, MEMORY, index, 8 journal entries, lessons, decisions, reflections, specs).
+- **Open threads:** Anvil fork testnet operational (Arbitrum Sepolia deferred), `live_execution` decision, jury veto wiring, per-token divergence check, 26-tx CSV gap investigation, capital acquisition.
+- **New features this session:** `--config` CLI flag, `SAVANT_CONFIG` env var in start.bat, Anvil fork testnet config (`config/test-anvil.toml`), wallet reconciliation fix, `scripts/prefund_wallet.sh` (Anvil + ETH/USDC prefund), fresh DB wipe + backup.
 
 ---
 

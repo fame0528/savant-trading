@@ -16,7 +16,9 @@ pub mod verdict_parser;
 
 pub use judge::{JudgeError, JuryJudge};
 pub use key_manager::{JuryKey, JuryKeyError, JuryKeyManager};
-pub use pool::{JuryPool, JuryPoolMetrics};
+pub use pool::{
+    JurorRecord, JuryCycleRecord, JuryKeyHealth, JuryPool, JuryPoolMetrics, VerdictBreakdown,
+};
 
 use serde::{Deserialize, Serialize};
 

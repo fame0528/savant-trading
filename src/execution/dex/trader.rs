@@ -690,8 +690,23 @@ impl<B: DexBackend + 'static> DexTrader<B> {
     }
 
     /// Build a swap transaction via the backend (handles Permit2 signing).
+    /// FID-160 Fix 2: Validates the response — rejects zero buy_amount (dust/stale routes).
     pub async fn build_swap_tx(&self, params: &SwapParams) -> Result<SwapTx, ExecutionError> {
-        self.backend.build_swap_tx(params).await
+        let swap_tx = self.backend.build_swap_tx(params).await?;
+
+        // FID-160: Reject zero buy_amount — 0x can return valid-looking
+        // calldata with 0 output when liquidity is stale or route is bad.
+        if let Some(ref buy) = swap_tx.buy_amount {
+            let buy_f64: f64 = buy.parse().unwrap_or(0.0);
+            if buy_f64 <= 0.0 {
+                return Err(ExecutionError::Other(format!(
+                    "FID-160: 0x returned zero buy_amount for {} -> {} — rejecting swap",
+                    params.src_token, params.dst_token
+                )));
+            }
+        }
+
+        Ok(swap_tx)
     }
 
     /// Register an additional chain for multi-chain execution (FID-045).
@@ -1240,12 +1255,20 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                     // Parse market price from quote (0x returns USD price, 1inch returns src amount)
                     let market_price_raw: f64 = quote.price.parse().unwrap_or(0.0);
 
-                    // If market price unavailable, calculate from buy/sell amounts
-                    // This is the same as effective_price, so spread = 0 (no spread check needed)
+                    // FID-160 Fix 3: When market price unavailable, reject instead of
+                    // defaulting to effective_price (which makes spread=0, a tautology).
                     let market_price = if market_price_raw > 0.0 {
                         market_price_raw
                     } else {
-                        effective_price
+                        log_warn!(
+                            "SPREAD",
+                            "Market price unavailable for {} — rejecting swap (cannot validate spread)",
+                            swap_params.dst_token
+                        );
+                        return Err(ExecutionError::Other(format!(
+                            "Market price unavailable for {} — cannot validate spread",
+                            swap_params.dst_token
+                        )));
                     };
 
                     let spread_bps =
@@ -1282,7 +1305,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         // catch_unwind prevents panics in the HTTP client from killing the engine.
         let swap_tx = match tokio::time::timeout(
             std::time::Duration::from_secs(15),
-            std::panic::AssertUnwindSafe(self.backend.build_swap_tx(&swap_params)).catch_unwind(),
+            std::panic::AssertUnwindSafe(self.build_swap_tx(&swap_params)).catch_unwind(),
         )
         .await
         {
@@ -1411,19 +1434,38 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             "data": call_data
         }, "latest"]);
 
-        let current_allowance = match self.rpc_call("eth_call", call_params).await {
-            Ok(result) => {
-                let hex_str = result.as_str().unwrap_or("0x0");
-                U256::from_str_radix(hex_str.trim_start_matches("0x"), 16).unwrap_or(U256::ZERO)
+        // FID-161: Retry allowance check up to 3 times with backoff.
+        // On Anvil forks, the first RPC call can fail with "metadata is not found"
+        // because the storage slot hasn't been cached yet. Retrying gives the fork
+        // time to fetch the data from the upstream archive node.
+        let mut current_allowance = U256::ZERO;
+        for attempt in 1..=3u32 {
+            match self.rpc_call("eth_call", call_params.clone()).await {
+                Ok(result) => {
+                    let hex_str = result.as_str().unwrap_or("0x0");
+                    current_allowance = U256::from_str_radix(
+                        hex_str.trim_start_matches("0x"), 16,
+                    ).unwrap_or(U256::ZERO);
+                    break;
+                }
+                Err(e) => {
+                    if attempt < 3 {
+                        warn!(
+                            "Allowance check attempt {}/3 failed for {}: {}. Retrying in {}ms...",
+                            attempt, token_address, e, attempt * 500
+                        );
+                        tokio::time::sleep(
+                            std::time::Duration::from_millis(attempt as u64 * 500)
+                        ).await;
+                    } else {
+                        warn!(
+                            "Failed to check {} allowance after 3 attempts: {} — assuming zero",
+                            token_address, e
+                        );
+                    }
+                }
             }
-            Err(e) => {
-                warn!(
-                    "Failed to check {} allowance: {} — assuming zero",
-                    token_address, e
-                );
-                U256::ZERO
-            }
-        };
+        }
 
         let required = U256::from_str_radix(amount_wei, 10).unwrap_or(U256::ZERO);
 
@@ -2065,6 +2107,7 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
                 strategy_name: format!("dex_{}", self.backend.name()),
                 opened_at: Utc::now(),
                 scale_level: ScaleLevel::Full,
+                token_address: super::lookup_token(pair.split('/').next().unwrap_or(""), self.chain_id).map(|(addr, _)| addr).unwrap_or_default(),
             },
         );
 

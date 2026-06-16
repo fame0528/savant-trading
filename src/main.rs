@@ -128,8 +128,33 @@ async fn main() -> anyhow::Result<()> {
 
     let args: Vec<String> = std::env::args().collect();
 
-    let config = AppConfig::load(Path::new("config/default.toml")).unwrap_or_else(|e| {
-        warn!("Config load failed ({}), using defaults", e);
+    // Parse --config flag early and strip it from args so it doesn't
+    // interfere with subcommand matching (serve, --test, --dry-run, etc.)
+    let config_path = args
+        .iter()
+        .position(|a| a == "--config")
+        .and_then(|i| args.get(i + 1).map(|p| (i, p.clone())))
+        .map(|(_, path)| path)
+        .unwrap_or_else(|| "config/default.toml".to_string());
+
+    let args: Vec<String> = args
+        .into_iter()
+        .scan(false, |skip, a| {
+            if *skip {
+                *skip = false;
+                return Some(None); // skip this arg (the path value)
+            }
+            if a == "--config" {
+                *skip = true;
+                return Some(None); // skip the flag itself
+            }
+            Some(Some(a))
+        })
+        .flatten()
+        .collect();
+
+    let config = AppConfig::load(Path::new(&config_path)).unwrap_or_else(|e| {
+        warn!("Config load failed from '{}' ({}), using defaults", config_path, e);
         AppConfig::default()
     });
 
@@ -510,6 +535,9 @@ fn print_help() {
     println!("  savant backtest           Backtest on historical data");
     println!("  savant report             Performance report");
     println!();
+    println!("OPTIONS:");
+    println!("  --config <path>           Use custom config file (default: config/default.toml)");
+    println!();
     println!("DASHBOARD: http://localhost:3000  (requires `savant serve`)");
     println!("API:       http://localhost:8080/api/");
     println!("  /status /portfolio /positions /trades /decisions");
@@ -548,8 +576,15 @@ async fn emergency_liquidate() -> anyhow::Result<()> {
     }
 
     // Load config and create executor
+    let config_path = std::env::args()
+        .collect::<Vec<_>>()
+        .windows(2)
+        .find(|w| w[0] == "--config")
+        .and_then(|w| w.get(1))
+        .cloned()
+        .unwrap_or_else(|| "config/default.toml".to_string());
     let config =
-        savant_trading::core::config::AppConfig::load(std::path::Path::new("config/default.toml"))?;
+        savant_trading::core::config::AppConfig::load(std::path::Path::new(&config_path))?;
     let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)?;
     let api_key = std::env::var(&config.exchange.dex.api_key_env)?;
 
@@ -761,6 +796,7 @@ async fn recover_positions(config: &savant_trading::core::config::AppConfig) -> 
                 strategy_name: "recovered".to_string(),
                 opened_at: chrono::Utc::now(),
                 scale_level: ScaleLevel::Full,
+                token_address: savant_trading::execution::dex::lookup_token(token.symbol, config.exchange.dex.chain_id).map(|(addr, _)| addr).unwrap_or_default(),
             };
             recovered.push((pos, value));
         }

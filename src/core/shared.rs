@@ -2,8 +2,11 @@
 
 use std::collections::{HashMap, VecDeque};
 use std::sync::Arc;
+use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 
+use crate::agent::jury::{JuryCycleRecord, JuryKeyHealth, JuryPoolMetrics};
+use crate::core::config::RegimeSizes;
 use crate::core::types::{AccountState, Position, TradeRecord};
 use crate::insight::aggregator::MarketContext;
 
@@ -52,6 +55,52 @@ pub struct SharedEngineData {
     pub inject_context_queue: Arc<RwLock<Vec<String>>>,
     /// Command history for undo support (last 10 commands).
     pub command_history: Arc<RwLock<VecDeque<crate::agent::commands::CommandHistoryEntry>>>,
+
+    // ---- FID-162: Jury observability surfaces ----
+    /// Live jury state snapshot (cumulative + key health + veto flag).
+    pub jury_state: Arc<RwLock<JuryStateSnapshot>>,
+    /// Ring buffer of recent jury cycle records (capped 50).
+    pub jury_recent: Arc<RwLock<VecDeque<JuryCycleRecord>>>,
+}
+
+/// FID-162: Live jury state for `/api/jury/status`.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JuryStateSnapshot {
+    pub enabled: bool,
+    pub jury_size: usize,
+    pub m3_control_active: bool,
+    pub free_models_used: Vec<String>,
+    pub veto_enabled: bool,
+    pub veto_threshold: f64,
+    pub regime_sizes: RegimeSizes,
+    pub cumulative: JuryPoolMetrics,
+    pub key_health: JuryKeyHealth,
+    pub estimated_m3_calls: u64,
+    pub estimated_free_model_calls: u64,
+    pub veto_flag_active_now: bool,
+    pub last_cycle_at: Option<String>, // null if never ran
+    pub source: String, // "live" | "stale" | "never_ran" | "engine_off" | "disabled"
+}
+
+impl Default for JuryStateSnapshot {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            jury_size: 0,
+            m3_control_active: false,
+            free_models_used: vec![],
+            veto_enabled: false,
+            veto_threshold: 0.0,
+            regime_sizes: RegimeSizes::default(),
+            cumulative: JuryPoolMetrics::default(),
+            key_health: JuryKeyHealth::default(),
+            estimated_m3_calls: 0,
+            estimated_free_model_calls: 0,
+            veto_flag_active_now: false,
+            last_cycle_at: None,
+            source: "disabled".to_string(),
+        }
+    }
 }
 
 /// Memory system state for TUI display.
@@ -83,6 +132,10 @@ pub struct DecisionRecord {
     /// Dashboard shows a red "REJECTED" badge when this is Some.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub execution_status: Option<String>,
+    /// FID-161: Tracks WHY the action was changed from the LLM's original response.
+    /// None = LLM's original action. Some = the override that fired.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub override_source: Option<String>,
 }
 
 /// Severity level for activity log entries.
@@ -107,6 +160,10 @@ pub enum ActivityLevel {
 pub struct ActivityEntry {
     pub timestamp: String,
     pub level: ActivityLevel,
+    /// FID-162: Subsystem tag (`"JURY"`, `"ENGINE"`, `"RISK"`, `"EXEC"`, `"LLM"`, `"RECON"`, `"VAULT"`, `"MEM"`).
+    /// `None` for legacy callers. Dashboard renders as a colored chip.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
     pub pair: String,
     pub message: String,
 }
@@ -144,15 +201,28 @@ impl SharedEngineData {
             pending_approval: Arc::new(RwLock::new(None)),
             inject_context_queue: Arc::new(RwLock::new(Vec::new())),
             command_history: Arc::new(RwLock::new(VecDeque::new())),
+            // FID-162: jury observability surfaces
+            jury_state: Arc::new(RwLock::new(JuryStateSnapshot::default())),
+            jury_recent: Arc::new(RwLock::new(VecDeque::with_capacity(50))),
         }
     }
 
     /// Log an activity entry. Keeps last 200 entries.
     /// Uses try_write() to avoid blocking the engine if the API server holds a read lock.
-    pub async fn log_activity(&self, level: ActivityLevel, pair: &str, message: &str) {
+    ///
+    /// FID-162: `source` tags the subsystem for the dashboard. Pass `Some("JURY")`,
+    /// `Some("RISK")`, etc. Pass `None` for legacy callers (will not render a source chip).
+    pub async fn log_activity(
+        &self,
+        level: ActivityLevel,
+        source: Option<&str>,
+        pair: &str,
+        message: &str,
+    ) {
         let entry = ActivityEntry {
             timestamp: chrono::Local::now().format("%H:%M:%S").to_string(),
             level,
+            source: source.map(String::from),
             pair: pair.to_string(),
             message: message.to_string(),
         };

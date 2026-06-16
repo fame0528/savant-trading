@@ -271,6 +271,16 @@ impl ZeroXBackend {
             hex::encode(&sig_bytes)
         );
 
+        // TEMP DEBUG (FID-159): log the actual signature length we're producing
+        tracing::warn!(
+            "FID-159 DEBUG: sign_permit2 produced sig length={}, r_len={}, s_len={}, v={}, hex_prefix=0x{}",
+            sig_bytes.len(),
+            r.len(),
+            s.len(),
+            v,
+            hex::encode(&sig_bytes[..8.min(sig_bytes.len())])
+        );
+
         Ok(hex::encode(&sig_bytes))
     }
 
@@ -557,6 +567,9 @@ impl DexBackend for ZeroXBackend {
             value: value.to_string(),
             gas: gas_with_buffer,
             gas_price,
+            // FID-160: Capture API response amounts for post-quote validation
+            buy_amount: Some(json["buyAmount"].as_str().unwrap_or("0").to_string()),
+            sell_amount: Some(json["sellAmount"].as_str().unwrap_or("0").to_string()),
         })
     }
 

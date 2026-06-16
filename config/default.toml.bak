@@ -1,0 +1,330 @@
+[exchange]
+name = "market_data"
+# Execution backend: "0x" (DEX, no KYC), "1inch" (DEX, no KYC)
+backend = "0x"
+ws_url = "wss://ws.kraken.com/v2"
+rest_url = "https://api.kraken.com"
+
+[exchange.dex]
+# DEX-specific settings (only used when backend = "0x" or "1inch")
+chain_id = 42161
+rpc_url = "https://arb1.arbitrum.io/rpc"
+wallet_key_env = "WALLET_PRIVATE_KEY"
+api_key_env = "ZEROEX_API_KEY"
+# FID-109: Slippage 30 bps minimum for 0x Gasless API compatibility
+slippage_pct = 0.0030
+
+# Multi-chain configuration (FID-045)
+# Each chain has its own RPC, gas token, and slippage settings.
+# The engine scans enabled chains in parallel.
+# Add chain IDs to 'enabled' to activate them.
+[chains.ethereum]
+chain_id = 1
+name = "Ethereum"
+rpc_url = "https://eth.llamarpc.com"
+native_token = "ETH"
+min_gas_native = 0.005
+slippage_pct = 0.005
+enabled = true
+
+[chains.arbitrum]
+chain_id = 42161
+name = "Arbitrum"
+rpc_url = "https://arb1.arbitrum.io/rpc"
+native_token = "ETH"
+min_gas_native = 0.002
+slippage_pct = 0.005
+enabled = true
+
+[chains.base]
+chain_id = 8453
+name = "Base"
+rpc_url = "https://mainnet.base.org"
+native_token = "ETH"
+min_gas_native = 0.001
+slippage_pct = 0.005
+enabled = true
+
+[chains.optimism]
+chain_id = 10
+name = "Optimism"
+rpc_url = "https://mainnet.optimism.io"
+native_token = "ETH"
+min_gas_native = 0.001
+slippage_pct = 0.0075
+enabled = true
+
+[chains.bsc]
+chain_id = 56
+name = "BNB Smart Chain"
+rpc_url = "https://bsc-dataseed.binance.org"
+native_token = "BNB"
+min_gas_native = 0.001
+slippage_pct = 0.005
+enabled = true
+
+# FID-153: Ethereum Sepolia testnet (chain_id 11155111) — THE testnet for 0x
+# - 0x V2 Settler contract IS deployed on Sepolia (chain_config.json in 0x-settler repo confirms)
+# - Deployer/Registry: 0x00000000000004533Fe15556B1E086BB1A72cEae
+# - AllowanceHolder: 0x0000000000001fF3684f28c67538d4D072C22734 (same address as Cancun-hardfork mainnets)
+# - Permit2: 0x000000000022D473030F116dDEE9F6B43aC78BA3 (universal across all chains)
+# - Read-only by default; engine selects this chain only when SAVANT_CHAIN=sepolia
+# - Test ETH: free from Alchemy, QuickNode, or Chainlink Sepolia faucets
+# - Test USDC: 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238 (Circle bridged USDC, same address on Sepolia and Arbitrum Sepolia)
+# - Test WETH: 0xfFf9976782d46cc05630d1f6eBab18b2324d6B14
+# - 0x API (quote discovery) is MAINNET ONLY — no testnet endpoint. The engine must
+#   construct calldata directly (using the deployer/registry to get the current
+#   Settler address) or use a pre-built 0x quote from mainnet and submit to Sepolia.
+#   For the testnet validation loop, we use the direct-contract path (FID-155).
+[chains.sepolia]
+chain_id = 11155111
+name = "Ethereum Sepolia"
+rpc_url = "https://rpc.sepolia.org"
+native_token = "ETH"
+min_gas_native = 0.0001   # Lower than mainnet; test ETH is free
+slippage_pct = 0.01        # Higher tolerance for testnet (liquidity is thinner)
+enabled = false              # NOT enabled by default. Set SAVANT_CHAIN=sepolia AND set enabled=true in your local config to use.
+
+# KNOWN LIMITATION (FID-153, 2026-06-14): 0x V2 Settler is NOT deployed on Arbitrum Sepolia (chain_id 421614).
+# The 0x-settler chain_config.json lists Ethereum Sepolia (chainId 11155111) as the only testnet.
+# This means FID-133's adversarial scenarios and FID-155's direct-contract tests must target
+# Ethereum Sepolia, not Arbitrum Sepolia. The Arbitrum Sepolia USDC address added earlier is
+# documented but unused; it's preserved in case 0x-settler adds Arbitrum Sepolia support in the future.
+# Tracking: 0xProject/0x-settler chain_config.json — re-check periodically for Arbitrum Sepolia entry.
+# Re-discover token addresses every N cycles (default 10 = ~50 min)
+discovery_interval_cycles = 10
+# Minimum 24h volume (USD) for discovered tokens
+min_volume_usd = 1000000.0
+# Minimum holder count for discovered tokens
+min_holders = 500
+# Validate new addresses via 0x /price endpoint before adding
+validate_via_0x = true
+# Path to persistent token store (JSON)
+persist_path = "data/tokens.json"
+
+[risk]
+max_risk_per_trade = 0.005
+# Position allocation — scalping: 0.5% risk per trade, full deploy at low balance
+# At $25 with full_deploy: 100% of capital, stop at 0.5%
+dynamic_risk_tiers = [
+    { balance = 500.0, risk_pct = 0.005 },    # 0.5% risk per trade at low balance
+    { balance = 5000.0, risk_pct = 0.003 },   # 0.3% risk per trade
+    { balance = 50000.0, risk_pct = 0.002 },  # 0.2% risk per trade
+    { balance = 999999.0, risk_pct = 0.001 }, # 0.1% risk per trade
+]
+# Dynamic safety nets — scalping: tighter limits, faster halts
+# At $25: daily_loss=$1.25, drawdown=$2.50. Quick stop on bad days.
+max_daily_loss = 0.05
+max_drawdown = 0.99  # Disabled — AI agent trades on data, not emotions. Re-enable if needed.
+min_daily_loss_usd = 1.25    # Floor: 5% of $25
+min_drawdown_usd = 2.50      # Floor: 10% of $25
+max_positions = 1
+# Dynamic R:R — scalping needs 1.5:1 minimum
+min_rr_ratio = 1.5
+min_rr_ratio_low_balance = 1.2  # When balance < $50, accept tighter R:R
+low_balance_threshold = 50.0    # Below this, use relaxed R:R
+# Spread filter — reject trades where spread > 25bps (scalping)
+spread_filter_bps = 30.0
+# FID-108: Session liquidity penalty — deep Asian session has 42% less depth
+# Multiplier applied to LLM confidence during low-liquidity hours
+session_penalty_deep_asian = 0.90
+# Risk buckets for correlation cap (FID-035)
+# Max 1 open position from meme bucket at any time
+[risk.buckets]
+macro = ["BTC/USD", "ETH/USD", "SOL/USD", "ADA/USD", "AVAX/USD"]
+legacy = ["XRP/USD", "LINK/USD", "DOGE/USD"]
+meme = ["PEPE/USD", "SHIB/USD", "FLOKI/USD", "TURBO/USD", "MOG/USD"]
+
+[strategy.momentum]
+ema_period = 100
+volume_spike_multiplier = 2.0
+atr_compression_threshold = 0.7
+
+[strategy.mean_reversion]
+profile_periods = 100
+value_area_pct = 0.70
+volume_spike_multiplier = 1.5
+
+[strategy.regime]
+adx_period = 14
+adx_trending_threshold = 25.0
+adx_ranging_threshold = 20.0
+atr_volatility_multiplier = 1.5
+
+[mode]
+# SAFETY: live_execution = true means REAL MONEY trades on the live account.
+# A failed swap or bad slippage costs real capital.
+# Set to false for paper-trading / backtesting mode.
+# When false, the engine still evaluates and logs decisions but never submits txns.
+live_execution = true
+
+[ai]
+# **FID-138 (M3):** Switched from openrouter/owl-alpha to TokenRouter/MiniMax-M3
+# for the free M3 trial week. disable_thinking=true skips chain-of-thought.
+# max_tokens=4096 constrains reasoning budget.
+#
+# To switch back to owl-alpha:
+#   provider = "openrouter"
+#   endpoint = "https://openrouter.ai/api/v1"
+#   model = "openrouter/owl-alpha"
+#   api_key_env = "OPENROUTER_API_KEY"
+#   max_tokens = 8192
+#   disable_thinking = false
+provider = "tokenrouter"
+endpoint = "https://api.tokenrouter.com/v1"
+model = "MiniMax-M3"
+api_key_env = "TOKEN_ROUTER_API_KEY"
+autonomy_level = 3
+max_decisions_per_hour = 20
+# Expanded to use more of the 1M context window (FID-015)
+context_window_candles = 500
+knowledge_token_budget = 12000
+price_tolerance_pct = 1.0
+max_retries = 3
+# 0.6 optimal for MoE reasoning models emitting structured JSON (FID-015)
+temperature = 0.6
+# Nucleus sampling — limits token pool to top 95% probability mass
+top_p = 0.95
+# Constrain thinking budget for M3: 4096 forces concise JSON action blocks.
+# M3 will exhaust the full budget on chain-of-thought if not constrained.
+max_tokens = 4096
+# Reasoning model needs room for chain-of-thought (FID-015)
+timeout_secs = 300
+# FID-138: Disable chain-of-thought reasoning for M3.
+# Gets the final decision JSON without the <think> preamble.
+disable_thinking = true
+
+# OpenRouter-specific configuration (only used when provider = "openrouter")
+[ai.openrouter]
+endpoint = "https://openrouter.ai/api/v1"
+model = "openrouter/owl-alpha"
+api_key_env = "OPENROUTER_API_KEY"
+# Your site URL — OpenRouter uses this for ranking
+referer = "https://github.com/fame0528/savant-trading"
+# Your app name — shown in OpenRouter dashboard attribution
+title = "Savant Trading Engine"
+
+[ai.jury]
+enabled = true
+jury_size = 10
+# openrouter/free is a router that selects free models at random from all
+# available free models on OpenRouter (24 models across NVIDIA, OpenInference,
+# Venice, Google, etc.). The router handles provider assignment automatically.
+# Juror 0 is always the M3 control group (uses provider_config_m3, not this list).
+models = [
+  "openrouter/free",
+]
+quorum_pct = 0.6
+timeout_secs = 45
+max_consecutive_failures = 3
+key_prefix = "savant-jury"
+cleanup_keys_on_shutdown = true
+jury_veto_enabled = true
+jury_veto_threshold = 0.70
+
+[ai.openrouter.management]
+# Management API key (created on OpenRouter dashboard, used for admin operations only)
+# Cannot be used for LLM completion calls
+management_key_env = "OPENROUTER_MANAGEMENT_KEY"
+endpoint = "https://openrouter.ai/api/v1/keys"
+
+# NVIDIA NIM configuration (only used when provider = "nvidia")
+[ai.nvidia]
+endpoint = "https://integrate.api.nvidia.com/v1"
+model = "deepseek-ai/deepseek-v4-flash"
+api_key_env = "NVIDIA_API_KEY"
+
+# TokenRouter configuration (only used when provider = "tokenrouter")
+# OpenAI-compatible gateway: https://api.tokenrouter.com/v1
+# Supports MiniMax M3 (1M context, 512K output, 34 tok/s)
+[ai.tokenrouter]
+endpoint = "https://api.tokenrouter.com/v1"
+model = "MiniMax-M3"
+api_key_env = "TOKEN_ROUTER_API_KEY"
+
+# Sandbox configuration (FID-123) — independent from [ai]
+# Allows testing different models/providers while the engine runs in production.
+# Falls back to [ai] fields when not configured.
+#
+# **FID-138 (M3 thinking leak):** max_tokens=4096 constrains reasoning models
+# (MiniMax M3) so they don't exhaust the budget on chain-of-thought.
+# disable_thinking=true skips the reasoning phase entirely for M3.
+#
+# Usage:
+#   cargo run --release -- --test --sandbox
+#   cargo run --release -- --test --sandbox --model minimax/minimax-m3
+#   cargo run --release -- --test --sandbox --endpoint https://api.tokenrouter.com/v1 --api-key-env TOKENROUTER_API_KEY
+[sandbox]
+endpoint = "https://api.tokenrouter.com/v1"
+model = "MiniMax-M3"
+api_key_env = "TOKEN_ROUTER_API_KEY"
+# Constrain thinking budget: M3 will exhaust 131K tokens on chain-of-thought.
+# 8192 gives M3 room to compute conviction scores without triggering think blocks.
+# 4096 was too tight — M3 couldn't compute trigger weights and defaulted to 0.0.
+max_tokens = 8192
+temperature = 0.6
+top_p = 0.95
+timeout_secs = 300
+# Skip chain-of-thought entirely for M3 (reasoning consumed by model internally).
+# Gets the final decision JSON without the <think> preamble.
+disable_thinking = true
+
+[sandbox.management]
+management_key_env = "OPENROUTER_MANAGEMENT_KEY"
+endpoint = "https://openrouter.ai/api/v1/keys"
+
+[insight]
+funding_rate_enabled = true
+liquidation_enabled = true
+fear_greed_enabled = true
+btc_dominance_enabled = true
+exchange_flows_enabled = true
+news_sentiment_enabled = true
+rss_enabled = true
+rss_max_items = 10
+onchain_enabled = true
+
+[insight.coinmarketcap]
+# CoinMarketCap API for dynamic pair discovery
+# Free tier: 10K calls/month, data refreshed every 1 minute
+api_key_env = "COINMARKETCAP_API_KEY"
+# How many top coins to fetch for pair discovery
+top_coins_limit = 100
+# Minimum 24h volume to consider a pair tradeable (USD)
+min_volume_24h = 1000000
+# Minimum volatility score to include in active trading
+min_volatility_score = 5.0
+
+[training]
+# Minimum sample size for semantic pattern promotion
+min_sample_size = 5
+# Win rate threshold below which a condition is an anti-pattern
+failure_win_rate = 0.30
+# Maximum portfolio heat (total risk / equity)
+max_portfolio_heat = 0.40
+# SQLite backup interval in hours
+backup_interval_hours = 6
+# Maximum number of backup files to keep
+max_backups = 7
+# Knowledge utility learning rate (per episode)
+utility_learning_rate = 0.05
+# Minimum utility score before knowledge unit is archived
+utility_archive_threshold = 0.30
+# Maximum active experience replay lessons
+max_active_lessons = 50
+# Brier score threshold for confidence cap enforcement
+brier_cap_threshold = 0.25
+# Minimum trades before memory context activates
+memory_context_min_trades = 5
+
+# FID-147: Wallet Reconciliation Heartbeat
+# Compares in-memory portfolio state to on-chain reality at the start of every cycle.
+# Halts the engine on divergence beyond the configured thresholds.
+# RPC failure does NOT halt (logs a warning instead) — RPC unreliability is not state drift.
+[reconciliation]
+chain_id = 42161                  # Arbitrum One mainnet
+# wallet_address reads from $WALLET_ADDRESS env var (set in .env or runtime)
+rpc_url = "https://arb1.arbitrum.io/rpc"
+divergence_threshold_usd = 0.10   # Sub-$1 account scale: $0.10 is meaningful
+divergence_threshold_pct = 0.01   # 1% of equity
+interval_cycles = 1               # Every cycle. Increase for less latency-sensitive runs.

@@ -87,6 +87,12 @@ impl ContextEngine {
     }
 
     fn build_tsln_message(&mut self, ctx: &FullContext) -> String {
+        // FID-163 Part B: Reset TSLN serializer state per pair.
+        // A single TslnSerializer instance is reused across all 30 pairs in a cycle;
+        // without this reset, last_close from pair A bleeds into pair B's first
+        // candle diff, producing wildly wrong differential encodings.
+        self.tsln_serializer.reset();
+
         let mut msg = String::new();
         msg.push_str(&format!("## Current Market Data — {}\n\n", ctx.pair));
 
@@ -96,7 +102,7 @@ impl ContextEngine {
             msg.push_str("### ZigZag Pivots\n");
             for (idx, price, is_peak) in &pivots {
                 let label = if *is_peak { "PEAK" } else { "TROUGH" };
-                msg.push_str(&format!("  [{}] #{} @ ${:.2}\n", label, idx, price));
+                msg.push_str(&format!("  [{}] #{} @ ${}\n", label, idx, price));
             }
             msg.push('\n');
         }
@@ -104,11 +110,11 @@ impl ContextEngine {
         // KBar features (compact statistical summary)
         if let Some((z, vol, trend, vol_ratio)) = IndicatorEngine::kbar_features(ctx.candles) {
             msg.push_str(&format!(
-        "### KBar Features\nz-score: {:.2} | AnnVol: {:.4} | Trend: {:.4} | VolRatio: {:.2}{}\n\n",
+        "### KBar Features\nz-score: {} | AnnVol: {} | Trend: {} | VolRatio: {}{}\n\n",
         z, vol, trend, vol_ratio,
         ctx.indicators.volume_sma.map_or_else(
             String::new,
-            |v| format!(" (avg_vol: ${:.0})", v),
+            |v| format!(" (avg_vol: ${})", v),
         )
             ));
         }
@@ -122,10 +128,10 @@ impl ContextEngine {
         };
         let tsln_data = self.tsln_serializer.serialize_data_only(candles_to_use);
         msg.push_str(&format!("### TSLN Candle Data ({} candles)\n```\n{}\n```\n", candles_to_use.len(), tsln_data));
-        
+
         // Live price
         if let Some(live) = ctx.live_price {
-            msg.push_str(&format!("**LIVE PRICE: ${:.4}**\n", live));
+            msg.push_str(&format!("**LIVE PRICE: ${}**\n", live));
         }
 
         // Indicators (compact)
@@ -141,7 +147,7 @@ impl ContextEngine {
         // Market context
         msg.push_str(&format!("Regime: {:?}\n", ctx.regime));
         if let Some(imb) = ctx.order_book_imbalance {
-            msg.push_str(&format!("OrderBook Imbalance: {:+.2}\n", imb));
+            msg.push_str(&format!("OrderBook Imbalance: {:+}\n", imb));
         }
 
         // Market insight (truncated)
@@ -152,7 +158,7 @@ impl ContextEngine {
             msg.push_str("\n## Open Positions\n");
             for pos in ctx.positions {
                 msg.push_str(&format!(
-                    "- {} {} @ {:.2} | SL: {:.2} | TP1: {:.2} | PnL: {:.2}\n",
+                    "- {} {} @ {} | SL: {} | TP1: {} | PnL: {}\n",
                     pos.pair, pos.side, pos.entry_price, pos.stop_loss, pos.take_profit_1, pos.unrealized_pnl
                 ));
             }
@@ -160,7 +166,7 @@ impl ContextEngine {
 
         // Account
         msg.push_str(&format!(
-            "\n## Account\nBalance: ${:.2} | Equity: ${:.2} | DD: {:.1}%\n",
+            "\n## Account\nBalance: ${} | Equity: ${} | DD: {}%\n",
             ctx.account.balance,
             ctx.account.equity,
             ctx.account.drawdown_pct * 100.0,
@@ -168,6 +174,131 @@ impl ContextEngine {
         if ctx.account.open_positions >= ctx.account.max_positions {
             msg.push_str("**AT MAX POSITIONS** — Only ADJUST_STOP or PASS.\n");
         }
+
+        // === FID-163 Part C: Add 9 missing context blocks (full parity with legacy path) ===
+
+        // 1. Higher-timeframe candles
+        for (tf, tf_candles) in &ctx.higher_tf_candles {
+            if tf_candles.is_empty() {
+                continue;
+            }
+            msg.push_str(&format!("\n### Higher Timeframe — {} {}\n", tf, ctx.pair));
+            if let Some(last) = tf_candles.last() {
+                msg.push_str(&format!(
+                    "Latest {} Candle: O={} H={} L={} C={} V={}\n",
+                    tf, last.open, last.high, last.low, last.close, last.volume
+                ));
+            }
+        }
+
+        // 2. Volume profile
+        if let Some(vp) = ctx.volume_profile {
+            msg.push_str(&format!(
+                "\n## Volume Profile\nPOC: {} | VAH: {} | VAL: {}\n",
+                vp.poc_price, vp.value_area_high, vp.value_area_low
+            ));
+        }
+
+        // 3. On-chain analytics
+        let oc = &ctx.market_context.onchain;
+        if oc.mvrv.is_some() || oc.sopr.is_some() || oc.nvt_signal.is_some() {
+            msg.push_str("\n## On-Chain Analytics\n");
+            if let Some(mvrv) = oc.mvrv {
+                let state = if mvrv > 3.5 {
+                    "EUPHORIA (sell signal)"
+                } else if mvrv > 2.0 {
+                    "Warming up"
+                } else if mvrv > 1.0 {
+                    "Neutral/Undervalued"
+                } else {
+                    "CAPITULATION (strong buy)"
+                };
+                msg.push_str(&format!("MVRV: {} — {}\n", mvrv, state));
+            }
+            if let Some(sopr) = oc.sopr {
+                let state = if sopr > 1.0 {
+                    "Profit realization"
+                } else {
+                    "Loss realization (capitulation)"
+                };
+                msg.push_str(&format!("SOPR: {} — {}\n", sopr, state));
+            }
+            if let Some(nvt) = oc.nvt_signal {
+                msg.push_str(&format!("NVT Signal: {}\n", nvt));
+            }
+        }
+
+        // 4. Recent news
+        if !ctx.market_context.rss_items.is_empty() {
+            msg.push_str(&format!(
+                "\n## Recent News\n{}\n",
+                crate::insight::rss::format_for_context(&ctx.market_context.rss_items, 5)
+            ));
+        }
+
+        // 5. Recent trade history
+        if let Some(trades) = ctx.recent_trades {
+            if !trades.is_empty() {
+                msg.push_str("\n## Recent Trade History\n");
+                let wins = trades.iter().filter(|t| t.pnl > 0.0).count();
+                let losses = trades.iter().filter(|t| t.pnl <= 0.0).count();
+                let avg_win = if wins > 0 {
+                    trades.iter().filter(|t| t.pnl > 0.0).map(|t| t.pnl).sum::<f64>() / wins as f64
+                } else { 0.0 };
+                let avg_loss = if losses > 0 {
+                    trades.iter().filter(|t| t.pnl <= 0.0).map(|t| t.pnl).sum::<f64>() / losses as f64
+                } else { 0.0 };
+                let profit_factor = if avg_loss != 0.0 {
+                    (avg_win * wins as f64) / (avg_loss.abs() * losses as f64)
+                } else { f64::INFINITY };
+                for (i, trade) in trades.iter().take(10).enumerate() {
+                    msg.push_str(&format!(
+                        "{}. {} {} @ {} → {} | PnL: ${} ({}%) | {}\n",
+                        i + 1,
+                        trade.pair,
+                        if trade.pnl > 0.0 { "WIN" } else { "LOSS" },
+                        trade.entry_price,
+                        trade.exit_price,
+                        trade.pnl,
+                        trade.pnl_pct,
+                        trade.closed_at.format("%Y-%m-%d")
+                    ));
+                }
+                msg.push_str(&format!(
+                    "Summary: {}W/{}L ({}% WR) | Avg Win: ${} | Avg Loss: ${} | PF: {}\n",
+                    wins, losses,
+                    if wins + losses > 0 { wins as f64 / (wins + losses) as f64 * 100.0 } else { 0.0 },
+                    avg_win, avg_loss, profit_factor
+                ));
+            }
+        }
+
+        // 6. Memory context (pre-formatted by memory::context::format_memory_prompt)
+        if let Some(ref memory) = ctx.memory_context {
+            if !memory.is_empty() {
+                msg.push_str(memory);
+            }
+        }
+
+        // 7. Decision log context
+        if let Some(ref log_ctx) = ctx.decision_log_context {
+            if !log_ctx.is_empty() {
+                msg.push_str("\n## Recent Decision Log\n");
+                msg.push_str(log_ctx);
+            }
+        }
+
+        // 8. Active trading universe
+        if let Some(pairs) = ctx.active_pairs {
+            if !pairs.is_empty() {
+                msg.push_str(&format!("\n## Active Trading Universe ({} pairs)\n", pairs.len()));
+                msg.push_str(&pairs.join(", "));
+                msg.push_str("\nThe pair shown above is already vetted for liquidity and safety. Evaluate it.");
+            }
+        }
+
+        // 9. Market conditions (SOUL.md §XIII action triggers)
+        msg.push_str(&format!("\n## Market Conditions\n{}\n", ctx.market_context.conditions_summary()));
 
         // Decision required
         msg.push_str("\n## Decision Required\n");

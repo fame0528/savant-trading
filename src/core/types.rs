@@ -243,6 +243,11 @@ pub struct Position {
     pub strategy_name: String,
     pub opened_at: DateTime<Utc>,
     pub scale_level: ScaleLevel,
+    /// On-chain ERC-20 token address for this position's base asset.
+    /// Used by reconciliation heartbeat to verify on-chain balance matches
+    /// in-memory tracking. Empty string if unknown (legacy positions).
+    #[serde(default)]
+    pub token_address: String,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -412,6 +417,7 @@ mod tests {
             strategy_name: "test".into(),
             scale_level: ScaleLevel::Full,
             opened_at: Utc::now(),
+            token_address: String::new(),
         }
     }
 

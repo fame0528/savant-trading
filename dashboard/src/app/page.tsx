@@ -17,7 +17,9 @@ import {
 import { useDashboard } from "@/hooks/useDashboard";
 import { copyFormatters, downloadTradesCSV } from "@/lib/copy";
 import { sounds } from "@/lib/sounds";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getGlobalTerminal } from "@/components/Terminal";
+import type { JuryStateSnapshot, JuryCycleRecord } from "@/lib/api";
 import toast, { Toaster } from "react-hot-toast";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -150,7 +152,11 @@ export default function Dashboard() {
   const prevStops = useRef<Record<string, number>>({});
 
   const live = (status?.mode ?? "").toUpperCase() === "LIVE";
+  const testnet = (status?.mode ?? "").toUpperCase() === "TESTNET";
+  const paper = (status?.mode ?? "").toUpperCase() === "PAPER";
   const eq = portfolio?.equity ?? portfolio?.balance ?? 0;
+  // Engine is "warming up" if online but hasn't produced any state yet.
+  const warmingUp = online && !portfolio && positions.length === 0;
 
   // Sound effects on state changes
   // FID-087: Skip sounds on initial data load (prevTradeCount === 0 means first poll).
@@ -246,7 +252,7 @@ export default function Dashboard() {
         },
       }} />
 
-      {/* ── Connection Overlay ── */}
+      {/* ── Connection / Warmup Overlay ── */}
       {!online && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-(--bg)/90 backdrop-blur-sm">
           <Image src="/savant.png" alt="SAVANT" width={256} height={256} className="rounded-lg mb-4 opacity-50" />
@@ -258,18 +264,38 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+      {online && warmingUp && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-(--panel)/95 border border-(--cyan)/30 backdrop-blur-md px-3 py-1.5 rounded text-[10px] text-(--cyan) font-mono shadow-[0_0_18px_rgba(0,200,255,0.18)]">
+          <i className="fa-solid fa-spinner fa-spin text-[9px]" />
+          <span>Warming up — first cycle in progress (~3 min). Dashboard populates when ready.</span>
+        </div>
+      )}
 
       {/* ── Header ── */}
       <div className="flex items-center gap-3 bg-linear-to-b from-[rgba(20,24,40,0.7)] to-[rgba(12,14,24,0.5)] border border-(--line) backdrop-blur-xl px-3 py-1.5 shrink-0">
         <Image src="/savant.png" alt="SAVANT" width={36} height={36} className="rounded" />
         <span className="text-base font-extrabold tracking-[6px] bg-linear-to-r from-white to-(--cyan) bg-clip-text text-transparent">SAVANT</span>
         <span className="text-[9px] tracking-[3px] uppercase text-(--dim)">Autonomous Trading Agent</span>
-        <span className={`inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase ${
-          live ? "border-(--cyan)/30 bg-(--cyan)/10 text-(--cyan)" : "border-(--amber)/30 bg-(--amber)/10 text-(--amber)"
-        }`}>
-          <Icon name={live ? "fa-satellite-dish" : "fa-moon"} className="text-[8px]" />
-          {status?.mode ?? "—"} · {status?.running ? "RUNNING" : "IDLE"}
-        </span>
+        {/* Mode badge: only show "LIVE · RUNNING" for actual mainnet execution.
+            TESTNET and PAPER get dedicated badges below — no duplicate text. */}
+        {live && (
+          <span className={`inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase border-(--cyan)/30 bg-(--cyan)/10 text-(--cyan)`}>
+            <Icon name="fa-satellite-dish" className="text-[8px]" />
+            LIVE · {status?.running ? "RUNNING" : "IDLE"}
+          </span>
+        )}
+        {testnet && (
+          <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase border-(--amber)/40 bg-(--amber)/15 text-(--amber)">
+            <Icon name="fa-flask" className="text-[8px]" />
+            TESTNET (Anvil)
+          </span>
+        )}
+        {paper && (
+          <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase border-(--violet)/30 bg-(--violet)/10 text-(--violet)">
+            <Icon name="fa-scroll" className="text-[8px]" />
+            PAPER MODE
+          </span>
+        )}
         {portfolio?.hunt_mode && (
           <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase" style={{ color: 'var(--neon-red)', borderColor: 'rgba(255, 45, 85, 0.3)', backgroundColor: 'rgba(255, 45, 85, 0.1)', textShadow: 'var(--neon-red-glow)' }}>
             <Icon name="fa-crosshairs" className="text-[8px]" />
@@ -345,7 +371,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-6 gap-1.5 shrink-0">
         <KPI icon="fa-wallet" label="Portfolio Value" value={fmt.usd(eq)} color="text-(--cyan)" />
         <KPI icon="fa-bank" label="Cash Balance" value={fmt.usd(portfolio?.balance ?? 0)} sub="USD available" />
-        <KPI icon="fa-sack-dollar" label="Profit" value={fmt.usd(session?.total_pnl ?? 0)} sub={`${fmt.usd(session?.starting_balance ?? 30)} invested → ${fmt.usd(portfolio?.equity ?? 0)} on-chain`} color={pnlClass(session?.total_pnl ?? 0)} />
+        <KPI icon="fa-sack-dollar" label="Profit" value={fmt.usd(session?.total_pnl ?? 0)} sub={`${fmt.usd(session?.starting_balance ?? 0)} invested → ${fmt.usd(portfolio?.equity ?? 0)} on-chain`} color={pnlClass(session?.total_pnl ?? 0)} />
         <KPI icon="fa-bullseye" label="Win Rate" value={`${((session?.win_rate ?? 0) * 100).toFixed(0)}%`} sub={`${session?.wins ?? 0}W / ${session?.losses ?? 0}L`} color="text-(--green)" />
         <KPI icon="fa-rotate" label="Trades Today" value={`${portfolio?.trades_today ?? 0}`} sub={`${session?.total_trades ?? 0} total`} color="text-(--violet)" />
         <KPI icon="fa-layer-group" label="Positions" value={`${positions.length} / ${risk?.max_positions ?? 3}`} sub={positions.length > 0 ? positions.map(p => p.pair.split("/")[0]).join(", ") : "none open"} />
@@ -657,6 +683,12 @@ export default function Dashboard() {
                         <Icon name={d.execution_status ? "fa-circle-xmark" : a === "BUY" ? "fa-circle-arrow-up" : a === "SELL" || a === "CLOSE" ? "fa-circle-arrow-down" : a === "ADJUST" || a === "ADJUSTSTOP" ? "fa-sliders" : "fa-minus"} className="text-[6px]" />
                         {d.execution_status ? "REJECTED" : a.replace("_", " ")}
                       </span>
+                      {d.override_source && (
+                        <span className="text-[7px] px-1 py-0.5 rounded font-mono text-(--amber) bg-(--amber)/10 flex items-center gap-0.5">
+                          <Icon name="fa-arrow-right-arrow-left" className="text-[5px]" />
+                          {d.override_source.replace("_", " ")}
+                        </span>
+                      )}
                       <ProgressBar aria-label="Confidence" size="sm" value={conf} color={conf >= 67 ? "success" : conf >= 34 ? "warning" : "danger"} className="flex-1">
                         <ProgressBar.Track>
                           <ProgressBar.Fill />
@@ -672,6 +704,13 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Row 2.5: Jury (FID-162) — full-width strip with status, metrics, veto flag, recent cycles */}
+        <JurySection
+          status={state.juryStatus}
+          recent={state.juryRecent}
+          onCopy={() => copyFormatters.jury(state.juryStatus) + "\n\n--- Recent Cycles ---\n" + copyFormatters.juryRecent(state.juryRecent)}
+        />
+
         {/* Row 3: Console | Activity | Trades */}
         <div className="bg-[#0a0c14] border border-(--line) flex flex-col overflow-hidden">
           <div className="flex items-center gap-2 px-3 py-1.5 border-b border-(--line)">
@@ -680,16 +719,20 @@ export default function Dashboard() {
             <div className="flex-1" />
             <CopyButton text={() => {
               try {
-                const el = document.querySelector('.xterm-screen');
-                if (!el) return "Terminal not available";
-                const rows = el.querySelectorAll('.xterm-rows > div');
+                // FID-161: Use xterm buffer API to copy complete terminal output
+                // (all scrollback). The old approach (DOM scraping) failed to capture
+                // the full content reliably.
+                const term = getGlobalTerminal();
+                if (!term) return "Terminal not available";
+                const buffer = term.buffer.active;
                 const lines: string[] = [];
-                rows.forEach((row) => {
-                  const spans = row.querySelectorAll('span');
-                  let line = "";
-                  spans.forEach((s) => { line += s.textContent ?? ""; });
-                  if (line.trim()) lines.push(line);
-                });
+                for (let i = 0; i < buffer.length; i++) {
+                  const line = buffer.getLine(i);
+                  if (line) {
+                    const text = line.translateToString(true);
+                    if (text) lines.push(text);
+                  }
+                }
                 return lines.join("\n") || "No terminal output";
               } catch { return "Could not read terminal"; }
             }} title="Copy terminal output" />
@@ -722,7 +765,10 @@ export default function Dashboard() {
                   e.level === "Trade" ? "text-(--green)" : e.level === "Decision" ? "text-(--violet)" : e.level === "Warning" || e.level === "Error" ? "text-(--red)" : e.level === "Thinking" ? "text-(--amber)" : "text-(--txt)"
                 }`}>
                   <span className="text-(--dimmer) shrink-0">{formatTime12h(e.timestamp)}</span>
-                  <span className="text-(--cyan) shrink-0 w-[60px] overflow-hidden text-ellipsis">{e.pair}</span>
+                  {e.source && (
+                    <span className="text-(--cyan) shrink-0 w-[44px] overflow-hidden text-ellipsis font-bold text-[9px]">[{e.source}]</span>
+                  )}
+                  <span className={`shrink-0 w-[60px] overflow-hidden text-ellipsis ${e.source ? "" : "text-(--cyan)"}`}>{e.pair}</span>
                   <span className="overflow-hidden text-ellipsis">{e.message}</span>
                 </div>
               ))
@@ -782,6 +828,162 @@ export default function Dashboard() {
           </div>
         </div>
 
+      </div>
+    </div>
+  );
+}
+
+// FID-162: Jury observability section.
+function JurySection({
+  status,
+  recent,
+  onCopy,
+}: {
+  status: JuryStateSnapshot | null;
+  recent: JuryCycleRecord[];
+  onCopy: () => string;
+}) {
+  const [expandedCycle, setExpandedCycle] = useState<number | null>(null);
+
+  const src = status?.source ?? "engine_off";
+  const srcLabel = src === "live" ? "live" : src === "stale" ? "stale" : src === "never_ran" ? "never ran" : src === "disabled" ? "disabled" : "engine off";
+  const srcColor = src === "live" ? "text-(--green)" : src === "stale" ? "text-(--amber)" : "text-(--dim)";
+
+  const m = status?.cumulative;
+  const totalEvals = m?.total_evaluations ?? 0;
+  const avgLatency = totalEvals > 0 ? Math.round((m?.total_latency_ms ?? 0) / totalEvals) : 0;
+  const lastCycle = status?.last_cycle_at ?? null;
+  const lastCycleAge = lastCycle ? Math.round((Date.now() - new Date(lastCycle).getTime()) / 1000) : null;
+  const isStale = lastCycleAge != null && lastCycleAge > 300; // 5 min
+
+  return (
+    <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
+      <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-(--line)">
+        <Icon name="fa-gavel" className="text-(--dim) text-[10px]" />
+        <span className="text-[10px] tracking-[2px] uppercase font-semibold text-(--dim)">Jury</span>
+        <span className={`text-[9px] font-bold leading-none ${srcColor}`}>● {srcLabel}</span>
+        {status?.veto_flag_active_now && (
+          <span className="text-[9px] px-1.5 py-0.5 rounded font-bold leading-none text-(--red) bg-(--red)/10 border border-(--red)/30">
+            ⚠ VETO FLAG ACTIVE
+          </span>
+        )}
+        <span className="ml-auto text-[9px] font-bold leading-none text-(--cyan)">{recent.length} cycles</span>
+        <span className="ml-auto inline-flex items-center">
+          <CopyButton text={onCopy} title="Copy jury status" />
+        </span>
+      </div>
+
+      {/* 4 sub-panels in 4-column grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-2 p-2 text-[10px]">
+        {/* Panel 1: Status */}
+        <div className="space-y-1">
+          <p className="text-(--dim) tracking-wider uppercase text-[8px] font-bold">Status</p>
+          <MetricRow icon="fa-power-off" label="Enabled" value={status?.enabled ? "yes" : "no"} color={status?.enabled ? "text-(--green)" : "text-(--red)"} />
+          <MetricRow icon="fa-users" label="Size" value={`${status?.jury_size ?? 0} (T:${status?.regime_sizes.trending} R:${status?.regime_sizes.ranging} V:${status?.regime_sizes.volatile})`} />
+          <MetricRow icon="fa-microchip" label="M3 ctrl" value={status?.m3_control_active ? "active" : "off"} color={status?.m3_control_active ? "text-(--green)" : "text-(--dim)"} />
+          <MetricRow icon="fa-robot" label="Free mods" value={status?.free_models_used?.slice(0, 2).join(", ") || "—"} />
+          <MetricRow icon="fa-ban" label="Veto" value={`${status?.veto_enabled ? "on" : "off"} @ ${((status?.veto_threshold ?? 0) * 100).toFixed(0)}%`} />
+          <MetricRow icon="fa-key" label="Keys" value={`${status?.key_health.healthy ?? 0}/${status?.key_health.total ?? 0} h${status?.key_health.rotating ? `, ${status.key_health.rotating} rot` : ""}`} />
+        </div>
+
+        {/* Panel 2: Cumulative metrics */}
+        <div className="space-y-1">
+          <p className="text-(--dim) tracking-wider uppercase text-[8px] font-bold">Cumulative</p>
+          <MetricRow icon="fa-rotate" label="Evaluations" value={totalEvals} />
+          <MetricRow icon="fa-scale-balanced" label="Quorum fails" value={m?.quorum_failures ?? 0} color={(m?.quorum_failures ?? 0) > 0 ? "text-(--amber)" : "text-(--txt)"} />
+          <MetricRow icon="fa-comments" label="Total verdicts" value={m?.total_verdicts ?? 0} />
+          <MetricRow icon="fa-circle-xmark" label="Total failures" value={m?.total_failures ?? 0} color={(m?.total_failures ?? 0) > 0 ? "text-(--amber)" : "text-(--txt)"} />
+          <MetricRow icon="fa-stopwatch" label="Avg latency" value={`${avgLatency}ms`} />
+          <MetricRow icon="fa-microchip" label="M3 calls" value={status?.estimated_m3_calls ?? 0} />
+          <MetricRow icon="fa-globe" label="Free calls" value={status?.estimated_free_model_calls ?? 0} />
+          {isStale && (
+            <p className="text-(--amber) text-[9px] mt-1">
+              <Icon name="fa-triangle-exclamation" className="text-[8px] mr-1" />
+              Stale ({lastCycleAge}s since last cycle)
+            </p>
+          )}
+        </div>
+
+        {/* Panel 3: Live veto flag + status pill */}
+        <div className="space-y-1">
+          <p className="text-(--dim) tracking-wider uppercase text-[8px] font-bold">Veto State</p>
+          {status?.veto_flag_active_now ? (
+            <div className="rounded border border-(--red)/30 bg-(--red)/5 p-2">
+              <p className="text-(--red) text-[10px] font-bold">
+                <Icon name="fa-circle-exclamation" className="text-[8px] mr-1" />
+                VETO FLAG SET
+              </p>
+              <p className="text-(--dim) text-[9px] mt-1">Overrides will fire on next Buy/Sell in this cycle.</p>
+            </div>
+          ) : (
+            <div className="rounded border border-(--green)/30 bg-(--green)/5 p-2">
+              <p className="text-(--green) text-[10px] font-bold">
+                <Icon name="fa-check" className="text-[8px] mr-1" />
+                JURY CLEAR
+              </p>
+              <p className="text-(--dim) text-[9px] mt-1">No active dissent.</p>
+            </div>
+          )}
+          <p className="text-(--dim) text-[9px] mt-2">
+            Last cycle: {lastCycle ? dayjs(lastCycle).fromNow(true) + " ago" : "never"}
+          </p>
+        </div>
+
+        {/* Panel 4: Recent cycles table (collapsed to last 5 for compactness) */}
+        <div className="space-y-1 max-h-32 overflow-y-auto">
+          <p className="text-(--dim) tracking-wider uppercase text-[8px] font-bold sticky top-0 bg-(--panel)">
+            Recent Cycles ({recent.length})
+          </p>
+          {recent.length === 0 ? (
+            <p className="text-(--dimmer) text-[9px] italic">No jury cycles yet.</p>
+          ) : (
+            [...recent].reverse().slice(0, 5).map((c) => {
+              const isExpanded = expandedCycle === c.cycle_id;
+              const v = c.verdict_breakdown;
+              return (
+                <div
+                  key={c.cycle_id}
+                  className={`rounded border px-1.5 py-1 cursor-pointer ${
+                    c.veto_enforced ? "border-(--red)/40 bg-(--red)/5" :
+                    c.veto_detected ? "border-(--amber)/40 bg-(--amber)/5" :
+                    "border-(--line)"
+                  }`}
+                  onClick={() => setExpandedCycle(isExpanded ? null : c.cycle_id)}
+                >
+                  <div className="flex items-center gap-1.5 text-[9px] font-mono">
+                    <span className="text-(--dim)">#{c.cycle_id}</span>
+                    <span className="text-(--dim)">{dayjs(c.timestamp).fromNow(true)}</span>
+                    <span className="text-(--green)">{v.buy}B</span>
+                    <span className="text-(--red)">{v.sell}S</span>
+                    <span className="text-(--dim)">{v.hold}H</span>
+                    {v.failed > 0 && <span className="text-(--amber)">{v.failed}F</span>}
+                    <span className="ml-auto text-(--cyan)">{(c.consensus_strength * 100).toFixed(0)}%</span>
+                    {c.quorum_met ? <Icon name="fa-check" className="text-(--green) text-[7px]" /> : <Icon name="fa-xmark" className="text-(--red) text-[7px]" />}
+                    {c.veto_enforced && <span className="text-(--red) text-[7px] font-bold">VE</span>}
+                    {c.veto_detected && !c.veto_enforced && <span className="text-(--amber) text-[7px] font-bold">VD</span>}
+                  </div>
+                  <div className="text-[8px] text-(--dim) mt-0.5 font-mono">
+                    {c.consensus_action || "—"}
+                    {c.judge_action && c.judge_action !== c.consensus_action ? ` (judge: ${c.judge_action})` : ""}
+                  </div>
+                  {isExpanded && c.per_juror.length > 0 && (
+                    <div className="mt-1 pl-2 border-l border-(--line) text-[8px] font-mono space-y-0.5">
+                      {c.per_juror.slice(0, 6).map((j) => (
+                        <div key={j.juror_id} className="flex gap-1">
+                          <span className="text-(--dim) w-3">#{j.juror_id}</span>
+                          <span className={`w-9 ${j.verdict === "BUY" ? "text-(--green)" : j.verdict === "SELL" ? "text-(--red)" : "text-(--dim)"}`}>{j.verdict}</span>
+                          <span className="text-(--dim) flex-1 truncate">{j.model_slug || "—"}</span>
+                          <span className="text-(--cyan)">{(j.confidence * 100).toFixed(0)}%</span>
+                        </div>
+                      ))}
+                      {c.per_juror.length > 6 && <div className="text-(--dim)">+ {c.per_juror.length - 6} more</div>}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
     </div>
   );

@@ -128,11 +128,11 @@ impl TslnSerializer {
             let v_diff = candle.volume - prev_vol;
             format_diff(v_diff)
         } else {
-            format!("{:.1}", candle.volume)
+            format!("{}", candle.volume)
         };
 
         output.push_str(&format!(
-            "{} {} {} {} {:.2} {}\n",
+            "{} {} {} {} {} {}\n",
             ts_line,
             format_diff(o_diff),
             format_diff(h_diff),
@@ -148,12 +148,12 @@ impl TslnSerializer {
 
 /// Format a differential value: omit if zero, sign prefix otherwise.
 fn format_diff(v: f64) -> String {
-    if v.abs() < 0.001 {
+    if v == 0.0 {
         "+0".to_string()
     } else if v > 0.0 {
-        format!("+{:.2}", v)
+        format!("+{}", v)
     } else {
-        format!("{:.2}", v)
+        format!("{}", v)
     }
 }
 
@@ -307,5 +307,107 @@ mod tests {
     fn schema_header_is_constant() {
         let h = TslnSerializer::schema_header();
         assert_eq!(h, "# Schema: t:timestamp o:open h:high l:low c:close v:volume");
+    }
+
+    // === FID-163: Precision preservation tests ===
+
+    #[test]
+    fn tsln_preserves_sub_cent_precision() {
+        // Close=0.009123456 has 6 decimal places of meaningful data.
+        // With {:.2}, it would round to 0.01 — losing all sub-cent info.
+        // With {} Display, it should round-trip exactly.
+        let candle = make_candle(1705312800, 0.009123456, 0.009223456, 0.009023456, 0.009123456, 1000.0);
+        let mut ser = TslnSerializer::new();
+        let encoded = ser.serialize(std::slice::from_ref(&candle));
+        let decoded = deserialize(&encoded);
+        assert_eq!(decoded.len(), 1);
+        assert!((decoded[0].close - candle.close).abs() < 1e-10,
+                "close should round-trip exact: expected {}, got {}", candle.close, decoded[0].close);
+    }
+
+    #[test]
+    fn tsln_preserves_tiny_diffs() {
+        // Candle has close=1.0000001234, but O/H/L differ by 0.0000000001
+        // (diff = ±1e-10). Old code with abs<0.001 would collapse these to "+0".
+        // New code must preserve them as non-zero strings.
+        let candle = make_candle(
+            1705312800,
+            1.0000001235, // open: +1e-10 from close
+            1.0000001236, // high: +2e-10 from close
+            1.0000001233, // low: -1e-10 from close
+            1.0000001234, // close
+            100.0,
+        );
+        let mut ser = TslnSerializer::new();
+        let encoded = ser.serialize(&[candle]);
+        // The encoded line should contain non-zero diffs for O/H/L.
+        // A collapsed "+0" appears exactly 4 times consecutively for the OHLV slots only
+        // when ALL diffs are exactly zero. Here they are tiny, so they should render.
+        // Check that we have at least one non-zero diff string.
+        let non_zero_count = encoded.lines()
+            .nth(2) // data row
+            .map(|line| line.split_whitespace()
+                .take(4) // O, H, L, V diffs
+                .filter(|tok| *tok != "+0" && *tok != "0")
+                .count())
+            .unwrap_or(0);
+        assert!(non_zero_count >= 1,
+                "Tiny diffs should not collapse to +0; encoded was:\n{}", encoded);
+    }
+
+    #[test]
+    fn tsln_preserves_volume_precision() {
+        let candle = make_candle(1705312800, 1.0, 1.0, 1.0, 1.0, 1234.5678);
+        let mut ser = TslnSerializer::new();
+        let encoded = ser.serialize(std::slice::from_ref(&candle));
+        let decoded = deserialize(&encoded);
+        assert!((decoded[0].volume - candle.volume).abs() < 1e-9,
+                "volume should round-trip exact: expected {}, got {}", candle.volume, decoded[0].volume);
+    }
+
+    #[test]
+    fn tsln_preserves_high_price_precision() {
+        let candle = make_candle(1705312800, 42123.456789, 42124.456789, 42122.456789, 42123.456789, 500.0);
+        let mut ser = TslnSerializer::new();
+        let encoded = ser.serialize(std::slice::from_ref(&candle));
+        let decoded = deserialize(&encoded);
+        assert!((decoded[0].close - candle.close).abs() < 1e-9,
+                "high price should round-trip exact: expected {}, got {}", candle.close, decoded[0].close);
+    }
+
+    #[test]
+    fn tsln_reset_clears_state() {
+        // After reset, base_timestamp/last_close/last_volume should be None.
+        let mut ser = TslnSerializer::new();
+        let _ = ser.serialize(&[make_candle(1705312800, 1.0, 1.0, 1.0, 1.0, 100.0)]);
+        assert!(ser.base_timestamp.is_some());
+        assert!(ser.last_close.is_some());
+        ser.reset();
+        assert!(ser.base_timestamp.is_none());
+        assert!(ser.last_close.is_none());
+        assert!(ser.last_volume.is_none());
+    }
+
+    #[test]
+    fn tsln_isolates_state_across_pairs() {
+        // FID-163 Part B: the state-bleed bug.
+        // Without reset, pair B's first candle's O/H/L diffs would be
+        // (pair_B_open - pair_A_close), producing nonsense.
+        let pair_a = vec![make_candle(1705312800, 50000.0, 50001.0, 49999.0, 50000.0, 100.0)];
+        let pair_b = vec![make_candle(1705312800, 0.01, 0.011, 0.009, 0.01, 50.0)];
+
+        let mut ser = TslnSerializer::new();
+        let _ = ser.serialize(&pair_a);
+        // Reset between pairs (this is what build_tsln_message now does)
+        ser.reset();
+        let encoded_b = ser.serialize(&pair_b);
+
+        // Pair B's first candle is the first after reset, so O/H/L diffs should be 0
+        // (or very small due to floating-point repr of the candle itself).
+        // Crucially, they should NOT contain "-49999" (which is what state-bleed would produce).
+        assert!(!encoded_b.contains("-49999"),
+                "Pair B O/H/L diffs bled from pair A close. encoded_b was:\n{}", encoded_b);
+        assert!(!encoded_b.contains("-50000"),
+                "Pair B O/H/L diffs bled from pair A close. encoded_b was:\n{}", encoded_b);
     }
 }

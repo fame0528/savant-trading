@@ -408,7 +408,7 @@ pub fn format_patterns_for_prompt(patterns: &[SemanticPattern]) -> String {
         };
 
         msg.push_str(&format!(
-            "- **{}** ({})**: {:.0}% win rate, PF {:.2}, avg R:R {:.1} (N={})\n",
+            "- **{}** ({})**: {}% win rate, PF {}, avg R:R {} (N={})\n",
             pattern.category,
             label,
             pattern.win_rate * 100.0,

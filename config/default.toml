@@ -59,63 +59,67 @@ chain_id = 56
 name = "BNB Smart Chain"
 rpc_url = "https://bsc-dataseed.binance.org"
 native_token = "BNB"
-min_gas_native = 0.005
-slippage_pct = 0.01
-enabled = false
+min_gas_native = 0.001
+slippage_pct = 0.005
+enabled = true
 
+# FID-153: Ethereum Sepolia testnet (chain_id 11155111) — THE testnet for 0x
+# - 0x V2 Settler contract IS deployed on Sepolia (chain_config.json in 0x-settler repo confirms)
+# - Deployer/Registry: 0x00000000000004533Fe15556B1E086BB1A72cEae
+# - AllowanceHolder: 0x0000000000001fF3684f28c67538d4D072C22734 (same address as Cancun-hardfork mainnets)
+# - Permit2: 0x000000000022D473030F116dDEE9F6B43aC78BA3 (universal across all chains)
+# - Read-only by default; engine selects this chain only when SAVANT_CHAIN=sepolia
+# - Test ETH: free from Alchemy, QuickNode, or Chainlink Sepolia faucets
+# - Test USDC: 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238 (Circle bridged USDC, same address on Sepolia and Arbitrum Sepolia)
+# - Test WETH: 0xfFf9976782d46cc05630d1f6eBab18b2324d6B14
+# - 0x API (quote discovery) is MAINNET ONLY — no testnet endpoint. The engine must
+#   construct calldata directly (using the deployer/registry to get the current
+#   Settler address) or use a pre-built 0x quote from mainnet and submit to Sepolia.
+#   For the testnet validation loop, we use the direct-contract path (FID-155).
+[chains.sepolia]
+chain_id = 11155111
+name = "Ethereum Sepolia"
+rpc_url = "https://rpc.sepolia.org"
+native_token = "ETH"
+min_gas_native = 0.0001   # Lower than mainnet; test ETH is free
+slippage_pct = 0.01        # Higher tolerance for testnet (liquidity is thinner)
+enabled = false              # NOT enabled by default. Set SAVANT_CHAIN=sepolia AND set enabled=true in your local config to use.
+
+# KNOWN LIMITATION (FID-153, 2026-06-14): 0x V2 Settler is NOT deployed on Arbitrum Sepolia (chain_id 421614).
+# The 0x-settler chain_config.json lists Ethereum Sepolia (chainId 11155111) as the only testnet.
+# This means FID-133's adversarial scenarios and FID-155's direct-contract tests must target
+# Ethereum Sepolia, not Arbitrum Sepolia. The Arbitrum Sepolia USDC address added earlier is
+# documented but unused; it's preserved in case 0x-settler adds Arbitrum Sepolia support in the future.
+# Tracking: 0xProject/0x-settler chain_config.json — re-check periodically for Arbitrum Sepolia entry.
 [trading]
-# Core pairs — always tracked, highest liquidity
-# BTC & ETH are the foundation. Top 10 + meme coins are where the action is.
 pairs = [
-    # Tier 1: GUARANTEED deep liquidity on Arbitrum (>$100M daily DEX volume)
     "WETH/USD", "BTC/USD", "ARB/USD",
-    # Tier 2: Major DeFi tokens — verified Arbitrum addresses, deep 0x routes
     "LINK/USD", "UNI/USD", "AAVE/USD", "PEPE/USD",
-    # Tier 3: DeFi with good Arbitrum presence
     "PENDLE/USD", "COMP/USD", "LDO/USD",
-    # Tier 4: High-volatility scalping targets (added for 24/7 opportunity coverage)
     "CRV/USD", "RENDER/USD", "FET/USD", "DOT/USD",
     "ENA/USD", "MAGIC/USD", "GNS/USD", "JOE/USD",
 ]
-# Full deploy mode: concentrate all capital into single best-conviction trade.
-# When balance is low, spreading across pairs wastes capital on gas friction.
-# The AI picks the highest-confidence setup and deploys everything.
 full_deploy = true
-# NOTE: SOL, XRP, ADA, AVAX, SHIB, FLOKI, TURBO, MOG are NOT swappable
-# on Arbitrum via 0x API — they don't have Arbitrum token addresses.
-# Set to true to scan all Kraken USD pairs for opportunity
-# WARNING: Scans 455+ pairs, takes 15+ minutes per cycle. Only enable if needed.
 scan_all_pairs = true
-# Safety filters for scan_all_pairs mode
-# Minimum 24h volume in USD — filters out scamcoins and illiquid garbage
 min_volume_24h_usd = 1500000.0
-# Minimum token price in USD — filters out micro-cap trash
 min_price_usd = 0.001
-# Symbols to always exclude (case-insensitive)
 blacklisted_symbols = []
 timeframe = "5m"
 timeframes = ["5m", "1h", "4h", "1d"]
 base_currency = "USD"
 starting_balance = 30.0
 database_url = "sqlite:data/savant.db"
-# DEX costs: 0x spread (~0.15%) + Uniswap v3 fee (~0.05%) + slippage (~0.05%)
-# Gas on Arbitrum is negligible at ~$0.025/swap
-# FID-109: Slippage 30 bps minimum for 0x Gasless API compatibility
 fee_rate = 0.0005
 slippage_pct = 0.0030
 
 # FID-118: Pair health rotation
 [trading.pair_rotation]
-# Re-discover new pairs every N cycles (default 60 = ~3 hours at 5m intervals)
 interval_cycles = 60
-# Permanently evict pair after N consecutive dead cycles (default 5 = ~25 min)
 eviction_threshold = 5
-# Re-check evicted pairs every N cycles (default 300 = ~25 hours)
 revival_check_cycles = 300
 
-# FID-120: Dynamic token database — self-updating address resolution
+# FID-120: Dynamic token database
 [token_store]
-# Enable persistent token store + periodic discovery
 enabled = true
 # Re-discover token addresses every N cycles (default 10 = ~50 min)
 discovery_interval_cycles = 10
@@ -182,7 +186,7 @@ atr_volatility_multiplier = 1.5
 # A failed swap or bad slippage costs real capital.
 # Set to false for paper-trading / backtesting mode.
 # When false, the engine still evaluates and logs decisions but never submits txns.
-live_execution = true
+live_execution = false
 
 [ai]
 # **FID-138 (M3):** Switched from openrouter/owl-alpha to TokenRouter/MiniMax-M3
@@ -231,7 +235,7 @@ referer = "https://github.com/fame0528/savant-trading"
 title = "Savant Trading Engine"
 
 [ai.jury]
-enabled = true
+enabled = false
 jury_size = 10
 # openrouter/free is a router that selects free models at random from all
 # available free models on OpenRouter (24 models across NVIDIA, OpenInference,
@@ -342,3 +346,15 @@ max_active_lessons = 50
 brier_cap_threshold = 0.25
 # Minimum trades before memory context activates
 memory_context_min_trades = 5
+
+# FID-147: Wallet Reconciliation Heartbeat
+# Compares in-memory portfolio state to on-chain reality at the start of every cycle.
+# Halts the engine on divergence beyond the configured thresholds.
+# RPC failure does NOT halt (logs a warning instead) — RPC unreliability is not state drift.
+[reconciliation]
+chain_id = 42161                  # Arbitrum One mainnet
+wallet_address = "0x543CA0434B84aD38c858D2D178D2082521711fBC"
+rpc_url = "https://arb1.arbitrum.io/rpc"
+divergence_threshold_usd = 0.10   # Sub-$1 account scale: $0.10 is meaningful
+divergence_threshold_pct = 0.01   # 1% of equity
+interval_cycles = 1               # Every cycle. Increase for less latency-sensitive runs.

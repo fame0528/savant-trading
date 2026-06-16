@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -249,7 +249,7 @@ impl Default for TokenRouterConfig {
 }
 
 /// Regime-specific jury sizes (FID-114 Phase 6).
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RegimeSizes {
     #[serde(default = "default_regime_size_trending")]
     pub trending: usize,

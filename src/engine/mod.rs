@@ -22,7 +22,7 @@ use savant_trading::agent::context_engine::ContextEngine;
 use savant_trading::agent::context_state::ContextState;
 use savant_trading::agent::decision_log::DecisionLog;
 use savant_trading::agent::jury::JuryKeyManager;
-use savant_trading::agent::jury::{JuryPool, JuryJudge};
+use savant_trading::agent::jury::{JuryCycleRecord, JuryJudge, JuryPool, JurorRecord, VerdictBreakdown};
 use savant_trading::agent::openrouter_management::OpenRouterManagementClient;
 use savant_trading::agent::orchestrator::{AgentConfig, AgentOrchestrator, AutonomyLevel};
 use savant_trading::agent::prompts::{self, PromptComposer};
@@ -135,6 +135,9 @@ struct EngineState {
 
     // FID-120: Persistent token store
     token_store_entries: Vec<savant_trading::data::token_discovery::TokenStoreEntry>,
+
+    // Startup optimization: skip Cycle 1 candle refetch when startup data is fresh
+    startup_candles_loaded_at: Option<std::time::Instant>,
 }
 
 impl EngineState {
@@ -545,6 +548,7 @@ impl EngineState {
                         shared_activity.push(savant_trading::core::shared::ActivityEntry {
                             timestamp: ts,
                             level: lvl,
+                            source: None,
                             pair,
                             message: msg,
                         });
@@ -919,6 +923,7 @@ impl EngineState {
                 Err(e) => error!("Candle fetch task panicked: {}", e),
             }
         }
+        let startup_candles_loaded_at = Some(std::time::Instant::now());
         info!(
             "Fetching initial market insight for {} pairs...",
             active_pairs.len()
@@ -930,301 +935,20 @@ impl EngineState {
         }
         info!("Initial market insight seeded to dashboard");
 
-        // WALLET SYNC
-        if let Some(ref mut ex) = executor {
-            let all_sync_pairs: Vec<String> = curated_pairs.iter().cloned().collect();
-            info!(
-                "Wallet sync: checking on-chain balances for {} pairs ({} config + {} discovered)...",
-                all_sync_pairs.len(),
-                config.trading.pairs.len(),
-                all_sync_pairs.len().saturating_sub(config.trading.pairs.len()),
-            );
-            let discrepancies = match tokio::time::timeout(
-                std::time::Duration::from_secs(30),
-                ex.sync_wallet_positions(&all_sync_pairs),
-            )
-            .await
-            {
-                Ok(d) => d,
-                Err(_) => {
-                    error!("Wallet sync timed out after 30s — continuing without sync");
-                    Vec::new()
-                }
-            };
-            for (pair, on_chain_qty, tracked_qty) in &discrepancies {
-                if *tracked_qty < 0.001 && *on_chain_qty > 0.001 {
-                    let existing_pos = portfolio.positions().values()
-                        .find(|p| p.pair == *pair)
-                        .cloned();
-
-                    if let Some(mut existing) = existing_pos {
-                        if existing.side == Side::Short {
-                            warn!(
-                                "WALLET SYNC: {} journal says SHORT but on-chain holds {:.6} tokens — forcing LONG",
-                                pair, on_chain_qty
-                            );
-                            existing.side = Side::Long;
-                            existing.stop_loss = existing.entry_price * 0.92;
-                            existing.take_profit_1 = existing.entry_price * 1.10;
-                            existing.take_profit_2 = existing.entry_price * 1.20;
-                            existing.take_profit_3 = existing.entry_price * 1.30;
-                        }
-                        let old_qty = existing.quantity;
-                        existing.quantity = *on_chain_qty;
-                        existing.current_price = market_stores
-                            .get(pair)
-                            .and_then(|s| s.last().map(|c| c.close))
-                            .unwrap_or(existing.current_price);
-                        existing.risk_amount = existing.entry_price * on_chain_qty;
-                        portfolio.positions_mut().insert(existing.id.clone(), existing.clone());
-                        if let Some(ref mut ex) = executor {
-                            let exec_id = format!("exec-{}", existing.id);
-                            ex.register_position(exec_id.clone(), existing.clone());
-                            executor_position_map.insert(existing.id.clone(), exec_id.clone());
-                        }
-                        if let Some(ref j) = journal {
-                            let _ = j.save_position(&existing).await;
-                        }
-                        info!(
-                            "WALLET SYNC: Updated {} quantity {:.6} → {:.6} (kept journal entry @ ${:.4})",
-                            pair, old_qty, on_chain_qty, existing.entry_price,
-                        );
-                        continue;
-                    }
-
-                    let market_price = market_stores
-                        .get(pair)
-                        .and_then(|s| s.last().map(|c| c.close))
-                        .unwrap_or(0.0);
-                    let entry_price = if market_price > 0.0 {
-                        market_price
-                    } else {
-                        if let Some(ref j) = journal {
-                            j.get_trades(1000)
-                                .await
-                                .unwrap_or_default()
-                                .iter()
-                                .rfind(|t| t.pair == *pair)
-                                .map(|t| t.entry_price)
-                                .unwrap_or(0.0)
-                        } else {
-                            0.0
-                        }
-                    };
-
-                    if entry_price <= 0.0 {
-                        error!("WALLET SYNC: Cannot recover {} — no valid entry price (market={:.4}). Skipping.",
-                            pair, market_price);
-                        shared
-                            .log_activity(
-                                savant_trading::core::shared::ActivityLevel::Error,
-                                pair,
-                                "WALLET SYNC FAILED: Cannot recover — no valid entry price",
-                            )
-                            .await;
-                        continue;
-                    }
-
-                    let recovery_pos = savant_trading::core::types::Position {
-                        id: format!("wallet-recovery-{}", pair.replace('/', "_").to_lowercase()),
-                        pair: pair.clone(),
-                        side: savant_trading::core::types::Side::Long,
-                        entry_price,
-                        current_price: market_price.max(entry_price),
-                        quantity: *on_chain_qty,
-                        stop_loss: entry_price * 0.85,
-                        take_profit_1: entry_price * 1.10,
-                        take_profit_2: entry_price * 1.20,
-                        take_profit_3: entry_price * 1.30,
-                        unrealized_pnl: 0.0,
-                        risk_amount: entry_price * on_chain_qty,
-                        strategy_name: "wallet_recovery".to_string(),
-                        scale_level: savant_trading::core::types::ScaleLevel::Full,
-                        opened_at: chrono::DateTime::from_timestamp(0, 0).unwrap_or_else(chrono::Utc::now),
-                    };
-                    portfolio
-                        .positions_mut()
-                        .insert(recovery_pos.id.clone(), recovery_pos.clone());
-                    if let Some(ref mut ex) = executor {
-                        let exec_id = format!("exec-{}", recovery_pos.id);
-                        ex.register_position(exec_id.clone(), recovery_pos.clone());
-                        executor_position_map.insert(recovery_pos.id.clone(), exec_id.clone());
-                        info!(
-                            "WALLET SYNC: Registered {} in DexTrader as {}",
-                            pair, exec_id
-                        );
-                    }
-                    if let Some(ref j) = journal {
-                        let _ = j.save_position(&recovery_pos).await;
-                    }
-                    warn!(
-                        "WALLET SYNC: Recovered {} — {:.6} tokens @ ${:.4} (source: market_price — no journal entry)",
-                        pair, on_chain_qty, entry_price,
-                    );
-                    shared
-                        .log_activity(
-                            savant_trading::core::shared::ActivityLevel::Warning,
-                            pair,
-                            &format!(
-                                "WALLET SYNC: Recovered {:.6} tokens @ ${:.4}",
-                                on_chain_qty, entry_price
-                            ),
-                        )
-                        .await;
-                } else if *on_chain_qty < 0.001 && *tracked_qty > 0.001 {
-                    if let Some(pos_id) = portfolio
-                        .positions()
-                        .iter()
-                        .find(|(_, p)| p.pair == *pair)
-                        .map(|(id, _)| id.clone())
-                    {
-                        portfolio.positions_mut().remove(&pos_id);
-                        if let Some(ref j) = journal {
-                            let _ = j.delete_position(&pos_id).await;
-                        }
-                        warn!(
-                            "WALLET SYNC: {} position gone from chain — removed ghost",
-                            pair
-                        );
-                        shared
-                            .log_activity(
-                                savant_trading::core::shared::ActivityLevel::Warning,
-                                pair,
-                                "WALLET SYNC: Position gone from chain — removed ghost",
-                            )
-                            .await;
-                    }
-                }
-            }
-
-            // FID-116 GAP FIX: If on-chain has MORE tokens than tracked, update position qty.
-            // Handles: tokens acquired outside engine, airdrops, or under-counted positions.
-            {
-                for (pair, on_chain_qty, tracked_qty) in &discrepancies {
-                    if *on_chain_qty > *tracked_qty + 0.001 && *tracked_qty > 0.001 {
-                        if let Some(existing) = portfolio.positions_mut().values_mut()
-                            .find(|p| p.pair == *pair)
-                        {
-                            let old_qty = existing.quantity;
-                            existing.quantity = *on_chain_qty;
-                            existing.risk_amount = existing.entry_price * on_chain_qty;
-                            info!(
-                                "FID-116 GAP: {} qty {:.4} -> {:.4} (on-chain has more)",
-                                pair, old_qty, on_chain_qty
-                            );
-                        }
-                    }
-            // FID-116: Refresh equity after gap fix updates position quantities
-            portfolio.refresh_equity();
-                }
-            }
-            let short_ids: Vec<String> = portfolio.positions().iter()
-                .filter(|(_, p)| p.side == Side::Short)
-                .map(|(id, _)| id.clone())
-                .collect();
-            for id in &short_ids {
-                if let Some(p) = portfolio.positions_mut().get_mut(id) {
-                    warn!(
-                        "SIDE CORRECTION: {} — spot-only mode, forcing SHORT → LONG",
-                        p.pair
-                    );
-                    let pair = p.pair.clone();
-                    p.side = Side::Long;
-                    p.stop_loss = p.entry_price * 0.92;
-                    p.take_profit_1 = p.entry_price * 1.10;
-                    p.take_profit_2 = p.entry_price * 1.20;
-                    p.take_profit_3 = p.entry_price * 1.30;
-                    if let Some(ref j) = journal {
-                        let _ = j.save_position(p).await;
-                    }
-                    let corrected = p.clone();
-                    let corrected_id = id.clone();
-                    if let Some(ref mut ex) = executor {
-                        let exec_id = executor_position_map.get(&corrected_id)
-                            .cloned()
-                            .unwrap_or_else(|| format!("exec-{}", corrected_id));
-                        ex.register_position(exec_id.clone(), corrected);
-                        debug!("FID-094: Synced side correction to DexTrader: {} → {}", corrected_id, exec_id);
-                    }
-                    shared.log_activity(
-                        savant_trading::core::shared::ActivityLevel::Warning,
-                        &pair,
-                        "SIDE CORRECTION: spot-only mode, forced SHORT → LONG",
-                    ).await;
-                }
-            }
-            if discrepancies.is_empty() {
-                info!("Wallet sync: all positions reconciled with on-chain balances");
-            }
-            portfolio.refresh_equity();
-            portfolio.account_mut().open_positions = portfolio.positions().len();
-            if portfolio.account().equity < 0.01 && !portfolio.positions().is_empty() {
-                let token_value: f64 = portfolio.positions().values()
-                    .map(|p| p.current_price * p.quantity)
-                    .sum();
-                if token_value > 0.0 {
-                    portfolio.account_mut().equity = token_value;
-                    info!("FID-109: Set equity to token value ${:.2}", token_value);
-                }
-            }
-            {
-                let mut shared_account = shared.account.write().await;
-                *shared_account = portfolio.account().clone();
-                let mut shared_positions = shared.positions.write().await;
-                *shared_positions = portfolio.positions().values().cloned().collect();
-            }
-            info!(
-                "Wallet sync complete: {} positions, balance=${:.2}, equity=${:.2}, open={}",
-                portfolio.positions().len(),
-                portfolio.account().balance,
-                portfolio.account().equity,
-                portfolio.account().open_positions,
-            );
-            let shared_pos_count = shared.positions.read().await.len();
-            let shared_open = shared.account.read().await.open_positions;
-            if shared_pos_count != portfolio.positions().len() || shared_open != portfolio.positions().len() {
-                warn!(
-                    "FID-109: Shared state mismatch — portfolio={} positions, shared_positions={}, shared_open={}. Forcing sync.",
-                    portfolio.positions().len(), shared_pos_count, shared_open
-                );
-                let mut sp = shared.positions.write().await;
-                *sp = portfolio.positions().values().cloned().collect();
-                let mut sa = shared.account.write().await;
-                *sa = portfolio.account().clone();
-            }
-            {
-                let mut curve = shared.equity_curve.write().await;
-                curve.push(serde_json::json!({
-                    "timestamp": chrono::Utc::now().to_rfc3339(),
-                    "equity": portfolio.account().equity,
-                    "balance": portfolio.account().balance,
-                }));
-            }
-        }
-
-        if let Some(ref ex) = executor {
-            let exec_positions = ex.open_positions();
-            if portfolio.positions().is_empty() && !exec_positions.is_empty() {
-                for pos in exec_positions {
-                    info!(
-                        "FID-109: Syncing executor position to portfolio: {} {} qty={:.6}",
-                        pos.pair, pos.side, pos.quantity
-                    );
-                    portfolio.positions_mut().insert(pos.id.clone(), pos.clone());
-                }
-                portfolio.account_mut().open_positions = portfolio.positions().len();
-                portfolio.refresh_equity();
-                if portfolio.account().equity < 0.01 {
-                    let token_value: f64 = portfolio.positions().values()
-                        .map(|p| p.current_price * p.quantity)
-                        .sum();
-                    if token_value > 0.0 {
-                        portfolio.account_mut().equity = token_value;
-                        info!("FID-109: Set equity to token value ${:.2}", token_value);
-                    }
-                }
-            }
-        }
+        // WALLET SYNC — REMOVED (FID-155 / DECISION-015)
+        // The old wallet-sync block ran a separate sync_wallet_positions call
+        // that created duplicate positions alongside DexTrader::new()'s
+        // chain-recovery path. It also queried the executor's register_position
+        // with xec-wallet-recovery-* IDs, which kept the 1970-epoch sentinel
+        // timestamps alive in the in-memory state.
+        //
+        // The new chain-recovery in wallet_recovery::ChainPositionRecovery
+        // is the SINGLE source of truth for positions on engine startup. It
+        // runs in DexTrader::new() and writes directly to the DexTrader's
+        // positions map. No duplicate, no sentinel timestamps, no 56-year ages.
+        //
+        // Periodic reconciliation (5 min wall-clock) is handled by the FID-155
+        // block at the top of every cycle.
 
         // FID-117: Clean up orphaned JSON snapshot files from before FID-117.
         // These files are no longer read or written — journal is the source of truth.
@@ -1237,10 +961,13 @@ impl EngineState {
         if let Some(ref j) = journal {
             let usdc_only: f64 = portfolio.account().balance;
             match j.ensure_starting_equity(usdc_only).await {
-                Ok(true) => info!(
-                    "FID-117: Recorded starting_equity = ${:.2} (USDC-only, before recovery)",
-                    usdc_only
-                ),
+                Ok(true) => {
+                    info!(
+                        "FID-117: Recorded starting_equity = ${:.2} (USDC-only, before recovery)",
+                        usdc_only
+                    );
+                    *shared.starting_equity.write().await = usdc_only;
+                }
                 Ok(false) => {
                     if let Ok(Some(saved)) = j.get_starting_equity().await {
                         info!("FID-117: Loaded starting_equity = ${:.2} from journal", saved);
@@ -1385,6 +1112,7 @@ impl EngineState {
             last_discovery_tick,
             last_revival_check_tick,
             token_store_entries,
+            startup_candles_loaded_at,
         })
     }
 }
@@ -1430,6 +1158,7 @@ pub async fn run(
     let shared = state.shared;
     let candle_api = state.candle_api;
     let mut active_pairs = state.active_pairs;
+    let mut last_chain_sync: std::time::Instant = std::time::Instant::now();
     let curated_pairs = state.curated_pairs;
     let mut market_stores = state.market_stores;
     let mut portfolio = state.portfolio;
@@ -1480,6 +1209,7 @@ pub async fn run(
     let mut last_discovery_tick = state.last_discovery_tick;
     let mut last_revival_check_tick = state.last_revival_check_tick;
     let mut token_store_entries = state.token_store_entries;
+    let mut startup_candles_loaded_at = state.startup_candles_loaded_at;
     let mut jury_pool = state.jury_pool;
 
     let autonomy = match config.ai.autonomy_level {
@@ -1500,6 +1230,140 @@ pub async fn run(
     loop {
         tick += 1;
         let cycle_start = std::time::Instant::now();
+
+        // FID-155 / DECISION-015: Periodic chain-driven reconciliation.
+        // Every 5 minutes wall-clock, re-query the chain for token balances
+        // and reconcile the engine's in-memory positions with on-chain reality.
+        // Adds missing positions, closes stragglers, updates qty drift.
+        // This is the second line of defense against stale state (FID-147
+        // heartbeat is the first).
+        {
+            use savant_trading::execution::wallet_recovery::{
+                ChainPositionRecovery, ChainRecoveryConfig,
+            };
+            let now = std::time::Instant::now();
+            let elapsed = now.duration_since(last_chain_sync);
+            if elapsed >= std::time::Duration::from_secs(300) {
+                let active_chain_name = std::env::var("SAVANT_CHAIN")
+                    .unwrap_or_else(|_| "arbitrum".to_string());
+                if let Some(chain_cfg) = config.chains.get(&active_chain_name) {
+                    let recovery = ChainPositionRecovery::new(ChainRecoveryConfig {
+                        rpc_url: chain_cfg.rpc_url.clone(),
+                        wallet_address: shared.wallet_address.read().await.clone(),
+                        chain_id: chain_cfg.chain_id,
+                    });
+                    let known_tokens: Vec<(String, String, u8)> =
+                        savant_trading::data::token_discovery::load_token_store("data/tokens.json")
+                            .into_iter()
+                            .map(|t| (t.symbol, t.address, t.decimals))
+                            .collect();
+                    let positions_snapshot: std::collections::HashMap<String, savant_trading::core::types::Position> =
+                        portfolio.positions().iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+                    let in_mem_usdc = portfolio.account().balance;
+                    // Reuse the heartbeat helper to get on-chain USDC.
+                    // We pass a single dummy position so the helper does its work.
+                    let recon_helper_cfg = savant_trading::execution::reconciliation::ReconciliationConfig {
+                        chain_id: chain_cfg.chain_id,
+                        wallet_address: shared.wallet_address.read().await.clone(),
+                        rpc_url: chain_cfg.rpc_url.clone(),
+                        divergence_threshold_usd: 0.10,
+                        divergence_threshold_pct: 0.01,
+                        interval_cycles: 1,
+                    };
+                    let dummy_pos = std::collections::HashMap::new();
+                    let acct = portfolio.account().clone();
+                    let usdc_report = savant_trading::execution::reconciliation::reconcile_wallet_state(
+                        &recon_helper_cfg, &acct, &dummy_pos,
+                    ).await;
+                    let on_chain_usdc = if usdc_report.rpc_failure {
+                        in_mem_usdc // RPC failed — assume no drift to avoid false positives
+                    } else {
+                        usdc_report.on_chain_usdc
+                    };
+                    let result = recovery.reconcile_with(
+                        &positions_snapshot,
+                        &known_tokens,
+                        in_mem_usdc,
+                        on_chain_usdc,
+                    ).await;
+                    if result.is_clean() {
+                        debug!(
+                            "FID-155: 5-min chain sync clean. {} positions tracked.",
+                            positions_snapshot.len()
+                        );
+                    } else {
+                        info!(
+                            "FID-155: 5-min chain sync drift detected. to_add={} to_close={} to_update={} drift_usd={:.2}",
+                            result.to_add.len(),
+                            result.to_close.len(),
+                            result.to_update.len(),
+                            result.drift_usd
+                        );
+                        // Apply qty updates: re-set in-memory position quantity to chain value.
+                        for updated in &result.to_update {
+                            if let Some(existing) = portfolio.positions_mut().get_mut(&updated.id) {
+                                existing.quantity = updated.quantity;
+                            }
+                        }
+                    }
+                }
+                last_chain_sync = now;
+            }
+        }
+
+        // FID-147: Wallet Reconciliation Heartbeat (runs at start of every cycle).
+        // Compares in-memory portfolio state to on-chain reality. Halts the
+        // engine on divergence beyond the configured thresholds. RPC failures
+        // log a warning without halting.
+        //
+        // FID-154: Chain selection. The engine selects its chain from config via
+        // the SAVANT_CHAIN env var (default: "arbitrum"). This lets the same
+        // binary run against mainnet (Arbitrum One, chain_id 42161) or testnet
+        // (Arbitrum Sepolia, chain_id 421614) without recompiling.
+        {
+            use savant_trading::execution::reconciliation::{
+                reconcile_wallet_state, ReconciliationConfig,
+            };
+            let active_chain_name = std::env::var("SAVANT_CHAIN")
+                .unwrap_or_else(|_| "arbitrum".to_string());
+            let active_chain = config.chains.get(&active_chain_name);
+            if active_chain.is_none() {
+                error!(
+                    "FID-154: SAVANT_CHAIN='{}' not found in config/chains. Available: {:?}. Halting cycle.",
+                    active_chain_name,
+                    config.chains.keys().collect::<Vec<_>>()
+                );
+                break;
+            }
+            let active_chain = active_chain.unwrap();
+            let recon_cfg = ReconciliationConfig {
+                chain_id: active_chain.chain_id,
+                wallet_address: shared.wallet_address.read().await.clone(),
+                rpc_url: active_chain.rpc_url.clone(),
+                divergence_threshold_usd: 0.10,
+                divergence_threshold_pct: 0.01,
+                interval_cycles: 1,
+            };
+            info!("FID-154: Heartbeat using chain '{}' (chain_id={})", active_chain_name, active_chain.chain_id);
+            let positions_snapshot: std::collections::HashMap<String, savant_trading::core::types::Position> =
+                portfolio.positions().iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+            let account_snapshot = portfolio.account().clone();
+            let report = reconcile_wallet_state(&recon_cfg, &account_snapshot, &positions_snapshot).await;
+            if report.halted {
+                error!(
+                    "FID-147: Wallet reconciliation halt: {}. Writing savant.blocked and exiting cycle.",
+                    report.halt_reason.as_deref().unwrap_or("unknown")
+                );
+                let _ = std::fs::write(
+                    "savant.blocked",
+                    format!("{}\nTrigger: wallet_reconciliation\nReason: {}\n",
+                        chrono::Utc::now().to_rfc3339(),
+                        report.halt_reason.as_deref().unwrap_or("unknown")),
+                );
+                // Halt by exiting the cycle. The engine's outer code handles shutdown.
+                break;
+            }
+        }
 
         // FID-093 D1: Explicit midnight UTC reset for daily PnL.
         // update_prices() already does this, but only runs when prices arrive.
@@ -1588,6 +1452,7 @@ pub async fn run(
                     shared
                         .log_activity(
                             savant_trading::core::shared::ActivityLevel::Warning,
+                            Some("ENGINE"),
                             "SYSTEM",
                             &format!("CANCEL-ALL: {}", reason),
                         )
@@ -1611,6 +1476,15 @@ pub async fn run(
         // WS ticker only updates the LAST candle's close — all other candles freeze.
         // FID-093 C4: Skip fetch if latest candle is less than 1 minute old
         // (same candle period — no new candle has formed yet).
+        // Startup optimization: skip ALL candle refresh if startup was < 5 min ago
+        // (data was just fetched during EngineState::new, Cycle 1 re-fetch is redundant).
+        let startup_fresh = startup_candles_loaded_at
+            .map(|t| t.elapsed() < Duration::from_secs(300))
+            .unwrap_or(false);
+        if startup_fresh {
+            startup_candles_loaded_at = None; // Only skip once
+        }
+        if !startup_fresh {
         {
             let tf = config.trading.timeframe.clone();
             let tf_minutes = parse_timeframe_minutes(&tf);
@@ -1652,6 +1526,7 @@ pub async fn run(
                 }
             }
         }
+        } // end if !startup_fresh
 
         // Refresh insight every 5 ticks (all pairs, single funding API call)
         if tick.is_multiple_of(5) {
@@ -1872,6 +1747,7 @@ pub async fn run(
             shared
                 .log_activity(
                     savant_trading::core::shared::ActivityLevel::Thinking,
+                    Some("ENGINE"),
                     "SYSTEM",
                     &format!(
                         "HUNT MODE ACTIVE: ${:.2} idle of ${:.2} equity — scanning all pairs for entries",
@@ -2109,6 +1985,7 @@ pub async fn run(
 
                 // Query memory context with timeout to prevent SQLite deadlocks
                 let memory_ctx_str = if let Some(ref mem) = memory {
+                    let cusum_for_pair = cusum_charts.get(pair);
                     match tokio::time::timeout(
                         std::time::Duration::from_secs(2),
                         savant_trading::memory::context::query_memory_context(
@@ -2116,6 +1993,7 @@ pub async fn run(
                             pair,
                             &format!("{}", regime),
                             current_session.name(),
+                            cusum_for_pair,
                         ),
                     )
                     .await
@@ -2455,6 +2333,16 @@ pub async fn run(
                 if let Some(ref mut jp) = jury_pool {
                     let regime = current_session.name();
                     let jury_result = jp.evaluate(&cleaned, savant_trading::core::types::MarketRegime::Ranging).await;
+
+                    // FID-162: build cycle record (some fields filled later when judgment available).
+                    let cycle_ts = chrono::Utc::now().to_rfc3339();
+                    let verdict_breakdown = VerdictBreakdown {
+                        buy: jury_result.verdicts.iter().filter(|v| v.verdict.to_uppercase() == "BUY").count(),
+                        sell: jury_result.verdicts.iter().filter(|v| v.verdict.to_uppercase() == "SELL").count(),
+                        hold: jury_result.verdicts.iter().filter(|v| v.verdict.to_uppercase() == "HOLD").count(),
+                        failed: jury_result.failed_count,
+                    };
+
                     if jury_result.quorum_met {
                         let judge = JuryJudge::new(
                             agent.provider_clone(),
@@ -2472,6 +2360,7 @@ pub async fn run(
                                 );
                                 shared.log_activity(
                                     savant_trading::core::shared::ActivityLevel::Decision,
+                                    Some("JURY"),
                                     "JURY",
                                     &format!(
                                         "Shadow: {} verdicts, {:.0}% consensus, {:?}",
@@ -2482,6 +2371,7 @@ pub async fn run(
                                 ).await;
                                 // FID-146: Reset veto flag at start of every detection pass.
                                 // FID-146: Jury veto detection — use consensus_strength as dissent proxy.
+                                let mut veto_detected = false;
                                 if config.ai.jury.jury_veto_enabled
                                     && matches!(judgment.decision.action, savant_trading::agent::decision_parser::TradeAction::Buy | savant_trading::agent::decision_parser::TradeAction::Sell)
                                 {
@@ -2489,11 +2379,64 @@ pub async fn run(
                                     if judgment.consensus_strength < dissent_threshold {
                                         warn!("FID-146 JURY VETO: consensus={:.0}% < threshold={:.0}%", judgment.consensus_strength * 100.0, dissent_threshold * 100.0);
                                         savant_trading::jury_state::FID_146_JURY_VETO.store(true, std::sync::atomic::Ordering::Relaxed);
+                                        veto_detected = true;
                                     }
                                 }
+
+                                // FID-162: record the cycle with judgment data.
+                                let consensus_action = format!("{:?}", judgment.decision.action);
+                                let per_juror: Vec<JurorRecord> = jury_result
+                                    .verdicts
+                                    .iter()
+                                    .enumerate()
+                                    .map(|(i, v)| JurorRecord {
+                                        juror_id: i,
+                                        model_slug: jury_result.model_ids.get(i).cloned().unwrap_or_default(),
+                                        verdict: v.verdict.clone(),
+                                        confidence: v.confidence,
+                                        key_argument: v.key_argument.clone(),
+                                        risk_flag: v.risk_flag.clone(),
+                                        parse_status: "ok".to_string(),
+                                        latency_ms: 0,
+                                    })
+                                    .collect();
+                                jp.add_cycle_record(JuryCycleRecord {
+                                    cycle_id: 0,
+                                    timestamp: cycle_ts.clone(),
+                                    verdict_breakdown,
+                                    consensus_strength: judgment.consensus_strength,
+                                    consensus_action,
+                                    quorum_met: true,
+                                    failed_count: jury_result.failed_count,
+                                    latency_ms: jury_result.total_latency_ms,
+                                    primary_action: None, // populated in phase 3 once per-pair batch actions known
+                                    judge_action: Some(format!("{:?}", judgment.decision.action)),
+                                    primary_judge_agreed: None,
+                                    veto_detected,
+                                    veto_enforced: false, // enforced only inside the per-pair phase 3 loop
+                                    veto_enforced_pairs: vec![],
+                                    per_juror,
+                                });
                             }
                             Err(e) => {
                                 warn!("FID-114 JURY: Judge failed ({}), using batch decisions", e);
+                                jp.add_cycle_record(JuryCycleRecord {
+                                    cycle_id: 0,
+                                    timestamp: cycle_ts.clone(),
+                                    verdict_breakdown,
+                                    consensus_strength: 0.0,
+                                    consensus_action: String::new(),
+                                    quorum_met: true,
+                                    failed_count: jury_result.failed_count,
+                                    latency_ms: jury_result.total_latency_ms,
+                                    primary_action: None,
+                                    judge_action: None,
+                                    primary_judge_agreed: None,
+                                    veto_detected: false,
+                                    veto_enforced: false,
+                                    veto_enforced_pairs: vec![],
+                                    per_juror: vec![],
+                                });
                             }
                         }
                     } else {
@@ -2502,7 +2445,54 @@ pub async fn run(
                             jury_result.verdicts.len(),
                             config.ai.jury.size_for_regime(regime)
                         );
+                        jp.add_cycle_record(JuryCycleRecord {
+                            cycle_id: 0,
+                            timestamp: cycle_ts.clone(),
+                            verdict_breakdown,
+                            consensus_strength: 0.0,
+                            consensus_action: String::new(),
+                            quorum_met: false,
+                            failed_count: jury_result.failed_count,
+                            latency_ms: jury_result.total_latency_ms,
+                            primary_action: None,
+                            judge_action: None,
+                            primary_judge_agreed: None,
+                            veto_detected: false,
+                            veto_enforced: false,
+                            veto_enforced_pairs: vec![],
+                            per_juror: vec![],
+                        });
                     }
+
+                    // FID-162: update live jury_state snapshot (cumulative + key health + veto flag).
+                    let key_health = jp.key_manager().key_health().await;
+                    let source = if !config.ai.jury.enabled {
+                        "disabled"
+                    } else if jp.metrics().total_evaluations == 0 {
+                        "never_ran"
+                    } else {
+                        "live"
+                    };
+                    *shared.jury_state.write().await = savant_trading::core::shared::JuryStateSnapshot {
+                        enabled: config.ai.jury.enabled,
+                        jury_size: config.ai.jury.jury_size,
+                        m3_control_active: true,
+                        free_models_used: if config.ai.jury.models.is_empty() {
+                            vec![config.ai.jury.model.clone()]
+                        } else {
+                            config.ai.jury.models.clone()
+                        },
+                        veto_enabled: config.ai.jury.jury_veto_enabled,
+                        veto_threshold: config.ai.jury.jury_veto_threshold,
+                        regime_sizes: config.ai.jury.regime_sizes.clone(),
+                        cumulative: jp.metrics().clone(),
+                        key_health,
+                        estimated_m3_calls: jp.m3_calls(),
+                        estimated_free_model_calls: jp.free_model_calls(),
+                        veto_flag_active_now: jp.veto_flag_active(),
+                        last_cycle_at: Some(cycle_ts),
+                        source: source.to_string(),
+                    };
                 }
 
                     // Try to parse as JSON array — handles MiMo returning individual
@@ -2702,6 +2692,11 @@ pub async fn run(
                         {
                             warn!("FID-146 JURY VETO OVERRIDE: {} {:?} -> Pass", decision.pair, decision.action);
                             decision.action = savant_trading::agent::decision_parser::TradeAction::Pass;
+                            decision.override_source = Some("jury_veto".to_string());
+                            // FID-162: record this override against the most recent cycle.
+                            if let Some(ref jp) = jury_pool {
+                                jp.record_veto_override(&decision.pair);
+                            }
                         }
                     let decision_record = savant_trading::core::shared::DecisionRecord {
                         timestamp: Utc::now().to_rfc3339(),
@@ -2716,6 +2711,7 @@ pub async fn run(
                         confidence: decision.confidence,
                         reasoning: decision.reasoning.clone(),
             execution_status: None,
+                    override_source: decision.override_source.clone(),
                     };
                     shared.push_decision(decision_record);
 
@@ -2737,6 +2733,7 @@ pub async fn run(
                         shared
                             .log_activity(
                                 savant_trading::core::shared::ActivityLevel::Decision,
+                                Some("LLM"),
                                 &decision.pair,
                                 &format!(
                                     "{} [{}] | {:.0}% | R:{:.1} | {}",
@@ -3071,6 +3068,7 @@ pub async fn run(
                                     );
                                     shared.log_activity(
                                         savant_trading::core::shared::ActivityLevel::Warning,
+                                        Some("RISK"),
                                         &decision.pair,
                                         &format!(
                                             "FID-088 TRIGGER: {} — overriding to {}",
@@ -3285,6 +3283,36 @@ pub async fn run(
                                                             0.0
                                                         };
 
+                                                        // FID-148: Per-trade loss check on close (FID-146 / LESSON-001)
+                                                        // The check_per_trade_loss method exists at src/risk/circuit_breaker.rs:163
+                                                        // but had zero production callers before this wiring.
+                                                        // On a loss > 5% of equity AND >= $0.50 floor, halt the engine.
+                                                        if pnl < 0.0 {
+                                                            let equity = portfolio.account().equity;
+                                                            if let CircuitBreakerResult::Triggered(reason) =
+                                                                circuit_breaker.check_per_trade_loss(pnl, equity)
+                                                            {
+                                                                let halt_msg = format!(
+                                                                    "Per-trade loss on close: {} — pnl=${:.4} equity=${:.4}",
+                                                                    reason, pnl, equity
+                                                                );
+                                                                error!(
+                                                                    "FID-148: CIRCUIT BREAKER TRIGGERED — per_trade_loss. {}. Writing savant.blocked.",
+                                                                    halt_msg
+                                                                );
+                                                                let _ = std::fs::write(
+                                                                    "savant.blocked",
+                                                                    format!("{}\nTrigger: per_trade_loss\nReason: {}\n",
+                                                                        chrono::Utc::now().to_rfc3339(), halt_msg),
+                                                                );
+                                                                // Skip recording this trade as a normal close — the position
+                                                                // is stranded with a halts-block file, requiring operator review.
+                                                                return Err(anyhow::anyhow!(
+                                                                    "FID-148: per-trade loss triggered circuit breaker: {}", halt_msg
+                                                                ));
+                                                            }
+                                                        }
+
                                                         info!(
                                                             "AI {:?} {} — closed position {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
                                                             decision.action, decision.pair, pos_id,
@@ -3329,14 +3357,45 @@ pub async fn run(
                                                         }
                                                         shared.log_activity(
                                                             savant_trading::core::shared::ActivityLevel::Trade,
+                                                            Some("EXEC"),
                                                             &trade.pair,
                                                             &format!("CLOSED {} | PnL: ${:.2} ({:.2}%)", trade.side, pnl, pnl_pct),
                                                         ).await;
 
                                                         // FID-085: Update decision log with trade outcome
+                                                        // A03: Compute alpha vs BTC benchmark over trade holding period
+                                                        let alpha_vs_benchmark = if let Some(btc_store) = market_stores.get("BTC/USD") {
+                                                            let btc_candles = btc_store.candles();
+                                                            if btc_candles.is_empty() {
+                                                                0.0
+                                                            } else {
+                                                                // Staleness guard: if closest BTC candle is >2x the timeframe from trade open, skip alpha
+                                                                let closest_gap_secs = btc_candles.iter()
+                                                                    .min_by_key(|c| (c.timestamp - trade.opened_at).num_seconds().abs())
+                                                                    .map(|c| (c.timestamp - trade.opened_at).num_seconds().abs())
+                                                                    .unwrap_or(i64::MAX);
+                                                                if closest_gap_secs > (interval_seconds as i64 * 2) {
+                                                                    0.0
+                                                                } else {
+                                                                    let btc_at_open = btc_candles.iter()
+                                                                        .min_by_key(|c| (c.timestamp - trade.opened_at).num_seconds().abs())
+                                                                        .map(|c| c.close)
+                                                                        .unwrap_or(0.0);
+                                                                    let btc_at_close = btc_candles.back().map(|c| c.close).unwrap_or(0.0);
+                                                                    if btc_at_open > 0.0 && btc_at_close > 0.0 {
+                                                                        let btc_return_pct = ((btc_at_close - btc_at_open) / btc_at_open) * 100.0;
+                                                                        pnl_pct - btc_return_pct
+                                                                    } else {
+                                                                        0.0
+                                                                    }
+                                                                }
+                                                            }
+                                                        } else {
+                                                            0.0
+                                                        };
                                                         decision_log.update_outcome(&trade.pair, savant_trading::agent::decision_log::TradeOutcome {
                                                             raw_return_pct: pnl_pct,
-                                                            alpha_vs_benchmark: 0.0, // TODO: compute vs BTC benchmark
+                                                            alpha_vs_benchmark,
                                                             reflection: if pnl > 0.0 {
                                                                 format!("WIN: {} closed at {:.4}, PnL ${:.2}", trade.side, exit_price, pnl)
                                                             } else {
@@ -3444,6 +3503,7 @@ pub async fn run(
                                             );
                                             shared.log_activity(
                                                 savant_trading::core::shared::ActivityLevel::Warning,
+                                                Some("RISK"),
                                                 &decision.pair,
                                                 &format!("REJECTED: {}", reason),
                                             ).await;
@@ -3508,6 +3568,7 @@ pub async fn run(
                                                         );
                                                         shared.log_activity(
                                                             savant_trading::core::shared::ActivityLevel::Warning,
+                                                            Some("RISK"),
                                                             &decision.pair,
                                                             &format!("REJECTED: {}", reason),
                                                         ).await;
@@ -3527,6 +3588,7 @@ pub async fn run(
                                                         );
                                                         shared.log_activity(
                                                             savant_trading::core::shared::ActivityLevel::Warning,
+                                                            Some("RISK"),
                                                             &decision.pair,
                                                             &format!("REJECTED: {}", reason),
                                                         ).await;
@@ -3534,6 +3596,11 @@ pub async fn run(
                                                     }
                                                     if !check.balance_ok {
                                                         log_warn!("BALANCE", "{} — insufficient sell token balance (0x issues.balance)", decision.pair);
+                                                    }
+                                                    // FID-160 Fix 1: Log allowance issues detected by check_liquidity.
+                // Actual approval is handled by ensure_permit2_approval in place_order.
+                                                    if !check.allowance_ok {
+                                                    log_warn!("ALLOWANCE", "{} — insufficient token allowance (0x issues.allowance). Will auto-approve before swap.", decision.pair);
                                                     }
                                                     info!("Liquidity OK: {} on {} (buy_tax={}bps, price={})", decision.pair, "0x", check.buy_tax_bps, check.price);
                                                 }
@@ -3668,6 +3735,7 @@ pub async fn run(
                                                 );
                                                 shared.log_activity(
                                                     savant_trading::core::shared::ActivityLevel::Info,
+                                                    Some("RISK"),
                                                     &decision.pair,
                                                     &format!("ADJUSTED: ${:.2} -> ${:.2} ({} cap)", order_value, safe_max, pct_label),
                                                 ).await;
@@ -3698,6 +3766,7 @@ pub async fn run(
                                                 );
                                                 shared.log_activity(
                                                     savant_trading::core::shared::ActivityLevel::Warning,
+                                                    Some("RISK"),
                                                     &decision.pair,
                                                     &format!("SKIPPED: {}", reason),
                                                 ).await;
@@ -3750,16 +3819,17 @@ pub async fn run(
                                                             side: decision.side,
                                                             entry_price: decision.entry_price,
                                                             current_price: decision.entry_price,
-                                                            quantity: quantity,
+                                                            quantity,
                                                             stop_loss: decision.stop_loss,
                                                             take_profit_1: decision.take_profit_1,
                                                             take_profit_2: decision.take_profit_2,
                                                             take_profit_3: decision.take_profit_3,
                                                             unrealized_pnl: 0.0,
-                                                            risk_amount: risk_amount,
+                                                            risk_amount,
                                                             strategy_name: "ai-agent".to_string(),
                                                             opened_at: chrono::Utc::now(),
                                                             scale_level: ScaleLevel::Full,
+                                                            token_address: savant_trading::execution::dex::lookup_token(decision.pair.split("/").next().unwrap_or(""), config.exchange.dex.chain_id).map(|(addr, _)| addr).unwrap_or_default(),
                                                         };
                                                         // Track position in PortfolioManager for state/reporting
                                                         portfolio
@@ -3906,6 +3976,7 @@ pub async fn run(
                                             );
                                             shared.log_activity(
                                                 savant_trading::core::shared::ActivityLevel::Warning,
+                                                Some("RISK"),
                                                 &decision.pair,
                                                 &format!("REJECTED: {}", reason),
                                             ).await;
@@ -3929,6 +4000,7 @@ pub async fn run(
                                             );
                                             shared.log_activity(
                                                 savant_trading::core::shared::ActivityLevel::Info,
+                                                Some("RISK"),
                                                 &decision.pair,
                                                 &format!("ADJUST STOP → ${:.4}", decision.stop_loss),
                                             ).await;
@@ -4206,6 +4278,7 @@ pub async fn run(
             shared
                 .log_activity(
                     savant_trading::core::shared::ActivityLevel::Trade,
+                    Some("EXEC"),
                     &trail.pair,
                     &format!(
                         "TRAIL {} | SL {:.4} → {:.4}",
@@ -4324,6 +4397,7 @@ pub async fn run(
                                     warn!("Restored position {} to PortfolioManager — will retry close next cycle", pid);
                                     shared.log_activity(
                                         savant_trading::core::shared::ActivityLevel::Warning,
+                                        Some("EXEC"),
                                         &trade.pair,
                                         &format!("CLOSE FAILED: {} — position stays open, will retry. Error: {}", trade.pair, e),
                                     ).await;
@@ -4373,6 +4447,7 @@ pub async fn run(
                                     warn!("Restored position {} to PortfolioManager — will retry close next cycle", pid);
                                     shared.log_activity(
                                         savant_trading::core::shared::ActivityLevel::Warning,
+                                        Some("EXEC"),
                                         &trade.pair,
                                         &format!("CLOSE FAILED: {} — position stays open, will retry. Error: {}", trade.pair, e),
                                     ).await;
@@ -4480,6 +4555,7 @@ pub async fn run(
             shared
                 .log_activity(
                     savant_trading::core::shared::ActivityLevel::Trade,
+                    Some("EXEC"),
                     &trade.pair,
                     &format!(
                         "{} {} | PnL: ${:.2} ({:.2}%) | {}",
@@ -4824,6 +4900,7 @@ pub async fn run(
                                         strategy_name: String::new(),
                                         scale_level: savant_trading::core::types::ScaleLevel::Full,
                                         opened_at: chrono::Utc::now(),
+                                        token_address: String::new(),
                                     };
                                     ex.register_position(exec_id.clone(), ghost);
                                 }
@@ -4858,6 +4935,7 @@ pub async fn run(
                                 // Dashboard notification
                                 shared.log_activity(
                                     savant_trading::core::shared::ActivityLevel::Warning,
+                                    Some("RECON"),
                                     &pair,
                                     &format!("EXTERNAL CLOSE: tokens no longer on-chain — position removed. Equity: ${:.2}", new_equity),
                                 ).await;
