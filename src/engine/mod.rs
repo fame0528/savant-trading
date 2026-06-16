@@ -2108,7 +2108,8 @@ pub async fn run(
                 // FID-085: Delta-compression for observability ONLY.
                 // Always send the full prompt to the LLM — never strip context.
                 // The delta % is logged at debug level to avoid noise.
-                let delta_result = ctx_state.compute_delta(&user_message, config.context.delta_compression_threshold);
+                // FID-164: per-pair state isolation + token-based detection.
+                let delta_result = ctx_state.compute_delta(pair, &user_message, config.context.delta_compression_min_token_savings);
                 if tracing::enabled!(tracing::Level::DEBUG) {
                     match delta_result {
                         savant_trading::agent::context_state::DeltaResult::NoChange => {
@@ -2123,8 +2124,8 @@ pub async fn run(
                     }
                 }
 
-                // FID-085: Anti-thrashing check (observability only, debug level)
-                if ctx_state.should_skip_compression(config.context.anti_thrash_min_savings) {
+                // FID-164: Per-pair anti-thrashing (was global in FID-085).
+                if ctx_state.should_skip_compression_for(pair, config.context.delta_compression_min_token_savings) {
                     tracing::debug!("Anti-thrashing: {} has low compression efficiency", pair);
                 }
 
@@ -5202,6 +5203,9 @@ pub async fn run(
             tick,
             interval_display
         );
+
+        // FID-164: log cumulative token savings for this cycle, reset for next.
+        ctx_state.end_cycle();
 
         // FID-082 Fix 4: Use time::sleep only — tokio::select! with ctrl_c
         // can interfere with sleep on Windows. Ctrl+C handled by OS.

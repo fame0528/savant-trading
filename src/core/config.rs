@@ -445,12 +445,12 @@ pub struct ContextConfig {
     /// Brain cache TTL in seconds (how long the static prefix stays cached)
     #[serde(default = "default_brain_cache_ttl")]
     pub brain_cache_ttl: u64,
-    /// Delta compression threshold: skip data injection if changed less than this fraction
-    #[serde(default = "default_delta_threshold")]
-    pub delta_compression_threshold: f64,
-    /// Anti-thrash: minimum savings fraction over 2 cycles to continue compression
-    #[serde(default = "default_anti_thrash_min_savings")]
-    pub anti_thrash_min_savings: f64,
+    /// Minimum tokens that delta-compression must save to be worthwhile (FID-164).
+    /// Adaptive threshold: 1.0 - (min_token_savings / current_tokens). Smaller prompts
+    /// get a more lenient threshold, larger prompts get a stricter one. Also drives
+    /// per-pair anti-thrashing (skip if last 2 cycles saved < this many tokens each).
+    #[serde(default = "default_delta_compression_min_token_savings")]
+    pub delta_compression_min_token_savings: usize,
     /// Hard minimum context window (tokens) — warn if model is below this
     #[serde(default = "default_min_context_guard")]
     pub min_context_guard: u32,
@@ -507,8 +507,7 @@ impl Default for ContextConfig {
         Self {
             encoding_mode: default_encoding_mode(),
             brain_cache_ttl: default_brain_cache_ttl(),
-            delta_compression_threshold: default_delta_threshold(),
-            anti_thrash_min_savings: default_anti_thrash_min_savings(),
+            delta_compression_min_token_savings: default_delta_compression_min_token_savings(),
             min_context_guard: default_min_context_guard(),
             warn_context_guard: default_warn_context_guard(),
             decision_log_max_entries: default_decision_log_max_entries(),
@@ -534,11 +533,8 @@ fn default_encoding_mode() -> String {
 fn default_brain_cache_ttl() -> u64 {
     3600
 }
-fn default_delta_threshold() -> f64 {
-    0.02
-}
-fn default_anti_thrash_min_savings() -> f64 {
-    0.10
+fn default_delta_compression_min_token_savings() -> usize {
+    50
 }
 fn default_min_context_guard() -> u32 {
     4096
