@@ -1246,7 +1246,7 @@ pub async fn run(
             let elapsed = now.duration_since(last_chain_sync);
             if elapsed >= std::time::Duration::from_secs(300) {
                 let active_chain_name = std::env::var("SAVANT_CHAIN")
-                    .unwrap_or_else(|_| "arbitrum".to_string());
+                    .unwrap_or_else(|_| "ethereum".to_string());
                 if let Some(chain_cfg) = config.chains.get(&active_chain_name) {
                     let recovery = ChainPositionRecovery::new(ChainRecoveryConfig {
                         rpc_url: chain_cfg.rpc_url.clone(),
@@ -1326,7 +1326,7 @@ pub async fn run(
                 reconcile_wallet_state, ReconciliationConfig,
             };
             let active_chain_name = std::env::var("SAVANT_CHAIN")
-                .unwrap_or_else(|_| "arbitrum".to_string());
+                .unwrap_or_else(|_| "ethereum".to_string());
             let active_chain = config.chains.get(&active_chain_name);
             if active_chain.is_none() {
                 error!(

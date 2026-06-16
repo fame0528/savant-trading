@@ -18,7 +18,12 @@ if exist .env (
 )
 :: Config override: set SAVANT_CONFIG env var to use a custom config file.
 :: Example: set SAVANT_CONFIG=config\test-anvil.toml
-if not defined SAVANT_CONFIG set "SAVANT_CONFIG=config\test-anvil.toml"
+if not defined SAVANT_CONFIG set "SAVANT_CONFIG=config\default.toml"
+
+:: FID-167: Active chain selection. Set SAVANT_CHAIN to one of the chains
+:: declared in [chains.*] in config/default.toml. Default: ethereum.
+:: Options: ethereum, arbitrum, base, optimism, bsc, sepolia (testnet).
+if not defined SAVANT_CHAIN set "SAVANT_CHAIN=ethereum"
 
 :: FID-126-R3: bypass conviction + confidence gates for sub-$500 balances.
 :: This restores the pre-FID-127 "all-in" path. Remove if balance > $500.
@@ -87,6 +92,9 @@ if %errorlevel% equ 0 (
     if errorlevel 1 (
         echo  WARNING: Anvil failed to start. Engine will retry RPC but may hang.
     )
+) else (
+    echo  Skipping Anvil auto-start (config is not test-anvil.toml).
+    echo  Active chain: %SAVANT_CHAIN% (from SAVANT_CHAIN env var).
 )
 echo.
 

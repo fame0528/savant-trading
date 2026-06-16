@@ -351,10 +351,13 @@ memory_context_min_trades = 5
 # Compares in-memory portfolio state to on-chain reality at the start of every cycle.
 # Halts the engine on divergence beyond the configured thresholds.
 # RPC failure does NOT halt (logs a warning instead) — RPC unreliability is not state drift.
+#
+# FID-167: chain_id here is a fallback for the wallet_address + rpc_url fields.
+# The active chain at runtime is determined by the SAVANT_CHAIN env var (default: ethereum).
+# The chain_id below is informational; the engine reads SAVANT_CHAIN and uses the matching
+# [chains.*] block from this config file.
 [reconciliation]
-chain_id = 42161                  # Arbitrum One mainnet
 wallet_address = "0x543CA0434B84aD38c858D2D178D2082521711fBC"
-rpc_url = "https://arb1.arbitrum.io/rpc"
 divergence_threshold_usd = 0.10   # Sub-$1 account scale: $0.10 is meaningful
 divergence_threshold_pct = 0.01   # 1% of equity
 interval_cycles = 1               # Every cycle. Increase for less latency-sensitive runs.
