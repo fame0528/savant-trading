@@ -17,6 +17,10 @@ pub struct LlmConfig {
     pub temperature: f64,
     pub top_p: f64,
     pub timeout_secs: u64,
+    /// FID-166: Separate, lower timeout for streaming calls. M3 should respond in
+    /// 30s. 60s gives headroom. Stalled streaming upstreams fail fast and fall back
+    /// to non-streaming.
+    pub streaming_timeout_secs: u64,
     pub extra_headers: Vec<(String, String)>,
     /// FID-138: Disable chain-of-thought reasoning for models that support it.
     /// When true, adds `"thinking": {"type": "disabled"}` to the request body.
@@ -34,6 +38,7 @@ impl Default for LlmConfig {
             temperature: 0.6,
             top_p: 0.95,
             timeout_secs: 300,
+            streaming_timeout_secs: 60,
             extra_headers: vec![],
             disable_thinking: false,
         }
@@ -47,7 +52,11 @@ pub struct Message {
 }
 
 pub struct LlmProvider {
+    /// Non-streaming client (chat, fallback). Uses `timeout_secs` (default 300s).
     client: reqwest::Client,
+    /// FID-166: Streaming client (chat_stream). Uses `streaming_timeout_secs`
+    /// (default 60s) so stalled upstreams fail fast and fall back to non-streaming.
+    streaming_client: reqwest::Client,
     config: LlmConfig,
 }
 
@@ -80,6 +89,7 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                     temperature: ai_cfg.temperature,
                     top_p: ai_cfg.top_p,
                     timeout_secs: ai_cfg.timeout_secs,
+                    streaming_timeout_secs: ai_cfg.streaming_timeout_secs,
                     extra_headers: vec![],
                     disable_thinking: ai_cfg.disable_thinking,
                 },
@@ -97,6 +107,7 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                     temperature: ai_cfg.temperature,
                     top_p: ai_cfg.top_p,
                     timeout_secs: ai_cfg.timeout_secs.max(300),
+                    streaming_timeout_secs: ai_cfg.streaming_timeout_secs.max(300),
                     extra_headers: vec![],
                     disable_thinking: ai_cfg.disable_thinking,
                 },
@@ -113,6 +124,7 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                     temperature: ai_cfg.temperature,
                     top_p: ai_cfg.top_p,
                     timeout_secs: ai_cfg.timeout_secs,
+                    streaming_timeout_secs: ai_cfg.streaming_timeout_secs,
                     extra_headers: vec![],
                     disable_thinking: ai_cfg.disable_thinking,
                 },
@@ -130,6 +142,7 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                     temperature: ai_cfg.temperature,
                     top_p: ai_cfg.top_p,
                     timeout_secs: ai_cfg.timeout_secs,
+                    streaming_timeout_secs: ai_cfg.streaming_timeout_secs,
                     extra_headers: vec![],
                     disable_thinking: ai_cfg.disable_thinking,
                 },
@@ -144,6 +157,7 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                     temperature: ai_cfg.temperature,
                     top_p: ai_cfg.top_p,
                     timeout_secs: ai_cfg.timeout_secs,
+                    streaming_timeout_secs: ai_cfg.streaming_timeout_secs,
                     extra_headers: vec![],
                     disable_thinking: ai_cfg.disable_thinking,
                 },
@@ -171,7 +185,15 @@ impl LlmProvider {
             .timeout(std::time::Duration::from_secs(config.timeout_secs))
             .build()
             .unwrap_or_else(|_| reqwest::Client::new());
-        Self { client, config }
+        let streaming_client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(config.streaming_timeout_secs))
+            .build()
+            .unwrap_or_else(|_| reqwest::Client::new());
+        Self {
+            client,
+            streaming_client,
+            config,
+        }
     }
 
     pub fn config_clone(&self) -> LlmConfig {
@@ -184,7 +206,7 @@ impl LlmProvider {
         let mut last_err = String::new();
 
         for attempt in 0..max_attempts {
-            let resp = match self.send_with_retry(&body, 3, "chat()").await {
+            let resp = match self.send_with_retry(&body, 3, "chat()", false).await {
                 Ok(r) => r,
                 Err(e) => {
                     last_err = format!("{}", e);
@@ -237,11 +259,11 @@ impl LlmProvider {
         messages: &[Message],
     ) -> Result<String, LlmError> {
         let stream_body = self.build_body(system, messages, true);
-        let max_retries = 2;
+        let max_retries = 1;
         let mut last_err = String::new();
 
         for attempt in 0..max_retries {
-            let resp = match self.send_with_retry(&stream_body, 2, "Stream").await {
+            let resp = match self.send_with_retry(&stream_body, 2, "Stream", true).await {
                 Ok(r) => r,
                 Err(e) => {
                     last_err = format!("{}", e);
@@ -276,7 +298,7 @@ impl LlmProvider {
             last_err
         );
         let body = self.build_body(system, messages, false);
-        let resp = self.send_with_retry(&body, 1, "Fallback").await?;
+        let resp = self.send_with_retry(&body, 1, "Fallback", false).await?;
         Self::parse_non_streaming(resp).await
     }
 
@@ -339,10 +361,18 @@ impl LlmProvider {
         body
     }
 
-    async fn send_request(&self, body: &serde_json::Value) -> Result<reqwest::Response, LlmError> {
+    async fn send_request(
+        &self,
+        body: &serde_json::Value,
+        use_streaming_client: bool,
+    ) -> Result<reqwest::Response, LlmError> {
         let url = format!("{}/chat/completions", self.config.endpoint);
-        let mut req_builder = self
-            .client
+        let client = if use_streaming_client {
+            &self.streaming_client
+        } else {
+            &self.client
+        };
+        let mut req_builder = client
             .post(&url)
             .header("Content-Type", "application/json")
             .header("Authorization", format!("Bearer {}", self.config.api_key));
@@ -357,18 +387,21 @@ impl LlmProvider {
     }
 
     /// Shared retry logic for HTTP requests. Handles 429 (with retry-after),
-    /// 502/503/529 (transient), and connection errors with exponential backoff.
-    /// Returns the successful response for the caller to parse.
+    /// 502/503/504/529 (transient, FID-166 added 504), and connection errors
+    /// with exponential backoff. Returns the successful response for the caller.
+    /// `use_streaming_client` selects between the regular and streaming reqwest
+    /// clients (different timeouts).
     async fn send_with_retry(
         &self,
         body: &serde_json::Value,
         max_attempts: u32,
         label: &str,
+        use_streaming_client: bool,
     ) -> Result<reqwest::Response, LlmError> {
         let mut last_err = String::new();
 
         for attempt in 0..max_attempts {
-            let resp = match self.send_request(body).await {
+            let resp = match self.send_request(body, use_streaming_client).await {
                 Ok(r) => r,
                 Err(e) => {
                     last_err = format!("{}", e);
@@ -408,7 +441,7 @@ impl LlmProvider {
                 last_err = format!("Rate limited (429), waited {}s", retry_after);
                 continue;
             }
-            if status == 502 || status == 503 || status == 529 {
+            if status == 502 || status == 503 || status == 504 || status == 529 {
                 last_err = format!("HTTP {} (transient)", status);
                 if attempt < max_attempts - 1 {
                     let wait = 2u64.pow(attempt + 1);
@@ -615,7 +648,7 @@ impl LlmProvider {
             };
 
             let status = resp.status();
-            if status == 429 || status == 502 || status == 503 || status == 529 {
+            if status == 429 || status == 502 || status == 503 || status == 504 || status == 529 {
                 last_err = format!("HTTP {} (transient)", status);
                 if attempt < max_attempts - 1 {
                     let wait = 2u64.pow(attempt + 1);

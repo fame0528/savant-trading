@@ -682,6 +682,7 @@ impl EngineState {
                 temperature: config.ai.temperature,
                 top_p: config.ai.top_p,
                 timeout_secs: config.ai.timeout_secs,
+                streaming_timeout_secs: config.ai.streaming_timeout_secs,
                 extra_headers: vec![
                     (
                         "HTTP-Referer".to_string(),

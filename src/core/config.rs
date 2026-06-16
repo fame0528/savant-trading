@@ -119,6 +119,9 @@ fn default_top_p() -> f64 {
 fn default_timeout_secs() -> u64 {
     300
 }
+fn default_streaming_timeout_secs() -> u64 {
+    60
+}
 
 fn default_openrouter_endpoint() -> String {
     "https://openrouter.ai/api/v1".into()
@@ -419,6 +422,10 @@ pub struct AiConfig {
     pub top_p: f64,
     #[serde(default = "default_timeout_secs")]
     pub timeout_secs: u64,
+    /// FID-166: Streaming client timeout (M3 should respond in 30s; 60s gives
+    /// headroom). Stalled streaming upstreams fail fast and fall back to non-streaming.
+    #[serde(default = "default_streaming_timeout_secs")]
+    pub streaming_timeout_secs: u64,
     /// FID-138: Disable chain-of-thought reasoning for models that support it.
     /// When true, adds `"thinking": {"type": "disabled"}` to the request body.
     /// Only effective for reasoning models (MiniMax M3, DeepSeek R1, etc.).
@@ -1072,6 +1079,7 @@ impl Default for AppConfig {
                 top_p: 0.95,
                 max_tokens: 131072,
                 timeout_secs: 300,
+                streaming_timeout_secs: 60,
                 disable_thinking: false,
                 openrouter: OpenRouterConfig::default(),
                 nvidia: NvidiaConfig::default(),
