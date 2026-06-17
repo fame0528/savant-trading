@@ -69,6 +69,7 @@ Field Rules:
 
 - action: BUY to open long, SELL to open short, HOLD for no action, CLOSE to exit existing, ADJUST_STOP to modify stop
   **CRITICAL RULES:**
+  0. **PASS is NOT a default (FID-192).** PASS means "I have zero directional view on this pair." Most pairs have SOME directional lean. Output Buy or Sell with conviction_score (0.05-1.0) and let the engine's regime gate filter it. Below the threshold, the gate downgrades to HOLD.
   1. If ANY position_audit has management_trigger != "none", the action CANNOT be HOLD. You MUST execute the mandated_action.
   2. If would_initiate_new_long_at_current_price is FALSE for a held position, action MUST be CLOSE.
   3. If your reasoning identifies that the thesis has weakened — EMA crossover against direction, volume selloff, lower highs/lower lows — the action MUST be CLOSE, not HOLD. A weakened thesis is a failing thesis.

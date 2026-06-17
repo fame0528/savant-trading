@@ -83,9 +83,28 @@ Output the EXACT computation. The parser will not silently remap 0.42 or 0.67.
 
 7/10 checklist points + no critical invalidation = grounds for a low-conviction entry. The 10-point pre-trade checklist is now an EVALUATION MATRIX (FID-132), not a Boolean gate. Modifiers from missing criteria reduce conviction by their sum but do not auto-Pass.
 
-# Out-of-Range Handling (FID-184)
+# Out-of-Range Handling (FID-192)
 
-Calculate a probability score between 0.00 and 1.00 indicating the likelihood of upward price movement. A score of 0.50 represents absolute uncertainty or a non-directional ranging market. DO NOT default to 0.0 — output a granular value based on actual trigger quality. The engine will gate against the regime threshold (0.05 Trending / 0.10 Ranging / 0.15 Volatile / 0.20 GreyZone). If conviction > 1.0, clamp to 1.0. If sizing_multiplier > 1.0, clamp to 1.0.
+**CRITICAL: DO NOT output action: PASS as a default. PASS is a strong commitment, not a hedge.**
+
+For each pair, you MUST commit to a directional position based on your analysis:
+- If your analysis suggests the price will go UP in the next 1-2 candles: output action: Buy with conviction_score based on trigger quality
+- If your analysis suggests the price will go DOWN: output action: SELL with conviction_score
+- If your analysis says "I have NO view" (e.g., truly ranging with no edge, no volume): output action: PASS — but this is rare. Most setups have SOME directional lean.
+
+When uncertain, output a Buy or Sell with low conviction_score (0.05-0.20) and the engine's regime gate will filter it. The threshold is:
+- Trending: 0.05
+- Ranging: 0.10
+- Volatile: 0.15
+- GreyZone: 0.20
+
+A Buy with conviction_score 0.10 in a Trending regime WILL pass the gate. If you don't think the setup is good enough to trade at all, output conviction_score 0.04 (below all thresholds) — but the action MUST still be Buy or Sell, not PASS.
+
+PASS is for when you have zero directional view. Most setups don't qualify. Most setups qualify for a low-conviction Buy or Sell.
+
+The engine's regime gate, position sizer, and risk limits are your safety net. Use them. Don't pre-gate yourself with action: PASS.
+
+Calculate a probability score between 0.00 and 1.00 indicating the likelihood of upward price movement. A score of 0.50 represents absolute uncertainty or a non-directional ranging market. DO NOT default to 0.0 — output a granular value based on actual trigger quality. The engine will gate against the regime threshold. If conviction > 1.0, clamp to 1.0. If sizing_multiplier > 1.0, clamp to 1.0.
 
 # Schema Change Risk
 

@@ -2923,6 +2923,12 @@ pub async fn run(
                         stop_loss: decision.stop_loss,
                         take_profit: decision.take_profit_1,
                         reasoning: decision.reasoning.clone(),
+                        conviction_score: decision.conviction_score,
+                        regime_label: format!("{:?}", decision.regime_label),
+                        trigger_strong: decision.trigger_weights.strong,
+                        trigger_moderate: decision.trigger_weights.moderate,
+                        trigger_weak: decision.trigger_weights.weak,
+                        override_source: decision.override_source.clone().unwrap_or_default(),
                         outcome: None,
                     });
 
@@ -4092,6 +4098,12 @@ pub async fn run(
                                                         "Your BUY signal was correct. Position auto-adjusted from ${:.2} to ${:.2} ({} portfolio cap). Analysis was sound — only sizing was adjusted.",
                                                         order_value, safe_max, pct_label
                                                     ),
+                                                    conviction_score: decision.conviction_score,
+                                                    regime_label: format!("{:?}", decision.regime_label),
+                                                    trigger_strong: decision.trigger_weights.strong,
+                                                    trigger_moderate: decision.trigger_weights.moderate,
+                                                    trigger_weak: decision.trigger_weights.weak,
+                                                    override_source: String::new(),
                                                     outcome: None,
                                                 });
                                         }

@@ -21,6 +21,25 @@ pub struct DecisionEntry {
     pub stop_loss: f64,
     pub take_profit: f64,
     pub reasoning: String,
+    /// FID-192: conviction_score from LLM (0.0-1.0). Captures LLM's raw
+    /// directional confidence so we can debug why the engine traded
+    /// or didn't trade, even when the LLM outputs action: PASS.
+    #[serde(default)]
+    pub conviction_score: f64,
+    /// FID-192: regime_label output by LLM (Trending/Volatile/Ranging/GreyZone).
+    #[serde(default)]
+    pub regime_label: String,
+    /// FID-192: trigger_weights output by LLM (strong/moderate/weak counts).
+    #[serde(default)]
+    pub trigger_strong: u32,
+    #[serde(default)]
+    pub trigger_moderate: u32,
+    #[serde(default)]
+    pub trigger_weak: u32,
+    /// FID-192: which override fired (conviction_gate, confidence_floor,
+    /// zero_base_review, jury_veto, etc.). Empty if no override.
+    #[serde(default)]
+    pub override_source: String,
     pub outcome: Option<TradeOutcome>,
 }
 
@@ -188,6 +207,12 @@ mod tests {
             stop_loss: 2400.0,
             take_profit: 2500.0,
             reasoning: "Test reasoning".to_string(),
+            conviction_score: 0.65,
+            regime_label: "Trending".to_string(),
+            trigger_strong: 1,
+            trigger_moderate: 1,
+            trigger_weak: 1,
+            override_source: String::new(),
             outcome: None,
         }
     }
