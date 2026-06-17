@@ -78,7 +78,8 @@ pairs = [
     "ENA/USD", "MAGIC/USD", "GNS/USD", "JOE/USD",
 ]
 full_deploy = true
-scan_all_pairs = true
+# FID-189: see comment in config/default.toml
+scan_all_pairs = false
 min_volume_24h_usd = 1500000.0
 min_price_usd = 0.001
 blacklisted_symbols = []

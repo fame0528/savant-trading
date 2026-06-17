@@ -100,7 +100,13 @@ pairs = [
     "ENA/USD", "MAGIC/USD", "GNS/USD", "JOE/USD",
 ]
 full_deploy = true
-scan_all_pairs = true
+# FID-189: scan_all_pairs = false activates the existing smart pre-scoring
+# at engine/mod.rs:2052-2120. The pre-scoring skips pairs with no signal
+# (RSI extreme, ADX trend, EMA cross, volume spike, BB squeeze) before
+# sending to the LLM. With scan_all_pairs = true, the LLM receives 30-50
+# pairs and defaults to 0% conviction (default-to-hold bias). With it
+# off, the LLM sees only pairs with measurable setups.
+scan_all_pairs = false
 min_volume_24h_usd = 1500000.0
 min_price_usd = 0.001
 blacklisted_symbols = []
