@@ -19,6 +19,7 @@ pub mod geckoterminal;
 pub mod kraken;
 pub mod kucoin;
 pub mod okx;
+pub mod zero_x_price;
 
 use crate::core::error::ExecutionError;
 use crate::core::types::Candle;

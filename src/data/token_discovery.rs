@@ -273,9 +273,9 @@ pub fn seed_token_store_from_static(
 }
 
 /// USDC address on Arbitrum (native, 6 decimals).
-const USDC_ARBITRUM: &str = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831";
+pub const USDC_ARBITRUM: &str = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831";
 /// 10 USDC in base units (6 decimals) — above dust threshold for 0x routing.
-const VALIDATION_SELL_AMOUNT: &str = "10000000";
+pub const VALIDATION_SELL_AMOUNT: &str = "10000000";
 /// Delay between 0x API calls to respect 5 RPS free-tier limit.
 pub const VALIDATION_RATE_LIMIT_MS: u64 = 250;
 /// Max tokens to validate per refresh cycle to bound main-loop latency.
