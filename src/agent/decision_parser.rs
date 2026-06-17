@@ -417,7 +417,7 @@ pub fn parse_decision(
         } else {
             -0.05
         };
-        tracing::warn!(
+        tracing::debug!(
             "FID-126 anti-pattern noise: conviction=0.50/0.65 (default-to-threshold), adding noise={:+.2} from pair hash for {}",
             noise,
             decision.pair
@@ -590,7 +590,7 @@ pub fn parse_decision(
     if decision.would_initiate_new_long == Some(false)
         && matches!(decision.action, TradeAction::Pass)
     {
-        tracing::warn!(
+        tracing::info!(
             "FID-096 ZERO-BASE ENFORCEMENT: would_initiate_new_long=false but action was {:?}. Overriding to Close. Pair: {}",
             decision.action, decision.pair
         );

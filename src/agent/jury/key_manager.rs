@@ -154,7 +154,7 @@ impl JuryKeyManager {
         if let Some(key) = keys.iter().find(|k| k.hash == hash) {
             let failures = key.consecutive_failures.fetch_add(1, Ordering::Relaxed) + 1;
             if failures >= self.config.max_consecutive_failures {
-                warn!(
+                info!(
                     "Jury key '{}' exceeded failure threshold ({}/{})",
                     key.label, failures, self.config.max_consecutive_failures
                 );

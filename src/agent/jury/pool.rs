@@ -403,7 +403,7 @@ impl JuryPool {
                     }
                 }
                 Ok((label, hash, Err(_))) => {
-                    warn!("Jury member '{}': timed out", label);
+                    info!("Jury member '{}': timed out", label);
                     failed += 1;
                     if !hash.is_empty() {
                         let _ = self.key_manager.record_failure(&hash).await;
@@ -421,7 +421,7 @@ impl JuryPool {
 
         if !quorum_met {
             self.metrics.quorum_failures += 1;
-            warn!(
+            info!(
                 "Jury quorum NOT met: {}/{} verdicts (need {})",
                 verdicts.len(),
                 jury_size,

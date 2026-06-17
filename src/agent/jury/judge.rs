@@ -307,7 +307,7 @@ impl JuryJudge {
 
         let consensus = self.calculate_consensus(jury_result);
 
-        warn!(
+        info!(
             "Judge fallback: majority vote → {:?} (BUY:{}, SELL:{}, HOLD:{}, consensus: {:.0}%)",
             action,
             buy,
