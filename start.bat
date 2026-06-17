@@ -92,17 +92,13 @@ echo.
 
 :: ============================================================
 :: Auto-start Anvil fork if not running (self-recovery).
-:: Only runs for test-anvil.toml — mainnet configs don't need Anvil.
+:: start-anvil.bat is idempotent — exits quickly if Anvil is up.
+:: Unconditional call avoids the cmd.exe parens-block parse error
+:: that the previous if/else/findstr pattern produced. (FID-178/179)
 :: ============================================================
-echo %SAVANT_CONFIG% | findstr /i "anvil" >nul
-if %errorlevel% equ 0 (
-    call "%~dp0start-anvil.bat"
-    if errorlevel 1 (
-        echo  WARNING: Anvil failed to start. Engine will retry RPC but may hang.
-    )
-) else (
-    echo  Skipping Anvil auto-start (config is not test-anvil.toml).
-    echo  Active chain: %SAVANT_CHAIN% (from SAVANT_CHAIN env var).
+call "%~dp0start-anvil.bat"
+if errorlevel 1 (
+    echo  WARNING: Anvil failed to start. Engine will retry RPC but may hang.
 )
 echo.
 
