@@ -102,18 +102,34 @@ for chain in &enabled_chains {
 
 **Implementation:** After each chain's cycle, collect token prices across chains. Compare. Emit signal if profitable.
 
-### Action 5: Hyperliquid integration
+### Action 5: Hyperliquid integration (UPDATED with Gemini Q3)
 
 **File:** `src/execution/hyperliquid/` (new module)
 
-**Scope:** Perpetuals trading via Hyperliquid's orderbook API. No 0x equivalent.
+**Gemini Q3 specifics:**
+- Hyperliquid = Layer-1 CLOB (central limit orderbook), not AMM
+- ~10ms execution latency (vs 1-3s for EVM DEX)
+- Zero gas fees
+- Maker rebate: -0.003% (negative fee = you get paid)
+- Taker fee: 0.045%
+- Hourly funding rates (not 8h like CEX perps)
+- Up to 20k operations/sec
+- Tuned Tendermint BFT consensus
+
+**Strategy differences from EVM DEX:**
+- Use limit orders to capture maker rebate (0.015% edge)
+- Account for hourly funding carry cost
+- Sub-second latency advantage matters
+- No MEV exposure (centralized orderbook)
+- No AMM slippage (orderbook depth is explicit)
 
 **Phases:**
 - Phase 1: REST API client for Hyperliquid
 - Phase 2: Orderbook streaming via WebSocket
 - Phase 3: Position management (long/short, leverage, liquidation price)
-- Phase 4: Funding rate awareness (perps have funding costs)
-- Phase 5: Engine integration (add Hyperliquid as a sub-strategy)
+- Phase 4: Funding rate awareness (perps have funding costs, must model carry)
+- Phase 5: Limit order placement to capture maker rebate
+- Phase 6: Engine integration (add Hyperliquid as a sub-strategy)
 
 **Legal note:** Hyperliquid is KY-restricted in the US. Spencer has a separate spec for the legal question. Implementation proceeds in parallel.
 
