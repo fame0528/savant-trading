@@ -17,13 +17,18 @@ if exist .env (
     echo  WARNING: .env not found. API keys may be missing.
 )
 :: Config override: set SAVANT_CONFIG env var to use a custom config file.
-:: Example: set SAVANT_CONFIG=config\test-anvil.toml
-if not defined SAVANT_CONFIG set "SAVANT_CONFIG=config\default.toml"
+:: Example: set SAVANT_CONFIG=config\default.toml
+:: FID-177: default reverted to test-anvil.toml (Anvil). Spencer's working dev
+:: setup is Anvil. FID-167 changed the default to default.toml (Ethereum
+:: mainnet) but that broke the Anvil workflow. Use SAVANT_CONFIG env var
+:: to override for mainnet/multi-chain testing.
+if not defined SAVANT_CONFIG set "SAVANT_CONFIG=config\test-anvil.toml"
 
 :: FID-167: Active chain selection. Set SAVANT_CHAIN to one of the chains
-:: declared in [chains.*] in config/default.toml. Default: ethereum.
-:: Options: ethereum, arbitrum, base, optimism, bsc, sepolia (testnet).
-if not defined SAVANT_CHAIN set "SAVANT_CHAIN=ethereum"
+:: declared in [chains.*] in config/test-anvil.toml. Default: arbitrum.
+:: The Anvil workflow only enables Arbitrum. For other chains, use
+:: config\default.toml and SAVANT_CHAIN=ethereum (or base, optimism, bsc).
+if not defined SAVANT_CHAIN set "SAVANT_CHAIN=arbitrum"
 
 :: FID-126-R3: bypass conviction + confidence gates for sub-$500 balances.
 :: This restores the pre-FID-127 "all-in" path. Remove if balance > $500.
