@@ -126,6 +126,10 @@ test-env.bat
 %*
 *"-*-*".md  # literal quoted-filename pattern (e.g. "Foo Bar.md")
 
+# PowerShell variable-as-filename artifacts (e.g. $null, $500)
+# Created by `> $null`, `echo $x > $500`, or similar in unquoted contexts
+$*
+
 # === Session training/sandbox run logs ===
 scripts/logs/
 training_*.log
