@@ -1,0 +1,56 @@
+# git-cliff configuration for Savant Trading
+# Generates CHANGELOG.md from Conventional Commits + FID references
+# Run: `git-cliff -o CHANGELOG.md` to regenerate
+
+[changelog]
+header = """
+# Changelog\n\nAll notable changes to Savant Trading are documented here.\n
+"""
+body = """
+{% if version %}\
+## [{{ version | trim_start_matches(pat="v") }}] — {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+## [Unreleased]
+{% endif %}\
+
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | upper_first }}
+{% for commit in commits %}
+- {% if commit.scope %}**{{ commit.scope }}**: {% endif %}{{ commit.message | split(pat="\n") | first | upper_first | trim }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/fame0528/savant-trading/commit/{{ commit.id }})){%- if commit.footers %}
+  {% for footer in commit.footers %}
+  - {{ footer.token }}: {{ footer.value }}
+  {% endfor %}
+{%- endif %}
+{% endfor %}
+{% endfor %}
+"""
+footer = ""
+trim = true
+
+[git]
+conventional_commits = true
+filter_unconventional = false
+split_commits = false
+commit_parsers = [
+  { message = "^feat\\(FID-[0-9]+\\)", group = "Features (FID Core)" },
+  { message = "^feat", group = "Features" },
+  { message = "^fix\\(FID-[0-9]+\\)", group = "Bug Fixes (FID Resolved)" },
+  { message = "^fix", group = "Bug Fixes" },
+  { message = "^docs\\(FID-[0-9]+\\)", group = "FID Lifecycle Archives" },
+  { message = "^docs", group = "Documentation" },
+  { message = "^perf", group = "Performance" },
+  { message = "^refactor", group = "Refactoring" },
+  { message = "^chore", group = "Miscellaneous" },
+  { message = ".*", group = "Other" },
+]
+commit_preprocessors = [
+  { pattern = '\(FID-([0-9]+)\)', replace = "([FID-${1}](https://github.com/fame0528/savant-trading/issues/${1}))" },
+]
+filter_commits = false
+topo_order = false
+sort_commits = "oldest"
+
+[changelog.git]
+tag_pattern = "v[0-9]+\\.[0-9]+\\.[0-9]+"
+topo_order = false
+sort_commits = "oldest"
