@@ -80,6 +80,10 @@ pub struct ContextState {
     pairs: HashMap<String, PairState>,
     /// Cumulative token savings this cycle (for telemetry, reset by `end_cycle()`)
     total_tokens_saved_this_cycle: usize,
+    /// FID-186: lifetime total compressions (incremented per pair per cycle)
+    total_compressions: u64,
+    /// FID-186: lifetime total tokens saved (cumulative across all cycles)
+    total_tokens_saved: u64,
     /// Global cycle counter (incremented per pair, as before)
     cycle_count: u64,
     /// Data blocks with TTL for pruning
@@ -98,6 +102,8 @@ impl ContextState {
         Self {
             pairs: HashMap::new(),
             total_tokens_saved_this_cycle: 0,
+            total_compressions: 0,
+            total_tokens_saved: 0,
             cycle_count: 0,
             data_blocks: Vec::new(),
             soft_trim_ratio,
@@ -150,6 +156,9 @@ impl ContextState {
         };
 
         self.record_token_savings(pair, diff.saved);
+        // FID-186: increment lifetime counters
+        self.total_compressions += 1;
+        self.total_tokens_saved += diff.saved as u64;
 
         if diff.ratio < threshold {
             // Small change — inject delta
@@ -159,7 +168,7 @@ impl ContextState {
                 .and_then(|s| s.previous_text.clone())
                 .unwrap_or_default();
             let delta = self.extract_changes(&prev_text, current_text);
-            info!(
+            debug!(
                 "Delta-compression: {} {:.1}% change (threshold {:.1}%, saved {} tokens) — injecting delta only",
                 pair,
                 diff.ratio * 100.0,
@@ -170,7 +179,7 @@ impl ContextState {
             DeltaResult::Delta(delta)
         } else {
             // Large change — full injection (regime shift)
-            info!(
+            debug!(
                 "Delta-compression: {} {:.1}% change (threshold {:.1}%, saved {} tokens) — full injection (regime shift)",
                 pair,
                 diff.ratio * 100.0,
@@ -218,6 +227,25 @@ impl ContextState {
                 self.cycle_count,
                 self.pairs.len(),
                 self.total_tokens_saved_this_cycle
+            );
+            // FID-186: dump aggregate metrics to data/context_state_metrics.json
+            let metrics = serde_json::json!({
+                "cycle": self.cycle_count,
+                "pairs_evaluated": self.pairs.len(),
+                "tokens_saved_this_cycle": self.total_tokens_saved_this_cycle,
+                "total_compressions": self.total_compressions,
+                "total_tokens_saved": self.total_tokens_saved,
+                "avg_compression_rate": if self.total_compressions > 0 {
+                    self.total_tokens_saved as f64 / self.total_compressions as f64
+                } else {
+                    0.0
+                },
+                "timestamp": chrono::Utc::now().to_rfc3339(),
+            });
+            let _ = std::fs::create_dir_all("data");
+            let _ = std::fs::write(
+                "data/context_state_metrics.json",
+                serde_json::to_string_pretty(&metrics).unwrap_or_default(),
             );
         }
         self.total_tokens_saved_this_cycle = 0;
