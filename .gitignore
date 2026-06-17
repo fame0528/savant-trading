@@ -24,6 +24,10 @@ dev/fids/archive/
 dev/plans/
 dev/baselines/
 
+# Live jury metrics (overwritten each cycle). Archive snapshots in
+# dev/logs/archive/ are tracked as historical record.
+dev/logs/jury-metrics.json
+
 # Keep active FIDs and LEARNINGS.md tracked
 !dev/fids/*.md
 !dev/LEARNINGS.md

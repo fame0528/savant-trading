@@ -2,6 +2,70 @@
 
 All notable changes to Savant Trading are documented here.
 
+## [0.14.6] — 2026-06-17
+
+### Strategy Recalibration (Gemini Deep Research Integration)
+
+Following overnight 16h paper-mode run analysis (96 cycles, 703 PASS, 0 trades), the strategy was recalibrated per Gemini Q1/Q2/Q4/Q7 sniper/scalping recommendations.
+
+### Changed — Conviction Thresholds Lowered (FID-184)
+
+- Trending: 0.20 ? 0.05
+- Volatile: 0.25 ? 0.15
+- Ranging: 0.25 ? 0.10
+- GreyZone: 0.25 ? 0.20 (default-to-PASS retained)
+
+### Fixed — Prompt Anti-Pattern (FID-184)
+
+Removed the "if you cannot compute, output 0.0 and select PASS" instruction. Replaced with: "Output granular probability between 0.00 and 1.00. A score of 0.50 represents absolute uncertainty." This eliminates the default-to-hold bias that produced 87% zero-conviction decisions.
+
+### Added — Cognitive Slippage Penalty (FID-184)
+
+Equity snapshots now apply 0.5%/min latency penalty, capped at 50 bps, when cycle elapsed > 10s. This reflects real-world execution decay from LLM "think" time.
+
+### Fixed — Jury Regime Hardcoding (FID-184)
+
+Jury was hardcoded to `MarketRegime::Ranging`. Now maps session to regime: US-EU Overlap ? Trending, others ? Ranging.
+
+### Changed — Pre-Screening Activated (FID-189)
+
+Set `scan_all_pairs = false` in `config/default.toml` and `config/test-anvil.toml`. This activates the existing pre-scoring at `engine/mod.rs:2052-2120` (FID-056/FID-118) which gates pairs on: RSI extreme, ADX trend, EMA cross, volume spike, BB squeeze. Pairs with no signal no longer reach the LLM.
+
+### Changed — Kelly Sizing 0.5x ? 0.25x (FID-190)
+
+Per Gemini Q1: "0.25x fractional Kelly sizing algorithm based on calculated signal edge to manage maximum drawdowns." Quarter-Kelly provides additional safety margin with limited historical data.
+
+### Added — 0x AMM Price Source (FID-188)
+
+New `src/data/sources/zero_x_price.rs` provides AMM-implied spot price for live trading decisions on Arbitrum, including slippage. Replaces Kraken CEX-derived spot price for live trading. Historical candle data still uses multi-source aggregation (Kraken, OKX, KuCoin, etc.).
+
+### Changed — Log Hygiene (FID-185 + FID-186)
+
+Demoted 8 working-as-designed `warn!` calls to `info!` or `debug!`:
+- FID-126 anti-pattern noise ? debug
+- FID-096 ZERO-BASE ENFORCEMENT ? info
+- Judge fallback (majority vote) ? info
+- Jury key threshold ? info
+- Jury member timed out ? info
+- Jury quorum NOT met ? info
+- Context State Delta-compression ? debug
+
+Context State now also writes aggregate metrics to `data/context_state_metrics.json` per cycle (total_compressions, total_tokens_saved, avg_compression_rate).
+
+### Added — Pre-Push Validation Hook (FID-191)
+
+`scripts/pre-push-validation.ps1` runs `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, and `cargo test --workspace --all-targets` before any push. Blocks broken builds from reaching remote. Caught a real fmt violation in `test_e2e_fid160.rs` on first run.
+
+### Deferred — Multi-Chain Architecture (FID-187)
+
+Scoped for v0.15.0. The full per-chain sub-strategy execution (`tokio::spawn` per chain, per-chain state isolation, cross-chain portfolio aggregation) is a multi-week architectural change. FID-188 (0x AMM) and FID-189 (pre-screening) are the v0.14.5-era components that enable the v0.15.0 multi-chain refactor.
+
+### Build & Test
+
+- 354 lib tests pass, 0 clippy warnings, 0 build errors
+- Engine running on Anvil paper mode (PID 46608)
+- 200-500 trade statistical sample required before live mode (Gemini Q1)
+
 ## [0.14.5] — 2026-06-17
 
 ### Fixed — start.bat Freezes Kilo CLI (FID-175)
