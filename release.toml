@@ -10,12 +10,18 @@ tag = true
 tag-name = "v{{version}}"
 pre-release-commit-message = "chore: release version {{version}}"
 shared-version = true
+publish = false  # Proprietary software, not published to crates.io
+enable-all-features = false
 
 # Version search-and-replace across these files
+# All literal strings (single quotes) to avoid backslash escaping in TOML.
 pre-release-replacements = [
-  { file = "VERSION", search = "[0-9]+\\.[0-9]+\\.[0-9]+", replace = "{{version}}" },
-  { file = "Cargo.toml", search = 'version = "[0-9]+\\.[0-9]+\\.[0-9]+"', replace = 'version = "{{version}}"' },
-  { file = "protocol.config.yaml", search = 'version: "[0-9]+\\.[0-9]+\\.[0-9]+"', replace = 'version: "{{version}}"' },
-  { file = "README.md", search = 'v0\\.1[0-9]\\.[0-9]+', replace = "v{{version}}" },
-  { file = "README.md", search = '# SAVANT TRADING v[0-9]+\\.[0-9]+\\.[0-9]+', replace = "# SAVANT TRADING v{{version}}" },
+  { file = "VERSION", search = '[0-9]+\.[0-9]+\.[0-9]+', replace = "{{version}}" },
+  { file = "Cargo.toml", search = 'version = "[0-9]+\.[0-9]+\.[0-9]+"', replace = 'version = "{{version}}"' },
+  # protocol.config.yaml has TWO version fields: project.version (bump with engine)
+  # and protocol.version (stays at 0.1.0). Match project block with newlines using
+  # TOML basic string (double-quoted) so \n is interpreted as a newline.
+  { file = "protocol.config.yaml", search = "project:\n  name: \"savant-trading\"\n  description: \"AI-native autonomous crypto trading engine \u2014 DEX-only via 0x API\"\n  version: \"[0-9]+\\.[0-9]+\\.[0-9]+\"", replace = "project:\n  name: \"savant-trading\"\n  description: \"AI-native autonomous crypto trading engine \u2014 DEX-only via 0x API\"\n  version: \"{{version}}\"" },
+  { file = "README.md", search = '# SAVANT TRADING v[0-9]+\.[0-9]+\.[0-9]+', replace = '# SAVANT TRADING v{{version}}' },
+  { file = "README.md", search = 'Version-[0-9]+\.[0-9]+\.[0-9]+', replace = 'Version-{{version}}' },
 ]

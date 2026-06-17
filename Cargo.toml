@@ -5,6 +5,10 @@ edition = "2021"
 rust-version = "1.91"
 description = "AI-native autonomous crypto trading engine — Multi-chain DEX (Arbitrum, 0x API)"
 default-run = "savant"
+license = "Proprietary"
+license-file = "LICENSE"
+repository = "https://github.com/fame0528/savant-trading"
+homepage = "https://github.com/fame0528/savant-trading"
 
 [dependencies]
 # Async runtime
