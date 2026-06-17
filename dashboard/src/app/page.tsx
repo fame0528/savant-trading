@@ -386,7 +386,7 @@ export default function Dashboard() {
        * and gets the full vertical space of the bento grid. Closed Trades and
        * Activity are normal single-row panels.
        */}
-      <div className="flex-1 grid grid-cols-3 grid-rows-[1.2fr_1fr_1fr] gap-1.5 min-h-0">
+      <div className="flex-1 grid grid-cols-3 grid-rows-[1fr_1fr_1fr] gap-1.5 min-h-0">
 
         {/* Row 1: Equity | Performance | Market Insight */}
         <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
