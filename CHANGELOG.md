@@ -8,6 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Housekeeping
 
+- **FID-168 v2 archived** (2026-06-16 22:30 EST): Wire FID-165 Summarization into Engine Cycle Loop — strict-read. Snapshot now includes regime + ATR + ADX + RSI (was just pair/action/conf). Cycle_elapsed safety check before summary call. is_stale() now used to force re-summarize every 60s. Math corrected (first pruning at ~10 cycles, not 100). 2 new tests, 359 total passing.
+- **FID-170 v2 archived** (2026-06-16 22:45 EST): Stage-Based Summarization — strict-read. Added `split_into_stages_by_tokens` (token-based splits, not count-based). Per-stage `summarize_with_fallback_public` (was just plain `summarize`). 2 new tests, 361 total passing.
+- **FID-171 v2 archived** (2026-06-16 23:00 EST): Handoff Summaries — strict-read. Dead code removed (`let _ = chunk_size_cap;`). Now uses chunked `summarize_chunks_only` path (matches FID-170 pattern). HANDOFF_INSTRUCTIONS now has explicit "you are the new LLM" role statement. 1 new test, 362 total passing.
+
+### What Shipped (v0.14.4) — 3 FIDs strict-read, 5 new tests, 362 total tests passing
+
+- **FID-168 v2 (Strict-read improvements)**: Cycle_snapshot now captures regime + ATR + ADX + RSI so the LLM's summary has the data the prompt asked for. Cycle_elapsed safety check before the summary LLM call (skip if cycle is at >4min, to avoid the 5min watchdog). is_stale() freshness check (force re-summarize every 60s when context is below budget). Math corrected.
+- **FID-170 v2 (Strict-read improvements)**: Token-based stage splits (not count-based) so LLM inputs are balanced regardless of block size distribution. Per-stage summarize_with_fallback gives partial-failure recovery (was plain summarize).
+- **FID-171 v2 (Strict-read improvements)**: Dead code removed. Pattern consistency with FID-170 (chunked path with private helper). "You are the new LLM" role statement in the handoff instructions.
+
+## [Unreleased] — 2026-06-16
+
+### Housekeeping
+
 - **FID-168 archived** (2026-06-16 18:50 EST): Wire FID-165 Summarization into Engine Cycle Loop. Per-pair cycle_snapshot DataBlock added; end-of-cycle prune (30% target) + summarize via M3; historical summary prepended to per-pair user message. 4 new tests, 351 total passing.
 - **FID-172 archived** (2026-06-16 19:00 EST): Engine Restart + Paper-Mode Validation Spec. Pre-flight verified (M3 proxy running, .env keys, live_execution=false). Actual start.bat invocation is Spencer's action; FID becomes a validation spec. Engine startup is documented as Spencer's call.
 - **FID-170 archived** (2026-06-16 20:35 EST): Stage-Based Summarization (Phase 2 of FID-165). Port of openclaw's summarizeInStages. Splits history into N stages, summarizes each, merges via final LLM call. 4 new tests, 355 total passing.
