@@ -207,10 +207,7 @@ impl GoPlusClient {
                     symbol
                 );
             } else {
-                debug!(
-                    "GoPlus: no known address for {} (already logged)",
-                    symbol
-                );
+                debug!("GoPlus: no known address for {} (already logged)", symbol);
             }
             Ok(true)
         }

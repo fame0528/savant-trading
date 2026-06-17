@@ -162,7 +162,10 @@ mod tests {
             ..Default::default()
         };
         let prompt = format_memory_prompt(&ctx);
-        assert!(prompt.contains("54.321"),
-                "win rate 0.54321 should render as 54.321%, got prompt:\n{}", prompt);
+        assert!(
+            prompt.contains("54.321"),
+            "win rate 0.54321 should render as 54.321%, got prompt:\n{}",
+            prompt
+        );
     }
 }

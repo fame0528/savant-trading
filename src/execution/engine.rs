@@ -96,5 +96,7 @@ pub trait ExecutionEngine: Send + Sync {
     }
 
     /// Get the chain ID for this executor.
-    fn chain_id(&self) -> u64 { 0 }
+    fn chain_id(&self) -> u64 {
+        0
+    }
 }

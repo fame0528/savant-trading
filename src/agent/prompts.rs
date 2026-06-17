@@ -93,10 +93,7 @@ impl PromptComposer {
     /// Compose the mutable knowledge section.
     /// Cached: if the knowledge selection hasn't changed (same digest), returns cached result.
     /// Returns (knowledge_section, digest).
-    pub fn compose_mutable(
-        &mut self,
-        knowledge_units: &[&KnowledgeUnit],
-    ) -> (String, String) {
+    pub fn compose_mutable(&mut self, knowledge_units: &[&KnowledgeUnit]) -> (String, String) {
         let mut knowledge_section = String::new();
 
         if !knowledge_units.is_empty() {

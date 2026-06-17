@@ -482,9 +482,9 @@ impl PortfolioManager {
     pub fn set_balance(&mut self, balance: f64) {
         self.account.balance = balance;
         self.account.equity = balance; // safe intermediate; refresh_equity() overwrites
-        // Do NOT reset peak_equity — it must survive balance syncs.
-        // Previously this corrupted drawdown tracking by resetting peak_equity to
-        // the raw USDC balance, ignoring position values.
+                                       // Do NOT reset peak_equity — it must survive balance syncs.
+                                       // Previously this corrupted drawdown tracking by resetting peak_equity to
+                                       // the raw USDC balance, ignoring position values.
     }
 
     /// Save engine state to disk for crash recovery (PROD-3).

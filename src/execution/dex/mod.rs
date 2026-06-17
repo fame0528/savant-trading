@@ -127,12 +127,12 @@ pub fn usdc_address_for_chain(chain_id: u64) -> Option<&'static str> {
         42161 => Some("0xaf88d065e77c8cC2239327C5EDb3A432268e5831"), // Arbitrum native USDC
         421614 => Some("0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"), // Arbitrum Sepolia test USDC (Circle)
         11155111 => Some("0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"), // Ethereum Sepolia test USDC (Circle bridged; same address as Arbitrum Sepolia)
-        8453 => Some("0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"),  // Base native USDC
-        10 => Some("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"),    // Optimism native USDC
-        56 => Some("0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d"),    // BSC USDC (18 decimals!)
-        137 => Some("0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"),   // Polygon native USDC
-        1 => Some("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"),     // Ethereum native USDC
-        43114 => Some("0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"), // Avalanche native USDC
+        8453 => Some("0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"),     // Base native USDC
+        10 => Some("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"),       // Optimism native USDC
+        56 => Some("0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d"),       // BSC USDC (18 decimals!)
+        137 => Some("0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"),      // Polygon native USDC
+        1 => Some("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"),        // Ethereum native USDC
+        43114 => Some("0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"),    // Avalanche native USDC
         _ => None, // Unknown chain — caller must handle
     }
 }

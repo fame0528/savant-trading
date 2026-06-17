@@ -183,7 +183,9 @@ impl LlmSummarizer {
 
         for block in blocks {
             let block_tokens = count_tokens(&block.content);
-            if !current_blocks.is_empty() && current_tokens + block_tokens > self.config.max_chunk_tokens {
+            if !current_blocks.is_empty()
+                && current_tokens + block_tokens > self.config.max_chunk_tokens
+            {
                 chunks.push(Chunk {
                     blocks: std::mem::take(&mut current_blocks),
                     token_count: current_tokens,
@@ -219,7 +221,10 @@ impl LlmSummarizer {
         if current_tokens <= target_tokens {
             debug!(
                 "Prune: no-op ({} tokens ≤ {} target = {}% of {})",
-                current_tokens, target_tokens, (target_share * 100.0) as u32, context_window
+                current_tokens,
+                target_tokens,
+                (target_share * 100.0) as u32,
+                context_window
             );
             return 0;
         }
@@ -341,7 +346,10 @@ impl LlmSummarizer {
             match self.summarize_with_fallback_public(&chunks).await {
                 Ok(s) => partial_summaries.push(s),
                 Err(e) => {
-                    warn!("Stage summarization failed (continuing with what we have): {}", e);
+                    warn!(
+                        "Stage summarization failed (continuing with what we have): {}",
+                        e
+                    );
                 }
             }
         }
@@ -524,10 +532,7 @@ impl LlmSummarizer {
                 Err(e) => {
                     warn!("Chunk summarization failed: {}", e);
                     if any_success {
-                        return Err((
-                            Some(summary),
-                            format!("Partial failure: {}", e),
-                        ));
+                        return Err((Some(summary), format!("Partial failure: {}", e)));
                     }
                 }
             }
@@ -623,8 +628,16 @@ mod tests {
         // Should produce 2 chunks (each ~50 blocks = 2500 tokens, both under 4000).
         // But individual blocks may force more chunks if a single block is large.
         // The exact count depends on per-block token counts.
-        assert!(chunks.len() >= 2, "expected multiple chunks, got {}", chunks.len());
-        assert!(chunks.len() <= 100, "expected <= 100 chunks, got {}", chunks.len());
+        assert!(
+            chunks.len() >= 2,
+            "expected multiple chunks, got {}",
+            chunks.len()
+        );
+        assert!(
+            chunks.len() <= 100,
+            "expected <= 100 chunks, got {}",
+            chunks.len()
+        );
     }
 
     #[test]
@@ -638,7 +651,11 @@ mod tests {
         let removed = summarizer.prune_for_context_share(&mut blocks, 0.1, 1000);
         // Should remove at least 9 (leaving 1 block = ~100 tokens).
         assert!(removed >= 9, "expected >= 9 removed, got {}", removed);
-        assert!(blocks.len() <= 1, "expected <= 1 remaining, got {}", blocks.len());
+        assert!(
+            blocks.len() <= 1,
+            "expected <= 1 remaining, got {}",
+            blocks.len()
+        );
     }
 
     #[test]
@@ -681,9 +698,7 @@ mod tests {
     #[test]
     fn split_into_stages_caps_parts_at_block_count() {
         let summarizer = LlmSummarizer::chunking_only();
-        let blocks: Vec<DataBlock> = (0..3)
-            .map(|i| make_block(&format!("block{}", i)))
-            .collect();
+        let blocks: Vec<DataBlock> = (0..3).map(|i| make_block(&format!("block{}", i))).collect();
         // 3 blocks, 10 parts requested → capped at 3
         let stages = summarizer.split_into_stages(&blocks, 10);
         assert_eq!(stages.len(), 3);
@@ -692,9 +707,7 @@ mod tests {
     #[test]
     fn split_into_stages_handles_default_zero() {
         let summarizer = LlmSummarizer::chunking_only();
-        let blocks: Vec<DataBlock> = (0..5)
-            .map(|i| make_block(&format!("block{}", i)))
-            .collect();
+        let blocks: Vec<DataBlock> = (0..5).map(|i| make_block(&format!("block{}", i))).collect();
         // parts=0 → defaults to 2
         let stages = summarizer.split_into_stages(&blocks, 0);
         assert_eq!(stages.len(), 2);
@@ -711,10 +724,10 @@ mod tests {
         // (110). small_2 alone → stage 3 (10). 3 stages total, but stage 3 is
         // small enough to merge.
         let blocks: Vec<DataBlock> = vec![
-            make_block(&"huge_1 ".repeat(100)),  // ~100 tokens
-            make_block(&"huge_2 ".repeat(100)),  // ~100 tokens
-            make_block(&"small_1 ".repeat(10)),  // ~10 tokens
-            make_block(&"small_2 ".repeat(10)),  // ~10 tokens
+            make_block(&"huge_1 ".repeat(100)), // ~100 tokens
+            make_block(&"huge_2 ".repeat(100)), // ~100 tokens
+            make_block(&"small_1 ".repeat(10)), // ~10 tokens
+            make_block(&"small_2 ".repeat(10)), // ~10 tokens
         ];
         let stages = summarizer.split_into_stages_by_tokens(&blocks, 2);
         // The exact stage count depends on the greedy fill, but the total tokens
@@ -750,9 +763,9 @@ mod tests {
     fn split_into_stages_by_tokens_handles_oversized_block() {
         let summarizer = LlmSummarizer::chunking_only();
         let blocks: Vec<DataBlock> = vec![
-            make_block(&"tiny ".repeat(5)),     // ~5 tokens
-            make_block(&"huge ".repeat(500)),    // ~500 tokens (oversized)
-            make_block(&"tiny ".repeat(5)),     // ~5 tokens
+            make_block(&"tiny ".repeat(5)),   // ~5 tokens
+            make_block(&"huge ".repeat(500)), // ~500 tokens (oversized)
+            make_block(&"tiny ".repeat(5)),   // ~5 tokens
         ];
         let stages = summarizer.split_into_stages_by_tokens(&blocks, 2);
         // Should produce multiple stages, no empty stage.
@@ -766,9 +779,7 @@ mod tests {
     fn summarize_in_stages_with_few_blocks_uses_single_call() {
         // No provider — only the chunking path is testable without LLM.
         let summarizer = LlmSummarizer::chunking_only();
-        let blocks: Vec<DataBlock> = (0..5)
-            .map(|i| make_block(&format!("block{}", i)))
-            .collect();
+        let blocks: Vec<DataBlock> = (0..5).map(|i| make_block(&format!("block{}", i))).collect();
         // 5 blocks < min_blocks_for_split (default 50) → should attempt single-call,
         // but without a provider it returns "No LLM provider configured" error.
         // We verify the function exists and the early-exit logic works structurally.
@@ -788,9 +799,7 @@ mod tests {
     #[tokio::test]
     async fn summarize_for_handoff_without_provider_fails() {
         let summarizer = LlmSummarizer::chunking_only();
-        let blocks: Vec<DataBlock> = (0..3)
-            .map(|i| make_block(&format!("block{}", i)))
-            .collect();
+        let blocks: Vec<DataBlock> = (0..3).map(|i| make_block(&format!("block{}", i))).collect();
         let result = summarizer.summarize_for_handoff(&blocks).await;
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("No LLM provider"));

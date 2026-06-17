@@ -464,7 +464,10 @@ mod tests {
         let mut ctx = MarketContext::default();
         ctx.funding.funding_rate = Some(0.000123456789);
         let summary = ctx.summary();
-        assert!(summary.contains("0.0123456789"),
-                "summary should preserve full funding rate precision, got: {}", summary);
+        assert!(
+            summary.contains("0.0123456789"),
+            "summary should preserve full funding rate precision, got: {}",
+            summary
+        );
     }
 }

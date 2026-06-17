@@ -70,7 +70,7 @@ pub struct JuryPoolMetrics {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct JuryKeyHealth {
     pub total: usize,
-    pub healthy: usize, // consecutive_failures < max_consecutive_failures
+    pub healthy: usize,  // consecutive_failures < max_consecutive_failures
     pub rotating: usize, // >= max_consecutive_failures
     pub last_rotation_at: Option<String>, // ISO8601
 }
@@ -103,7 +103,7 @@ pub struct JuryCycleRecord {
     pub cycle_id: u64,
     pub timestamp: String, // ISO8601
     pub verdict_breakdown: VerdictBreakdown,
-    pub consensus_strength: f64, // 0.0-1.0
+    pub consensus_strength: f64,  // 0.0-1.0
     pub consensus_action: String, // "BUY" | "SELL" | "HOLD" | ""
     pub quorum_met: bool,
     pub failed_count: usize,
@@ -129,8 +129,7 @@ impl JuryPool {
         key_manager: JuryKeyManager,
         config: JuryConfig,
     ) -> Self {
-        let jury_system_prompt =
-            include_str!("../prompts/jury_member.md").to_string();
+        let jury_system_prompt = include_str!("../prompts/jury_member.md").to_string();
 
         // Ensure dev/logs/ exists for metrics flush (once at init, not every cycle)
         let _ = std::fs::create_dir_all("dev/logs");
@@ -243,8 +242,10 @@ impl JuryPool {
         ) {
             warn!("Failed to flush jury metrics: {}", e);
         } else if self.metrics.total_evaluations > 0 {
-            info!("Jury metrics flushed (evals={}, quorum_fails={})",
-                self.metrics.total_evaluations, self.metrics.quorum_failures);
+            info!(
+                "Jury metrics flushed (evals={}, quorum_fails={})",
+                self.metrics.total_evaluations, self.metrics.quorum_failures
+            );
         }
     }
 
@@ -252,11 +253,7 @@ impl JuryPool {
     ///
     /// Returns a JuryResult with all successful verdicts, quorum status,
     /// and failure counts. The Judge synthesizes this into a final decision.
-    pub async fn evaluate(
-        &mut self,
-        user_message: &str,
-        regime: MarketRegime,
-    ) -> JuryResult {
+    pub async fn evaluate(&mut self, user_message: &str, regime: MarketRegime) -> JuryResult {
         let start = Instant::now();
         let jury_size = self.config.size_for_regime(&regime.to_string());
         let quorum = (jury_size as f64 * self.config.quorum_pct).ceil() as usize;
@@ -300,7 +297,13 @@ impl JuryPool {
                 let model = self.provider_config_m3.model.clone();
                 let label = format!("m3-control-{}", chrono::Utc::now().timestamp());
                 // Empty hash — M3 control doesn't participate in key rotation
-                (provider, model, self.m3_api_key.clone(), label, String::new())
+                (
+                    provider,
+                    model,
+                    self.m3_api_key.clone(),
+                    label,
+                    String::new(),
+                )
             } else {
                 let key = match self.key_manager.acquire_key().await {
                     Some(k) => k,
@@ -321,7 +324,13 @@ impl JuryPool {
                     // Legacy fallback: use the single `model` field for all free jurors.
                     self.config.model.clone()
                 };
-                (provider, model, key.api_key, key.label.clone(), key.hash.clone())
+                (
+                    provider,
+                    model,
+                    key.api_key,
+                    key.label.clone(),
+                    key.hash.clone(),
+                )
             };
 
             let system = self.jury_system_prompt.clone();

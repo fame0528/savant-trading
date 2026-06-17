@@ -2406,8 +2406,12 @@ mod historical_tests {
         crate::jury_state::clear_veto();
         // Simulate 7/10 jury members disagreeing with primary Buy
         crate::jury_state::FID_146_JURY_VETO.store(true, std::sync::atomic::Ordering::Relaxed);
-        let veto_active = crate::jury_state::FID_146_JURY_VETO.load(std::sync::atomic::Ordering::Relaxed);
-        assert!(veto_active, "FID_146_JURY_VETO should be true after 7/10 jury dissent");
+        let veto_active =
+            crate::jury_state::FID_146_JURY_VETO.load(std::sync::atomic::Ordering::Relaxed);
+        assert!(
+            veto_active,
+            "FID_146_JURY_VETO should be true after 7/10 jury dissent"
+        );
         // Create a Buy decision
         let mut decision = TradeDecision {
             action: TradeAction::Buy,
@@ -2485,11 +2489,16 @@ mod historical_tests {
             trigger_weights: Default::default(),
             override_source: None,
         };
-        let veto_active = crate::jury_state::FID_146_JURY_VETO.load(std::sync::atomic::Ordering::Relaxed);
+        let veto_active =
+            crate::jury_state::FID_146_JURY_VETO.load(std::sync::atomic::Ordering::Relaxed);
         if veto_active && matches!(decision.action, TradeAction::Buy | TradeAction::Sell) {
             decision.action = TradeAction::Pass;
         }
-        assert_eq!(decision.action, TradeAction::Buy, "Buy should NOT be overridden when veto is inactive");
+        assert_eq!(
+            decision.action,
+            TradeAction::Buy,
+            "Buy should NOT be overridden when veto is inactive"
+        );
     }
 
     // FID-146: Veto detection logic — 7/10 jury disagreeing with primary Buy should trigger.
@@ -2498,16 +2507,19 @@ mod historical_tests {
         use crate::agent::jury::JuryVerdict;
         let primary = "BUY";
         // Simulate 10 jury verdicts: 3 say BUY (agree), 7 say HOLD (disagree)
-        let verdicts: Vec<JuryVerdict> = (0..10).map(|i| JuryVerdict {
-            verdict: if i < 3 { "BUY".into() } else { "HOLD".into() },
-            confidence: 0.5,
-            key_argument: String::new(),
-            risk_flag: String::new(),
-            evidence_quality: None,
-            reasoning: String::new(),
-        }).collect();
+        let verdicts: Vec<JuryVerdict> = (0..10)
+            .map(|i| JuryVerdict {
+                verdict: if i < 3 { "BUY".into() } else { "HOLD".into() },
+                confidence: 0.5,
+                key_argument: String::new(),
+                risk_flag: String::new(),
+                evidence_quality: None,
+                reasoning: String::new(),
+            })
+            .collect();
         let total = verdicts.len() as f64;
-        let disagrees = verdicts.iter()
+        let disagrees = verdicts
+            .iter()
             .filter(|v| v.verdict.to_uppercase() != primary)
             .count() as f64;
         let disagree_pct = disagrees / total;

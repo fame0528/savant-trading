@@ -92,10 +92,7 @@ impl CusumChart {
         } else if self.is_improving() {
             format!("IMPROVING (S+={})", self.upper_sum)
         } else {
-            format!(
-                "STABLE (S+={}, S-={})",
-                self.upper_sum, self.lower_sum
-            )
+            format!("STABLE (S+={}, S-={})", self.upper_sum, self.lower_sum)
         }
     }
 }
@@ -154,7 +151,10 @@ mod tests {
         let mut chart = CusumChart::new(1.5, 0.5, 5.0);
         chart.upper_sum = 1.234567890123;
         let s = chart.status();
-        assert!(s.contains("1.234567890123"),
-                "status() should preserve full precision, got: {}", s);
+        assert!(
+            s.contains("1.234567890123"),
+            "status() should preserve full precision, got: {}",
+            s
+        );
     }
 }

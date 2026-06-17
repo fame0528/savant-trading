@@ -134,12 +134,14 @@ impl ContextEngine {
         // KBar features (compact statistical summary)
         if let Some((z, vol, trend, vol_ratio)) = IndicatorEngine::kbar_features(ctx.candles) {
             msg.push_str(&format!(
-        "### KBar Features\nz-score: {} | AnnVol: {} | Trend: {} | VolRatio: {}{}\n\n",
-        z, vol, trend, vol_ratio,
-        ctx.indicators.volume_sma.map_or_else(
-            String::new,
-            |v| format!(" (avg_vol: ${})", v),
-        )
+                "### KBar Features\nz-score: {} | AnnVol: {} | Trend: {} | VolRatio: {}{}\n\n",
+                z,
+                vol,
+                trend,
+                vol_ratio,
+                ctx.indicators
+                    .volume_sma
+                    .map_or_else(String::new, |v| format!(" (avg_vol: ${})", v),)
             ));
         }
 
@@ -151,7 +153,11 @@ impl ContextEngine {
             ctx.candles
         };
         let tsln_data = self.tsln_serializer.serialize_data_only(candles_to_use);
-        msg.push_str(&format!("### TSLN Candle Data ({} candles)\n```\n{}\n```\n", candles_to_use.len(), tsln_data));
+        msg.push_str(&format!(
+            "### TSLN Candle Data ({} candles)\n```\n{}\n```\n",
+            candles_to_use.len(),
+            tsln_data
+        ));
 
         // Live price
         if let Some(live) = ctx.live_price {
@@ -175,7 +181,10 @@ impl ContextEngine {
         }
 
         // Market insight (truncated)
-        msg.push_str(&format!("\n## Market Insight\n{}\n", ctx.market_context.summary()));
+        msg.push_str(&format!(
+            "\n## Market Insight\n{}\n",
+            ctx.market_context.summary()
+        ));
 
         // Positions
         if !ctx.positions.is_empty() {
@@ -183,7 +192,12 @@ impl ContextEngine {
             for pos in ctx.positions {
                 msg.push_str(&format!(
                     "- {} {} @ {} | SL: {} | TP1: {} | PnL: {}\n",
-                    pos.pair, pos.side, pos.entry_price, pos.stop_loss, pos.take_profit_1, pos.unrealized_pnl
+                    pos.pair,
+                    pos.side,
+                    pos.entry_price,
+                    pos.stop_loss,
+                    pos.take_profit_1,
+                    pos.unrealized_pnl
                 ));
             }
         }
@@ -267,14 +281,30 @@ impl ContextEngine {
                 let wins = trades.iter().filter(|t| t.pnl > 0.0).count();
                 let losses = trades.iter().filter(|t| t.pnl <= 0.0).count();
                 let avg_win = if wins > 0 {
-                    trades.iter().filter(|t| t.pnl > 0.0).map(|t| t.pnl).sum::<f64>() / wins as f64
-                } else { 0.0 };
+                    trades
+                        .iter()
+                        .filter(|t| t.pnl > 0.0)
+                        .map(|t| t.pnl)
+                        .sum::<f64>()
+                        / wins as f64
+                } else {
+                    0.0
+                };
                 let avg_loss = if losses > 0 {
-                    trades.iter().filter(|t| t.pnl <= 0.0).map(|t| t.pnl).sum::<f64>() / losses as f64
-                } else { 0.0 };
+                    trades
+                        .iter()
+                        .filter(|t| t.pnl <= 0.0)
+                        .map(|t| t.pnl)
+                        .sum::<f64>()
+                        / losses as f64
+                } else {
+                    0.0
+                };
                 let profit_factor = if avg_loss != 0.0 {
                     (avg_win * wins as f64) / (avg_loss.abs() * losses as f64)
-                } else { f64::INFINITY };
+                } else {
+                    f64::INFINITY
+                };
                 for (i, trade) in trades.iter().take(10).enumerate() {
                     msg.push_str(&format!(
                         "{}. {} {} @ {} → {} | PnL: ${} ({}%) | {}\n",
@@ -290,9 +320,16 @@ impl ContextEngine {
                 }
                 msg.push_str(&format!(
                     "Summary: {}W/{}L ({}% WR) | Avg Win: ${} | Avg Loss: ${} | PF: {}\n",
-                    wins, losses,
-                    if wins + losses > 0 { wins as f64 / (wins + losses) as f64 * 100.0 } else { 0.0 },
-                    avg_win, avg_loss, profit_factor
+                    wins,
+                    losses,
+                    if wins + losses > 0 {
+                        wins as f64 / (wins + losses) as f64 * 100.0
+                    } else {
+                        0.0
+                    },
+                    avg_win,
+                    avg_loss,
+                    profit_factor
                 ));
             }
         }
@@ -315,14 +352,20 @@ impl ContextEngine {
         // 8. Active trading universe
         if let Some(pairs) = ctx.active_pairs {
             if !pairs.is_empty() {
-                msg.push_str(&format!("\n## Active Trading Universe ({} pairs)\n", pairs.len()));
+                msg.push_str(&format!(
+                    "\n## Active Trading Universe ({} pairs)\n",
+                    pairs.len()
+                ));
                 msg.push_str(&pairs.join(", "));
                 msg.push_str("\nThe pair shown above is already vetted for liquidity and safety. Evaluate it.");
             }
         }
 
         // 9. Market conditions (SOUL.md §XIII action triggers)
-        msg.push_str(&format!("\n## Market Conditions\n{}\n", ctx.market_context.conditions_summary()));
+        msg.push_str(&format!(
+            "\n## Market Conditions\n{}\n",
+            ctx.market_context.conditions_summary()
+        ));
 
         // Decision required
         msg.push_str("\n## Decision Required\n");
@@ -333,7 +376,11 @@ impl ContextEngine {
 
     /// Determine adaptive candle count based on market regime.
     /// Ranging: 50, Trending: 100, Volatile: 200.
-    fn adaptive_candle_count(&self, regime: MarketRegime, _indicators: &crate::core::types::IndicatorValues) -> usize {
+    fn adaptive_candle_count(
+        &self,
+        regime: MarketRegime,
+        _indicators: &crate::core::types::IndicatorValues,
+    ) -> usize {
         match regime {
             MarketRegime::Ranging => self.config.adaptive_candles_ranging,
             MarketRegime::Trending => self.config.adaptive_candles_trending,
@@ -372,7 +419,8 @@ impl ContextEngine {
             if prev != current_digest {
                 tracing::warn!(
                     "Cache break detected: systemPrompt digest changed from {} to {}",
-                    prev, current_digest
+                    prev,
+                    current_digest
                 );
                 return true;
             }
@@ -410,8 +458,15 @@ impl ContextEngine {
 
     /// Summarize a data block into a compact one-liner.
     /// Pattern: [data_type] entity: key_metric_1, key_metric_2, ...
-    pub fn summarize_data_block(block_type: &str, pair: &str, metrics: &[(String, String)]) -> String {
-        let metrics_str: Vec<String> = metrics.iter().map(|(k, v)| format!("{}={}", k, v)).collect();
+    pub fn summarize_data_block(
+        block_type: &str,
+        pair: &str,
+        metrics: &[(String, String)],
+    ) -> String {
+        let metrics_str: Vec<String> = metrics
+            .iter()
+            .map(|(k, v)| format!("{}={}", k, v))
+            .collect();
         format!("[{}] {}: {}", block_type, pair, metrics_str.join(", "))
     }
 
@@ -444,7 +499,8 @@ impl ContextEngine {
                 result.push_str(trimmed);
                 result.push('\n');
             }
-            if trimmed.contains('$') && (trimmed.contains("Balance") || trimmed.contains("Equity")) {
+            if trimmed.contains('$') && (trimmed.contains("Balance") || trimmed.contains("Equity"))
+            {
                 result.push_str(trimmed);
                 result.push('\n');
             }
@@ -452,7 +508,11 @@ impl ContextEngine {
                 result.push_str(trimmed);
                 result.push('\n');
             }
-            if trimmed.contains("Decision") || trimmed.contains("BUY") || trimmed.contains("SELL") || trimmed.contains("PASS") {
+            if trimmed.contains("Decision")
+                || trimmed.contains("BUY")
+                || trimmed.contains("SELL")
+                || trimmed.contains("PASS")
+            {
                 result.push_str(trimmed);
                 result.push('\n');
             }

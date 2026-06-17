@@ -378,7 +378,11 @@ impl TradeJournal {
             // normal P&L drift ($50->$55 = 10%) and NOT catastrophic losses
             // ($50->$20 would be a decrease, not an increase — don't erase loss history).
             if equity > existing {
-                let pct_change = if existing > 0.0 { (equity - existing) / existing } else { 1.0 };
+                let pct_change = if existing > 0.0 {
+                    (equity - existing) / existing
+                } else {
+                    1.0
+                };
                 if pct_change > 0.5 {
                     self.set_setting("starting_equity", &format!("{:.6}", equity))
                         .await?;

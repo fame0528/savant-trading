@@ -82,7 +82,9 @@ impl JuryJudge {
                         // Free models sometimes emit wildly wrong prices (e.g., 95 for BTC at 100K).
                         // Use a wide tolerance (20%) to only catch truly hallucinated prices,
                         // not legitimate limit entries near current price.
-                        if decision.action == TradeAction::Buy || decision.action == TradeAction::Sell {
+                        if decision.action == TradeAction::Buy
+                            || decision.action == TradeAction::Sell
+                        {
                             let max_deviation = current_price * 0.20; // 20% tolerance
                             if (decision.entry_price - current_price).abs() > max_deviation {
                                 warn!(
@@ -123,10 +125,7 @@ impl JuryJudge {
                         // return malformed JSON occasionally. The fallback
                         // (majority vote) is the correct behavior — we just
                         // don't need to spam the log every time it happens.
-                        debug!(
-                            "Judge: parse failed ({}), falling back to majority vote",
-                            e
-                        );
+                        debug!("Judge: parse failed ({}), falling back to majority vote", e);
                         Ok(self.fallback_majority_vote(jury_result, current_price))
                     }
                 }
@@ -134,7 +133,10 @@ impl JuryJudge {
             Err(e) => {
                 // FID-181: same demotion. Judge LLM call failures are
                 // already logged at the calling site. Don't double-log.
-                debug!("Judge: LLM call failed ({}), falling back to majority vote", e);
+                debug!(
+                    "Judge: LLM call failed ({}), falling back to majority vote",
+                    e
+                );
                 Ok(self.fallback_majority_vote(jury_result, current_price))
             }
         }
@@ -268,11 +270,7 @@ impl JuryJudge {
     }
 
     /// Fallback: majority vote when the Judge LLM fails.
-    fn fallback_majority_vote(
-        &self,
-        jury_result: &JuryResult,
-        current_price: f64,
-    ) -> JuryJudgment {
+    fn fallback_majority_vote(&self, jury_result: &JuryResult, current_price: f64) -> JuryJudgment {
         let mut buy = 0usize;
         let mut sell = 0usize;
         let mut hold = 0usize;
@@ -311,7 +309,11 @@ impl JuryJudge {
 
         warn!(
             "Judge fallback: majority vote → {:?} (BUY:{}, SELL:{}, HOLD:{}, consensus: {:.0}%)",
-            action, buy, sell, hold, consensus * 100.0
+            action,
+            buy,
+            sell,
+            hold,
+            consensus * 100.0
         );
 
         JuryJudgment {

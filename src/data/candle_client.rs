@@ -359,7 +359,10 @@ impl CandleClient {
                 };
 
                 // Filter: blacklist
-                if blacklist_lower.iter().any(|b| b == &base_sym.to_lowercase()) {
+                if blacklist_lower
+                    .iter()
+                    .any(|b| b == &base_sym.to_lowercase())
+                {
                     continue;
                 }
                 // Filter: volume

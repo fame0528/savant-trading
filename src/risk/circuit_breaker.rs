@@ -86,7 +86,10 @@ impl CircuitBreaker {
             );
             tracing::info!(
                 "CIRCUIT_BREAKER_TRIPPED daily_loss=${:.2} ({:.2}%) floor=${:.2} max_pct={:.2}%",
-                daily_loss_dollars, daily_loss_pct * 100.0, self.daily_loss_floor_usd, self.max_daily_loss_pct * 100.0
+                daily_loss_dollars,
+                daily_loss_pct * 100.0,
+                self.daily_loss_floor_usd,
+                self.max_daily_loss_pct * 100.0
             );
             return CircuitBreakerResult::Triggered(format!(
                 "Daily loss limit: ${:.2} ({:.2}%)",
@@ -175,7 +178,9 @@ impl CircuitBreaker {
         if loss_pct > PER_TRADE_LOSS_PCT && loss_dollars >= PER_TRADE_LOSS_FLOOR_USD {
             warn!(
                 "Circuit breaker: per-trade loss ${:.2} ({:.2}%) exceeds 5% limit (equity=${:.2})",
-                loss_dollars, loss_pct * 100.0, equity
+                loss_dollars,
+                loss_pct * 100.0,
+                equity
             );
             return CircuitBreakerResult::Triggered(format!(
                 "Per-trade loss: ${:.2} ({:.2}%) exceeds 5% limit (equity=${:.2})",

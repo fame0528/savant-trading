@@ -62,7 +62,9 @@ impl ModelCapabilities {
                 requires_reasoning_roundtrip: true,
                 structured_method: "json_mode".to_string(),
                 supports_cache_control: false,
-                notes: vec!["Reasoning split: content and reasoning are in separate fields".to_string()],
+                notes: vec![
+                    "Reasoning split: content and reasoning are in separate fields".to_string(),
+                ],
             },
         );
 

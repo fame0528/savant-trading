@@ -88,9 +88,8 @@ impl TriggerWeights {
     /// produce: 1M+2W = 0.7+0.6 = 1.3/3 = 0.43 (no longer hits 0.50). Verified all
     /// combos in 0S-3S × 0M-3M × 0W-3W grid avoid 0.50 and 0.65 cliffs.
     pub fn conviction_score(&self) -> f64 {
-        let sum = (self.strong as f64) * 1.0
-            + (self.moderate as f64) * 0.65
-            + (self.weak as f64) * 0.3;
+        let sum =
+            (self.strong as f64) * 1.0 + (self.moderate as f64) * 0.65 + (self.weak as f64) * 0.3;
         (sum / 3.0).clamp(0.0, 1.0)
     }
 }
@@ -408,7 +407,11 @@ pub fn parse_decision(
             .pair
             .bytes()
             .fold(0u32, |acc, b| acc.wrapping_mul(31).wrapping_add(b as u32));
-        let noise: f64 = if pair_hash.is_multiple_of(2) { 0.05 } else { -0.05 };
+        let noise: f64 = if pair_hash.is_multiple_of(2) {
+            0.05
+        } else {
+            -0.05
+        };
         tracing::warn!(
             "FID-126 anti-pattern noise: conviction=0.50/0.65 (default-to-threshold), adding noise={:+.2} from pair hash for {}",
             noise,
@@ -495,8 +498,9 @@ pub fn parse_decision(
             decision.confidence * 100.0,
             CONFIDENCE_FLOOR * 100.0,
             decision.action
-        );            decision.action = TradeAction::Pass;
-            decision.override_source = Some("confidence_floor".to_string());
+        );
+        decision.action = TradeAction::Pass;
+        decision.override_source = Some("confidence_floor".to_string());
     } else if bypass_gates && decision.confidence < CONFIDENCE_FLOOR && is_entry {
         tracing::debug!(
             "FID-126 bypass: confidence floor skipped, allowing {:?} with confidence={:.0}% (below {:.0}% floor)",
@@ -556,7 +560,9 @@ pub fn parse_decision(
             decision.action = new_action;
             decision.override_source = Some("management_trigger".to_string());
             // If mandated_stop_price is set and action is ADJUST_STOP, use it
-            if decision.mandated_stop_price > 0.0 && matches!(decision.action, TradeAction::AdjustStop) {
+            if decision.mandated_stop_price > 0.0
+                && matches!(decision.action, TradeAction::AdjustStop)
+            {
                 decision.stop_loss = decision.mandated_stop_price;
             }
         }
@@ -576,7 +582,9 @@ pub fn parse_decision(
     // FID-096 Fix 2: Zero-Base Review enforcement.
     // If the LLM's position_audit says "would not buy at current price" but
     // action is HOLD, the agent is contradicting its own analysis. Override to CLOSE.
-    if decision.would_initiate_new_long == Some(false) && matches!(decision.action, TradeAction::Pass) {
+    if decision.would_initiate_new_long == Some(false)
+        && matches!(decision.action, TradeAction::Pass)
+    {
         tracing::warn!(
             "FID-096 ZERO-BASE ENFORCEMENT: would_initiate_new_long=false but action was {:?}. Overriding to Close. Pair: {}",
             decision.action, decision.pair
@@ -851,9 +859,12 @@ fn extract_pair(text: &str) -> Option<String> {
             _ => return None,
         };
         // Normalize on-chain token names: ETH → WETH, BTC → WBTC
-        let base_norm = crate::core::types::Candle::display_pair(
-            &format!("{}/{}", base, quote_norm)
-        ).split('/').next().unwrap_or(&base).to_string();
+        let base_norm =
+            crate::core::types::Candle::display_pair(&format!("{}/{}", base, quote_norm))
+                .split('/')
+                .next()
+                .unwrap_or(&base)
+                .to_string();
         return Some(format!("{}/{}", base_norm, quote_norm));
     }
     None
@@ -1362,7 +1373,10 @@ mod tests {
         let decision = parse_decision(json, 65000.0, 10.0).unwrap();
         // Should be remapped to 0.45 or 0.55, never exactly 0.50
         let cs_str = format!("{:.3}", decision.conviction_score);
-        assert_ne!(cs_str, "0.500", "Anti-pattern noise should break 0.500 cliff");
+        assert_ne!(
+            cs_str, "0.500",
+            "Anti-pattern noise should break 0.500 cliff"
+        );
     }
 
     #[test]

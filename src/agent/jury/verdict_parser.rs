@@ -199,7 +199,14 @@ fn extract_confidence_from_text(text: &str) -> Option<f64> {
 /// Extract a key argument from the first meaningful sentence.
 fn extract_key_argument(text: &str) -> String {
     // Look for sentences containing reasoning keywords
-    let keywords = ["because", "due to", "given", "suggests", "indicates", "shows"];
+    let keywords = [
+        "because",
+        "due to",
+        "given",
+        "suggests",
+        "indicates",
+        "shows",
+    ];
     for sentence in text.split(&['.', '!', '?'][..]) {
         let trimmed = sentence.trim();
         if keywords.iter().any(|k| trimmed.contains(k)) && trimmed.len() > 10 {
@@ -277,15 +284,15 @@ mod tests {
 
     #[test]
     fn parse_evidence_quality_fraction() {
-        let json =
-            r#"{"verdict": "BUY", "confidence": 0.8, "evidence_quality": "7/10", "reasoning": "test"}"#;
+        let json = r#"{"verdict": "BUY", "confidence": 0.8, "evidence_quality": "7/10", "reasoning": "test"}"#;
         let v = parse_verdict(json).unwrap();
         assert!((v.evidence_quality.unwrap() - 0.7).abs() < 0.01);
     }
 
     #[test]
     fn parse_truncated_verdict() {
-        let json = r#"{"verdict": "BUY", "confidence": 0.65, "key_argument": "Strong setup due to vol"#;
+        let json =
+            r#"{"verdict": "BUY", "confidence": 0.65, "key_argument": "Strong setup due to vol"#;
         let v = parse_verdict(json).unwrap();
         assert_eq!(v.verdict, "BUY");
     }

@@ -5,10 +5,10 @@
 //!
 //! Reference: TradingAgents `memory.py` pattern.
 
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use serde::{Deserialize, Serialize};
 
 /// A single decision log entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -64,7 +64,12 @@ impl DecisionLog {
 
     /// Update the most recent entry for a pair with outcome.
     pub fn update_outcome(&mut self, pair: &str, outcome: TradeOutcome) {
-        if let Some(entry) = self.entries.iter_mut().rev().find(|e| e.pair == pair && e.outcome.is_none()) {
+        if let Some(entry) = self
+            .entries
+            .iter_mut()
+            .rev()
+            .find(|e| e.pair == pair && e.outcome.is_none())
+        {
             entry.outcome = Some(outcome);
             self.flush();
         }
@@ -74,12 +79,16 @@ impl DecisionLog {
     /// Returns same-pair full entries and cross-pair reflections only.
     pub fn context_for_pair(&self, pair: &str, max_same: usize, max_cross: usize) -> String {
         let mut msg = String::new();
-        let same: Vec<&DecisionEntry> = self.entries.iter()
+        let same: Vec<&DecisionEntry> = self
+            .entries
+            .iter()
             .rev()
             .filter(|e| e.pair == pair)
             .take(max_same)
             .collect();
-        let cross: Vec<&DecisionEntry> = self.entries.iter()
+        let cross: Vec<&DecisionEntry> = self
+            .entries
+            .iter()
             .rev()
             .filter(|e| e.pair != pair && e.outcome.is_some())
             .take(max_cross)
@@ -90,8 +99,12 @@ impl DecisionLog {
             for entry in &same {
                 msg.push_str(&format!(
                     "- [{}] {} {} (conf={}%, R:R={}) — {}\n",
-                    entry.timestamp, entry.pair, entry.action,
-                    entry.confidence * 100.0, entry.risk_reward, entry.reasoning,
+                    entry.timestamp,
+                    entry.pair,
+                    entry.action,
+                    entry.confidence * 100.0,
+                    entry.risk_reward,
+                    entry.reasoning,
                 ));
                 if let Some(ref out) = entry.outcome {
                     msg.push_str(&format!(
@@ -108,8 +121,11 @@ impl DecisionLog {
                 if let Some(ref out) = entry.outcome {
                     msg.push_str(&format!(
                         "- [{}] {}: {} → {}% — {}\n",
-                        entry.timestamp, entry.pair, entry.action,
-                        out.raw_return_pct, out.reflection,
+                        entry.timestamp,
+                        entry.pair,
+                        entry.action,
+                        out.raw_return_pct,
+                        out.reflection,
                     ));
                 }
             }
@@ -212,11 +228,14 @@ mod tests {
         let _ = fs::remove_file(&path);
         let mut log = DecisionLog::open(&path, 100);
         log.append(sample_entry("BTC/USD", "BUY"));
-        log.update_outcome("BTC/USD", TradeOutcome {
-            raw_return_pct: 3.5,
-            alpha_vs_benchmark: 1.2,
-            reflection: "Good entry timing".to_string(),
-        });
+        log.update_outcome(
+            "BTC/USD",
+            TradeOutcome {
+                raw_return_pct: 3.5,
+                alpha_vs_benchmark: 1.2,
+                reflection: "Good entry timing".to_string(),
+            },
+        );
         let ctx = log.context_for_pair("BTC/USD", 5, 5);
         assert!(ctx.contains("3.5%"));
         assert!(ctx.contains("Good entry timing"));
@@ -229,11 +248,14 @@ mod tests {
         let _ = fs::remove_file(&path);
         let mut log = DecisionLog::open(&path, 100);
         log.append(sample_entry("ETH/USD", "BUY"));
-        log.update_outcome("ETH/USD", TradeOutcome {
-            raw_return_pct: 2.0,
-            alpha_vs_benchmark: 0.5,
-            reflection: "Lesson learned".to_string(),
-        });
+        log.update_outcome(
+            "ETH/USD",
+            TradeOutcome {
+                raw_return_pct: 2.0,
+                alpha_vs_benchmark: 0.5,
+                reflection: "Lesson learned".to_string(),
+            },
+        );
         log.append(sample_entry("BTC/USD", "BUY"));
         let ctx = log.context_for_pair("BTC/USD", 5, 5);
         assert!(ctx.contains("Cross-Pair"));

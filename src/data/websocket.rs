@@ -56,7 +56,10 @@ pub fn create_channel() -> (
 /// falls back to "unknown", and logs `Kraken WS subscribe failed for unknown`.
 fn build_subscribe_messages(pairs: &[String], depth: u32) -> Vec<String> {
     let symbols = serde_json::Value::Array(
-        pairs.iter().map(|p| serde_json::Value::String(p.clone())).collect()
+        pairs
+            .iter()
+            .map(|p| serde_json::Value::String(p.clone()))
+            .collect(),
     );
     vec![
         serde_json::json!({
@@ -225,9 +228,10 @@ fn parse_trades(json: &serde_json::Value) -> Option<WsMessage> {
 pub async fn connect(url: &str, pairs: Vec<String>, tx: mpsc::UnboundedSender<WsMessage>) {
     // Convert on-chain pair names to exchange names for Kraken subscription
     // WETH/USD → ETH/USD, WBTC/USD → BTC/USD
-    let exchange_pairs: Vec<String> = pairs.iter().map(|p| {
-        crate::core::types::Candle::exchange_pair(p).to_string()
-    }).collect();
+    let exchange_pairs: Vec<String> = pairs
+        .iter()
+        .map(|p| crate::core::types::Candle::exchange_pair(p).to_string())
+        .collect();
     let subscribe_msgs = build_subscribe_messages(&exchange_pairs, 10);
     let mut backoff_secs = 1u64;
     let max_backoff = 30u64;

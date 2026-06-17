@@ -445,7 +445,8 @@ impl IndicatorEngine {
             atr_values.last().copied().unwrap_or(0.0)
         } else {
             // Fallback: 1.5% of average price
-            let avg_price: f64 = candles.iter().map(|c| c.close).sum::<f64>() / candles.len() as f64;
+            let avg_price: f64 =
+                candles.iter().map(|c| c.close).sum::<f64>() / candles.len() as f64;
             avg_price * 0.015
         };
 
@@ -554,7 +555,8 @@ impl IndicatorEngine {
             .windows(2)
             .map(|w| (w[1] / w[0]).ln())
             .collect();
-        let vol_variance: f64 = returns.iter().map(|r| r.powi(2)).sum::<f64>() / returns.len() as f64;
+        let vol_variance: f64 =
+            returns.iter().map(|r| r.powi(2)).sum::<f64>() / returns.len() as f64;
         let annualized_vol = vol_variance.sqrt() * (525_960.0_f64).sqrt(); // 5-min candles per year
 
         // Trend score: linear regression slope over 20 periods
@@ -728,15 +730,17 @@ mod tests {
     fn zigzag_detects_pivots() {
         // Price goes up then down then up — enough variation for pivots
         let prices: Vec<f64> = vec![
-            100.0, 102.0, 104.0, 106.0, 108.0, 110.0,
-            108.0, 106.0, 104.0, 102.0, 100.0, 98.0,
-            100.0, 102.0, 104.0, 106.0, 108.0, 110.0,
-            108.0, 106.0, 104.0, 102.0, 100.0, 98.0,
+            100.0, 102.0, 104.0, 106.0, 108.0, 110.0, 108.0, 106.0, 104.0, 102.0, 100.0, 98.0,
+            100.0, 102.0, 104.0, 106.0, 108.0, 110.0, 108.0, 106.0, 104.0, 102.0, 100.0, 98.0,
             100.0, 102.0, 104.0, 106.0, 108.0, 110.0,
         ];
         let candles = make_candles(prices);
         let pivots = IndicatorEngine::zigzag_pivots(&candles, 14);
-        assert!(pivots.len() >= 2, "Expected >= 2 pivots, got {}", pivots.len());
+        assert!(
+            pivots.len() >= 2,
+            "Expected >= 2 pivots, got {}",
+            pivots.len()
+        );
     }
 
     #[test]
@@ -754,7 +758,11 @@ mod tests {
         let (_z, vol, trend, vol_ratio) = features.unwrap();
         assert!(vol >= 0.0);
         assert!(vol_ratio >= 0.0);
-        assert!(trend > 0.0, "Expected positive trend for uptrend, got {}", trend);
+        assert!(
+            trend > 0.0,
+            "Expected positive trend for uptrend, got {}",
+            trend
+        );
     }
 
     #[test]

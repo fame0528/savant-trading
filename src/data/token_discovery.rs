@@ -197,7 +197,11 @@ pub fn load_token_store(path: &str) -> Vec<TokenStoreEntry> {
     match std::fs::read_to_string(path) {
         Ok(json) => match serde_json::from_str::<Vec<TokenStoreEntry>>(&json) {
             Ok(entries) => {
-                info!("Token store: loaded {} entries from {}", entries.len(), path);
+                info!(
+                    "Token store: loaded {} entries from {}",
+                    entries.len(),
+                    path
+                );
                 entries
             }
             Err(e) => {
@@ -354,10 +358,7 @@ pub async fn validate_token_liquidity(
 
 /// Resolve a single token's contract address on a given chain via Blockscout search API.
 /// Returns `None` if the token doesn't exist on the chain or the API call fails.
-pub async fn resolve_token_address(
-    symbol: &str,
-    chain_id: u64,
-) -> Option<(String, u8)> {
+pub async fn resolve_token_address(symbol: &str, chain_id: u64) -> Option<(String, u8)> {
     // Blockscout instances per chain
     let blockscout_url = match chain_id {
         42161 => "https://arbitrum.blockscout.com",
@@ -380,20 +381,30 @@ pub async fn resolve_token_address(
     let resp = match client.get(&url).send().await {
         Ok(r) => r,
         Err(e) => {
-            debug!("resolve_token_address: Blockscout HTTP error for {}: {}", symbol, e);
+            debug!(
+                "resolve_token_address: Blockscout HTTP error for {}: {}",
+                symbol, e
+            );
             return None;
         }
     };
 
     if !resp.status().is_success() {
-        debug!("resolve_token_address: Blockscout returned {} for {}", resp.status(), symbol);
+        debug!(
+            "resolve_token_address: Blockscout returned {} for {}",
+            resp.status(),
+            symbol
+        );
         return None;
     }
 
     let json: serde_json::Value = match resp.json().await {
         Ok(j) => j,
         Err(e) => {
-            debug!("resolve_token_address: JSON parse error for {}: {}", symbol, e);
+            debug!(
+                "resolve_token_address: JSON parse error for {}: {}",
+                symbol, e
+            );
             return None;
         }
     };
@@ -424,7 +435,10 @@ pub async fn resolve_token_address(
         }
     }
 
-    debug!("resolve_token_address: no exact match for {} on chain {}", symbol, chain_id);
+    debug!(
+        "resolve_token_address: no exact match for {} on chain {}",
+        symbol, chain_id
+    );
     None
 }
 
@@ -502,7 +516,8 @@ pub async fn refresh_token_store(
                     }
                 }
                 // Rate limit: 250ms between requests (5 RPS free tier)
-                tokio::time::sleep(std::time::Duration::from_millis(VALIDATION_RATE_LIMIT_MS)).await;
+                tokio::time::sleep(std::time::Duration::from_millis(VALIDATION_RATE_LIMIT_MS))
+                    .await;
             }
         }
 
@@ -522,13 +537,17 @@ pub async fn refresh_token_store(
             discovered_at: now.clone(),
         });
         added += 1;
-    }    if added > 0 {
+    }
+    if added > 0 {
         if let Err(e) = save_token_store(persist_path, existing_entries) {
             warn!("Token refresh: failed to persist: {}", e);
         } else {
             let validation_msg = if validate_via_0x && api_key.is_some() {
                 if skipped_validation > 0 {
-                    format!(", {} validated, {} skipped (cap)", validated, skipped_validation)
+                    format!(
+                        ", {} validated, {} skipped (cap)",
+                        validated, skipped_validation
+                    )
                 } else {
                     format!(", {} validated", validated)
                 }
@@ -537,7 +556,9 @@ pub async fn refresh_token_store(
             };
             info!(
                 "FID-121 Token refresh: {} new tokens added (total: {}){}",
-                added, existing_entries.len(), validation_msg
+                added,
+                existing_entries.len(),
+                validation_msg
             );
         }
     } else {

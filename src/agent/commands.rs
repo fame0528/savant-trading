@@ -49,7 +49,10 @@ impl AutonomyLevel {
 #[serde(tag = "action", rename_all = "snake_case")]
 pub enum OperatorCommand {
     /// Force-close a position by pair name.
-    OverrideClose { pair: String, reason: Option<String> },
+    OverrideClose {
+        pair: String,
+        reason: Option<String>,
+    },
     /// Set stop-loss for a position.
     OverrideStop { pair: String, stop_loss: f64 },
     /// Inject operator message into next LLM evaluation.
@@ -69,7 +72,11 @@ pub enum OperatorCommand {
     /// Explain last decision for a pair.
     Explain { pair: String },
     /// Operator verdict on a trade.
-    Feedback { pair: String, verdict: String, note: Option<String> },
+    Feedback {
+        pair: String,
+        verdict: String,
+        note: Option<String>,
+    },
     /// Add pair to evaluation list for N cycles.
     Watch { pair: String, cycles: u32 },
     /// Reverse the last command.
@@ -157,7 +164,9 @@ pub struct InjectContextRateLimiter {
 
 impl InjectContextRateLimiter {
     pub fn new() -> Self {
-        Self { count_this_cycle: 0 }
+        Self {
+            count_this_cycle: 0,
+        }
     }
 
     pub fn reset(&mut self) {
@@ -181,7 +190,9 @@ pub struct QueryRateLimiter {
 
 impl QueryRateLimiter {
     pub fn new() -> Self {
-        Self { timestamps: VecDeque::new() }
+        Self {
+            timestamps: VecDeque::new(),
+        }
     }
 
     pub fn check(&mut self) -> bool {
@@ -272,8 +283,14 @@ fn parse_natural_language(input: &str) -> Result<OperatorCommand, String> {
 
     // what's happening with <pair> / explain <pair>
     if (words[0] == "explain" || lower.starts_with("what")) && words.len() >= 2 {
-        let pair_start = if words[0] == "explain" { 1 } else {
-            words.iter().position(|w| w.contains("with") || w.contains("about")).map(|i| i + 1).unwrap_or(words.len() - 1)
+        let pair_start = if words[0] == "explain" {
+            1
+        } else {
+            words
+                .iter()
+                .position(|w| w.contains("with") || w.contains("about"))
+                .map(|i| i + 1)
+                .unwrap_or(words.len() - 1)
         };
         if pair_start < words.len() {
             let pair = extract_pair_name(&words[pair_start..]);

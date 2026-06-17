@@ -153,8 +153,8 @@ impl FailureTracker {
                 .filter(|r| r.category == ErrorCategory::Permanent)
                 .max_by_key(|r| r.timestamp)
             {
-                let remaining = chrono::Duration::minutes(60)
-                    - (chrono::Utc::now() - last.timestamp);
+                let remaining =
+                    chrono::Duration::minutes(60) - (chrono::Utc::now() - last.timestamp);
                 if remaining > chrono::Duration::zero() {
                     return Some(remaining);
                 }
@@ -230,10 +230,7 @@ pub fn diagnose_preflight_failure(
     }
 
     if err_lower.contains("nonce") {
-        return (
-            "Nonce collision".into(),
-            "Refresh nonce and retry".into(),
-        );
+        return ("Nonce collision".into(), "Refresh nonce and retry".into());
     }
 
     if err_lower.contains("max fee per gas") || err_lower.contains("underpriced") {
@@ -243,10 +240,7 @@ pub fn diagnose_preflight_failure(
         );
     }
 
-    (
-        "Unknown error".into(),
-        format!("Review error: {}", err_str),
-    )
+    ("Unknown error".into(), format!("Review error: {}", err_str))
 }
 
 /// Minimal transaction receipt for on-chain verification.
@@ -271,9 +265,9 @@ fn verify_swap_direction(
         ExecutionError::Other("TxReceipt missing raw data for direction verification".into())
     })?;
 
-    let logs = raw["logs"].as_array().ok_or_else(|| {
-        ExecutionError::Other("TxReceipt missing logs array".into())
-    })?;
+    let logs = raw["logs"]
+        .as_array()
+        .ok_or_else(|| ExecutionError::Other("TxReceipt missing logs array".into()))?;
 
     // ERC-20 Transfer event topic0
     let transfer_topic = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
@@ -341,7 +335,9 @@ fn verify_swap_direction(
 
     if !src_sent_from_wallet && dst_received_by_wallet {
         // dst arrived but src didn't leave — this is a buy, not a sell
-        tracing::warn!("FID-105: dst_token received but src_token not sent — possible direction reversal");
+        tracing::warn!(
+            "FID-105: dst_token received but src_token not sent — possible direction reversal"
+        );
         return Err(ExecutionError::Other(format!(
             "Swap direction reversal detected: {} received but {} not sent. \
              The DEX API may have returned calldata for the opposite direction.",
@@ -349,7 +345,11 @@ fn verify_swap_direction(
         )));
     }
 
-    tracing::debug!("FID-105: Swap direction verified: {} sent, {} received", src_token.symbol, dst_token.symbol);
+    tracing::debug!(
+        "FID-105: Swap direction verified: {} sent, {} received",
+        src_token.symbol,
+        dst_token.symbol
+    );
     Ok(())
 }
 
@@ -596,14 +596,11 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             // (capital is deployed into tokens, not sitting as USDC).
             let mut has_on_chain_tokens = false;
             for pos in trader.positions.values() {
-                let (_, dst_token) = match resolve_pair_on_chain(
-                    &pos.pair,
-                    pos.side,
-                    trader.chain_id,
-                ) {
-                    Ok(tokens) => tokens,
-                    Err(_) => continue,
-                };
+                let (_, dst_token) =
+                    match resolve_pair_on_chain(&pos.pair, pos.side, trader.chain_id) {
+                        Ok(tokens) => tokens,
+                        Err(_) => continue,
+                    };
                 if !dst_token.address.is_empty() {
                     if let Some(qty) = trader
                         .query_token_balance(&dst_token.address, dst_token.decimals)
@@ -639,14 +636,11 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         if !trader.positions.is_empty() && trader.closed_trades.is_empty() {
             let mut all_phantom = true;
             for pos in trader.positions.values() {
-                let (_, dst_token) = match resolve_pair_on_chain(
-                    &pos.pair,
-                    pos.side,
-                    trader.chain_id,
-                ) {
-                    Ok(tokens) => tokens,
-                    Err(_) => continue,
-                };
+                let (_, dst_token) =
+                    match resolve_pair_on_chain(&pos.pair, pos.side, trader.chain_id) {
+                        Ok(tokens) => tokens,
+                        Err(_) => continue,
+                    };
                 if !dst_token.address.is_empty() {
                     if let Some(on_chain_qty) = trader
                         .query_token_balance(&dst_token.address, dst_token.decimals)
@@ -1124,7 +1118,11 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                         16,
                     )
                     .unwrap_or(0);
-                    return Ok(TxReceipt { status, gas_used, raw: Some(val.clone()) });
+                    return Ok(TxReceipt {
+                        status,
+                        gas_used,
+                        raw: Some(val.clone()),
+                    });
                 }
                 Err(e) => {
                     if attempt < max_attempts - 1 {
@@ -1443,20 +1441,21 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             match self.rpc_call("eth_call", call_params.clone()).await {
                 Ok(result) => {
                     let hex_str = result.as_str().unwrap_or("0x0");
-                    current_allowance = U256::from_str_radix(
-                        hex_str.trim_start_matches("0x"), 16,
-                    ).unwrap_or(U256::ZERO);
+                    current_allowance = U256::from_str_radix(hex_str.trim_start_matches("0x"), 16)
+                        .unwrap_or(U256::ZERO);
                     break;
                 }
                 Err(e) => {
                     if attempt < 3 {
                         warn!(
                             "Allowance check attempt {}/3 failed for {}: {}. Retrying in {}ms...",
-                            attempt, token_address, e, attempt * 500
+                            attempt,
+                            token_address,
+                            e,
+                            attempt * 500
                         );
-                        tokio::time::sleep(
-                            std::time::Duration::from_millis(attempt as u64 * 500)
-                        ).await;
+                        tokio::time::sleep(std::time::Duration::from_millis(attempt as u64 * 500))
+                            .await;
                     } else {
                         warn!(
                             "Failed to check {} allowance after 3 attempts: {} — assuming zero",
@@ -1661,7 +1660,8 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
         self.order_counter += 1;
 
-        let (src_token, dst_token) = resolve_pair_on_chain(&pos.pair,
+        let (src_token, dst_token) = resolve_pair_on_chain(
+            &pos.pair,
             match pos.side {
                 Side::Long => Side::Short,
                 Side::Short => Side::Long,
@@ -1700,7 +1700,10 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                         close_qty
                     }
                 } else {
-                    warn!("FID-103: Balance query failed for {} — using requested qty as fallback", pos.pair);
+                    warn!(
+                        "FID-103: Balance query failed for {} — using requested qty as fallback",
+                        pos.pair
+                    );
                     close_qty
                 }
             }
@@ -1718,7 +1721,10 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         let wei_val: u128 = match qty_wei.parse() {
             Ok(v) => v,
             Err(e) => {
-                warn!("Close wei parse failed for {}: {} — qty_wei={}", pos.pair, e, qty_wei);
+                warn!(
+                    "Close wei parse failed for {}: {} — qty_wei={}",
+                    pos.pair, e, qty_wei
+                );
                 0
             }
         };
@@ -1729,7 +1735,9 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         if actual_close_qty < 0.0001 || qty_wei == "0" {
             tracing::warn!(
                 "FID-094: Close qty too small for {} — actual={:.8}, wei={}. Returning error.",
-                pos.pair, actual_close_qty, qty_wei
+                pos.pair,
+                actual_close_qty,
+                qty_wei
             );
             return Err(ExecutionError::Other(format!(
                 "Close quantity too small: {:.8} {} (on-chain balance may be 0)",
@@ -1779,7 +1787,10 @@ impl<B: DexBackend + 'static> DexTrader<B> {
 
         let usdc_balance_before = self.balance;
 
-        let tx_hash = match self.execute_swap(&src_token, &dst_token, &qty_wei, true).await {
+        let tx_hash = match self
+            .execute_swap(&src_token, &dst_token, &qty_wei, true)
+            .await
+        {
             Ok(hash) => hash,
             Err(e) if e.to_string().contains("Dust output") => {
                 warn!(
@@ -1887,7 +1898,10 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                                 break;
                             }
                             if attempt > 1 {
-                                info!("FID-146: USDC verification succeeded on attempt {}/3", attempt);
+                                info!(
+                                    "FID-146: USDC verification succeeded on attempt {}/3",
+                                    attempt
+                                );
                             }
                             info!(
                                 "On-chain verified: {} close delivered ${:.2} USDC (before=${:.2}, after=${:.2})",
@@ -2108,7 +2122,12 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
                 strategy_name: format!("dex_{}", self.backend.name()),
                 opened_at: Utc::now(),
                 scale_level: ScaleLevel::Full,
-                token_address: super::lookup_token(pair.split('/').next().unwrap_or(""), self.chain_id).map(|(addr, _)| addr).unwrap_or_default(),
+                token_address: super::lookup_token(
+                    pair.split('/').next().unwrap_or(""),
+                    self.chain_id,
+                )
+                .map(|(addr, _)| addr)
+                .unwrap_or_default(),
             },
         );
 
@@ -2265,7 +2284,10 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
         let usdc_addr = match super::usdc_address_for_chain(self.chain_id) {
             Some(addr) => addr,
             None => {
-                warn!("No USDC address for chain {} — skipping balance sync", self.chain_id);
+                warn!(
+                    "No USDC address for chain {} — skipping balance sync",
+                    self.chain_id
+                );
                 return Ok(());
             }
         };
@@ -2324,7 +2346,12 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
                     let wei = match U256::from_str_radix(hex_clean, 16) {
                         Ok(w) => w,
                         Err(e) => {
-                            tracing::warn!("sync_balance: Failed to parse hex '{}' for {}: {}", hex_clean, sym, e);
+                            tracing::warn!(
+                                "sync_balance: Failed to parse hex '{}' for {}: {}",
+                                hex_clean,
+                                sym,
+                                e
+                            );
                             continue;
                         }
                     };
@@ -2422,14 +2449,23 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
                     let wei = match U256::from_str_radix(hex_clean, 16) {
                         Ok(w) => w,
                         Err(e) => {
-                            tracing::warn!("query_token_balance: parse failed for {}: {}", token_address, e);
+                            tracing::warn!(
+                                "query_token_balance: parse failed for {}: {}",
+                                token_address,
+                                e
+                            );
                             return None;
                         }
                     };
                     let divisor = 10f64.powi(decimals as i32);
                     let balance = wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
                     if balance <= 0.0 {
-                        tracing::warn!("BALANCE QUERY: {} returned 0 (hex='{}', decimals={})", token_address, hex, decimals);
+                        tracing::warn!(
+                            "BALANCE QUERY: {} returned 0 (hex='{}', decimals={})",
+                            token_address,
+                            hex,
+                            decimals
+                        );
                     }
                     Some(balance)
                 } else {
@@ -2473,7 +2509,9 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                         Err(e) => {
                             tracing::warn!(
                                 "Failed to parse balance hex '{}' for {}: {}",
-                                hex_clean, token_address, e
+                                hex_clean,
+                                token_address,
+                                e
                             );
                             return None;
                         }
@@ -2489,12 +2527,19 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                     } else {
                         tracing::debug!(
                             "BALANCE QUERY: {} = {:.8} (hex='{}', decimals={})",
-                            token_address, balance, hex, decimals
+                            token_address,
+                            balance,
+                            hex,
+                            decimals
                         );
                     }
                     Some(balance)
                 } else {
-                    tracing::warn!("BALANCE QUERY: {} returned non-string result: {:?}", token_address, result);
+                    tracing::warn!(
+                        "BALANCE QUERY: {} returned non-string result: {:?}",
+                        token_address,
+                        result
+                    );
                     None
                 }
             }

@@ -167,7 +167,10 @@ async fn main() -> anyhow::Result<()> {
         .collect();
 
     let config = AppConfig::load(Path::new(&config_path)).unwrap_or_else(|e| {
-        warn!("Config load failed from '{}' ({}), using defaults", config_path, e);
+        warn!(
+            "Config load failed from '{}' ({}), using defaults",
+            config_path, e
+        );
         AppConfig::default()
     });
 
@@ -414,13 +417,19 @@ async fn main() -> anyhow::Result<()> {
                         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                         match child.try_wait() {
                             Ok(Some(status)) => {
-                                warn!("Dashboard process exited with status: {} — restarting in 5s", status);
+                                warn!(
+                                    "Dashboard process exited with status: {} — restarting in 5s",
+                                    status
+                                );
                                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                                 break; // Break inner loop to restart
                             }
                             Ok(None) => { /* still running */ }
                             Err(e) => {
-                                error!("Error checking dashboard status: {} — restarting in 10s", e);
+                                error!(
+                                    "Error checking dashboard status: {} — restarting in 10s",
+                                    e
+                                );
                                 tokio::time::sleep(std::time::Duration::from_secs(10)).await;
                                 break;
                             }
@@ -454,7 +463,10 @@ async fn main() -> anyhow::Result<()> {
         _ => {}
     }
 
-    info!("=== SAVANT TRADING ENGINE v{} ===", env!("CARGO_PKG_VERSION"));
+    info!(
+        "=== SAVANT TRADING ENGINE v{} ===",
+        env!("CARGO_PKG_VERSION")
+    );
     info!(
         "Mode: {}",
         if !config.mode.live_execution {
@@ -596,8 +608,7 @@ async fn emergency_liquidate() -> anyhow::Result<()> {
         .and_then(|w| w.get(1))
         .cloned()
         .unwrap_or_else(|| "config/default.toml".to_string());
-    let config =
-        savant_trading::core::config::AppConfig::load(std::path::Path::new(&config_path))?;
+    let config = savant_trading::core::config::AppConfig::load(std::path::Path::new(&config_path))?;
     let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)?;
     let api_key = std::env::var(&config.exchange.dex.api_key_env)?;
 
@@ -809,7 +820,12 @@ async fn recover_positions(config: &savant_trading::core::config::AppConfig) -> 
                 strategy_name: "recovered".to_string(),
                 opened_at: chrono::Utc::now(),
                 scale_level: ScaleLevel::Full,
-                token_address: savant_trading::execution::dex::lookup_token(token.symbol, config.exchange.dex.chain_id).map(|(addr, _)| addr).unwrap_or_default(),
+                token_address: savant_trading::execution::dex::lookup_token(
+                    token.symbol,
+                    config.exchange.dex.chain_id,
+                )
+                .map(|(addr, _)| addr)
+                .unwrap_or_default(),
             };
             recovered.push((pos, value));
         }
@@ -949,8 +965,11 @@ async fn close_all_positions(
     .await?;
 
     let wallet_hex = format!("{:#x}", trader.wallet_address());
-    let usdc_address = savant_trading::execution::dex::usdc_address_for_chain(config.exchange.dex.chain_id)
-        .ok_or_else(|| anyhow::anyhow!("No USDC address for chain {}", config.exchange.dex.chain_id))?;
+    let usdc_address =
+        savant_trading::execution::dex::usdc_address_for_chain(config.exchange.dex.chain_id)
+            .ok_or_else(|| {
+                anyhow::anyhow!("No USDC address for chain {}", config.exchange.dex.chain_id)
+            })?;
 
     let journal = TradeJournal::new(&config.trading.database_url).await?;
     let positions = journal.load_positions().await?;

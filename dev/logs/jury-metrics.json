@@ -1,8 +1,8 @@
 {
-  "quorum_failures": 0,
-  "timestamp": "2026-06-17T07:25:20.017256800+00:00",
-  "total_evaluations": 6,
-  "total_failures": 13,
-  "total_latency_ms": 234403,
-  "total_verdicts": 47
+  "quorum_failures": 4,
+  "timestamp": "2026-06-17T18:55:03.357031100+00:00",
+  "total_evaluations": 79,
+  "total_failures": 171,
+  "total_latency_ms": 3193889,
+  "total_verdicts": 619
 }

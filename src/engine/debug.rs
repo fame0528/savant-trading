@@ -263,7 +263,10 @@ pub async fn run_live_test(
 
     println!("Positions: {} open", positions.len());
     for pos in &positions {
-        println!("  {} {} @ {:.2} | SL: {:.2} | Qty: {:.6}", pos.pair, pos.side, pos.entry_price, pos.stop_loss, pos.quantity);
+        println!(
+            "  {} {} @ {:.2} | SL: {:.2} | Qty: {:.6}",
+            pos.pair, pos.side, pos.entry_price, pos.stop_loss, pos.quantity
+        );
     }
     println!("Balance: ${:.2}", account_balance);
 
@@ -278,14 +281,17 @@ pub async fn run_live_test(
             let p = pair.clone();
             async move {
                 let mut candles = api.get_ohlc(&p, interval, None).await.unwrap_or_default();
-                if candles.len() > 1 { candles.pop(); }
+                if candles.len() > 1 {
+                    candles.pop();
+                }
                 (p, candles)
             }
         })
         .collect();
 
     let candle_results = futures_util::future::join_all(candle_futures).await;
-    let mut market_stores: std::collections::HashMap<String, Vec<Candle>> = std::collections::HashMap::new();
+    let mut market_stores: std::collections::HashMap<String, Vec<Candle>> =
+        std::collections::HashMap::new();
     for (pair, candles) in candle_results {
         if !candles.is_empty() {
             println!("  {}: {} candles", pair, candles.len());
@@ -380,7 +386,9 @@ pub async fn run_live_test(
             session: savant_trading::core::session::current_session(),
             memory_context: None,
             higher_tf_candles: vec![],
-            context_tags: savant_trading::agent::context_builder::generate_context_tags(&indicators),
+            context_tags: savant_trading::agent::context_builder::generate_context_tags(
+                &indicators,
+            ),
             live_price: None,
             decision_log_context: None,
             dex_price: None,
@@ -424,8 +432,14 @@ pub async fn run_live_test(
                         println!("  Side: {:?}", decision.side);
                         println!("  Confidence: {:.0}%", decision.confidence * 100.0);
                         println!("  R:R: {:.2}", decision.risk_reward);
-                        println!("  Entry: {:.2} | Stop: {:.2}", decision.entry_price, decision.stop_loss);
-                        println!("  TP1: {:.2} | TP2: {:.2} | TP3: {:.2}", decision.take_profit_1, decision.take_profit_2, decision.take_profit_3);
+                        println!(
+                            "  Entry: {:.2} | Stop: {:.2}",
+                            decision.entry_price, decision.stop_loss
+                        );
+                        println!(
+                            "  TP1: {:.2} | TP2: {:.2} | TP3: {:.2}",
+                            decision.take_profit_1, decision.take_profit_2, decision.take_profit_3
+                        );
                         println!("  Reasoning: {}", decision.reasoning);
                         all_decisions.push(decision);
                     }
@@ -447,7 +461,14 @@ pub async fn run_live_test(
     println!("Pairs evaluated: {}", pairs.len());
     println!("Decisions: {}", all_decisions.len());
     for d in &all_decisions {
-        println!("  {} {:?} {:.0}% R:{:.2} — {}", d.pair, d.action, d.confidence * 100.0, d.risk_reward, &d.reasoning[..d.reasoning.len().min(80)]);
+        println!(
+            "  {} {:?} {:.0}% R:{:.2} — {}",
+            d.pair,
+            d.action,
+            d.confidence * 100.0,
+            d.risk_reward,
+            &d.reasoning[..d.reasoning.len().min(80)]
+        );
     }
 
     println!("\n=== LIVE TEST COMPLETE ===");

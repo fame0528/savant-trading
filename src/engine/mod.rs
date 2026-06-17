@@ -7,8 +7,8 @@ pub use training::{run_action_test, run_sandbox, run_training};
 pub use utils::parse_timeframe;
 pub use utils::parse_timeframe_minutes;
 
-use utils::{create_executor, derive_address_from_key, load_knowledge_base};
 use training::verify_token_safety;
+use utils::{create_executor, derive_address_from_key, load_knowledge_base};
 
 use chrono::{Timelike, Utc};
 use std::collections::{HashMap, HashSet};
@@ -22,7 +22,9 @@ use savant_trading::agent::context_engine::ContextEngine;
 use savant_trading::agent::context_state::ContextState;
 use savant_trading::agent::decision_log::DecisionLog;
 use savant_trading::agent::jury::JuryKeyManager;
-use savant_trading::agent::jury::{JuryCycleRecord, JuryJudge, JuryPool, JurorRecord, VerdictBreakdown};
+use savant_trading::agent::jury::{
+    JurorRecord, JuryCycleRecord, JuryJudge, JuryPool, VerdictBreakdown,
+};
 use savant_trading::agent::openrouter_management::OpenRouterManagementClient;
 use savant_trading::agent::orchestrator::{AgentConfig, AgentOrchestrator, AutonomyLevel};
 use savant_trading::agent::prompts::{self, PromptComposer};
@@ -206,17 +208,19 @@ impl EngineState {
         }
         // FID-120: Persistent token store — initialized before live_execution check
         // so it's always in scope for EngineState construction.
-        let mut token_store_entries: Vec<savant_trading::data::token_discovery::TokenStoreEntry> = Vec::new();
+        let mut token_store_entries: Vec<savant_trading::data::token_discovery::TokenStoreEntry> =
+            Vec::new();
 
         if config.mode.live_execution {
             // FID-120: Seed persistent token store from static ARBITRUM_TOKENS on first run,
             // then load from persistent store. The store is the source of truth.
             let persist_path = &config.trading.token_store.persist_path;
-            token_store_entries = savant_trading::data::token_discovery::seed_token_store_from_static(
-                persist_path,
-                savant_trading::execution::dex::ARBITRUM_TOKENS,
-                config.exchange.dex.chain_id,
-            );
+            token_store_entries =
+                savant_trading::data::token_discovery::seed_token_store_from_static(
+                    persist_path,
+                    savant_trading::execution::dex::ARBITRUM_TOKENS,
+                    config.exchange.dex.chain_id,
+                );
             // Extend token DB from persistent store (superset of static + discovered)
             let store_entries: Vec<(String, String, u8)> = token_store_entries
                 .iter()
@@ -225,7 +229,8 @@ impl EngineState {
             savant_trading::execution::dex::extend_token_db(&store_entries);
             info!(
                 "FID-120 Token DB: {} entries loaded from persistent store ({})",
-                store_entries.len(), persist_path
+                store_entries.len(),
+                persist_path
             );
             // P1-1d: Discover additional Arbitrum tokens from Blockscout
             // FID-120: Merge newly discovered tokens into persistent store
@@ -233,7 +238,9 @@ impl EngineState {
                 config.trading.token_store.min_volume_usd,
                 config.trading.token_store.min_holders,
                 100,
-            ).await {
+            )
+            .await
+            {
                 Ok(discovered) => {
                     let mut discovered_entries: Vec<(String, String, u8)> = Vec::new();
                     for token in &discovered {
@@ -247,10 +254,16 @@ impl EngineState {
                     }
                     if !discovered_entries.is_empty() {
                         savant_trading::execution::dex::extend_token_db(&discovered_entries);
-                        info!("Token discovery: {} discovered → {} new pairs added to DB",
-                            discovered.len(), discovered_entries.len());
+                        info!(
+                            "Token discovery: {} discovered → {} new pairs added to DB",
+                            discovered.len(),
+                            discovered_entries.len()
+                        );
                     } else {
-                        info!("Token discovery: {} discovered — all already in curated list", discovered.len());
+                        info!(
+                            "Token discovery: {} discovered — all already in curated list",
+                            discovered.len()
+                        );
                     }
                     // FID-120: Merge discovered tokens into persistent store
                     // FID-121: Gate through 0x validation when enabled
@@ -259,10 +272,12 @@ impl EngineState {
                         .iter()
                         .map(|e| e.symbol.to_uppercase())
                         .collect();
-                    let zerox_key_startup = std::env::var(&config.exchange.dex.api_key_env).ok()
+                    let zerox_key_startup = std::env::var(&config.exchange.dex.api_key_env)
+                        .ok()
                         .filter(|k| !k.is_empty());
                     let mut new_from_discovery = 0usize;
-                    let startup_validate = config.trading.token_store.validate_via_0x && zerox_key_startup.is_some();
+                    let startup_validate =
+                        config.trading.token_store.validate_via_0x && zerox_key_startup.is_some();
                     for token in &discovered {
                         if !known.contains(&token.symbol.to_uppercase()) {
                             // FID-121: Cap validation to bound startup latency
@@ -291,7 +306,11 @@ impl EngineState {
                                     address: token.address.clone(),
                                     decimals: token.decimals,
                                     chain_id: config.exchange.dex.chain_id,
-                                    source: if startup_validate { "0x_validated".into() } else { "blockscout_startup".into() },
+                                    source: if startup_validate {
+                                        "0x_validated".into()
+                                    } else {
+                                        "blockscout_startup".into()
+                                    },
                                     discovered_at: now.clone(),
                                 },
                             );
@@ -299,7 +318,10 @@ impl EngineState {
                         }
                     }
                     if new_from_discovery > 0 {
-                        if let Err(e) = savant_trading::data::token_discovery::save_token_store(persist_path, &token_store_entries) {
+                        if let Err(e) = savant_trading::data::token_discovery::save_token_store(
+                            persist_path,
+                            &token_store_entries,
+                        ) {
                             warn!("FID-120: Failed to persist startup discoveries: {}", e);
                         } else {
                             info!("FID-120: Merged {} startup discoveries into persistent store (total: {})",
@@ -308,7 +330,10 @@ impl EngineState {
                     }
                 }
                 Err(e) => {
-                    warn!("Token discovery failed ({}), continuing with persistent store only", e);
+                    warn!(
+                        "Token discovery failed ({}), continuing with persistent store only",
+                        e
+                    );
                 }
             }
         }
@@ -343,7 +368,7 @@ impl EngineState {
                                 let mut wa = shared.wallet_address.write().await;
                                 *wa = addr.clone();
                                 let masked = if addr.len() > 10 {
-                                    format!("{}...{}", &addr[..6], &addr[addr.len()-4..])
+                                    format!("{}...{}", &addr[..6], &addr[addr.len() - 4..])
                                 } else {
                                     addr.clone()
                                 };
@@ -487,7 +512,10 @@ impl EngineState {
                             ex.register_position(exec_id.clone(), pos.clone());
                             executor_position_map.insert(id.clone(), exec_id.clone());
                         }
-                        info!("Registered {} journal positions in DexTrader", portfolio.positions().len());
+                        info!(
+                            "Registered {} journal positions in DexTrader",
+                            portfolio.positions().len()
+                        );
                     }
                 }
                 Ok(_) => info!("No persisted positions in DB"),
@@ -495,17 +523,26 @@ impl EngineState {
             }
 
             {
-                let config_pairs: std::collections::HashSet<&str> = config.trading.pairs.iter().map(|s| s.as_str()).collect();
-                let stale_ids: Vec<String> = portfolio.positions().keys()
+                let config_pairs: std::collections::HashSet<&str> =
+                    config.trading.pairs.iter().map(|s| s.as_str()).collect();
+                let stale_ids: Vec<String> = portfolio
+                    .positions()
+                    .keys()
                     .filter(|id| {
-                        portfolio.positions().get(*id).is_some_and(|p| !config_pairs.contains(p.pair.as_str()))
+                        portfolio
+                            .positions()
+                            .get(*id)
+                            .is_some_and(|p| !config_pairs.contains(p.pair.as_str()))
                     })
                     .cloned()
                     .collect();
                 let mut stale_removed = false;
                 for stale_id in &stale_ids {
                     if let Some(pos) = portfolio.positions_mut().remove(stale_id) {
-                        warn!("STALE POSITION REMOVED: {} ({}) — not in current config pairs", stale_id, pos.pair);
+                        warn!(
+                            "STALE POSITION REMOVED: {} ({}) — not in current config pairs",
+                            stale_id, pos.pair
+                        );
                         if let Some(ref j) = journal {
                             let _ = j.delete_position(stale_id).await;
                         }
@@ -563,7 +600,8 @@ impl EngineState {
         // FID-181: load persisted equity history (if any) and seed the in-memory curve.
         {
             let path = std::path::PathBuf::from("data/equity_history.json");
-            let history = savant_trading::core::shared::SharedEngineData::load_equity_history(&path);
+            let history =
+                savant_trading::core::shared::SharedEngineData::load_equity_history(&path);
             if history.is_empty() {
                 info!("Equity curve: starting fresh for current session (no persisted history)");
             } else {
@@ -640,7 +678,9 @@ impl EngineState {
         );
         info!(
             "AI agent initialized: {:?} mode with provider '{}', encoding={}",
-            autonomy, config.ai.provider, ctx_engine.encoding_mode()
+            autonomy,
+            config.ai.provider,
+            ctx_engine.encoding_mode()
         );
 
         {
@@ -658,7 +698,10 @@ impl EngineState {
                                 keys.len()
                             );
                             for key in &keys {
-                                if key.limit.unwrap_or(0.0) > 0.0 && key.limit_remaining.unwrap_or(0.0) < key.limit.unwrap_or(0.0) * 0.1 {
+                                if key.limit.unwrap_or(0.0) > 0.0
+                                    && key.limit_remaining.unwrap_or(0.0)
+                                        < key.limit.unwrap_or(0.0) * 0.1
+                                {
                                     warn!(
                                         "OpenRouter key '{}' is approaching limit: {:.0}/{:.0} credits remaining",
                                         key.name.as_deref().unwrap_or("?"), key.limit_remaining.unwrap_or(0.0), key.limit.unwrap_or(0.0)
@@ -712,8 +755,7 @@ impl EngineState {
             };
 
             // M3 control API key: from TOKEN_ROUTER_API_KEY env var.
-            let m3_api_key = std::env::var(&config.ai.tokenrouter.api_key_env)
-                .unwrap_or_default();
+            let m3_api_key = std::env::var(&config.ai.tokenrouter.api_key_env).unwrap_or_default();
             if m3_api_key.is_empty() {
                 warn!(
                     "FID-147: {} not set — M3 control juror will fail to authenticate",
@@ -745,7 +787,10 @@ impl EngineState {
                     jury_pool = Some(jp);
                 }
                 Err(e) => {
-                    warn!("FID-114 Phase 6: JuryPool init failed ({}). Jury disabled.", e);
+                    warn!(
+                        "FID-114 Phase 6: JuryPool init failed ({}). Jury disabled.",
+                        e
+                    );
                 }
             }
         }
@@ -792,20 +837,19 @@ impl EngineState {
             order_books.insert(pair.clone(), OrderBookManager::new(pair));
         }
 
-        let memory = match savant_trading::memory::episodic::EpisodicMemory::new(
-            "sqlite:data/memory.db",
-        )
-        .await
-        {
-            Ok(m) => {
-                info!("Episodic memory initialized");
-                Some(m)
-            }
-            Err(e) => {
-                warn!("Episodic memory init failed: {} — memory disabled", e);
-                None
-            }
-        };
+        let memory =
+            match savant_trading::memory::episodic::EpisodicMemory::new("sqlite:data/memory.db")
+                .await
+            {
+                Ok(m) => {
+                    info!("Episodic memory initialized");
+                    Some(m)
+                }
+                Err(e) => {
+                    warn!("Episodic memory init failed: {} — memory disabled", e);
+                    None
+                }
+            };
 
         let mut cusum_charts: HashMap<String, savant_trading::memory::cusum::CusumChart> =
             HashMap::new();
@@ -823,7 +867,8 @@ impl EngineState {
             if name.ends_with(".md") {
                 for line in content.lines() {
                     let trimmed = line.trim();
-                    if !trimmed.is_empty() && !trimmed.starts_with('#') && !trimmed.starts_with('>') {
+                    if !trimmed.is_empty() && !trimmed.starts_with('#') && !trimmed.starts_with('>')
+                    {
                         operator_rules.push(trimmed.to_string());
                     }
                 }
@@ -971,7 +1016,6 @@ impl EngineState {
         let _ = std::fs::remove_file("data/starting_equity.json");
         let _ = std::fs::remove_file("data/starting_balance.json");
 
-
         // FID-117: Record starting equity from USDC-only balance.
         // Runs after journal init, before wallet recovery.
         if let Some(ref j) = journal {
@@ -986,7 +1030,10 @@ impl EngineState {
                 }
                 Ok(false) => {
                     if let Ok(Some(saved)) = j.get_starting_equity().await {
-                        info!("FID-117: Loaded starting_equity = ${:.2} from journal", saved);
+                        info!(
+                            "FID-117: Loaded starting_equity = ${:.2} from journal",
+                            saved
+                        );
                         *shared.starting_equity.write().await = saved;
                     }
                 }
@@ -1013,15 +1060,15 @@ impl EngineState {
                     if (p.stop_loss - default_sl).abs() < 0.01 {
                         let new_sl = match (p.pair.as_str(), p.side) {
                             ("LINK/USD", Side::Long) => Some(7.00),
-                            ("LINK/USD", Side::Short) => Some(
-                                (p.entry_price * 1.08 * 100.0).round() / 100.0,
-                            ),
-                            ("WETH/USD", Side::Long) => Some(
-                                (p.entry_price * 0.92 * 100.0).round() / 100.0,
-                            ),
-                            ("WETH/USD", Side::Short) => Some(
-                                (p.entry_price * 1.08 * 100.0).round() / 100.0,
-                            ),
+                            ("LINK/USD", Side::Short) => {
+                                Some((p.entry_price * 1.08 * 100.0).round() / 100.0)
+                            }
+                            ("WETH/USD", Side::Long) => {
+                                Some((p.entry_price * 0.92 * 100.0).round() / 100.0)
+                            }
+                            ("WETH/USD", Side::Short) => {
+                                Some((p.entry_price * 1.08 * 100.0).round() / 100.0)
+                            }
                             _ => None,
                         };
                         new_sl.map(|sl| (p.pair.clone(), sl))
@@ -1260,8 +1307,8 @@ pub async fn run(
             let now = std::time::Instant::now();
             let elapsed = now.duration_since(last_chain_sync);
             if elapsed >= std::time::Duration::from_secs(300) {
-                let active_chain_name = std::env::var("SAVANT_CHAIN")
-                    .unwrap_or_else(|_| "ethereum".to_string());
+                let active_chain_name =
+                    std::env::var("SAVANT_CHAIN").unwrap_or_else(|_| "ethereum".to_string());
                 if let Some(chain_cfg) = config.chains.get(&active_chain_name) {
                     let recovery = ChainPositionRecovery::new(ChainRecoveryConfig {
                         rpc_url: chain_cfg.rpc_url.clone(),
@@ -1273,35 +1320,48 @@ pub async fn run(
                             .into_iter()
                             .map(|t| (t.symbol, t.address, t.decimals))
                             .collect();
-                    let positions_snapshot: std::collections::HashMap<String, savant_trading::core::types::Position> =
-                        portfolio.positions().iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+                    let positions_snapshot: std::collections::HashMap<
+                        String,
+                        savant_trading::core::types::Position,
+                    > = portfolio
+                        .positions()
+                        .iter()
+                        .map(|(k, v)| (k.clone(), v.clone()))
+                        .collect();
                     let in_mem_usdc = portfolio.account().balance;
                     // Reuse the heartbeat helper to get on-chain USDC.
                     // We pass a single dummy position so the helper does its work.
-                    let recon_helper_cfg = savant_trading::execution::reconciliation::ReconciliationConfig {
-                        chain_id: chain_cfg.chain_id,
-                        wallet_address: shared.wallet_address.read().await.clone(),
-                        rpc_url: chain_cfg.rpc_url.clone(),
-                        divergence_threshold_usd: 0.10,
-                        divergence_threshold_pct: 0.01,
-                        interval_cycles: 1,
-                    };
+                    let recon_helper_cfg =
+                        savant_trading::execution::reconciliation::ReconciliationConfig {
+                            chain_id: chain_cfg.chain_id,
+                            wallet_address: shared.wallet_address.read().await.clone(),
+                            rpc_url: chain_cfg.rpc_url.clone(),
+                            divergence_threshold_usd: 0.10,
+                            divergence_threshold_pct: 0.01,
+                            interval_cycles: 1,
+                        };
                     let dummy_pos = std::collections::HashMap::new();
                     let acct = portfolio.account().clone();
-                    let usdc_report = savant_trading::execution::reconciliation::reconcile_wallet_state(
-                        &recon_helper_cfg, &acct, &dummy_pos,
-                    ).await;
+                    let usdc_report =
+                        savant_trading::execution::reconciliation::reconcile_wallet_state(
+                            &recon_helper_cfg,
+                            &acct,
+                            &dummy_pos,
+                        )
+                        .await;
                     let on_chain_usdc = if usdc_report.rpc_failure {
                         in_mem_usdc // RPC failed — assume no drift to avoid false positives
                     } else {
                         usdc_report.on_chain_usdc
                     };
-                    let result = recovery.reconcile_with(
-                        &positions_snapshot,
-                        &known_tokens,
-                        in_mem_usdc,
-                        on_chain_usdc,
-                    ).await;
+                    let result = recovery
+                        .reconcile_with(
+                            &positions_snapshot,
+                            &known_tokens,
+                            in_mem_usdc,
+                            on_chain_usdc,
+                        )
+                        .await;
                     if result.is_clean() {
                         debug!(
                             "FID-155: 5-min chain sync clean. {} positions tracked.",
@@ -1340,8 +1400,8 @@ pub async fn run(
             use savant_trading::execution::reconciliation::{
                 reconcile_wallet_state, ReconciliationConfig,
             };
-            let active_chain_name = std::env::var("SAVANT_CHAIN")
-                .unwrap_or_else(|_| "ethereum".to_string());
+            let active_chain_name =
+                std::env::var("SAVANT_CHAIN").unwrap_or_else(|_| "ethereum".to_string());
             let active_chain = config.chains.get(&active_chain_name);
             if active_chain.is_none() {
                 error!(
@@ -1360,11 +1420,21 @@ pub async fn run(
                 divergence_threshold_pct: 0.01,
                 interval_cycles: 1,
             };
-            info!("FID-154: Heartbeat using chain '{}' (chain_id={})", active_chain_name, active_chain.chain_id);
-            let positions_snapshot: std::collections::HashMap<String, savant_trading::core::types::Position> =
-                portfolio.positions().iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+            info!(
+                "FID-154: Heartbeat using chain '{}' (chain_id={})",
+                active_chain_name, active_chain.chain_id
+            );
+            let positions_snapshot: std::collections::HashMap<
+                String,
+                savant_trading::core::types::Position,
+            > = portfolio
+                .positions()
+                .iter()
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect();
             let account_snapshot = portfolio.account().clone();
-            let report = reconcile_wallet_state(&recon_cfg, &account_snapshot, &positions_snapshot).await;
+            let report =
+                reconcile_wallet_state(&recon_cfg, &account_snapshot, &positions_snapshot).await;
             if report.halted {
                 error!(
                     "FID-147: Wallet reconciliation halt: {}. Writing savant.blocked and exiting cycle.",
@@ -1372,9 +1442,11 @@ pub async fn run(
                 );
                 let _ = std::fs::write(
                     "savant.blocked",
-                    format!("{}\nTrigger: wallet_reconciliation\nReason: {}\n",
+                    format!(
+                        "{}\nTrigger: wallet_reconciliation\nReason: {}\n",
                         chrono::Utc::now().to_rfc3339(),
-                        report.halt_reason.as_deref().unwrap_or("unknown")),
+                        report.halt_reason.as_deref().unwrap_or("unknown")
+                    ),
                 );
                 // Halt by exiting the cycle. The engine's outer code handles shutdown.
                 break;
@@ -1388,7 +1460,10 @@ pub async fn run(
             let today = chrono::Utc::now().date_naive();
             if today != last_daily_reset {
                 let acct = portfolio.account_mut();
-                info!("Midnight UTC reset: clearing daily PnL (${:.2}) and trade count ({})", acct.daily_pnl, acct.trades_today);
+                info!(
+                    "Midnight UTC reset: clearing daily PnL (${:.2}) and trade count ({})",
+                    acct.daily_pnl, acct.trades_today
+                );
                 acct.daily_pnl = 0.0;
                 acct.trades_today = 0;
                 last_daily_reset = today;
@@ -1418,7 +1493,10 @@ pub async fn run(
             ws_messages_drained += 1;
             match msg {
                 savant_trading::data::websocket::WsMessage::Ticker(ticker) => {
-                    ws_ticker_prices.insert(ticker.pair.clone(), (ticker.last, std::time::Instant::now()));
+                    ws_ticker_prices.insert(
+                        ticker.pair.clone(),
+                        (ticker.last, std::time::Instant::now()),
+                    );
                     // FID-086: Feed live WS price into candle store so the LLM
                     // model sees real-time prices instead of startup-frozen data.
                     if let Some(store) = market_stores.get_mut(&ticker.pair) {
@@ -1477,7 +1555,9 @@ pub async fn run(
                 savant_trading::data::websocket::WsMessage::StateChange(state) => {
                     if state == savant_trading::data::websocket::WsState::Connected {
                         ws_just_reconnected = true;
-                        info!("FID-081: WS reconnected — will verify price freshness on next cycle");
+                        info!(
+                            "FID-081: WS reconnected — will verify price freshness on next cycle"
+                        );
                     }
                 }
                 _ => {}
@@ -1501,47 +1581,49 @@ pub async fn run(
             startup_candles_loaded_at = None; // Only skip once
         }
         if !startup_fresh {
-        {
-            let tf = config.trading.timeframe.clone();
-            let tf_minutes = parse_timeframe_minutes(&tf);
-            let mut candle_refresh_futures = tokio::task::JoinSet::new();
-            let now = chrono::Utc::now();
-            for pair in &active_pairs {
-                // FID-093 C4: Skip fetch if latest candle < 1 min old
-                let skip_fetch = market_stores
-                    .get(pair.as_str())
-                    .and_then(|s| s.last().map(|c| {
-                        let age = now.signed_duration_since(c.timestamp);
-                        age.num_seconds() < 60
-                    }))
-                    .unwrap_or(false);
-                if skip_fetch {
-                    continue;
-                }
-                let router = candle_router.clone();
-                let pair_clone = pair.clone();
-                candle_refresh_futures.spawn(async move {
-                    let result = router.fetch_candles(&pair_clone, tf_minutes, 200).await;
-                    (pair_clone, result)
-                });
-            }
-            while let Some(result) = candle_refresh_futures.join_next().await {
-                if let Ok((pair, Ok(mut candles))) = result {
-                    if candles.len() > 1 {
-                        candles.pop(); // Remove incomplete last candle
+            {
+                let tf = config.trading.timeframe.clone();
+                let tf_minutes = parse_timeframe_minutes(&tf);
+                let mut candle_refresh_futures = tokio::task::JoinSet::new();
+                let now = chrono::Utc::now();
+                for pair in &active_pairs {
+                    // FID-093 C4: Skip fetch if latest candle < 1 min old
+                    let skip_fetch = market_stores
+                        .get(pair.as_str())
+                        .and_then(|s| {
+                            s.last().map(|c| {
+                                let age = now.signed_duration_since(c.timestamp);
+                                age.num_seconds() < 60
+                            })
+                        })
+                        .unwrap_or(false);
+                    if skip_fetch {
+                        continue;
                     }
-                    if let Some(store) = market_stores.get_mut(&pair) {
-                        store.add_candles(candles);
+                    let router = candle_router.clone();
+                    let pair_clone = pair.clone();
+                    candle_refresh_futures.spawn(async move {
+                        let result = router.fetch_candles(&pair_clone, tf_minutes, 200).await;
+                        (pair_clone, result)
+                    });
+                }
+                while let Some(result) = candle_refresh_futures.join_next().await {
+                    if let Ok((pair, Ok(mut candles))) = result {
+                        if candles.len() > 1 {
+                            candles.pop(); // Remove incomplete last candle
+                        }
+                        if let Some(store) = market_stores.get_mut(&pair) {
+                            store.add_candles(candles);
+                        }
+                    }
+                }
+                // Re-apply any live WS prices on top of fresh candles
+                for (pair, (price, _)) in &ws_ticker_prices {
+                    if let Some(store) = market_stores.get_mut(pair) {
+                        store.update_last_close(*price);
                     }
                 }
             }
-            // Re-apply any live WS prices on top of fresh candles
-            for (pair, (price, _)) in &ws_ticker_prices {
-                if let Some(store) = market_stores.get_mut(pair) {
-                    store.update_last_close(*price);
-                }
-            }
-        }
         } // end if !startup_fresh
 
         // Refresh insight every 5 ticks (all pairs, single funding API call)
@@ -1606,7 +1688,9 @@ pub async fn run(
         }
 
         // FID-118: Periodic re-discovery of new pairs (default every 60 cycles = ~3 hours)
-        if tick.saturating_sub(last_discovery_tick) >= config.trading.pair_rotation.interval_cycles && config.trading.scan_all_pairs {
+        if tick.saturating_sub(last_discovery_tick) >= config.trading.pair_rotation.interval_cycles
+            && config.trading.scan_all_pairs
+        {
             last_discovery_tick = tick;
             match candle_api
                 .discover_safe_usd_pairs(
@@ -1619,9 +1703,7 @@ pub async fn run(
                 Ok(discovered) => {
                     let before = active_pairs.len();
                     for p in &discovered {
-                        if !active_pairs.contains(p)
-                            && !permanent_dead.contains(p.as_str())
-                        {
+                        if !active_pairs.contains(p) && !permanent_dead.contains(p.as_str()) {
                             active_pairs.push(p.clone());
                             // Create market data store for new pair
                             market_stores.insert(
@@ -1652,7 +1734,10 @@ pub async fn run(
         // FID-118: Periodic revival check — re-check evicted pairs (default every 300 cycles = ~25 hours)
         // Cap at 5 pairs per cycle to bound main-loop latency.
         // Uses JoinSet for parallel HTTP requests instead of sequential .await.
-        if tick.saturating_sub(last_revival_check_tick) >= config.trading.pair_rotation.revival_check_cycles && !permanent_dead.is_empty() {
+        if tick.saturating_sub(last_revival_check_tick)
+            >= config.trading.pair_rotation.revival_check_cycles
+            && !permanent_dead.is_empty()
+        {
             last_revival_check_tick = tick;
             const MAX_REVIVAL_PER_CYCLE: usize = 5;
             let evicted: Vec<String> = permanent_dead
@@ -1700,7 +1785,8 @@ pub async fn run(
             && tick.is_multiple_of(config.trading.token_store.discovery_interval_cycles)
             && config.mode.live_execution
         {
-            let zerox_api_key = std::env::var(&config.exchange.dex.api_key_env).ok()
+            let zerox_api_key = std::env::var(&config.exchange.dex.api_key_env)
+                .ok()
                 .filter(|k| !k.is_empty());
             let (added, total) = savant_trading::data::token_discovery::refresh_token_store(
                 &config.trading.token_store.persist_path,
@@ -1823,7 +1909,13 @@ pub async fn run(
                 if config.mode.live_execution && !curated_pairs.contains(pair) {
                     dead_tokens.insert(pair.to_string());
                     // FID-118: Track dead streak for permanent eviction
-                    track_dead_streak(pair, &mut dead_streaks, &mut permanent_dead, &mut pairs_evicted, config.trading.pair_rotation.eviction_threshold);
+                    track_dead_streak(
+                        pair,
+                        &mut dead_streaks,
+                        &mut permanent_dead,
+                        &mut pairs_evicted,
+                        config.trading.pair_rotation.eviction_threshold,
+                    );
                     continue;
                 }
 
@@ -1839,7 +1931,13 @@ pub async fn run(
                     if nonzero_count == 0 {
                         dead_tokens.insert(pair.to_string());
                         // FID-118: Track dead streak for permanent eviction
-                        track_dead_streak(pair, &mut dead_streaks, &mut permanent_dead, &mut pairs_evicted, config.trading.pair_rotation.eviction_threshold);
+                        track_dead_streak(
+                            pair,
+                            &mut dead_streaks,
+                            &mut permanent_dead,
+                            &mut pairs_evicted,
+                            config.trading.pair_rotation.eviction_threshold,
+                        );
                     }
                     continue;
                 }
@@ -1860,7 +1958,13 @@ pub async fn run(
                 if all_dead {
                     dead_tokens.insert(pair.to_string());
                     // FID-118: Track dead streak for permanent eviction
-                    track_dead_streak(pair, &mut dead_streaks, &mut permanent_dead, &mut pairs_evicted, config.trading.pair_rotation.eviction_threshold);
+                    track_dead_streak(
+                        pair,
+                        &mut dead_streaks,
+                        &mut permanent_dead,
+                        &mut pairs_evicted,
+                        config.trading.pair_rotation.eviction_threshold,
+                    );
                     continue;
                 }
                 // DEX safety: reject tokens with near-zero price diversity
@@ -1880,7 +1984,13 @@ pub async fn run(
                     // 200 candles with < 2 unique close prices = truly dead
                     dead_tokens.insert(pair.to_string());
                     // FID-118: Track dead streak for permanent eviction
-                    track_dead_streak(pair, &mut dead_streaks, &mut permanent_dead, &mut pairs_evicted, config.trading.pair_rotation.eviction_threshold);
+                    track_dead_streak(
+                        pair,
+                        &mut dead_streaks,
+                        &mut permanent_dead,
+                        &mut pairs_evicted,
+                        config.trading.pair_rotation.eviction_threshold,
+                    );
                     continue;
                 }
 
@@ -1954,7 +2064,8 @@ pub async fn run(
 
                     // P1-3c: Dynamic ADX threshold — lower in bear markets
                     let fg = insight.cached().sentiment.fear_greed_index.unwrap_or(50) as f64;
-                    let adx_threshold = (25.0 - ((50.0 - fg).max(0.0) / 30.0 * 7.0)).clamp(18.0, 25.0);
+                    let adx_threshold =
+                        (25.0 - ((50.0 - fg).max(0.0) / 30.0 * 7.0)).clamp(18.0, 25.0);
                     let rsi_signal = !(30.0..=70.0).contains(&rsi);
                     let trend_signal = adx > adx_threshold;
                     let ema_cross = (ema_fast > 0.0 && ema_slow > 0.0)
@@ -1968,9 +2079,11 @@ pub async fn run(
                     });
                     // P1-3b: Bollinger Band Squeeze — BB inside Keltner Channels
                     let bb_squeeze = if candle_data.len() >= 20 {
-                        let last20: Vec<f64> = candle_data.iter().rev().take(20).map(|c| c.close).collect();
+                        let last20: Vec<f64> =
+                            candle_data.iter().rev().take(20).map(|c| c.close).collect();
                         let sma20 = last20.iter().sum::<f64>() / last20.len() as f64;
-                        let variance = last20.iter().map(|c| (c - sma20).powi(2)).sum::<f64>() / last20.len() as f64;
+                        let variance = last20.iter().map(|c| (c - sma20).powi(2)).sum::<f64>()
+                            / last20.len() as f64;
                         let stddev = variance.sqrt();
                         let bb_upper = sma20 + 2.0 * stddev;
                         let bb_lower = sma20 - 2.0 * stddev;
@@ -1978,21 +2091,28 @@ pub async fn run(
                         let ema20 = sma20; // Simplified: use SMA as EMA approximation for squeeze detection
                         let atr14: f64 = if candle_data.len() >= 14 {
                             let recent: Vec<&Candle> = candle_data.iter().rev().take(14).collect();
-                            let tr_sum: f64 = recent.windows(2).map(|w| {
-                                let high = w[0].high;
-                                let low = w[0].low;
-                                let prev_close = w[1].close;
-                                let tr1 = high - low;
-                                let tr2 = (high - prev_close).abs();
-                                let tr3 = (low - prev_close).abs();
-                                tr1.max(tr2).max(tr3)
-                            }).sum();
+                            let tr_sum: f64 = recent
+                                .windows(2)
+                                .map(|w| {
+                                    let high = w[0].high;
+                                    let low = w[0].low;
+                                    let prev_close = w[1].close;
+                                    let tr1 = high - low;
+                                    let tr2 = (high - prev_close).abs();
+                                    let tr3 = (low - prev_close).abs();
+                                    tr1.max(tr2).max(tr3)
+                                })
+                                .sum();
                             tr_sum / 14.0
-                        } else { 0.0 };
+                        } else {
+                            0.0
+                        };
                         let keltner_upper = ema20 + 1.5 * atr14;
                         let keltner_lower = ema20 - 1.5 * atr14;
                         bb_upper < keltner_upper && bb_lower > keltner_lower
-                    } else { false };
+                    } else {
+                        false
+                    };
 
                     if !rsi_signal && !trend_signal && !ema_cross && !volume_spike && !bb_squeeze {
                         continue;
@@ -2106,7 +2226,8 @@ pub async fn run(
 
                 // Step 1: Select knowledge units and clone to release borrow on agent
                 let knowledge_units: Vec<savant_trading::agent::knowledge::KnowledgeUnit> = {
-                    let conditions = savant_trading::agent::context_builder::determine_conditions(&ctx);
+                    let conditions =
+                        savant_trading::agent::context_builder::determine_conditions(&ctx);
                     let selected = agent.knowledge_base().select_with_tags(
                         &conditions,
                         &ctx.context_tags,
@@ -2116,7 +2237,7 @@ pub async fn run(
                 };
                 let knowledge_refs: Vec<&savant_trading::agent::knowledge::KnowledgeUnit> =
                     knowledge_units.iter().collect();
-                
+
                 // Step 2: Compose prompt and build user message (mutable borrow of agent)
                 let system_prompt = agent.composer_mut().compose(&knowledge_refs);
                 // FID-168: pass the cumulative historical summary (if any) into the user message.
@@ -2127,7 +2248,11 @@ pub async fn run(
                 // Always send the full prompt to the LLM — never strip context.
                 // The delta % is logged at debug level to avoid noise.
                 // FID-164: per-pair state isolation + token-based detection.
-                let delta_result = ctx_state.compute_delta(pair, &user_message, config.context.delta_compression_min_token_savings);
+                let delta_result = ctx_state.compute_delta(
+                    pair,
+                    &user_message,
+                    config.context.delta_compression_min_token_savings,
+                );
                 if tracing::enabled!(tracing::Level::DEBUG) {
                     match delta_result {
                         savant_trading::agent::context_state::DeltaResult::NoChange => {
@@ -2143,7 +2268,10 @@ pub async fn run(
                 }
 
                 // FID-164: Per-pair anti-thrashing (was global in FID-085).
-                if ctx_state.should_skip_compression_for(pair, config.context.delta_compression_min_token_savings) {
+                if ctx_state.should_skip_compression_for(
+                    pair,
+                    config.context.delta_compression_min_token_savings,
+                ) {
                     tracing::debug!("Anti-thrashing: {} has low compression efficiency", pair);
                 }
 
@@ -2169,7 +2297,11 @@ pub async fn run(
             active_pairs.retain(|p| !permanent_dead.contains(p.as_str()));
             let pruned = before - active_pairs.len();
             if pruned > 0 {
-                info!("FID-118: Pruned {} evicted pairs, watchlist now {}", pruned, active_pairs.len());
+                info!(
+                    "FID-118: Pruned {} evicted pairs, watchlist now {}",
+                    pruned,
+                    active_pairs.len()
+                );
             }
         }
 
@@ -2346,52 +2478,68 @@ pub async fn run(
                         &cleaned[..cleaned.len().min(300)]
                     );
 
-                // FID-114 Phase 8: Jury overlay — shadow mode evaluation
-                // Run jury on the batch response, log results for comparison.
-                // In shadow mode, batch decisions are ALWAYS used for execution.
-                if let Some(ref mut jp) = jury_pool {
-                    let regime = current_session.name();
-                    let jury_result = jp.evaluate(&cleaned, savant_trading::core::types::MarketRegime::Ranging).await;
+                    // FID-114 Phase 8: Jury overlay — shadow mode evaluation
+                    // Run jury on the batch response, log results for comparison.
+                    // In shadow mode, batch decisions are ALWAYS used for execution.
+                    if let Some(ref mut jp) = jury_pool {
+                        let regime = current_session.name();
+                        let jury_result = jp
+                            .evaluate(&cleaned, savant_trading::core::types::MarketRegime::Ranging)
+                            .await;
 
-                    // FID-162: build cycle record (some fields filled later when judgment available).
-                    let cycle_ts = chrono::Utc::now().to_rfc3339();
-                    let verdict_breakdown = VerdictBreakdown {
-                        buy: jury_result.verdicts.iter().filter(|v| v.verdict.to_uppercase() == "BUY").count(),
-                        sell: jury_result.verdicts.iter().filter(|v| v.verdict.to_uppercase() == "SELL").count(),
-                        hold: jury_result.verdicts.iter().filter(|v| v.verdict.to_uppercase() == "HOLD").count(),
-                        failed: jury_result.failed_count,
-                    };
+                        // FID-162: build cycle record (some fields filled later when judgment available).
+                        let cycle_ts = chrono::Utc::now().to_rfc3339();
+                        let verdict_breakdown = VerdictBreakdown {
+                            buy: jury_result
+                                .verdicts
+                                .iter()
+                                .filter(|v| v.verdict.to_uppercase() == "BUY")
+                                .count(),
+                            sell: jury_result
+                                .verdicts
+                                .iter()
+                                .filter(|v| v.verdict.to_uppercase() == "SELL")
+                                .count(),
+                            hold: jury_result
+                                .verdicts
+                                .iter()
+                                .filter(|v| v.verdict.to_uppercase() == "HOLD")
+                                .count(),
+                            failed: jury_result.failed_count,
+                        };
 
-                    if jury_result.quorum_met {
-                        let judge = JuryJudge::new(
-                            agent.provider_clone(),
-                            config.ai.price_tolerance_pct,
-                        );
-                        let current_price = 1_000_000.0; // Shadow mode: bypass price validation
-                        match judge.judge(&cleaned, &jury_result, current_price).await {
-                            Ok(judgment) => {
-                                info!(
+                        if jury_result.quorum_met {
+                            let judge = JuryJudge::new(
+                                agent.provider_clone(),
+                                config.ai.price_tolerance_pct,
+                            );
+                            let current_price = 1_000_000.0; // Shadow mode: bypass price validation
+                            match judge.judge(&cleaned, &jury_result, current_price).await {
+                                Ok(judgment) => {
+                                    info!(
                                     "FID-114 JURY SHADOW: verdicts={} consensus={:.0}% action={:?} dissent={}",
                                     judgment.jury_size_used,
                                     judgment.consensus_strength * 100.0,
                                     judgment.decision.action,
                                     judgment.dissent_analysis
                                 );
-                                shared.log_activity(
-                                    savant_trading::core::shared::ActivityLevel::Decision,
-                                    Some("JURY"),
-                                    "JURY",
-                                    &format!(
-                                        "Shadow: {} verdicts, {:.0}% consensus, {:?}",
-                                        judgment.jury_size_used,
-                                        judgment.consensus_strength * 100.0,
-                                        judgment.decision.action
-                                    ),
-                                ).await;
-                                // FID-146: Reset veto flag at start of every detection pass.
-                                // FID-146: Jury veto detection — use consensus_strength as dissent proxy.
-                                let mut veto_detected = false;
-                                if config.ai.jury.jury_veto_enabled
+                                    shared
+                                        .log_activity(
+                                            savant_trading::core::shared::ActivityLevel::Decision,
+                                            Some("JURY"),
+                                            "JURY",
+                                            &format!(
+                                                "Shadow: {} verdicts, {:.0}% consensus, {:?}",
+                                                judgment.jury_size_used,
+                                                judgment.consensus_strength * 100.0,
+                                                judgment.decision.action
+                                            ),
+                                        )
+                                        .await;
+                                    // FID-146: Reset veto flag at start of every detection pass.
+                                    // FID-146: Jury veto detection — use consensus_strength as dissent proxy.
+                                    let mut veto_detected = false;
+                                    if config.ai.jury.jury_veto_enabled
                                     && matches!(judgment.decision.action, savant_trading::agent::decision_parser::TradeAction::Buy | savant_trading::agent::decision_parser::TradeAction::Sell)
                                 {
                                     let dissent_threshold = 1.0 - config.ai.jury.jury_veto_threshold;
@@ -2402,117 +2550,129 @@ pub async fn run(
                                     }
                                 }
 
-                                // FID-162: record the cycle with judgment data.
-                                let consensus_action = format!("{:?}", judgment.decision.action);
-                                let per_juror: Vec<JurorRecord> = jury_result
-                                    .verdicts
-                                    .iter()
-                                    .enumerate()
-                                    .map(|(i, v)| JurorRecord {
-                                        juror_id: i,
-                                        model_slug: jury_result.model_ids.get(i).cloned().unwrap_or_default(),
-                                        verdict: v.verdict.clone(),
-                                        confidence: v.confidence,
-                                        key_argument: v.key_argument.clone(),
-                                        risk_flag: v.risk_flag.clone(),
-                                        parse_status: "ok".to_string(),
-                                        latency_ms: 0,
-                                    })
-                                    .collect();
-                                jp.add_cycle_record(JuryCycleRecord {
-                                    cycle_id: 0,
-                                    timestamp: cycle_ts.clone(),
-                                    verdict_breakdown,
-                                    consensus_strength: judgment.consensus_strength,
-                                    consensus_action,
-                                    quorum_met: true,
-                                    failed_count: jury_result.failed_count,
-                                    latency_ms: jury_result.total_latency_ms,
-                                    primary_action: None, // populated in phase 3 once per-pair batch actions known
-                                    judge_action: Some(format!("{:?}", judgment.decision.action)),
-                                    primary_judge_agreed: None,
-                                    veto_detected,
-                                    veto_enforced: false, // enforced only inside the per-pair phase 3 loop
-                                    veto_enforced_pairs: vec![],
-                                    per_juror,
-                                });
+                                    // FID-162: record the cycle with judgment data.
+                                    let consensus_action =
+                                        format!("{:?}", judgment.decision.action);
+                                    let per_juror: Vec<JurorRecord> = jury_result
+                                        .verdicts
+                                        .iter()
+                                        .enumerate()
+                                        .map(|(i, v)| JurorRecord {
+                                            juror_id: i,
+                                            model_slug: jury_result
+                                                .model_ids
+                                                .get(i)
+                                                .cloned()
+                                                .unwrap_or_default(),
+                                            verdict: v.verdict.clone(),
+                                            confidence: v.confidence,
+                                            key_argument: v.key_argument.clone(),
+                                            risk_flag: v.risk_flag.clone(),
+                                            parse_status: "ok".to_string(),
+                                            latency_ms: 0,
+                                        })
+                                        .collect();
+                                    jp.add_cycle_record(JuryCycleRecord {
+                                        cycle_id: 0,
+                                        timestamp: cycle_ts.clone(),
+                                        verdict_breakdown,
+                                        consensus_strength: judgment.consensus_strength,
+                                        consensus_action,
+                                        quorum_met: true,
+                                        failed_count: jury_result.failed_count,
+                                        latency_ms: jury_result.total_latency_ms,
+                                        primary_action: None, // populated in phase 3 once per-pair batch actions known
+                                        judge_action: Some(format!(
+                                            "{:?}",
+                                            judgment.decision.action
+                                        )),
+                                        primary_judge_agreed: None,
+                                        veto_detected,
+                                        veto_enforced: false, // enforced only inside the per-pair phase 3 loop
+                                        veto_enforced_pairs: vec![],
+                                        per_juror,
+                                    });
+                                }
+                                Err(e) => {
+                                    warn!(
+                                        "FID-114 JURY: Judge failed ({}), using batch decisions",
+                                        e
+                                    );
+                                    jp.add_cycle_record(JuryCycleRecord {
+                                        cycle_id: 0,
+                                        timestamp: cycle_ts.clone(),
+                                        verdict_breakdown,
+                                        consensus_strength: 0.0,
+                                        consensus_action: String::new(),
+                                        quorum_met: true,
+                                        failed_count: jury_result.failed_count,
+                                        latency_ms: jury_result.total_latency_ms,
+                                        primary_action: None,
+                                        judge_action: None,
+                                        primary_judge_agreed: None,
+                                        veto_detected: false,
+                                        veto_enforced: false,
+                                        veto_enforced_pairs: vec![],
+                                        per_juror: vec![],
+                                    });
+                                }
                             }
-                            Err(e) => {
-                                warn!("FID-114 JURY: Judge failed ({}), using batch decisions", e);
-                                jp.add_cycle_record(JuryCycleRecord {
-                                    cycle_id: 0,
-                                    timestamp: cycle_ts.clone(),
-                                    verdict_breakdown,
-                                    consensus_strength: 0.0,
-                                    consensus_action: String::new(),
-                                    quorum_met: true,
-                                    failed_count: jury_result.failed_count,
-                                    latency_ms: jury_result.total_latency_ms,
-                                    primary_action: None,
-                                    judge_action: None,
-                                    primary_judge_agreed: None,
-                                    veto_detected: false,
-                                    veto_enforced: false,
-                                    veto_enforced_pairs: vec![],
-                                    per_juror: vec![],
-                                });
-                            }
-                        }
-                    } else {
-                        warn!(
+                        } else {
+                            warn!(
                             "FID-114 JURY: Quorum not met ({}/{} verdicts), using batch decisions",
                             jury_result.verdicts.len(),
                             config.ai.jury.size_for_regime(regime)
                         );
-                        jp.add_cycle_record(JuryCycleRecord {
-                            cycle_id: 0,
-                            timestamp: cycle_ts.clone(),
-                            verdict_breakdown,
-                            consensus_strength: 0.0,
-                            consensus_action: String::new(),
-                            quorum_met: false,
-                            failed_count: jury_result.failed_count,
-                            latency_ms: jury_result.total_latency_ms,
-                            primary_action: None,
-                            judge_action: None,
-                            primary_judge_agreed: None,
-                            veto_detected: false,
-                            veto_enforced: false,
-                            veto_enforced_pairs: vec![],
-                            per_juror: vec![],
-                        });
-                    }
+                            jp.add_cycle_record(JuryCycleRecord {
+                                cycle_id: 0,
+                                timestamp: cycle_ts.clone(),
+                                verdict_breakdown,
+                                consensus_strength: 0.0,
+                                consensus_action: String::new(),
+                                quorum_met: false,
+                                failed_count: jury_result.failed_count,
+                                latency_ms: jury_result.total_latency_ms,
+                                primary_action: None,
+                                judge_action: None,
+                                primary_judge_agreed: None,
+                                veto_detected: false,
+                                veto_enforced: false,
+                                veto_enforced_pairs: vec![],
+                                per_juror: vec![],
+                            });
+                        }
 
-                    // FID-162: update live jury_state snapshot (cumulative + key health + veto flag).
-                    let key_health = jp.key_manager().key_health().await;
-                    let source = if !config.ai.jury.enabled {
-                        "disabled"
-                    } else if jp.metrics().total_evaluations == 0 {
-                        "never_ran"
-                    } else {
-                        "live"
-                    };
-                    *shared.jury_state.write().await = savant_trading::core::shared::JuryStateSnapshot {
-                        enabled: config.ai.jury.enabled,
-                        jury_size: config.ai.jury.jury_size,
-                        m3_control_active: true,
-                        free_models_used: if config.ai.jury.models.is_empty() {
-                            vec![config.ai.jury.model.clone()]
+                        // FID-162: update live jury_state snapshot (cumulative + key health + veto flag).
+                        let key_health = jp.key_manager().key_health().await;
+                        let source = if !config.ai.jury.enabled {
+                            "disabled"
+                        } else if jp.metrics().total_evaluations == 0 {
+                            "never_ran"
                         } else {
-                            config.ai.jury.models.clone()
-                        },
-                        veto_enabled: config.ai.jury.jury_veto_enabled,
-                        veto_threshold: config.ai.jury.jury_veto_threshold,
-                        regime_sizes: config.ai.jury.regime_sizes.clone(),
-                        cumulative: jp.metrics().clone(),
-                        key_health,
-                        estimated_m3_calls: jp.m3_calls(),
-                        estimated_free_model_calls: jp.free_model_calls(),
-                        veto_flag_active_now: jp.veto_flag_active(),
-                        last_cycle_at: Some(cycle_ts),
-                        source: source.to_string(),
-                    };
-                }
+                            "live"
+                        };
+                        *shared.jury_state.write().await =
+                            savant_trading::core::shared::JuryStateSnapshot {
+                                enabled: config.ai.jury.enabled,
+                                jury_size: config.ai.jury.jury_size,
+                                m3_control_active: true,
+                                free_models_used: if config.ai.jury.models.is_empty() {
+                                    vec![config.ai.jury.model.clone()]
+                                } else {
+                                    config.ai.jury.models.clone()
+                                },
+                                veto_enabled: config.ai.jury.jury_veto_enabled,
+                                veto_threshold: config.ai.jury.jury_veto_threshold,
+                                regime_sizes: config.ai.jury.regime_sizes.clone(),
+                                cumulative: jp.metrics().clone(),
+                                key_health,
+                                estimated_m3_calls: jp.m3_calls(),
+                                estimated_free_model_calls: jp.free_model_calls(),
+                                veto_flag_active_now: jp.veto_flag_active(),
+                                last_cycle_at: Some(cycle_ts),
+                                source: source.to_string(),
+                            };
+                    }
 
                     // Try to parse as JSON array — handles MiMo returning individual
                     // objects with text between them instead of a clean array
@@ -2562,12 +2722,17 @@ pub async fn run(
                             );
                             // FID-097 Fix 5: Validate batch size — log missing pairs
                             if deduped_decisions.len() < batch_size {
-                                let returned_pairs: std::collections::HashSet<String> = deduped_decisions
-                                    .iter()
-                                    .filter_map(|d| d.get("pair").and_then(|p| p.as_str()).map(String::from))
-                                    .collect();
-                                let requested: &std::collections::HashSet<String> = &price_map.keys().cloned().collect();
-                                let missing: Vec<&String> = requested.difference(&returned_pairs).collect();
+                                let returned_pairs: std::collections::HashSet<String> =
+                                    deduped_decisions
+                                        .iter()
+                                        .filter_map(|d| {
+                                            d.get("pair").and_then(|p| p.as_str()).map(String::from)
+                                        })
+                                        .collect();
+                                let requested: &std::collections::HashSet<String> =
+                                    &price_map.keys().cloned().collect();
+                                let missing: Vec<&String> =
+                                    requested.difference(&returned_pairs).collect();
                                 if !missing.is_empty() {
                                     warn!(
                                         "FID-097: Batch incomplete — missing {} pair(s): {}. Will auto-evaluate next cycle.",
@@ -2701,22 +2866,30 @@ pub async fn run(
                     );
 
                     // Log ALL decisions including Hold (CRIT-2)
-                        // FID-146: Reset veto flag at start of every per-pair evaluation block.
-                        // Prevents flag leak across cycles when jury block is skipped (quorum not met, Err).
-                        savant_trading::jury_state::clear_veto();
-                        // FID-146: Jury veto override — if jury supermajority disagreed with primary
-                        // Buy/Sell, override this pair's decision to Pass. Reset flag after firing.
-                        if savant_trading::jury_state::FID_146_JURY_VETO.load(std::sync::atomic::Ordering::Relaxed)
-                            && matches!(decision.action, savant_trading::agent::decision_parser::TradeAction::Buy | savant_trading::agent::decision_parser::TradeAction::Sell)
-                        {
-                            warn!("FID-146 JURY VETO OVERRIDE: {} {:?} -> Pass", decision.pair, decision.action);
-                            decision.action = savant_trading::agent::decision_parser::TradeAction::Pass;
-                            decision.override_source = Some("jury_veto".to_string());
-                            // FID-162: record this override against the most recent cycle.
-                            if let Some(ref jp) = jury_pool {
-                                jp.record_veto_override(&decision.pair);
-                            }
+                    // FID-146: Reset veto flag at start of every per-pair evaluation block.
+                    // Prevents flag leak across cycles when jury block is skipped (quorum not met, Err).
+                    savant_trading::jury_state::clear_veto();
+                    // FID-146: Jury veto override — if jury supermajority disagreed with primary
+                    // Buy/Sell, override this pair's decision to Pass. Reset flag after firing.
+                    if savant_trading::jury_state::FID_146_JURY_VETO
+                        .load(std::sync::atomic::Ordering::Relaxed)
+                        && matches!(
+                            decision.action,
+                            savant_trading::agent::decision_parser::TradeAction::Buy
+                                | savant_trading::agent::decision_parser::TradeAction::Sell
+                        )
+                    {
+                        warn!(
+                            "FID-146 JURY VETO OVERRIDE: {} {:?} -> Pass",
+                            decision.pair, decision.action
+                        );
+                        decision.action = savant_trading::agent::decision_parser::TradeAction::Pass;
+                        decision.override_source = Some("jury_veto".to_string());
+                        // FID-162: record this override against the most recent cycle.
+                        if let Some(ref jp) = jury_pool {
+                            jp.record_veto_override(&decision.pair);
                         }
+                    }
                     let decision_record = savant_trading::core::shared::DecisionRecord {
                         timestamp: Utc::now().to_rfc3339(),
                         pair: decision.pair.clone(),
@@ -2729,8 +2902,8 @@ pub async fn run(
                         take_profit_3: decision.take_profit_3,
                         confidence: decision.confidence,
                         reasoning: decision.reasoning.clone(),
-            execution_status: None,
-                    override_source: decision.override_source.clone(),
+                        execution_status: None,
+                        override_source: decision.override_source.clone(),
                     };
                     shared.push_decision(decision_record);
 
@@ -2792,12 +2965,23 @@ pub async fn run(
                             .find(|(p, _, _)| *p == decision.pair);
                         let (atr_str, adx_str, rsi_str, regime_str) = match pair_data {
                             Some((_, ind, reg)) => (
-                                ind.atr.map(|v| format!("ATR{:.2}", v)).unwrap_or_else(|| "ATR?".to_string()),
-                                ind.adx.map(|v| format!("ADX{:.1}", v)).unwrap_or_else(|| "ADX?".to_string()),
-                                ind.rsi.map(|v| format!("RSI{:.1}", v)).unwrap_or_else(|| "RSI?".to_string()),
+                                ind.atr
+                                    .map(|v| format!("ATR{:.2}", v))
+                                    .unwrap_or_else(|| "ATR?".to_string()),
+                                ind.adx
+                                    .map(|v| format!("ADX{:.1}", v))
+                                    .unwrap_or_else(|| "ADX?".to_string()),
+                                ind.rsi
+                                    .map(|v| format!("RSI{:.1}", v))
+                                    .unwrap_or_else(|| "RSI?".to_string()),
                                 format!("{}", reg),
                             ),
-                            None => ("ATR?".to_string(), "ADX?".to_string(), "RSI?".to_string(), "Reg?".to_string()),
+                            None => (
+                                "ATR?".to_string(),
+                                "ADX?".to_string(),
+                                "RSI?".to_string(),
+                                "Reg?".to_string(),
+                            ),
                         };
                         format!(
                             "[{}] {} | {} {} | conf {:.0}% | {} {} {}",
@@ -2806,7 +2990,9 @@ pub async fn run(
                             action_label,
                             regime_str,
                             decision.confidence * 100.0,
-                            atr_str, adx_str, rsi_str,
+                            atr_str,
+                            adx_str,
+                            rsi_str,
                         )
                     };
                     ctx_state.add_cycle_snapshot(snapshot_line);
@@ -2819,7 +3005,7 @@ pub async fn run(
                             decision.confidence,
                             &decision.reasoning,
                         ) {
-    Ok(()) => log_vault!("VAULT", "Saved {}", decision.pair),
+                            Ok(()) => log_vault!("VAULT", "Saved {}", decision.pair),
                             Err(e) => log_warn!("VAULT", "Failed {}: {}", decision.pair, e),
                         }
                     }
@@ -2906,10 +3092,8 @@ pub async fn run(
                         // For BUY/SELL, store for later update on trade close.
                         if let Some(eid) = episode_id {
                             let action_str = format!("{:?}", decision.action);
-                            episode_store.insert(
-                                format!("{}-{}-{}", decision.pair, action_str, tick),
-                                eid,
-                            );
+                            episode_store
+                                .insert(format!("{}-{}-{}", decision.pair, action_str, tick), eid);
                         }
                     }
 
@@ -2918,8 +3102,11 @@ pub async fn run(
                     // override to the mandated action. This catches cases where the LLM
                     // didn't produce the position_audit fields (weak model fallback).
                     // FID-089: Use actual market price from market_stores, not stale pos.current_price.
-                    if decision.action == savant_trading::agent::decision_parser::TradeAction::Pass {
-                        let pair_pos = portfolio.positions().values()
+                    if decision.action == savant_trading::agent::decision_parser::TradeAction::Pass
+                    {
+                        let pair_pos = portfolio
+                            .positions()
+                            .values()
                             .find(|p| p.pair == decision.pair)
                             .cloned();
                         if let Some(pos) = pair_pos {
@@ -2927,7 +3114,9 @@ pub async fn run(
                                 .iter()
                                 .find(|(p, _, _)| *p == decision.pair);
                             let (atr_val, adx_val, _rsi_val, _regime_str) = pair_data
-                                .map(|(_, ind, reg)| (ind.atr, ind.adx, ind.rsi, format!("{}", reg)))
+                                .map(|(_, ind, reg)| {
+                                    (ind.atr, ind.adx, ind.rsi, format!("{}", reg))
+                                })
                                 .unwrap_or((None, None, None, "Unknown".to_string()));
 
                             // FID-089 Fix 1: Get actual market price from candle data
@@ -2953,7 +3142,8 @@ pub async fn run(
                             // FID-089 Fix 5: Guard — skip trigger if price not yet updated
                             // (current_price still equals entry_price from wallet recovery)
                             let price_stale = pos.entry_price > 0.0
-                                && (pos.current_price - pos.entry_price).abs() / pos.entry_price < 0.001;
+                                && (pos.current_price - pos.entry_price).abs() / pos.entry_price
+                                    < 0.001;
                             if price_stale && actual_market_price <= 0.0 {
                                 // No market data available and price hasn't been updated — skip
                                 debug!("FID-089: Skipping trigger for {} — price not yet updated from market data", decision.pair);
@@ -2971,9 +3161,8 @@ pub async fn run(
                                 let mut trigger_reason = String::new();
 
                                 // FID-089 Fix 7: ATR sanity check — skip if ATR > 10% of price
-                                let atr_valid = atr_val.is_some_and(|a| {
-                                    a > 0.0 && a < effective_price * 0.10
-                                });
+                                let atr_valid =
+                                    atr_val.is_some_and(|a| a > 0.0 && a < effective_price * 0.10);
 
                                 // Trigger 1: Stop Distance Violation
                                 if atr_valid {
@@ -3000,8 +3189,12 @@ pub async fn run(
                                 if !trigger_fired {
                                     if let Some(adx) = adx_val {
                                         let stop_pct = if pos.entry_price > 0.0 {
-                                            (pos.entry_price - pos.stop_loss).abs() / pos.entry_price * 100.0
-                                        } else { 0.0 };
+                                            (pos.entry_price - pos.stop_loss).abs()
+                                                / pos.entry_price
+                                                * 100.0
+                                        } else {
+                                            0.0
+                                        };
                                         if adx < 20.0 && stop_pct > 5.0 {
                                             trigger_fired = true;
                                             mandated_action = "adjust_stop".to_string();
@@ -3009,7 +3202,9 @@ pub async fn run(
                                                 if let Some(atr) = atr_val {
                                                     mandated_stop = match pos.side {
                                                         Side::Long => effective_price - (atr * 1.5),
-                                                        Side::Short => effective_price + (atr * 1.5),
+                                                        Side::Short => {
+                                                            effective_price + (atr * 1.5)
+                                                        }
                                                     };
                                                 }
                                             }
@@ -3026,15 +3221,20 @@ pub async fn run(
                                 // High ADX + underwater = strong trend AGAINST position
                                 if !trigger_fired {
                                     if let Some(adx) = adx_val {
-                                    let ema_bearish = pair_data.is_some_and(|(_, ind, _)| {
-                                        match (ind.ema_fast, ind.ema_slow) {
-                                            (Some(f), Some(s)) => f < s,
-                                            _ => false,
-                                        }
-                                    });
+                                        let ema_bearish =
+                                            pair_data.is_some_and(|(_, ind, _)| {
+                                                match (ind.ema_fast, ind.ema_slow) {
+                                                    (Some(f), Some(s)) => f < s,
+                                                    _ => false,
+                                                }
+                                            });
                                         let underwater = pos.unrealized_pnl < 0.0
                                             || effective_price < pos.entry_price;
-                                        if adx > 25.0 && underwater && ema_bearish && pos.side == Side::Long {
+                                        if adx > 25.0
+                                            && underwater
+                                            && ema_bearish
+                                            && pos.side == Side::Long
+                                        {
                                             trigger_fired = true;
                                             mandated_action = "close".to_string();
                                             trigger_reason = format!(
@@ -3080,7 +3280,8 @@ pub async fn run(
                                 // FID-092 Trigger 6: Parabolic SAR Exit
                                 // Current price below SAR → CLOSE
                                 if !trigger_fired {
-                                    let sar_val = pair_data.and_then(|(_, ind, _)| ind.parabolic_sar);
+                                    let sar_val =
+                                        pair_data.and_then(|(_, ind, _)| ind.parabolic_sar);
                                     if let Some(sar) = sar_val {
                                         let price_below_sar = match pos.side {
                                             Side::Long => effective_price < sar,
@@ -3103,18 +3304,20 @@ pub async fn run(
                                     // Tightening the stop is futile if we can't execute the close.
                                     let on_cooldown = close_failure_cooldown
                                         .get(decision.pair.as_str())
-                                        .is_some_and(|t| t.elapsed().as_secs() < CLOSE_COOLDOWN_SECS);
+                                        .is_some_and(|t| {
+                                            t.elapsed().as_secs() < CLOSE_COOLDOWN_SECS
+                                        });
                                     if on_cooldown && mandated_action == "adjust_stop" {
                                         debug!(
                                             "FID-094 TRIGGER GUARD: {} — close on cooldown, skipping futile ADJUST_STOP",
                                             decision.pair
                                         );
                                     } else {
-                                    warn!(
+                                        warn!(
                                         "FID-088 ENGINE TRIGGER: {} — {}. Overriding Pass to {}. New stop: {:.4}",
                                         decision.pair, trigger_reason, mandated_action, mandated_stop
                                     );
-                                    shared.log_activity(
+                                        shared.log_activity(
                                         savant_trading::core::shared::ActivityLevel::Warning,
                                         Some("RISK"),
                                         &decision.pair,
@@ -3123,13 +3326,13 @@ pub async fn run(
                                             trigger_reason, mandated_action
                                         ),
                                     ).await;
-                                    // Override the decision
-                                    if mandated_action == "adjust_stop" && mandated_stop > 0.0 {
-                                        decision.action = savant_trading::agent::decision_parser::TradeAction::AdjustStop;
-                                        decision.stop_loss = mandated_stop;
-                                    } else if mandated_action == "close" {
-                                        decision.action = savant_trading::agent::decision_parser::TradeAction::Close;
-                                    }
+                                        // Override the decision
+                                        if mandated_action == "adjust_stop" && mandated_stop > 0.0 {
+                                            decision.action = savant_trading::agent::decision_parser::TradeAction::AdjustStop;
+                                            decision.stop_loss = mandated_stop;
+                                        } else if mandated_action == "close" {
+                                            decision.action = savant_trading::agent::decision_parser::TradeAction::Close;
+                                        }
                                     } // end FID-094 trigger guard else
                                 }
                             }
@@ -3187,11 +3390,20 @@ pub async fn run(
                     }
 
                     // FID-072: Calculate actual R:R from prices for comparison with LLM's claim
-                    let actual_rr = if decision.entry_price > 0.0 && decision.stop_loss > 0.0 && decision.take_profit_1 > 0.0 {
+                    let actual_rr = if decision.entry_price > 0.0
+                        && decision.stop_loss > 0.0
+                        && decision.take_profit_1 > 0.0
+                    {
                         let risk = (decision.entry_price - decision.stop_loss).abs();
                         let reward = (decision.take_profit_1 - decision.entry_price).abs();
-                        if risk > 0.0 { reward / risk } else { 0.0 }
-                    } else { 0.0 };
+                        if risk > 0.0 {
+                            reward / risk
+                        } else {
+                            0.0
+                        }
+                    } else {
+                        0.0
+                    };
 
                     info!(
                         "AI DECISION: {:?} {} {} @ {:.2} | SL: {:.2} | TP1: {:.2} | Conf: {:.0}% | R:R claimed={:.2} actual={:.2} | Reason: {}",
@@ -3212,14 +3424,17 @@ pub async fn run(
 
                         // FID-108: Circuit breaker only blocks NEW positions (Buy/Sell),
                         // not management actions (Close/AdjustStop) on existing positions.
-                        let needs_circuit_check = matches!(
-                            decision.action,
-                            TradeAction::Buy | TradeAction::Sell
-                        );
+                        let needs_circuit_check =
+                            matches!(decision.action, TradeAction::Buy | TradeAction::Sell);
                         let circuit_ok = if needs_circuit_check {
                             match circuit_breaker.check(portfolio.account()) {
                                 CircuitBreakerResult::Triggered(reason) => {
-                                    log_circuit!("CIRCUIT BREAKER", "{} — {}", decision.pair, reason);
+                                    log_circuit!(
+                                        "CIRCUIT BREAKER",
+                                        "{} — {}",
+                                        decision.pair,
+                                        reason
+                                    );
                                     // Classify trigger type for midnight auto-clear logic.
                                     // daily_loss blocks auto-clear at midnight UTC (PnL resets).
                                     // drawdown/max_positions/heat/spread blocks persist until manual clear.
@@ -3240,7 +3455,12 @@ pub async fn run(
                                     };
                                     let _ = std::fs::write(
                                         "savant.blocked",
-                                        format!("{}\nTrigger: {}\nReason: {}\n", Utc::now().to_rfc3339(), trigger_type, reason),
+                                        format!(
+                                            "{}\nTrigger: {}\nReason: {}\n",
+                                            Utc::now().to_rfc3339(),
+                                            trigger_type,
+                                            reason
+                                        ),
                                     );
                                     error!("CIRCUIT BREAKER TRIGGERED — wrote savant.blocked.");
                                     false
@@ -3252,186 +3472,214 @@ pub async fn run(
                         };
 
                         if circuit_ok {
-
-                                match decision.action {
-                                    TradeAction::Sell | TradeAction::Close => {
-                                        // --- CLOSE LOGIC ---
-                                        // Find existing positions for this pair and close them.
-                                        let positions_to_close: Vec<(String, Position)> = {
-                                            let positions = if let Some(ref ex) = executor {
-                                                ex.open_positions()
-                                            } else {
-                                                portfolio.positions().values().collect()
-                                            };
-                                            positions
-                                                .into_iter()
-                                                .filter(|p| p.pair == decision.pair)
-                                                .map(|p| (p.id.clone(), p.clone()))
-                                                .collect()
-                                        };
-
-                                        if positions_to_close.is_empty() {
-                                            // DEX cannot SHORT — must own token to sell it.
-                                            // AI Sell signal skipped until a LONG position is opened first.
-                                            log_phase!("SELL", "{} — no own tokens, cannot SHORT (DEX requires owning the asset)", decision.pair);
+                            match decision.action {
+                                TradeAction::Sell | TradeAction::Close => {
+                                    // --- CLOSE LOGIC ---
+                                    // Find existing positions for this pair and close them.
+                                    let positions_to_close: Vec<(String, Position)> = {
+                                        let positions = if let Some(ref ex) = executor {
+                                            ex.open_positions()
                                         } else {
-                                            for (pos_id, pos) in &positions_to_close {
-                                                log_trade!(
-                                                    "CLOSE",
-                                                    "Position {} for {} (action={:?})",
-                                                    pos_id,
-                                                    decision.pair,
-                                                    decision.action
-                                                );
-                                                let close_result = if let Some(ref mut ex) =
-                                                    executor
+                                            portfolio.positions().values().collect()
+                                        };
+                                        positions
+                                            .into_iter()
+                                            .filter(|p| p.pair == decision.pair)
+                                            .map(|p| (p.id.clone(), p.clone()))
+                                            .collect()
+                                    };
+
+                                    if positions_to_close.is_empty() {
+                                        // DEX cannot SHORT — must own token to sell it.
+                                        // AI Sell signal skipped until a LONG position is opened first.
+                                        log_phase!("SELL", "{} — no own tokens, cannot SHORT (DEX requires owning the asset)", decision.pair);
+                                    } else {
+                                        for (pos_id, pos) in &positions_to_close {
+                                            log_trade!(
+                                                "CLOSE",
+                                                "Position {} for {} (action={:?})",
+                                                pos_id,
+                                                decision.pair,
+                                                decision.action
+                                            );
+                                            let close_result = if let Some(ref mut ex) = executor {
+                                                match tokio::time::timeout(
+                                                    std::time::Duration::from_secs(60),
+                                                    ex.close_position(pos_id),
+                                                )
+                                                .await
                                                 {
-                                                    match tokio::time::timeout(
-                                                        std::time::Duration::from_secs(60),
-                                                        ex.close_position(pos_id),
-                                                    )
-                                                    .await
-                                                    {
-                                                        Ok(result) => result,
-                                                        Err(_) => {
-                                                            log_swap_fail!(
-                                                                "TIMEOUT",
-                                                                "close_position for {} took >60s",
-                                                                pos_id
-                                                            );
-                                                            Err(savant_trading::core::error::ExecutionError::Other(
+                                                    Ok(result) => result,
+                                                    Err(_) => {
+                                                        log_swap_fail!(
+                                                            "TIMEOUT",
+                                                            "close_position for {} took >60s",
+                                                            pos_id
+                                                        );
+                                                        Err(savant_trading::core::error::ExecutionError::Other(
                                                                 format!("close_position timed out after 60s for {}", pos_id)
                                                             ))
-                                                        }
                                                     }
-                                                } else {
-                                                    portfolio.close_position(pos_id).await
-                                                };
+                                                }
+                                            } else {
+                                                portfolio.close_position(pos_id).await
+                                            };
 
-                                                match close_result {
-                                                    Ok(order) => {
-                                                        let exit_price = order
-                                                            .filled_price
-                                                            .or(order.price)
-                                                            .unwrap_or(pos.current_price);
-                                                        let pnl = match pos.side {
-                                                            Side::Long => {
-                                                                (exit_price - pos.entry_price)
-                                                                    * pos.quantity
-                                                            }
-                                                            Side::Short => {
-                                                                (pos.entry_price - exit_price)
-                                                                    * pos.quantity
-                                                            }
-                                                        };
-                                                        let pnl_pct = if pos.entry_price > 0.0 {
-                                                            pnl / (pos.entry_price * pos.quantity)
-                                                                * 100.0
-                                                        } else {
-                                                            0.0
-                                                        };
+                                            match close_result {
+                                                Ok(order) => {
+                                                    let exit_price = order
+                                                        .filled_price
+                                                        .or(order.price)
+                                                        .unwrap_or(pos.current_price);
+                                                    let pnl = match pos.side {
+                                                        Side::Long => {
+                                                            (exit_price - pos.entry_price)
+                                                                * pos.quantity
+                                                        }
+                                                        Side::Short => {
+                                                            (pos.entry_price - exit_price)
+                                                                * pos.quantity
+                                                        }
+                                                    };
+                                                    let pnl_pct = if pos.entry_price > 0.0 {
+                                                        pnl / (pos.entry_price * pos.quantity)
+                                                            * 100.0
+                                                    } else {
+                                                        0.0
+                                                    };
 
-                                                        // FID-148: Per-trade loss check on close (FID-146 / LESSON-001)
-                                                        // The check_per_trade_loss method exists at src/risk/circuit_breaker.rs:163
-                                                        // but had zero production callers before this wiring.
-                                                        // On a loss > 5% of equity AND >= $0.50 floor, halt the engine.
-                                                        if pnl < 0.0 {
-                                                            let equity = portfolio.account().equity;
-                                                            if let CircuitBreakerResult::Triggered(reason) =
-                                                                circuit_breaker.check_per_trade_loss(pnl, equity)
-                                                            {
-                                                                let halt_msg = format!(
+                                                    // FID-148: Per-trade loss check on close (FID-146 / LESSON-001)
+                                                    // The check_per_trade_loss method exists at src/risk/circuit_breaker.rs:163
+                                                    // but had zero production callers before this wiring.
+                                                    // On a loss > 5% of equity AND >= $0.50 floor, halt the engine.
+                                                    if pnl < 0.0 {
+                                                        let equity = portfolio.account().equity;
+                                                        if let CircuitBreakerResult::Triggered(
+                                                            reason,
+                                                        ) = circuit_breaker
+                                                            .check_per_trade_loss(pnl, equity)
+                                                        {
+                                                            let halt_msg = format!(
                                                                     "Per-trade loss on close: {} — pnl=${:.4} equity=${:.4}",
                                                                     reason, pnl, equity
                                                                 );
-                                                                error!(
+                                                            error!(
                                                                     "FID-148: CIRCUIT BREAKER TRIGGERED — per_trade_loss. {}. Writing savant.blocked.",
                                                                     halt_msg
                                                                 );
-                                                                let _ = std::fs::write(
+                                                            let _ = std::fs::write(
                                                                     "savant.blocked",
                                                                     format!("{}\nTrigger: per_trade_loss\nReason: {}\n",
                                                                         chrono::Utc::now().to_rfc3339(), halt_msg),
                                                                 );
-                                                                // Skip recording this trade as a normal close — the position
-                                                                // is stranded with a halts-block file, requiring operator review.
-                                                                return Err(anyhow::anyhow!(
+                                                            // Skip recording this trade as a normal close — the position
+                                                            // is stranded with a halts-block file, requiring operator review.
+                                                            return Err(anyhow::anyhow!(
                                                                     "FID-148: per-trade loss triggered circuit breaker: {}", halt_msg
                                                                 ));
-                                                            }
                                                         }
+                                                    }
 
-                                                        info!(
+                                                    info!(
                                                             "AI {:?} {} — closed position {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
                                                             decision.action, decision.pair, pos_id,
                                                             exit_price, pnl, pnl_pct,
                                                         );
-                                                        portfolio.account_mut().trades_today += 1;
+                                                    portfolio.account_mut().trades_today += 1;
 
-                                                        let trade = TradeRecord {
-                                                            id: format!("ai-close-{}", tick),
-                                                            pair: pos.pair.clone(),
-                                                            side: pos.side,
-                                                            entry_price: pos.entry_price,
-                                                            exit_price,
-                                                            quantity: pos.quantity,
-                                                            pnl,
-                                                            pnl_pct,
-                                                            fees: 0.0,
-                                                            strategy_name: pos
-                                                                .strategy_name
-                                                                .clone(),
-                                                            opened_at: pos.opened_at,
-                                                            closed_at: chrono::Utc::now(),
-                                                            notes: format!(
-                                                                "AI {:?} via {}",
-                                                                decision.action, decision.pair
-                                                            ),
-                                                            on_chain_verified: false,
-                                                            tx_hash: None,
-                                                        };
+                                                    let trade = TradeRecord {
+                                                        id: format!("ai-close-{}", tick),
+                                                        pair: pos.pair.clone(),
+                                                        side: pos.side,
+                                                        entry_price: pos.entry_price,
+                                                        exit_price,
+                                                        quantity: pos.quantity,
+                                                        pnl,
+                                                        pnl_pct,
+                                                        fees: 0.0,
+                                                        strategy_name: pos.strategy_name.clone(),
+                                                        opened_at: pos.opened_at,
+                                                        closed_at: chrono::Utc::now(),
+                                                        notes: format!(
+                                                            "AI {:?} via {}",
+                                                            decision.action, decision.pair
+                                                        ),
+                                                        on_chain_verified: false,
+                                                        tx_hash: None,
+                                                    };
 
-                                                        log_trade!("CLOSED", "{:?} {} | Pos: {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
+                                                    log_trade!("CLOSED", "{:?} {} | Pos: {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
                                                             decision.action, decision.pair, pos_id,
                                                             exit_price, pnl, pnl_pct);
 
-                                                        // DB: delete position, record trade, log activity — instant
-                                                        if let Some(ref j) = journal {
-                                                            let _ = j.delete_position(pos_id).await;
-                                                            let _ = j.record_trade(&trade).await;
-                                                            let _ = j.record_activity("Trade", &trade.pair,
+                                                    // DB: delete position, record trade, log activity — instant
+                                                    if let Some(ref j) = journal {
+                                                        let _ = j.delete_position(pos_id).await;
+                                                        let _ = j.record_trade(&trade).await;
+                                                        let _ = j.record_activity("Trade", &trade.pair,
                                                                 &format!("CLOSED {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
                                                                     trade.side, exit_price, pnl, pnl_pct)).await;
-                                                        }
-                                                        shared.log_activity(
+                                                    }
+                                                    shared.log_activity(
                                                             savant_trading::core::shared::ActivityLevel::Trade,
                                                             Some("EXEC"),
                                                             &trade.pair,
                                                             &format!("CLOSED {} | PnL: ${:.2} ({:.2}%)", trade.side, pnl, pnl_pct),
                                                         ).await;
 
-                                                        // FID-085: Update decision log with trade outcome
-                                                        // A03: Compute alpha vs BTC benchmark over trade holding period
-                                                        let alpha_vs_benchmark = if let Some(btc_store) = market_stores.get("BTC/USD") {
+                                                    // FID-085: Update decision log with trade outcome
+                                                    // A03: Compute alpha vs BTC benchmark over trade holding period
+                                                    let alpha_vs_benchmark =
+                                                        if let Some(btc_store) =
+                                                            market_stores.get("BTC/USD")
+                                                        {
                                                             let btc_candles = btc_store.candles();
                                                             if btc_candles.is_empty() {
                                                                 0.0
                                                             } else {
                                                                 // Staleness guard: if closest BTC candle is >2x the timeframe from trade open, skip alpha
-                                                                let closest_gap_secs = btc_candles.iter()
-                                                                    .min_by_key(|c| (c.timestamp - trade.opened_at).num_seconds().abs())
-                                                                    .map(|c| (c.timestamp - trade.opened_at).num_seconds().abs())
+                                                                let closest_gap_secs = btc_candles
+                                                                    .iter()
+                                                                    .min_by_key(|c| {
+                                                                        (c.timestamp
+                                                                            - trade.opened_at)
+                                                                            .num_seconds()
+                                                                            .abs()
+                                                                    })
+                                                                    .map(|c| {
+                                                                        (c.timestamp
+                                                                            - trade.opened_at)
+                                                                            .num_seconds()
+                                                                            .abs()
+                                                                    })
                                                                     .unwrap_or(i64::MAX);
-                                                                if closest_gap_secs > (interval_seconds as i64 * 2) {
+                                                                if closest_gap_secs
+                                                                    > (interval_seconds as i64 * 2)
+                                                                {
                                                                     0.0
                                                                 } else {
-                                                                    let btc_at_open = btc_candles.iter()
-                                                                        .min_by_key(|c| (c.timestamp - trade.opened_at).num_seconds().abs())
+                                                                    let btc_at_open = btc_candles
+                                                                        .iter()
+                                                                        .min_by_key(|c| {
+                                                                            (c.timestamp
+                                                                                - trade.opened_at)
+                                                                                .num_seconds()
+                                                                                .abs()
+                                                                        })
                                                                         .map(|c| c.close)
                                                                         .unwrap_or(0.0);
-                                                                    let btc_at_close = btc_candles.back().map(|c| c.close).unwrap_or(0.0);
-                                                                    if btc_at_open > 0.0 && btc_at_close > 0.0 {
-                                                                        let btc_return_pct = ((btc_at_close - btc_at_open) / btc_at_open) * 100.0;
+                                                                    let btc_at_close = btc_candles
+                                                                        .back()
+                                                                        .map(|c| c.close)
+                                                                        .unwrap_or(0.0);
+                                                                    if btc_at_open > 0.0
+                                                                        && btc_at_close > 0.0
+                                                                    {
+                                                                        let btc_return_pct =
+                                                                            ((btc_at_close
+                                                                                - btc_at_open)
+                                                                                / btc_at_open)
+                                                                                * 100.0;
                                                                         pnl_pct - btc_return_pct
                                                                     } else {
                                                                         0.0
@@ -3441,7 +3689,7 @@ pub async fn run(
                                                         } else {
                                                             0.0
                                                         };
-                                                        decision_log.update_outcome(&trade.pair, savant_trading::agent::decision_log::TradeOutcome {
+                                                    decision_log.update_outcome(&trade.pair, savant_trading::agent::decision_log::TradeOutcome {
                                                             raw_return_pct: pnl_pct,
                                                             alpha_vs_benchmark,
                                                             reflection: if pnl > 0.0 {
@@ -3451,345 +3699,382 @@ pub async fn run(
                                                             },
                                                         });
 
-                                                        // FID-098 Fix 1b: Update episodic memory with actual outcome
-                                                        if let Some(ref mem) = memory {
-                                                            let action_str = format!("{:?}", decision.action);
-                                                            let lookup_key = format!("{}-{}-{}", trade.pair, action_str, tick);
-                                                            if let Some(episode_id) = episode_store.get(&lookup_key) {
-                                                                let achieved_rr = if trade.entry_price > 0.0 && trade.quantity > 0.0 {
-                                                                    pnl / (trade.entry_price * trade.quantity)
-                                                                } else {
-                                                                    0.0
-                                                                };
-                                                                if let Err(e) = mem.update_outcome(
+                                                    // FID-098 Fix 1b: Update episodic memory with actual outcome
+                                                    if let Some(ref mem) = memory {
+                                                        let action_str =
+                                                            format!("{:?}", decision.action);
+                                                        let lookup_key = format!(
+                                                            "{}-{}-{}",
+                                                            trade.pair, action_str, tick
+                                                        );
+                                                        if let Some(episode_id) =
+                                                            episode_store.get(&lookup_key)
+                                                        {
+                                                            let achieved_rr = if trade.entry_price
+                                                                > 0.0
+                                                                && trade.quantity > 0.0
+                                                            {
+                                                                pnl / (trade.entry_price
+                                                                    * trade.quantity)
+                                                            } else {
+                                                                0.0
+                                                            };
+                                                            if let Err(e) = mem
+                                                                .update_outcome(
                                                                     episode_id,
                                                                     pnl,
                                                                     pnl_pct,
                                                                     pnl > 0.0,
                                                                     achieved_rr,
-                                                                ).await {
-                                                                    warn!("FID-098: Failed to update episode outcome for {}: {}", trade.pair, e);
-                                                                } else {
-                                                                    debug!("FID-098: Updated episode {} outcome: PnL=${:.2}", &episode_id[..8], pnl);
-                                                                }
-                                                                episode_store.remove(&lookup_key);
+                                                                )
+                                                                .await
+                                                            {
+                                                                warn!("FID-098: Failed to update episode outcome for {}: {}", trade.pair, e);
+                                                            } else {
+                                                                debug!("FID-098: Updated episode {} outcome: PnL=${:.2}", &episode_id[..8], pnl);
                                                             }
+                                                            episode_store.remove(&lookup_key);
                                                         }
-
-                                                        // Update shared state immediately
-                                                        {
-                                                            let mut sp =
-                                                                shared.positions.write().await;
-                                                            *sp = portfolio
-                                                                .positions()
-                                                                .values()
-                                                                .cloned()
-                                                                .collect();
-                                                            let mut sa =
-                                                                shared.account.write().await;
-                                                            *sa = portfolio.account().clone();
-                                                            let mut st =
-                                                                shared.closed_trades.write().await;
-                                                            *st =
-                                                                portfolio.closed_trades().to_vec();
-                                                        }
-
-                                                        event_bus.publish(
-                                                            TradingEvent::PositionClosed(trade),
-                                                        );
                                                     }
-                                                    Err(e) => {
-                                                        error!(
-                                                            "AI {:?} {} failed for position {}: {}",
-                                                            decision.action,
-                                                            decision.pair,
-                                                            pos_id,
-                                                            e,
-                                                        );
+
+                                                    // Update shared state immediately
+                                                    {
+                                                        let mut sp = shared.positions.write().await;
+                                                        *sp = portfolio
+                                                            .positions()
+                                                            .values()
+                                                            .cloned()
+                                                            .collect();
+                                                        let mut sa = shared.account.write().await;
+                                                        *sa = portfolio.account().clone();
+                                                        let mut st =
+                                                            shared.closed_trades.write().await;
+                                                        *st = portfolio.closed_trades().to_vec();
                                                     }
+
+                                                    event_bus.publish(
+                                                        TradingEvent::PositionClosed(trade),
+                                                    );
+                                                }
+                                                Err(e) => {
+                                                    error!(
+                                                        "AI {:?} {} failed for position {}: {}",
+                                                        decision.action, decision.pair, pos_id, e,
+                                                    );
                                                 }
                                             }
                                         }
                                     }
-                                    TradeAction::Buy => {
-                                        // --- OPEN LOGIC ---
-                                        log_phase!(
-                                            "BUY",
-                                            "Calculating position size for {}",
-                                            decision.pair
-                                        );
+                                }
+                                TradeAction::Buy => {
+                                    // --- OPEN LOGIC ---
+                                    log_phase!(
+                                        "BUY",
+                                        "Calculating position size for {}",
+                                        decision.pair
+                                    );
 
-                                        // FID-072: Sync on-chain balance before opening new position
-                                        if let Some(ref mut ex) = executor {
-                                            if ex.sync_balance().await.is_ok() {
-                                                let fresh = ex.balance();
-                                                portfolio.account_mut().balance = fresh;
-                                                debug!("Pre-trade balance sync: ${:.2}", fresh);
-                                            }
+                                    // FID-072: Sync on-chain balance before opening new position
+                                    if let Some(ref mut ex) = executor {
+                                        if ex.sync_balance().await.is_ok() {
+                                            let fresh = ex.balance();
+                                            portfolio.account_mut().balance = fresh;
+                                            debug!("Pre-trade balance sync: ${:.2}", fresh);
                                         }
+                                    }
 
-                                        // Price tolerance check (FID-035): reject if price drifted
-                                        // too far from AI's entry during LLM evaluation (20-60s window)
-                                        let current_price = market_stores
-                                            .get(&decision.pair)
-                                            .and_then(|s| s.last().map(|c| c.close))
-                                            .unwrap_or(decision.entry_price);
-                                        let drift = ((current_price - decision.entry_price)
-                                            / decision.entry_price)
-                                            .abs()
-                                            * 100.0;
-                                        if drift > config.ai.price_tolerance_pct {
-                                            let reason = format!(
-                                                "Price drifted {:.1}% (entry={:.4} current={:.4})",
-                                                drift, decision.entry_price, current_price
-                                            );
-                                            log_warn!(
-                                                "TOLERANCE",
-                                                "{} — {}",
-                                                decision.pair,
-                                                reason
-                                            );
-                                            shared.log_activity(
+                                    // Price tolerance check (FID-035): reject if price drifted
+                                    // too far from AI's entry during LLM evaluation (20-60s window)
+                                    let current_price = market_stores
+                                        .get(&decision.pair)
+                                        .and_then(|s| s.last().map(|c| c.close))
+                                        .unwrap_or(decision.entry_price);
+                                    let drift = ((current_price - decision.entry_price)
+                                        / decision.entry_price)
+                                        .abs()
+                                        * 100.0;
+                                    if drift > config.ai.price_tolerance_pct {
+                                        let reason = format!(
+                                            "Price drifted {:.1}% (entry={:.4} current={:.4})",
+                                            drift, decision.entry_price, current_price
+                                        );
+                                        log_warn!("TOLERANCE", "{} — {}", decision.pair, reason);
+                                        shared.log_activity(
                                                 savant_trading::core::shared::ActivityLevel::Warning,
                                                 Some("RISK"),
                                                 &decision.pair,
                                                 &format!("REJECTED: {}", reason),
                                             ).await;
-                                            continue;
-                                        }
+                                        continue;
+                                    }
 
-                                        // Token safety verification (FID-052):
-                                        // - Curated config pairs: SKIP check entirely (known-good tokens)
-                                        // - Other pairs: check but DON'T reject on failure (0x quote is the real gate)
-                                        let token_symbol =
-                                            decision.pair.split('/').next().unwrap_or("");
-                                        let is_curated = curated_pairs.contains(&decision.pair);
-                                        if !is_curated {
-                                            if let Some((token_addr, _)) =
-                                                savant_trading::execution::dex::lookup_token(
-                                                    token_symbol,
-                                                    config.exchange.dex.chain_id,
-                                                )
-                                            {
-                                                if !token_addr.is_empty() {
-                                                    match verify_token_safety(&token_addr).await {
-                                                        Ok((vol, holders)) => {
-                                                            if vol < 1_000_000.0 {
-                                                                log_warn!("VOLUME", "{} — 24h volume ${:.0} < $1M (proceeding anyway, 0x will fail if no liquidity)", decision.pair, vol);
-                                                            }
-                                                            if holders < 5_000 {
-                                                                log_warn!("HOLDERS", "{} — {} holders < 5000 (proceeding anyway, 0x will fail if no liquidity)", decision.pair, holders);
-                                                            }
+                                    // Token safety verification (FID-052):
+                                    // - Curated config pairs: SKIP check entirely (known-good tokens)
+                                    // - Other pairs: check but DON'T reject on failure (0x quote is the real gate)
+                                    let token_symbol =
+                                        decision.pair.split('/').next().unwrap_or("");
+                                    let is_curated = curated_pairs.contains(&decision.pair);
+                                    if !is_curated {
+                                        if let Some((token_addr, _)) =
+                                            savant_trading::execution::dex::lookup_token(
+                                                token_symbol,
+                                                config.exchange.dex.chain_id,
+                                            )
+                                        {
+                                            if !token_addr.is_empty() {
+                                                match verify_token_safety(&token_addr).await {
+                                                    Ok((vol, holders)) => {
+                                                        if vol < 1_000_000.0 {
+                                                            log_warn!("VOLUME", "{} — 24h volume ${:.0} < $1M (proceeding anyway, 0x will fail if no liquidity)", decision.pair, vol);
                                                         }
-                                                        Err(e) => {
-                                                            log_warn!("VERIFY", "{} — Blockscout unavailable ({}), proceeding (0x quote is the real gate)", decision.pair, e);
+                                                        if holders < 5_000 {
+                                                            log_warn!("HOLDERS", "{} — {} holders < 5000 (proceeding anyway, 0x will fail if no liquidity)", decision.pair, holders);
                                                         }
+                                                    }
+                                                    Err(e) => {
+                                                        log_warn!("VERIFY", "{} — Blockscout unavailable ({}), proceeding (0x quote is the real gate)", decision.pair, e);
                                                     }
                                                 }
                                             }
-                                        } else {
-                                            info!("Token safety: {} is curated — skipping Blockscout check", decision.pair);
                                         }
+                                    } else {
+                                        info!("Token safety: {} is curated — skipping Blockscout check", decision.pair);
+                                    }
 
-                                        // Liquidity pre-check (FID-052): call 0x /price endpoint
-                                        // to confirm DEX routing is available before committing.
-                                        // This is read-only, no gas, fast (~200ms).
-                                        // Returns rich data: tax info (honeypot detection), balance issues.
-                                        if let Some(ref mut ex) = executor {
-                                            let check_amount = 5.0_f64; // $5 test amount
-                                            match ex
-                                                .check_liquidity(
-                                                    &decision.pair,
-                                                    decision.side,
-                                                    check_amount,
-                                                )
-                                                .await
-                                            {
-                                                Ok(check) => {
-                                                    if !check.available {
-                                                        let reason = "No DEX liquidity available (0x /price returned false)".to_string();
-                                                        log_warn!(
-                                                            "LIQUIDITY",
-                                                            "{} — {}",
-                                                            decision.pair,
-                                                            reason
-                                                        );
-                                                        shared.log_activity(
+                                    // Liquidity pre-check (FID-052): call 0x /price endpoint
+                                    // to confirm DEX routing is available before committing.
+                                    // This is read-only, no gas, fast (~200ms).
+                                    // Returns rich data: tax info (honeypot detection), balance issues.
+                                    if let Some(ref mut ex) = executor {
+                                        let check_amount = 5.0_f64; // $5 test amount
+                                        match ex
+                                            .check_liquidity(
+                                                &decision.pair,
+                                                decision.side,
+                                                check_amount,
+                                            )
+                                            .await
+                                        {
+                                            Ok(check) => {
+                                                if !check.available {
+                                                    let reason = "No DEX liquidity available (0x /price returned false)".to_string();
+                                                    log_warn!(
+                                                        "LIQUIDITY",
+                                                        "{} — {}",
+                                                        decision.pair,
+                                                        reason
+                                                    );
+                                                    shared.log_activity(
                                                             savant_trading::core::shared::ActivityLevel::Warning,
                                                             Some("RISK"),
                                                             &decision.pair,
                                                             &format!("REJECTED: {}", reason),
                                                         ).await;
-                                                        continue;
-                                                    }
-                                                    // Honeypot detection: buy tax > 1% = suspicious
-                                                    if check.buy_tax_bps > 100 {
-                                                        let reason = format!(
-                                                            "Buy tax {:.1}% — potential honeypot",
-                                                            check.buy_tax_bps as f64 / 100.0
-                                                        );
-                                                        log_warn!(
-                                                            "TAX",
-                                                            "{} — {}",
-                                                            decision.pair,
-                                                            reason
-                                                        );
-                                                        shared.log_activity(
+                                                    continue;
+                                                }
+                                                // Honeypot detection: buy tax > 1% = suspicious
+                                                if check.buy_tax_bps > 100 {
+                                                    let reason = format!(
+                                                        "Buy tax {:.1}% — potential honeypot",
+                                                        check.buy_tax_bps as f64 / 100.0
+                                                    );
+                                                    log_warn!(
+                                                        "TAX",
+                                                        "{} — {}",
+                                                        decision.pair,
+                                                        reason
+                                                    );
+                                                    shared.log_activity(
                                                             savant_trading::core::shared::ActivityLevel::Warning,
                                                             Some("RISK"),
                                                             &decision.pair,
                                                             &format!("REJECTED: {}", reason),
                                                         ).await;
-                                                        continue;
-                                                    }
-                                                    if !check.balance_ok {
-                                                        log_warn!("BALANCE", "{} — insufficient sell token balance (0x issues.balance)", decision.pair);
-                                                    }
-                                                    // FID-160 Fix 1: Log allowance issues detected by check_liquidity.
-                // Actual approval is handled by ensure_permit2_approval in place_order.
-                                                    if !check.allowance_ok {
+                                                    continue;
+                                                }
+                                                if !check.balance_ok {
+                                                    log_warn!("BALANCE", "{} — insufficient sell token balance (0x issues.balance)", decision.pair);
+                                                }
+                                                // FID-160 Fix 1: Log allowance issues detected by check_liquidity.
+                                                // Actual approval is handled by ensure_permit2_approval in place_order.
+                                                if !check.allowance_ok {
                                                     log_warn!("ALLOWANCE", "{} — insufficient token allowance (0x issues.allowance). Will auto-approve before swap.", decision.pair);
-                                                    }
-                                                    info!("Liquidity OK: {} on {} (buy_tax={}bps, price={})", decision.pair, "0x", check.buy_tax_bps, check.price);
                                                 }
-                                                Err(e) => {
-                                                    log_warn!("LIQUIDITY", "{} — pre-check error ({}), proceeding anyway", decision.pair, e);
-                                                }
+                                                info!("Liquidity OK: {} on {} (buy_tax={}bps, price={})", decision.pair, "0x", check.buy_tax_bps, check.price);
+                                            }
+                                            Err(e) => {
+                                                log_warn!(
+                                                    "LIQUIDITY",
+                                                    "{} — pre-check error ({}), proceeding anyway",
+                                                    decision.pair,
+                                                    e
+                                                );
                                             }
                                         }
+                                    }
 
-                                        // FID-104: Auto-extend TP to meet minimum R:R before sizer check
-                                        let risk = (decision.entry_price - decision.stop_loss).abs();
-                                        if risk > 0.0 {
-                                            let reward = match decision.side {
-                                                Side::Long => decision.take_profit_1 - decision.entry_price,
-                                                Side::Short => decision.entry_price - decision.take_profit_1,
+                                    // FID-104: Auto-extend TP to meet minimum R:R before sizer check
+                                    let risk = (decision.entry_price - decision.stop_loss).abs();
+                                    if risk > 0.0 {
+                                        let reward = match decision.side {
+                                            Side::Long => {
+                                                decision.take_profit_1 - decision.entry_price
+                                            }
+                                            Side::Short => {
+                                                decision.entry_price - decision.take_profit_1
+                                            }
+                                        };
+                                        let actual_rr = reward / risk;
+                                        let min_rr = config.risk.min_rr_ratio;
+                                        if actual_rr < min_rr && reward > 0.0 {
+                                            let required_reward = risk * min_rr;
+                                            let old_tp = decision.take_profit_1;
+                                            decision.take_profit_1 = match decision.side {
+                                                Side::Long => {
+                                                    decision.entry_price + required_reward
+                                                }
+                                                Side::Short => {
+                                                    decision.entry_price - required_reward
+                                                }
                                             };
-                                            let actual_rr = reward / risk;
-                                            let min_rr = config.risk.min_rr_ratio;
-                                            if actual_rr < min_rr && reward > 0.0 {
-                                                let required_reward = risk * min_rr;
-                                                let old_tp = decision.take_profit_1;
-                                                decision.take_profit_1 = match decision.side {
-                                                    Side::Long => decision.entry_price + required_reward,
-                                                    Side::Short => decision.entry_price - required_reward,
-                                                };
-                                                decision.risk_reward = min_rr;
-                                                info!("FID-104: Extended TP for {}: {:.4} → {:.4} (R:R {:.2}→{:.2})",
+                                            decision.risk_reward = min_rr;
+                                            info!("FID-104: Extended TP for {}: {:.4} → {:.4} (R:R {:.2}→{:.2})",
                                                     decision.pair, old_tp, decision.take_profit_1, actual_rr, min_rr);
-                                            }
                                         }
+                                    }
 
-                                        let ps = position_sizer.calculate(
-                                            portfolio.account(),
-                                            decision.entry_price,
-                                            decision.stop_loss,
-                                            decision.take_profit_1,
-                                            decision.side,
-                                        );
+                                    let ps = position_sizer.calculate(
+                                        portfolio.account(),
+                                        decision.entry_price,
+                                        decision.stop_loss,
+                                        decision.take_profit_1,
+                                        decision.side,
+                                    );
 
-                                        // DIAGNOSTIC (Phase 3 RED): trace position sizing result
-                                        match &ps {
-                                            Some(PositionSize::Sized { quantity: q, risk_amount: r, rr_ratio: rr }) => {
-                                                tracing::info!(
+                                    // DIAGNOSTIC (Phase 3 RED): trace position sizing result
+                                    match &ps {
+                                        Some(PositionSize::Sized {
+                                            quantity: q,
+                                            risk_amount: r,
+                                            rr_ratio: rr,
+                                        }) => {
+                                            tracing::info!(
                                                     "POSITION_SIZED pair={} side={:?} qty={:.6} risk=${:.4} rr={:.2} entry={:.4} stop={:.4}",
                                                     decision.pair, decision.side, q, r, rr, decision.entry_price, decision.stop_loss
                                                 );
-                                            }
-                                            Some(PositionSize::Refused { reason }) => {
-                                                tracing::info!(
+                                        }
+                                        Some(PositionSize::Refused { reason }) => {
+                                            tracing::info!(
                                                     "POSITION_REFUSED pair={} side={:?} reason={:?} entry={:.4} stop={:.4}",
                                                     decision.pair, decision.side, reason, decision.entry_price, decision.stop_loss
                                                 );
-                                            }
-                                            None => {
-                                                tracing::info!(
+                                        }
+                                        None => {
+                                            tracing::info!(
                                                     "POSITION_NONE pair={} side={:?} entry={:.4} stop={:.4} tp1={:.4}",
                                                     decision.pair, decision.side, decision.entry_price, decision.stop_loss, decision.take_profit_1
                                                 );
-                                            }
                                         }
-                                        if let Some(PositionSize::Sized { mut quantity, mut risk_amount, .. }) = ps {
-                                            // P1-3a: Compute TP2/TP3 from ATR
-                                            let atr = market_stores
-                                                .get(&decision.pair)
-                                                .and_then(|s| {
-                                                    let closes: Vec<f64> = s.candles().iter().rev().take(14).map(|c| c.close).collect();
-                                                    if closes.len() < 14 { return None; }
-                                                    let mean = closes.iter().sum::<f64>() / closes.len() as f64;
-                                                    let variance = closes.iter().map(|c| (c - mean).powi(2)).sum::<f64>() / closes.len() as f64;
-                                                    Some(variance.sqrt())
-                                                });
-                                            if let Some(atr_val) = atr {
-                                                let (tp2, tp3) = match decision.side {
-                                                    Side::Long => (
-                                                        decision.take_profit_1 + atr_val * 1.0,
-                                                        decision.take_profit_1 + atr_val * 2.0,
-                                                    ),
-                                                    Side::Short => (
-                                                        decision.take_profit_1 - atr_val * 1.0,
-                                                        decision.take_profit_1 - atr_val * 2.0,
-                                                    ),
-                                                };
-                                                decision.take_profit_2 = tp2;
-                                                decision.take_profit_3 = tp3;
-                                                info!("FID-102: TP2/TP3 from ATR for {}: TP2={:.4} TP3={:.4} (ATR={:.4})",
+                                    }
+                                    if let Some(PositionSize::Sized {
+                                        mut quantity,
+                                        mut risk_amount,
+                                        ..
+                                    }) = ps
+                                    {
+                                        // P1-3a: Compute TP2/TP3 from ATR
+                                        let atr = market_stores.get(&decision.pair).and_then(|s| {
+                                            let closes: Vec<f64> = s
+                                                .candles()
+                                                .iter()
+                                                .rev()
+                                                .take(14)
+                                                .map(|c| c.close)
+                                                .collect();
+                                            if closes.len() < 14 {
+                                                return None;
+                                            }
+                                            let mean =
+                                                closes.iter().sum::<f64>() / closes.len() as f64;
+                                            let variance = closes
+                                                .iter()
+                                                .map(|c| (c - mean).powi(2))
+                                                .sum::<f64>()
+                                                / closes.len() as f64;
+                                            Some(variance.sqrt())
+                                        });
+                                        if let Some(atr_val) = atr {
+                                            let (tp2, tp3) = match decision.side {
+                                                Side::Long => (
+                                                    decision.take_profit_1 + atr_val * 1.0,
+                                                    decision.take_profit_1 + atr_val * 2.0,
+                                                ),
+                                                Side::Short => (
+                                                    decision.take_profit_1 - atr_val * 1.0,
+                                                    decision.take_profit_1 - atr_val * 2.0,
+                                                ),
+                                            };
+                                            decision.take_profit_2 = tp2;
+                                            decision.take_profit_3 = tp3;
+                                            info!("FID-102: TP2/TP3 from ATR for {}: TP2={:.4} TP3={:.4} (ATR={:.4})",
                                                     decision.pair, tp2, tp3, atr_val);
-                                            }
-                                            let session =
-                                                savant_trading::core::session::current_session();
-                                            let session_mult = session.position_size_multiplier();
-                                            if session_mult != 1.0 {
-                                                quantity *= session_mult;
-                                                risk_amount *= session_mult;
-                                            }
+                                        }
+                                        let session =
+                                            savant_trading::core::session::current_session();
+                                        let session_mult = session.position_size_multiplier();
+                                        if session_mult != 1.0 {
+                                            quantity *= session_mult;
+                                            risk_amount *= session_mult;
+                                        }
 
-                                            // Duplicate guard: skip if already have open position on this pair+side
-                                            let already_open = {
-                                                let positions = if let Some(ref ex) = executor {
-                                                    ex.open_positions()
-                                                } else {
-                                                    portfolio.positions().values().collect()
-                                                };
-                                                positions.iter().any(|p| {
-                                                    p.pair == decision.pair
-                                                        && p.side == decision.side
-                                                })
-                                            };
-                                            // Concentration cap: full_deploy allows 100%, normal mode 33%
-                                            // Use 99.99% of cap to prevent rounding past wallet balance
-                                            let total_portfolio = if let Some(ref ex) = executor {
-                                                ex.balance()
+                                        // Duplicate guard: skip if already have open position on this pair+side
+                                        let already_open = {
+                                            let positions = if let Some(ref ex) = executor {
+                                                ex.open_positions()
                                             } else {
-                                                portfolio.account().balance
+                                                portfolio.positions().values().collect()
                                             };
-                                            let max_concentration = if config.trading.full_deploy
-                                                && total_portfolio
-                                                    < config.risk.low_balance_threshold
-                                            {
-                                                1.00
+                                            positions.iter().any(|p| {
+                                                p.pair == decision.pair && p.side == decision.side
+                                            })
+                                        };
+                                        // Concentration cap: full_deploy allows 100%, normal mode 33%
+                                        // Use 99.99% of cap to prevent rounding past wallet balance
+                                        let total_portfolio = if let Some(ref ex) = executor {
+                                            ex.balance()
+                                        } else {
+                                            portfolio.account().balance
+                                        };
+                                        let max_concentration = if config.trading.full_deploy
+                                            && total_portfolio < config.risk.low_balance_threshold
+                                        {
+                                            1.00
+                                        } else {
+                                            0.33
+                                        };
+                                        let safe_max = total_portfolio * max_concentration * 0.9999;
+                                        let order_value = decision.entry_price * quantity;
+                                        if order_value > safe_max {
+                                            // Auto-adjust: percentage-based sizing with buffer
+                                            let adjusted_qty = safe_max / decision.entry_price;
+                                            let pct_label = if max_concentration >= 1.0 {
+                                                "100%"
                                             } else {
-                                                0.33
+                                                "33%"
                                             };
-                                            let safe_max = total_portfolio * max_concentration * 0.9999;
-                                            let order_value = decision.entry_price * quantity;
-                                            if order_value > safe_max {
-                                                // Auto-adjust: percentage-based sizing with buffer
-                                                let adjusted_qty = safe_max / decision.entry_price;
-                                                let pct_label = if max_concentration >= 1.0 { "100%" } else { "33%" };
-                                                info!(
+                                            info!(
                                                     "AI BUY {} — Auto-adjusting to {} cap: ${:.2} -> ${:.2} (qty {:.4} -> {:.4})",
                                                     decision.pair, pct_label, order_value, safe_max, quantity, adjusted_qty
                                                 );
-                                                shared.log_activity(
+                                            shared.log_activity(
                                                     savant_trading::core::shared::ActivityLevel::Info,
                                                     Some("RISK"),
                                                     &decision.pair,
                                                     &format!("ADJUSTED: ${:.2} -> ${:.2} ({} cap)", order_value, safe_max, pct_label),
                                                 ).await;
-                                                quantity = adjusted_qty;
-                                                // Inject feedback into decision log so LLM knows its signal was correct
-                                                decision_log.append(savant_trading::agent::decision_log::DecisionEntry {
+                                            quantity = adjusted_qty;
+                                            // Inject feedback into decision log so LLM knows its signal was correct
+                                            decision_log.append(savant_trading::agent::decision_log::DecisionEntry {
                                                     timestamp: Utc::now().to_rfc3339(),
                                                     pair: decision.pair.clone(),
                                                     action: "FEEDBACK".to_string(),
@@ -3803,65 +4088,65 @@ pub async fn run(
                                                     ),
                                                     outcome: None,
                                                 });
-                                            }
-                                            if already_open {
-                                                let reason =
-                                                    "Already have open position on this pair+side"
-                                                        .to_string();
-                                                info!(
-                                                    "AI BUY {} {:?} — {}",
-                                                    decision.pair, decision.side, reason
-                                                );
-                                                shared.log_activity(
+                                        }
+                                        if already_open {
+                                            let reason =
+                                                "Already have open position on this pair+side"
+                                                    .to_string();
+                                            info!(
+                                                "AI BUY {} {:?} — {}",
+                                                decision.pair, decision.side, reason
+                                            );
+                                            shared.log_activity(
                                                     savant_trading::core::shared::ActivityLevel::Warning,
                                                     Some("RISK"),
                                                     &decision.pair,
                                                     &format!("SKIPPED: {}", reason),
                                                 ).await;
-                                            } else {
-                                                log_swap!(
-                                                    "ORDER",
-                                                    "Placing for {} via executor...",
-                                                    decision.pair
-                                                );
-                                                let order = if let Some(ref mut ex) = executor {
-                                                    match tokio::time::timeout(
-                                                        std::time::Duration::from_secs(60),
-                                                        ex.place_order(
-                                                            &decision.pair,
-                                                            decision.side,
-                                                            quantity,
-                                                            Some(decision.entry_price),
-                                                        ),
-                                                    )
-                                                    .await
-                                                    {
-                                                        Ok(result) => result,
-                                                        Err(_) => {
-                                                            log_swap_fail!(
-                                                                "TIMEOUT",
-                                                                "place_order for {} took >60s",
-                                                                decision.pair
-                                                            );
-                                                            Err(savant_trading::core::error::ExecutionError::Other(
+                                        } else {
+                                            log_swap!(
+                                                "ORDER",
+                                                "Placing for {} via executor...",
+                                                decision.pair
+                                            );
+                                            let order = if let Some(ref mut ex) = executor {
+                                                match tokio::time::timeout(
+                                                    std::time::Duration::from_secs(60),
+                                                    ex.place_order(
+                                                        &decision.pair,
+                                                        decision.side,
+                                                        quantity,
+                                                        Some(decision.entry_price),
+                                                    ),
+                                                )
+                                                .await
+                                                {
+                                                    Ok(result) => result,
+                                                    Err(_) => {
+                                                        log_swap_fail!(
+                                                            "TIMEOUT",
+                                                            "place_order for {} took >60s",
+                                                            decision.pair
+                                                        );
+                                                        Err(savant_trading::core::error::ExecutionError::Other(
                                                                 format!("place_order timed out after 60s for {}", decision.pair)
                                                             ))
-                                                        }
                                                     }
-                                                } else {
-                                                    portfolio
-                                                        .place_order(
-                                                            &decision.pair,
-                                                            decision.side,
-                                                            quantity,
-                                                            Some(decision.entry_price),
-                                                        )
-                                                        .await
-                                                };
+                                                }
+                                            } else {
+                                                portfolio
+                                                    .place_order(
+                                                        &decision.pair,
+                                                        decision.side,
+                                                        quantity,
+                                                        Some(decision.entry_price),
+                                                    )
+                                                    .await
+                                            };
 
-                                                match order {
-                                                    Ok(_) => {
-                                                        let pos = Position {
+                                            match order {
+                                                Ok(_) => {
+                                                    let pos = Position {
                                                             id: format!("ai-{}", tick),
                                                             pair: decision.pair.clone(),
                                                             side: decision.side,
@@ -3879,184 +4164,194 @@ pub async fn run(
                                                             scale_level: ScaleLevel::Full,
                                                             token_address: savant_trading::execution::dex::lookup_token(decision.pair.split("/").next().unwrap_or(""), config.exchange.dex.chain_id).map(|(addr, _)| addr).unwrap_or_default(),
                                                         };
-                                                        // Track position in PortfolioManager for state/reporting
-                                                        portfolio
-                                                            .positions_mut()
-                                                            .insert(pos.id.clone(), pos.clone());
-                                                        portfolio.account_mut().open_positions =
-                                                            portfolio.positions().len();
-                                                        portfolio.account_mut().trades_today += 1;
-                                                        portfolio.refresh_equity();
-                                                        let acc = portfolio.account();
-                                                        info!("AI position opened: {} — balance ${:.2}, equity ${:.2}",
+                                                    // Track position in PortfolioManager for state/reporting
+                                                    portfolio
+                                                        .positions_mut()
+                                                        .insert(pos.id.clone(), pos.clone());
+                                                    portfolio.account_mut().open_positions =
+                                                        portfolio.positions().len();
+                                                    portfolio.account_mut().trades_today += 1;
+                                                    portfolio.refresh_equity();
+                                                    let acc = portfolio.account();
+                                                    info!("AI position opened: {} — balance ${:.2}, equity ${:.2}",
                                                             decision.pair, acc.balance, acc.equity);
 
-                                                        // Place stop-loss on executor for live mode
-                                                        if let Some(ref mut ex) = executor {
-                                                            if let Some(exec_pos) = ex
-                                                                .open_positions()
-                                                                .iter()
-                                                                .find(|p| {
-                                                                    p.pair == pos.pair
-                                                                        && p.side == pos.side
-                                                                })
+                                                    // Place stop-loss on executor for live mode
+                                                    if let Some(ref mut ex) = executor {
+                                                        if let Some(exec_pos) =
+                                                            ex.open_positions().iter().find(|p| {
+                                                                p.pair == pos.pair
+                                                                    && p.side == pos.side
+                                                            })
+                                                        {
+                                                            let exec_id = exec_pos.id.clone();
+                                                            executor_position_map.insert(
+                                                                pos.id.clone(),
+                                                                exec_id.clone(),
+                                                            );
+                                                            if let Err(e) =
+                                                                ex.place_stop_loss(&exec_id).await
                                                             {
-                                                                let exec_id = exec_pos.id.clone();
-                                                                executor_position_map.insert(
-                                                                    pos.id.clone(),
-                                                                    exec_id.clone(),
-                                                                );
-                                                                if let Err(e) = ex
-                                                                    .place_stop_loss(&exec_id)
-                                                                    .await
-                                                                {
-                                                                    warn!("Failed to place stop-loss for position {}: {}", exec_id, e);
-                                                                } else {
-                                                                    info!("Stop-loss placed for position {} @ {:.4}", exec_id, pos.stop_loss);
-                                                                }
+                                                                warn!("Failed to place stop-loss for position {}: {}", exec_id, e);
                                                             } else {
-                                                                warn!("Position not found for stop-loss after placing order for {}", pos.pair);
+                                                                info!("Stop-loss placed for position {} @ {:.4}", exec_id, pos.stop_loss);
                                                             }
+                                                        } else {
+                                                            warn!("Position not found for stop-loss after placing order for {}", pos.pair);
                                                         }
+                                                    }
 
-                                                        // Write trade alert to file for external monitoring
-                                                        let alert = serde_json::json!({
-                                                            "type": "TRADE_OPENED",
-                                                            "timestamp": chrono::Utc::now().to_rfc3339(),
-                                                            "pair": decision.pair,
-                                                            "side": format!("{:?}", decision.side),
-                                                            "action": format!("{:?}", decision.action),
-                                                            "entry_price": decision.entry_price,
-                                                            "stop_loss": decision.stop_loss,
-                                                            "take_profit_1": decision.take_profit_1,
-                                                            "quantity": quantity,
-                                                            "risk_amount": risk_amount,
-                                                            "confidence": decision.confidence,
-                                                            "risk_reward": decision.risk_reward,
+                                                    // Write trade alert to file for external monitoring
+                                                    let alert = serde_json::json!({
+                                                        "type": "TRADE_OPENED",
+                                                        "timestamp": chrono::Utc::now().to_rfc3339(),
+                                                        "pair": decision.pair,
+                                                        "side": format!("{:?}", decision.side),
+                                                        "action": format!("{:?}", decision.action),
+                                                        "entry_price": decision.entry_price,
+                                                        "stop_loss": decision.stop_loss,
+                                                        "take_profit_1": decision.take_profit_1,
+                                                        "quantity": quantity,
+                                                        "risk_amount": risk_amount,
+                                                        "confidence": decision.confidence,
+                                                        "risk_reward": decision.risk_reward,
+                                                    });
+                                                    let alert_line = format!("{}\n", alert);
+                                                    let _ = std::fs::OpenOptions::new()
+                                                        .create(true)
+                                                        .append(true)
+                                                        .open("data/alerts.jsonl")
+                                                        .and_then(|mut f| {
+                                                            use std::io::Write;
+                                                            f.write_all(alert_line.as_bytes())
                                                         });
-                                                        let alert_line = format!("{}\n", alert);
-                                                        let _ = std::fs::OpenOptions::new()
-                                                            .create(true)
-                                                            .append(true)
-                                                            .open("data/alerts.jsonl")
-                                                            .and_then(|mut f| {
-                                                                use std::io::Write;
-                                                                f.write_all(alert_line.as_bytes())
-                                                            });
 
-                                                        log_trade!("OPENED", "{} {:?} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4} TP2: {:.4} TP3: {:.4} | Risk: ${:.2} | Scale: 50%→TP1, 30%→TP2, 20%→TP3",
+                                                    log_trade!("OPENED", "{} {:?} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4} TP2: {:.4} TP3: {:.4} | Risk: ${:.2} | Scale: 50%→TP1, 30%→TP2, 20%→TP3",
                                                             decision.side, decision.action, decision.entry_price,
                                                             quantity, decision.stop_loss, decision.take_profit_1, decision.take_profit_2, decision.take_profit_3, risk_amount);
 
-                                                        // Persist to DB instantly
-                                                        if let Some(ref j) = journal {
-                                                            if let Err(e) =
-                                                                j.save_position(&pos).await
-                                                            {
-                                                                warn!("Failed to persist position to DB: {}", e);
-                                                            }
-                                                            let _ = j.record_activity("Trade", &pos.pair,
+                                                    // Persist to DB instantly
+                                                    if let Some(ref j) = journal {
+                                                        if let Err(e) = j.save_position(&pos).await
+                                                        {
+                                                            warn!("Failed to persist position to DB: {}", e);
+                                                        }
+                                                        let _ = j.record_activity("Trade", &pos.pair,
                                                                 &format!("OPENED {} {} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4}",
                                                                     decision.side, decision.pair, decision.entry_price,
                                                                     quantity, decision.stop_loss, decision.take_profit_1)).await;
-                                                        }
-
-                                                        // Update shared state immediately
-                                                        {
-                                                            let mut sp =
-                                                                shared.positions.write().await;
-                                                            *sp = portfolio
-                                                                .positions()
-                                                                .values()
-                                                                .cloned()
-                                                                .collect();
-                                                            let mut sa =
-                                                                shared.account.write().await;
-                                                            *sa = portfolio.account().clone();
-                                                        }
-
-                                                        event_bus.publish(
-                                                            TradingEvent::PositionOpened(pos),
-                                                        );
                                                     }
-                                                    // FID-108: Record failure in tracker
-                                                    Err(e) => {
-                                                        let category = savant_trading::execution::dex::trader::categorize_error(&e);
-                                                        let base = decision.pair.split('/').next().unwrap_or(&decision.pair);
-                                                        failure_tracker.record_failure(base, &e.to_string(), &category);
-                                                        error!("AI order failed: {} | category={}", e, category);
+
+                                                    // Update shared state immediately
+                                                    {
+                                                        let mut sp = shared.positions.write().await;
+                                                        *sp = portfolio
+                                                            .positions()
+                                                            .values()
+                                                            .cloned()
+                                                            .collect();
+                                                        let mut sa = shared.account.write().await;
+                                                        *sa = portfolio.account().clone();
                                                     }
+
+                                                    event_bus
+                                                        .publish(TradingEvent::PositionOpened(pos));
+                                                }
+                                                // FID-108: Record failure in tracker
+                                                Err(e) => {
+                                                    let category = savant_trading::execution::dex::trader::categorize_error(&e);
+                                                    let base = decision
+                                                        .pair
+                                                        .split('/')
+                                                        .next()
+                                                        .unwrap_or(&decision.pair);
+                                                    failure_tracker.record_failure(
+                                                        base,
+                                                        &e.to_string(),
+                                                        &category,
+                                                    );
+                                                    error!(
+                                                        "AI order failed: {} | category={}",
+                                                        e, category
+                                                    );
                                                 }
                                             }
-                                        } else {
-                                            let actual_rr = match decision.side {
-                                                Side::Long => {
-                                                    if decision.entry_price > decision.stop_loss
-                                                        && decision.stop_loss > 0.0
-                                                    {
-                                                        (decision.take_profit_1
+                                        }
+                                    } else {
+                                        let actual_rr = match decision.side {
+                                            Side::Long => {
+                                                if decision.entry_price > decision.stop_loss
+                                                    && decision.stop_loss > 0.0
+                                                {
+                                                    (decision.take_profit_1 - decision.entry_price)
+                                                        / (decision.entry_price
+                                                            - decision.stop_loss)
+                                                } else {
+                                                    0.0
+                                                }
+                                            }
+                                            Side::Short => {
+                                                if decision.stop_loss > decision.entry_price
+                                                    && decision.entry_price > 0.0
+                                                {
+                                                    (decision.entry_price - decision.take_profit_1)
+                                                        / (decision.stop_loss
                                                             - decision.entry_price)
-                                                            / (decision.entry_price
-                                                                - decision.stop_loss)
-                                                    } else {
-                                                        0.0
-                                                    }
+                                                } else {
+                                                    0.0
                                                 }
-                                                Side::Short => {
-                                                    if decision.stop_loss > decision.entry_price
-                                                        && decision.entry_price > 0.0
-                                                    {
-                                                        (decision.entry_price
-                                                            - decision.take_profit_1)
-                                                            / (decision.stop_loss
-                                                                - decision.entry_price)
-                                                    } else {
-                                                        0.0
-                                                    }
-                                                }
-                                            };
-                                            let reason = format!("Position sizer rejected — claimed R:R={:.1}, actual={:.1} (entry={} stop={} tp={})", decision.risk_reward, actual_rr, decision.entry_price, decision.stop_loss, decision.take_profit_1);
-                                            log_swap_fail!(
-                                                "BUY REJECTED",
-                                                "{} — {}",
-                                                decision.pair,
-                                                reason
-                                            );
-                                            shared.log_activity(
+                                            }
+                                        };
+                                        let reason = format!("Position sizer rejected — claimed R:R={:.1}, actual={:.1} (entry={} stop={} tp={})", decision.risk_reward, actual_rr, decision.entry_price, decision.stop_loss, decision.take_profit_1);
+                                        log_swap_fail!(
+                                            "BUY REJECTED",
+                                            "{} — {}",
+                                            decision.pair,
+                                            reason
+                                        );
+                                        shared.log_activity(
                                                 savant_trading::core::shared::ActivityLevel::Warning,
                                                 Some("RISK"),
                                                 &decision.pair,
                                                 &format!("REJECTED: {}", reason),
                                             ).await;
-                                        }
                                     }
-                                    TradeAction::Pass => {
-                                        // Already handled in pre-execution filter above.
-                                        // Reaching here means Pass was not filtered — skip silently.
-                                        continue;
-                                    }
-                                    TradeAction::AdjustStop => {
-                                        // Wire AdjustStop to stop_overrides shared state
-                                        if decision.stop_loss > 0.0 {
-                                            let mut overrides = shared.stop_overrides.write().await;
-                                            overrides.insert(decision.pair.clone(), decision.stop_loss);
-                                            info!(
-                                                "AI ADJUST_STOP for {} → ${:.4} (confidence {:.0}%)",
-                                                decision.pair,
-                                                decision.stop_loss,
-                                                decision.confidence * 100.0
-                                            );
-                                            shared.log_activity(
+                                }
+                                TradeAction::Pass => {
+                                    // Already handled in pre-execution filter above.
+                                    // Reaching here means Pass was not filtered — skip silently.
+                                    continue;
+                                }
+                                TradeAction::AdjustStop => {
+                                    // Wire AdjustStop to stop_overrides shared state
+                                    if decision.stop_loss > 0.0 {
+                                        let mut overrides = shared.stop_overrides.write().await;
+                                        overrides.insert(decision.pair.clone(), decision.stop_loss);
+                                        info!(
+                                            "AI ADJUST_STOP for {} → ${:.4} (confidence {:.0}%)",
+                                            decision.pair,
+                                            decision.stop_loss,
+                                            decision.confidence * 100.0
+                                        );
+                                        shared
+                                            .log_activity(
                                                 savant_trading::core::shared::ActivityLevel::Info,
                                                 Some("RISK"),
                                                 &decision.pair,
-                                                &format!("ADJUST STOP → ${:.4}", decision.stop_loss),
-                                            ).await;
-                                        } else {
-                                            warn!("AI ADJUST_STOP for {} but stop_loss={:.4} — ignoring", decision.pair, decision.stop_loss);
-                                        }
+                                                &format!(
+                                                    "ADJUST STOP → ${:.4}",
+                                                    decision.stop_loss
+                                                ),
+                                            )
+                                            .await;
+                                    } else {
+                                        warn!(
+                                            "AI ADJUST_STOP for {} but stop_loss={:.4} — ignoring",
+                                            decision.pair, decision.stop_loss
+                                        );
                                     }
                                 }
+                            }
                         }
                     }
                 }
@@ -4403,7 +4698,10 @@ pub async fn run(
                             if let Some(ref j) = journal {
                                 if let Some(ref pid) = paper_id {
                                     if let Err(e) = j.delete_position(pid).await {
-                                        warn!("Failed to delete closed position {} from journal: {}", pid, e);
+                                        warn!(
+                                            "Failed to delete closed position {} from journal: {}",
+                                            pid, e
+                                        );
                                     }
                                 }
                             }
@@ -4414,7 +4712,8 @@ pub async fn run(
                                 eid, e
                             );
                             // FID-094 Fix 2: Record close failure for cooldown
-                            close_failure_cooldown.insert(trade.pair.clone(), std::time::Instant::now());
+                            close_failure_cooldown
+                                .insert(trade.pair.clone(), std::time::Instant::now());
                             // FID-074: Revert the PnL that check_stops added to balance,
                             // since the on-chain close didn't actually execute.
                             portfolio.account_mut().balance -= trade.pnl;
@@ -4506,7 +4805,10 @@ pub async fn run(
                             if let Some(ref j) = journal {
                                 if let Some(ref pid) = paper_id {
                                     if let Err(e) = j.delete_position(pid).await {
-                                        warn!("Failed to delete closed position {} from journal: {}", pid, e);
+                                        warn!(
+                                            "Failed to delete closed position {} from journal: {}",
+                                            pid, e
+                                        );
                                     }
                                 }
                             }
@@ -4624,7 +4926,8 @@ pub async fn run(
                 // Find the episode for this pair — stop/TP closes may not have an exact
                 // tick match, so search by pair prefix in the store
                 let pair_prefix = format!("{}-Buy", trade.pair);
-                let found = episode_store.iter()
+                let found = episode_store
+                    .iter()
                     .find(|(k, _)| k.starts_with(&pair_prefix))
                     .map(|(k, v)| (k.clone(), v.clone()));
                 if let Some((key, episode_id)) = found {
@@ -4634,17 +4937,33 @@ pub async fn run(
                         0.0
                     };
                     let is_reverted = reverted_trades.iter().any(|(pair, side, entry, exit)| {
-                        *pair == trade.pair && *side == trade.side
+                        *pair == trade.pair
+                            && *side == trade.side
                             && (*entry - trade.entry_price).abs() < 0.0001
                             && (*exit - trade.exit_price).abs() < 0.0001
                     });
                     if !is_reverted {
-                        if let Err(e) = mem.update_outcome(
-                            &episode_id, trade.pnl, trade.pnl_pct, trade.pnl > 0.0, achieved_rr,
-                        ).await {
-                            warn!("FID-098: Failed to update episode outcome for {}: {}", trade.pair, e);
+                        if let Err(e) = mem
+                            .update_outcome(
+                                &episode_id,
+                                trade.pnl,
+                                trade.pnl_pct,
+                                trade.pnl > 0.0,
+                                achieved_rr,
+                            )
+                            .await
+                        {
+                            warn!(
+                                "FID-098: Failed to update episode outcome for {}: {}",
+                                trade.pair, e
+                            );
                         } else {
-                            debug!("FID-098: Updated episode {} outcome: PnL=${:.2} ({})", &episode_id[..8], trade.pnl, tp_label);
+                            debug!(
+                                "FID-098: Updated episode {} outcome: PnL=${:.2} ({})",
+                                &episode_id[..8],
+                                trade.pnl,
+                                tp_label
+                            );
                         }
                     }
                     episode_store.remove(&key);
@@ -4736,7 +5055,11 @@ pub async fn run(
                 // FID-081 Fix 6: Candle staleness warning
                 let candle_age = chrono::Utc::now().signed_duration_since(last_candle.timestamp);
                 if candle_age.num_seconds() > candle_staleness_threshold.as_secs() as i64 {
-                    warn!("FID-081: Candle data stale for {} — last candle {}s ago", pair, candle_age.num_seconds());
+                    warn!(
+                        "FID-081: Candle data stale for {} — last candle {}s ago",
+                        pair,
+                        candle_age.num_seconds()
+                    );
                 }
                 all_prices.insert(pair.clone(), last_candle.close);
             }
@@ -4845,21 +5168,34 @@ pub async fn run(
             // Detects externally sold tokens (manual swap, another app) and removes
             // phantom positions that no longer have on-chain backing.
             if tick == 1 || tick.is_multiple_of(2) {
-                let position_pairs: Vec<(String, String, f64)> = portfolio.positions().iter()
+                let position_pairs: Vec<(String, String, f64)> = portfolio
+                    .positions()
+                    .iter()
                     .map(|(id, p)| (id.clone(), p.pair.clone(), p.quantity))
                     .collect();
 
                 for (pos_id, pair, pos_qty) in position_pairs {
-                    if pos_qty <= 0.0001 { continue; }
+                    if pos_qty <= 0.0001 {
+                        continue;
+                    }
 
                     // Resolve token address — use Side::Short to get the BASE token
                     // (what we hold for a LONG position). Side::Long would return USDC.
-                    if let Ok((base_token, _)) = savant_trading::execution::dex::resolve_pair_on_chain(
-                        &pair, Side::Short, ex.chain_id(),
-                    ) {
-                        if base_token.address.is_empty() { continue; }
+                    if let Ok((base_token, _)) =
+                        savant_trading::execution::dex::resolve_pair_on_chain(
+                            &pair,
+                            Side::Short,
+                            ex.chain_id(),
+                        )
+                    {
+                        if base_token.address.is_empty() {
+                            continue;
+                        }
 
-                        if let Some(on_chain) = ex.query_token_balance(&base_token.address, base_token.decimals).await {
+                        if let Some(on_chain) = ex
+                            .query_token_balance(&base_token.address, base_token.decimals)
+                            .await
+                        {
                             if on_chain <= 0.0001 && pos_qty > 0.0001 {
                                 // EXTERNAL CLOSE: tokens gone from on-chain
                                 warn!(
@@ -4879,12 +5215,18 @@ pub async fn run(
                                         .and_then(|s| s.last().map(|c| c.close))
                                         .unwrap_or(pos.current_price);
                                     let pnl = match pos.side {
-                                        Side::Long => (market_price - pos.entry_price) * pos.quantity,
-                                        Side::Short => (pos.entry_price - market_price) * pos.quantity,
+                                        Side::Long => {
+                                            (market_price - pos.entry_price) * pos.quantity
+                                        }
+                                        Side::Short => {
+                                            (pos.entry_price - market_price) * pos.quantity
+                                        }
                                     };
                                     let pnl_pct = if pos.entry_price > 0.0 && pos.quantity > 0.0 {
                                         pnl / (pos.entry_price * pos.quantity) * 100.0
-                                    } else { 0.0 };
+                                    } else {
+                                        0.0
+                                    };
                                     (pnl, pnl_pct)
                                 } else {
                                     (0.0, 0.0)
@@ -4923,13 +5265,15 @@ pub async fn run(
 
                                 // Remove from PortfolioManager
                                 if let Some(_removed) = portfolio.positions_mut().remove(&pos_id) {
-                                    portfolio.account_mut().open_positions = portfolio.positions().len();
+                                    portfolio.account_mut().open_positions =
+                                        portfolio.positions().len();
                                     reconciliation_removed.insert(pos_id.clone());
                                 }
 
                                 // Remove from DexTrader
                                 {
-                                    let exec_id = executor_position_map.get(&pos_id)
+                                    let exec_id = executor_position_map
+                                        .get(&pos_id)
                                         .cloned()
                                         .unwrap_or_else(|| format!("exec-{}", pos_id));
                                     let ghost = savant_trading::core::types::Position {
@@ -4991,13 +5335,21 @@ pub async fn run(
                                 // FID-098 Fix 1d: Update episodic memory with external close outcome
                                 if let Some(ref mem) = memory {
                                     let pair_prefix = format!("{}-Buy", pair);
-                                    let found = episode_store.iter()
+                                    let found = episode_store
+                                        .iter()
                                         .find(|(k, _)| k.starts_with(&pair_prefix))
                                         .map(|(k, v)| (k.clone(), v.clone()));
                                     if let Some((key, episode_id)) = found {
-                                        if let Err(e) = mem.update_outcome(
-                                            &episode_id, ext_pnl, ext_pnl_pct, ext_pnl > 0.0, 0.0,
-                                        ).await {
+                                        if let Err(e) = mem
+                                            .update_outcome(
+                                                &episode_id,
+                                                ext_pnl,
+                                                ext_pnl_pct,
+                                                ext_pnl > 0.0,
+                                                0.0,
+                                            )
+                                            .await
+                                        {
                                             warn!("FID-098: Failed to update episode for external close {}: {}", pair, e);
                                         } else {
                                             debug!("FID-098: Updated episode {} for external close: PnL=${:.2}", &episode_id[..8], ext_pnl);
@@ -5005,7 +5357,6 @@ pub async fn run(
                                         episode_store.remove(&key);
                                     }
                                 }
-
                             } else if on_chain > 0.0001 && on_chain < pos_qty * 0.5 {
                                 // Partial external close
                                 warn!(
@@ -5122,9 +5473,8 @@ pub async fn run(
 
             // WIRE-7: Update memory snapshot for TUI
             let brier_score = if brier_predictions.len() >= 20 {
-                let score = savant_trading::memory::calibration::calculate_brier_score(
-                    &brier_predictions,
-                );
+                let score =
+                    savant_trading::memory::calibration::calculate_brier_score(&brier_predictions);
                 Some(score.total)
             } else {
                 None
@@ -5270,7 +5620,10 @@ pub async fn run(
                 Err(_) => Vec::new(),
             };
             let path = std::path::PathBuf::from("data/equity_history.json");
-            savant_trading::core::shared::SharedEngineData::save_equity_history(&path, &curve_snapshot);
+            savant_trading::core::shared::SharedEngineData::save_equity_history(
+                &path,
+                &curve_snapshot,
+            );
         }
 
         // FID-164: log cumulative token savings for this cycle, reset for next.
@@ -5322,7 +5675,12 @@ pub async fn run(
                         summary_stale,
                         ctx_state.data_blocks_token_count()
                     ),
-                    Err(e) => log_warn!("CONTEXT", "Pruned {} blocks, summary failed: {}", removed, e),
+                    Err(e) => log_warn!(
+                        "CONTEXT",
+                        "Pruned {} blocks, summary failed: {}",
+                        removed,
+                        e
+                    ),
                 }
             }
         }

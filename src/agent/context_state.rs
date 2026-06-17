@@ -192,8 +192,8 @@ impl ContextState {
         if pair_state.token_savings_history.len() < 2 {
             return false;
         }
-        let last_two = &pair_state.token_savings_history
-            [pair_state.token_savings_history.len() - 2..];
+        let last_two =
+            &pair_state.token_savings_history[pair_state.token_savings_history.len() - 2..];
         let both_inefficient = last_two.iter().all(|&s| s < min_token_savings);
         if both_inefficient {
             // FID-181: demote to debug — per-pair anti-thrashing skip is expected
@@ -315,11 +315,7 @@ impl ContextState {
     ///
     /// This is a wrapper around `LlmSummarizer::prune_for_context_share` that
     /// operates on the `data_blocks` field of `ContextState`.
-    pub fn prune_old_blocks(
-        &mut self,
-        target_share: f64,
-        context_window: usize,
-    ) -> usize {
+    pub fn prune_old_blocks(&mut self, target_share: f64, context_window: usize) -> usize {
         let summarizer = LlmSummarizer::chunking_only();
         summarizer.prune_for_context_share(&mut self.data_blocks, target_share, context_window)
     }
@@ -348,7 +344,10 @@ impl ContextState {
 
     /// Get the current data blocks' total token count.
     pub fn data_blocks_token_count(&self) -> usize {
-        self.data_blocks.iter().map(|b| count_tokens(&b.content)).sum()
+        self.data_blocks
+            .iter()
+            .map(|b| count_tokens(&b.content))
+            .sum()
     }
 
     /// FID-168: add a per-cycle snapshot (one line per pair decision) as a DataBlock.
@@ -366,10 +365,7 @@ impl ContextState {
     /// FID-168: summarize the pruned history via the LLM. Stores the result in
     /// `summary_ctx`. Returns Ok(()) on success (or no-op when no blocks to summarize),
     /// Err on summarization failure.
-    pub async fn summarize_history(
-        &mut self,
-        summarizer: &LlmSummarizer,
-    ) -> Result<(), String> {
+    pub async fn summarize_history(&mut self, summarizer: &LlmSummarizer) -> Result<(), String> {
         if self.data_blocks.is_empty() {
             return Ok(());
         }
@@ -381,7 +377,11 @@ impl ContextState {
                 debug!(
                     "FID-168: summary updated, current_token_count={}, summary_len={}",
                     token_count,
-                    self.summary_ctx.summary.as_ref().map(|s| s.len()).unwrap_or(0)
+                    self.summary_ctx
+                        .summary
+                        .as_ref()
+                        .map(|s| s.len())
+                        .unwrap_or(0)
                 );
                 Ok(())
             }
@@ -489,19 +489,34 @@ mod tests {
         let result = state.compute_delta("BTC/USD", &new, 5);
         // With a 200-line prompt and 1 extra line, ratio ≈ 1/201 ≈ 0.005
         // Threshold = 1 - (5/201) ≈ 0.975, so 0.005 < 0.975 → Delta
-        assert!(matches!(result, DeltaResult::Delta(_) | DeltaResult::Full(_)));
+        assert!(matches!(
+            result,
+            DeltaResult::Delta(_) | DeltaResult::Full(_)
+        ));
     }
 
     #[test]
     fn per_pair_isolation_no_cross_contamination() {
         let mut state = ContextState::new(0.30, 0.50);
         // Pair A gets compressed (Full on first cycle)
-        state.compute_delta("A/USD", "a big long prompt for pair A with many many many tokens", 5);
+        state.compute_delta(
+            "A/USD",
+            "a big long prompt for pair A with many many many tokens",
+            5,
+        );
         // Pair B should still see Full on its first cycle (no bleed from A)
-        let result = state.compute_delta("B/USD", "b big long prompt for pair B with many many many tokens", 5);
+        let result = state.compute_delta(
+            "B/USD",
+            "b big long prompt for pair B with many many many tokens",
+            5,
+        );
         assert!(matches!(result, DeltaResult::Full(_)));
         // Pair A's second call with the SAME text should be NoChange
-        let result_a_again = state.compute_delta("A/USD", "a big long prompt for pair A with many many many tokens", 5);
+        let result_a_again = state.compute_delta(
+            "A/USD",
+            "a big long prompt for pair A with many many many tokens",
+            5,
+        );
         assert!(matches!(result_a_again, DeltaResult::NoChange));
     }
 
@@ -668,7 +683,8 @@ mod tests {
         let mut state = ContextState::new(0.30, 0.50);
         // The engine produces lines like:
         //   [2026-06-16 18:00:00] BTC/USD | PASS Ranging | conf 0% | ATR1.23 ADX18.4 RSI55.2
-        let rich = "[2026-06-16 18:00:00] BTC/USD | PASS Ranging | conf 0% | ATR1.23 ADX18.4 RSI55.2";
+        let rich =
+            "[2026-06-16 18:00:00] BTC/USD | PASS Ranging | conf 0% | ATR1.23 ADX18.4 RSI55.2";
         state.add_cycle_snapshot(rich.to_string());
         assert!(state.data_blocks[0].content.contains("Ranging"));
         assert!(state.data_blocks[0].content.contains("ATR1.23"));
@@ -711,7 +727,11 @@ mod tests {
         assert!(removed > 0, "expected some blocks pruned, got {}", removed);
         // After pruning, blocks remaining should be small.
         let remaining_tokens = state.data_blocks_token_count();
-        assert!(remaining_tokens <= 1000, "tokens after prune {} exceed budget 1000", remaining_tokens);
+        assert!(
+            remaining_tokens <= 1000,
+            "tokens after prune {} exceed budget 1000",
+            remaining_tokens
+        );
     }
 
     #[test]

@@ -136,12 +136,7 @@ struct DiagnosticResponse {
 ///
 /// Creates a timestamped directory under `data/sandbox_responses/` and writes
 /// one JSON file per scenario plus an index file for quick filtering.
-fn save_raw_responses(
-    responses: &[DiagnosticResponse],
-    tag: &str,
-    model: &str,
-    endpoint: &str,
-) {
+fn save_raw_responses(responses: &[DiagnosticResponse], tag: &str, model: &str, endpoint: &str) {
     use std::io::Write;
 
     let timestamp = chrono::Utc::now().format("%Y-%m-%d_%H-%M-%S");
@@ -693,23 +688,21 @@ async fn run_training_batch(
     // PHASE 2c: Save raw responses for diagnostic inspection
     if save_responses {
         let resolved_model = model_override.unwrap_or(&config.ai.model);
-        let diagnostic: Vec<DiagnosticResponse> = all_responses.iter().map(|sr| DiagnosticResponse {
-            scenario_id: sr.scenario_id.clone(),
-            scenario_name: sr.scenario_name.clone(),
-            category: sr.category.clone(),
-            difficulty: String::new(),
-            expected_action: sr.expected_action.clone(),
-            current_price: sr.current_price,
-            raw_response: sr.response.as_ref().ok().cloned(),
-            error: sr.response.as_ref().err().map(|e| e.to_string()),
-            latency_ms: sr.latency_ms,
-        }).collect();
-        save_raw_responses(
-            &diagnostic,
-            "training",
-            resolved_model,
-            &config.ai.endpoint,
-        );
+        let diagnostic: Vec<DiagnosticResponse> = all_responses
+            .iter()
+            .map(|sr| DiagnosticResponse {
+                scenario_id: sr.scenario_id.clone(),
+                scenario_name: sr.scenario_name.clone(),
+                category: sr.category.clone(),
+                difficulty: String::new(),
+                expected_action: sr.expected_action.clone(),
+                current_price: sr.current_price,
+                raw_response: sr.response.as_ref().ok().cloned(),
+                error: sr.response.as_ref().err().map(|e| e.to_string()),
+                latency_ms: sr.latency_ms,
+            })
+            .collect();
+        save_raw_responses(&diagnostic, "training", resolved_model, &config.ai.endpoint);
     }
 
     // PHASE 3: Parse, capture episodes, collect stats
@@ -1496,8 +1489,10 @@ pub async fn run_sandbox(
         .clone()
         .unwrap_or_else(|| config.sandbox.model.clone());
 
-    println!("Sandbox provider: endpoint={} model={} key_env={}",
-        sandbox_endpoint, resolved_model, sandbox_api_key_env);
+    println!(
+        "Sandbox provider: endpoint={} model={} key_env={}",
+        sandbox_endpoint, resolved_model, sandbox_api_key_env
+    );
 
     let api_keys: Vec<String> = std::env::var("SANDBOX_API_KEYS")
         .unwrap_or_else(|_| std::env::var(sandbox_api_key_env).unwrap_or_default())
@@ -1917,23 +1912,21 @@ pub async fn run_sandbox(
 
     // Phase 2c: Save raw responses for diagnostic inspection
     if save_responses {
-        let diagnostic: Vec<DiagnosticResponse> = all_responses.iter().map(|sr| DiagnosticResponse {
-            scenario_id: sr.scenario_id.clone(),
-            scenario_name: sr.scenario_name.clone(),
-            category: sr.category.clone(),
-            difficulty: sr.difficulty.clone(),
-            expected_action: sr.expected_action.clone(),
-            current_price: sr.current_price,
-            raw_response: sr.response.as_ref().ok().cloned(),
-            error: sr.response.as_ref().err().map(|e| e.to_string()),
-            latency_ms: 0,
-        }).collect();
-        save_raw_responses(
-            &diagnostic,
-            "sandbox",
-            &resolved_model,
-            sandbox_endpoint,
-        );
+        let diagnostic: Vec<DiagnosticResponse> = all_responses
+            .iter()
+            .map(|sr| DiagnosticResponse {
+                scenario_id: sr.scenario_id.clone(),
+                scenario_name: sr.scenario_name.clone(),
+                category: sr.category.clone(),
+                difficulty: sr.difficulty.clone(),
+                expected_action: sr.expected_action.clone(),
+                current_price: sr.current_price,
+                raw_response: sr.response.as_ref().ok().cloned(),
+                error: sr.response.as_ref().err().map(|e| e.to_string()),
+                latency_ms: 0,
+            })
+            .collect();
+        save_raw_responses(&diagnostic, "sandbox", &resolved_model, sandbox_endpoint);
     }
 
     // Phase 3: Grade all responses

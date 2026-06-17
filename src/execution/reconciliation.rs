@@ -181,7 +181,8 @@ pub async fn reconcile_wallet_state(
                 // RPC failure: log warn, skip this token (don't halt on transient RPC issues)
                 tracing::warn!(
                     "WALLET_RECONCILIATION: {} per-token balance query failed ({}), skipping",
-                    pair, e
+                    pair,
+                    e
                 );
             }
         }
@@ -264,7 +265,10 @@ async fn query_token_balance(
     // returns 0 — which masquerades as "no balance" rather than an RPC error.
     //
     // This was the actual bug, masked by a wrong initial fix that over-padded.
-    let addr_hex = wallet_address.strip_prefix("0x").unwrap_or(wallet_address).to_lowercase();
+    let addr_hex = wallet_address
+        .strip_prefix("0x")
+        .unwrap_or(wallet_address)
+        .to_lowercase();
     // Do NOT left-pad the address. It must be exactly 20 bytes (40 hex chars).
     let data = format!("0x70a08231000000000000000000000000{}", addr_hex);
 
@@ -290,15 +294,15 @@ async fn query_token_balance(
         .await
         .map_err(|e| format!("rpc send: {}", e))?;
 
-    let json: serde_json::Value = resp
-        .json()
-        .await
-        .map_err(|e| format!("rpc parse: {}", e))?;
+    let json: serde_json::Value = resp.json().await.map_err(|e| format!("rpc parse: {}", e))?;
 
     // Check for JSON-RPC error first (Anvil and other nodes return {"error": {...}})
     if let Some(err) = json.get("error") {
         let code = err.get("code").and_then(|c| c.as_i64()).unwrap_or(0);
-        let msg = err.get("message").and_then(|m| m.as_str()).unwrap_or("unknown");
+        let msg = err
+            .get("message")
+            .and_then(|m| m.as_str())
+            .unwrap_or("unknown");
         return Err(format!("rpc error {}: {}", code, msg));
     }
 
@@ -425,7 +429,7 @@ mod tests {
         // Construct a synthetic report to validate the math.
         let report_under_threshold = ReconciliationReport {
             in_memory_usdc: 100.0,
-            on_chain_usdc: 99.95,  // $0.05 divergence
+            on_chain_usdc: 99.95, // $0.05 divergence
             usdc_divergence: 0.05,
             usdc_divergence_pct: 0.0005,
             in_memory_position_count: 0,
@@ -439,7 +443,7 @@ mod tests {
 
         let report_over_threshold = ReconciliationReport {
             in_memory_usdc: 100.0,
-            on_chain_usdc: 50.0,  // $50 divergence
+            on_chain_usdc: 50.0, // $50 divergence
             usdc_divergence: 50.0,
             usdc_divergence_pct: 0.50,
             in_memory_position_count: 0,

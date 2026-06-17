@@ -62,7 +62,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .await?;
 
-    println!("DexTrader initialized: wallet={:#x}, balance=${:.2}", trader.wallet_address(), ExecutionEngine::balance(&trader));
+    println!(
+        "DexTrader initialized: wallet={:#x}, balance=${:.2}",
+        trader.wallet_address(),
+        ExecutionEngine::balance(&trader)
+    );
     println!();
 
     // Swap params: $5 USDC → WETH on Arbitrum
@@ -104,7 +108,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if buy_f64 > 0.0 {
                     println!("  ✅ Fix 5: buy_amount populated and non-zero");
                     println!("  ✅ Fix 2: Wrapper validation PASSED (buy_amount > 0)");
-                    println!("  ✅ Fix 6: Keystone wiring CONFIRMED (response came through wrapper)");
+                    println!(
+                        "  ✅ Fix 6: Keystone wiring CONFIRMED (response came through wrapper)"
+                    );
                     passed += 3;
                 } else {
                     println!("  ❌ Fix 2: Wrapper should have rejected zero buy_amount!");
@@ -251,14 +257,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("  ✅ PASS: Anvil fork wallet correctly prefunded");
         passed += 1;
     } else {
-        println!("  ❌ FAIL: Wallet not prefunded correctly (ETH={}, USDC={})", eth_balance, usdc_balance);
+        println!(
+            "  ❌ FAIL: Wallet not prefunded correctly (ETH={}, USDC={})",
+            eth_balance, usdc_balance
+        );
         failed += 1;
     }
     println!();
 
     // ─── SUMMARY ───
     println!("========================================");
-    println!("  FID-160 E2E RESULTS: {} passed, {} failed", passed, failed);
+    println!(
+        "  FID-160 E2E RESULTS: {} passed, {} failed",
+        passed, failed
+    );
     println!("========================================");
 
     if failed > 0 {

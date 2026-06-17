@@ -42,7 +42,11 @@ mod tests {
     #[test]
     fn count_simple_text() {
         let count = count_tokens("The quick brown fox jumps over the lazy dog.");
-        assert!(count > 0 && count < 20, "Expected 5-15 tokens, got {}", count);
+        assert!(
+            count > 0 && count < 20,
+            "Expected 5-15 tokens, got {}",
+            count
+        );
     }
 
     #[test]
@@ -60,7 +64,12 @@ mod tests {
         // For numerical data, BPE typically produces MORE tokens than chars/4
         assert!(bpe_count > 0, "BPE count should be > 0");
         // Just verify it's a reasonable number
-        assert!(bpe_count < data.len(), "BPE count ({}) should be < char count ({})", bpe_count, data.len());
+        assert!(
+            bpe_count < data.len(),
+            "BPE count ({}) should be < char count ({})",
+            bpe_count,
+            data.len()
+        );
     }
 
     #[test]
@@ -80,11 +89,19 @@ mod tests {
     #[test]
     fn count_large_prompt() {
         // Simulate a ~31K char prompt
-        let large_text = "ETH/USD candle data: O=2450.50 H=2455.00 L=2448.00 C=2452.00 V=1000.00\n".repeat(400);
+        let large_text =
+            "ETH/USD candle data: O=2450.50 H=2455.00 L=2448.00 C=2452.00 V=1000.00\n".repeat(400);
         let count = count_tokens(&large_text);
-        assert!(count > 500, "Large prompt should have >500 tokens, got {}", count);
+        assert!(
+            count > 500,
+            "Large prompt should have >500 tokens, got {}",
+            count
+        );
         // Verify it's not just chars/4
         let chars4 = large_text.len() / 4;
-        assert!(count != chars4 || large_text.len() < 100, "BPE should differ from chars/4 for large text");
+        assert!(
+            count != chars4 || large_text.len() < 100,
+            "BPE should differ from chars/4 for large text"
+        );
     }
 }

@@ -282,13 +282,15 @@ async fn get_decisions(State(state): State<AppState>) -> Json<ApiResponse<Vec<De
     // FID-119: Raised from 20 to 50 for scan_all_pairs mode (53 pairs max)
     const MAX_DECISIONS: usize = 50;
     const MAX_NON_PASS: usize = 15;
-    let non_pass: Vec<DecisionRecord> = decisions.iter()
+    let non_pass: Vec<DecisionRecord> = decisions
+        .iter()
         .rev()
         .filter(|d| !d.action.eq_ignore_ascii_case("Pass"))
         .take(MAX_NON_PASS)
         .cloned()
         .collect();
-    let pass: Vec<DecisionRecord> = decisions.iter()
+    let pass: Vec<DecisionRecord> = decisions
+        .iter()
         .rev()
         .filter(|d| d.action.eq_ignore_ascii_case("Pass"))
         .take(MAX_DECISIONS.saturating_sub(non_pass.len()))
@@ -451,7 +453,11 @@ async fn get_session(State(state): State<AppState>) -> Json<ApiResponse<serde_js
     // Falls back to config only if journal has no entry yet.
     let starting = {
         let se = *state.shared.starting_equity.read().await;
-        if se > 0.01 { se } else { state.config.trading.starting_balance }
+        if se > 0.01 {
+            se
+        } else {
+            state.config.trading.starting_balance
+        }
     };
 
     // Count ALL trades for win/loss
@@ -460,7 +466,11 @@ async fn get_session(State(state): State<AppState>) -> Json<ApiResponse<serde_js
 
     // FID-116: Use chain_equity for true PnL (not stale portfolio equity).
     let chain_eq = *state.shared.chain_equity.read().await;
-    let current_equity = if chain_eq > 0.0 { chain_eq } else { account.equity };
+    let current_equity = if chain_eq > 0.0 {
+        chain_eq
+    } else {
+        account.equity
+    };
     let true_pnl = current_equity - starting;
 
     Json(ApiResponse::ok(serde_json::json!({
@@ -513,7 +523,8 @@ async fn get_jury_recent(
     State(state): State<AppState>,
 ) -> Json<ApiResponse<Vec<savant_trading::agent::jury::JuryCycleRecord>>> {
     let recent = state.shared.jury_recent.read().await;
-    let cycles: Vec<savant_trading::agent::jury::JuryCycleRecord> = recent.iter().cloned().collect();
+    let cycles: Vec<savant_trading::agent::jury::JuryCycleRecord> =
+        recent.iter().cloned().collect();
     Json(ApiResponse::ok(cycles))
 }
 
@@ -615,7 +626,10 @@ async fn start_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_j
             });
 
             *state.engine_child.lock().unwrap_or_else(|e| e.into_inner()) = None;
-            *state.engine_started_at.lock().unwrap_or_else(|e| e.into_inner()) = Some(Instant::now());
+            *state
+                .engine_started_at
+                .lock()
+                .unwrap_or_else(|e| e.into_inner()) = Some(Instant::now());
 
             let mut status = state.engine_status.write().await;
             status.running = true;
@@ -638,12 +652,19 @@ async fn start_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_j
 }
 
 async fn stop_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
-    let child = state.engine_child.lock().unwrap_or_else(|e| e.into_inner()).take();
+    let child = state
+        .engine_child
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .take();
     if let Some(mut child) = child {
         let _ = child.start_kill();
     }
     state.engine_running.store(false, Ordering::Relaxed);
-    *state.engine_started_at.lock().unwrap_or_else(|e| e.into_inner()) = None;
+    *state
+        .engine_started_at
+        .lock()
+        .unwrap_or_else(|e| e.into_inner()) = None;
 
     let mut status = state.engine_status.write().await;
     status.running = false;
@@ -658,12 +679,19 @@ async fn stop_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_js
 async fn restart_engine(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
     // Stop
     {
-        let child = state.engine_child.lock().unwrap_or_else(|e| e.into_inner()).take();
+        let child = state
+            .engine_child
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .take();
         if let Some(mut child) = child {
             let _ = child.start_kill();
         }
         state.engine_running.store(false, Ordering::Relaxed);
-        *state.engine_started_at.lock().unwrap_or_else(|e| e.into_inner()) = None;
+        *state
+            .engine_started_at
+            .lock()
+            .unwrap_or_else(|e| e.into_inner()) = None;
     }
     tokio::time::sleep(std::time::Duration::from_millis(500)).await;
 
@@ -776,7 +804,8 @@ async fn get_wallet(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
     let cached_addr = state.shared.wallet_address.read().await;
     let address = if cached_addr.is_empty() {
         // Fallback: derive on first request if startup caching failed
-        let private_key = std::env::var(&state.config.exchange.dex.wallet_key_env).unwrap_or_default();
+        let private_key =
+            std::env::var(&state.config.exchange.dex.wallet_key_env).unwrap_or_default();
         if private_key.is_empty() {
             return Json(ApiResponse {
                 data: serde_json::json!({"address": null, "error": "WALLET_PRIVATE_KEY not set"}),
@@ -805,7 +834,9 @@ async fn get_wallet(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
     let eth_balance = query_eth_balance(rpc_url, &address).await;
 
     // Query USDC balance
-    let usdc_contract = match savant_trading::execution::dex::usdc_address_for_chain(state.config.exchange.dex.chain_id) {
+    let usdc_contract = match savant_trading::execution::dex::usdc_address_for_chain(
+        state.config.exchange.dex.chain_id,
+    ) {
         Some(addr) => addr,
         None => {
             return Json(ApiResponse {
@@ -1151,10 +1182,7 @@ async fn agent_command_rest(
     State(state): State<AppState>,
     axum::extract::Json(body): axum::extract::Json<serde_json::Value>,
 ) -> axum::extract::Json<serde_json::Value> {
-    let input = body
-        .get("command")
-        .and_then(|v| v.as_str())
-        .unwrap_or("");
+    let input = body.get("command").and_then(|v| v.as_str()).unwrap_or("");
     let response = handle_command(input, &state.shared).await;
     axum::extract::Json(serde_json::to_value(&response).unwrap_or_default())
 }
@@ -1182,10 +1210,7 @@ async fn handle_command(
         OperatorCommand::OverrideStop { pair, stop_loss } => {
             let mut overrides = shared.stop_overrides.write().await;
             overrides.insert(pair.clone(), stop_loss);
-            CommandResponse::success(format!(
-                "Stop set to {:.4} for {}",
-                stop_loss, pair
-            ))
+            CommandResponse::success(format!("Stop set to {:.4} for {}", stop_loss, pair))
         }
 
         OperatorCommand::InjectContext { message } => {
@@ -1204,9 +1229,7 @@ async fn handle_command(
             CommandResponse::success("Trading paused — engine will stop after current cycle")
         }
 
-        OperatorCommand::Resume => {
-            CommandResponse::success("Trading resumed")
-        }
+        OperatorCommand::Resume => CommandResponse::success("Trading resumed"),
 
         OperatorCommand::Status => {
             let account = shared.account.read().await;
@@ -1267,7 +1290,11 @@ async fn handle_command(
             }
         }
 
-        OperatorCommand::Feedback { pair, verdict, note } => {
+        OperatorCommand::Feedback {
+            pair,
+            verdict,
+            note,
+        } => {
             // Store feedback for episodic memory calibration
             CommandResponse::success(format!(
                 "Feedback recorded for {}: {} — {}",
@@ -1278,22 +1305,18 @@ async fn handle_command(
         }
 
         OperatorCommand::Watch { pair, cycles } => {
-            CommandResponse::success(format!(
-                "Watching {} for {} cycles",
-                pair, cycles
-            ))
+            CommandResponse::success(format!("Watching {} for {} cycles", pair, cycles))
         }
 
         OperatorCommand::Undo => {
             let mut history = shared.command_history.write().await;
             if let Some(entry) = history.pop_back() {
                 // Execute the inverse command
-                let inverse_response = Box::pin(handle_command_inner(
-                    &entry.inverse,
-                    shared,
+                let inverse_response = Box::pin(handle_command_inner(&entry.inverse, shared)).await;
+                CommandResponse::success(format!(
+                    "Undone: {}",
+                    inverse_response.message.unwrap_or_default()
                 ))
-                .await;
-                CommandResponse::success(format!("Undone: {}", inverse_response.message.unwrap_or_default()))
             } else {
                 CommandResponse::error("Nothing to undo")
             }
@@ -1316,7 +1339,10 @@ async fn handle_command_inner(
         savant_trading::agent::commands::OperatorCommand::OverrideClose { pair, .. } => {
             let mut overrides = shared.close_overrides.write().await;
             overrides.insert(pair.clone(), true);
-            savant_trading::agent::commands::CommandResponse::success(format!("Undone: closing {}", pair))
+            savant_trading::agent::commands::CommandResponse::success(format!(
+                "Undone: closing {}",
+                pair
+            ))
         }
         savant_trading::agent::commands::OperatorCommand::OverrideStop { pair, stop_loss } => {
             let mut overrides = shared.stop_overrides.write().await;
@@ -1348,7 +1374,8 @@ fn compute_engine_mode(config: &savant_trading::core::config::AppConfig) -> Stri
     }
     // Check the active chain's RPC URL for local-fork markers.
     // SAVANT_CHAIN env var (default "arbitrum") selects which chain config to use.
-    let active_chain_name = std::env::var("SAVANT_CHAIN").unwrap_or_else(|_| "arbitrum".to_string());
+    let active_chain_name =
+        std::env::var("SAVANT_CHAIN").unwrap_or_else(|_| "arbitrum".to_string());
     if let Some(chain_cfg) = config.chains.get(&active_chain_name) {
         let rpc = chain_cfg.rpc_url.to_lowercase();
         // Local-fork markers: 127.0.0.1, localhost, hardhat, anvil, ganache.
@@ -1485,7 +1512,12 @@ mod tests {
         let record = savant_trading::agent::jury::JuryCycleRecord {
             cycle_id: 42,
             timestamp: "2026-06-15T20:00:00Z".to_string(),
-            verdict_breakdown: savant_trading::agent::jury::VerdictBreakdown { buy: 3, sell: 2, hold: 5, failed: 0 },
+            verdict_breakdown: savant_trading::agent::jury::VerdictBreakdown {
+                buy: 3,
+                sell: 2,
+                hold: 5,
+                failed: 0,
+            },
             consensus_strength: 0.65,
             consensus_action: "HOLD".to_string(),
             quorum_met: true,
@@ -1515,7 +1547,8 @@ mod tests {
         assert!(json.contains("BTC/USD"));
         assert!(json.contains("minimax/m3"));
         // Round-trip
-        let parsed: savant_trading::agent::jury::JuryCycleRecord = serde_json::from_str(&json).unwrap();
+        let parsed: savant_trading::agent::jury::JuryCycleRecord =
+            serde_json::from_str(&json).unwrap();
         assert_eq!(parsed.cycle_id, 42);
         assert_eq!(parsed.veto_enforced_pairs, vec!["BTC/USD".to_string()]);
     }

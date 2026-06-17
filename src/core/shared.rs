@@ -1,8 +1,8 @@
 //! Shared engine state for cross-module access (API, TUI, engine).
 
+use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
 use std::sync::Arc;
-use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 
 use crate::agent::jury::{JuryCycleRecord, JuryKeyHealth, JuryPoolMetrics};
@@ -79,7 +79,7 @@ pub struct JuryStateSnapshot {
     pub estimated_free_model_calls: u64,
     pub veto_flag_active_now: bool,
     pub last_cycle_at: Option<String>, // null if never ran
-    pub source: String, // "live" | "stale" | "never_ran" | "engine_off" | "disabled"
+    pub source: String,                // "live" | "stale" | "never_ran" | "engine_off" | "disabled"
 }
 
 impl Default for JuryStateSnapshot {
@@ -344,7 +344,12 @@ impl SharedEngineData {
             return;
         }
         if let Err(e) = std::fs::rename(&tmp_path, path) {
-            tracing::warn!("FID-181: failed to rename {} -> {}: {}", tmp_path.display(), path.display(), e);
+            tracing::warn!(
+                "FID-181: failed to rename {} -> {}: {}",
+                tmp_path.display(),
+                path.display(),
+                e
+            );
         }
     }
 }
@@ -407,7 +412,10 @@ mod tests {
         let tmp = std::env::temp_dir().join("savant_equity_malformed.json");
         std::fs::write(&tmp, "{ this is not json").unwrap();
         let result = SharedEngineData::load_equity_history(&tmp);
-        assert!(result.is_empty(), "malformed JSON should return empty, not panic");
+        assert!(
+            result.is_empty(),
+            "malformed JSON should return empty, not panic"
+        );
         let _ = std::fs::remove_file(&tmp);
     }
 }

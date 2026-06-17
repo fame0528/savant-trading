@@ -50,7 +50,10 @@ pub struct ReconcileResult {
 
 impl ReconcileResult {
     pub fn is_clean(&self) -> bool {
-        self.to_add.is_empty() && self.to_close.is_empty() && self.to_update.is_empty() && self.drift_usd < 0.10
+        self.to_add.is_empty()
+            && self.to_close.is_empty()
+            && self.to_update.is_empty()
+            && self.drift_usd < 0.10
     }
 }
 
@@ -85,9 +88,15 @@ impl ChainPositionRecovery {
             .connect_timeout(Duration::from_secs(3))
             .build()
             .unwrap_or_else(|_| Client::new());
-        let wallet_address_lowercase =
-            config.wallet_address.trim_start_matches("0x").to_lowercase();
-        Self { config, client, wallet_address_lowercase }
+        let wallet_address_lowercase = config
+            .wallet_address
+            .trim_start_matches("0x")
+            .to_lowercase();
+        Self {
+            config,
+            client,
+            wallet_address_lowercase,
+        }
     }
 
     /// Build the calldata for `balanceOf(address)` per the canonical ABI encoding:
@@ -106,11 +115,7 @@ impl ChainPositionRecovery {
     /// Query the chain for a single token's balance in this wallet.
     /// Returns the balance as a human-readable float, or `None` on RPC error.
     /// Filters out zero balances (no point tracking them).
-    pub async fn query_token_balance(
-        &self,
-        token_address: &str,
-        decimals: u8,
-    ) -> Option<f64> {
+    pub async fn query_token_balance(&self, token_address: &str, decimals: u8) -> Option<f64> {
         let token_lower = token_address.trim_start_matches("0x").to_lowercase();
         let calldata = self.balance_of_calldata();
         let body = serde_json::json!({
@@ -169,10 +174,7 @@ impl ChainPositionRecovery {
     /// `timestamp` field as a `DateTime<Utc>`, or `None` on any error.
     /// This is what we use to populate `Position.opened_at` — the chain has
     /// the exact second, so no estimation is needed.
-    pub async fn get_block_timestamp(
-        &self,
-        block_number: u64,
-    ) -> Option<DateTime<Utc>> {
+    pub async fn get_block_timestamp(&self, block_number: u64) -> Option<DateTime<Utc>> {
         let body = serde_json::json!({
             "jsonrpc": "2.0",
             "id": 1u64,
@@ -236,10 +238,7 @@ impl ChainPositionRecovery {
     /// `known_tokens` is a list of `(symbol, address, decimals)` for tokens
     /// the engine might be holding. The full universe of tokens is large;
     /// we only query tokens we know about (from `data/tokens.json`).
-    pub async fn scan_all_positions(
-        &self,
-        known_tokens: &[(String, String, u8)],
-    ) -> Vec<Position> {
+    pub async fn scan_all_positions(&self, known_tokens: &[(String, String, u8)]) -> Vec<Position> {
         let now = Utc::now();
         let latest_block = self.latest_block().await.unwrap_or(0);
         let block_ts = if latest_block > 0 {
@@ -347,10 +346,7 @@ impl ChainPositionRecovery {
         for chain_pos in &chain_positions {
             let engine_match = current_positions
                 .values()
-                .find(|p| {
-                    !p.token_address.is_empty()
-                        && p.token_address == chain_pos.token_address
-                })
+                .find(|p| !p.token_address.is_empty() && p.token_address == chain_pos.token_address)
                 .cloned();
             match engine_match {
                 None => {
@@ -393,9 +389,7 @@ impl ChainPositionRecovery {
 /// Returns a vector of (symbol, address, decimals) for every non-empty
 /// address in the token store. The engine loads this once at startup
 /// and reuses it for both initial scan and periodic reconciliation.
-pub fn load_known_tokens_from_store(
-    tokens: &[TokenStoreEntry],
-) -> Vec<(String, String, u8)> {
+pub fn load_known_tokens_from_store(tokens: &[TokenStoreEntry]) -> Vec<(String, String, u8)> {
     let mut out = Vec::new();
     for token in tokens {
         if token.address.is_empty() {

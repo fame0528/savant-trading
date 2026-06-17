@@ -437,7 +437,9 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
         ctx.account.max_positions
     ));
     if ctx.account.open_positions >= ctx.account.max_positions {
-        msg.push_str("**AT MAX POSITIONS** — Do not propose new entries. Only ADJUST_STOP or PASS.\n");
+        msg.push_str(
+            "**AT MAX POSITIONS** — Do not propose new entries. Only ADJUST_STOP or PASS.\n",
+        );
     }
     if is_hunt_mode {
         msg.push_str(&format!(
@@ -527,9 +529,14 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
     // FID-125: Inject active pair list so the model knows its trading universe
     if let Some(pairs) = ctx.active_pairs {
         if !pairs.is_empty() {
-            msg.push_str(&format!("\n## Active Trading Universe ({} pairs)\n", pairs.len()));
+            msg.push_str(&format!(
+                "\n## Active Trading Universe ({} pairs)\n",
+                pairs.len()
+            ));
             msg.push_str(&pairs.join(", "));
-            msg.push_str("\nThe pair shown above is already vetted for liquidity and safety. Evaluate it.");
+            msg.push_str(
+                "\nThe pair shown above is already vetted for liquidity and safety. Evaluate it.",
+            );
         }
     }
 

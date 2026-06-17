@@ -79,7 +79,7 @@ impl JuryKeyManager {
                 .client
                 .create_key(CreateKeyRequest {
                     name: label.clone(),
-                    limit: None,        // Free models = $0 cost
+                    limit: None, // Free models = $0 cost
                     limit_reset: None,
                     include_byok_in_limit: None,
                 })
@@ -87,13 +87,19 @@ impl JuryKeyManager {
             {
                 Ok(created) => {
                     let key_preview = if created.key.len() > 12 {
-                        format!("{}...{}", &created.key[..8], &created.key[created.key.len()-4..])
+                        format!(
+                            "{}...{}",
+                            &created.key[..8],
+                            &created.key[created.key.len() - 4..]
+                        )
                     } else {
                         created.key.clone()
                     };
                     tracing::debug!(
                         "Jury key [{}] created: key_preview={}, hash={}",
-                        i, key_preview, created.data.hash.as_deref().unwrap_or("unknown")
+                        i,
+                        key_preview,
+                        created.data.hash.as_deref().unwrap_or("unknown")
                     );
                     keys.push(JuryKey {
                         api_key: created.key,
@@ -192,8 +198,16 @@ impl JuryKeyManager {
                         orphaned.len()
                     );
                     for key in &orphaned {
-                        if let Err(e) = self.client.delete_key(key.hash.as_deref().unwrap_or("")).await {
-                            warn!("Failed to delete orphaned key '{}': {}", key.name.as_deref().unwrap_or("?"), e);
+                        if let Err(e) = self
+                            .client
+                            .delete_key(key.hash.as_deref().unwrap_or(""))
+                            .await
+                        {
+                            warn!(
+                                "Failed to delete orphaned key '{}': {}",
+                                key.name.as_deref().unwrap_or("?"),
+                                e
+                            );
                         }
                     }
                 }
@@ -274,7 +288,10 @@ impl Drop for JuryKeyManager {
                             info!("Drop: deleted jury key: {}", key.label);
                         }
                     }
-                    info!("Drop: jury key cleanup complete: {} keys deleted", keys.len());
+                    info!(
+                        "Drop: jury key cleanup complete: {} keys deleted",
+                        keys.len()
+                    );
                 });
             }
             Err(_) => {

@@ -31,7 +31,8 @@ impl KuCoinSource {
         if parts.len() != 2 {
             return None;
         }
-        let base = crate::core::types::Candle::exchange_base(parts[0].to_uppercase().as_str()).to_string();
+        let base =
+            crate::core::types::Candle::exchange_base(parts[0].to_uppercase().as_str()).to_string();
         let quote = parts[1].to_uppercase();
 
         let kc_quote = match quote.as_str() {

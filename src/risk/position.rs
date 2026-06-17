@@ -363,10 +363,14 @@ mod tests {
         let result = sizer.calculate(&account, 100.0, 95.0, 110.0, Side::Long);
         let ps = result.expect("basic sizing should succeed");
         match ps {
-            PositionSize::Sized { quantity, risk_amount, .. } => {
+            PositionSize::Sized {
+                quantity,
+                risk_amount,
+                ..
+            } => {
                 assert_eq!(risk_amount, 500.0); // 10% of 5000
-                // Risk-based size = 500/5 = 100 units, but max_position_pct
-                // (30% of $5000=$1500) caps at 15
+                                                // Risk-based size = 500/5 = 100 units, but max_position_pct
+                                                // (30% of $5000=$1500) caps at 15
                 assert_eq!(quantity, 15.0);
             }
             PositionSize::Refused { reason } => {
@@ -414,8 +418,14 @@ mod tests {
         let sizer = PositionSizer::new(0.02, 1.5);
         let account = make_account(30.0);
         let result = sizer.calculate_with_conviction(
-            &account, 100.0, 95.0, 110.0, Side::Long,
-            0.50, 1.0, None,
+            &account,
+            100.0,
+            95.0,
+            110.0,
+            Side::Long,
+            0.50,
+            1.0,
+            None,
         );
         // At 0.50, scaler=0 → sized risk is 0
         match result {
@@ -433,8 +443,14 @@ mod tests {
         let sizer = PositionSizer::new(0.02, 1.5);
         let account = make_account(30.0);
         let result = sizer.calculate_with_conviction(
-            &account, 100.0, 95.0, 110.0, Side::Long,
-            0.30, 1.0, None,
+            &account,
+            100.0,
+            95.0,
+            110.0,
+            Side::Long,
+            0.30,
+            1.0,
+            None,
         );
         match result {
             PositionSize::Refused { reason } => {
@@ -454,12 +470,24 @@ mod tests {
 
         // Compute relative scaling: 0.75 should give 0.5x the risk of 1.0
         let r_full = sizer.calculate_with_conviction(
-            &account, 100.0, 95.0, 110.0, Side::Long,
-            1.00, 1.0, None,
+            &account,
+            100.0,
+            95.0,
+            110.0,
+            Side::Long,
+            1.00,
+            1.0,
+            None,
         );
         let r_75 = sizer.calculate_with_conviction(
-            &account, 100.0, 95.0, 110.0, Side::Long,
-            0.75, 1.0, None,
+            &account,
+            100.0,
+            95.0,
+            110.0,
+            Side::Long,
+            0.75,
+            1.0,
+            None,
         );
 
         let risk_full = match r_full {
@@ -486,8 +514,14 @@ mod tests {
         let account = make_account(30.0);
         // conviction=0.55 → scaler=0.1 → tiny risk. Gas=$1.50 > 0.5 * tiny risk → refuse
         let result = sizer.calculate_with_conviction(
-            &account, 100.0, 95.0, 110.0, Side::Long,
-            0.55, 1.0, Some(1.50),
+            &account,
+            100.0,
+            95.0,
+            110.0,
+            Side::Long,
+            0.55,
+            1.0,
+            Some(1.50),
         );
         // Note: $30 balance at 0.55 conviction produces ~$0.03 risk.
         // gas=$1.50 > 0.5 * $0.03 = $0.015 → refuse.
@@ -495,7 +529,10 @@ mod tests {
         // Either refusal reason is acceptable; we test that SOME guard fired.
         match result {
             PositionSize::Refused { reason } => {
-                assert!(matches!(reason, RefusalReason::UneconomicGas | RefusalReason::BelowMinNotional));
+                assert!(matches!(
+                    reason,
+                    RefusalReason::UneconomicGas | RefusalReason::BelowMinNotional
+                ));
             }
             PositionSize::Sized { .. } => {
                 panic!("expected refusal (gas or min-notional), got sized");
@@ -510,8 +547,14 @@ mod tests {
         // Low conviction + high balance isn't possible since 0.50 = scaler=0
         // Use a low balance + borderline conviction: scaled risk should be < $1
         let result = sizer.calculate_with_conviction(
-            &account, 100.0, 95.0, 110.0, Side::Long,
-            0.55, 0.25, None, // sizing=0.25 makes scaled_risk even smaller
+            &account,
+            100.0,
+            95.0,
+            110.0,
+            Side::Long,
+            0.55,
+            0.25,
+            None, // sizing=0.25 makes scaled_risk even smaller
         );
         match result {
             PositionSize::Refused { reason } => {
@@ -529,12 +572,24 @@ mod tests {
         let account = make_account(5000.0);
 
         let r_full = sizer.calculate_with_conviction(
-            &account, 100.0, 95.0, 110.0, Side::Long,
-            0.75, 1.0, None,
+            &account,
+            100.0,
+            95.0,
+            110.0,
+            Side::Long,
+            0.75,
+            1.0,
+            None,
         );
         let r_half = sizer.calculate_with_conviction(
-            &account, 100.0, 95.0, 110.0, Side::Long,
-            0.75, 0.5, None,
+            &account,
+            100.0,
+            95.0,
+            110.0,
+            Side::Long,
+            0.75,
+            0.5,
+            None,
         );
 
         let risk_full = match r_full {
@@ -572,27 +627,45 @@ mod tests {
         // $400 → tier=1.00, tier_risk_amount=400, scaled_risk = 400 * 0.01 = 4.0
         let acct_400 = make_account(400.0);
         let r_400 = sizer.calculate_with_conviction(
-            &acct_400, 100.0, 95.0, 110.0, Side::Long,
-            1.0, 1.0, None,
+            &acct_400,
+            100.0,
+            95.0,
+            110.0,
+            Side::Long,
+            1.0,
+            1.0,
+            None,
         );
 
         // $2000 → tier=0.10, tier_risk_amount=200, scaled_risk = 200 * 0.01 = 2.0
         let acct_2000 = make_account(2000.0);
         let r_2000 = sizer.calculate_with_conviction(
-            &acct_2000, 100.0, 95.0, 110.0, Side::Long,
-            1.0, 1.0, None,
+            &acct_2000,
+            100.0,
+            95.0,
+            110.0,
+            Side::Long,
+            1.0,
+            1.0,
+            None,
         );
 
         let risk_400 = match r_400 {
             PositionSize::Sized { risk_amount, .. } => risk_amount,
             PositionSize::Refused { reason } => {
-                panic!("$400 / tier=1.00 should be sized, got refused: {:?}", reason);
+                panic!(
+                    "$400 / tier=1.00 should be sized, got refused: {:?}",
+                    reason
+                );
             }
         };
         let risk_2000 = match r_2000 {
             PositionSize::Sized { risk_amount, .. } => risk_amount,
             PositionSize::Refused { reason } => {
-                panic!("$2000 / tier=0.10 should be sized, got refused: {:?}", reason);
+                panic!(
+                    "$2000 / tier=0.10 should be sized, got refused: {:?}",
+                    reason
+                );
             }
         };
 

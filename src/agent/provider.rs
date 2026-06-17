@@ -99,18 +99,19 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                 ],
             )
         }
-        "ollama" => (                LlmConfig {
-                    endpoint: "http://localhost:11434/v1".to_string(),
-                    model: ai_cfg.model.clone(),
-                    api_key: String::new(),
-                    max_tokens: ai_cfg.max_tokens,
-                    temperature: ai_cfg.temperature,
-                    top_p: ai_cfg.top_p,
-                    timeout_secs: ai_cfg.timeout_secs.max(300),
-                    streaming_timeout_secs: ai_cfg.streaming_timeout_secs.max(300),
-                    extra_headers: vec![],
-                    disable_thinking: ai_cfg.disable_thinking,
-                },
+        "ollama" => (
+            LlmConfig {
+                endpoint: "http://localhost:11434/v1".to_string(),
+                model: ai_cfg.model.clone(),
+                api_key: String::new(),
+                max_tokens: ai_cfg.max_tokens,
+                temperature: ai_cfg.temperature,
+                top_p: ai_cfg.top_p,
+                timeout_secs: ai_cfg.timeout_secs.max(300),
+                streaming_timeout_secs: ai_cfg.streaming_timeout_secs.max(300),
+                extra_headers: vec![],
+                disable_thinking: ai_cfg.disable_thinking,
+            },
             vec![],
         ),
         "nvidia" => {
@@ -149,18 +150,19 @@ pub fn create_provider(ai_cfg: &AiConfig) -> LlmProvider {
                 vec![],
             )
         }
-        _ => (                LlmConfig {
-                    endpoint: ai_cfg.endpoint.clone(),
-                    model: ai_cfg.model.clone(),
-                    api_key: std::env::var(&ai_cfg.api_key_env).unwrap_or_default(),
-                    max_tokens: ai_cfg.max_tokens,
-                    temperature: ai_cfg.temperature,
-                    top_p: ai_cfg.top_p,
-                    timeout_secs: ai_cfg.timeout_secs,
-                    streaming_timeout_secs: ai_cfg.streaming_timeout_secs,
-                    extra_headers: vec![],
-                    disable_thinking: ai_cfg.disable_thinking,
-                },
+        _ => (
+            LlmConfig {
+                endpoint: ai_cfg.endpoint.clone(),
+                model: ai_cfg.model.clone(),
+                api_key: std::env::var(&ai_cfg.api_key_env).unwrap_or_default(),
+                max_tokens: ai_cfg.max_tokens,
+                temperature: ai_cfg.temperature,
+                top_p: ai_cfg.top_p,
+                timeout_secs: ai_cfg.timeout_secs,
+                streaming_timeout_secs: ai_cfg.streaming_timeout_secs,
+                extra_headers: vec![],
+                disable_thinking: ai_cfg.disable_thinking,
+            },
             vec![],
         ),
     };
@@ -186,7 +188,9 @@ impl LlmProvider {
             .build()
             .unwrap_or_else(|_| reqwest::Client::new());
         let streaming_client = reqwest::Client::builder()
-            .timeout(std::time::Duration::from_secs(config.streaming_timeout_secs))
+            .timeout(std::time::Duration::from_secs(
+                config.streaming_timeout_secs,
+            ))
             .build()
             .unwrap_or_else(|_| reqwest::Client::new());
         Self {
@@ -302,7 +306,12 @@ impl LlmProvider {
         Self::parse_non_streaming(resp).await
     }
 
-    pub(crate) fn build_body(&self, system: &str, messages: &[Message], stream: bool) -> serde_json::Value {
+    pub(crate) fn build_body(
+        &self,
+        system: &str,
+        messages: &[Message],
+        stream: bool,
+    ) -> serde_json::Value {
         // FID-085: Check model capabilities for cache_control support
         let caps = crate::agent::provider_caps::ModelCapabilities::for_model(&self.config.model);
 
@@ -638,7 +647,10 @@ impl LlmProvider {
                         let wait = 2u64.pow(attempt + 1);
                         tracing::warn!(
                             "jury request failed (attempt {}/{}): {}. Retrying in {}s...",
-                            attempt + 1, max_attempts, last_err, wait
+                            attempt + 1,
+                            max_attempts,
+                            last_err,
+                            wait
                         );
                         tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
                         continue;
@@ -654,7 +666,10 @@ impl LlmProvider {
                     let wait = 2u64.pow(attempt + 1);
                     tracing::warn!(
                         "jury HTTP {} (attempt {}/{}). Retrying in {}s...",
-                        status, attempt + 1, max_attempts, wait
+                        status,
+                        attempt + 1,
+                        max_attempts,
+                        wait
                     );
                     tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
                     continue;
