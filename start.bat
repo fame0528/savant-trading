@@ -54,9 +54,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%PS_TEMP%" 2>nul
 del "%PS_TEMP%" 2>nul
 
 :: 2. Kill stale dashboard dev server AND M3 proxy (both are node.exe).
-::    We accept killing all node.exe here because there are no other
-::    intentional node processes for this project.
-> "%PS_TEMP%" echo Get-Process -Name node -ErrorAction SilentlyContinue ^| ForEach-Object { taskkill /F /PID $_.Id 2^>$null ; Write-Output ("Killed node PID " + $_.Id) }
+::    Scoped by command-line filter: only kill node processes whose
+::    cmdline contains "savant-trading" or "m3-proxy". This protects
+::    kilo CLI and any other unrelated node processes (MCP servers,
+::    firebase-tools, playwright, etc.) that kilo spawns.
+::    Pattern mirrors line 52's savant.exe path filter.
+> "%PS_TEMP%" echo $procs = Get-Process -Name node -ErrorAction SilentlyContinue ; foreach ($p in $procs) { $cmd = (Get-CimInstance Win32_Process -Filter "ProcessId = $($p.Id)").CommandLine ; if ($cmd -like '*savant-trading*' -or $cmd -like '*m3-proxy*') { taskkill /F /PID $p.Id 2^>$null ; Write-Output ("Killed savant node PID " + $p.Id) } }
 powershell -NoProfile -ExecutionPolicy Bypass -File "%PS_TEMP%" 2>nul
 del "%PS_TEMP%" 2>nul
 
