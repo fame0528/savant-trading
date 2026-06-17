@@ -45,23 +45,28 @@ pub enum RegimeLabel {
 }
 
 impl RegimeLabel {
-    /// FID-126: Regime-dependent conviction threshold.
+    /// FID-126 + FID-184: Regime-dependent conviction threshold.
     /// Below this threshold, new entries (BUY/SELL) are downgraded to Hold.
     ///
-    /// **v0.14.0 (MS-2 tune #2):** Thresholds lowered further from 0.30/0.40/0.40/0.40
-    /// to 0.20/0.25/0.25/0.25. Rationale: M3 sandbox 2026-06-12_22-09-12 produced
-    /// 88% Pass rate with conviction scores 0.00-0.43. The model's natural output
-    /// band is 0.0-0.5. Thresholds must sit inside that band. Target: BUY rate 15-30%,
-    /// failure rate < 10%. Ranging gets same threshold as Volatile/GreyZone (0.25)
-    /// because Ranging scenarios dominate the corpus (44%) and the old 0.75 was
-    /// unreachable. Trending stays lower (0.20) because trend-following has higher
-    /// signal quality.
+    /// **v0.14.5 (FID-184):** Thresholds lowered from 0.20/0.25/0.25/0.25 to
+    /// 0.05-0.18 dynamic by regime per Gemini Q1 research ("0.20-0.25 is
+    /// mathematically prohibitive" for scalping). Sniper/scalping strategy
+    /// (Spencer directive 2026-06-17): turn small positions into larger ones,
+    /// capture 0.5-1.2% moves. Higher Kelly multipliers (Trending 0.25x)
+    /// compensate for lower thresholds via smaller position size.
     pub fn conviction_threshold(self) -> f64 {
         match self {
-            RegimeLabel::Trending => 0.20,
-            RegimeLabel::Volatile => 0.25,
-            RegimeLabel::Ranging => 0.25,
-            RegimeLabel::GreyZone => 0.25,
+            // Trending: lowest threshold (0.05-0.08 per Gemini). Trend-following
+            // has highest signal quality, so even low conviction is actionable.
+            RegimeLabel::Trending => 0.05,
+            // Volatile: mid threshold (0.15-0.18 per Gemini). Higher noise-to-signal
+            // ratio, bear veto mandatory.
+            RegimeLabel::Volatile => 0.15,
+            // Ranging: low-mid threshold (0.10-0.12 per Gemini). Mean-reversion setups.
+            RegimeLabel::Ranging => 0.10,
+            // GreyZone: default to PASS (Gemini: 0.20+ default to PASS).
+            // Regime uncertainty window — don't trade.
+            RegimeLabel::GreyZone => 0.20,
         }
     }
 }
@@ -1327,7 +1332,7 @@ mod tests {
 
     #[test]
     fn conviction_gate_blocks_low_conviction() {
-        // v0.14.0 (MS-2 tune #2): conviction_score=0.19 < Trending threshold 0.20 → action=Pass
+        // v0.14.5 (FID-184): conviction_score=0.03 < Trending threshold 0.05 → action=Pass
         let json = r#"{
             "action": "Buy",
             "pair": "BTC/USD",
@@ -1339,8 +1344,8 @@ mod tests {
             "take_profit_3": 69500.0,
             "position_size_pct": 50.0,
             "confidence": 0.5,
-            "conviction_score": 0.19,
-            "reasoning": "Weak conviction",
+            "conviction_score": 0.03,
+            "reasoning": "Very weak conviction",
             "knowledge_sources": [],
             "risk_reward": 2.5
         }"#;

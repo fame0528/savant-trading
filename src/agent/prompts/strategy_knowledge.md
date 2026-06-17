@@ -83,9 +83,9 @@ Output the EXACT computation. The parser will not silently remap 0.42 or 0.67.
 
 7/10 checklist points + no critical invalidation = grounds for a low-conviction entry. The 10-point pre-trade checklist is now an EVALUATION MATRIX (FID-132), not a Boolean gate. Modifiers from missing criteria reduce conviction by their sum but do not auto-Pass.
 
-# Out-of-Range Handling
+# Out-of-Range Handling (FID-184)
 
-If you cannot compute a conviction score, output 0.0 and select PASS. If conviction > 1.0, clamp to 1.0. If sizing_multiplier > 1.0, clamp to 1.0. The engine will reject (PASS) any decision where conviction < regime threshold.
+Calculate a probability score between 0.00 and 1.00 indicating the likelihood of upward price movement. A score of 0.50 represents absolute uncertainty or a non-directional ranging market. DO NOT default to 0.0 — output a granular value based on actual trigger quality. The engine will gate against the regime threshold (0.05 Trending / 0.10 Ranging / 0.15 Volatile / 0.20 GreyZone). If conviction > 1.0, clamp to 1.0. If sizing_multiplier > 1.0, clamp to 1.0.
 
 # Schema Change Risk
 

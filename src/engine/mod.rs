@@ -2482,10 +2482,16 @@ pub async fn run(
                     // Run jury on the batch response, log results for comparison.
                     // In shadow mode, batch decisions are ALWAYS used for execution.
                     if let Some(ref mut jp) = jury_pool {
-                        let regime = current_session.name();
-                        let jury_result = jp
-                            .evaluate(&cleaned, savant_trading::core::types::MarketRegime::Ranging)
-                            .await;
+                        // FID-184: Map current session to actual market regime
+                        // instead of hardcoding Ranging. US-EU overlap tends to
+                        // be trending; other sessions are typically ranging.
+                        let session_name = current_session.name();
+                        let regime = if session_name == "US-EU Overlap" {
+                            savant_trading::core::types::MarketRegime::Trending
+                        } else {
+                            savant_trading::core::types::MarketRegime::Ranging
+                        };
+                        let jury_result = jp.evaluate(&cleaned, regime).await;
 
                         // FID-162: build cycle record (some fields filled later when judgment available).
                         let cycle_ts = chrono::Utc::now().to_rfc3339();
@@ -2621,7 +2627,7 @@ pub async fn run(
                             warn!(
                             "FID-114 JURY: Quorum not met ({}/{} verdicts), using batch decisions",
                             jury_result.verdicts.len(),
-                            config.ai.jury.size_for_regime(regime)
+                            config.ai.jury.size_for_regime(&regime.to_string())
                         );
                             jp.add_cycle_record(JuryCycleRecord {
                                 cycle_id: 0,
@@ -5605,12 +5611,28 @@ pub async fn run(
         // Captures (balance, equity, drawdown, open positions) for the chart.
         {
             let acc = portfolio.account();
+            // FID-184: Cognitive slippage penalty (Gemini Q7)
+            // LLM took time to "think" before execution. Penalize equity by
+            // (volatility-per-second) * (llm_latency). Vol proxy: 0.5%/min
+            // baseline scalper target. Penalty only applied when elapsed > 10s
+            // (ignore trivial cycles).
+            let elapsed = cycle_start.elapsed().as_secs_f64();
+            let cognitive_slippage_bps: f64 = if elapsed > 10.0 {
+                // 0.5% per minute * elapsed minutes, capped at 50 bps
+                (0.005 * elapsed / 60.0 * 10_000.0).min(50.0)
+            } else {
+                0.0
+            };
+            let equity_after_slippage = acc.equity * (1.0 - cognitive_slippage_bps / 10_000.0);
             let snap = serde_json::json!({
                 "timestamp": chrono::Utc::now().to_rfc3339(),
                 "balance": acc.balance,
-                "equity": acc.equity,
+                "equity": equity_after_slippage,
+                "equity_raw": acc.equity,
                 "drawdown_pct": acc.drawdown_pct,
                 "open_positions": acc.open_positions,
+                "cognitive_slippage_bps": cognitive_slippage_bps,
+                "cycle_elapsed_secs": elapsed,
             });
             shared.push_equity_snapshot(snap);
             // Snapshot to disk (non-blocking: try_write on a Mutex; if held, skip).
