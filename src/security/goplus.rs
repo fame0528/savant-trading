@@ -27,6 +27,9 @@ pub struct TokenSecurity {
 pub struct GoPlusClient {
     client: reqwest::Client,
     cache: Mutex<HashMap<String, TokenSecurity>>,
+    /// FID-181: tokens we've already logged as "no known address for X" —
+    /// so we don't spam the log every cycle for the same long-tail tokens.
+    logged_unknowns: Mutex<std::collections::HashSet<String>>,
 }
 
 impl Default for GoPlusClient {
@@ -43,6 +46,7 @@ impl GoPlusClient {
                 .build()
                 .unwrap_or_else(|_| reqwest::Client::new()),
             cache: Mutex::new(HashMap::new()),
+            logged_unknowns: Mutex::new(std::collections::HashSet::new()),
         }
     }
 
@@ -187,11 +191,27 @@ impl GoPlusClient {
         if let Some((address, _decimals)) = crate::execution::dex::lookup_token(&upper, 42161) {
             self.check_token(&address, symbol).await
         } else {
-            // Unknown address — don't block, just warn
-            warn!(
-                "GoPlus: no known address for {} — skipping security check",
-                symbol
-            );
+            // FID-181: dedupe — log each unknown token only once per session.
+            // Long-tail pairs like AERO/FUN/GIGA would otherwise spam every cycle.
+            let already_logged = self
+                .logged_unknowns
+                .lock()
+                .map(|s| s.contains(&upper))
+                .unwrap_or(false);
+            if !already_logged {
+                if let Ok(mut s) = self.logged_unknowns.lock() {
+                    s.insert(upper);
+                }
+                info!(
+                    "GoPlus: no known address for {} — skipping security check (won't re-log this token)",
+                    symbol
+                );
+            } else {
+                debug!(
+                    "GoPlus: no known address for {} (already logged)",
+                    symbol
+                );
+            }
             Ok(true)
         }
     }

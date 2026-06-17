@@ -49,21 +49,29 @@ pub fn create_channel() -> (
 }
 
 /// Build subscribe messages for Kraken WS v2.
+/// FID-181: Kraken v2 expects `params.symbol` to be a JSON array of strings,
+/// not a single string. The v1 format (single string) is rejected with an
+/// error like `{"method":"subscribe","success":false,"error":"..."}`. The
+/// handler then reads `result.channel` which is null in the error response,
+/// falls back to "unknown", and logs `Kraken WS subscribe failed for unknown`.
 fn build_subscribe_messages(pairs: &[String], depth: u32) -> Vec<String> {
+    let symbols = serde_json::Value::Array(
+        pairs.iter().map(|p| serde_json::Value::String(p.clone())).collect()
+    );
     vec![
         serde_json::json!({
             "method": "subscribe",
-            "params": { "channel": "ticker", "symbol": pairs }
+            "params": { "channel": "ticker", "symbol": symbols }
         })
         .to_string(),
         serde_json::json!({
             "method": "subscribe",
-            "params": { "channel": "book", "symbol": pairs, "depth": depth }
+            "params": { "channel": "book", "symbol": symbols.clone(), "depth": depth }
         })
         .to_string(),
         serde_json::json!({
             "method": "subscribe",
-            "params": { "channel": "trade", "symbol": pairs }
+            "params": { "channel": "trade", "symbol": symbols }
         })
         .to_string(),
     ]
@@ -87,7 +95,14 @@ pub fn parse_message(raw: &str) -> Option<Vec<WsMessage>> {
             if success {
                 debug!("Kraken WS subscribed to {}", channel);
             } else {
-                warn!("Kraken WS subscribe failed for {}", channel);
+                // FID-181: include the actual error message from Kraken so the
+                // operator can see what went wrong. The response shape for a
+                // failed subscribe is {method, success:false, error:"<msg>", result:null}.
+                let err = json
+                    .get("error")
+                    .and_then(|e| e.as_str())
+                    .unwrap_or("(no error message)");
+                warn!("Kraken WS subscribe failed for {} — {}", channel, err);
             }
             return None;
         }

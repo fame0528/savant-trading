@@ -4,7 +4,7 @@
 //! all jury verdicts and produces the final decision. It weights verdicts by
 //! evidence quality, resolves contradictions, and can override weak majority consensus.
 
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 use crate::agent::decision_parser::{self, TradeAction};
 use crate::agent::jury::{JuryJudgment, JuryResult};
@@ -119,7 +119,11 @@ impl JuryJudge {
                         })
                     }
                     Err(e) => {
-                        warn!(
+                        // FID-181: demote parse failure to debug. Free models
+                        // return malformed JSON occasionally. The fallback
+                        // (majority vote) is the correct behavior — we just
+                        // don't need to spam the log every time it happens.
+                        debug!(
                             "Judge: parse failed ({}), falling back to majority vote",
                             e
                         );
@@ -128,7 +132,9 @@ impl JuryJudge {
                 }
             }
             Err(e) => {
-                warn!("Judge: LLM call failed ({}), falling back to majority vote", e);
+                // FID-181: same demotion. Judge LLM call failures are
+                // already logged at the calling site. Don't double-log.
+                debug!("Judge: LLM call failed ({}), falling back to majority vote", e);
                 Ok(self.fallback_majority_vote(jury_result, current_price))
             }
         }

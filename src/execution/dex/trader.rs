@@ -1571,7 +1571,8 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         self.balance = state.balance;
         self.order_counter = state.order_counter;
 
-        warn!(
+        // FID-181: demote to info — startup notice, not a per-cycle warning.
+        info!(
             "DEX stop-losses are CLIENT-SIDE only — NOT exchange-guaranteed. \
              Positions loaded from state: {}",
             self.positions.len()

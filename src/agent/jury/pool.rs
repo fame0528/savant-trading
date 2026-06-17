@@ -10,7 +10,7 @@ use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
 use serde::{Deserialize, Serialize};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 use crate::agent::jury::verdict_parser;
 use crate::agent::jury::{JuryKeyManager, JuryResult};
@@ -373,7 +373,11 @@ impl JuryPool {
                             }
                         }
                         Err(e) => {
-                            warn!("Jury member '{}': parse failed: {}", label, e);
+                            // FID-181: free models return malformed JSON
+                            // occasionally. The key_manager tracks failures
+                            // and rotates keys (max_consecutive_failures=3).
+                            // The warn-spam is noise — demote to debug.
+                            debug!("Jury member '{}': parse failed: {}", label, e);
                             failed += 1;
                             if !hash.is_empty() {
                                 let _ = self.key_manager.record_failure(&hash).await;
@@ -382,7 +386,8 @@ impl JuryPool {
                     }
                 }
                 Ok((label, hash, Ok(Err(e)))) => {
-                    warn!("Jury member '{}': LLM error: {}", label, e);
+                    // FID-181: same demotion for LLM errors.
+                    debug!("Jury member '{}': LLM error: {}", label, e);
                     failed += 1;
                     if !hash.is_empty() {
                         let _ = self.key_manager.record_failure(&hash).await;

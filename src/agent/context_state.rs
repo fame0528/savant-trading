@@ -15,7 +15,7 @@ use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 use std::time::{Duration, Instant};
-use tracing::{debug, info, warn};
+use tracing::{debug, info};
 
 /// Result of delta-compression analysis.
 pub enum DeltaResult {
@@ -196,7 +196,11 @@ impl ContextState {
             [pair_state.token_savings_history.len() - 2..];
         let both_inefficient = last_two.iter().all(|&s| s < min_token_savings);
         if both_inefficient {
-            warn!(
+            // FID-181: demote to debug — per-pair anti-thrashing skip is expected
+            // for pairs with similar contexts cycle-to-cycle. The aggregate log
+            // at engine/mod.rs:2147 (debug-level "low compression efficiency") covers
+            // operators who need this info; the per-pair spam is noise.
+            debug!(
                 "Anti-thrashing: {} last 2 compressions saved <{} tokens each — skipping",
                 pair, min_token_savings
             );

@@ -558,8 +558,23 @@ impl EngineState {
                     info!("No activity entries in journal");
                 }
             }
+        }
 
-            info!("Equity curve: starting fresh for current session (historical snapshots skipped)");
+        // FID-181: load persisted equity history (if any) and seed the in-memory curve.
+        {
+            let path = std::path::PathBuf::from("data/equity_history.json");
+            let history = savant_trading::core::shared::SharedEngineData::load_equity_history(&path);
+            if history.is_empty() {
+                info!("Equity curve: starting fresh for current session (no persisted history)");
+            } else {
+                info!("Equity curve: loaded {} persisted snapshots", history.len());
+                if let Ok(mut curve) = shared.equity_curve.try_write() {
+                    *curve = history;
+                } else {
+                    // Lock held by another task (e.g., the per-cycle write). Skip seed.
+                    debug!("FID-181: equity curve lock held on startup, skipping seed");
+                }
+            }
         }
 
         {
@@ -5235,6 +5250,28 @@ pub async fn run(
             tick,
             interval_display
         );
+
+        // FID-181: record an equity curve snapshot and persist to disk.
+        // Captures (balance, equity, drawdown, open positions) for the chart.
+        {
+            let acc = portfolio.account();
+            let snap = serde_json::json!({
+                "timestamp": chrono::Utc::now().to_rfc3339(),
+                "balance": acc.balance,
+                "equity": acc.equity,
+                "drawdown_pct": acc.drawdown_pct,
+                "open_positions": acc.open_positions,
+            });
+            shared.push_equity_snapshot(snap);
+            // Snapshot to disk (non-blocking: try_write on a Mutex; if held, skip).
+            // We snapshot in-memory and write to disk; the in-memory cap is 200.
+            let curve_snapshot: Vec<serde_json::Value> = match shared.equity_curve.try_read() {
+                Ok(g) => g.clone(),
+                Err(_) => Vec::new(),
+            };
+            let path = std::path::PathBuf::from("data/equity_history.json");
+            savant_trading::core::shared::SharedEngineData::save_equity_history(&path, &curve_snapshot);
+        }
 
         // FID-164: log cumulative token savings for this cycle, reset for next.
         ctx_state.end_cycle();

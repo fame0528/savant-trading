@@ -377,8 +377,16 @@ export default function Dashboard() {
         <KPI icon="fa-layer-group" label="Positions" value={`${positions.length} / ${risk?.max_positions ?? 3}`} sub={positions.length > 0 ? positions.map(p => p.pair.split("/")[0]).join(", ") : "none open"} />
       </div>
 
-      {/* ── Bento Grid ── */}
-      <div className="flex-1 grid grid-cols-[1.6fr_1fr_1fr] grid-rows-[1.2fr_1fr_1fr] gap-1.5 min-h-0">
+      {/* ── Bento Grid ──
+       * Layout: 3 equal columns × 3 rows.
+       *   row 1 (1.2fr tall): Equity | Performance | Market Insight
+       *   row 2 (1fr tall):   Positions | Risk | Decisions
+       *   row 3 (1fr tall):   Closed Trades | Activity | Terminal
+       * The Terminal cell (row 3 col 3) has row-span-3 so it spans rows 1+2+3
+       * and gets the full vertical space of the bento grid. Closed Trades and
+       * Activity are normal single-row panels.
+       */}
+      <div className="flex-1 grid grid-cols-3 grid-rows-[1.2fr_1fr_1fr] gap-1.5 min-h-0">
 
         {/* Row 1: Equity | Performance | Market Insight */}
         <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
@@ -711,8 +719,93 @@ export default function Dashboard() {
           onCopy={() => copyFormatters.jury(state.juryStatus) + "\n\n--- Recent Cycles ---\n" + copyFormatters.juryRecent(state.juryRecent)}
         />
 
-        {/* Row 3: Console | Activity | Trades */}
-        <div className="bg-[#0a0c14] border border-(--line) flex flex-col overflow-hidden">
+        {/* Row 3 col 1: Closed Trades (single row) */}
+        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
+          <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-(--line)">
+            <span className="inline-flex items-center"><Icon name="fa-receipt" className="text-(--dim) text-[10px]" /></span>
+            <span className="text-[10px] tracking-[2px] uppercase font-semibold text-(--dim) leading-none">Closed Trades</span>
+            <span className="ml-auto text-[9px] font-bold leading-none text-(--cyan)">{trades.length}</span>
+            <span className="ml-auto inline-flex items-center">
+              <CopyButton text={() => copyFormatters.trades(trades)} title="Copy closed trades" />
+            </span>
+            {trades.length > 0 && (
+              <button
+                onClick={() => downloadTradesCSV(trades)}
+                className="inline-flex items-center justify-center text-(--dim) hover:text-(--cyan) transition-colors cursor-pointer leading-none"
+                title="Download CSV"
+              >
+                <Icon name="fa-download" className="text-[9px]" />
+              </button>
+            )}
+          </div>
+          <div className="flex-1 px-3 pb-2 overflow-y-auto">
+            {trades.length === 0 ? (
+              <p className="text-(--dimmer) text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No closed trades yet.</p>
+            ) : (
+              <table className="w-full text-[10px]">
+                <thead>
+                  <tr className="text-(--dimmer) text-left">
+                    <th className="py-0.5 pr-2"><Icon name="fa-hashtag" className="mr-0.5 text-[7px]" />PAIR</th>
+                    <th className="py-0.5 pr-2"><Icon name="fa-arrow-right-arrow-left" className="mr-0.5 text-[7px]" />SIDE</th>
+                    <th className="py-0.5 pr-2"><Icon name="fa-door-open" className="mr-0.5 text-[7px]" />ENTRY</th>
+                    <th className="py-0.5 pr-2"><Icon name="fa-door-closed" className="mr-0.5 text-[7px]" />EXIT</th>
+                    <th className="py-0.5 pr-2"><Icon name="fa-sack-dollar" className="mr-0.5 text-[7px]" />P&L</th>
+                    <th className="py-0.5"><Icon name="fa-percent" className="mr-0.5 text-[7px]" />%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {trades.slice(0, 10).map((t) => (
+                    <tr key={t.id} className="border-t border-white/3 even:bg-white/1.5">
+                      <td className="py-0.5 pr-2 font-semibold">{t.pair}</td>
+                      <td className={`py-0.5 pr-2 ${pnlClass(t.side === "Long" ? 1 : -1)}`}>
+                        <span className="flex items-center gap-0.5"><Icon name={t.side === "Long" ? "fa-arrow-up" : "fa-arrow-down"} className="text-[7px]" />{t.side}</span>
+                      </td>
+                      <td className="py-0.5 pr-2 font-mono">{fmt.price(t.entry_price)}</td>
+                      <td className="py-0.5 pr-2 font-mono">{fmt.price(t.exit_price)}</td>
+                      <td className={`py-0.5 pr-2 font-mono ${pnlClass(t.pnl)}`}>{fmt.usd(t.pnl)}</td>
+                      <td className={`py-0.5 font-mono ${pnlClass(t.pnl_pct)}`}>{t.pnl_pct.toFixed(2)}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
+          <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-(--line)">
+            <Icon name="fa-timeline" className="text-(--dim) text-[10px]" />
+            <span className="text-[10px] tracking-[2px] uppercase font-semibold text-(--dim)">Activity</span>
+            <span className="ml-auto text-[9px] font-bold text-(--cyan)">{activity.length}</span>
+            <span className="inline-flex items-center">
+              <CopyButton text={() => copyFormatters.activity(activity)} title="Copy activity log" />
+            </span>
+          </div>
+          <div className="flex-1 px-3 pb-2 overflow-y-auto font-mono text-[10px]">
+            {activity.length === 0 ? (
+              <p className="text-(--dimmer) text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No activity yet.</p>
+            ) : (
+              [...activity].reverse().slice(0, 30).map((e, i) => (
+                <div key={i} className={`flex gap-2 py-px border-b border-white/2 whitespace-nowrap ${
+                  e.level === "Trade" ? "text-(--green)" : e.level === "Decision" ? "text-(--violet)" : e.level === "Warning" || e.level === "Error" ? "text-(--red)" : e.level === "Thinking" ? "text-(--amber)" : "text-(--txt)"
+                }`}>
+                  <span className="text-(--dimmer) shrink-0">{formatTime12h(e.timestamp)}</span>
+                  {e.source && (
+                    <span className="text-(--cyan) shrink-0 w-[44px] overflow-hidden text-ellipsis font-bold text-[9px]">[{e.source}]</span>
+                  )}
+                  <span className={`shrink-0 w-[60px] overflow-hidden text-ellipsis ${e.source ? "" : "text-(--cyan)"}`}>{e.pair}</span>
+                  <span className="overflow-hidden text-ellipsis">{e.message}</span>
+                </div>
+              ))
+             )}
+           </div>
+         </div>
+
+        {/* Row 3 col 3: Terminal (row-span-3 — full-height right column).
+            Swapped with Closed Trades per FID-180 followup. The terminal log
+            is the most useful real-time signal during a run, so it gets
+            the tall column. Closed Trades moves to col 1 (single row). */}
+        <div className="bg-[#0a0c14] border border-(--line) flex flex-col overflow-hidden row-span-3">
           <div className="flex items-center gap-2 px-3 py-1.5 border-b border-(--line)">
             <i className="fa-solid fa-terminal text-(--dim) text-[9px]" />
             <span className="text-[10px] text-(--dim) tracking-wider font-mono leading-none">savant — terminal</span>
@@ -744,87 +837,6 @@ export default function Dashboard() {
             <ErrorBoundary label="Terminal">
               <TerminalContainer className="h-full" />
             </ErrorBoundary>
-          </div>
-        </div>
-
-        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
-          <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-(--line)">
-            <Icon name="fa-timeline" className="text-(--dim) text-[10px]" />
-            <span className="text-[10px] tracking-[2px] uppercase font-semibold text-(--dim)">Activity</span>
-            <span className="ml-auto text-[9px] font-bold text-(--cyan)">{activity.length}</span>
-            <span className="inline-flex items-center">
-              <CopyButton text={() => copyFormatters.activity(activity)} title="Copy activity log" />
-            </span>
-          </div>
-          <div className="flex-1 px-3 pb-2 overflow-y-auto font-mono text-[10px]">
-            {activity.length === 0 ? (
-              <p className="text-(--dimmer) text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No activity yet.</p>
-            ) : (
-              [...activity].reverse().slice(0, 30).map((e, i) => (
-                <div key={i} className={`flex gap-2 py-px border-b border-white/2 whitespace-nowrap ${
-                  e.level === "Trade" ? "text-(--green)" : e.level === "Decision" ? "text-(--violet)" : e.level === "Warning" || e.level === "Error" ? "text-(--red)" : e.level === "Thinking" ? "text-(--amber)" : "text-(--txt)"
-                }`}>
-                  <span className="text-(--dimmer) shrink-0">{formatTime12h(e.timestamp)}</span>
-                  {e.source && (
-                    <span className="text-(--cyan) shrink-0 w-[44px] overflow-hidden text-ellipsis font-bold text-[9px]">[{e.source}]</span>
-                  )}
-                  <span className={`shrink-0 w-[60px] overflow-hidden text-ellipsis ${e.source ? "" : "text-(--cyan)"}`}>{e.pair}</span>
-                  <span className="overflow-hidden text-ellipsis">{e.message}</span>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden row-span-3">
-          <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-(--line)">
-            <span className="inline-flex items-center"><Icon name="fa-receipt" className="text-(--dim) text-[10px]" /></span>
-            <span className="text-[10px] tracking-[2px] uppercase font-semibold text-(--dim) leading-none">Closed Trades</span>
-            <span className="ml-auto text-[9px] font-bold leading-none text-(--cyan)">{trades.length}</span>
-            <span className="ml-auto inline-flex items-center">
-              <CopyButton text={() => copyFormatters.trades(trades)} title="Copy closed trades" />
-            </span>
-            {trades.length > 0 && (
-              <button
-                onClick={() => downloadTradesCSV(trades)}
-                className="inline-flex items-center justify-center text-(--dim) hover:text-(--cyan) transition-colors cursor-pointer leading-none"
-                title="Download CSV"
-              >
-                <Icon name="fa-download" className="text-[9px]" />
-              </button>
-            )}
-          </div>
-          <div className="flex-1 px-3 pb-2 overflow-y-auto">
-            {trades.length === 0 ? (
-              <p className="text-(--dimmer) text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No closed trades yet.</p>
-            ) : (
-              <table className="w-full text-[11px]">
-                <thead>
-                  <tr className="text-(--dimmer) text-left">
-                    <th className="py-1.5 pr-2"><Icon name="fa-hashtag" className="mr-0.5 text-[7px]" />PAIR</th>
-                    <th className="py-1.5 pr-2"><Icon name="fa-arrow-right-arrow-left" className="mr-0.5 text-[7px]" />SIDE</th>
-                    <th className="py-1.5 pr-2"><Icon name="fa-door-open" className="mr-0.5 text-[7px]" />ENTRY</th>
-                    <th className="py-1.5 pr-2"><Icon name="fa-door-closed" className="mr-0.5 text-[7px]" />EXIT</th>
-                    <th className="py-1.5 pr-2"><Icon name="fa-sack-dollar" className="mr-0.5 text-[7px]" />P&L</th>
-                    <th className="py-1.5"><Icon name="fa-percent" className="mr-0.5 text-[7px]" />%</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {trades.slice(0, 30).map((t) => (
-                    <tr key={t.id} className="border-t border-white/3 even:bg-white/1.5">
-                      <td className="py-1.5 pr-2 font-semibold">{t.pair}</td>
-                      <td className={`py-1.5 pr-2 ${pnlClass(t.side === "Long" ? 1 : -1)}`}>
-                        <span className="flex items-center gap-0.5"><Icon name={t.side === "Long" ? "fa-arrow-up" : "fa-arrow-down"} className="text-[7px]" />{t.side}</span>
-                      </td>
-                      <td className="py-1.5 pr-2 font-mono">{fmt.price(t.entry_price)}</td>
-                      <td className="py-1.5 pr-2 font-mono">{fmt.price(t.exit_price)}</td>
-                      <td className={`py-1.5 pr-2 font-mono ${pnlClass(t.pnl)}`}>{fmt.usd(t.pnl)}</td>
-                      <td className={`py-1.5 font-mono ${pnlClass(t.pnl_pct)}`}>{t.pnl_pct.toFixed(2)}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
           </div>
         </div>
 

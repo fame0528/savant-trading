@@ -586,9 +586,10 @@ impl IndicatorEngine {
             1.0
         };
 
-        // Debug: log when 3-candle avg is still near zero (truly dead pair)
+        // FID-181: demote to debug — VolRatio=0 for illiquid long-tail pairs is
+        // expected. Operators who need this can enable debug logging.
         if recent_vol < 0.001 && vol_sma20 > 0.0 {
-            tracing::warn!(
+            tracing::debug!(
                 "VolRatio=0: recent_3avg={:.6}, sma20={:.6}, last_5_vols={:?}",
                 recent_vol,
                 vol_sma20,

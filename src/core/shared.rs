@@ -269,10 +269,145 @@ impl SharedEngineData {
             }
         }
     }
+
+    /// FID-181: Push an equity curve snapshot. Caps in-memory curve at 200
+    /// snapshots (FIFO drop). Persistence is the engine's job — see
+    /// `engine::run_loop` which calls this and writes to disk.
+    pub fn push_equity_snapshot(&self, snapshot: serde_json::Value) {
+        match self.equity_curve.try_write() {
+            Ok(mut curve) => {
+                curve.push(snapshot);
+                // FIFO: keep only the most recent 200 snapshots
+                if curve.len() > 200 {
+                    let drop_count = curve.len() - 200;
+                    curve.drain(0..drop_count);
+                }
+            }
+            Err(_) => {
+                // Lock held — skip rather than stall
+            }
+        }
+    }
+
+    /// FID-181: Load persisted equity curve from disk on engine startup.
+    /// Returns the snapshots (oldest first) or empty Vec if file doesn't exist
+    /// or is malformed. Caps at 200.
+    pub fn load_equity_history(path: &std::path::Path) -> Vec<serde_json::Value> {
+        if !path.exists() {
+            return Vec::new();
+        }
+        let raw = match std::fs::read_to_string(path) {
+            Ok(s) => s,
+            Err(e) => {
+                tracing::warn!("FID-181: failed to read equity_history.json: {}", e);
+                return Vec::new();
+            }
+        };
+        let parsed: serde_json::Value = match serde_json::from_str(&raw) {
+            Ok(v) => v,
+            Err(e) => {
+                tracing::warn!("FID-181: failed to parse equity_history.json: {}", e);
+                return Vec::new();
+            }
+        };
+        let arr = parsed.get("snapshots").and_then(|v| v.as_array());
+        let Some(arr) = arr else {
+            return Vec::new();
+        };
+        // Take the most recent 200
+        let start = if arr.len() > 200 { arr.len() - 200 } else { 0 };
+        arr[start..].to_vec()
+    }
+
+    /// FID-181: Persist equity curve to disk. Atomic write (write to .tmp, rename).
+    /// Called after each cycle's push_equity_snapshot. Errors are logged but
+    /// don't crash the engine — the in-memory curve still works.
+    pub fn save_equity_history(path: &std::path::Path, curve: &[serde_json::Value]) {
+        if let Some(parent) = path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        let payload = serde_json::json!({
+            "version": 1,
+            "saved_at": chrono::Utc::now().to_rfc3339(),
+            "snapshots": curve,
+        });
+        let serialized = match serde_json::to_string_pretty(&payload) {
+            Ok(s) => s,
+            Err(e) => {
+                tracing::warn!("FID-181: failed to serialize equity history: {}", e);
+                return;
+            }
+        };
+        let tmp_path = path.with_extension("json.tmp");
+        if let Err(e) = std::fs::write(&tmp_path, &serialized) {
+            tracing::warn!("FID-181: failed to write {}: {}", tmp_path.display(), e);
+            return;
+        }
+        if let Err(e) = std::fs::rename(&tmp_path, path) {
+            tracing::warn!("FID-181: failed to rename {} -> {}: {}", tmp_path.display(), path.display(), e);
+        }
+    }
 }
 
 impl Default for SharedEngineData {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn push_equity_snapshot_appends_and_caps() {
+        let shared = SharedEngineData::new();
+        for i in 0..205 {
+            shared.push_equity_snapshot(serde_json::json!({"i": i}));
+        }
+        let curve = shared.equity_curve.try_read().unwrap();
+        assert_eq!(curve.len(), 200, "FIFO cap should hold at 200");
+        // First surviving snapshot is i=5 (0-4 dropped)
+        assert_eq!(curve[0]["i"], 5);
+        assert_eq!(curve[199]["i"], 204);
+    }
+
+    #[test]
+    fn save_and_load_equity_history_round_trip() {
+        let tmp = std::env::temp_dir().join("savant_equity_test.json");
+        let _ = std::fs::remove_file(&tmp);
+
+        // Save a small curve
+        let curve: Vec<serde_json::Value> = (0..3)
+            .map(|i| serde_json::json!({"timestamp": "2026-06-17T00:00:00Z", "equity": 50.0 + i as f64}))
+            .collect();
+        SharedEngineData::save_equity_history(&tmp, &curve);
+
+        // Load it back
+        let loaded = SharedEngineData::load_equity_history(&tmp);
+        assert_eq!(loaded.len(), 3);
+        assert_eq!(loaded[0]["equity"], 50.0);
+        assert_eq!(loaded[2]["equity"], 52.0);
+
+        // Cleanup
+        let _ = std::fs::remove_file(&tmp);
+        let _ = std::fs::remove_file(tmp.with_extension("json.tmp"));
+    }
+
+    #[test]
+    fn load_equity_history_missing_file_returns_empty() {
+        let nonexistent = PathBuf::from("/tmp/savant_definitely_does_not_exist_12345.json");
+        let result = SharedEngineData::load_equity_history(&nonexistent);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn load_equity_history_malformed_json_returns_empty() {
+        let tmp = std::env::temp_dir().join("savant_equity_malformed.json");
+        std::fs::write(&tmp, "{ this is not json").unwrap();
+        let result = SharedEngineData::load_equity_history(&tmp);
+        assert!(result.is_empty(), "malformed JSON should return empty, not panic");
+        let _ = std::fs::remove_file(&tmp);
     }
 }
