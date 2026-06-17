@@ -1136,3 +1136,44 @@ The alpha computation block at `src/engine/mod.rs` lines ~3438-3470 has a syntax
 - The strategy/universe conversation itself: SPEC-2026-0616-001 recommended Path A (multi-chain, done). Whether the strategy is profitable is still unknown.
 
 **Memory state:** ~3-hour session, 3 FIDs + 1 spec, 1 overstep correction from Spencer, 6 new tests, 357 total pass. Critical lesson: "Vera suggests; Spencer runs" for high-blast-radius actions.
+
+## Session 2026-06-16 (v0.14.4): FID-168/170/171 v2 strict-read
+
+**Context:** Spencer asked: "tackle FID-168, FID-170, FID-171 if they don't have FIDs, make them, include any missed suggestions or blindspots and improvements i forgot to ask, run perfection on the updated FIDs then code. read echo.md 0-end before proceeding, granting automation lvl 3." The 3 FIDs already existed (shipped v0.14.3). I ran the Perfection Loop on each, found 9 blindspots, applied improvements. v0.14.4 shipped.
+
+**Key Learnings:**
+
+- **The Perfection Loop on existing FIDs is as important as on new ones.** Spencer's "if they don't have FIDs" was a hook for "do the strict-read pass." The 9 blindspots I found are quality issues that don't break tests but reduce the value of the feature. A 5-minute strict-read pass after the initial implementation is high-leverage work.
+- **Most "out of scope" improvements turn out to be in scope.** The 9 blindspots include: dead code, wrong math, wrong mental model, missing data, missing safety check. **None of these were "future enhancements" — they were concrete bugs in the shipped code.** Spencer's "include any missed suggestions or blindspots and improvements i forgot to ask" was the trigger.
+- **Strict-read is its own kind of work.** It's not "make it work" or "make it fast" — it's "find what the v1 author got wrong." Required mental mode: "this is finished, now look for what's wrong with it." Different from the greenfield mindset.
+- **"Snapshot data should match summary prompt fields."** v1 captured `pair | action | conf`. The summary prompt asked for regime/ATR/RSI. **The summary was operating on partial data.** Lesson: the data flow into a summarization step must match the prompt's expectations, or the summary is degraded.
+- **Auxiliary LLM calls need a watchdog safety.** Always check `cycle_start.elapsed()` before invoking a slow operation. Pattern: if elapsed > 4min, skip and log. The data flows back next cycle.
+- **"Use or remove it" — dead code is a smell.** v1 had `is_stale()` defined but never called. v1 had `let _ = chunk_size_cap;` which discarded its value. **Two cycles later, the placeholder was still there.** Lesson: if you add a method or field "for later," use it in the same FID or remove it. Otherwise the placeholder accumulates.
+- **"Simpler than openclaw" is not always better.** v1 used `self.summarize(stage)` instead of `self.summarize_with_fallback(chunks)`. **The "simpler" version had weaker failure recovery.** A stage with oversized blocks would have failed in v1; v2 retries with the non-oversized subset.
+- **Token-based splits vs count-based splits matter for LLM-balanced inputs.** Token-based splits keep each stage under target_per_stage tokens. The LLM gets a balanced input regardless of input distribution.
+- **Greedy fill for token-balanced splits.** The `split_into_stages_by_tokens` implementation uses greedy fill: each stage gets up to target_per_stage tokens, single oversized blocks get their own stage. Simpler than openclaw's `buildStageSplitPlanWithWorker` (Web Worker async) and achieves the same outcome.
+- **Address the LLM directly in the prompt.** v1's instructions said "the new model" in third person. v2 says "You are the new LLM." The LLM is reading the prompt; address it as "you." Pattern: prompts that roleplay a specific actor should use second-person.
+- **"YOUR ROLE" section in long prompts.** When the prompt has multiple sections (ROLE, MUST CAPTURE, PRIORITIZE), label them. The LLM scans section headers; a labeled "YOUR ROLE" stands out.
+- **Public API + private helper pattern.** v2 added `summarize_chunks_only` as a private helper that takes `&LlmProvider`, mirroring the existing private `summarize_chunks`. The public `summarize_for_handoff` orchestrates: chunk → `summarize_chunks_only` → return. Pattern: keep helpers private, expose one public method that orchestrates them.
+- **Math claims need verification.** v1 said "first pruning at ~100 cycles." v2: at 70 chars/pair × 30 pairs × 5 cycles = 10500 chars/cycle, target=5000 → first pruning at ~10 cycles. **The v1 estimate was off by 10x.** Always run the math before claiming a behavior. The numbers are: chars × pairs / 4 = tokens (rough). Target = context_window_candles * 10. First-pruning cycle = target / (chars × pairs / 4).
+- **The `let _ = ...` pattern is anti-pattern in Rust.** It suppresses unused-variable warnings, but it also hides dead code. Better: remove the line entirely or use the value. v2 uses the value.
+- **clippy `vec_init_then_push` and `manual_div_ceil` are common lints.** v2 hit `vec_init_then_push` on the new tests (fixed with `vec![]` macro) and `manual_div_ceil` on the splitting code (fixed with `usize::div_ceil` from std 1.73). Both are stylistic, but they catch real issues.
+- **PowerShell multi-line commit messages can fail silently.** The body of the feat commit was long (16 lines) and PowerShell may have truncated. **Pattern: use `git commit -m "title" -m "body"` (two -m flags) for multi-line messages.** Avoid single multi-line string literals.
+
+**Files Shipped:**
+
+- 2 commits to main: `28cef5d4` (feat: FID-168/170/171 v2 strict-read improvements, 6 files, +424/-101), `a27d22b6` (docs: v0.14.4)
+- 1 v0.14.4 release: https://github.com/fame0528/savant-trading/releases/tag/v0.14.4
+- 3 FIDs updated in-place (FID-168, 170, 171 in archive)
+- 1 new memory file: `dev/vera/memory/2026-06-16-v0.14.4.md`
+- Source files changed: `src/agent/context_state.rs` (FID-168), `src/agent/llm_summarizer.rs` (FID-170, 171), `src/engine/mod.rs` (FID-168)
+- Docs: `CHANGELOG.md` (v0.14.4 section), `README.md` (362 tests), `VERSION`/`Cargo.toml`/`protocol.config.yaml` (0.14.4), `dev/vera/MEMORY.md` (status header)
+
+**Open Threads (next session):**
+
+- FID-172: engine restart + paper-mode validation. Spencer runs `start.bat`. Vera writes the validation report.
+- FID-173: backtest or live paper-mode run to validate strategy profitability (depends on FID-172 outcome)
+- FID-169: parallel multi-chain operation (DEFERRED to v0.15.0, scope too large for one session)
+- FID-174 (potential): strategy/universe retune spec if FID-173 shows 0 actionable setups on liquid majors
+
+**Memory state:** ~1.5-hour session, 3 FIDs strict-read, 9 improvements, 5 new tests, 362 total pass. Critical lesson: strict-read after the initial implementation is high-leverage work; most "out of scope" improvements turn out to be in scope.

@@ -1,7 +1,7 @@
 # MEMORY.md — Vera's Curated Long-Term Memory
 
-**Last updated:** 2026-06-16 22:00 EST (Vera session: v0.14.3 — 4 FIDs shipped (FID-168, 170, 171, 172-spec), full openclaw compaction port complete, ECHO release)
-**Status:** v0.14.3 RELEASED. 4 commits pushed. 357 tests pass (345 lib + 10 bin + 2 doc, 0 fail). Engine OFF. Capital: $0 USDC + 2.6 GRT stranded. FID-169 (parallel multi-chain) + FID-173 (validation/backtest) queued. Engine startup is Spencer's action.
+**Last updated:** 2026-06-16 23:30 EST (Vera session: v0.14.4 — 3 FIDs strict-read, 5 new tests, 9 improvements across FID-168/170/171)
+**Status:** v0.14.4 RELEASED. 2 commits pushed. 362 tests pass (350 lib + 10 bin + 2 doc, 0 fail). Engine OFF. Capital: $0 USDC + 2.6 GRT stranded. FID-169 (parallel multi-chain) + FID-173 (validation/backtest) queued.
 
 ---
 
