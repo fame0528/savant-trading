@@ -1177,3 +1177,36 @@ The alpha computation block at `src/engine/mod.rs` lines ~3438-3470 has a syntax
 - FID-174 (potential): strategy/universe retune spec if FID-173 shows 0 actionable setups on liquid majors
 
 **Memory state:** ~1.5-hour session, 3 FIDs strict-read, 9 improvements, 5 new tests, 362 total pass. Critical lesson: strict-read after the initial implementation is high-leverage work; most "out of scope" improvements turn out to be in scope.
+
+## Session 2026-06-17 (v0.14.5 hotfixes + FID-181 + engine running overnight)
+
+**Context:** Spencer returned for a late session (00:45-02:50 EST). Multiple issues found during earlier start.bat run: equity curve empty (never written by engine), dashboard Terminal not spanning 3 rows, warning log noise 61 lines/cycle, WebSocket v2 broken. Plus 3 start.bat hotfixes (node kill kills kilo, dotenvy parse failure breaks .env, Anvil block cmd.exe parse error). All 4 issues consolidated into FID-181. v0.14.5 shipped. Engine running on Anvil overnight.
+
+**Key Learnings:**
+
+- **"Nothing is out of scope" — scope expands to include bugs found along the way.** FID-181 started as "equity curve fix" and grew to include dashboard layout, warning cleanup, and WebSocket v2 because those were also broken. Spencer's rule: never defer unless explicitly stated. **This is now a hard rule: if you find a bug while working on a feature, fix it in the same FID or expand scope.**
+- **4 issues can be 1 FID when they're all found in a single session and none is a blocker for shipping.** FID-181 is 4 unrelated fixes bundled into one atomic commit. The Perfection Loop validates each independently, and all share the same release.
+- **The equity curve was broken from inception.** The engine never wrote to `state.shared.equity_curve`. Only the backtest engine did (`src/backtest/engine.rs:172,183,212`). For ~3 releases the dashboard was permanently "Collecting equity data…" with no one noticing because the engine was always off during Vera's sessions. **Lesson: test the monitoring infrastructure even when the engine is in paper mode.**
+- **Atomic write matters for data integrity.** `/tmp/equity_history.tmp` + `std::fs::rename` = either old file or new file, never a half-written file. The 200-snapshot cap prevents unbounded file growth. **Pattern: `.tmp` + rename for all persistent state files.**
+- **WebSocket protocol errors hide behind null fields.** Kraken v2 returns `result: { channel: null }` on error. The response handler was reading `result.channel` instead of checking `error`. **Lesson: WS handlers should check `error` field first, not `result`.**
+- **HashSet dedup for per-cycle log lines.** The GoPlus warning "no known address" fired once per token per cycle. With 21 tokens, that's 21 warn lines/cycle. A `HashSet<String>` with `logged_unknowns` deduplicates: log once per token ever. **Pattern: cached log suppression with per-component sets, cleared on cycle boundary.**
+- **Engine telemetry should be verified in the first cycle, not after an hour of data.** The engine ran for 35+ minutes before I realized the equity curve was still empty. **Pattern: add a startup log line confirming "equity tracking active" or similar.**
+- **Dashboard visual issues are often stale server processes.** The new build exists in `.next/` but the running server may have been started before the build. Kill the dashboard server before restarting start.bat for dashboard changes to take effect.
+- **Jury re-enablement was trivial (config change) but conceptually important.** FID-179 just toggles `jury.enabled = true` in test-anvil.toml. But the jury system was disabled because of an earlier misconception (FID-161 era). Spencer: "the whole logic of the jury was getting multiple opinions, that's why i built the system lol." **Lesson: don't disable core architecture features based on LLM reasoning noise issues — fix the noise instead. The jury IS the differentiator.**
+- **Hyperliquid is parked, not dead.** Use `dev/vera/notes/` for research, `dev/vera/specs/` for plans. Never FIDs for parked work. Per Spencer: "organize it outside of FIDs."
+- **Stray .env lines with leading digits break ALL env loading.** `0X_API_KEY=611d1892...` starts with a digit. The dotenvy parser rejects it, which causes the entire `.env` file to fail to load → ALL API keys empty → 401 errors on every LLM call. **Always check `.env` parse failures when seeing credential errors across multiple services.**
+- **`Stop-Process -Name node` kills ALL node processes including kilo's MCP servers.** Scope by command-line filter or process parent.
+- **`call start-anvil.bat` is safer than inline Anvil conditionals.** cmd.exe's nested `if` blocks with parentheses have subtle parsing rules. A separate `.bat` file with `call` is always correct.
+
+**Files Shipped:**
+
+- 3 commits to main: `0eb1da8d` (feat: FID-181 equity curve + dashboard + warning cleanup + WebSocket v2), `79a8b447` (docs: HL research + v0.15.0 scope spec), `a1c6dfee` (docs: archive FID-179/180). Plus earlier hotfix commits: `bac3ee66` (FID-175), `9282ad79` (FID-176), `74199319` (FID-178), `927cb0d4` (FID-177), `35ca1e4b` (FID-179+180).
+- 1 v0.14.5 release (no tag, 3 commits)
+- 8 FIDs archived: 175, 176, 177, 178, 179, 180, 181
+- 2 new specs: `dev/vera/specs/v0.15.0-scope-parallel-multi-chain.md`
+- 1 new note: `dev/vera/notes/hyperliquid-research-2026-06-17.md`
+- 1 new memory file: `dev/vera/memory/2026-06-17.md`
+- Source files changed: `src/engine/mod.rs` (FID-181 equity curve), `src/core/shared.rs` (FID-181 persistence), `src/data/websocket.rs` (FID-181 WS v2), `src/security/goplus.rs` (FID-181 HashSet dedup), `src/engine/mod.rs` (warning demotions), `src/agent/jury/mod.rs` (FID-179), `src/agent/jury/judge.rs` (warn→debug), `src/agent/jury/pool.rs` (warn→debug), `src/data/indicators.rs` (warn→debug), `src/execution/dex/trader.rs` (warn→info), `dashboard/src/app/page.tsx` (FID-180+181 layout), `start.bat` (FID-175, 177, 178), `config/test-anvil.toml` (FID-179), `config/default.toml` (FID-181), `.env.example` (FID-176), `start-anvil.bat` (FID-178)
+- Docs: `CHANGELOG.md` (v0.14.5 section), `README.md` (354 tests), `dev/vera/MEMORY.md` (status header)
+
+**Memory state:** ~2-hour session, 4 hotfix FIDs + 1 master FID, 4 new tests, 354 total pass. Engine running overnight on Anvil. Critical lessons: "nothing out of scope" expands FID scope; verify monitoring in first cycle; WS handler check error before result; HashSet dedup for log noise; dashboard layout needs server restart.

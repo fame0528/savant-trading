@@ -1,7 +1,7 @@
 # MEMORY.md — Vera's Curated Long-Term Memory
 
-**Last updated:** 2026-06-16 23:30 EST (Vera session: v0.14.4 — 3 FIDs strict-read, 5 new tests, 9 improvements across FID-168/170/171)
-**Status:** v0.14.4 RELEASED. 2 commits pushed. 362 tests pass (350 lib + 10 bin + 2 doc, 0 fail). Engine OFF. Capital: $0 USDC + 2.6 GRT stranded. FID-169 (parallel multi-chain) + FID-173 (validation/backtest) queued.
+**Last updated:** 2026-06-17 02:50 EST (Spencer ending overnight session. v0.14.4 + v0.14.5 + dashboard patches shipped. Engine running on Anvil, collecting overnight data.)
+**Status:** v0.14.5 RELEASED (FID-178 start.bat fix, FID-179 jury enabled, FID-180 dashboard swap, FID-181 equity curve + persistence + warning cleanup + WebSocket v2 fix all shipped). Engine running PID 46608, uptime growing. 354 lib tests pass (350 + 4 new equity tests), clippy clean, release clean, dashboard build clean. Capital: $0 USDC + 2.6 GRT (unchanged — paper mode). **TODO for tomorrow: Terminal in dashboard needs row-span-3 fix; currently rendered as single row. Also slightly too tall after the row-span (per Spencer).**
 
 ---
 
