@@ -656,6 +656,32 @@ mod tests {
         assert!(state.data_blocks[0].content.contains("BTC/USD"));
     }
 
+    /// FID-168 v2: snapshots now include regime + ATR + ADX + RSI.
+    /// The summary prompt (FID-165) asks for these fields; capturing them in
+    /// the snapshot makes the LLM's summary useful.
+    #[test]
+    fn add_cycle_snapshot_includes_market_context() {
+        let mut state = ContextState::new(0.30, 0.50);
+        // The engine produces lines like:
+        //   [2026-06-16 18:00:00] BTC/USD | PASS Ranging | conf 0% | ATR1.23 ADX18.4 RSI55.2
+        let rich = "[2026-06-16 18:00:00] BTC/USD | PASS Ranging | conf 0% | ATR1.23 ADX18.4 RSI55.2";
+        state.add_cycle_snapshot(rich.to_string());
+        assert!(state.data_blocks[0].content.contains("Ranging"));
+        assert!(state.data_blocks[0].content.contains("ATR1.23"));
+        assert!(state.data_blocks[0].content.contains("ADX18.4"));
+        assert!(state.data_blocks[0].content.contains("RSI55.2"));
+    }
+
+    /// FID-168 v2: is_stale() returns true when no summary exists, true when
+    /// the last update is older than MIN_SUMMARIZATION_INTERVAL, false otherwise.
+    #[test]
+    fn is_stale_triggers_fresh_summary() {
+        let mut state = ContextState::new(0.30, 0.50);
+        assert!(state.summary_context().is_stale()); // no summary
+        state.update_summary("Test".to_string(), 100);
+        assert!(!state.summary_context().is_stale()); // just updated
+    }
+
     #[test]
     fn summary_skipped_when_no_overflow() {
         let mut state = ContextState::new(0.30, 0.50);

@@ -289,28 +289,35 @@ The risk is medium because:
 ## Resolution
 
 - **Fixed By:** Vera
-- **Fixed Date:** 2026-06-16 20:35 EST
-- **Fix Description:** Added `summarize_in_stages(blocks, parts, min_blocks_for_split)` method to `LlmSummarizer`. Added `split_into_stages` helper that evenly divides blocks by count. Added `MERGE_SUMMARIES_INSTRUCTIONS` constant (port of openclaw's merge instructions). Customized to be trading-specific.
-- **Tests Added:** 4 (split_into_stages_creates_equal_chunks, split_into_stages_caps_parts_at_block_count, split_into_stages_handles_default_zero, summarize_in_stages_with_few_blocks_uses_single_call)
-- **Verified By:** `cargo test` (343 lib + 10 bin + 2 doc = 355, 0 fail), `cargo clippy --all-targets -- -D warnings` (clean), `cargo build --release` (clean), grep AUDIT
+- **Fixed Date:** 2026-06-16 20:35 EST (v1); 2026-06-16 22:45 EST (v2 strict-read)
+- **Fix Description (v1):** Added `summarize_in_stages(blocks, parts, min_blocks_for_split)` method to `LlmSummarizer`. Added `split_into_stages` helper that evenly divides blocks by count. Added `MERGE_SUMMARIES_INSTRUCTIONS` constant (port of openclaw's merge instructions). Customized to be trading-specific.
+- **Fix Description (v2 strict-read improvements, 2026-06-16 22:45):**
+  - **A. Use `summarize_with_fallback` per stage (was just `summarize`).** v1 used `self.summarize(stage)` per stage, losing openclaw's partial-failure recovery. v2 uses `self.summarize_with_fallback_public(chunks)` per stage, which tries the full stage, then partial (excluding oversized chunks), then a generic fallback. **This is a real fidelity improvement vs openclaw.** Added `summarize_with_fallback_public` method as a public wrapper that pulls the LLM provider from `self`.
+  - **B. Token-based splits (was count-based).** v1's `split_into_stages` divided by count, leading to lopsided stages. v2 added `split_into_stages_by_tokens` which divides by token count using greedy fill. This produces balanced LLM inputs even when individual blocks have wildly different token counts (e.g., long block from a news event vs short decision lines). Port of openclaw's `buildStageSplitPlanWithWorker` (which uses token shares; we use a simpler greedy fill that achieves the same outcome). **v1's `split_into_stages` is preserved for callers that want count-balanced splits.**
+- **Tests Added (v1):** 4 (split_into_stages_creates_equal_chunks, split_into_stages_caps_parts_at_block_count, split_into_stages_handles_default_zero, summarize_in_stages_with_few_blocks_uses_single_call)
+- **Tests Added (v2):** 2 (split_into_stages_by_tokens_balances_token_counts, split_into_stages_by_tokens_handles_oversized_block)
+- **Verified By:** `cargo test` (349 lib + 10 bin + 2 doc = 361, 0 fail), `cargo clippy --all-targets -- -D warnings` (clean), `cargo build --release` (clean), grep AUDIT
 
-**AUDIT (FID-151):**
+**AUDIT (FID-151) — v2:**
 
 ```text
-$ grep -rn "summarize_in_stages\|split_into_stages\|MERGE_SUMMARIES_INSTRUCTIONS" src/
+$ grep -rn "summarize_in_stages\|split_into_stages\|split_into_stages_by_tokens\|MERGE_SUMMARIES_INSTRUCTIONS\|summarize_with_fallback_public" src/
 src/agent/llm_summarizer.rs:14: pub const MERGE_SUMMARIES_INSTRUCTIONS: &str = "..."
-src/agent/llm_summarizer.rs:199: pub fn split_into_stages(&self, blocks: &[DataBlock], parts: usize) -> Vec<Vec<DataBlock>>
-src/agent/llm_summarizer.rs:217: pub async fn summarize_in_stages(&self, blocks: &[DataBlock], parts: usize, min_blocks_for_split: usize) -> Result<String, String>
-src/agent/llm_summarizer.rs:443-455: 4 unit tests
-# 1 constant, 2 methods, 4 tests. All in llm_summarizer.rs. NOT called by engine (opt-in API).
+src/agent/llm_summarizer.rs:241: pub fn split_into_stages(&self, blocks: &[DataBlock], parts: usize) -> Vec<Vec<DataBlock>>     # v1: count-based
+src/agent/llm_summarizer.rs:262: pub fn split_into_stages_by_tokens(&self, blocks: &[DataBlock], parts: usize) -> Vec<Vec<DataBlock>>   # v2: token-based
+src/agent/llm_summarizer.rs:302: pub async fn summarize_in_stages(&self, ...) -> Result<String, String>     # v2: uses token-based + per-stage summarize_with_fallback
+src/agent/llm_summarizer.rs:404: pub async fn summarize_with_fallback_public(&self, chunks: &[Chunk]) -> Result<String, String>   # v2: public wrapper
+# 1 constant, 4 methods, 6 tests. All in llm_summarizer.rs. NOT called by engine (opt-in API).
 ```
 
-- **Commit/PR:** Pending (v0.14.3 batch)
-- **Archived:** Pending
+- **Commit/PR:** Pending (v0.14.3 batch + v0.14.4 v2 batch)
+- **Archived:** Pending (v0.14.3 status: archived; v0.14.4 v2 status: update here)
 
 ---
 
 ## Lessons Learned
+
+### v1 lessons (shipped 2026-06-16 20:35)
 
 - **Stage-based summarization is opt-in, not auto.** The engine uses single-call (FID-168). Stage-based fires only when callers explicitly opt in. This avoids 4x more LLM calls in the common case.
 - **`div_ceil` is in std since Rust 1.73.** Older code uses `(a + b - 1) / b` for ceiling division. The new `usize::div_ceil` is cleaner and clippy `manual_div_ceil` lint flags the manual version.
@@ -318,6 +325,15 @@ src/agent/llm_summarizer.rs:443-455: 4 unit tests
 - **Partial failure handling matters.** If 2 of 3 stage summarizations fail, we still merge the 1 that succeeded. If all 3 fail, we return Err. The merge step itself can fail too (LLM down) — we return Err. Three layers of failure modes, three different recovery paths.
 - **Stage-based is rare in v0.14.3.** The engine prunes to ~10-30 blocks per cycle. min_blocks_for_split = 50. So the engine never triggers stage-based. But the API is there for v0.15.0 when history is larger.
 
+### v2 lessons (added 2026-06-16 22:45 strict-read)
+
+- **Use the same fallback path openclaw uses, not a simpler one.** v1 used `self.summarize(stage)` per stage, which is a single-shot. v2 uses `self.summarize_with_fallback_public(chunks)`, which is the openclaw-equivalent. **The "simpler" version had weaker failure recovery.** A stage with oversized blocks would have failed in v1; v2 retries with the non-oversized subset. Real fidelity improvement.
+- **Token-based splits vs count-based splits matter for LLM-balanced inputs.** v1: 100 blocks × 1 parts = 1 stage of 100 blocks. If 50 of those blocks are 5 tokens each and 50 are 100 tokens each, the LLM sees 250+5000 = 5250 tokens in one call. v2 splits to keep each stage under target_per_stage tokens. **The LLM gets a balanced input regardless of input distribution.** Greedy fill (simpler than openclaw's `buildStageSplitPlanWithWorker`) achieves the same outcome.
+- **A single oversized block should get its own stage, not be combined with neighbors.** The greedy fill check `current_tokens + block_tokens > target_per_stage` correctly handles this. A 500-token block with target 110 will become its own stage.
+- **Greedy fill can produce more stages than `parts` requested.** For 4 blocks (100+100+10+10 tokens) with parts=2 and target=110, the greedy produces 3 stages (huge_1 alone, huge_2+small_1, small_2 alone). **This is OK** — the result is more balanced, not less. The test verifies no blocks are lost and no stages are empty.
+- **Public wrapper pattern for private methods.** `summarize_with_fallback` was private (took `&LlmProvider` arg). v2 added `summarize_with_fallback_public` that takes `&self` and pulls the provider from `self.provider`. **Pattern: when a private method needs `&LlmProvider`, expose a `&self` wrapper that pulls from `self.provider`.** This avoids the caller having to pass the provider explicitly.
+- **The 4 unit tests from v1 used a misleading test name.** v1 had `summarize_in_stages_with_few_blocks_uses_single_call` which didn't actually test the function — it tested `split_into_stages`. **A test name should describe what it tests.** v2's tests are more direct.
+
 ---
 
-*FID-170 created 2026-06-16 20:00 EST, implemented 20:35 EST, 4 new tests, 355 total pass, archived as part of v0.14.3 batch — Vera*
+*FID-170 created 2026-06-16 20:00 EST, implemented 20:35 EST (v1, 4 new tests, 355 total pass), strict-read 22:45 EST (v2, 6 new tests, 361 total pass, 2 fidelity improvements, archived as part of v0.14.4 batch) — Vera*

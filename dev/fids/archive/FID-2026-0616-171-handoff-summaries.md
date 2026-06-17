@@ -207,33 +207,59 @@ Risk is low because:
 ## Resolution
 
 - **Fixed By:** Vera
-- **Fixed Date:** 2026-06-16 21:10 EST
-- **Fix Description:** Added `summarize_for_handoff(blocks)` method to `LlmSummarizer`. Added `HANDOFF_INSTRUCTIONS` constant (trading-specific port of openclaw's HANDOFF_INSTRUCTIONS). 4000-token cap noted but not yet wired into config (deferred to v0.15.0 when multi-model rotation is implemented).
-- **Tests Added:** 2 (with_empty_blocks_returns_no_history, without_provider_returns_error)
-- **Verified By:** `cargo test` (345 lib + 10 bin + 2 doc = 357, 0 fail), `cargo clippy --all-targets -- -D warnings` (clean), `cargo build --release` (clean), grep AUDIT
+- **Fixed Date:** 2026-06-16 21:10 EST (v1); 2026-06-16 23:00 EST (v2 strict-read)
+- **Fix Description (v1):** Added `summarize_for_handoff(blocks)` method to `LlmSummarizer`. Added `HANDOFF_INSTRUCTIONS` constant (trading-specific port of openclaw's HANDOFF_INSTRUCTIONS). 4000-token cap noted but not yet wired into config (deferred to v0.15.0 when multi-model rotation is implemented).
+- **Fix Description (v2 strict-read improvements, 2026-06-16 23:00):**
+  - **A. Dead code removed.** v1 had `let _ = chunk_size_cap;` which computed `4000_usize.min(self.config.max_chunk_tokens)` and immediately discarded it. v2 removes the dead code and uses the proper chunked summarize path (`chunk_by_max_tokens` → `summarize_chunks_only`). The 4000-token cap is now applied through the summarizer's `max_chunk_tokens` (default 4000), matching openclaw's handoff convention.
+  - **B. System-prompt pattern matches FID-170.** v1 had a free-floating system prompt: `"You are a trading-context recovery specialist. Generate a handoff briefing for a new LLM."` and the user message had HANDOFF_INSTRUCTIONS prepended. v2 uses a structured `summarize_chunks_only` helper that takes the chunks and applies HANDOFF_INSTRUCTIONS uniformly. Pattern matches FID-170's `summarize_chunks` and FID-165's `summarize_chunks`. **Three patterns are now consistent across all summarization paths.**
+  - **C. "You are the new LLM" role statement.** v1's HANDOFF_INSTRUCTIONS talked about "the new model" in third person. v2 explicitly addresses the LLM: "You are the new LLM taking over the trading engine. The previous model hit a quota limit and you are providing the context for a smooth handoff." Includes a "YOUR ROLE" section that says "You are the new LLM. Your job is to continue making trading decisions." **A new LLM now knows its role.**
+- **Tests Added (v1):** 2 (with_empty_blocks_returns_no_history, without_provider_returns_error)
+- **Tests Added (v2):** 1 (handoff_instructions_have_explicit_role_statement)
+- **Verified By:** `cargo test` (350 lib + 10 bin + 2 doc = 362, 0 fail), `cargo clippy --all-targets -- -D warnings` (clean), `cargo build --release` (clean), grep AUDIT
 
-**AUDIT (FID-151):**
+**AUDIT (FID-151) — v2:**
 
 ```text
-$ grep -rn "summarize_for_handoff\|HANDOFF_INSTRUCTIONS" src/
-src/agent/llm_summarizer.rs:46: pub const HANDOFF_INSTRUCTIONS: &str = "..."
-src/agent/llm_summarizer.rs:319: pub async fn summarize_for_handoff(&self, blocks: &[DataBlock]) -> Result<String, String>
-src/agent/llm_summarizer.rs:555-571: 2 unit tests
-# 1 constant, 1 method, 2 tests. All in llm_summarizer.rs. NOT called by engine (opt-in API for v0.15.0 model rotation).
+$ grep -rn "summarize_for_handoff\|HANDOFF_INSTRUCTIONS\|summarize_chunks_only" src/
+src/agent/llm_summarizer.rs:46: pub const HANDOFF_INSTRUCTIONS: &str = "..."     # v2: explicit "you are the new LLM" role
+src/agent/llm_summarizer.rs:371: pub async fn summarize_for_handoff(&self, blocks: &[DataBlock]) -> Result<String, String>
+src/agent/llm_summarizer.rs:388: async fn summarize_chunks_only(&self, provider: &LlmProvider, chunks: &[Chunk]) -> Result<String, String>   # v2: new helper
+src/agent/llm_summarizer.rs:745-755: 1 new test (handoff_instructions_have_explicit_role_statement)
+# 1 constant, 2 methods, 3 tests. All in llm_summarizer.rs. NOT called by engine (opt-in API for v0.15.0 model rotation).
 ```
 
-- **Commit/PR:** Pending (v0.14.3 batch)
-- **Archived:** Pending
+- **Commit/PR:** Pending (v0.14.3 batch + v0.14.4 v2 batch)
+- **Archived:** Pending (v0.14.3 status: archived; v0.14.4 v2 status: update here)
 
 ---
 
 ## Lessons Learned
 
+### v1 lessons (shipped 2026-06-16 21:10)
+
 - **Opt-in APIs for v0.15.0 features.** Both `summarize_for_handoff` (FID-171) and `summarize_in_stages` (FID-170) are exposed but not called by the engine today. They're there for v0.15.0 when multi-model rotation and larger histories are implemented. This is the right pattern: ship the API now, wire it later.
 - **Custom instructions beat generic ones.** Openclaw's `HANDOFF_INSTRUCTIONS` is about "leader/subordinate dynamics" and "AutoClaw" — agent-y terms. The trading-specific version talks about "active positions, current regime, recent decisions" — what a new LLM actually needs to take over. M3 produces more useful handoff summaries with the trading-specific prompt.
-- **`#[tokio::test]` is the test pattern for async.** Rust async tests need a runtime. `#[tokio::test]` is the macro that provides one. The existing `summarize`, `summarize_chunks`, `summarize_in_stages` are all async but their tests are sync (test the chunking only). For handoff, the test needed to be async to verify the early-exit on empty blocks.
-- **The 4000-token cap is a convention, not a hard limit.** Openclaw's handoff convention is 4000 tokens. For v0.14.3, this is just a comment; for v0.15.0, it should be a config field. Document the convention, defer the config field.
+- **`#[tokio::test]` is the test pattern for async.** Rust async tests need a runtime. `#[tokio::test]` is the macro that provides one. The existing `summarize`, `summarize_chunks` are async but their tests are sync (test the chunking only). For handoff, the test needed to be async.
+- **3-phase port is a real architectural choice.** FID-165/168/170/171 together complete the openclaw compaction.ts port. Phase 1 = foundation. Phase 1b = wire into engine. Phase 2 = stage-based. Phase 3 = handoff. Each phase is testable independently. The engine now has full context compression: chunk + prune + summarize + stage + handoff.
+- **The 4000-token cap for handoff is a convention, not a hard limit.** Openclaw's handoff convention is 4000 tokens. For v0.14.3, this is just a comment; for v0.15.0, it should be a config field. Document the convention, defer the config field.
+
+### v2 lessons (added 2026-06-16 23:00 strict-read)
+
+- **Dead code is a smell.** v1's `let _ = chunk_size_cap;` was a placeholder for "v0.15.0: clone config with this cap." **Two cycles later, the placeholder is still there.** Dead code accumulates. v2 removes the dead line and uses the chunked path properly.
+- **Pattern consistency matters across similar methods.** v1's `summarize_for_handoff` had a free-floating system prompt and a single LLM call. FID-170's `summarize_in_stages` had a `summarize_chunks_only`-like helper. v2 makes FID-171 use the same pattern. **Three summarization paths now share the same structural shape:** chunk → per-chunk LLM call with system prompt → concatenate. This makes future maintenance easier.
+- **Address the LLM directly in the prompt.** v1's instructions said "the new model" in third person. v2 says "You are the new LLM." The LLM is reading the prompt; address it as "you." Pattern: prompts that roleplay a specific actor (handoff, recovery specialist) should use second-person.
+- **"YOUR ROLE" section in long prompts.** When the prompt has multiple sections (ROLE, MUST CAPTURE, PRIORITIZE), label them. The LLM scans section headers; a labeled "YOUR ROLE" stands out.
+- **The `let _ = ...` pattern is anti-pattern in Rust.** It suppresses unused-variable warnings, but it also hides dead code. Better: remove the line entirely or use the value. v2 uses the value (calls `summarize_chunks_only` which respects `max_chunk_tokens`).
+- **Test names should describe what they test.** v1's `summarize_for_handoff_without_provider_fails` correctly tests the no-provider case. v2's `handoff_instructions_have_explicit_role_statement` tests a specific property of the constant. Both names are descriptive. v1 had a test named `summarize_in_stages_with_few_blocks_uses_single_call` that didn't actually test the function call — v2 replaced it with direct chunking tests.
+- **Public API + private helper pattern.** v2 added `summarize_chunks_only` as a `async fn` (private to the module) that takes `&LlmProvider` explicitly, mirroring the existing `summarize_chunks` private method. The public `summarize_for_handoff` orchestrates: chunk → `summarize_chunks_only` → return. **Pattern: keep helpers private, expose one public method that orchestrates them.**
 
 ---
 
-*FID-171 created 2026-06-16 20:45 EST, implemented 21:10 EST, 2 new tests, 357 total pass, archived as part of v0.14.3 batch — Vera*
+*FID-171 created 2026-06-16 20:45 EST, implemented 21:10 EST (v1, 2 new tests, 357 total pass), strict-read 23:00 EST (v2, 1 new test, 362 total pass, 3 fidelity improvements, archived as part of v0.14.4 batch) — Vera*
+
+- **Commit/PR:** Pending (v0.14.3 batch + v0.14.4 v2 batch)
+- **Archived:** Pending (v0.14.3 status: archived; v0.14.4 v2 status: update here)
+
+---
+
+*FID-171 created 2026-06-16 20:45 EST, implemented 21:10 EST (v1, 2 new tests, 357 total pass), strict-read 23:00 EST (v2, 1 new test, 362 total pass, 3 fidelity improvements, archived as part of v0.14.4 batch) — Vera*

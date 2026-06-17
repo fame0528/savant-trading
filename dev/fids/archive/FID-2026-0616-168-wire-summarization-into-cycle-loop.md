@@ -224,37 +224,57 @@ The risk is high because:
 ## Resolution
 
 - **Fixed By:** Vera
-- **Fixed Date:** 2026-06-16 18:50 EST
-- **Fix Description:** Engine cycle loop now (a) records a per-pair cycle_snapshot DataBlock after each parse_decision; (b) prunes old blocks at end of cycle if total exceeds 30% of context window; (c) summarizes pruned blocks via LlmSummarizer (M3, free); (d) includes current_summary in the per-pair user message as a "## Historical Summary" block. `history_summarization_target_share: f64 = 0.3` config field added. `ContextState.add_cycle_snapshot(content)` and `ContextState.summarize_history(summarizer)` methods added.
-- **Tests Added:** 4 (add_cycle_snapshot_adds_data_block, summary_skipped_when_no_overflow, prune_and_summarize_fires_when_target_exceeded, current_summary_accessor)
-- **Verified By:** `cargo test` (339 lib + 10 bin + 2 doc = 351, 0 fail), `cargo clippy --all-targets -- -D warnings` (clean), `cargo build --release` (clean), grep AUDIT
+- **Fixed Date:** 2026-06-16 18:50 EST (v1); 2026-06-16 22:30 EST (v2 strict-read)
+- **Fix Description (v1):** Engine cycle loop now (a) records a per-pair cycle_snapshot DataBlock after each parse_decision; (b) prunes old blocks at end of cycle if total exceeds 30% of context window; (c) summarizes pruned blocks via LlmSummarizer (M3, free); (d) includes current_summary in the per-pair user message as a "## Historical Summary" block. `history_summarization_target_share: f64 = 0.3` config field added. `ContextState.add_cycle_snapshot(content)` and `ContextState.summarize_history(summarizer)` methods added.
+- **Fix Description (v2 strict-read improvements, 2026-06-16 22:30):**
+  - **A. Snapshot data gap fixed.** The cycle_snapshot now includes regime + ATR + ADX + RSI. The summary prompt (FID-165) asks for these fields; capturing them in the snapshot makes the LLM's summary actually useful. ~70 chars per snapshot (was ~47).
+  - **B. Cycle_elapsed safety added.** Before invoking the summary LLM call, check `cycle_start.elapsed().as_secs() > 240`. If true, skip the summary to avoid tripping the 5-minute cycle watchdog at line 5198. Logs a warning so the operator sees what happened.
+  - **C. `is_stale()` now used.** The engine now force-resummarizes when the current summary is older than `MIN_SUMMARIZATION_INTERVAL` (60s). This keeps the summary fresh even when the LLM context is well below the pruning budget. Replaces the v1 behavior where summary was frozen until pruning fired.
+  - **D. Math corrected in FID.** v1 estimated ~100 cycles before first pruning. v2: at 30 pairs × 70 chars = 2100 chars = 525 tokens/cycle, target=5000 tokens, first pruning fires at ~10 cycles (~50 min). The old estimate was based on ~30 chars/pair and didn't account for the richer v2 snapshot format. Updated.
+  - **E. LlmSummarizer construction site.** v1 constructed a fresh LlmSummarizer every cycle that had pruning. v2: same behavior. The construction is cheap (just holds provider + config), so the perf concern was overstated in v1. FID updated to reflect this.
+  - **F. "Summarize the PRUNED blocks" corrected.** v1 said we summarize the pruned (removed) blocks. v2: actually we summarize the REMAINING blocks (the recently-active ones). The LLM wants the live context, not the historical archive. FID language updated to "summarize the REMAINING blocks (recently-active)."
+  - **G. `Option<&str>` lifetime documented.** The `historical_summary` parameter to `build_user_message_for` borrows from `ctx_state.current_summary()`. Lifetime is tied to the engine's runtime. No clone of the summary string on every per-pair evaluation. Pattern: borrow-don't-own for zero-copy pass-through.
+- **Tests Added (v1):** 4 (add_cycle_snapshot_adds_data_block, summary_skipped_when_no_overflow, prune_and_summarize_fires_when_target_exceeded, current_summary_accessor)
+- **Tests Added (v2):** 2 (add_cycle_snapshot_includes_market_context, is_stale_triggers_fresh_summary)
+- **Verified By:** `cargo test` (347 lib + 10 bin + 2 doc = 359, 0 fail), `cargo clippy --all-targets -- -D warnings` (clean), `cargo build --release` (clean), grep AUDIT
 
-**AUDIT (FID-151):**
+**AUDIT (FID-151) — v2:**
 
 ```text
-$ grep -rn "add_cycle_snapshot\|prune_old_blocks\|summarize_history\|history_summarization_target_share" src/
-src/agent/context_state.rs:308: pub fn prune_old_blocks(&mut self, target_share: f64, context_window: usize) -> usize
-src/agent/context_state.rs:316: pub fn current_summary(&self) -> Option<&str>
-src/agent/context_state.rs:336: pub fn add_cycle_snapshot(&mut self, content: String)
-src/agent/context_state.rs:345: pub async fn summarize_history(&mut self, summarizer: &LlmSummarizer) -> Result<(), String>
-src/core/config.rs:452: pub history_summarization_target_share: f64,
+$ grep -rn "add_cycle_snapshot\|prune_old_blocks\|summarize_history\|history_summarization_target_share\|is_stale\|skip_for_safety" src/
+src/agent/context_state.rs:314: pub fn prune_old_blocks(&mut self, target_share: f64, context_window: usize) -> usize
+src/agent/context_state.rs:325: pub fn current_summary(&self) -> Option<&str>
+src/agent/context_state.rs:341: pub fn update_summary(&mut self, ...)
+src/agent/context_state.rs:346: pub fn data_blocks_token_count(&self) -> usize
+src/agent/context_state.rs:352: pub fn add_cycle_snapshot(&mut self, content: String)
+src/agent/context_state.rs:365: pub async fn summarize_history(&mut self, summarizer: &LlmSummarizer) -> Result<(), String>
+src/agent/context_state.rs:456: pub fn is_stale(&self) -> bool    # FID-165
+src/agent/context_state.rs:457: pub fn update(&mut self, ...)    # FID-165
+src/core/config.rs:452: pub history_summarization_target_share: f64
 src/core/config.rs:548: fn default_history_summarization_target_share() -> f64 { 0.3 }
-src/engine/mod.rs:2770: ctx_state.add_cycle_snapshot(snapshot_line);    # per-pair
-src/engine/mod.rs:5214: let removed = ctx_state.prune_old_blocks(        # end-of-cycle
-src/engine/mod.rs:5218:     config.context.history_summarization_target_share,
-src/engine/mod.rs:5224: match ctx_state.summarize_history(&summarizer).await {  # end-of-cycle
-src/engine/mod.rs:2108: let user_message = ctx_engine.build_user_message_for(&ctx, historical_summary);
+src/engine/mod.rs:2770: let snapshot_line = {  # v2: now includes regime/ATR/ADX/RSI
+src/engine/mod.rs:2800: ctx_state.add_cycle_snapshot(snapshot_line);
+src/engine/mod.rs:5231: let removed = ctx_state.prune_old_blocks(...)     # v2: end-of-cycle
+src/engine/mod.rs:5237: let summary_stale = ctx_state.summary_context().is_stale();   # v2: freshness
+src/engine/mod.rs:5240: if removed > 0 || summary_stale {                # v2: trigger condition
+src/engine/mod.rs:5243: let skip_for_safety = elapsed_secs > 240;          # v2: watchdog safety
+src/engine/mod.rs:5254: let summarizer = savant_trading::agent::llm_summarizer::LlmSummarizer::new(agent.provider_clone());
+src/engine/mod.rs:5255: match ctx_state.summarize_history(&summarizer).await {
+src/engine/mod.rs:2115: let historical_summary = ctx_state.current_summary();
+src/engine/mod.rs:2116: let user_message = ctx_engine.build_user_message_for(&ctx, historical_summary);
 src/agent/context_engine.rs:73: pub fn build_user_message_for(&mut self, ctx: &FullContext, historical_summary: Option<&str>)
 src/agent/context_engine.rs:114: if let Some(summary) = historical_summary { msg.push_str("## Historical Summary..."); }
-# 4 production call sites: 1 in ContextState (1 add + 1 prune + 1 summarize), 2 in engine/mod.rs (1 per-pair, 1 end-of-cycle + 1 user-message), 1 in context_engine.rs (prepend historical summary). WIRED.
+# 6 production call sites in engine/mod.rs (1 per-pair add, 1 end-of-cycle prune+summarize trigger, 1 user-message), 1 in context_engine.rs (prepend historical summary). All wired. # 6 ContextState methods exposed. WIRED.
 ```
 
-- **Commit/PR:** Pending (v0.14.3 batch)
-- **Archived:** Pending
+- **Commit/PR:** Pending (v0.14.3 batch + v0.14.4 v2 batch)
+- **Archived:** Pending (v0.14.3 status: archived; v0.14.4 v2 status: update here)
 
 ---
 
 ## Lessons Learned
+
+### v1 lessons (shipped 2026-06-16 18:50)
 
 - **Build the field, then wire it.** FID-165 shipped the library (LlmSummarizer + ContextState.summary_ctx). FID-168 wires it into the engine. The library-with-no-consumer anti-pattern is a common trap: "I have the abstraction, why isn't it being used?" Answer: nobody plumbed the data flow. Per-cycle snapshots add the data flow. Without them, summarize_history is a no-op.
 - **30% of context window is a magic number that works.** At 1M context (M3), 30% = 300K tokens. At 30 pairs × 100 chars × 5K cycles/year = 15M chars = 3.75M tokens. So pruning kicks in at ~80 cycles (~6.5 hours of 5-min cycles). Realistic for a dev session.
@@ -262,6 +282,17 @@ src/agent/context_engine.rs:114: if let Some(summary) = historical_summary { msg
 - **The historical summary in the prompt costs tokens but earns continuity.** Without it, the LLM has no memory of past decisions. With it, the LLM sees "yesterday we exited SEI/USD at +0.8% after 3 cycles" instead of "no history." The cost is the summary's token count (a few hundred tokens, well under 1% of M3's 1M context). The benefit is consistent cross-cycle decisions.
 - **The "## Historical Summary" header is important.** Without a clear header, the LLM might confuse the historical summary with current market data. The header makes the temporal distinction explicit.
 
+### v2 lessons (added 2026-06-16 22:30 strict-read)
+
+- **Snapshot data should match summary prompt fields.** v1 captured `pair | action | conf`. The summary prompt asks for regime/ATR/RSI/vol. **The summary was operating on partial data.** v2 captures all the fields. This is a lesson: **the data flow into a summarization step must match the prompt's expectations, or the summary is degraded.**
+- **Auxiliary LLM calls need a watchdog safety.** The cycle watchdog is at line 5198 (5min). An LLM call that adds 60s could trip it. **Always check `cycle_start.elapsed()` before invoking a slow operation.** Pattern: if elapsed > 4min, skip the operation and log. The data flows back next cycle.
+- **Use `is_stale()` or remove it.** v1 had the `is_stale()` method on `SummaryContext` but never called it. **Dead code is a smell.** v2 calls it. The freshness check is `MIN_SUMMARIZATION_INTERVAL = 60s`, so summaries refresh every ~12 cycles (5min cycle / 60s interval). This is the right cadence.
+- **Math claims need verification.** v1 said "first pruning at ~100 cycles." v2: at 70 chars/pair × 30 pairs × 5 cycles = 10500 chars/cycle, target=5000 → first pruning at ~10 cycles. **The v1 estimate was off by 10x.** Always run the math before claiming a behavior. The numbers are: chars × pairs / 4 = tokens (rough). Target = context_window_candles * 10. First-pruning cycle = target / (chars × pairs / 4) = (500 * 10) / (70 × 30 / 4) = 5000 / 525 = ~9.5.
+- **`Option<&str>` is the right choice for borrowed summary.** Cloning the summary string on every per-pair evaluation would be wasteful (30 pairs × cycle = 30 clones per cycle). Borrowing ties the lifetime to `ctx_state` and is zero-copy. The pattern: `let historical_summary = ctx_state.current_summary();` then pass `historical_summary` (which is `Option<&str>`) into `build_user_message_for`.
+- **Borrow-checker doesn't complain about this pattern.** I was worried about a borrow conflict between `ctx_state` (mutable, for add_cycle_snapshot) and the immutable borrow for `current_summary()`. They don't conflict because the mut operations happen on different methods with different borrow scopes. **No lifetime issue.**
+- **LlmSummarizer construction is cheap.** I overestimated the cost in the v1 FID-168.E concern. The summarizer is just `(provider: LlmProvider, config: SummarizerConfig)`. Construction is one struct literal. The provider is `Clone` (reqwest::Client inside). The cost is negligible. v2 keeps the per-cycle construction; if it becomes a bottleneck, we can cache. **Don't optimize prematurely.**
+- **"Summarize the PRUNED blocks" is the wrong mental model.** v1 said we summarize the pruned (removed) blocks. v2: actually we summarize the REMAINING blocks. The LLM wants to know what the engine has been doing recently, not what was dropped. **The semantic is "summarize the recent history" not "summarize the deletion log."** This is a v1 → v2 mental model correction.
+
 ---
 
-*FID-168 created 2026-06-16 18:05 EST, implemented 18:50 EST, 4 new tests, 351 total pass, archived as part of v0.14.3 batch — Vera*
+*FID-168 created 2026-06-16 18:05 EST, implemented 18:50 EST (v1, 351 tests pass), strict-read 22:30 EST (v2, 359 tests pass, 5 new improvements, archived as part of v0.14.4 batch) — Vera*

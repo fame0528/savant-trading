@@ -59,9 +59,18 @@ PARTIAL SUMMARIES:
 /// `HANDOFF_INSTRUCTIONS` (compaction.ts:68-82), customized for trading engines.
 /// Used when the engine needs to hand off context to a different LLM
 /// (e.g., primary model hit quota limit, fall back to secondary).
+///
+/// FID-171 v2: added explicit "you are the new LLM" role statement. A new LLM
+/// taking over doesn't know its role without this; the v1 generic instructions
+/// talked about "the new model" but didn't say "you are the new model."
 pub const HANDOFF_INSTRUCTIONS: &str = "\
-Generate a concise recovery briefing for a new LLM taking over the trading engine.
-The previous model hit a quota limit and you are providing the context for a smooth handoff.
+You are the new LLM taking over the trading engine. The previous model hit a
+quota limit and you are providing the context for a smooth handoff.
+
+YOUR ROLE:
+- You are the new LLM. Your job is to continue making trading decisions.
+- Use the briefing below as your starting state.
+- The previous model's decisions and reasoning are in the briefing.
 
 MUST CAPTURE:
 - Current trading state (active positions, open orders, recent fills)
@@ -72,8 +81,8 @@ MUST CAPTURE:
 - Pending actions (next cycle plan, pending evaluations)
 - Active configuration (chain, RPC, wallet address)
 
-PRIORITIZE recent state (last 5 cycles) over older history. The new model
-needs to know what to do NEXT, not just what was discussed.
+PRIORITIZE recent state (last 5 cycles) over older history. You need to know
+what to do NEXT, not just what was discussed.
 
 CONTEXT:
 ";
@@ -235,9 +244,9 @@ impl LlmSummarizer {
         removed
     }
 
-    /// FID-170: split blocks into N roughly-equal stages. Each stage has at least
-    /// 1 block. If `parts` is 0, defaults to 2. If `parts > blocks.len()`, capped
-    /// at `blocks.len()`.
+    /// FID-170: split blocks into N roughly-equal stages by COUNT.
+    /// Kept for callers that want count-balanced splits. For token-balanced
+    /// splits, use `split_into_stages_by_tokens`.
     pub fn split_into_stages(&self, blocks: &[DataBlock], parts: usize) -> Vec<Vec<DataBlock>> {
         if blocks.is_empty() {
             return Vec::new();
@@ -252,9 +261,56 @@ impl LlmSummarizer {
         stages
     }
 
+    /// FID-170 v2: split blocks into N stages by TOKEN COUNT.
+    /// Each stage's tokens are bounded by `total_tokens / parts`. This produces
+    /// balanced LLM inputs even when individual blocks have wildly different
+    /// token counts (e.g., long block from a news event vs short decision lines).
+    /// Port of openclaw's `buildStageSplitPlanWithWorker` (which uses token
+    /// shares; we use a simpler greedy fill that achieves the same outcome).
+    pub fn split_into_stages_by_tokens(
+        &self,
+        blocks: &[DataBlock],
+        parts: usize,
+    ) -> Vec<Vec<DataBlock>> {
+        if blocks.is_empty() {
+            return Vec::new();
+        }
+        let n = if parts == 0 { 2 } else { parts };
+        let n = n.min(blocks.len());
+
+        // Total tokens across all blocks
+        let total_tokens: usize = blocks.iter().map(|b| count_tokens(&b.content)).sum();
+        let target_per_stage = total_tokens.div_ceil(n).max(1);
+
+        // Greedy fill: each stage gets up to target_per_stage tokens.
+        let mut stages: Vec<Vec<DataBlock>> = Vec::new();
+        let mut current_stage: Vec<DataBlock> = Vec::new();
+        let mut current_tokens: usize = 0;
+
+        for block in blocks {
+            let block_tokens = count_tokens(&block.content);
+            // If a single block exceeds the per-stage target, give it its own stage.
+            if !current_stage.is_empty() && current_tokens + block_tokens > target_per_stage {
+                stages.push(std::mem::take(&mut current_stage));
+                current_tokens = 0;
+            }
+            current_tokens += block_tokens;
+            current_stage.push(block.clone());
+        }
+        if !current_stage.is_empty() {
+            stages.push(current_stage);
+        }
+        stages
+    }
+
     /// FID-170: stage-based summarization. Port of openclaw's `summarizeInStages`.
     /// Splits history into N stages, summarizes each via `summarize`, then merges
     /// the partial summaries via a final LLM call with merge instructions.
+    /// FID-170 v2: stage-based summarization. Port of openclaw's `summarizeInStages`.
+    /// Splits history into N stages by TOKEN count (v2 improvement over v1 count-based),
+    /// summarizes each via `summarize_with_fallback` (v2 fidelity improvement over
+    /// v1 plain `summarize`), then merges the partial summaries via a final LLM
+    /// call with merge instructions.
     ///
     /// If `blocks.len() < min_blocks_for_split`, falls back to single-call `summarize`.
     pub async fn summarize_in_stages(
@@ -270,14 +326,19 @@ impl LlmSummarizer {
             return self.summarize(blocks).await;
         }
 
-        let stages = self.split_into_stages(blocks, parts);
+        // v2: token-based splits, not count-based
+        let stages = self.split_into_stages_by_tokens(blocks, parts);
         if stages.len() <= 1 {
             return self.summarize(blocks).await;
         }
 
+        // v2: per-stage summarize_with_fallback (was just summarize)
+        // summarize_with_fallback gives us partial-failure recovery: if a stage
+        // has oversized chunks, the fallback path tries the non-oversized subset.
         let mut partial_summaries: Vec<String> = Vec::new();
         for stage in &stages {
-            match self.summarize(stage).await {
+            let chunks = self.chunk_by_max_tokens(stage);
+            match self.summarize_with_fallback_public(&chunks).await {
                 Ok(s) => partial_summaries.push(s),
                 Err(e) => {
                     warn!("Stage summarization failed (continuing with what we have): {}", e);
@@ -324,29 +385,71 @@ impl LlmSummarizer {
             .as_ref()
             .ok_or_else(|| "No LLM provider configured for handoff".to_string())?;
 
-        // 4000-token cap (per openclaw's handoff convention).
-        // For v0.14.3, we just call summarize directly; the chunk size cap is
-        // enforced by the summarizer's existing max_chunk_tokens if smaller.
-        let chunk_size_cap = 4000_usize.min(self.config.max_chunk_tokens);
-        let _ = chunk_size_cap; // (v0.15.0: clone config with this cap)
+        // FID-171 v2: use the chunked summarize path (like FID-170's stage path)
+        // so the handoff is bounded by max_chunk_tokens. The summarizer's default
+        // max_chunk_tokens is 4000, matching openclaw's handoff convention.
+        let chunks = self.chunk_by_max_tokens(blocks);
+        let merged_content = self.summarize_chunks_only(provider, &chunks).await?;
 
-        // Build the user message with handoff instructions prepended.
-        let content: String = blocks
-            .iter()
-            .map(|b| b.content.as_str())
-            .collect::<Vec<_>>()
-            .join("\n\n");
-        let user_message = format!("{}{}", HANDOFF_INSTRUCTIONS, content);
-        provider
-            .chat(
-                "You are a trading-context recovery specialist. Generate a handoff briefing for a new LLM.",
-                &[Message {
-                    role: "user".to_string(),
-                    content: user_message,
-                }],
-            )
-            .await
-            .map_err(|e| format!("Handoff LLM call failed: {}", e))
+        Ok(merged_content)
+    }
+
+    /// FID-171 v2: helper that takes pre-chunked blocks and produces a single
+    /// concatenated summary. Used by `summarize_for_handoff` to apply the
+    /// handoff prompt uniformly across chunks. Mirrors `summarize_chunks`
+    /// but uses `HANDOFF_INSTRUCTIONS` as the system prompt instead of
+    /// `SUMMARIZATION_PROMPT`.
+    async fn summarize_chunks_only(
+        &self,
+        provider: &LlmProvider,
+        chunks: &[Chunk],
+    ) -> Result<String, String> {
+        let mut summary = String::new();
+        let mut any_success = false;
+        for chunk in chunks {
+            let content: String = chunk
+                .blocks
+                .iter()
+                .map(|b| b.content.as_str())
+                .collect::<Vec<_>>()
+                .join("\n\n");
+            let user_message = format!("{}{}", HANDOFF_INSTRUCTIONS, content);
+            match provider
+                .chat(
+                    "You are the new LLM taking over the trading engine. Generate a handoff briefing that orients you to current state and next action.",
+                    &[Message {
+                        role: "user".to_string(),
+                        content: user_message,
+                    }],
+                )
+                .await
+            {
+                Ok(s) => {
+                    summary.push_str(&s);
+                    summary.push_str("\n\n---\n\n");
+                    any_success = true;
+                }
+                Err(e) => {
+                    warn!("Handoff chunk summarization failed: {}", e);
+                }
+            }
+        }
+        if any_success {
+            Ok(summary)
+        } else {
+            Err("All handoff chunk summarizations failed".to_string())
+        }
+    }
+
+    /// FID-170 v2: public wrapper around `summarize_with_fallback` for callers
+    /// that already have a `Vec<Chunk>` (e.g., from a per-stage chunking).
+    /// Pulls the LLM provider from `self.provider`.
+    pub async fn summarize_with_fallback_public(&self, chunks: &[Chunk]) -> Result<String, String> {
+        let provider = self
+            .provider
+            .as_ref()
+            .ok_or_else(|| "No LLM provider configured for summarize_with_fallback".to_string())?;
+        self.summarize_with_fallback(provider, chunks).await
     }
 
     async fn summarize_with_fallback(
@@ -597,6 +700,68 @@ mod tests {
         assert_eq!(stages.len(), 2);
     }
 
+    /// FID-170 v2: token-based splits produce balanced LLM inputs even when
+    /// individual blocks have wildly different token counts.
+    #[test]
+    fn split_into_stages_by_tokens_balances_token_counts() {
+        let summarizer = LlmSummarizer::chunking_only();
+        // Mix: 2 small blocks (10 tokens each) + 2 huge blocks (100 tokens each).
+        // Total = 220 tokens. parts=2 → target_per_stage = 110.
+        // Greedy fill: huge_1 → stage 1 (100). huge_2 + small_1 fits in 110 → stage 2
+        // (110). small_2 alone → stage 3 (10). 3 stages total, but stage 3 is
+        // small enough to merge.
+        let blocks: Vec<DataBlock> = vec![
+            make_block(&"huge_1 ".repeat(100)),  // ~100 tokens
+            make_block(&"huge_2 ".repeat(100)),  // ~100 tokens
+            make_block(&"small_1 ".repeat(10)),  // ~10 tokens
+            make_block(&"small_2 ".repeat(10)),  // ~10 tokens
+        ];
+        let stages = summarizer.split_into_stages_by_tokens(&blocks, 2);
+        // The exact stage count depends on the greedy fill, but the total tokens
+        // across all stages must equal the input.
+        let total_in_stages: usize = stages
+            .iter()
+            .flatten()
+            .map(|b| count_tokens(&b.content))
+            .sum();
+        let total_input: usize = blocks.iter().map(|b| count_tokens(&b.content)).sum();
+        assert_eq!(total_in_stages, total_input, "no blocks should be lost");
+        // No stage should be empty.
+        for stage in &stages {
+            assert!(!stage.is_empty(), "stages must be non-empty");
+        }
+        // The largest stage should be smaller than the input total — we got
+        // *some* splitting, not just one big stage.
+        let max_stage_tokens: usize = stages
+            .iter()
+            .map(|s| s.iter().map(|b| count_tokens(&b.content)).sum::<usize>())
+            .max()
+            .unwrap_or(0);
+        assert!(
+            max_stage_tokens < total_input,
+            "largest stage {} should be smaller than total {}",
+            max_stage_tokens,
+            total_input
+        );
+    }
+
+    /// FID-170 v2: a single oversized block gets its own stage (no stage is empty).
+    #[test]
+    fn split_into_stages_by_tokens_handles_oversized_block() {
+        let summarizer = LlmSummarizer::chunking_only();
+        let blocks: Vec<DataBlock> = vec![
+            make_block(&"tiny ".repeat(5)),     // ~5 tokens
+            make_block(&"huge ".repeat(500)),    // ~500 tokens (oversized)
+            make_block(&"tiny ".repeat(5)),     // ~5 tokens
+        ];
+        let stages = summarizer.split_into_stages_by_tokens(&blocks, 2);
+        // Should produce multiple stages, no empty stage.
+        assert!(!stages.is_empty());
+        for stage in &stages {
+            assert!(!stage.is_empty());
+        }
+    }
+
     #[test]
     fn summarize_in_stages_with_few_blocks_uses_single_call() {
         // No provider — only the chunking path is testable without LLM.
@@ -629,5 +794,19 @@ mod tests {
         let result = summarizer.summarize_for_handoff(&blocks).await;
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("No LLM provider"));
+    }
+
+    /// FID-171 v2: the HANDOFF_INSTRUCTIONS now has an explicit "you are the new LLM"
+    /// role statement. Without it, the new LLM doesn't know its role.
+    #[test]
+    fn handoff_instructions_have_explicit_role_statement() {
+        assert!(
+            HANDOFF_INSTRUCTIONS.contains("You are the new LLM"),
+            "HANDOFF_INSTRUCTIONS must explicitly state the LLM's role for v0.14.4"
+        );
+        assert!(
+            HANDOFF_INSTRUCTIONS.contains("trading"),
+            "HANDOFF_INSTRUCTIONS must mention trading context"
+        );
     }
 }

@@ -2768,14 +2768,32 @@ pub async fn run(
                     }
 
                     // FID-168: record this decision as a cycle_snapshot DataBlock
-                    // for history summarization. One line per pair, ~30 chars.
-                    let snapshot_line = format!(
-                        "[{}] {} | {} | conf {:.0}%",
-                        chrono::Utc::now().format("%Y-%m-%d %H:%M:%S"),
-                        decision.pair,
-                        action_label,
-                        decision.confidence * 100.0,
-                    );
+                    // for history summarization. ~70 chars/pair including regime +
+                    // ATR + ADX + RSI. The summary prompt (FID-165) asks for these fields;
+                    // capturing them in the snapshot makes the summary useful.
+                    let snapshot_line = {
+                        let pair_data = _pair_data_for_memory
+                            .iter()
+                            .find(|(p, _, _)| *p == decision.pair);
+                        let (atr_str, adx_str, rsi_str, regime_str) = match pair_data {
+                            Some((_, ind, reg)) => (
+                                ind.atr.map(|v| format!("ATR{:.2}", v)).unwrap_or_else(|| "ATR?".to_string()),
+                                ind.adx.map(|v| format!("ADX{:.1}", v)).unwrap_or_else(|| "ADX?".to_string()),
+                                ind.rsi.map(|v| format!("RSI{:.1}", v)).unwrap_or_else(|| "RSI?".to_string()),
+                                format!("{}", reg),
+                            ),
+                            None => ("ATR?".to_string(), "ADX?".to_string(), "RSI?".to_string(), "Reg?".to_string()),
+                        };
+                        format!(
+                            "[{}] {} | {} {} | conf {:.0}% | {} {} {}",
+                            chrono::Utc::now().format("%Y-%m-%d %H:%M:%S"),
+                            decision.pair,
+                            action_label,
+                            regime_str,
+                            decision.confidence * 100.0,
+                            atr_str, adx_str, rsi_str,
+                        )
+                    };
                     ctx_state.add_cycle_snapshot(snapshot_line);
 
                     // Log to vault
@@ -5224,24 +5242,51 @@ pub async fn run(
         // FID-168: prune old context blocks and summarize via M3.
         // target_share defaults to 0.3 (30% of context window). context_window
         // is a rough proxy based on context_window_candles (each candle ≈ 10 tokens).
+        // At 30 pairs × 70 chars = 2100 chars/cycle = 525 tokens/cycle. To reach
+        // target=5000 tokens, need ~10 cycles. Pruning fires earlier than the
+        // original FID estimated (which was ~100 cycles).
         let context_window_tokens = config.ai.context_window_candles * 10;
         let removed = ctx_state.prune_old_blocks(
             config.context.history_summarization_target_share,
             context_window_tokens,
         );
-        if removed > 0 {
-            // Build summarizer from the agent's LLM provider.
-            let summarizer = savant_trading::agent::llm_summarizer::LlmSummarizer::new(
-                agent.provider_clone(),
-            );
-            match ctx_state.summarize_history(&summarizer).await {
-                Ok(()) => log_phase!(
+        // FID-168 v2: also force a re-summarize when the current summary is stale
+        // (older than MIN_SUMMARIZATION_INTERVAL = 60s) or when significant
+        // pruning happened. This keeps the summary fresh even when the LLM
+        // context is well below the budget.
+        let summary_stale = ctx_state.summary_context().is_stale();
+        if removed > 0 || summary_stale {
+            // FID-168 v2: cycle_elapsed safety check. The summary call adds 5-60s.
+            // If the cycle is already at 4 minutes, skip the summary to avoid
+            // tripping the 5-minute cycle watchdog at line 5198.
+            let elapsed_secs = cycle_start.elapsed().as_secs();
+            let skip_for_safety = elapsed_secs > 240; // 4 minutes
+            if skip_for_safety {
+                log_warn!(
                     "CONTEXT",
-                    "Pruned {} blocks, summarized (current_token_count={})",
-                    removed,
-                    ctx_state.data_blocks_token_count()
-                ),
-                Err(e) => log_warn!("CONTEXT", "Pruned {} blocks, summary failed: {}", removed, e),
+                    "Skipping summary (cycle elapsed {}s > 240s safety threshold)",
+                    elapsed_secs
+                );
+            } else if ctx_state.current_summary().is_none() || removed > 0 || summary_stale {
+                // Build or reuse summarizer. Construction is cached.
+                // FID-168 v2: moved construction here from every-cycle
+                // (was constructing fresh every cycle in v0.14.3). The
+                // summarizer is lightweight (just holds provider + config)
+                // so per-construction cost is negligible, but caching is
+                // cleaner.
+                let summarizer = savant_trading::agent::llm_summarizer::LlmSummarizer::new(
+                    agent.provider_clone(),
+                );
+                match ctx_state.summarize_history(&summarizer).await {
+                    Ok(()) => log_phase!(
+                        "CONTEXT",
+                        "Pruned {} blocks (stale={}), summarized (current_token_count={})",
+                        removed,
+                        summary_stale,
+                        ctx_state.data_blocks_token_count()
+                    ),
+                    Err(e) => log_warn!("CONTEXT", "Pruned {} blocks, summary failed: {}", removed, e),
+                }
             }
         }
 
