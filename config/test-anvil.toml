@@ -173,7 +173,8 @@ referer = "https://github.com/fame0528/savant-trading"
 title = "Savant Trading Engine"
 
 [ai.jury]
-enabled = false
+# FID-179: Jury is core to Savant. Enabled on Anvil too.
+enabled = true
 jury_size = 10
 models = [
   "openrouter/free",

@@ -235,7 +235,10 @@ referer = "https://github.com/fame0528/savant-trading"
 title = "Savant Trading Engine"
 
 [ai.jury]
-enabled = false
+# FID-179: Jury is core to Savant (multi-model voting). Was disabled by default
+# while "situated." Now enabled. Use OPENROUTER_MANAGEMENT_KEY env var for the
+# 9 free-model juror provisioning. M3 control juror uses TOKEN_ROUTER_API_KEY.
+enabled = true
 jury_size = 10
 # openrouter/free is a router that selects free models at random from all
 # available free models on OpenRouter (24 models across NVIDIA, OpenInference,

@@ -18,6 +18,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **FID-170 v2 (Strict-read improvements)**: Token-based stage splits (not count-based) so LLM inputs are balanced regardless of block size distribution. Per-stage summarize_with_fallback gives partial-failure recovery (was plain summarize).
 - **FID-171 v2 (Strict-read improvements)**: Dead code removed. Pattern consistency with FID-170 (chunked path with private helper). "You are the new LLM" role statement in the handoff instructions.
 
+## [Unreleased] — 2026-06-17
+
+### Housekeeping
+
+- **FID-178 archived** (2026-06-17 00:25 EST): start.bat Hangs/Crashes at Anvil Auto-Start — Direct Invocation Workaround. Replaced the nested `if/else` block in start.bat (line 97-106) with an unconditional `call` to the idempotent `start-anvil.bat`. The old block had a cmd.exe parse error (`. was unexpected at this time.`) under certain invocation patterns. Workaround: `call start-anvil.bat` then direct binary.
+
+- **FID-179 archived** (2026-06-17 00:50 EST): Re-enable Jury System. Flipped `enabled = false` to `enabled = true` in `[ai.jury]` in both `config/default.toml` and `config/test-anvil.toml`. The jury (M3 control + 9 free-model jurors + 70% veto threshold) is a core feature of the Savant engine design — multi-model voting for decision validation. Was disabled by default in a prior session; now enabled. Uses `OPENROUTER_MANAGEMENT_KEY` env var for the 9 free-model juror provisioning. M3 control juror uses `TOKEN_ROUTER_API_KEY`. No code changes.
+
+- **FID-180 archived** (2026-06-17 00:55 EST): Dashboard Layout — Closed Trades Spans All 3 Rows + 2-3x Row Height. UI change in `dashboard/src/app/page.tsx`: added `row-span-3` to the Closed Trades container (spans all 3 rows of column 3 of the bento grid). Bumped table text from 10px to 11px. Bumped row padding from `py-0.5` (2px) to `py-1.5` (6px) for 3x taller rows. Bumped trade slice from 10 to 30 (more visible at once, with overflow-y-auto scrolling). Dashboard builds clean.
+
 ## [Unreleased] — 2026-06-16
 
 ### Housekeeping

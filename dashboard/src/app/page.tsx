@@ -776,7 +776,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
+        <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden row-span-3">
           <div className="flex items-center gap-2 px-3 pt-2 pb-1 border-b border-(--line)">
             <span className="inline-flex items-center"><Icon name="fa-receipt" className="text-(--dim) text-[10px]" /></span>
             <span className="text-[10px] tracking-[2px] uppercase font-semibold text-(--dim) leading-none">Closed Trades</span>
@@ -798,28 +798,28 @@ export default function Dashboard() {
             {trades.length === 0 ? (
               <p className="text-(--dimmer) text-xs text-center py-4"><Icon name="fa-inbox" className="mr-1" />No closed trades yet.</p>
             ) : (
-              <table className="w-full text-[10px]">
+              <table className="w-full text-[11px]">
                 <thead>
                   <tr className="text-(--dimmer) text-left">
-                    <th className="py-0.5 pr-2"><Icon name="fa-hashtag" className="mr-0.5 text-[7px]" />PAIR</th>
-                    <th className="py-0.5 pr-2"><Icon name="fa-arrow-right-arrow-left" className="mr-0.5 text-[7px]" />SIDE</th>
-                    <th className="py-0.5 pr-2"><Icon name="fa-door-open" className="mr-0.5 text-[7px]" />ENTRY</th>
-                    <th className="py-0.5 pr-2"><Icon name="fa-door-closed" className="mr-0.5 text-[7px]" />EXIT</th>
-                    <th className="py-0.5 pr-2"><Icon name="fa-sack-dollar" className="mr-0.5 text-[7px]" />P&L</th>
-                    <th className="py-0.5"><Icon name="fa-percent" className="mr-0.5 text-[7px]" />%</th>
+                    <th className="py-1.5 pr-2"><Icon name="fa-hashtag" className="mr-0.5 text-[7px]" />PAIR</th>
+                    <th className="py-1.5 pr-2"><Icon name="fa-arrow-right-arrow-left" className="mr-0.5 text-[7px]" />SIDE</th>
+                    <th className="py-1.5 pr-2"><Icon name="fa-door-open" className="mr-0.5 text-[7px]" />ENTRY</th>
+                    <th className="py-1.5 pr-2"><Icon name="fa-door-closed" className="mr-0.5 text-[7px]" />EXIT</th>
+                    <th className="py-1.5 pr-2"><Icon name="fa-sack-dollar" className="mr-0.5 text-[7px]" />P&L</th>
+                    <th className="py-1.5"><Icon name="fa-percent" className="mr-0.5 text-[7px]" />%</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {trades.slice(0, 10).map((t) => (
+                  {trades.slice(0, 30).map((t) => (
                     <tr key={t.id} className="border-t border-white/3 even:bg-white/1.5">
-                      <td className="py-0.5 pr-2 font-semibold">{t.pair}</td>
-                      <td className={`py-0.5 pr-2 ${pnlClass(t.side === "Long" ? 1 : -1)}`}>
+                      <td className="py-1.5 pr-2 font-semibold">{t.pair}</td>
+                      <td className={`py-1.5 pr-2 ${pnlClass(t.side === "Long" ? 1 : -1)}`}>
                         <span className="flex items-center gap-0.5"><Icon name={t.side === "Long" ? "fa-arrow-up" : "fa-arrow-down"} className="text-[7px]" />{t.side}</span>
                       </td>
-                      <td className="py-0.5 pr-2 font-mono">{fmt.price(t.entry_price)}</td>
-                      <td className="py-0.5 pr-2 font-mono">{fmt.price(t.exit_price)}</td>
-                      <td className={`py-0.5 pr-2 font-mono ${pnlClass(t.pnl)}`}>{fmt.usd(t.pnl)}</td>
-                      <td className={`py-0.5 font-mono ${pnlClass(t.pnl_pct)}`}>{t.pnl_pct.toFixed(2)}%</td>
+                      <td className="py-1.5 pr-2 font-mono">{fmt.price(t.entry_price)}</td>
+                      <td className="py-1.5 pr-2 font-mono">{fmt.price(t.exit_price)}</td>
+                      <td className={`py-1.5 pr-2 font-mono ${pnlClass(t.pnl)}`}>{fmt.usd(t.pnl)}</td>
+                      <td className={`py-1.5 font-mono ${pnlClass(t.pnl_pct)}`}>{t.pnl_pct.toFixed(2)}%</td>
                     </tr>
                   ))}
                 </tbody>

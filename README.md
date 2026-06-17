@@ -411,7 +411,7 @@ The risk layer is **independent of the AI brain** — the agent cannot override 
 
 ```bash
 cargo build
-cargo test # 362 tests
+cargo test # 350 tests
 cargo clippy -- -D warnings
 ```
 
