@@ -5,8 +5,11 @@ const MIN_ORDER_VALUE: f64 = 1.0;
 
 /// FID-127: Base risk per trade (2% of balance)
 const BASE_RISK_PCT: f64 = 0.02;
-/// FID-127: Half-Kelly fraction (micro-cap safety)
-const KELLY_FRACTION: f64 = 0.5;
+/// FID-190: Quarter-Kelly fraction per Gemini Q1 ("0.25x fractional Kelly sizing
+/// algorithm based on calculated signal edge to manage maximum drawdowns").
+/// Lower than Half-Kelly (0.5) for additional safety margin with limited
+/// historical data.
+const KELLY_FRACTION: f64 = 0.25;
 /// FID-127: Minimum gas-cost-to-risk ratio that triggers uneconomic guard.
 /// If gas > 0.5 * risk_amount, the trade is refused.
 const GAS_ECONOMIC_RATIO: f64 = 0.5;
@@ -568,8 +571,10 @@ mod tests {
 
     #[test]
     fn sizing_multiplier_scales_proportionally() {
+        // FID-190: 0.25x Kelly halves scaled_risk, so use $50k balance
+        // to ensure both sizing=1.0 and sizing=0.5 clear $1.00 min notional.
         let sizer = PositionSizer::new(0.02, 1.5);
-        let account = make_account(5000.0);
+        let account = make_account(50000.0);
 
         let r_full = sizer.calculate_with_conviction(
             &account,
@@ -681,13 +686,13 @@ mod tests {
 
         // Also assert the exact absolute values for clarity.
         assert!(
-            (risk_400 - 4.0).abs() < 0.001,
-            "$400 / tier=1.00 / conviction=1.0 should give risk=4.0, got {}",
+            (risk_400 - 2.0).abs() < 0.001,
+            "$400 / tier=1.00 / conviction=1.0 should give risk=2.0 (FID-190 0.25x Kelly), got {}",
             risk_400
         );
         assert!(
-            (risk_2000 - 2.0).abs() < 0.001,
-            "$2000 / tier=0.10 / conviction=1.0 should give risk=2.0, got {}",
+            (risk_2000 - 1.0).abs() < 0.001,
+            "$2000 / tier=0.10 / conviction=1.0 should give risk=1.0 (FID-190 0.25x Kelly), got {}",
             risk_2000
         );
     }
