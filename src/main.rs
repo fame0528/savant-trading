@@ -80,7 +80,20 @@ fn parse_test_args(args: &[String]) -> TestArgs {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    dotenvy::dotenv().ok();
+    // FID-176: log the dotenvy result so silent parse failures (e.g., a var
+    // name starting with a digit) are visible at startup. Without this, a
+    // malformed .env line aborts loading of ALL vars, and the engine runs
+    // with empty API keys — leading to 401 "Invalid token" errors that look
+    // like credential issues but are actually .env parser failures.
+    match dotenvy::dotenv() {
+        Ok(path) => eprintln!("[Savant] Loaded .env from {}", path.display()),
+        Err(e) => eprintln!(
+            "[Savant] WARNING: .env load FAILED: {}. \
+             All API keys may be empty. Check for malformed entries \
+             (e.g., var names starting with digits).",
+            e
+        ),
+    }
 
     // Catch panics and log them before crashing — without this, panics
     // from reqwest/tokio kill the engine silently with exit code 0xffffffff

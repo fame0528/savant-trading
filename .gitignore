@@ -1,10 +1,13 @@
 # === Secrets — NEVER commit ===
 .env
-.env.*
 *.key
 *.pem
 credentials.json
 API-KEYS.md
+
+# Secrets pattern with negation. .env.example is OK to commit (template only).
+.env.*
+!.env.example
 
 # === Runtime state ===
 savant.blocked
