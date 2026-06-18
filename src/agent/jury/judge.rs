@@ -349,6 +349,7 @@ impl JuryJudge {
                 regime_label: decision_parser::RegimeLabel::default(),
                 trigger_weights: decision_parser::TriggerWeights::default(),
                 override_source: None,
+                is_probe: false,
             },
             consensus_strength: consensus,
             dissent_analysis: self.analyze_dissent(jury_result),

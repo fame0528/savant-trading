@@ -161,6 +161,12 @@ pub struct TradeDecision {
     /// "management_trigger", "thesis_invalidation", "zero_base_review", "jury_veto".
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub override_source: Option<String>,
+    /// FID-184: True if this is a probe position. Probes are 0.5x sizing with
+    /// auto-TP at 0.6% and auto-timeout at 10 minutes. Used to generate trade
+    /// flow data for strategy validation. LLM sets this when conviction is
+    /// between the probe threshold and main threshold for the regime.
+    #[serde(default)]
+    pub is_probe: bool,
 }
 
 fn default_conviction_score() -> f64 {
@@ -305,6 +311,7 @@ pub fn parse_decision(
                                             regime_label: RegimeLabel::default(),
                                             trigger_weights: TriggerWeights::default(),
                                             override_source: None,
+                                            is_probe: false,
                                         });
                                     }
                                     tracing::debug!(
@@ -785,6 +792,7 @@ fn extract_from_freeform(text: &str) -> Option<TradeDecision> {
             regime_label: RegimeLabel::default(),
             trigger_weights: TriggerWeights::default(),
             override_source: None,
+            is_probe: false,
         });
     }
 
@@ -848,6 +856,7 @@ fn extract_from_freeform(text: &str) -> Option<TradeDecision> {
         regime_label: RegimeLabel::default(),
         trigger_weights: TriggerWeights::default(),
         override_source: None,
+        is_probe: false,
     })
 }
 
@@ -1207,6 +1216,7 @@ fn partial_extract(json: &str) -> Option<TradeDecision> {
             })
             .unwrap_or_default(),
         override_source: None,
+        is_probe: false,
     })
 }
 
@@ -1520,5 +1530,75 @@ Some extra reasoning text that leaked into the response..."#;
 
         let decision = parse_decision(&json.to_string(), 0.15, 10.0).unwrap();
         assert_eq!(decision.action, TradeAction::Pass);
+    }
+
+    // FID-184: Probe position parsing tests
+
+    #[test]
+    fn is_probe_field_parses_when_true() {
+        let json = serde_json::json!({
+            "action": "Buy",
+            "pair": "ENA/USD",
+            "side": "Long",
+            "entry_price": 0.0953,
+            "stop_loss": 0.0938,
+            "take_profit_1": 0.0965,
+            "position_size_pct": 50.0,
+            "confidence": 0.5,
+            "conviction_score": 0.04,
+            "regime_label": "Trending",
+            "is_probe": true,
+            "reasoning": "low conviction probe",
+            "knowledge_sources": [],
+            "risk_reward": 1.5
+        });
+
+        let decision = parse_decision(&json.to_string(), 0.0953, 10.0).unwrap();
+        assert!(decision.is_probe);
+    }
+
+    #[test]
+    fn is_probe_field_defaults_to_false_when_missing() {
+        let json = serde_json::json!({
+            "action": "Buy",
+            "pair": "ENA/USD",
+            "side": "Long",
+            "entry_price": 0.0953,
+            "stop_loss": 0.0938,
+            "take_profit_1": 0.0965,
+            "position_size_pct": 50.0,
+            "confidence": 0.5,
+            "conviction_score": 0.20,
+            "regime_label": "Trending",
+            "reasoning": "normal trade",
+            "knowledge_sources": [],
+            "risk_reward": 1.5
+        });
+
+        let decision = parse_decision(&json.to_string(), 0.0953, 10.0).unwrap();
+        assert!(!decision.is_probe);
+    }
+
+    #[test]
+    fn is_probe_field_defaults_to_false_when_false() {
+        let json = serde_json::json!({
+            "action": "Buy",
+            "pair": "ENA/USD",
+            "side": "Long",
+            "entry_price": 0.0953,
+            "stop_loss": 0.0938,
+            "take_profit_1": 0.0965,
+            "position_size_pct": 50.0,
+            "confidence": 0.5,
+            "conviction_score": 0.20,
+            "regime_label": "Trending",
+            "is_probe": false,
+            "reasoning": "normal trade",
+            "knowledge_sources": [],
+            "risk_reward": 1.5
+        });
+
+        let decision = parse_decision(&json.to_string(), 0.0953, 10.0).unwrap();
+        assert!(!decision.is_probe);
     }
 }

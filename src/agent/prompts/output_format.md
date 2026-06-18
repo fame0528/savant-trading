@@ -34,6 +34,7 @@ Single pair:
     "conviction_score": 0.0,
     "sizing_multiplier": 0.0,
     "regime_label": "Trending | Volatile | Ranging | GreyZone",
+    "is_probe": false,
     "trigger_weights": {
         "strong": 0,
         "moderate": 0,
@@ -69,14 +70,14 @@ Field Rules:
 
 - action: BUY to open long, SELL to open short, HOLD for no action, CLOSE to exit existing, ADJUST_STOP to modify stop
   **CRITICAL RULES:**
-  0. **PASS is NOT a default (FID-192).** PASS means "I have zero directional view on this pair." Most pairs have SOME directional lean. Output Buy or Sell with conviction_score (0.05-1.0) and let the engine's regime gate filter it. Below the threshold, the gate downgrades to HOLD.
+  0. **PASS is NOT a default (FID-192 / FID-198).** PASS means "I have zero directional view on this pair." Most pairs have SOME directional lean. Output Buy or Sell with conviction_score (0.05-1.0) and let the engine's regime gate filter it. Below the threshold, the gate downgrades to HOLD. If conviction is between the probe threshold and main threshold, output `is_probe: true`.
   1. If ANY position_audit has management_trigger != "none", the action CANNOT be HOLD. You MUST execute the mandated_action.
   2. If would_initiate_new_long_at_current_price is FALSE for a held position, action MUST be CLOSE.
   3. If your reasoning identifies that the thesis has weakened — EMA crossover against direction, volume selloff, lower highs/lower lows — the action MUST be CLOSE, not HOLD. A weakened thesis is a failing thesis.
   4. If your reasoning recommends exiting — even at breakeven or small loss — the action MUST be CLOSE, not HOLD.
   5. HOLD means "take no action and keep the position open." Do NOT use HOLD when you want to exit.
   6. ADJUST_STOP is your primary risk management tool. Use it proactively when stops are too wide or profit needs protection.
-  7. For NEW entries (BUY/SELL), the conviction_score MUST be >= the regime threshold (Trending 0.30, Volatile 0.40, Ranging 0.40, GreyZone 0.40). If below threshold, action MUST be HOLD. This is FID-126: the conviction gate replaces the old "3+ aligned triggers" Boolean.
+  7. For NEW entries (BUY/SELL), the conviction_score MUST be >= the regime threshold (Trending 0.05, Volatile 0.15, Ranging 0.10, GreyZone 0.20). If between probe and main threshold, set `is_probe: true`. If below probe threshold, action MUST be HOLD/PASS. This is FID-198: the engine and prompt are synchronized.
 
 - pair: must match a configured trading pair
 - side: Long for BUY, Short for SELL
@@ -87,12 +88,14 @@ Field Rules:
 - position_size_pct: percentage of portfolio to allocate (0-100)
 - confidence: 0.0 to 1.0 — be honest, don't inflate. Below 0.0 = automatically downgraded to HOLD for NEW ENTRIES ONLY. ADJUST_STOP and CLOSE are NOT gated by confidence. For HOLD decisions on existing positions, set confidence to your conviction in the HOLD thesis, NOT 0.0.
 
-- conviction_score (FID-126): 0.0 to 1.0 — granular trigger-quality score. Computed as clamp(sum(trigger_weights) / 3.0, 0.0, 1.0). Trigger weights: strong=1.0, moderate=0.65, weak=0.3. MUST vary across scenarios (std dev > 0.15); defaulting to 0.50 or 0.65 is a calibration failure.
-  - For NEW entries: MUST be >= regime threshold (Trending 0.30, Volatile 0.40, Ranging 0.40, GreyZone 0.40). If below, action MUST be HOLD.
+- conviction_score (FID-126 / FID-198): 0.0 to 1.0 — granular trigger-quality score. Computed as clamp(sum(trigger_weights) / 3.0, 0.0, 1.0). Trigger weights: strong=1.0, moderate=0.65, weak=0.3. MUST vary across scenarios (std dev > 0.15); defaulting to 0.50 or 0.65 is a calibration failure.
+  - For NEW entries: MUST be >= regime threshold (Trending 0.05, Volatile 0.15, Ranging 0.10, GreyZone 0.20). If between probe and main threshold, set `is_probe: true`. If below probe threshold (Trending 0.03, Volatile 0.08, Ranging 0.05, GreyZone 0.10), action MUST be HOLD/PASS.
   - For management actions (ADJUST_STOP, CLOSE): NOT gated by conviction threshold.
   - If you cannot compute, output 0.0 and select PASS/HOLD.
 
-- sizing_multiplier (FID-126): 0.0 to 1.0 — scales position size relative to base risk. Recommended: A+ setups 0.85-1.0, B setups 0.5-0.75, C setups 0.25-0.5. Clamped to [0.0, 1.0]. If omitted, defaults to 0.5. Combined with conviction via the formula in FID-127.
+- is_probe (FID-184): false by default. Set to true when conviction is between the probe threshold and the main threshold for the regime. The engine treats probes as 0.5x sizing with auto-TP at 0.6% and auto-timeout at 10 minutes. Used to generate trade flow data for strategy validation.
+
+- sizing_multiplier (FID-126 / FID-198): 0.0 to 1.0 — scales position size relative to base risk. Recommended: A+ setups 0.85-1.0, B setups 0.5-0.75, C setups 0.25-0.5. For probes, the engine uses 0.5 regardless of what you output. Clamped to [0.0, 1.0]. If omitted, defaults to 0.5. Combined with conviction via the formula in FID-127.
 
 - regime_label (FID-126): MUST be one of "Trending", "Volatile", "Ranging", "GreyZone". Determines which conviction threshold is enforced. GreyZone requires a regime-disambiguating trigger (range-boundary break or trend-continuation higher-high).
 
@@ -114,6 +117,8 @@ FID-126 SCHEMA CHANGE NOTES:
 
 ANTI-PATTERN REMINDERS:
 - Do NOT default conviction_score to 0.50 or 0.65. Output the actual granular value.
-- Do NOT use "GreyZone" as a default to avoid the higher Trending threshold. Pick the regime that matches the data.
+- Do NOT use "GreyZone" as a default to avoid the higher threshold. Pick the regime that matches the data.
 - Do NOT use empty trigger_weights with a high conviction_score. The two must be consistent.
+- Do NOT output PASS when there's any technical signal. Use `is_probe: true` for low conviction (above probe threshold, below main threshold).
+- DO use `is_probe: true` for low-conviction directional signals — this is the engine's way of generating trade flow data.
 </output_format>

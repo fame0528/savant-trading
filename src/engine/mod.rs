@@ -4019,6 +4019,36 @@ pub async fn run(
                                     );
 
                                     // DIAGNOSTIC (Phase 3 RED): trace position sizing result
+                                    let mut ps = ps;
+                                    // FID-184: Probe position override.
+                                    // If the LLM marked this as a probe, apply 0.5x sizing
+                                    // and a tighter auto-TP (0.6%) for faster resolution.
+                                    if decision.is_probe {
+                                        if let Some(PositionSize::Sized {
+                                            quantity: ref mut q,
+                                            risk_amount: ref mut r,
+                                            ..
+                                        }) = ps.as_mut()
+                                        {
+                                            *q *= 0.5;
+                                            *r *= 0.5;
+                                            tracing::info!(
+                                                "FID-184: Probe sizing — qty={:.6} risk=${:.4} (0.5x normal)",
+                                                q, r
+                                            );
+                                        }
+                                        // Probe auto-TP: 0.6% from entry (tighter than normal 0.8-1.2%)
+                                        let probe_tp_distance = decision.entry_price * 0.006;
+                                        let probe_tp = match decision.side {
+                                            Side::Long => decision.entry_price + probe_tp_distance,
+                                            Side::Short => decision.entry_price - probe_tp_distance,
+                                        };
+                                        decision.take_profit_1 = probe_tp;
+                                        tracing::info!(
+                                            "FID-184: Probe auto-TP set to {:.4} (0.6% from entry {:.4})",
+                                            probe_tp, decision.entry_price
+                                        );
+                                    }
                                     match &ps {
                                         Some(PositionSize::Sized {
                                             quantity: q,
@@ -4105,6 +4135,25 @@ pub async fn run(
                                                 p.pair == decision.pair && p.side == decision.side
                                             })
                                         };
+                                        // FID-184: Probe count guard. Max 3 concurrent probes
+                                        // to prevent probes from becoming excessive.
+                                        if decision.is_probe && !already_open {
+                                            let probe_count = portfolio
+                                                .positions()
+                                                .values()
+                                                .filter(|p| p.strategy_name == "probe")
+                                                .count();
+                                            if probe_count >= 3 {
+                                                info!(
+                                                    "FID-184: Max concurrent probes (3) reached. Downgrading probe {} to Pass.",
+                                                    decision.pair
+                                                );
+                                                decision.action =
+                                                    savant_trading::agent::decision_parser::TradeAction::Pass;
+                                                decision.override_source =
+                                                    Some("probe_count_exceeded".to_string());
+                                            }
+                                        }
                                         // Concentration cap: full_deploy allows 100%, normal mode 33%
                                         // Use 99.99% of cap to prevent rounding past wallet balance
                                         let total_portfolio = if let Some(ref ex) = executor {
@@ -4234,7 +4283,11 @@ pub async fn run(
                                                             take_profit_3: decision.take_profit_3,
                                                             unrealized_pnl: 0.0,
                                                             risk_amount,
-                                                            strategy_name: "ai-agent".to_string(),
+                                                            strategy_name: if decision.is_probe {
+                                                                "probe".to_string()
+                                                            } else {
+                                                                "ai-agent".to_string()
+                                                            },
                                                             opened_at: chrono::Utc::now(),
                                                             scale_level: ScaleLevel::Full,
                                                             token_address: savant_trading::execution::dex::lookup_token(decision.pair.split("/").next().unwrap_or(""), config.exchange.dex.chain_id).map(|(addr, _)| addr).unwrap_or_default(),
@@ -4250,6 +4303,38 @@ pub async fn run(
                                                     let acc = portfolio.account();
                                                     info!("AI position opened: {} — balance ${:.2}, equity ${:.2}",
                                                             decision.pair, acc.balance, acc.equity);
+
+                                                    // FID-184: Log probe positions separately.
+                                                    if decision.is_probe {
+                                                        let probe_entry = serde_json::json!({
+                                                            "type": "PROBE_OPENED",
+                                                            "timestamp": chrono::Utc::now().to_rfc3339(),
+                                                            "pair": decision.pair,
+                                                            "side": format!("{:?}", decision.side),
+                                                            "entry_price": decision.entry_price,
+                                                            "stop_loss": decision.stop_loss,
+                                                            "take_profit": decision.take_profit_1,
+                                                            "quantity": quantity,
+                                                            "auto_timeout_secs": 600,  // 10 min
+                                                            "auto_tp_pct": 0.006,
+                                                            "conviction_score": decision.conviction_score,
+                                                            "regime": format!("{:?}", decision.regime_label),
+                                                        });
+                                                        let _ = std::fs::create_dir_all("data");
+                                                        let _ = std::fs::OpenOptions::new()
+                                                            .create(true)
+                                                            .append(true)
+                                                            .open("data/probe_pnl.jsonl")
+                                                            .and_then(|mut f| {
+                                                                use std::io::Write;
+                                                                f.write_all(
+                                                                    probe_entry
+                                                                        .to_string()
+                                                                        .as_bytes(),
+                                                                )?;
+                                                                f.write_all(b"\n")
+                                                            });
+                                                    }
 
                                                     // Place stop-loss on executor for live mode
                                                     if let Some(ref mut ex) = executor {

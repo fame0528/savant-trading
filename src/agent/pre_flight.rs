@@ -95,6 +95,7 @@ mod tests {
             },
             regime_label: RegimeLabel::Trending,
             override_source: None,
+            is_probe: false,
             management_trigger_active: false,
             stop_distance_atr_multiple: 0.0,
             thesis_invalidated: false,

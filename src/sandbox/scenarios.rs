@@ -2440,6 +2440,7 @@ mod historical_tests {
             regime_label: Default::default(),
             trigger_weights: Default::default(),
             override_source: None,
+            is_probe: false,
         };
         // Apply override (replicates engine/mod.rs line ~2626 logic)
         if veto_active && matches!(decision.action, TradeAction::Buy | TradeAction::Sell) {
@@ -2488,6 +2489,7 @@ mod historical_tests {
             regime_label: Default::default(),
             trigger_weights: Default::default(),
             override_source: None,
+            is_probe: false,
         };
         let veto_active =
             crate::jury_state::FID_146_JURY_VETO.load(std::sync::atomic::Ordering::Relaxed);
