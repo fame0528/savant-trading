@@ -36,31 +36,73 @@ Observed in `logs/terminal/next-server (v16.2.7).txt`:
 
 ## Implementation
 
-**Location:** In `src/engine/mod.rs`, after the `parse_decision` call returns and before the executor call. The exact line number depends on which parse site (there are multiple per cycle — batch, AdjustStop, Close). The guard goes in the post-parse validation block, common to all sites.
+**Call site:** `src/engine/mod.rs:2844` is the only `parse_decision` call in the engine (verified by `grep -n parse_decision src/engine/mod.rs`). The guard goes immediately after this single call returns, before the `decision_log.append(...)` on the same line block.
+
+**Function:** extract the guard into a reusable function so the Perfection Loop can verify call-graph reachability cleanly. Per ECHO Law 13, one function = one truth.
 
 ```rust
 // FID-194: Pre-flight guard against phantom management.
-// If the LLM/jury says AdjustStop/Close but no position exists
-// for this pair+side in the executor's state, downgrade to Pass.
-// This catches the case where the LLM is managing a position
-// that was never opened (e.g., spread-rejected swap).
-if matches!(decision.action, TradeAction::AdjustStop | TradeAction::Close) {
-    let has_position = if let Some(ref ex) = executor {
+// Extracted to a function so it can be unit-tested in isolation
+// and audited via grep for callers.
+pub fn apply_pre_flight_guard(
+    decision: &mut TradeDecision,
+    executor: Option<&dyn ExecutionEngine>,
+    portfolio: &PortfolioManager,
+) {
+    // Only AdjustStop/Close actions need this check. BUY/SELL/PASS
+    // either open a new position (already validated by FID-195) or
+    // do nothing.
+    if !matches!(decision.action, TradeAction::AdjustStop | TradeAction::Close) {
+        return;
+    }
+    // The executor is the source of truth for live mode. In dry
+    // mode (no executor), fall back to the in-memory portfolio.
+    let has_position = if let Some(ex) = executor {
         ex.open_positions().iter().any(|p| p.pair == decision.pair)
     } else {
         portfolio.positions().values().any(|p| p.pair == decision.pair)
     };
     if !has_position {
+        let action_label = match decision.action {
+            TradeAction::AdjustStop => "AdjustStop",
+            TradeAction::Close => "Close",
+            _ => "unknown",
+        };
         info!(
             "FID-194: {} for {} but no position exists. Downgrading to Pass (override: no_position_to_manage).",
-            match decision.action { TradeAction::AdjustStop => "AdjustStop", TradeAction::Close => "Close", _ => "?" },
-            decision.pair
+            action_label, decision.pair
         );
         decision.action = TradeAction::Pass;
         decision.override_source = Some("no_position_to_manage".to_string());
     }
 }
 ```
+
+**Call site in `engine/mod.rs:2844`:**
+```rust
+match savant_trading::agent::decision_parser::parse_decision(...) {
+    Ok(mut decision) => {
+        // FID-194: Pre-flight guard against phantom management.
+        apply_pre_flight_guard(&mut decision, executor.as_deref(), &portfolio);
+        // ... existing decision_log.append(decision) ...
+    }
+    Err(e) => { ... }
+}
+```
+
+### Override feedback to LLM
+
+When the guard downgrades an action, the `override_source` field is set to `"no_position_to_manage"`. The next cycle, the LLM's `decision_log_context` includes this entry. The LLM can see "AdjustStop ENA 8:17 PM → override: no_position_to_manage" and learn that its management was invalid. This is the feedback loop.
+
+### CALL-GRAPH REACHABILITY (Law 4, FID-151)
+
+After implementation, grep verification:
+```bash
+grep -rn "apply_pre_flight_guard" src/ --include='*.rs'
+# Expected: at least 1 definition + 1 call site (engine/mod.rs:2844)
+```
+
+If the grep shows 0 callers (function defined but never called), the FID is rejected from `fixed` status and must re-enter GREEN.
 
 ---
 
@@ -74,7 +116,42 @@ fn preflight_guard_downgrades_adjuststop_for_phantom_position() {
     decision.action = TradeAction::AdjustStop;
     decision.pair = "ENA/USD".to_string();
     let executor_positions: Vec<Position> = vec![]; // no ENA position
-    // ... assert decision is downgraded to Pass
+    let executor = MockExecutor::new(executor_positions);
+    let portfolio = make_test_portfolio(); // also no ENA
+    
+    apply_pre_flight_guard(&mut decision, Some(&executor), &portfolio);
+    
+    assert_eq!(decision.action, TradeAction::Pass);
+    assert_eq!(decision.override_source, Some("no_position_to_manage".to_string()));
+}
+
+#[test]
+fn preflight_guard_keeps_adjuststop_when_position_exists() {
+    let mut decision = make_test_decision();
+    decision.action = TradeAction::AdjustStop;
+    decision.pair = "ENA/USD".to_string();
+    let ena_pos = make_ena_position();
+    let executor = MockExecutor::new(vec![ena_pos]);
+    let portfolio = make_test_portfolio_with_ena();
+    
+    apply_pre_flight_guard(&mut decision, Some(&executor), &portfolio);
+    
+    // No downgrade because ENA position exists
+    assert_eq!(decision.action, TradeAction::AdjustStop);
+    assert!(decision.override_source.is_none());
+}
+
+#[test]
+fn preflight_guard_ignores_buy_action() {
+    let mut decision = make_test_decision();
+    decision.action = TradeAction::Buy;
+    decision.pair = "ENA/USD".to_string();
+    let executor = MockExecutor::new(vec![]); // no ENA, but BUY is OK
+    
+    apply_pre_flight_guard(&mut decision, Some(&executor), &make_test_portfolio());
+    
+    // BUY is not downgraded (this guard is only for management)
+    assert_eq!(decision.action, TradeAction::Buy);
 }
 ```
 
@@ -90,6 +167,14 @@ Run paper mode for 1h with FID-194 active. Verify:
 - 0 phantom Close executions
 - All AdjustStop/Close actions correspond to real positions
 - Override source is logged for any downgrades
+
+### CALL-GRAPH REACHABILITY (Law 4, FID-151)
+
+After implementation:
+```bash
+grep -rn "apply_pre_flight_guard" src/ --include='*.rs'
+# Expected: 1 definition (in a new utility module) + 1 call site (engine/mod.rs:2844)
+```
 
 ---
 

@@ -111,6 +111,24 @@ The engine currently has $50 paper capital. If this bug ships to live, every spr
 
 Each fix is independently shippable. The LLM gets better feedback after each step. The team (LLM + jury + executor) converges on a single source of truth (the chain) incrementally.
 
+### Additional gaps found in Perfection Loop (added after initial draft)
+
+After running the Perfection Loop (5 loops, converged at 2% delta), the following gaps were identified and integrated into the 3 child FIDs:
+
+1. **Jury position context** — the jury in `pool.rs:256` only takes `user_message: &str`, so it reads the LLM's hallucinated text rather than the executor's actual state. The jury inherits the LLM's lie. Fix is in FID-195: when building the user message for jurors, prepend a structured "Open Positions" section from the executor.
+2. **Executor call sites beyond open_position** — `close_position` (lines 3520, 3537, 4698, 4781), `adjust_stop` (line 4211), and `place_stop_loss` all need `update_status` on both Ok and Err, not just open_position.
+3. **USDC balance reconciliation** — FID-196 must also reconcile USDC, not just token positions. The existing `reconcile_wallet_state` does USDC check but only halts; the new `apply_to_portfolio` corrects.
+4. **Config-driven thresholds** — hardcoded `divergence_threshold_usd = 0.10` and `pct = 0.01` should be config fields, not Rust constants.
+5. **Safety halt on extreme divergence** — if phantom value >50% of portfolio, halt instead of correct. >50% divergence indicates a serious bug, not routine drift.
+6. **Telemetry** — `data/reconciliation_telemetry.jsonl` for phantom_rate, orphan_rate, USDC divergence over time. Observability for all 3 FIDs.
+7. **Function merge with `reconcile_wallet_state` (Law 13)** — `apply_to_portfolio` extends the existing reconciliation rather than creating a new function. One function = one truth.
+8. **RPC failure handling** — if on-chain query fails, don't clear positions (might be RPC lag, not real divergence). Cross-check with USDC balance to disambiguate.
+9. **Schema migration** — old `decision_log.json` entries without `status` default to `Pending`. This is the correct default since we don't know their outcome.
+10. **Decision log size limit** — `context_for_pair(pair, 3, 2)` bounds LLM context to 3 same-pair + 2 cross-pair. Separate limit for Execution Outcomes (5 most recent finalized).
+11. **Execution Outcomes section** — the LLM needs explicit feedback on rejected orders, not just their absence. New `format_execution_outcomes()` function in context_builder.rs.
+12. **Pre-flight guard is at ONE parse site** — `parse_decision` is only called at `engine/mod.rs:2844` (verified by grep). The guard goes at that single call site, not multiple.
+13. **Mid-cycle reconciliation** — defer to v0.15.0 unless v0.14.6 validation shows drift in cycles. Optional optimization.
+
 ---
 
 ### Step 1: Pre-flight Guard (Option C) — Band-aid, 30 min
@@ -422,6 +440,27 @@ Loop 4→5: 0%
 - **Pre-flight guards are cheap insurance.** 15 lines of code at the engine boundary prevent a class of bugs that would be expensive to catch downstream. Always add them when the cost is small.
 - **Read 0-EOF before assuming a state is correct.** I assumed `portfolio.positions()` was the source of truth for the LLM. It was — but the LLM's context also includes its own decision log history, which contradicts the in-memory state. The source of truth is the chain, not any one in-memory cache.
 - **Multi-FID approach: 3 separate FIDs vs. one master.** Per ECHO Law 13 (utility-first), each step could be a separate FID. But all three reinforce each other and ship as a unit. **Decision: 3 separate FIDs (FID-194, FID-195, FID-196) so each can have its own Perfection Loop and verification.**
+- **Perfection Loop finds what you didn't know to ask.** The first draft of FID-193/194/195/196 had 12 gaps that only became visible after reading the actual source files (engine/mod.rs, decision_log.rs, context_builder.rs, pool.rs). The gaps weren't from laziness — they were from not reading the code 0-EOF before writing the FIDs. **Lesson: the Perfection Loop is a forcing function for the read. Run it before any FIDs are "ready for approval."**
+- **Function extension > function creation (Law 13).** The existing `reconcile_wallet_state` does USDC check but only halts. I almost created a new `apply_to_portfolio` function. The right move was to extend `reconcile_wallet_state` with the position-mutation logic, since they share the same chain query and same config. **Lesson: search for similar functions before creating new ones. One function = one truth.**
+- **Jury needs the same context the LLM has.** The jury was inheriting the LLM's hallucinated text because it only receives the LLM's response. The fix: give the jury the executor's position state directly, not via the LLM. **Lesson: in a multi-agent system, the second agent (jury) should be able to verify the first agent's (LLM) claims against ground truth, not just trust them.**
+- **Safety halt > silent correction.** When reconciliation detects drift, the safe move is to halt and let a human investigate, not to silently correct. >50% divergence indicates a real bug. **Lesson: the threshold between "correct" and "halt" is a design decision, not a default. Make it explicit and configurable.**
+- **Old code is the enemy of new schemas.** Adding `status: TradeStatus` to `DecisionEntry` is a schema break. Old entries (without status) default to `Pending` — which is the correct default because we don't know their outcome. **Lesson: serde `#[serde(default)]` is the migration strategy. Document what the default means and why.**
+
+---
+
+## Perfection Loop Summary (this FID ran 5 loops)
+
+| Loop | State | Finding | Fix |
+|------|-------|---------|-----|
+| 1 | RED | Initial gaps: 3 disconnected state sources, no shared ground truth | Catalog all failures |
+| 2 | GREEN | 3-step coordinated fix proposed (C → B → A) | Wrote 3 child FIDs |
+| 3 | AUDIT | Read source files 0-EOF. Found: 12 gaps not in initial draft. | Added gaps to FIDs |
+| 4 | SELF-CORRECT | Verified call-graph reachability: parse_decision at line 2844, place_order at 4133, close_position at 3520 | Specified exact call sites |
+| 5 | CONVERGENCE | Delta = 0%. All gaps integrated. | COMPLETE |
+
+**Total iterations:** 5 (max per Circuit Breaker Rule 5)
+**Convergence:** Achieved at loop 5 (delta 0% for 2 consecutive passes)
+**FID-151 AUDIT compliance:** All new `pub fn` (apply_pre_flight_guard, apply_to_portfolio, format_execution_outcomes) have explicit call sites in the FIDs. Grep verification will be run post-implementation.
 
 ---
 
