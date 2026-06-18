@@ -18,6 +18,7 @@ pub mod knowledge;
 pub mod llm_summarizer;
 pub mod openrouter_management;
 pub mod orchestrator;
+pub mod pre_flight;
 pub mod prompts;
 pub mod provider;
 pub mod provider_caps;

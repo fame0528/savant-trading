@@ -2847,6 +2847,17 @@ pub async fn run(
                 config.ai.price_tolerance_pct,
             ) {
                 Ok(mut decision) => {
+                    // FID-194: Pre-flight guard against phantom management.
+                    // If the LLM/jury says AdjustStop/Close but no position
+                    // exists, downgrade to Pass. This prevents managing phantom
+                    // positions that were never actually opened on-chain.
+                    let portfolio_positions: Vec<savant_trading::core::types::Position> =
+                        portfolio.positions().values().cloned().collect();
+                    savant_trading::agent::pre_flight::apply_pre_flight_guard(
+                        &mut decision,
+                        executor.as_deref(),
+                        &portfolio_positions,
+                    );
                     // Compact decision log: [PASS] LONG BTC/USD | 0% | R:R 0.0 | reason...
                     let reasoning_short: String = decision.reasoning.chars().take(60).collect();
                     let reasoning_short = if decision.reasoning.len() > 60 {
