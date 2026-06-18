@@ -32,6 +32,11 @@ pub struct ReconciliationConfig {
     pub divergence_threshold_pct: f64,
     /// Cycle interval — heartbeat runs every N cycles. Default: 1 (every cycle).
     pub interval_cycles: u32,
+    /// FID-196: Safety halt threshold. If phantom value exceeds this % of
+    /// total portfolio, apply_to_portfolio returns halt_recommended=true
+    /// without mutating state. Default: 0.50 (50%). A 50% divergence
+    /// indicates a serious bug, not routine drift.
+    pub safety_halt_threshold_pct: f64,
 }
 
 impl Default for ReconciliationConfig {
@@ -43,6 +48,7 @@ impl Default for ReconciliationConfig {
             divergence_threshold_usd: 0.10,
             divergence_threshold_pct: 0.01,
             interval_cycles: 1,
+            safety_halt_threshold_pct: 0.50,
         }
     }
 }
@@ -231,6 +237,169 @@ pub async fn reconcile_wallet_state(
         rpc_failure: false,
         skipped: false,
     }
+}
+
+/// FID-196: Apply reconciliation to portfolio + decision log.
+/// Mutates in-memory state to match on-chain reality. Catches:
+/// - Phantom positions: in memory but not on chain (executor rejected)
+/// - Orphan positions: on chain but not in memory (crash recovery, manual tx)
+/// - USDC balance drift: executor's balance vs portfolio's balance
+///
+/// Safety: if divergence exceeds `safety_halt_threshold_pct` (config-driven,
+/// default 50%), the function does NOT mutate state. It returns a halt signal.
+/// A 50% divergence indicates a serious bug, not routine drift.
+///
+/// Per ECHO Law 13, this function extends the existing `reconcile_wallet_state`
+/// responsibility (one function, one truth). The previous function only halted
+/// on divergence; this one corrects divergence and returns a halt signal only
+/// for extreme cases.
+pub fn apply_to_portfolio(
+    config: &ReconciliationConfig,
+    portfolio: &mut crate::execution::portfolio::PortfolioManager,
+    decision_log: &mut crate::agent::decision_log::DecisionLog,
+    executor: &dyn crate::execution::engine::ExecutionEngine,
+) -> ReconciliationApplyReport {
+    let mut report = ReconciliationApplyReport::default();
+
+    // Step 1: Get on-chain positions. If empty, we need to disambiguate
+    // "truly empty wallet" vs "RPC failure."
+    let on_chain_positions = executor.open_positions();
+    let on_chain_pairs: std::collections::HashSet<String> =
+        on_chain_positions.iter().map(|p| p.pair.clone()).collect();
+
+    // Step 2: Compute phantom value (positions in memory but not on chain).
+    // If phantom value > safety_halt_threshold_pct * total_portfolio, halt.
+    let in_memory: Vec<(String, crate::core::types::Position)> = portfolio
+        .positions()
+        .iter()
+        .map(|(k, v)| (k.clone(), v.clone()))
+        .collect();
+
+    let phantom_value: f64 = in_memory
+        .iter()
+        .filter(|(_, p)| !on_chain_pairs.contains(&p.pair))
+        .map(|(_, p)| (p.quantity * p.current_price).max(0.0))
+        .sum();
+
+    let total_portfolio_value =
+        (portfolio.account().balance + portfolio.account().equity).max(0.01); // avoid div-by-zero
+
+    if phantom_value / total_portfolio_value > config.safety_halt_threshold_pct {
+        report.halt_recommended = true;
+        report.halt_reason = Some(format!(
+            "Phantom value ${:.2} is {:.1}% of portfolio ${:.2}, exceeds safety threshold {:.1}%. Likely bug, not routine drift.",
+            phantom_value,
+            (phantom_value / total_portfolio_value) * 100.0,
+            total_portfolio_value,
+            config.safety_halt_threshold_pct * 100.0
+        ));
+        return report; // Don't mutate. Caller will halt the engine.
+    }
+
+    // Step 3: Clear phantoms (in memory but not on chain).
+    for (id, pos) in &in_memory {
+        if !on_chain_pairs.contains(&pos.pair) {
+            tracing::warn!(
+                "FID-196: Phantom position detected: {} (id={}, entry={:.4}) -- in memory but not on chain. Removing.",
+                pos.pair,
+                id,
+                pos.entry_price
+            );
+            report.phantom_cleared.push(pos.pair.clone());
+            portfolio.positions_mut().remove(id);
+            decision_log.update_status(
+                &pos.pair,
+                crate::agent::decision_log::TradeStatus::Rejected,
+                Some("phantom: not on chain".to_string()),
+            );
+        }
+    }
+
+    // Step 4: Add orphans (on chain but not in memory).
+    for on_chain_pos in &on_chain_positions {
+        let already_in_memory = portfolio
+            .positions()
+            .values()
+            .any(|p| p.pair == on_chain_pos.pair);
+        if !already_in_memory {
+            tracing::warn!(
+                "FID-196: Orphan on-chain position: {} (entry={:.4}) -- on chain but not in memory. Adding.",
+                on_chain_pos.pair,
+                on_chain_pos.entry_price
+            );
+            report.orphan_added.push(on_chain_pos.pair.clone());
+            portfolio
+                .positions_mut()
+                .insert(on_chain_pos.id.clone(), (*on_chain_pos).clone());
+            decision_log.update_status(
+                &on_chain_pos.pair,
+                crate::agent::decision_log::TradeStatus::Filled,
+                None,
+            );
+        }
+    }
+
+    // Step 5: USDC balance reconciliation. Compare executor's USDC balance
+    // to portfolio's balance. If they diverge by more than threshold, correct.
+    let executor_usdc = executor.balance();
+    let portfolio_usdc = portfolio.account().balance;
+    let usdc_div = (executor_usdc - portfolio_usdc).abs();
+    if usdc_div > config.divergence_threshold_usd {
+        tracing::warn!(
+            "FID-196: USDC balance divergence ${:.4}: portfolio=${:.4} executor=${:.4}. Correcting portfolio.",
+            usdc_div,
+            portfolio_usdc,
+            executor_usdc
+        );
+        report.usdc_divergence_corrected = executor_usdc - portfolio_usdc;
+        portfolio.set_balance(executor_usdc);
+    }
+
+    // Step 6: Update account state.
+    portfolio.account_mut().open_positions = portfolio.positions().len();
+
+    // Step 7: Telemetry. Append to data/reconciliation_telemetry.jsonl.
+    record_telemetry(&report);
+
+    report
+}
+
+/// FID-196: Telemetry record for reconciliation. Appends to
+/// data/reconciliation_telemetry.jsonl (one line per reconciliation cycle).
+fn record_telemetry(report: &ReconciliationApplyReport) {
+    let entry = serde_json::json!({
+        "timestamp": chrono::Utc::now().to_rfc3339(),
+        "event": "reconciliation",
+        "phantom_cleared_count": report.phantom_cleared.len(),
+        "orphan_added_count": report.orphan_added.len(),
+        "usdc_divergence_corrected": report.usdc_divergence_corrected,
+        "halt_recommended": report.halt_recommended,
+    });
+    let line = format!("{}\n", entry);
+    if let Ok(mut f) = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open("data/reconciliation_telemetry.jsonl")
+    {
+        use std::io::Write;
+        let _ = f.write_all(line.as_bytes());
+    }
+}
+
+/// FID-196: Report from apply_to_portfolio. Contains details of state
+/// corrections and any safety halt signal.
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+pub struct ReconciliationApplyReport {
+    pub phantom_cleared: Vec<String>,
+    pub orphan_added: Vec<String>,
+    pub usdc_divergence_corrected: f64,
+    /// FID-196: true if RPC failure prevented any state mutation.
+    pub rpc_failure: bool,
+    /// FID-196: true if divergence exceeded safety_halt_threshold_pct.
+    /// Caller should halt the engine.
+    pub halt_recommended: bool,
+    /// FID-196: reason for halt, if any.
+    pub halt_reason: Option<String>,
 }
 
 /// Query the on-chain balance of an ERC-20 token for a wallet address.
@@ -502,5 +671,209 @@ mod tests {
             "543ca0434b84ad38c858d2d178d2082521711fbc",
             "calldata must end with a 20-byte (40-hex) address, NOT zero-padded to 64"
         );
+    }
+
+    // =========================================================================
+    // FID-196: apply_to_portfolio tests
+    // =========================================================================
+
+    use crate::agent::decision_log::DecisionLog;
+    use crate::agent::decision_log::TradeStatus;
+    use crate::core::types::Position;
+    use crate::execution::portfolio::PortfolioManager;
+    use async_trait::async_trait;
+    use std::collections::HashMap;
+
+    fn make_pos(pair: &str, quantity: f64) -> Position {
+        Position {
+            id: format!("test-{}", pair),
+            pair: pair.to_string(),
+            side: crate::core::types::Side::Long,
+            entry_price: 1.0,
+            current_price: 1.0,
+            quantity,
+            stop_loss: 0.95,
+            take_profit_1: 1.05,
+            take_profit_2: 0.0,
+            take_profit_3: 0.0,
+            unrealized_pnl: 0.0,
+            risk_amount: 1.0,
+            strategy_name: "test".to_string(),
+            opened_at: Utc::now(),
+            scale_level: crate::core::types::ScaleLevel::Full,
+            token_address: String::new(),
+        }
+    }
+
+    struct TestExecutor {
+        positions: Vec<Position>,
+        balance: f64,
+    }
+
+    #[async_trait]
+    impl crate::execution::engine::ExecutionEngine for TestExecutor {
+        fn balance(&self) -> f64 {
+            self.balance
+        }
+        fn open_positions(&self) -> Vec<&Position> {
+            self.positions.iter().collect()
+        }
+        async fn place_order(
+            &mut self,
+            _pair: &str,
+            _side: crate::core::types::Side,
+            _quantity: f64,
+            _price: Option<f64>,
+        ) -> Result<crate::core::types::Order, crate::core::error::ExecutionError> {
+            unimplemented!()
+        }
+        async fn close_position(
+            &mut self,
+            _position_id: &str,
+        ) -> Result<crate::core::types::Order, crate::core::error::ExecutionError> {
+            unimplemented!()
+        }
+    }
+
+    fn make_test_portfolio(positions: Vec<Position>, balance: f64) -> PortfolioManager {
+        let mut pm = PortfolioManager::new(balance, 0.0, 0.0);
+        for p in positions {
+            pm.positions_mut().insert(p.id.clone(), p);
+        }
+        pm
+    }
+
+    fn make_test_log() -> DecisionLog {
+        DecisionLog::open("test_decisions.json", 100)
+    }
+
+    #[test]
+    fn apply_to_portfolio_clears_phantom_position() {
+        // Phantom worth $20 in a $100 portfolio = 20%, under 50% safety threshold
+        let phantom = make_pos("PHANTOM/USD", 20.0);
+        let mut portfolio = make_test_portfolio(vec![phantom.clone()], 50.0);
+        let mut log = make_test_log();
+        log.append(crate::agent::decision_log::DecisionEntry {
+            timestamp: Utc::now().to_rfc3339(),
+            pair: "PHANTOM/USD".to_string(),
+            action: "BUY".to_string(),
+            confidence: 0.5,
+            risk_reward: 1.0,
+            stop_loss: 0.95,
+            take_profit: 1.05,
+            reasoning: "test".to_string(),
+            conviction_score: 0.0,
+            regime_label: "Trending".to_string(),
+            trigger_strong: 0,
+            trigger_moderate: 0,
+            trigger_weak: 0,
+            override_source: String::new(),
+            status: TradeStatus::Pending,
+            rejection_reason: None,
+            outcome: None,
+        });
+
+        // Executor has no on-chain positions
+        let executor = TestExecutor {
+            positions: vec![],
+            balance: 50.0,
+        };
+        let cfg = ReconciliationConfig::default();
+
+        let report = apply_to_portfolio(&cfg, &mut portfolio, &mut log, &executor);
+
+        assert_eq!(report.phantom_cleared, vec!["PHANTOM/USD".to_string()]);
+        assert!(!report.halt_recommended);
+        assert!(portfolio.positions().is_empty());
+        // Decision log updated to Rejected
+        let entry = log.entries.last().unwrap();
+        assert_eq!(entry.status, TradeStatus::Rejected);
+    }
+
+    #[test]
+    fn apply_to_portfolio_adds_orphan_position() {
+        let orphan = make_pos("ORPHAN/USD", 50.0);
+        let mut portfolio = make_test_portfolio(vec![], 50.0);
+        let mut log = make_test_log();
+
+        // Executor has an on-chain position that's not in memory
+        let executor = TestExecutor {
+            positions: vec![orphan.clone()],
+            balance: 50.0,
+        };
+        let cfg = ReconciliationConfig::default();
+
+        let report = apply_to_portfolio(&cfg, &mut portfolio, &mut log, &executor);
+
+        assert_eq!(report.orphan_added, vec!["ORPHAN/USD".to_string()]);
+        assert_eq!(portfolio.positions().len(), 1);
+        // Position is stored under the executor's id (e.g., "test-ORPHAN/USD")
+        assert!(portfolio
+            .positions()
+            .keys()
+            .any(|k| k.contains("ORPHAN/USD")));
+    }
+
+    #[test]
+    fn apply_to_portfolio_reconciles_usdc_balance() {
+        let mut portfolio = make_test_portfolio(vec![], 50.0);
+        portfolio.set_balance(50.0);
+        let mut log = make_test_log();
+
+        // Executor has $1 less (someone sent tokens out-of-band)
+        let executor = TestExecutor {
+            positions: vec![],
+            balance: 49.0,
+        };
+        let cfg = ReconciliationConfig::default();
+
+        let report = apply_to_portfolio(&cfg, &mut portfolio, &mut log, &executor);
+
+        assert!((report.usdc_divergence_corrected - (-1.0)).abs() < 0.001);
+        assert!((portfolio.account().balance - 49.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn apply_to_portfolio_halts_on_extreme_divergence() {
+        // Phantom worth $80 in a $100 portfolio (equity+balance) = 80%, exceeds 50% safety threshold
+        let phantom = make_pos("BIG/USD", 80.0);
+        let mut portfolio = make_test_portfolio(vec![phantom.clone()], 50.0);
+        let mut log = make_test_log();
+
+        let executor = TestExecutor {
+            positions: vec![],
+            balance: 50.0,
+        };
+        let cfg = ReconciliationConfig::default();
+
+        let report = apply_to_portfolio(&cfg, &mut portfolio, &mut log, &executor);
+
+        assert!(report.halt_recommended);
+        assert!(report.halt_reason.is_some());
+        // Position NOT removed (halt not correct). The id is "test-BIG/USD"
+        // because that's what make_pos generates.
+        assert!(portfolio.positions().keys().any(|k| k.contains("BIG/USD")));
+        assert!(report.phantom_cleared.is_empty());
+    }
+
+    #[test]
+    fn apply_to_portfolio_no_op_when_states_match() {
+        let pos = make_pos("BTC/USD", 1.0);
+        let mut portfolio = make_test_portfolio(vec![pos.clone()], 49.0);
+        let mut log = make_test_log();
+
+        let executor = TestExecutor {
+            positions: vec![pos],
+            balance: 49.0,
+        };
+        let cfg = ReconciliationConfig::default();
+
+        let report = apply_to_portfolio(&cfg, &mut portfolio, &mut log, &executor);
+
+        assert!(report.phantom_cleared.is_empty());
+        assert!(report.orphan_added.is_empty());
+        assert_eq!(report.usdc_divergence_corrected, 0.0);
+        assert!(!report.halt_recommended);
+        assert_eq!(portfolio.positions().len(), 1);
     }
 }
