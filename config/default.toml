@@ -195,21 +195,20 @@ atr_volatility_multiplier = 1.5
 live_execution = false
 
 [ai]
-# **FID-138 (M3):** Switched from openrouter/owl-alpha to TokenRouter/MiniMax-M3
-# for the free M3 trial week. disable_thinking=true skips chain-of-thought.
-# max_tokens=4096 constrains reasoning budget.
+# **FID-200 (NVIDIA NIM):** Switched from TokenRouter M3 to NVIDIA NIM
+# DeepSeek-V4-Flash for free unlimited inference. Key in .env as NVIDIA_API_KEY.
+# NVIDIA catalog has 139 free models (74 from NVIDIA themselves); we can
+# switch via FID-200 (multi-model consensus) once validated.
 #
-# To switch back to owl-alpha:
-#   provider = "openrouter"
-#   endpoint = "https://openrouter.ai/api/v1"
-#   model = "openrouter/owl-alpha"
-#   api_key_env = "OPENROUTER_API_KEY"
-#   max_tokens = 8192
-#   disable_thinking = false
-provider = "tokenrouter"
-endpoint = "https://api.tokenrouter.com/v1"
-model = "MiniMax-M3"
-api_key_env = "TOKEN_ROUTER_API_KEY"
+# To switch back to M3 on TokenRouter:
+#   provider = "tokenrouter"
+#   endpoint = "https://api.tokenrouter.com/v1"
+#   model = "MiniMax-M3"
+#   api_key_env = "TOKEN_ROUTER_API_KEY"
+provider = "nvidia"
+endpoint = "https://integrate.api.nvidia.com/v1"
+model = "deepseek-ai/deepseek-v4-flash"
+api_key_env = "NVIDIA_API_KEY"
 autonomy_level = 3
 max_decisions_per_hour = 20
 # Expanded to use more of the 1M context window (FID-015)
@@ -221,8 +220,7 @@ max_retries = 3
 temperature = 0.6
 # Nucleus sampling — limits token pool to top 95% probability mass
 top_p = 0.95
-# Constrain thinking budget for M3: 4096 forces concise JSON action blocks.
-# M3 will exhaust the full budget on chain-of-thought if not constrained.
+# Constrain thinking budget for DeepSeek-V4-Flash: 4096 forces concise JSON.
 max_tokens = 4096
 # Reasoning model needs room for chain-of-thought (FID-015)
 timeout_secs = 300
