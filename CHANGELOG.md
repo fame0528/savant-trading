@@ -2,6 +2,52 @@
 
 All notable changes to Savant Trading are documented here.
 
+## [0.14.8] — 2026-06-18
+
+### Multi-Model Jury with NVIDIA NIM Expansion (FID-200)
+
+The single-model bias problem — M3 defaults to PASS on flat markets — is structural, not fixable by prompt engineering. v0.14.8 expands the jury from OpenRouter auto-routing to direct hand-selection of 10 free NVIDIA NIM models.
+
+### Changed — Primary LLM Provider
+
+Switched from TokenRouter (quota-limited) to NVIDIA NIM (free, no quota, same M3 model).
+
+- **Before:** TokenRouter ? M3, weekly quota
+- **After:** NVIDIA NIM ? `minimaxai/minimax-m3` (verified, working, ~3s latency)
+
+### Added — 10-Model NVIDIA NIM Jury
+
+Hand-selected free models with vendor/size/capability diversity. Each verified via direct API call against `https://integrate.api.nvidia.com/v1/chat/completions` before shipping.
+
+| Slot | Model | Vendor | Size |
+|---|---|---|---|
+| 0 | M3 control | MiniMax | MoE (Tiebreaker) |
+| 1 | llama-3.3-70b-instruct | Meta | 70B |
+| 2 | deepseek-v4-pro | DeepSeek | 1T |
+| 3 | nemotron-3-super-120b-a12b | NVIDIA | 120B |
+| 4 | llama-3.1-70b-instruct | Meta | 70B |
+| 5 | qwen3.5-397b-a17b | Alibaba | 397B |
+| 6 | mistral-large-3-675b-instruct-2512 | Mistral | 675B |
+| 7 | deepseek-v4-flash | DeepSeek | 1T |
+| 8 | glm-5.1 | Z.ai | flagship |
+| 9 | kimi-k2.6 | Moonshot | 1T |
+
+**Vendor mix:** 7 different vendors, sizes 70B to 1T params. Single-model bias dilution via diversity.
+
+### Preserved — OpenRouter Fallback
+
+Per Spencer's explicit constraint: OpenRouter path NOT ripped out. When `NVIDIA_API_KEY` is missing or NVIDIA calls fail, the jury falls back to OpenRouter (legacy behavior). Existing `[ai.openrouter]` config and `OPENROUTER_MANAGEMENT_KEY` env var still work.
+
+### Tests
+
+- 2 new unit tests in `pool.rs`: compile-time check for nvidia field, 10-model array validation
+- 386 total tests pass (was 384 before)
+- Clippy clean, fmt clean, pre-push green
+
+### Verification
+
+Per-model latency: 1-15s. Parallel calls: ~5-10s typical for 10 jurors. Total cycle time budget: 60s (well within).
+
 ## [0.14.7] — 2026-06-17
 
 ### State Sync (LLM/Jury/Executor on a Single Source of Truth)
