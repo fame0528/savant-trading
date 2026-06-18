@@ -739,7 +739,7 @@ impl EngineState {
                 max_tokens: config.ai.max_tokens,
                 temperature: config.ai.temperature,
                 top_p: config.ai.top_p,
-                timeout_secs: config.ai.timeout_secs,
+                timeout_secs: config.ai.jury.timeout_secs,
                 streaming_timeout_secs: config.ai.streaming_timeout_secs,
                 extra_headers: vec![
                     (
@@ -754,6 +754,38 @@ impl EngineState {
                 disable_thinking: config.ai.disable_thinking,
             };
 
+            // FID-200: NVIDIA NIM provider for jurors (free, no quota).
+            // When NVIDIA_API_KEY is set and `[ai.nvidia]` is configured, the jury
+            // uses NVIDIA NIM directly. Otherwise falls back to OpenRouter.
+            let nv_cfg = &config.ai.nvidia;
+            let provider_config_nvidia = {
+                let nv_key = std::env::var(&nv_cfg.api_key_env).unwrap_or_default();
+                if nv_key.is_empty() {
+                    warn!(
+                        "FID-200: {} not set, jury falls back to OpenRouter",
+                        nv_cfg.api_key_env
+                    );
+                    None
+                } else {
+                    info!(
+                        "FID-200: NVIDIA NIM jury enabled (model={}, endpoint={})",
+                        nv_cfg.model, nv_cfg.endpoint
+                    );
+                    Some(savant_trading::agent::provider::LlmConfig {
+                        endpoint: nv_cfg.endpoint.clone(),
+                        model: nv_cfg.model.clone(),
+                        api_key: nv_key,
+                        max_tokens: config.ai.max_tokens,
+                        temperature: config.ai.temperature,
+                        top_p: config.ai.top_p,
+                        timeout_secs: config.ai.jury.timeout_secs,
+                        streaming_timeout_secs: config.ai.streaming_timeout_secs,
+                        extra_headers: vec![],
+                        disable_thinking: config.ai.disable_thinking,
+                    })
+                }
+            };
+
             // M3 control API key: from TOKEN_ROUTER_API_KEY env var.
             let m3_api_key = std::env::var(&config.ai.tokenrouter.api_key_env).unwrap_or_default();
             if m3_api_key.is_empty() {
@@ -766,6 +798,7 @@ impl EngineState {
             let jp = JuryPool::new(
                 provider_config_m3,
                 provider_config_openrouter,
+                provider_config_nvidia,
                 m3_api_key,
                 JuryKeyManager::new(
                     OpenRouterManagementClient::with_endpoint(

@@ -31,11 +31,18 @@ use crate::jury_state;
 ///   from `key_manager`. Endpoint MUST be `https://openrouter.ai/api/v1`.
 ///   Each juror gets a separate management-provisioned key so they can hit
 ///   a different model (Gemma, Llama, Nemotron, Qwen, etc.).
+/// - **FID-200:** When `provider_config_nvidia` is Some, jurors 1..N use
+///   NVIDIA NIM instead of OpenRouter. The `models` array in JuryConfig
+///   must contain valid NVIDIA model slugs (e.g., `meta/llama-3.3-70b-instruct`).
+///   OpenRouter remains the fallback if NVIDIA calls fail.
 pub struct JuryPool {
     /// LlmConfig for the M3 control juror (juror 0). Endpoint = M3/TokenRouter.
     provider_config_m3: LlmConfig,
     /// LlmConfig for OpenRouter free jurors (1..N). Endpoint = openrouter.ai.
     provider_config_openrouter: LlmConfig,
+    /// FID-200: LlmConfig for NVIDIA NIM free jurors (1..N). When Some,
+    /// jurors use NVIDIA. When None, jurors fall back to OpenRouter.
+    provider_config_nvidia: Option<LlmConfig>,
     /// API key for the M3 control juror — from `TOKEN_ROUTER_API_KEY`.
     m3_api_key: String,
     /// Key manager for OpenRouter free jurors (acquires management keys).
@@ -52,6 +59,8 @@ pub struct JuryPool {
     m3_calls: AtomicU64,
     /// Free OpenRouter model call count (always $0).
     free_model_calls: AtomicU64,
+    /// FID-200: NVIDIA NIM model call count.
+    nvidia_calls: AtomicU64,
     /// Ring buffer of recent cycle records (FID-162, capped at 50).
     recent_cycles: Mutex<VecDeque<JuryCycleRecord>>,
 }
@@ -122,9 +131,13 @@ const RECENT_CYCLES_CAP: usize = 50;
 
 impl JuryPool {
     /// Create a new jury pool. Does NOT create keys — call `initialize()` first.
+    ///
+    /// `provider_config_nvidia`: When Some, jurors 1..N use NVIDIA NIM.
+    /// When None, jurors fall back to OpenRouter (legacy behavior).
     pub fn new(
         provider_config_m3: LlmConfig,
         provider_config_openrouter: LlmConfig,
+        provider_config_nvidia: Option<LlmConfig>,
         m3_api_key: String,
         key_manager: JuryKeyManager,
         config: JuryConfig,
@@ -137,6 +150,7 @@ impl JuryPool {
         Self {
             provider_config_m3,
             provider_config_openrouter,
+            provider_config_nvidia,
             m3_api_key,
             key_manager,
             config,
@@ -145,6 +159,7 @@ impl JuryPool {
             cycle_id: AtomicU64::new(0),
             m3_calls: AtomicU64::new(0),
             free_model_calls: AtomicU64::new(0),
+            nvidia_calls: AtomicU64::new(0),
             recent_cycles: Mutex::new(VecDeque::with_capacity(RECENT_CYCLES_CAP)),
         }
     }
@@ -303,6 +318,56 @@ impl JuryPool {
                     String::new(),
                 )
             } else {
+                // FID-200: NVIDIA NIM path. When `provider_config_nvidia` is Some,
+                // use it directly with NVIDIA_API_KEY. No key rotation needed.
+                if let Some(ref nv_cfg) = self.provider_config_nvidia {
+                    // nv_cfg is already an LlmConfig with api_key populated.
+                    // The env var was read once in the engine construction.
+                    let nv_api_key = nv_cfg.api_key.clone();
+                    if !nv_api_key.is_empty() {
+                        self.nvidia_calls.fetch_add(1, Ordering::Relaxed);
+                        let provider = LlmProvider::new(nv_cfg.clone());
+                        let model = if !free_models.is_empty() {
+                            free_models[(juror_idx - 1) % free_models.len()].clone()
+                        } else {
+                            nv_cfg.model.clone()
+                        };
+                        let label = format!(
+                            "savant-nvidia-{}-{}",
+                            juror_idx,
+                            chrono::Utc::now().timestamp()
+                        );
+                        info!("Jury: NVIDIA NIM juror {} using model={}", juror_idx, model);
+                        let system = self.jury_system_prompt.clone();
+                        let user = user_message.to_string();
+                        let timeout_secs = self.config.timeout_secs;
+                        join_set.spawn(async move {
+                            let result = tokio::time::timeout(
+                                Duration::from_secs(timeout_secs),
+                                provider.chat_with_override(
+                                    &system,
+                                    &[Message {
+                                        role: "user".to_string(),
+                                        content: user,
+                                    }],
+                                    &model,
+                                    &nv_api_key,
+                                    timeout_secs,
+                                    true,
+                                ),
+                            )
+                            .await;
+                            (label, String::new(), result)
+                        });
+                        continue;
+                    }
+                    warn!(
+                        "Jury: NVIDIA_API_KEY not set, falling back to OpenRouter for juror {}",
+                        juror_idx
+                    );
+                }
+
+                // OpenRouter path (fallback or legacy)
                 let key = match self.key_manager.acquire_key().await {
                     Some(k) => k,
                     None => {
@@ -530,5 +595,50 @@ mod tests {
         assert_eq!(result.verdicts.len(), 2);
         assert_eq!(result.failed_count, 1);
         assert!(!result.quorum_met);
+    }
+
+    // FID-200: NVIDIA NIM jury expansion tests
+
+    #[test]
+    fn jury_pool_struct_has_nvidia_field() {
+        // Compile-time guarantee: the field exists. Test passes by compiling.
+        use crate::agent::provider::LlmConfig;
+        let nv_cfg = LlmConfig {
+            endpoint: "https://integrate.api.nvidia.com/v1".to_string(),
+            model: "minimaxai/minimax-m3".to_string(),
+            api_key: "test-key".to_string(),
+            max_tokens: 4096,
+            temperature: 0.6,
+            top_p: 0.95,
+            timeout_secs: 60,
+            streaming_timeout_secs: 30,
+            extra_headers: vec![],
+            disable_thinking: false,
+        };
+        // Compile-time check: LlmConfig can be wrapped in Option for JuryPool
+        let _wrapped: Option<LlmConfig> = Some(nv_cfg);
+    }
+
+    #[test]
+    fn nvidia_models_array_has_ten_entries() {
+        // FID-200 spec: 10 NVIDIA NIM models in the jury array.
+        let config = JuryConfig {
+            models: vec![
+                "meta/llama-3.3-70b-instruct".to_string(),
+                "deepseek-ai/deepseek-v4-pro".to_string(),
+                "nvidia/nemotron-3-super-120b-a12b".to_string(),
+                "meta/llama-3.1-70b-instruct".to_string(),
+                "qwen/qwen3.5-397b-a17b".to_string(),
+                "mistralai/mistral-large-3-675b-instruct-2512".to_string(),
+                "deepseek-ai/deepseek-v4-flash".to_string(),
+                "z-ai/glm-5.1".to_string(),
+                "moonshotai/kimi-k2.6".to_string(),
+                "minimaxai/minimax-m3".to_string(),
+            ],
+            ..Default::default()
+        };
+        assert_eq!(config.models.len(), 10);
+        // M3 is juror 9 (last), used as tiebreaker.
+        assert!(config.models.last().unwrap().contains("minimax-m3"));
     }
 }

@@ -150,10 +150,10 @@ atr_volatility_multiplier = 1.5
 live_execution = true
 
 [ai]
-# FID-200: NVIDIA NIM with DeepSeek-V4-Flash (free unlimited)
+# FID-200: NVIDIA NIM with M3 (free unlimited, no quota)
 provider = "nvidia"
 endpoint = "https://integrate.api.nvidia.com/v1"
-model = "deepseek-ai/deepseek-v4-flash"
+model = "minimaxai/minimax-m3"
 api_key_env = "NVIDIA_API_KEY"
 autonomy_level = 3
 max_decisions_per_hour = 20
@@ -175,11 +175,21 @@ referer = "https://github.com/fame0528/savant-trading"
 title = "Savant Trading Engine"
 
 [ai.jury]
-# FID-179: Jury is core to Savant. Enabled on Anvil too.
+# FID-200: 10 NVIDIA NIM models for multi-model consensus. All verified.
+# OpenRouter path preserved as fallback (see key_manager).
 enabled = true
 jury_size = 10
 models = [
-  "openrouter/free",
+  "meta/llama-3.3-70b-instruct",
+  "deepseek-ai/deepseek-v4-pro",
+  "nvidia/nemotron-3-super-120b-a12b",
+  "meta/llama-3.1-70b-instruct",
+  "qwen/qwen3.5-397b-a17b",
+  "mistralai/mistral-large-3-675b-instruct-2512",
+  "deepseek-ai/deepseek-v4-flash",
+  "z-ai/glm-5.1",
+  "moonshotai/kimi-k2.6",
+  "minimaxai/minimax-m3",  # M3 — used as tiebreaker
 ]
 quorum_pct = 0.6
 timeout_secs = 45

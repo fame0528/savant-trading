@@ -196,18 +196,18 @@ live_execution = false
 
 [ai]
 # **FID-200 (NVIDIA NIM):** Switched from TokenRouter M3 to NVIDIA NIM
-# DeepSeek-V4-Flash for free unlimited inference. Key in .env as NVIDIA_API_KEY.
-# NVIDIA catalog has 139 free models (74 from NVIDIA themselves); we can
-# switch via FID-200 (multi-model consensus) once validated.
+# M3 directly. Same model, free unlimited inference, no TokenRouter quota.
+# Key in .env as NVIDIA_API_KEY. NVIDIA catalog has 139 free models.
+# Verified working via scripts/test-nvidia-nim.ps1.
 #
-# To switch back to M3 on TokenRouter:
+# To switch back to TokenRouter:
 #   provider = "tokenrouter"
 #   endpoint = "https://api.tokenrouter.com/v1"
 #   model = "MiniMax-M3"
 #   api_key_env = "TOKEN_ROUTER_API_KEY"
 provider = "nvidia"
 endpoint = "https://integrate.api.nvidia.com/v1"
-model = "deepseek-ai/deepseek-v4-flash"
+model = "minimaxai/minimax-m3"
 api_key_env = "NVIDIA_API_KEY"
 autonomy_level = 3
 max_decisions_per_hour = 20
@@ -220,7 +220,7 @@ max_retries = 3
 temperature = 0.6
 # Nucleus sampling — limits token pool to top 95% probability mass
 top_p = 0.95
-# Constrain thinking budget for DeepSeek-V4-Flash: 4096 forces concise JSON.
+# Constrain thinking budget for M3: 4096 forces concise JSON action blocks.
 max_tokens = 4096
 # Reasoning model needs room for chain-of-thought (FID-015)
 timeout_secs = 300
@@ -239,17 +239,25 @@ referer = "https://github.com/fame0528/savant-trading"
 title = "Savant Trading Engine"
 
 [ai.jury]
-# FID-179: Jury is core to Savant (multi-model voting). Was disabled by default
-# while "situated." Now enabled. Use OPENROUTER_MANAGEMENT_KEY env var for the
-# 9 free-model juror provisioning. M3 control juror uses TOKEN_ROUTER_API_KEY.
+# FID-200: 10 NVIDIA NIM models for multi-model consensus. All verified
+# working via /v1/chat/completions. Diverse vendor mix dilutes single-model bias.
+# Vendor breakdown: 2 Meta, 2 DeepSeek, 1 NVIDIA, 1 Alibaba (Qwen),
+# 1 Mistral, 1 Moonshot (Kimi), 1 Z.ai (GLM), 1 MiniMax (M3 — tiebreaker).
+# OpenRouter preserved as fallback (see key_manager for OpenRouter provisioning).
 enabled = true
 jury_size = 10
-# openrouter/free is a router that selects free models at random from all
-# available free models on OpenRouter (24 models across NVIDIA, OpenInference,
-# Venice, Google, etc.). The router handles provider assignment automatically.
-# Juror 0 is always the M3 control group (uses provider_config_m3, not this list).
+# All models on NVIDIA NIM (free tier). Juror 0 = M3 (tiebreaker).
 models = [
-  "openrouter/free",
+  "meta/llama-3.3-70b-instruct",
+  "deepseek-ai/deepseek-v4-pro",
+  "nvidia/nemotron-3-super-120b-a12b",
+  "meta/llama-3.1-70b-instruct",
+  "qwen/qwen3.5-397b-a17b",
+  "mistralai/mistral-large-3-675b-instruct-2512",
+  "deepseek-ai/deepseek-v4-flash",
+  "z-ai/glm-5.1",
+  "moonshotai/kimi-k2.6",
+  "minimaxai/minimax-m3",  # M3 — used as tiebreaker
 ]
 quorum_pct = 0.6
 timeout_secs = 45
