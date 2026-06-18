@@ -2188,7 +2188,21 @@ pub async fn run(
                 };
 
                 // FID-098 Fix 2: Build decision log context for this pair
-                let decision_log_ctx = decision_log.context_for_pair(pair, 3, 2);
+                // FID-195: Prepend execution outcomes (Filled/Rejected) so the
+                // LLM sees explicit feedback about its prior decisions.
+                let decision_log_ctx = {
+                    let outcomes =
+                        savant_trading::agent::context_builder::format_execution_outcomes(
+                            &decision_log,
+                            5,
+                        );
+                    let recent = decision_log.context_for_pair(pair, 3, 2);
+                    if outcomes.is_empty() {
+                        recent
+                    } else {
+                        format!("{}{}", outcomes, recent)
+                    }
+                };
 
                 let ctx = FullContext {
                     candles: &candle_data,
@@ -2491,7 +2505,33 @@ pub async fn run(
                         } else {
                             savant_trading::core::types::MarketRegime::Ranging
                         };
-                        let jury_result = jp.evaluate(&cleaned, regime).await;
+                        // FID-195: Prepend executor's open positions to the
+                        // user message so jurors can independently verify the
+                        // LLM isn't hallucinating positions.
+                        let jury_msg = if let Some(ref ex) = executor {
+                            let positions = ex.open_positions();
+                            if positions.is_empty() {
+                                format!(
+                                    "{}\n\n## Executor State: No open positions on chain.",
+                                    cleaned
+                                )
+                            } else {
+                                let mut ctx = String::from(
+                                    "\n\n## Executor State: Open positions on chain:\n",
+                                );
+                                for p in &positions {
+                                    ctx.push_str(&format!(
+                                        "  - {} {} @ {} (qty {:.4})\n",
+                                        p.pair, p.side, p.entry_price, p.quantity
+                                    ));
+                                }
+                                ctx.push_str("The LLM response above may or may not match this. If the LLM is managing a position NOT listed here, it is hallucinating. Veto.\n");
+                                format!("{}{}", cleaned, ctx)
+                            }
+                        } else {
+                            cleaned.clone()
+                        };
+                        let jury_result = jp.evaluate(&jury_msg, regime).await;
 
                         // FID-162: build cycle record (some fields filled later when judgment available).
                         let cycle_ts = chrono::Utc::now().to_rfc3339();
@@ -2940,6 +2980,8 @@ pub async fn run(
                         trigger_moderate: decision.trigger_weights.moderate,
                         trigger_weak: decision.trigger_weights.weak,
                         override_source: decision.override_source.clone().unwrap_or_default(),
+                        status: savant_trading::agent::decision_log::TradeStatus::Pending,
+                        rejection_reason: None,
                         outcome: None,
                     });
 
@@ -4115,6 +4157,8 @@ pub async fn run(
                                                     trigger_moderate: decision.trigger_weights.moderate,
                                                     trigger_weak: decision.trigger_weights.weak,
                                                     override_source: String::new(),
+                                                    status: savant_trading::agent::decision_log::TradeStatus::Pending,
+                                                    rejection_reason: None,
                                                     outcome: None,
                                                 });
                                         }
@@ -4285,6 +4329,12 @@ pub async fn run(
 
                                                     event_bus
                                                         .publish(TradingEvent::PositionOpened(pos));
+                                                    // FID-195: Mark the BUY decision as Filled.
+                                                    decision_log.update_status(
+                                                        &decision.pair,
+                                                        savant_trading::agent::decision_log::TradeStatus::Filled,
+                                                        None,
+                                                    );
                                                 }
                                                 // FID-108: Record failure in tracker
                                                 Err(e) => {
@@ -4302,6 +4352,12 @@ pub async fn run(
                                                     error!(
                                                         "AI order failed: {} | category={}",
                                                         e, category
+                                                    );
+                                                    // FID-195: Mark the BUY decision as Rejected.
+                                                    decision_log.update_status(
+                                                        &decision.pair,
+                                                        savant_trading::agent::decision_log::TradeStatus::Rejected,
+                                                        Some(e.to_string()),
                                                     );
                                                 }
                                             }

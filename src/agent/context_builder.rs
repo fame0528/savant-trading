@@ -547,3 +547,52 @@ pub fn build_user_message_static(ctx: &FullContext) -> String {
 
     msg
 }
+
+/// FID-195: Format execution outcomes for LLM context.
+/// Shows REJECTED entries explicitly so the LLM knows the position didn't open.
+/// Without this, the LLM would infer from absence of a position that the BUY
+/// either filled (and was sold) or is still open. Both inferences are wrong.
+///
+/// Returns an empty string if no finalized outcomes (Filled/Rejected) exist.
+pub fn format_execution_outcomes(
+    log: &crate::agent::decision_log::DecisionLog,
+    max_entries: usize,
+) -> String {
+    use crate::agent::decision_log::TradeStatus;
+    let recent: Vec<&crate::agent::decision_log::DecisionEntry> = log
+        .entries
+        .iter()
+        .rev()
+        .filter(|e| e.status != TradeStatus::Pending)
+        .take(max_entries)
+        .collect();
+    if recent.is_empty() {
+        return String::new();
+    }
+    let mut msg = String::from("\n## Execution Outcomes (Fills & Rejections)\n");
+    for entry in &recent {
+        match entry.status {
+            TradeStatus::Filled => {
+                msg.push_str(&format!(
+                    "  FILLED: {} {} @ {} (action committed on chain)\n",
+                    entry.pair, entry.action, entry.take_profit
+                ));
+            }
+            TradeStatus::Rejected => {
+                msg.push_str(&format!(
+                    "  REJECTED: {} {} - {} (NO POSITION OPENED on chain)\n",
+                    entry.pair,
+                    entry.action,
+                    entry
+                        .rejection_reason
+                        .as_deref()
+                        .unwrap_or("unknown reason")
+                ));
+            }
+            TradeStatus::Pending | TradeStatus::Expired => {
+                // Pending is filtered; Expired not yet emitted
+            }
+        }
+    }
+    msg
+}

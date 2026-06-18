@@ -10,6 +10,21 @@ use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
+/// FID-195: Execution status of a decision.
+/// Tracks whether the executor filled, rejected, or never processed the order.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub enum TradeStatus {
+    /// Decision made, executor outcome unknown (default for new entries).
+    #[default]
+    Pending,
+    /// Executor filled the order.
+    Filled,
+    /// Executor rejected the order (spread, dust, slippage, RPC error).
+    Rejected,
+    /// Decision expired without executor action.
+    Expired,
+}
+
 /// A single decision log entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DecisionEntry {
@@ -40,6 +55,14 @@ pub struct DecisionEntry {
     /// zero_base_review, jury_veto, etc.). Empty if no override.
     #[serde(default)]
     pub override_source: String,
+    /// FID-195: execution status. Default Pending for new entries.
+    /// `update_status()` mutates this when the executor reports fill/reject.
+    #[serde(default)]
+    pub status: TradeStatus,
+    /// FID-195: if status == Rejected, the executor's error message.
+    /// None otherwise.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rejection_reason: Option<String>,
     pub outcome: Option<TradeOutcome>,
 }
 
@@ -55,7 +78,9 @@ pub struct TradeOutcome {
 pub struct DecisionLog {
     path: PathBuf,
     max_entries: usize,
-    entries: Vec<DecisionEntry>,
+    /// FID-195: exposed as pub(crate) so context_builder can read entries
+    /// for format_execution_outcomes(). Not exposed publicly.
+    pub(crate) entries: Vec<DecisionEntry>,
 }
 
 impl DecisionLog {
@@ -94,15 +119,47 @@ impl DecisionLog {
         }
     }
 
+    /// FID-195: Update the most recent entry for a pair with executor status.
+    /// Used by the engine to mark decisions as Filled (success) or Rejected
+    /// (executor declined). The most recent entry is the one currently being
+    /// executed — we don't update older entries that have already been finalized.
+    ///
+    /// Returns true if a matching entry was found and updated.
+    pub fn update_status(
+        &mut self,
+        pair: &str,
+        status: TradeStatus,
+        rejection_reason: Option<String>,
+    ) -> bool {
+        if let Some(entry) = self
+            .entries
+            .iter_mut()
+            .rev()
+            .find(|e| e.pair == pair && e.status == TradeStatus::Pending)
+        {
+            entry.status = status;
+            if status == TradeStatus::Rejected {
+                entry.rejection_reason = rejection_reason;
+            }
+            self.flush();
+            return true;
+        }
+        false
+    }
+
     /// Get recent entries for context injection.
     /// Returns same-pair full entries and cross-pair reflections only.
     pub fn context_for_pair(&self, pair: &str, max_same: usize, max_cross: usize) -> String {
         let mut msg = String::new();
+        // FID-195: Filter out Rejected entries — the LLM shouldn't see them
+        // as still-active decisions. The LLM learns about rejections via
+        // the separate "## Execution Outcomes" section in context_builder.
         let same: Vec<&DecisionEntry> = self
             .entries
             .iter()
             .rev()
             .filter(|e| e.pair == pair)
+            .filter(|e| e.status != TradeStatus::Rejected)
             .take(max_same)
             .collect();
         let cross: Vec<&DecisionEntry> = self
@@ -110,6 +167,7 @@ impl DecisionLog {
             .iter()
             .rev()
             .filter(|e| e.pair != pair && e.outcome.is_some())
+            .filter(|e| e.status != TradeStatus::Rejected)
             .take(max_cross)
             .collect();
 
@@ -213,6 +271,8 @@ mod tests {
             trigger_moderate: 1,
             trigger_weak: 1,
             override_source: String::new(),
+            status: TradeStatus::Pending,
+            rejection_reason: None,
             outcome: None,
         }
     }

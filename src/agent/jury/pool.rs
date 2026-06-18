@@ -263,10 +263,8 @@ impl JuryPool {
         info!(
             "Jury: evaluating with {} members (regime: {:?}, quorum: {})",
             jury_size, regime, quorum
-        );
-
-        // FID-147: Filter JuryConfig.models to exclude the M3 marker entry.
-        // The M3 model is sourced from `provider_config_m3.model` for juror 0.
+        ); // FID-147: Filter JuryConfig.models to exclude the M3 marker entry.
+           // The M3 model is sourced from `provider_config_m3.model` for juror 0.
         let free_models: Vec<String> = self
             .config
             .models
