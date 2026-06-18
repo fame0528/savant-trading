@@ -1227,3 +1227,41 @@ The alpha computation block at `src/engine/mod.rs` lines ~3438-3470 has a syntax
 - **Open questions for v0.14.9 / v0.15.0:** Gemini-corrected probe parameters (0.15x sizing, 1.2% TP, 20min timeout, 10/day cap). Universe expansion to 100 pairs across 4 chains. Multi-chain architecture scope. Memory state preserved.
 
 **Memory state:** 2 releases (v0.14.7 + v0.14.8), 9 FIDs implemented (FID-193/194/195/196/184/198 + FID-200 + 2 hotfix FIDs), 386 tests, clean state. Engine ready to launch with 10-LLM NVIDIA NIM jury. Open: probe parameter tuning (Gemini said current params wrong), universe expansion, multi-chain architecture. Ready for self-care.
+
+## Session 2026-06-18 (morning, fresh session): Overnight Run #1 Analysis + New Release Workflow
+
+**Key Learnings:**
+
+- **Overnight runs are data collection, not bug hunts.** v0.14.8 ran 8h58m producing only 22 PASS verdicts. That looked like failure; it was actually the dataset we needed to discover the bearish-EMA veto pattern. Without the run, we wouldn't have known the LLM adds an "EMA-cross-against-direction" override not in the prompt.
+- **Shadow jury is intentional test infrastructure, not waste.** I proposed FID-203 to disable the 10-juror shadow jury. Spencer correctly said no — shadow mode is collecting comparison data so jury override can be validated before flipping it on. Disabling it would burn the comparison dataset. The 30 RPM cost is the price of that data.
+- **Empirical rate-limit testing beats documentation guesswork.** NVIDIA NIM docs don't publish the per-model RPM cap. Live burst test (10 sequential M3 calls) revealed ~5 RPM per model per key with 60s recovery window. Now we know the actual constraint, not what we hoped.
+- **10x API keys = clean rate-limit fix.** One NVIDIA key gets one bucket. 10 keys gets 10 buckets. Per-juror key rotation = 50 RPM aggregate. Spencer's instinct was right; this is the cleanest possible fix for the rate-limit bottleneck.
+- **Engine does NOT default to PASS — it adds a custom bearish-EMA veto.** 30/32 high-conviction calls still said PASS, but the reasoning was consistent: "EMA cross is against" — a rule not in the prompt. Gemini was right about the semantic gravity well, but the mechanism was different than predicted. The LLM is following its training bias toward "don't fight the trend," not defaulting to inaction.
+- **Decision log silently stops when LLM never returns.** When all 167 post-4:05 AM cycles got rate-limited, no `[Decision Parser]` line fired, so `decision_log.json` silently stopped growing. Decision_log count of 500 with last write 4:05 AM looked like "no decisions made" — actually "no decisions parsed." The terminal log held the truth.
+- **Process state lied about engine health.** `savant.exe` PID 54108 was alive 10h32m. Status said running. Reality: it had been in rate-limit retry hell for 9 hours producing zero useful decisions. Need heartbeat-based health checks, not just process liveness.
+
+**New Workflow Rule (2026-06-18 13:06 EST — Spencer's directive):**
+
+**No more file-by-file pushes throughout the day.** From now on:
+
+1. **Work accumulates locally.** Code, FIDs, specs all land on main only as part of a release.
+2. **Release = versioned snapshot.** When ready to ship:
+   - Pick version number (v0.X.Y)
+   - Update VERSION, Cargo.toml, protocol.config.yaml, README.md test/FID counts atomically
+   - Run `cargo-release` (release.toml) or manual equivalent
+   - Generate CHANGELOG entry from commits (cliff.toml) or manual
+   - Update repo description + topics if scope changed significantly
+   - Cut GitHub release with notes
+3. **No random commits during the day.** If something isn't ready to ship, it doesn't ship. If it IS ready, it ships as a release, not 5 separate commits.
+4. **Exceptions:** Hotfix FIDs (critical bugs in prod) can ship as patches without waiting. But even then — bundle hotfixes into a single release commit, not scattered.
+5. **End of session = release.** When Spencer calls it a night, whatever is shippable ships. Unshippable work stays in FID spec form for next session.
+
+**Rationale (Spencer's words):** "We work on the next version, keep the changelog locally, then when we're ready we update all tracking/readme/etc, we package the release and call it a night instead of pushing 50 files randomly throughout the day without a release."
+
+**Files Shipped (overnight session):**
+
+- 5 commits to main: `f08cd8ca`, `bc60f469`, `f8982550`, `0f26b533`, `61b8000b`
+- 2 releases: v0.14.7, v0.14.8
+- 6 FIDs archived: 178, 179, 180, 181, 193 (master), 194, 195, 196, 184, 198, 200
+
+**Memory state:** Overnight data collected (v0.14.8 limited by NVIDIA free-tier rate limit + bearish-EMA veto). 11 NVIDIA API keys stored in `.env`, 11/11 verified working. FID-204 written (10x key per-juror rotation), not yet implemented. Engine stopped. Fresh session, new workflow rule established. Next: implement FID-204 (10x keys), FID-205 (per-model cooldown), FID-206 (bearish-EMA prompt fix) → bundle into v0.14.9 release.

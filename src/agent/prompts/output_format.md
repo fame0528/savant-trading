@@ -68,16 +68,42 @@ Field Rules:
 
   CRITICAL FORCED-CHOICE RULE: If would_initiate_new_long_at_current_price is FALSE, the final action MUST be CLOSE. No exceptions. If you would not buy this asset today, you must not hold it.
 
-- action: BUY to open long, SELL to open short, HOLD for no action, CLOSE to exit existing, ADJUST_STOP to modify stop
-  **CRITICAL RULES:**
-  0. **PASS is NOT a default (FID-192 / FID-198).** PASS means "I have zero directional view on this pair." Most pairs have SOME directional lean. Output Buy or Sell with conviction_score (0.05-1.0) and let the engine's regime gate filter it. Below the threshold, the gate downgrades to HOLD. If conviction is between the probe threshold and main threshold, output `is_probe: true`.
-  1. If ANY position_audit has management_trigger != "none", the action CANNOT be HOLD. You MUST execute the mandated_action.
-  2. If would_initiate_new_long_at_current_price is FALSE for a held position, action MUST be CLOSE.
-  3. If your reasoning identifies that the thesis has weakened — EMA crossover against direction, volume selloff, lower highs/lower lows — the action MUST be CLOSE, not HOLD. A weakened thesis is a failing thesis.
-  4. If your reasoning recommends exiting — even at breakeven or small loss — the action MUST be CLOSE, not HOLD.
-  5. HOLD means "take no action and keep the position open." Do NOT use HOLD when you want to exit.
-  6. ADJUST_STOP is your primary risk management tool. Use it proactively when stops are too wide or profit needs protection.
-  7. For NEW entries (BUY/SELL), the conviction_score MUST be >= the regime threshold (Trending 0.05, Volatile 0.15, Ranging 0.10, GreyZone 0.20). If between probe and main threshold, set `is_probe: true`. If below probe threshold, action MUST be HOLD/PASS. This is FID-198: the engine and prompt are synchronized.
+- action: LONG to open long, SHORT to open short, NO_SIGNAL for no actionable setup, HOLD for management of existing, CLOSE to exit, ADJUST_STOP to modify stop
+  **FID-206 CRITICAL RULES:**
+  0. **Reasoning MUST come first in your JSON output.** Generate the "reasoning" field before the "action" field. This forces Chain-of-Thought before commitment and prevents the LLM from defaulting to NO_SIGNAL based on early bearish tokens (autoregressive exposure bias).
+  1. **Action Vocabulary (FID-206 sanitized):** You must output exactly one of:
+     - **LONG**: You detect an upward directional edge.
+     - **SHORT**: You detect a downward directional edge.
+     - **NO_SIGNAL**: The data is perfectly random noise — zero directional edge.
+     - **HOLD**: For existing positions where management triggers are inactive.
+     - **CLOSE** / **ADJUST_STOP**: For position management.
+  2. **Signal Isolation:** If you calculate a conviction_score > 0.0, you MUST output either LONG or SHORT. Do not second-guess the trend. Do not apply thresholds. The downstream quantitative engine handles risk management, threshold gating, and regime filters. If you see a setup, emit the signal.
+  3. **Contrarian Acceptance:** It is explicitly acceptable to issue a LONG signal when the EMA is bearish, provided other indicators (Z-score, momentum, volume) justify the conviction. You are a signal generator, not a portfolio manager.
+  4. **NO_SIGNAL is NOT a default** (FID-192 / FID-198 / FID-206). NO_SIGNAL means literally "zero directional edge, perfectly random noise." Most pairs have SOME directional lean — output the direction.
+  5. If ANY position_audit has management_trigger != "none", the action CANNOT be HOLD. You MUST execute the mandated_action.
+  6. If would_initiate_new_long_at_current_price is FALSE for a held position, action MUST be CLOSE.
+  7. If your reasoning identifies that the thesis has weakened — EMA crossover against direction, volume selloff, lower highs/lower lows — the action MUST be CLOSE, not HOLD. A weakened thesis is a failing thesis.
+  8. If your reasoning recommends exiting — even at breakeven or small loss — the action MUST be CLOSE, not HOLD.
+  9. HOLD means "take no action and keep the position open." Do NOT use HOLD when you want to exit.
+  10. ADJUST_STOP is your primary risk management tool. Use it proactively when stops are too wide or profit needs protection.
+  11. For NEW entries (LONG/SHORT), the conviction_score MUST be >= the regime threshold (Trending 0.05, Volatile 0.15, Ranging 0.10, GreyZone 0.20). If between probe and main threshold, set `is_probe: true`. If below probe threshold, action MUST be NO_SIGNAL/HOLD. This is FID-198: the engine and prompt are synchronized.
+
+  **FID-206 Few-Shot Examples (mandatory pattern reference):**
+
+  **Example 1 — Trend Continuation:**
+  Indicators: Bullish EMA cross (EMA_F 1.025 > EMA_S 1.018), ADX 32 trending, RSI 64, vol ratio 2.1x.
+  Reasoning: "EMA cross is bullish, momentum is strong, no bearish divergence. Trade the trend."
+  Output: `{"reasoning": "...", "is_probe": false, "conviction_score": 0.80, "action": "LONG"}`
+
+  **Example 2 — Contrarian Reversal (KEY EXAMPLE — model is allowed to fight the trend):**
+  Indicators: Bearish EMA cross (EMA_F 0.98 < EMA_S 1.00), ADX 28 trending, BUT RSI 28 (oversold), Z-score -2.1 (deep oversold), BB lower touch.
+  Reasoning: "EMA is bearish but Z-score at -2.1 indicates deep oversold. Mean-reversion expected. Trade the bounce, not the trend."
+  Output: `{"reasoning": "...", "is_probe": true, "conviction_score": 0.30, "action": "LONG"}`
+
+  **Example 3 — True Noise:**
+  Indicators: EMA_F ≈ EMA_S (no cross), ADX 14 (ranging), RSI 50 (mid), vol ratio 0.8 (below average), no momentum trigger.
+  Reasoning: "No trend, no momentum, no oversold signal. Genuinely random noise."
+  Output: `{"reasoning": "...", "is_probe": false, "conviction_score": 0.00, "action": "NO_SIGNAL"}`
 
 - pair: must match a configured trading pair
 - side: Long for BUY, Short for SELL
@@ -115,10 +141,13 @@ FID-126 SCHEMA CHANGE NOTES:
 - Engine default if sizing_multiplier missing: 0.5
 - Engine default if trigger_weights missing: empty object (conviction = 0.0)
 
-ANTI-PATTERN REMINDERS:
+ANTI-PATTERN REMINDERS (FID-206):
+
 - Do NOT default conviction_score to 0.50 or 0.65. Output the actual granular value.
 - Do NOT use "GreyZone" as a default to avoid the higher threshold. Pick the regime that matches the data.
 - Do NOT use empty trigger_weights with a high conviction_score. The two must be consistent.
-- Do NOT output PASS when there's any technical signal. Use `is_probe: true` for low conviction (above probe threshold, below main threshold).
+- Do NOT output NO_SIGNAL when there's any technical signal. NO_SIGNAL means literally zero edge — perfectly random noise. Use `is_probe: true` for low-conviction directional signals (above probe threshold, below main threshold).
+- Do NOT output NO_SIGNAL with a conviction_score > 0.10 — this is the FID-206 "contradictory signal" pattern. The engine logs a WARN when this happens. Output LONG or SHORT instead.
+- DO generate your reasoning field BEFORE your action field in the JSON. CoT-before-action prevents the autoregressive veto.
 - DO use `is_probe: true` for low-conviction directional signals — this is the engine's way of generating trade flow data.
 </output_format>

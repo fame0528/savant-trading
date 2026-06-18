@@ -8,9 +8,9 @@ use crate::core::types::Side;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub enum TradeAction {
-    #[serde(alias = "BUY", alias = "buy")]
+    #[serde(alias = "BUY", alias = "buy", alias = "LONG", alias = "long")]
     Buy,
-    #[serde(alias = "SELL", alias = "sell")]
+    #[serde(alias = "SELL", alias = "sell", alias = "SHORT", alias = "short")]
     Sell,
     #[serde(
         alias = "HOLD",
@@ -18,7 +18,13 @@ pub enum TradeAction {
         alias = "PASS",
         alias = "pass",
         alias = "SKIP",
-        alias = "skip"
+        alias = "skip",
+        alias = "NO_SIGNAL",
+        alias = "no_signal",
+        alias = "NoSignal",
+        alias = "NO-SIGNAL",
+        alias = "NOSIGNAL",
+        alias = "NO SIGNAL"
     )]
     Pass,
     #[serde(alias = "CLOSE", alias = "close")]
@@ -504,6 +510,22 @@ pub fn parse_decision(
         );
     }
 
+    // FID-206: Contradictory signal detection.
+    // Per Gemini research 2026-06-18, the LLM can output action=Pass while
+    // providing a high conviction_score (semantic gravity well effect).
+    // Detect this contradiction: high conviction + no signal = logical
+    // inconsistency. Log WARN, do NOT auto-override (LLM may be right that
+    // the high conviction is mechanical noise). The warning surfaces the
+    // pattern for analysis.
+    if matches!(decision.action, TradeAction::Pass) && decision.conviction_score > 0.10 {
+        tracing::warn!(
+            "FID-206: contradictory signal — pair={} action=Pass conviction={:.3} (>0.10 threshold for high-conviction no-signal). \
+             LLM may be applying a custom veto not in the prompt. \
+             Verify reasoning matches the action token before trusting.",
+            decision.pair, decision.conviction_score
+        );
+    }
+
     if !bypass_gates && decision.confidence < CONFIDENCE_FLOOR && is_entry {
         tracing::info!(
             "Confidence floor: {:.0}% < {:.0}% — downgrading {:?} to Hold",
@@ -973,7 +995,7 @@ fn normalize_llm_json(json: &str) -> String {
         let val = caps.get(1).unwrap().as_str();
         let upper = val.to_uppercase();
         let normalized = match upper.as_str() {
-            "HOLD" | "PASS" => "Pass",
+            "HOLD" | "PASS" | "NO_SIGNAL" | "NO-SIGNAL" | "NO SIGNAL" | "NOSIGNAL" => "Pass",
             "BUY" | "LONG" => "Buy",
             "SELL" | "SHORT" => "Sell",
             "CLOSE" | "EXIT" => "Close",
@@ -1093,9 +1115,10 @@ fn partial_extract(json: &str) -> Option<TradeDecision> {
 
     let action_str = value.get("action")?.as_str()?;
     let action = match action_str {
-        "Buy" | "BUY" | "buy" => TradeAction::Buy,
-        "Sell" | "SELL" | "sell" => TradeAction::Sell,
-        "Hold" | "HOLD" | "hold" | "Pass" | "PASS" | "pass" | "Skip" | "SKIP" | "skip" => {
+        "Buy" | "BUY" | "buy" | "Long" | "LONG" | "long" => TradeAction::Buy,
+        "Sell" | "SELL" | "sell" | "Short" | "SHORT" | "short" => TradeAction::Sell,
+        "Hold" | "HOLD" | "hold" | "Pass" | "PASS" | "pass" | "Skip" | "SKIP" | "skip"
+        | "NoSignal" | "NO_SIGNAL" | "no_signal" | "NoSignal " | "NO SIGNAL" | "NO-SIGNAL" => {
             TradeAction::Pass
         }
         "Close" | "CLOSE" | "close" => TradeAction::Close,
@@ -1600,5 +1623,102 @@ Some extra reasoning text that leaked into the response..."#;
 
         let decision = parse_decision(&json.to_string(), 0.0953, 10.0).unwrap();
         assert!(!decision.is_probe);
+    }
+
+    // FID-206: LONG/SHORT/NO_SIGNAL vocabulary alias tests.
+
+    #[test]
+    fn long_alias_maps_to_buy() {
+        let json = r#"{"action":"LONG","pair":"BTC/USD","side":"Long","entry_price":65000,"stop_loss":64000,"take_profit":67000,"position_size_pct":50,"confidence":0.6,"conviction_score":0.30,"regime_label":"Trending","reasoning":"bullish"}"#;
+        let decision = parse_decision(json, 65000.0, 10.0).unwrap();
+        assert_eq!(decision.action, TradeAction::Buy);
+    }
+
+    #[test]
+    fn short_alias_maps_to_sell() {
+        let json = serde_json::json!({
+            "action": "SHORT",
+            "pair": "BTC/USD",
+            "side": "Short",
+            "entry_price": 65000.0,
+            "stop_loss": 65500.0,
+            "take_profit": 63500.0,
+            "position_size_pct": 50.0,
+            "confidence": 0.6,
+            "conviction_score": 0.30,
+            "regime_label": "Trending",
+            "reasoning": "bearish",
+            "knowledge_sources": [],
+            "risk_reward": 1.5
+        });
+        let decision = parse_decision(&json.to_string(), 65000.0, 10.0).unwrap();
+        assert_eq!(decision.action, TradeAction::Sell);
+    }
+
+    #[test]
+    fn no_signal_alias_maps_to_pass() {
+        let json = r#"{"action":"NO_SIGNAL","pair":"BTC/USD","side":"Long","entry_price":0,"stop_loss":0,"take_profit":0,"position_size_pct":0,"confidence":0.0,"conviction_score":0.0,"regime_label":"Ranging","reasoning":"noise"}"#;
+        let decision = parse_decision(json, 65000.0, 10.0).unwrap();
+        assert_eq!(decision.action, TradeAction::Pass);
+    }
+
+    #[test]
+    fn no_signal_dash_alias_maps_to_pass() {
+        let json = r#"{"action":"NoSignal","pair":"BTC/USD","side":"Long","entry_price":0,"stop_loss":0,"take_profit":0,"position_size_pct":0,"confidence":0.0,"conviction_score":0.0,"regime_label":"Ranging","reasoning":"noise"}"#;
+        let decision = parse_decision(json, 65000.0, 10.0).unwrap();
+        assert_eq!(decision.action, TradeAction::Pass);
+    }
+
+    // FID-206: Contradictory signal detection.
+    // When LLM says action=Pass but conviction_score > 0.10, that's a
+    // contradictory signal that FID-206 warns about. Verify the parser
+    // keeps action=Pass (does NOT auto-upgrade) but the warning fires.
+
+    #[test]
+    fn contradictory_pass_high_conviction_stays_pass() {
+        // Ranging regime (threshold 0.10). Conviction 0.35 > 0.10 = contradiction.
+        // FID-206: parser stays Pass, engine WARNs.
+        let json = serde_json::json!({
+            "action": "Pass",
+            "pair": "BTC/USD",
+            "side": "Long",
+            "entry_price": 0.0,
+            "stop_loss": 0.0,
+            "take_profit": 0.0,
+            "position_size_pct": 0.0,
+            "confidence": 0.0,
+            "conviction_score": 0.35,
+            "regime_label": "Ranging",
+            "reasoning": "high conviction but pass action (semantic gravity well?)"
+        });
+        let decision = parse_decision(&json.to_string(), 65000.0, 10.0).unwrap();
+        // Should remain Pass — FID-206 logs warning but does NOT auto-upgrade.
+        // The warning fires via tracing, observable in test logs.
+        assert_eq!(decision.action, TradeAction::Pass);
+        assert_eq!(decision.conviction_score, 0.35);
+    }
+
+    #[test]
+    fn contradictory_short_alias_high_conviction() {
+        // SHORT (mapped to Sell) at Trending threshold (0.05).
+        // Conviction 0.08 > 0.05 = PASSES threshold. Not contradictory.
+        let json = serde_json::json!({
+            "action": "SHORT",
+            "pair": "BTC/USD",
+            "side": "Short",
+            "entry_price": 65000.0,
+            "stop_loss": 65500.0,  // Short: stop above entry
+            "take_profit": 63500.0,
+            "position_size_pct": 50.0,
+            "confidence": 0.5,
+            "conviction_score": 0.08,
+            "regime_label": "Trending",
+            "reasoning": "bearish trend",
+            "knowledge_sources": [],
+            "risk_reward": 1.5
+        });
+        let decision = parse_decision(&json.to_string(), 65000.0, 10.0).unwrap();
+        assert_eq!(decision.action, TradeAction::Sell);
+        assert_eq!(decision.conviction_score, 0.08);
     }
 }

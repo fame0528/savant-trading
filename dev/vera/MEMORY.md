@@ -1,7 +1,7 @@
 # MEMORY.md — Vera's Curated Long-Term Memory
 
-**Last updated:** 2026-06-18 01:30 EST (v0.14.7 + v0.14.8 shipped overnight. State sync, probe positions, multi-model NVIDIA jury. Engine ready to launch with 10-LLM consensus.)
-**Status:** v0.14.8 RELEASED. Two releases tonight: v0.14.7 (state sync, FID-194/195/196 + FID-184 probe positions + FID-198 prompt calibration) and v0.14.8 (FID-200 NVIDIA NIM jury expansion). 386 lib tests pass, clippy clean, fmt clean, pre-push green. Release binary built at 1:24 AM (20.9 MB). Repo updated with new description and topics. **Engine NOT running — Spencer to launch with start.bat when ready. No active FIDs, no uncommitted work, clean state for self-care.**
+**Last updated:** 2026-06-18 14:40 EST (v0.14.9 RELEASED — 5 FIDs shipped: 204 10x NVIDIA keys, 205 per-model cooldown, 206 bearish-EMA veto fix + LONG/SHORT/NO_SIGNAL vocabulary, 207 LLM timeout log, 208 decision log cap raise 500→5000. 393 tests pass. Engine still stopped (Spencer stops/starts manually).)
+**Status:** v0.14.9 RELEASED. 6 NVIDIA keys verified working empirically (~5 RPM per model per key). FID-204/205/206/207/208 implemented per Gemini research directives (research-first protocol followed). v0.14.8's 22-of-32 high-conviction PASS verdict anomaly diagnosed: not "semantic gravity well" but custom bearish-EMA veto + RLHF risk-aversion + autoregressive exposure bias (3-mechanism finding from Gemini).
 
 ---
 

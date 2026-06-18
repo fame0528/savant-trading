@@ -2,6 +2,97 @@
 
 All notable changes to Savant Trading are documented here.
 
+## [0.14.9] — 2026-06-18
+
+### Rate-Limit Resilience + Bearish-EMA Veto Fix
+
+Five FIDs addressing the operational bottlenecks observed in the v0.14.8 overnight run (2/169 LLM batches succeeded, 682 rate-limit WARNs, 22/22 high-conviction verdicts defaulting to PASS despite EMA bearish veto not being in the prompt).
+
+### Added — FID-204: 10x NVIDIA API Keys for Per-Juror Rate-Limit Isolation
+
+Overnight burst test empirically confirmed NVIDIA NIM free tier caps at ~5 RPM per model per key (5 successful M3 calls ? 429, 60s recovery). All 10 jurors were sharing one bucket.
+
+- `NvidiaConfig.api_key_envs: Vec<String>` — list of env var names for per-juror keys (default empty, backward-compatible)
+- `JuryPool` gains `nvidia_api_keys: Vec<String>` field; juror N (N >= 1) uses `keys[(N-1) % keys.len()]` round-robin
+- `load_nvidia_api_keys(config)` — engine startup helper that reads all env vars, skips empty/missing with WARN
+- 11 NVIDIA keys stored in `.env` as `NVIDIA_API_KEY` (legacy) + `NVIDIA_API_KEY_1..10` (multi-key)
+- 11/11 keys verified working via direct API test; 3/3 new keys confirmed can hit M3 model
+- Aggregate capacity: ~5 RPM × 10 keys = ~50 RPM (vs ~5 RPM previously)
+- `config/default.toml` and `config/test-anvil.toml` updated with `api_key_envs = [...]`
+
+### Added — FID-205: Per-Model Cooldown on HTTP 429
+
+Herd-retry mitigation. When a model returns 429, mark it cooldown for 60s (±10s jitter) and skip other jurors in that window.
+
+- `JuryPool.model_cooldowns: Mutex<HashMap<String, Instant>>` — tracks active cooldowns
+- `is_model_in_cooldown()` — auto-prune expired entries on read
+- `mark_model_cooldown()` — adds new entry with deterministic-ish jitter from system time
+- `is_rate_limit_error()` — detects 429 in LlmError message
+- `JuryPool::models_in_cooldown()` and `models_in_cooldown_count()` — telemetry/dashboard visibility
+
+### Added — FID-206: Bearish-EMA Veto Fix (Long/SHORT/NO_SIGNAL vocabulary)
+
+Per Gemini research 2026-06-18, the LLM's "default to PASS despite non-zero conviction" is not the predicted semantic gravity well — it's the model adding a custom bearish-EMA veto not in the prompt. The 22 verified v0.14.8 PASS verdicts all cited "EMA cross is against" as the reason.
+
+**Three mechanisms identified by research (with citations):**
+1. **RLHF financial risk-aversion** — alignment training penalizes confident trading advice
+2. **Semantic gravity well** — naming the forbidden action (PASS) primes the model to produce it
+3. **Autoregressive exposure bias** — early bearish tokens in reasoning skew later action tokens toward caution
+
+**Fix applied** (per Gemini research recommendations):
+- **Reasoning-first JSON schema** — `{"reasoning": "...", "is_probe": false, "conviction_score": 0.45, "action": "LONG"}` (CoT before action prevents premature commitment)
+- **Sanitized action vocabulary** — `LONG` / `SHORT` / `NO_SIGNAL` (vs `BUY` / `SELL` / `PASS`). NO_SIGNAL means literally "zero edge" — strips the colloquial "passing" implication that triggered risk-aversion training
+- **3 few-shot examples** — Trend Continuation, Contrarian Reversal (KEY EXAMPLE: bearish EMA + oversold Z-score ? LONG via mean-reversion), True Noise
+- **Engine-level contradictory signal warning** — when LLM outputs `action=Pass` with `conviction_score > 0.10`, parser logs WARN with pair + conviction (does NOT auto-override; surface the pattern for analysis)
+- `TradeAction` enum serde aliases updated to accept LONG / SHORT / NO_SIGNAL / NoSignal / NO-SIGNAL / NO SIGNAL / NOSIGNAL (all map to existing Buy / Sell / Pass variants)
+- `normalize_llm_json()` regex updated to recognize the new vocabulary
+- `src/agent/prompts/output_format.md` rewritten with FID-206 rules + examples + anti-pattern reminders
+
+### Added — FID-207: LLM Timeout Structured Logging
+
+Engine's batched M3 call (180s cap) now logs `[LLM] TIMEOUT — batch of N pairs produced no verdict after Ns` so overnight-log analyzers can count exactly how many cycles produced no decision (vs other failure modes).
+
+### Added — FID-208: Decision Log + Equity History Cap Raise (500 ? 5000)
+
+- `default_decision_log_max_entries`: 500 ? 5000 (~12 min history ? ~2h history at 3 cycles/min × 14 pairs)
+- Equity curve in-memory cap: 500 ? 5000 (same rationale)
+- Critical for debugging overnight behavior: v0.14.8 lost decision history at ~22 min into the run
+
+### Changed — Engine Wiring
+
+- Engine startup uses `load_nvidia_api_keys()` to populate jury pool
+- Engine wires `nvidia_api_keys: Vec<String>` through to `JuryPool::new()`
+- Primary `provider_config_nvidia.api_key` uses first key for fallback path
+- Batch LLM call site emits structured `[LLM] TIMEOUT` log on 180s elapse
+
+### Tests
+
+- **+15 new tests** (387 ? 402 total in lib suite). 393 in lib (per `cargo test --lib`), 10 in dashboard.
+  - FID-204: `pick_nvidia_key_round_robin`, `pick_nvidia_key_empty_returns_none`, `pick_nvidia_key_single_key_all_jurors_share`, `nvidia_config_default_has_empty_api_key_envs`, `nvidia_config_deserializes_api_key_envs_array`, `nvidia_config_backward_compat_without_api_key_envs_field`, `load_nvidia_keys_multi_key_loads_all`, `load_nvidia_keys_skips_empty_env_vars`, `load_nvidia_keys_legacy_single_key`, `load_nvidia_keys_no_keys_returns_empty`, `load_nvidia_keys_prefers_multi_over_legacy`
+  - FID-205: `cooldown_insert_and_check`, `cooldown_expired_auto_clears`, `cooldown_multiple_models_independent`, `is_rate_limit_error_detects_429`
+  - FID-206: `long_alias_maps_to_buy`, `short_alias_maps_to_sell`, `no_signal_alias_maps_to_pass`, `no_signal_dash_alias_maps_to_pass`, `contradictory_pass_high_conviction_stays_pass`, `contradictory_short_alias_high_conviction`
+
+### Empirical
+
+- 11/11 NVIDIA keys verified returning 200 OK on small llama-3.1-8b ping
+- 3/3 new keys verified can hit M3 model (cold start 20-35s, warm 1-2s)
+- Release build clean: clippy `--all-targets -D warnings` passes, `cargo build --release` 22.5s
+
+### Files Changed
+
+- `src/core/config.rs` — `NvidiaConfig.api_key_envs`, `load_nvidia_api_keys()`, `default_decision_log_max_entries 500?5000`
+- `src/agent/jury/pool.rs` — `nvidia_api_keys`, `model_cooldowns`, `pick_nvidia_key()`, `mark_model_cooldown()`, `is_model_in_cooldown()`, `is_rate_limit_error()`, `models_in_cooldown_count()`, 4 new tests
+- `src/agent/decision_parser.rs` — TradeAction serde aliases (LONG/SHORT/NO_SIGNAL), contradictory signal WARN, 6 new tests
+- `src/agent/prompts/output_format.md` — rewritten with FID-206 rules + 3 few-shot examples + anti-pattern reminders
+- `src/engine/mod.rs` — `load_nvidia_api_keys()` wiring, FID-207 timeout log
+- `config/default.toml` + `config/test-anvil.toml` — `api_key_envs = [...]` array
+- `.env` — 10 new NVIDIA_API_KEY_N env vars
+- `VERSION` — 0.14.8 ? 0.14.9
+- `Cargo.toml` — version 0.14.8 ? 0.14.9
+- `protocol.config.yaml` — version 0.14.8 ? 0.14.9
+- `README.md` — version + test count
+- `CHANGELOG.md` — this section
+
 ## [0.14.8] — 2026-06-18
 
 ### Multi-Model Jury with NVIDIA NIM Expansion (FID-200)

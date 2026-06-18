@@ -757,33 +757,36 @@ impl EngineState {
             // FID-200: NVIDIA NIM provider for jurors (free, no quota).
             // When NVIDIA_API_KEY is set and `[ai.nvidia]` is configured, the jury
             // uses NVIDIA NIM directly. Otherwise falls back to OpenRouter.
+            //
+            // FID-204: load all NVIDIA API keys from `api_key_envs` (multi-key)
+            // or fall back to single `api_key_env`. Each juror gets its own key.
             let nv_cfg = &config.ai.nvidia;
-            let provider_config_nvidia = {
-                let nv_key = std::env::var(&nv_cfg.api_key_env).unwrap_or_default();
-                if nv_key.is_empty() {
-                    warn!(
-                        "FID-200: {} not set, jury falls back to OpenRouter",
-                        nv_cfg.api_key_env
-                    );
-                    None
-                } else {
-                    info!(
-                        "FID-200: NVIDIA NIM jury enabled (model={}, endpoint={})",
-                        nv_cfg.model, nv_cfg.endpoint
-                    );
-                    Some(savant_trading::agent::provider::LlmConfig {
-                        endpoint: nv_cfg.endpoint.clone(),
-                        model: nv_cfg.model.clone(),
-                        api_key: nv_key,
-                        max_tokens: config.ai.max_tokens,
-                        temperature: config.ai.temperature,
-                        top_p: config.ai.top_p,
-                        timeout_secs: config.ai.jury.timeout_secs,
-                        streaming_timeout_secs: config.ai.streaming_timeout_secs,
-                        extra_headers: vec![],
-                        disable_thinking: config.ai.disable_thinking,
-                    })
-                }
+            let nvidia_api_keys = savant_trading::core::config::load_nvidia_api_keys(nv_cfg);
+            let provider_config_nvidia = if nvidia_api_keys.is_empty() {
+                warn!("FID-200: no NVIDIA API keys, jury falls back to OpenRouter");
+                None
+            } else {
+                // Use first key as the "primary" api_key for provider_config_nvidia.
+                // Per-juror key rotation happens in JuryPool::evaluate().
+                let primary_key = nvidia_api_keys[0].clone();
+                info!(
+                    "FID-200: NVIDIA NIM jury enabled (model={}, endpoint={}, {} keys for per-juror rotation)",
+                    nv_cfg.model,
+                    nv_cfg.endpoint,
+                    nvidia_api_keys.len()
+                );
+                Some(savant_trading::agent::provider::LlmConfig {
+                    endpoint: nv_cfg.endpoint.clone(),
+                    model: nv_cfg.model.clone(),
+                    api_key: primary_key,
+                    max_tokens: config.ai.max_tokens,
+                    temperature: config.ai.temperature,
+                    top_p: config.ai.top_p,
+                    timeout_secs: config.ai.jury.timeout_secs,
+                    streaming_timeout_secs: config.ai.streaming_timeout_secs,
+                    extra_headers: vec![],
+                    disable_thinking: config.ai.disable_thinking,
+                })
             };
 
             // M3 control API key: from TOKEN_ROUTER_API_KEY env var.
@@ -800,6 +803,7 @@ impl EngineState {
                 provider_config_openrouter,
                 provider_config_nvidia,
                 m3_api_key,
+                nvidia_api_keys,
                 JuryKeyManager::new(
                     OpenRouterManagementClient::with_endpoint(
                         std::env::var(&config.ai.openrouter.management.management_key_env)
@@ -2494,9 +2498,20 @@ pub async fn run(
             {
                 Ok(result) => result,
                 Err(_) => {
+                    // FID-207: structured [LLM] TIMEOUT log. Distinguishes the
+                    // "no LLM verdict" outcome from other cycle failures so the
+                    // overnight-log analyzer (and humans reading logs) can
+                    // count exactly how many cycles produced no decision.
+                    let elapsed = start.elapsed().as_secs();
+                    log_llm!(
+                        "LLM",
+                        "TIMEOUT — batch of {} pairs produced no verdict after {}s (180s cap); cycle skipped",
+                        batch_size,
+                        elapsed
+                    );
                     warn!(
-                        "Batch LLM call timed out after 180s — skipping {} pairs",
-                        batch_size
+                        "FID-207: LLM timeout — batch of {} pairs skipped after {}s",
+                        batch_size, elapsed
                     );
                     // FID-093 C9: Reset eval_in_progress flag on timeout.
                     // Without this, the flag stays true and ALL subsequent cycles
@@ -5774,9 +5789,10 @@ pub async fn run(
                         "drawdown_pct": account.drawdown_pct,
                         "open_positions": account.open_positions,
                     }));
-                    // Keep last 500 points
-                    if curve.len() > 500 {
-                        let drain_count = curve.len() - 500;
+                    // FID-208: keep last 5000 equity points (~2h history at 3 cycles/min).
+                    // Was 500 — too short to debug overnight behavior.
+                    if curve.len() > 5000 {
+                        let drain_count = curve.len() - 5000;
                         curve.drain(0..drain_count);
                     }
                 }

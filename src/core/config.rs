@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::Path;
+use tracing::{info, warn};
 
 use crate::core::error::ConfigError;
 
@@ -205,8 +206,18 @@ fn default_nvidia_model() -> String {
 pub struct NvidiaConfig {
     #[serde(default = "default_nvidia_endpoint")]
     pub endpoint: String,
+    /// Legacy single-key env var (NVIDIA_API_KEY). Used when `api_key_envs` is empty.
+    /// Backward-compatible: if `api_key_envs` is empty, engine reads this single var.
     #[serde(default = "default_nvidia_api_key_env")]
     pub api_key_env: String,
+    /// FID-204: Multi-key env var list for per-juror rate-limit isolation.
+    /// Each entry is an env var name to read. Example:
+    ///   api_key_envs = ["NVIDIA_API_KEY_1", "NVIDIA_API_KEY_2", ..., "NVIDIA_API_KEY_10"]
+    /// Juror N (N >= 1) uses keys[(N-1) % keys.len()]. Empty list = use legacy single key.
+    /// Empirical: NVIDIA NIM free tier caps ~5 RPM per model per key.
+    /// With 10 keys, aggregate capacity ~50 RPM (sufficient for 10-juror shadow pool).
+    #[serde(default)]
+    pub api_key_envs: Vec<String>,
     #[serde(default = "default_nvidia_model")]
     pub model: String,
 }
@@ -216,9 +227,52 @@ impl Default for NvidiaConfig {
         Self {
             endpoint: default_nvidia_endpoint(),
             api_key_env: default_nvidia_api_key_env(),
+            api_key_envs: Vec::new(),
             model: default_nvidia_model(),
         }
     }
+}
+
+/// FID-204: Load NVIDIA API keys from config. Prefers `api_key_envs` (multi-key)
+/// over `api_key_env` (single-key legacy). Returns the resolved key list.
+/// Empty env vars are skipped with a warning. Returns empty Vec if no keys found.
+pub fn load_nvidia_api_keys(config: &NvidiaConfig) -> Vec<String> {
+    let mut keys = Vec::new();
+
+    if !config.api_key_envs.is_empty() {
+        // FID-204 multi-key path: read all env vars in order.
+        for env_var in &config.api_key_envs {
+            match std::env::var(env_var) {
+                Ok(k) if !k.is_empty() => {
+                    keys.push(k);
+                }
+                Ok(_) => {
+                    warn!("FID-204: NVIDIA env var {} is empty, skipping", env_var);
+                }
+                Err(_) => {
+                    warn!("FID-204: NVIDIA env var {} not set, skipping", env_var);
+                }
+            }
+        }
+    } else {
+        // Legacy single-key path: read `api_key_env` only.
+        match std::env::var(&config.api_key_env) {
+            Ok(k) if !k.is_empty() => keys.push(k),
+            Ok(_) => warn!("FID-204: NVIDIA env var {} is empty", config.api_key_env),
+            Err(_) => warn!("FID-204: NVIDIA env var {} not set", config.api_key_env),
+        }
+    }
+
+    if keys.is_empty() {
+        warn!("FID-204: no NVIDIA API keys configured — NVIDIA NIM disabled");
+    } else {
+        info!(
+            "FID-204: loaded {} NVIDIA API key(s) for per-juror rotation",
+            keys.len()
+        );
+    }
+
+    keys
 }
 
 fn default_tokenrouter_endpoint() -> String {
@@ -559,7 +613,10 @@ fn default_warn_context_guard() -> u32 {
     8192
 }
 fn default_decision_log_max_entries() -> usize {
-    500
+    // FID-208: raised from 500 to 5000 so overnight runs keep full history.
+    // At ~3 cycles/min × 14 pairs/cycle = 42 decisions/min. 5000 entries = ~2h history.
+    // Original 500 entries = ~12 min history — too short to debug overnight behavior.
+    5000
 }
 fn default_min_volume_24h() -> f64 {
     1_500_000.0
@@ -1111,5 +1168,155 @@ impl Default for AppConfig {
             training: TrainingConfig::default(),
             chains: HashMap::new(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::env;
+
+    /// Save and restore env vars touched by a test so tests don't leak.
+    fn with_env<F: FnOnce()>(vars: &[&str], f: F) {
+        let originals: Vec<(String, Option<String>)> = vars
+            .iter()
+            .map(|v| (v.to_string(), env::var(v).ok()))
+            .collect();
+        // Clear first.
+        for v in vars {
+            env::remove_var(v);
+        }
+        f();
+        for (v, original) in originals {
+            match original {
+                Some(val) => env::set_var(v, val),
+                None => env::remove_var(v),
+            }
+        }
+    }
+
+    // FID-204: NvidiaConfig + load_nvidia_api_keys tests.
+
+    #[test]
+    fn nvidia_config_default_has_empty_api_key_envs() {
+        let cfg = NvidiaConfig::default();
+        assert_eq!(cfg.api_key_env, "NVIDIA_API_KEY");
+        assert!(cfg.api_key_envs.is_empty()); // Backward-compat: empty by default
+    }
+
+    #[test]
+    fn nvidia_config_deserializes_api_key_envs_array() {
+        let toml = r#"
+            endpoint = "https://integrate.api.nvidia.com/v1"
+            model = "deepseek-ai/deepseek-v4-flash"
+            api_key_env = "NVIDIA_API_KEY"
+            api_key_envs = ["NVIDIA_API_KEY_1", "NVIDIA_API_KEY_2", "NVIDIA_API_KEY_3"]
+        "#;
+        let cfg: NvidiaConfig = toml::from_str(toml).expect("parse TOML");
+        assert_eq!(cfg.api_key_envs.len(), 3);
+        assert_eq!(cfg.api_key_envs[0], "NVIDIA_API_KEY_1");
+    }
+
+    #[test]
+    fn nvidia_config_backward_compat_without_api_key_envs_field() {
+        // Old config files don't have api_key_envs — must still parse.
+        let toml = r#"
+            endpoint = "https://integrate.api.nvidia.com/v1"
+            model = "deepseek-ai/deepseek-v4-flash"
+            api_key_env = "NVIDIA_API_KEY"
+        "#;
+        let cfg: NvidiaConfig = toml::from_str(toml).expect("parse TOML");
+        assert!(cfg.api_key_envs.is_empty()); // Default = empty Vec
+    }
+
+    #[test]
+    fn load_nvidia_keys_multi_key_loads_all() {
+        with_env(
+            &[
+                "NVIDIA_API_KEY_1",
+                "NVIDIA_API_KEY_2",
+                "NVIDIA_API_KEY_3",
+                "NVIDIA_API_KEY",
+            ],
+            || {
+                env::set_var("NVIDIA_API_KEY_1", "k1");
+                env::set_var("NVIDIA_API_KEY_2", "k2");
+                env::set_var("NVIDIA_API_KEY_3", "k3");
+                let cfg = NvidiaConfig {
+                    api_key_envs: vec![
+                        "NVIDIA_API_KEY_1".to_string(),
+                        "NVIDIA_API_KEY_2".to_string(),
+                        "NVIDIA_API_KEY_3".to_string(),
+                    ],
+                    ..Default::default()
+                };
+                let keys = load_nvidia_api_keys(&cfg);
+                assert_eq!(keys, vec!["k1", "k2", "k3"]);
+            },
+        );
+    }
+
+    #[test]
+    fn load_nvidia_keys_skips_empty_env_vars() {
+        with_env(
+            &["NVIDIA_API_KEY_1", "NVIDIA_API_KEY_2", "NVIDIA_API_KEY_3"],
+            || {
+                env::set_var("NVIDIA_API_KEY_1", "k1");
+                env::set_var("NVIDIA_API_KEY_2", ""); // empty — skip
+                env::remove_var("NVIDIA_API_KEY_3"); // not set — skip
+                let cfg = NvidiaConfig {
+                    api_key_envs: vec![
+                        "NVIDIA_API_KEY_1".to_string(),
+                        "NVIDIA_API_KEY_2".to_string(),
+                        "NVIDIA_API_KEY_3".to_string(),
+                    ],
+                    ..Default::default()
+                };
+                let keys = load_nvidia_api_keys(&cfg);
+                assert_eq!(keys, vec!["k1"]);
+            },
+        );
+    }
+
+    #[test]
+    fn load_nvidia_keys_legacy_single_key() {
+        with_env(&["NVIDIA_API_KEY"], || {
+            env::set_var("NVIDIA_API_KEY", "legacy-key");
+            let cfg = NvidiaConfig::default(); // api_key_envs empty
+            let keys = load_nvidia_api_keys(&cfg);
+            assert_eq!(keys, vec!["legacy-key"]);
+        });
+    }
+
+    #[test]
+    fn load_nvidia_keys_no_keys_returns_empty() {
+        with_env(&["NVIDIA_API_KEY"], || {
+            env::remove_var("NVIDIA_API_KEY");
+            let cfg = NvidiaConfig::default();
+            let keys = load_nvidia_api_keys(&cfg);
+            assert!(keys.is_empty());
+        });
+    }
+
+    #[test]
+    fn load_nvidia_keys_prefers_multi_over_legacy() {
+        // When api_key_envs is set, only multi-key path is used. Legacy api_key_env is ignored.
+        with_env(
+            &["NVIDIA_API_KEY_1", "NVIDIA_API_KEY_2", "NVIDIA_API_KEY"],
+            || {
+                env::set_var("NVIDIA_API_KEY_1", "k1");
+                env::set_var("NVIDIA_API_KEY_2", "k2");
+                env::set_var("NVIDIA_API_KEY", "legacy-should-be-ignored");
+                let cfg = NvidiaConfig {
+                    api_key_envs: vec![
+                        "NVIDIA_API_KEY_1".to_string(),
+                        "NVIDIA_API_KEY_2".to_string(),
+                    ],
+                    ..Default::default()
+                };
+                let keys = load_nvidia_api_keys(&cfg);
+                assert_eq!(keys, vec!["k1", "k2"]); // legacy not included
+            },
+        );
     }
 }

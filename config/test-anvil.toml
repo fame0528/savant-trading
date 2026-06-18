@@ -155,6 +155,19 @@ provider = "nvidia"
 endpoint = "https://integrate.api.nvidia.com/v1"
 model = "minimaxai/minimax-m3"
 api_key_env = "NVIDIA_API_KEY"
+# FID-204: per-juror NVIDIA API key rotation (10 keys → ~50 RPM aggregate).
+api_key_envs = [
+    "NVIDIA_API_KEY_1",
+    "NVIDIA_API_KEY_2",
+    "NVIDIA_API_KEY_3",
+    "NVIDIA_API_KEY_4",
+    "NVIDIA_API_KEY_5",
+    "NVIDIA_API_KEY_6",
+    "NVIDIA_API_KEY_7",
+    "NVIDIA_API_KEY_8",
+    "NVIDIA_API_KEY_9",
+    "NVIDIA_API_KEY_10",
+]
 autonomy_level = 3
 max_decisions_per_hour = 20
 context_window_candles = 500

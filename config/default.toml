@@ -278,6 +278,21 @@ endpoint = "https://openrouter.ai/api/v1/keys"
 endpoint = "https://integrate.api.nvidia.com/v1"
 model = "deepseek-ai/deepseek-v4-flash"
 api_key_env = "NVIDIA_API_KEY"
+# FID-204: per-juror NVIDIA API key rotation for rate-limit isolation.
+# Each juror uses keys[(juror_idx - 1) % len]. Empty list = legacy single-key mode.
+# Empirical: NVIDIA free tier caps ~5 RPM per model per key. 10 keys = ~50 RPM aggregate.
+api_key_envs = [
+    "NVIDIA_API_KEY_1",
+    "NVIDIA_API_KEY_2",
+    "NVIDIA_API_KEY_3",
+    "NVIDIA_API_KEY_4",
+    "NVIDIA_API_KEY_5",
+    "NVIDIA_API_KEY_6",
+    "NVIDIA_API_KEY_7",
+    "NVIDIA_API_KEY_8",
+    "NVIDIA_API_KEY_9",
+    "NVIDIA_API_KEY_10",
+]
 
 # TokenRouter configuration (only used when provider = "tokenrouter")
 # OpenAI-compatible gateway: https://api.tokenrouter.com/v1

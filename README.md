@@ -1,4 +1,4 @@
-# SAVANT TRADING v0.14.8
+# SAVANT TRADING v0.14.9
 
 <!-- markdownlint-disable MD033 -->
 <div align="center">
@@ -411,7 +411,7 @@ The risk layer is **independent of the AI brain** — the agent cannot override 
 
 ```bash
 cargo build
-cargo test # 354 tests
+cargo test # 393 tests
 cargo clippy -- -D warnings
 ```
 

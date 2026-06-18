@@ -4,7 +4,7 @@
 //! from the JuryKeyManager. Collects results, checks quorum, and returns
 //! a JuryResult for the Judge to synthesize.
 
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
@@ -45,6 +45,14 @@ pub struct JuryPool {
     provider_config_nvidia: Option<LlmConfig>,
     /// API key for the M3 control juror — from `TOKEN_ROUTER_API_KEY`.
     m3_api_key: String,
+    /// FID-204: NVIDIA API keys for per-juror rate-limit isolation.
+    /// Each juror N (N >= 1) uses keys[(N-1) % keys.len()]. Empty Vec = legacy
+    /// single-key behavior (use the api_key in provider_config_nvidia).
+    nvidia_api_keys: Vec<String>,
+    /// FID-205: Per-model cooldown tracking. When a model returns 429, it's
+    /// marked cooldown until `Instant::now() + cooldown_duration + jitter`.
+    /// Other jurors skip models in cooldown to prevent herd retries.
+    model_cooldowns: Mutex<HashMap<String, Instant>>,
     /// Key manager for OpenRouter free jurors (acquires management keys).
     key_manager: JuryKeyManager,
     /// Jury configuration.
@@ -129,16 +137,98 @@ pub struct JuryCycleRecord {
 
 const RECENT_CYCLES_CAP: usize = 50;
 
+/// FID-205: Cooldown duration after a model returns 429. NVIDIA NIM empirically
+/// recovers within ~60s (we observed Retry-After absent, but 60s works in practice).
+const MODEL_COOLDOWN_DURATION_SECS: u64 = 60;
+
+/// FID-205: Random jitter added to cooldown expiration to prevent synchronized
+/// thundering-herd retries when cooldown boundaries align.
+const MODEL_COOLDOWN_JITTER_SECS: u64 = 10;
+
+/// FID-204: Pick the NVIDIA API key for a given juror index.
+/// Round-robin: juror N (N >= 1) uses keys[(N-1) % keys.len()].
+/// Returns None if no keys available (legacy single-key mode).
+fn pick_nvidia_key(juror_idx: usize, keys: &[String]) -> Option<String> {
+    if keys.is_empty() {
+        return None;
+    }
+    let i = juror_idx.saturating_sub(1) % keys.len();
+    Some(keys[i].clone())
+}
+
+/// FID-205: Check if a model is currently in cooldown. If expired, remove from
+/// cooldown map and return false (model is available). If active, return true.
+fn is_model_in_cooldown(cooldowns: &mut HashMap<String, Instant>, model: &str) -> bool {
+    if let Some(until) = cooldowns.get(model).copied() {
+        if Instant::now() < until {
+            return true;
+        }
+        // Cooldown expired — clean up.
+        cooldowns.remove(model);
+    }
+    false
+}
+
+/// FID-205: Detect 429 / "rate limited" in error message.
+fn is_rate_limit_error(err: &crate::agent::provider::LlmError) -> bool {
+    let msg = format!("{}", err);
+    msg.contains("429") || msg.to_lowercase().contains("rate limit")
+}
+
+/// FID-205: Count of models currently in cooldown (for telemetry / dashboard).
+impl JuryPool {
+    pub fn models_in_cooldown_count(&self) -> usize {
+        let mut cooldowns = self
+            .model_cooldowns
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
+        // Prune expired while counting.
+        cooldowns.retain(|_, until| Instant::now() < *until);
+        cooldowns.len()
+    }
+
+    /// FID-205: List models currently in cooldown (for telemetry / dashboard).
+    pub fn models_in_cooldown(&self) -> Vec<String> {
+        let mut cooldowns = self
+            .model_cooldowns
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
+        cooldowns.retain(|_, until| Instant::now() < *until);
+        cooldowns.keys().cloned().collect()
+    }
+}
+
+/// FID-205: Mark a model as in cooldown for `MODEL_COOLDOWN_DURATION_SECS + random jitter`.
+fn mark_model_cooldown(cooldowns: &mut HashMap<String, Instant>, model: String) {
+    use std::time::{Duration, SystemTime, UNIX_EPOCH};
+    // Deterministic-ish jitter from system time nanos — good enough for staggering.
+    let jitter_nanos = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.subsec_nanos() as u64)
+        .unwrap_or(0);
+    let jitter_secs = jitter_nanos % (MODEL_COOLDOWN_JITTER_SECS * 2 + 1); // 0..=2*jitter
+    let cooldown_until = Instant::now()
+        + Duration::from_secs(
+            MODEL_COOLDOWN_DURATION_SECS + jitter_secs.saturating_sub(MODEL_COOLDOWN_JITTER_SECS),
+        );
+    cooldowns.insert(model, cooldown_until);
+}
+
 impl JuryPool {
     /// Create a new jury pool. Does NOT create keys — call `initialize()` first.
     ///
     /// `provider_config_nvidia`: When Some, jurors 1..N use NVIDIA NIM.
     /// When None, jurors fall back to OpenRouter (legacy behavior).
+    ///
+    /// `nvidia_api_keys` (FID-204): Per-juror NVIDIA API keys for rate-limit
+    /// isolation. Empty Vec = legacy single-key mode (use api_key from
+    /// provider_config_nvidia for all jurors).
     pub fn new(
         provider_config_m3: LlmConfig,
         provider_config_openrouter: LlmConfig,
         provider_config_nvidia: Option<LlmConfig>,
         m3_api_key: String,
+        nvidia_api_keys: Vec<String>,
         key_manager: JuryKeyManager,
         config: JuryConfig,
     ) -> Self {
@@ -152,6 +242,8 @@ impl JuryPool {
             provider_config_openrouter,
             provider_config_nvidia,
             m3_api_key,
+            nvidia_api_keys,
+            model_cooldowns: Mutex::new(HashMap::new()),
             key_manager,
             config,
             jury_system_prompt,
@@ -319,28 +411,54 @@ impl JuryPool {
                 )
             } else {
                 // FID-200: NVIDIA NIM path. When `provider_config_nvidia` is Some,
-                // use it directly with NVIDIA_API_KEY. No key rotation needed.
+                // use it directly with NVIDIA API keys. FID-204: per-juror key
+                // rotation for rate-limit isolation. FID-205: skip models in cooldown.
                 if let Some(ref nv_cfg) = self.provider_config_nvidia {
-                    // nv_cfg is already an LlmConfig with api_key populated.
-                    // The env var was read once in the engine construction.
-                    let nv_api_key = nv_cfg.api_key.clone();
+                    let nv_model = if !free_models.is_empty() {
+                        free_models[(juror_idx - 1) % free_models.len()].clone()
+                    } else {
+                        nv_cfg.model.clone()
+                    };
+
+                    // FID-205: skip this juror if model is in cooldown.
+                    let model_in_cooldown = {
+                        let mut cooldowns = self
+                            .model_cooldowns
+                            .lock()
+                            .unwrap_or_else(|e| e.into_inner());
+                        is_model_in_cooldown(&mut cooldowns, &nv_model)
+                    };
+                    if model_in_cooldown {
+                        info!(
+                            "FID-205: skipping juror {} (model {} in cooldown)",
+                            juror_idx, nv_model
+                        );
+                        continue;
+                    }
+
+                    // FID-204: pick per-juror key (multi-key) or fall back to legacy single key.
+                    let nv_api_key = pick_nvidia_key(juror_idx, &self.nvidia_api_keys)
+                        .unwrap_or_else(|| nv_cfg.api_key.clone());
+
                     if !nv_api_key.is_empty() {
                         self.nvidia_calls.fetch_add(1, Ordering::Relaxed);
                         let provider = LlmProvider::new(nv_cfg.clone());
-                        let model = if !free_models.is_empty() {
-                            free_models[(juror_idx - 1) % free_models.len()].clone()
-                        } else {
-                            nv_cfg.model.clone()
-                        };
                         let label = format!(
-                            "savant-nvidia-{}-{}",
+                            "savant-nvidia-{}-{}-key{}",
                             juror_idx,
-                            chrono::Utc::now().timestamp()
+                            chrono::Utc::now().timestamp(),
+                            juror_idx.saturating_sub(1) % self.nvidia_api_keys.len().max(1),
                         );
-                        info!("Jury: NVIDIA NIM juror {} using model={}", juror_idx, model);
+                        info!(
+                            "Jury: NVIDIA NIM juror {} using model={} key_idx={}",
+                            juror_idx,
+                            nv_model,
+                            juror_idx.saturating_sub(1) % self.nvidia_api_keys.len().max(1),
+                        );
                         let system = self.jury_system_prompt.clone();
                         let user = user_message.to_string();
                         let timeout_secs = self.config.timeout_secs;
+                        let model_for_cooldown = nv_model.clone();
                         join_set.spawn(async move {
                             let result = tokio::time::timeout(
                                 Duration::from_secs(timeout_secs),
@@ -350,19 +468,19 @@ impl JuryPool {
                                         role: "user".to_string(),
                                         content: user,
                                     }],
-                                    &model,
+                                    &model_for_cooldown,
                                     &nv_api_key,
                                     timeout_secs,
                                     true,
                                 ),
                             )
                             .await;
-                            (label, String::new(), result)
+                            (label, String::new(), model_for_cooldown, result)
                         });
                         continue;
                     }
                     warn!(
-                        "Jury: NVIDIA_API_KEY not set, falling back to OpenRouter for juror {}",
+                        "Jury: no NVIDIA API key available for juror {}, falling back to OpenRouter",
                         juror_idx
                     );
                 }
@@ -399,6 +517,8 @@ impl JuryPool {
             let system = self.jury_system_prompt.clone();
             let user = user_message.to_string();
             let timeout_secs = self.config.timeout_secs;
+            // For OpenRouter path, no per-model cooldown (NVIDIA-only feature).
+            let model_for_cooldown = String::new();
 
             join_set.spawn(async move {
                 let result = tokio::time::timeout(
@@ -417,7 +537,7 @@ impl JuryPool {
                 )
                 .await;
 
-                (key_label, key_hash, result)
+                (key_label, key_hash, model_for_cooldown, result)
             });
         }
 
@@ -428,7 +548,7 @@ impl JuryPool {
 
         while let Some(result) = join_set.join_next().await {
             match result {
-                Ok((label, hash, Ok(Ok(response)))) => {
+                Ok((label, hash, _model, Ok(Ok(response)))) => {
                     match verdict_parser::parse_verdict(&response) {
                         Ok(v) => {
                             info!(
@@ -457,15 +577,27 @@ impl JuryPool {
                         }
                     }
                 }
-                Ok((label, hash, Ok(Err(e)))) => {
+                Ok((label, hash, model, Ok(Err(e)))) => {
                     // FID-181: same demotion for LLM errors.
                     debug!("Jury member '{}': LLM error: {}", label, e);
                     failed += 1;
                     if !hash.is_empty() {
                         let _ = self.key_manager.record_failure(&hash).await;
                     }
+                    // FID-205: if NVIDIA model returned 429, mark it cooldown.
+                    if !model.is_empty() && is_rate_limit_error(&e) {
+                        let mut cooldowns = self
+                            .model_cooldowns
+                            .lock()
+                            .unwrap_or_else(|e| e.into_inner());
+                        mark_model_cooldown(&mut cooldowns, model.clone());
+                        warn!(
+                            "FID-205: marking model {} cooldown after 429 ({})",
+                            model, e
+                        );
+                    }
                 }
-                Ok((label, hash, Err(_))) => {
+                Ok((label, hash, _model, Err(_))) => {
                     info!("Jury member '{}': timed out", label);
                     failed += 1;
                     if !hash.is_empty() {
@@ -640,5 +772,87 @@ mod tests {
         assert_eq!(config.models.len(), 10);
         // M3 is juror 9 (last), used as tiebreaker.
         assert!(config.models.last().unwrap().contains("minimax-m3"));
+    }
+
+    // FID-204: per-juror NVIDIA API key rotation tests.
+
+    #[test]
+    fn pick_nvidia_key_round_robin() {
+        let keys = vec!["k1".to_string(), "k2".to_string(), "k3".to_string()];
+        // juror_idx 1 -> keys[0], juror 2 -> keys[1], juror 3 -> keys[2],
+        // juror 4 -> keys[0] (wrap), juror 0 -> keys[2] (saturating_sub returns 0)
+        assert_eq!(pick_nvidia_key(1, &keys), Some("k1".to_string()));
+        assert_eq!(pick_nvidia_key(2, &keys), Some("k2".to_string()));
+        assert_eq!(pick_nvidia_key(3, &keys), Some("k3".to_string()));
+        assert_eq!(pick_nvidia_key(4, &keys), Some("k1".to_string()));
+        assert_eq!(pick_nvidia_key(11, &keys), Some("k2".to_string())); // (10 % 3)
+    }
+
+    #[test]
+    fn pick_nvidia_key_empty_returns_none() {
+        let keys: Vec<String> = vec![];
+        // Legacy mode: no per-juror keys, fall back to provider_config_nvidia.api_key
+        assert_eq!(pick_nvidia_key(1, &keys), None);
+    }
+
+    #[test]
+    fn pick_nvidia_key_single_key_all_jurors_share() {
+        let keys = vec!["only-key".to_string()];
+        // With 1 key, all jurors use it (round-robin is degenerate)
+        assert_eq!(pick_nvidia_key(1, &keys), Some("only-key".to_string()));
+        assert_eq!(pick_nvidia_key(5, &keys), Some("only-key".to_string()));
+        assert_eq!(pick_nvidia_key(10, &keys), Some("only-key".to_string()));
+    }
+
+    // FID-205: per-model cooldown tests.
+
+    #[test]
+    fn cooldown_insert_and_check() {
+        let mut cooldowns: HashMap<String, Instant> = HashMap::new();
+        let model = "deepseek-v4-flash".to_string();
+
+        // Initially not in cooldown
+        assert!(!is_model_in_cooldown(&mut cooldowns, &model));
+
+        // Mark cooldown, then check
+        mark_model_cooldown(&mut cooldowns, model.clone());
+        assert!(is_model_in_cooldown(&mut cooldowns, &model));
+        assert_eq!(cooldowns.len(), 1);
+    }
+
+    #[test]
+    fn cooldown_expired_auto_clears() {
+        let mut cooldowns: HashMap<String, Instant> = HashMap::new();
+        let model = "llama-3.3-70b".to_string();
+
+        // Insert expired cooldown directly
+        cooldowns.insert(model.clone(), Instant::now() - Duration::from_secs(120));
+        assert_eq!(cooldowns.len(), 1);
+
+        // Check should auto-clear on read
+        assert!(!is_model_in_cooldown(&mut cooldowns, &model));
+        assert_eq!(cooldowns.len(), 0);
+    }
+
+    #[test]
+    fn cooldown_multiple_models_independent() {
+        let mut cooldowns: HashMap<String, Instant> = HashMap::new();
+        mark_model_cooldown(&mut cooldowns, "model-a".to_string());
+        mark_model_cooldown(&mut cooldowns, "model-b".to_string());
+        assert_eq!(cooldowns.len(), 2);
+        assert!(is_model_in_cooldown(&mut cooldowns, "model-a"));
+        assert!(is_model_in_cooldown(&mut cooldowns, "model-b"));
+        assert!(!is_model_in_cooldown(&mut cooldowns, "model-c"));
+    }
+
+    #[test]
+    fn is_rate_limit_error_detects_429() {
+        use crate::agent::provider::LlmError;
+        let err_429 = LlmError::Http("HTTP 429 (transient)".to_string());
+        assert!(is_rate_limit_error(&err_429));
+        let err_rate = LlmError::Http("HTTP 503: rate limited".to_string());
+        assert!(is_rate_limit_error(&err_rate));
+        let err_other = LlmError::Http("connection refused".to_string());
+        assert!(!is_rate_limit_error(&err_other));
     }
 }
