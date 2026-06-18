@@ -136,3 +136,4 @@ training_*.log
 
 # === Third-party research clones (large, regenerated on demand) ===
 research/repos/
+test_decisions.json
