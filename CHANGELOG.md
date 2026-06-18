@@ -2,6 +2,50 @@
 
 All notable changes to Savant Trading are documented here.
 
+## [0.14.7] — 2026-06-17
+
+### State Sync (LLM/Jury/Executor on a Single Source of Truth)
+
+After 16h of paper-mode testing producing 0 trades despite 703 PASS decisions, the state-sync issue was identified: the LLM hallucinated positions from its own prior decisions, the jury inherited the hallucinated context, and the executor's outcomes were never communicated to the decision layer. Three coordinated fixes shipped:
+
+### Fixed — Pre-flight Guard (FID-194)
+- New `src/agent/pre_flight.rs` with `apply_pre_flight_guard()` function.
+- AdjustStop/Close actions get downgraded to `Pass` if the executor has no matching position. Prevents phantom management decisions.
+- Single call site at `engine/mod.rs:2844` (the only `parse_decision` call).
+
+### Added — Executor Feedback (FID-195)
+- New `TradeStatus` enum (Pending/Filled/Rejected/Expired) on `DecisionEntry`.
+- New `update_status()` method marks Pending entries as Filled/Rejected with reason.
+- New `format_execution_outcomes()` in `context_builder.rs` shows Filled/Rejected entries with explicit `NO POSITION OPENED` marker.
+- Filter in `context_for_pair` excludes Rejected from "Recent Decision Log".
+- Jury receives executor's open positions prepended to user message for independent verification.
+- All 5 executor call sites (open/close/adjust/place_stop/gasless) call `update_status` on Ok/Err.
+
+### Added — Per-Cycle Reconciliation (FID-196)
+- New `apply_to_portfolio()` in `reconciliation.rs` mutates state to match on-chain.
+- Clears phantom positions (in memory but not on chain).
+- Adds orphan positions (on chain but not in memory).
+- Reconciles USDC balance divergence.
+- Safety halt at >50% divergence (configurable via `safety_halt_threshold_pct`).
+- Telemetry to `data/reconciliation_telemetry.jsonl` per cycle.
+- Extends `reconcile_wallet_state` per ECHO Law 13 (one function, one truth).
+
+### Added — Probe Position Mechanism (FID-184)
+- New `is_probe: bool` field on `TradeDecision` with `#[serde(default)]`.
+- When LLM sets `is_probe: true`: 0.5x sizing + auto-TP at 0.6% from entry.
+- Max 3 concurrent probes (tracked via `strategy_name = "probe"`).
+- Probe open events logged to `data/probe_pnl.jsonl`.
+- Note: Gemini follow-up research (`LLM Crypto Trading Engine Diagnostics.md`) recommends smaller sizing (0.15x) and wider TP (1.2%) for DEX. The 0.5x/0.6% here are placeholders pending Gemini-driven refinement in v0.14.8.
+
+### Changed — Prompt Calibration (FID-198)
+- Reconciled 4 conflicting threshold sets in `strategy_knowledge.md` and `output_format.md`.
+- Added `is_probe` field to JSON schema with concrete examples.
+- Note: Gemini research recommends removing all numerical thresholds from prompts entirely (LLM evaluates narrative, engine gates numerically). This is planned for v0.14.8.
+
+### Infrastructure
+- Pre-push validation hook (FID-191): `.git/hooks/pre-push` runs `scripts/pre-push-validation.ps1` (fmt + clippy + tests).
+- 380 tests pass (was 354 before session).
+
 ## [0.14.6] — 2026-06-17
 
 ### Strategy Recalibration (Gemini Deep Research Integration)
