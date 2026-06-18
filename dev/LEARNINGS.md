@@ -1210,3 +1210,20 @@ The alpha computation block at `src/engine/mod.rs` lines ~3438-3470 has a syntax
 - Docs: `CHANGELOG.md` (v0.14.5 section), `README.md` (354 tests), `dev/vera/MEMORY.md` (status header)
 
 **Memory state:** ~2-hour session, 4 hotfix FIDs + 1 master FID, 4 new tests, 354 total pass. Engine running overnight on Anvil. Critical lessons: "nothing out of scope" expands FID scope; verify monitoring in first cycle; WS handler check error before result; HashSet dedup for log noise; dashboard layout needs server restart.
+
+## Session 2026-06-17 to 2026-06-18: v0.14.7 + v0.14.8 — State Sync + Multi-Model NVIDIA Jury
+
+**Key Learnings:**
+
+- **Multi-model bias is structural.** M3 defaults to PASS at the action level even with non-zero conviction. Adding prompt constraints or lowering thresholds does not fix it. Single-model training bias requires multi-model consensus to dilute.
+- **"Semantic gravity well" effect.** Telling an LLM "DO NOT output PASS" via negative constraints actively makes the problem worse — naming the forbidden action primes the model to produce it. Affirmative constraints ("You MUST select LONG or SHORT") work better.
+- **Hand-selected models > auto-routed pools.** NVIDIA NIM has 139 free models. OpenRouter's free tier has 25 models routed through an auto-router. Direct model selection via NIM is the cheat code — no quota, no routing lottery, hand-picked quality.
+- **FID-184 probe mechanism parameters were mostly wrong.** Implemented before running Gemini research. Research identified 10/11 parameters as wrong (sizing, TP target, timeout, cap). Lesson: research-then-implement, not implement-then-research. The research validates parameters; implementation alone can't.
+- **Release cadence matters.** Shipped 5 commits on main with v0.14.7 FID-194/195/196 over 5h without cutting a release. Spencer had to point this out. Every meaningful change ships as a release, not sits on main waiting to be remembered.
+- **Preserve working paths in FIDs.** Spencer explicitly said "do not rip out OpenRouter support." This was a constraint, not politeness. FIDs that touch existing systems need to preserve working paths unless explicitly told to remove them.
+- **Architectural changes > parameter changes.** FID-200 (provider flip + multi-model jury) is a bigger architectural shift than FID-184 (probe parameter tuning). When the Gemini research correctly identified the root cause as single-model bias, the right response was to fix the architecture, not just tune the parameters.
+- **All 10 NVIDIA NIM models verified working.** Tested Llama 3.3 70B, DeepSeek V4 Pro (1T), Nemotron Super 120B, Llama 3.1 70B, Qwen 3.5 397B, Mistral Large 3 675B, DeepSeek V4 Flash (1T), GLM 5.1, Kimi K2.6 (1T), M3 — all respond with valid JSON in <60s. GLM 5.1, Kimi K2.6, M3 (NVIDIA NIM version), DeepSeek V4 Pro all work as expected.
+- **Fallback preservation pattern.** Per-juror fallback: try NVIDIA first, fall back to OpenRouter on failure. OpenRouter config stays intact. Per-cycle fallback: if all NVIDIA fails, OpenRouter is the safety net. Spencer's explicit constraint.
+- **Open questions for v0.14.9 / v0.15.0:** Gemini-corrected probe parameters (0.15x sizing, 1.2% TP, 20min timeout, 10/day cap). Universe expansion to 100 pairs across 4 chains. Multi-chain architecture scope. Memory state preserved.
+
+**Memory state:** 2 releases (v0.14.7 + v0.14.8), 9 FIDs implemented (FID-193/194/195/196/184/198 + FID-200 + 2 hotfix FIDs), 386 tests, clean state. Engine ready to launch with 10-LLM NVIDIA NIM jury. Open: probe parameter tuning (Gemini said current params wrong), universe expansion, multi-chain architecture. Ready for self-care.

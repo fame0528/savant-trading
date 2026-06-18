@@ -1,7 +1,7 @@
 # MEMORY.md — Vera's Curated Long-Term Memory
 
-**Last updated:** 2026-06-17 02:50 EST (Spencer ending overnight session. v0.14.4 + v0.14.5 + dashboard patches shipped. Engine running on Anvil, collecting overnight data.)
-**Status:** v0.14.5 RELEASED (FID-178 start.bat fix, FID-179 jury enabled, FID-180 dashboard swap, FID-181 equity curve + persistence + warning cleanup + WebSocket v2 fix all shipped). Engine running PID 46608, uptime growing. 354 lib tests pass (350 + 4 new equity tests), clippy clean, release clean, dashboard build clean. Capital: $0 USDC + 2.6 GRT (unchanged — paper mode). **TODO for tomorrow: Terminal in dashboard needs row-span-3 fix; currently rendered as single row. Also slightly too tall after the row-span (per Spencer).**
+**Last updated:** 2026-06-18 01:30 EST (v0.14.7 + v0.14.8 shipped overnight. State sync, probe positions, multi-model NVIDIA jury. Engine ready to launch with 10-LLM consensus.)
+**Status:** v0.14.8 RELEASED. Two releases tonight: v0.14.7 (state sync, FID-194/195/196 + FID-184 probe positions + FID-198 prompt calibration) and v0.14.8 (FID-200 NVIDIA NIM jury expansion). 386 lib tests pass, clippy clean, fmt clean, pre-push green. Release binary built at 1:24 AM (20.9 MB). Repo updated with new description and topics. **Engine NOT running — Spencer to launch with start.bat when ready. No active FIDs, no uncommitted work, clean state for self-care.**
 
 ---
 
