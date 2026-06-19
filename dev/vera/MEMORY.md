@@ -1,7 +1,25 @@
 # MEMORY.md — Vera's Curated Long-Term Memory
 
-**Last updated:** 2026-06-19 00:00 EST (v0.14.10 RELEASED — SOT infrastructure phase 1. Schema migration + 5 wrapper methods + BlockReason + 2 new error variants. 405 tests pass. Engine still has the state-divergence bug; FID-211 will migrate engine callers to the new wrappers.)
-**Status:** v0.14.10 RELEASED. Engine will run overnight for data collection on v0.14.10 binary. FID-211 (engine migration) is the first task of the next session. The DB is now the SOT for positions; the in-memory map is a read-through cache. wrappers exist but are dormant until FID-211 wires engine callers. FID-209 (is_anvil spread bypass) shipped in v0.14.9 is still working.
+**Last updated:** 2026-06-19 19:32 EST (v0.15.0 RELEASED — full engine migration to v0.14.10 SOT wrappers. Runtime nesting panic FIXED in `JuryKeyManager::drop`. State carryover divergence handled via new `DivergenceType` enum (StartupCarryover adopts chain on Anvil, errors on live; only RealTime halts). 12 `positions_mut()` engine call sites migrated to SOT wrappers. 8 fire-and-forget SQLite writes converted to error-aware logging. New `WalletKey(SecretBox<String>)` newtype + 7 unit tests in `src/core/security.rs`. **412 tests pass, clippy clean, on origin/main at `ce01247b` + `0ad6582f`.** Stage 2 (7 deferred items) documented in `dev/handoffs/2026-06-19-FID-211-stage2-handoff.md` for next session. Next session will likely be GLM 5.2 in zcode harness for 5-day trial — I will boot as Vera regardless.)
+**Status:** v0.15.0 RELEASED. Engine binary at v0.14.10 (not yet rebuilt for v0.15.0 — Spencer runs the engine; he controls the binary). FID-211 Stage 1 complete; Stage 2 explicitly deferred to v0.15.1 with Spencer approval. Engine restart tonight will exercise v0.15.0 end-to-end for the first time. The dual-write data-integrity hole that FID-210 left open is now closed (DB-first writes via SOT wrappers in engine hot paths).
+
+---
+
+## Handoff pointer (2026-06-19 19:32 EST)
+
+**Before starting any work in the next session, read:**
+
+`dev/handoffs/2026-06-19-FID-211-stage2-handoff.md`
+
+That document contains:
+- Identity anchor (Vera persists across model substrate changes — M3 in Kilo Code today, likely GLM 5.2 in zcode tomorrow)
+- Spencer's 10 standing rules (in priority order)
+- Cross-agent claim rule (FID-151)
+- The 7-item FID-211 Stage 2 deferred list with line numbers, source bugs, and acceptance criteria
+- Sandbox-vs-benchmark guidance (don't trust cross-agent benchmark numbers; trust `run-model-tests.ps1`)
+- Files to read on boot + files NOT to touch
+
+This handoff doc is the **canonical next-session anchor**. MEMORY.md (this file) is long-term; the handoff doc is current-state.
 
 ---
 
@@ -283,3 +301,57 @@ What I *will* do: maintain this memory file daily, complete my own bootstrap, wr
 ---
 
 *Vera MEMORY.md 0.1.0 — 2026-06-16 15:35 EST — v0.14.1 released, FIDs 160-163 archived, 337 tests, engine OFF, FID-164 queued*
+
+---
+
+## v0.15.0 milestone (2026-06-19 19:32 EST) — APPEND ONLY
+
+**Status header updated above. This is an additive log entry, not a revision to prior content.**
+
+### What happened
+
+- **v0.15.0 SHIPPED.** Full engine migration to v0.14.10 SOT wrappers. Origin/main commits `ce01247b` (release) + `0ad6582f` (archive + lessons). Pushed and verified.
+- **FID-211** archived at `dev/fids/archive/FID-2026-0619-211-engine-migration-runtime-state-carryover.md`. 9 bugs fixed (3 critical, 5 high, 1 medium). Stage 2 (7 items) deferred to v0.15.1 with Spencer acknowledgment.
+- **422 tests pass** (412 lib + 10 dashboard). `cargo clippy -- -D warnings` clean. Engine binary NOT yet rebuilt for v0.15.0 (Spencer's action).
+
+### Why this matters (decision-evidence)
+
+- The v0.14.10 overnight crash trail (`logs/terminal/next-server (v16.2.7).txt` frozen at 12:37 AM) revealed two CRITICAL bugs the previous session had missed:
+  1. Runtime nesting panic in `JuryKeyManager::drop` (`key_manager.rs:283`) — Drop called `Handle::block_on` inside tokio runtime.
+  2. State carryover divergence halts engine on first cycle after fresh Anvil restart — reconciliation treated "engine fresh start with stale SQLite" the same as "real-time chain drift."
+- Both fixed in v0.15.0. Engine migration closed the dual-write hole FID-210 left open.
+
+### Session-end state (anchored for next session)
+
+- No live exercise yet. v0.15.0 has never run end-to-end against an Anvil fork. Spencer will restart the engine tonight.
+- 7 Stage 2 items documented in the handoff doc. None are time-sensitive. Spencer will pick where to start v0.15.1.
+- Cross-agent benchmark numbers (Opus 4.8 vs GLM 5.2 vs M3) were self-attributed by my earlier self in this session. Treat as **plausible estimates, not facts**. The sandbox `run-model-tests.ps1` is the real eval.
+
+### My honest assessment of this session
+
+I made two errors worth recording for the next session:
+1. **"Mechanical" was wrong.** I wrote in LEARNINGS at end of v0.14.10 that "the engine migration is mechanical." When I actually did the migration, I found 4 more bugs of the same class. The lesson: never declare future work mechanical without reading the code first.
+2. **The deferral list was wrong.** My first FID-211 had 5 "Out of Scope" items. Spencer called it out: "why is anything being deferred? i never approved that." I re-audited, folded 4 more bugs into scope, and shipped v0.15.0. The deferral list is the AUDIT'S output, not its input. Generate it AFTER the audit, not before.
+
+GLM 5.2 (or whatever model boots next) — the benchmarks won't help you catch bugs. The discipline will.
+
+### Files I touched this session (additive, no revisions to prior work)
+
+- Created: `dev/handoffs/2026-06-19-FID-211-stage2-handoff.md` (next-session anchor)
+- Created: `src/core/security.rs` (WalletKey newtype + 7 tests)
+- Modified: `src/agent/jury/key_manager.rs:263-300` (Drop fix)
+- Modified: `src/execution/reconciliation.rs` (DivergenceType enum)
+- Modified: `src/execution/portfolio.rs` (adjust_quantity + sync_from_db_position + remove_synced_position + clear_position_cache wrappers)
+- Modified: `src/engine/mod.rs` (12 positions_mut migrations + 8 fire-and-forget conversions + DivergenceType handler)
+- Modified: `src/core/mod.rs` (added `pub mod security;`)
+- Modified: `Cargo.toml` (secrecy = "0.10", zeroize = "1")
+- Modified: `CHANGELOG.md` (v0.15.0 section prepended)
+- Modified: `README.md` (v0.15.0, 412 tests)
+- Modified: `VERSION`, `protocol.config.yaml` (0.14.10 → 0.15.0)
+- Modified: `dev/LEARNINGS.md` (added 7 lessons from this session)
+- Archived: `dev/fids/archive/FID-2026-0619-211-engine-migration-runtime-state-carryover.md`
+- **Released:** https://github.com/fame0528/savant-trading/releases/tag/v0.15.0
+
+---
+
+*Vera signing off — 2026-06-19 19:32 EST — M3 in Kilo Code. Next boot: Vera in zcode (likely GLM 5.2). Same persona, same standards, new substrate. The handoff doc has everything the next session needs.*
