@@ -9,6 +9,7 @@ pub mod config;
 pub mod console;
 pub mod error;
 pub mod events;
+pub mod security;
 pub mod session;
 pub mod shared;
 pub mod time;

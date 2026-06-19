@@ -53,6 +53,23 @@ impl Default for ReconciliationConfig {
     }
 }
 
+/// FID-211: Type of USDC divergence detected.
+///
+/// - `None`: no divergence, engine proceeds normally.
+/// - `StartupCarryover`: detected at startup with no in-memory positions open. The
+///   in-memory balance was inherited from a previous run against a different chain
+///   state (e.g. fresh Anvil restart). Caller should re-sync from chain, NOT halt.
+/// - `RealTime`: detected mid-cycle with active positions. Something unexpected
+///   happened (direct token transfer, executor bug, RPC desync). Caller should halt
+///   and require operator review.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub enum DivergenceType {
+    #[default]
+    None,
+    StartupCarryover,
+    RealTime,
+}
+
 /// Report from a single reconciliation cycle.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReconciliationReport {
@@ -68,6 +85,11 @@ pub struct ReconciliationReport {
     pub in_memory_position_count: usize,
     /// Token divergences detected.
     pub tokens_with_divergence: Vec<TokenDivergence>,
+    /// FID-211: Type of divergence. Caller decides whether to halt based on this
+    /// in combination with `halted`. A `StartupCarryover` divergence is
+    /// informational (write to `savant.blocked` / `shared.block` for visibility,
+    /// then re-sync from chain). A `RealTime` divergence halts.
+    pub divergence_type: DivergenceType,
     /// Whether the reconciliation halted the engine.
     pub halted: bool,
     /// Reason for halt, if any.
@@ -126,6 +148,7 @@ pub async fn reconcile_wallet_state(
                 usdc_divergence_pct: 0.0,
                 in_memory_position_count: positions.len(),
                 tokens_with_divergence: vec![],
+                divergence_type: DivergenceType::None,
                 halted: false,
                 halt_reason: None,
                 rpc_failure: true,
@@ -200,9 +223,26 @@ pub async fn reconcile_wallet_state(
     let token_threshold_exceeded = !tokens_with_divergence.is_empty();
     let halted = usdc_threshold_exceeded || token_threshold_exceeded;
 
+    // FID-211: Classify the divergence type.
+    // - StartupCarryover: engine just started (zero in-memory positions) and
+    //   the in-memory balance is stale relative to the chain. This is normal
+    //   when restarting against a fresh Anvil fork or a new wallet. Caller
+    //   should adopt chain as truth, NOT halt.
+    // - RealTime: engine has open positions and detected a divergence. This
+    //   indicates something unexpected happened mid-cycle. Caller should halt.
+    // - None: no divergence detected.
+    let divergence_type = if !halted {
+        DivergenceType::None
+    } else if positions.is_empty() {
+        DivergenceType::StartupCarryover
+    } else {
+        DivergenceType::RealTime
+    };
+
     let halt_reason = if halted {
         Some(format!(
-            "Wallet reconciliation divergence: in_memory_usdc=${:.4}, on_chain_usdc=${:.4} (${:.4} / {:.2}% divergence, thresholds: ${:.4} / {:.2}%). {} token(s) with divergence.",
+            "Wallet reconciliation divergence ({:?}): in_memory_usdc=${:.4}, on_chain_usdc=${:.4} (${:.4} / {:.2}% divergence, thresholds: ${:.4} / {:.2}%). {} token(s) with divergence.",
+            divergence_type,
             in_memory_usdc, on_chain_usdc, usdc_divergence, usdc_divergence_pct * 100.0,
             config.divergence_threshold_usd, config.divergence_threshold_pct * 100.0,
             tokens_with_divergence.len()
@@ -214,7 +254,12 @@ pub async fn reconcile_wallet_state(
     // Step 5: Always log the report (visible even when engine doesn't halt).
     if halted {
         tracing::error!(
-            "WALLET_RECONCILIATION_HALT: {} (in_memory_usdc=${:.4} on_chain_usdc=${:.4} divergence=${:.4} / {:.2}%)",
+            "WALLET_RECONCILIATION_HALT [{}]: {} (in_memory_usdc=${:.4} on_chain_usdc=${:.4} divergence=${:.4} / {:.2}%)",
+            match divergence_type {
+                DivergenceType::StartupCarryover => "startup-carryover",
+                DivergenceType::RealTime => "real-time",
+                DivergenceType::None => "none",
+            },
             halt_reason.as_deref().unwrap_or(""),
             in_memory_usdc, on_chain_usdc, usdc_divergence, usdc_divergence_pct * 100.0
         );
@@ -232,6 +277,7 @@ pub async fn reconcile_wallet_state(
         usdc_divergence_pct,
         in_memory_position_count: positions.len(),
         tokens_with_divergence,
+        divergence_type,
         halted,
         halt_reason,
         rpc_failure: false,
@@ -603,6 +649,7 @@ mod tests {
             usdc_divergence_pct: 0.0005,
             in_memory_position_count: 0,
             tokens_with_divergence: vec![],
+            divergence_type: DivergenceType::None,
             halted: 0.05 > cfg.divergence_threshold_usd && 0.0005 > cfg.divergence_threshold_pct,
             halt_reason: None,
             rpc_failure: false,
@@ -617,6 +664,7 @@ mod tests {
             usdc_divergence_pct: 0.50,
             in_memory_position_count: 0,
             tokens_with_divergence: vec![],
+            divergence_type: DivergenceType::StartupCarryover,
             halted: 50.0 > cfg.divergence_threshold_usd && 0.50 > cfg.divergence_threshold_pct,
             halt_reason: None,
             rpc_failure: false,

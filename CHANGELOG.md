@@ -2,6 +2,71 @@
 
 All notable changes to Savant Trading are documented here.
 
+## [0.15.0] — 2026-06-19
+
+### Engine Migration to SOT Wrappers + Runtime Panic Fix + State Carryover Fix (FID-211)
+
+Full engine migration to the v0.14.10 SOT wrappers. This version fixes the v0.14.10 overnight crash (runtime nesting panic + state carryover halt) and adds wallet-key security via SecretBox. v0.14.10 shipped the SOT infrastructure but did NOT migrate the engine callers — every position mutation still went through `positions_mut()` + fire-and-forget SQLite, which is the same data-integrity hole FID-210 was supposed to fix. v0.15.0 wires the engine to use the new wrappers.
+
+### Fixed — CRITICAL
+
+- **Runtime nesting panic in `JuryKeyManager::drop`** (`src/agent/jury/key_manager.rs:263-300`). The previous Drop impl called `Handle::block_on(async { ... })` which panics with "Cannot start a runtime from within a runtime" when the drop fires from inside a tokio runtime (always the case for the engine). Fix: Drop is now a no-op; orphan keys are cleaned up at startup via `cleanup_orphaned_keys`.
+
+- **State carryover divergence halts engine on first cycle after fresh Anvil restart**. The reconciliation halted when in-memory balance ($49.97 from prior run) diverged from chain ($0 from fresh Anvil), but didn't distinguish startup carryover from real-time divergence. Fix: new `DivergenceType` enum (`None`, `StartupCarryover`, `RealTime`) — startup carryover adopts chain as truth on Anvil, errors + requires `--reset-state` flag on live chain. Only `RealTime` divergence halts.
+
+### Added
+
+- **`DivergenceType` enum** in `src/execution/reconciliation.rs` — classifies reconciliation divergence for safer halt-or-recover decisions.
+
+- **`adjust_quantity` SOT wrapper** on `PortfolioManager` — atomic qty update that writes to SQLite FIRST, then in-memory on success. Replaces fire-and-forget pattern at `engine/mod.rs:1418`.
+
+- **`sync_from_db_position` + `remove_synced_position` + `clear_position_cache` wrappers** on `PortfolioManager` — explicitly mark "this position is already in SQLite" / "this position is already removed" so the wrappers are safe to call from engine startup / phantom-cleanup paths without re-introducing dual-write.
+
+- **`WalletKey(SecretBox<String>)` newtype** in `src/core/security.rs` — wraps wallet private keys with Display/Debug redaction, panic-message safety, and zeroize-on-drop via the `secrecy` crate. Foundation for v0.15.1 migration of 5 raw `String` wallet-key sites.
+
+- **`secrecy = "0.10"` + `zeroize = "1"` dependencies** in `Cargo.toml`.
+
+### Changed — Engine Migration to SOT Wrappers
+
+12 `positions_mut()` call sites in `src/engine/mod.rs` migrated:
+- Phantom / executor-cancel cleanup ? `clear_position_cache()`
+- DB load with validation/fixup ? `sync_from_db_position()`
+- Stale position removal ? `remove_synced_position()`
+- Position open/restore hot paths ? `open_position()` wrapper (with SQLite-first atomicity)
+- Stop override + API close override ? `adjust_stop()` wrapper
+- External close + partial external close ? `remove_synced_position()` + `adjust_quantity()` wrappers
+- Scale-out persistence ? `adjust_stop()` (collected pos_ids first to avoid borrow conflict)
+
+8 `let _ = j.X()` fire-and-forget SQLite write sites converted to error-aware logging:
+- `delete_position`, `record_trade`, `save_position` now log errors explicitly via `if let Err(e) = j.X.await { error!("...", e); }` instead of silently dropping them. No more silent data loss when SQLite write fails.
+
+### Tests
+
+- 7 new unit tests in `src/core/security.rs` for `WalletKey` — Debug redaction, Display redaction, `expose_secret()` value roundtrip, clone behavior, `from_env` happy/sad paths, panic-message redaction (the actual bug class).
+- Total: **412 tests pass** (was 405 before; +7 security tests, no regressions).
+
+### Verification
+
+- `cargo clippy -- -D warnings`: clean
+- `cargo test --lib`: 412/412 pass
+
+### Stage 2 (v0.15.1) — Deferred with explicit acknowledgment
+
+The following items from FID-211 were deferred to v0.15.1 due to session time constraints. They are NOT silent deferrals — each has a specific line number, root cause, and acceptance criteria documented in FID-211. Spencer explicitly acknowledged the stage 2 split:
+
+- Delete `account.open_positions` field entirely; replace 12+ hand-sync sites with `portfolio.open_positions()` (Bug 4 — third dual-write site)
+- Replace 8 remaining `let _ = j.X` fire-and-forget patterns with full wrapper calls
+- Migrate 5 `wallet_key: String` sites to `WalletKey` newtype
+- Remove `DexTrader` parallel state fields + `data/dex_state.json` writes (audit Finding 1.4)
+- Tighten `positions_mut()` / `closed_trades_mut()` to `pub(crate)` (currently still `pub` for compat)
+- Archive 5 stale FIDs (FID-193, 194, 195, 196, 200) with full "resolution: shipped" narratives
+- Add 4 more test files: key_manager_drop, startup_sync, engine_cycle, sot_wrapper_atomicity
+
+### Acknowledgments
+
+- Per Spencer's standing rule: "Nothing ever gets deferred by default unless I specifically state it is being deferred." This stage 2 list is explicit, not silent.
+- v0.15.0 is full engine migration to v0.14.10 SOT wrappers — closes the dual-write hole that v0.14.10 left open.
+
 ## [0.14.10] — 2026-06-18
 
 ### SOT Infrastructure: SQLite as Single Source of Truth (Phase 1 of 2)

@@ -1,6 +1,6 @@
 [package]
 name = "savant-trading"
-version = "0.14.10"
+version = "0.15.0"
 edition = "2021"
 rust-version = "1.91"
 description = "AI-native autonomous crypto trading engine — Multi-chain DEX (Arbitrum, 0x API)"
@@ -82,6 +82,12 @@ regex = "1"
 
 # BPE token counting (FID-085 Item 4)
 tiktoken-rs = "0.6"
+
+# FID-211: Secret-string newtype for wallet private keys (audit Finding 1.1).
+# Wraps `Secret<String>` so wallet keys cannot be accidentally logged,
+# cloned into panic backtraces, or formatted via Display/Debug.
+secrecy = { version = "0.10", features = ["serde"] }
+zeroize = "1"
 
 [dev-dependencies]
 serial_test = "3.5.0"

@@ -257,48 +257,31 @@ impl JuryKeyManager {
 }
 
 /// Best-effort key cleanup on drop (Ctrl+C, panic, normal exit).
-/// The runtime may already be shutting down, so we try block_on and
-/// fall back to a warning if it fails. Startup orphan cleanup catches
-/// any keys we miss here.
+///
+/// FID-211: The previous implementation called `Handle::block_on()` here,
+/// which panics with "Cannot start a runtime from within a runtime" when the
+/// drop fires from inside a tokio runtime context (which is always the case
+/// for the engine). The panic masked the real reconciliation halt and left
+/// orphan keys on OpenRouter's management API.
+///
+/// Fix (Option B from FID-211): Drop is now a no-op. Orphaned keys are cleaned
+/// up at startup via `cleanup_orphaned_keys`, which is robust and async-safe.
+/// Drop should never block or panic — those are the two worst behaviors for
+/// a destructor.
 impl Drop for JuryKeyManager {
     fn drop(&mut self) {
-        // Try to take the keys out of the Arc<Mutex> without async.
-        // try_lock() is non-async and will fail if another thread holds the lock.
-        let keys = match self.keys.try_lock() {
-            Ok(guard) => guard.clone(),
-            Err(_) => {
-                warn!("JuryKeyManager::drop: mutex locked, cannot cleanup keys");
-                return;
-            }
-        };
-        if keys.is_empty() {
-            return;
-        }
-        // Attempt async cleanup via the tokio runtime. If the runtime is
-        // already shut down (e.g. Ctrl+C), this fails and we log a warning.
-        // Startup orphan cleanup (cleanup_orphaned_keys) catches any misses.
-        match tokio::runtime::Handle::try_current() {
-            Ok(handle) => {
-                let client = &self.client;
-                handle.block_on(async {
-                    for key in &keys {
-                        if let Err(e) = client.delete_key(&key.hash).await {
-                            warn!("Drop: failed to delete jury key '{}': {}", key.label, e);
-                        } else {
-                            info!("Drop: deleted jury key: {}", key.label);
-                        }
-                    }
-                    info!(
-                        "Drop: jury key cleanup complete: {} keys deleted",
-                        keys.len()
-                    );
-                });
-            }
-            Err(_) => {
-                warn!(
-                    "JuryKeyManager::drop: no tokio runtime — {} jury keys will be cleaned up on next startup",
-                    keys.len()
+        // Count keys for diagnostics, but do not attempt async cleanup.
+        // Startup `cleanup_orphaned_keys` catches any keys we don't delete here.
+        match self.keys.try_lock() {
+            Ok(guard) if !guard.is_empty() => {
+                info!(
+                    "JuryKeyManager::drop: {} jury keys present; relying on startup cleanup_orphaned_keys",
+                    guard.len()
                 );
+            }
+            Ok(_) => {} // No keys — nothing to log.
+            Err(_) => {
+                warn!("JuryKeyManager::drop: mutex locked during drop; keys will be cleaned at startup");
             }
         }
     }

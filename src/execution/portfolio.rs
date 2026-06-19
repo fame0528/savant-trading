@@ -538,7 +538,7 @@ impl PortfolioManager {
 
     /// FID-210: SOLE mutation point for closing a position. Persists TradeRecord
     /// to DB, removes position from DB, then updates cache.
-    /// 
+    ///
     /// NOTE: Named `close_position_persist` to avoid collision with the
     /// existing engine-side `close_position` close-only helper (which is
     /// being refactored in FID-211). Once the engine migrates to this method,
@@ -641,6 +641,57 @@ impl PortfolioManager {
         Ok(())
     }
 
+    /// FID-211: SOLE mutation point for adjusting position quantity in place
+    /// (e.g. when chain sync detects a qty drift between engine and on-chain).
+    /// Persists updated Position to DB FIRST, then updates cache.
+    ///
+    /// This replaces the old `portfolio.positions_mut().get_mut(&id).quantity = X`
+    /// pattern at `engine/mod.rs:1418` (FID-155 chain sync drift detection), which
+    /// mutated in-memory without writing to SQLite — a silent data integrity bug.
+    ///
+    /// # Atomicity
+    /// 1. Cache read for validation (quantity must be > 0)
+    /// 2. DB write (SOT)
+    /// 3. In-memory update (only if DB succeeds)
+    ///
+    /// On DB failure, the in-memory state is NOT modified, so the next
+    /// reconciliation cycle will re-detect the drift.
+    pub async fn adjust_quantity(
+        &mut self,
+        position_id: &str,
+        new_quantity: f64,
+        journal: &crate::monitor::journal::TradeJournal,
+    ) -> Result<(), ExecutionError> {
+        // 1. Validate
+        if new_quantity <= 0.0 {
+            return Err(ExecutionError::Other(format!(
+                "adjust_quantity: new_quantity must be > 0, got {}",
+                new_quantity
+            )));
+        }
+        let mut pos = self
+            .positions
+            .get(position_id)
+            .ok_or_else(|| ExecutionError::PositionNotFound(position_id.to_string()))?
+            .clone();
+        let old_quantity = pos.quantity;
+        // 2. Update cache value
+        pos.quantity = new_quantity;
+        // 3. Persist to DB (SOT)
+        journal.save_position(&pos).await.map_err(|e| {
+            ExecutionError::Other(format!("DB save_position (adjust_quantity): {}", e))
+        })?;
+        // 4. Update in-memory cache (after DB confirms)
+        self.positions.insert(position_id.to_string(), pos);
+        tracing::info!(
+            "FID-211: adjust_quantity: {} qty {} → {}",
+            position_id,
+            old_quantity,
+            new_quantity
+        );
+        Ok(())
+    }
+
     /// FID-210: SOLE mutation point for partial close (TP1/TP2 scale-out).
     /// Persists a TradeRecord for the closed portion, updates the position
     /// in the DB (reduced qty, new scale_level, new stop), and removes the
@@ -700,9 +751,10 @@ impl PortfolioManager {
         &mut self,
         journal: &crate::monitor::journal::TradeJournal,
     ) -> Result<usize, ExecutionError> {
-        let positions = journal.load_positions().await.map_err(|e| {
-            ExecutionError::Other(format!("DB load_positions: {}", e))
-        })?;
+        let positions = journal
+            .load_positions()
+            .await
+            .map_err(|e| ExecutionError::Other(format!("DB load_positions: {}", e)))?;
         let count = positions.len();
         for pos in positions {
             self.positions.insert(pos.id.clone(), pos);
@@ -718,6 +770,45 @@ impl PortfolioManager {
         Ok(count)
     }
 
+    /// FID-211: SOLE mutation point for syncing a position that is ALREADY in DB
+    /// into the in-memory cache. Used during engine startup after `load_from_db`
+    /// when validation/fixup steps modify the loaded position (e.g. SL defaults).
+    ///
+    /// **Pre-condition:** The position MUST already exist in the DB. This method
+    /// does NOT write to SQLite. Calling this with a position that isn't in the DB
+    /// creates the same data-integrity hole as the old `positions_mut().insert()`.
+    ///
+    /// After syncing, `refresh_from_positions` is called so derived state stays
+    /// consistent.
+    pub fn sync_from_db_position(&mut self, pos: Position) {
+        self.positions.insert(pos.id.clone(), pos);
+        self.account.refresh_from_positions(&self.positions);
+    }
+
+    /// FID-211: SOLE mutation point for removing a position that is ALREADY removed
+    /// from DB (or confirmed phantom). Used after the engine deletes from SQLite via
+    /// `journal.delete_position()` and just needs to drop the in-memory copy.
+    ///
+    /// **Pre-condition:** The position MUST already be removed from SQLite (or
+    /// confirmed to never have existed there). Otherwise this re-introduces the
+    /// dual-write hole.
+    pub fn remove_synced_position(&mut self, position_id: &str) -> Option<Position> {
+        let removed = self.positions.remove(position_id);
+        if removed.is_some() {
+            self.account.refresh_from_positions(&self.positions);
+        }
+        removed
+    }
+
+    /// FID-211: SOLE mutation point for clearing the in-memory position cache.
+    /// Used for phantom-position cleanup when the executor reports 0 positions
+    /// but the cache has stale ones. The caller is responsible for also deleting
+    /// from SQLite via `journal.delete_position()` for each id.
+    pub fn clear_position_cache(&mut self) {
+        self.positions.clear();
+        self.account.refresh_from_positions(&self.positions);
+    }
+
     /// FID-210: Computed property — replaces the 11 manual
     /// `account.open_positions = positions.len()` sites in the codebase.
     pub fn open_positions(&self) -> usize {
@@ -726,12 +817,7 @@ impl PortfolioManager {
 
     /// FID-210: Helper to construct a TradeRecord from a closed position.
     /// Extracted from the original check_stops inline logic.
-    fn build_trade_record(
-        &self,
-        pos: &Position,
-        exit_price: f64,
-        notes: String,
-    ) -> TradeRecord {
+    fn build_trade_record(&self, pos: &Position, exit_price: f64, notes: String) -> TradeRecord {
         let slippage = exit_price * self.slippage_pct;
         let adjusted_exit = match pos.side {
             Side::Long => exit_price - slippage,

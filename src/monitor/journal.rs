@@ -30,11 +30,9 @@ async fn migrate_v210(pool: &sqlx::SqlitePool) -> Result<(), sqlx::Error> {
         .map(|r| r.get::<String, _>(1))
         .collect();
     if !trades_cols.iter().any(|c| c == "real_trade") {
-        sqlx::query(
-            "ALTER TABLE trades ADD COLUMN real_trade BOOLEAN NOT NULL DEFAULT 1",
-        )
-        .execute(pool)
-        .await?;
+        sqlx::query("ALTER TABLE trades ADD COLUMN real_trade BOOLEAN NOT NULL DEFAULT 1")
+            .execute(pool)
+            .await?;
         info!("FID-210: Migrated trades table — added real_trade column");
     }
 

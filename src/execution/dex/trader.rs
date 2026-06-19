@@ -719,7 +719,11 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         self.is_anvil = is_anvil;
         tracing::info!(
             "FID-209: DexTrader spread filter bypass {}",
-            if is_anvil { "ENABLED (Anvil local fork mode)" } else { "DISABLED (mainnet mode)" }
+            if is_anvil {
+                "ENABLED (Anvil local fork mode)"
+            } else {
+                "DISABLED (mainnet mode)"
+            }
         );
     }
 
@@ -2668,8 +2672,14 @@ mod tests {
         let toml = include_str!("../../../config/default.toml");
         let cfg: crate::core::config::AppConfig =
             toml::from_str(toml).expect("default.toml must parse");
-        assert!(!cfg.mode.is_anvil, "default.toml must have is_anvil = false");
-        assert!(!cfg.mode.live_execution, "default.toml must have live_execution = false");
+        assert!(
+            !cfg.mode.is_anvil,
+            "default.toml must have is_anvil = false"
+        );
+        assert!(
+            !cfg.mode.live_execution,
+            "default.toml must have live_execution = false"
+        );
     }
 
     #[test]
@@ -2678,8 +2688,14 @@ mod tests {
         let toml = include_str!("../../../config/test-anvil.toml");
         let cfg: crate::core::config::AppConfig =
             toml::from_str(toml).expect("test-anvil.toml must parse");
-        assert!(cfg.mode.is_anvil, "test-anvil.toml must have is_anvil = true");
-        assert!(cfg.mode.live_execution, "test-anvil.toml must have live_execution = true");
+        assert!(
+            cfg.mode.is_anvil,
+            "test-anvil.toml must have is_anvil = true"
+        );
+        assert!(
+            cfg.mode.live_execution,
+            "test-anvil.toml must have live_execution = true"
+        );
     }
 
     #[test]
@@ -2689,7 +2705,10 @@ mod tests {
         let cfg: crate::core::config::AppConfig =
             toml::from_str(toml).expect("canary.toml must parse");
         assert!(!cfg.mode.is_anvil, "canary.toml must have is_anvil = false");
-        assert!(cfg.mode.live_execution, "canary.toml must have live_execution = true");
+        assert!(
+            cfg.mode.live_execution,
+            "canary.toml must have live_execution = true"
+        );
     }
 
     #[test]
@@ -2700,8 +2719,7 @@ mod tests {
         let toml_without = r#"
             live_execution = true
         "#;
-        let result: Result<crate::core::config::ModeConfig, _> =
-            toml::from_str(toml_without);
+        let result: Result<crate::core::config::ModeConfig, _> = toml::from_str(toml_without);
         // is_anvil is required (no #[serde(default)] on the field).
         // If we ever add serde(default), this test must be removed.
         assert!(result.is_err(), "is_anvil must be required, not defaulted");

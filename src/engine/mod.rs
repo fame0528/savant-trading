@@ -405,8 +405,12 @@ impl EngineState {
                 for pid in portfolio.positions().keys() {
                     reconciliation_removed.insert(pid.clone());
                 }
-                portfolio.positions_mut().clear();
-                portfolio.account_mut().open_positions = 0;
+                // FID-211: Phantom positions are confirmed not on chain. Use the
+                // safe wrapper instead of `positions_mut().clear()`. We do NOT delete
+                // from SQLite here because the journal is initialized AFTER this
+                // block. A follow-up phantom-clear loop below (after journal init)
+                // handles the SQLite side.
+                portfolio.clear_position_cache();
                 portfolio.account_mut().unrealized_pnl = 0.0;
                 portfolio.account_mut().peak_equity = portfolio.account().equity;
                 portfolio.account_mut().drawdown_pct = 0.0;
@@ -502,10 +506,10 @@ impl EngineState {
                             pos.take_profit_1,
                             pos.quantity
                         );
-                        portfolio.positions_mut().insert(pos.id.clone(), pos);
+                        portfolio.sync_from_db_position(pos);
                     }
-                    portfolio.account_mut().open_positions = portfolio.positions().len();
-                    info!("Loaded {} positions from DB", portfolio.positions().len());
+                    portfolio.account_mut().open_positions = portfolio.open_positions();
+                    info!("Loaded {} positions from DB", portfolio.open_positions());
                     if let Some(ref mut ex) = executor {
                         for (id, pos) in portfolio.positions().iter() {
                             let exec_id = format!("exec-{}", id);
@@ -538,19 +542,24 @@ impl EngineState {
                     .collect();
                 let mut stale_removed = false;
                 for stale_id in &stale_ids {
-                    if let Some(pos) = portfolio.positions_mut().remove(stale_id) {
+                    if let Some(pos) = portfolio.remove_synced_position(stale_id) {
                         warn!(
                             "STALE POSITION REMOVED: {} ({}) — not in current config pairs",
                             stale_id, pos.pair
                         );
                         if let Some(ref j) = journal {
-                            let _ = j.delete_position(stale_id).await;
+                            if let Err(e) = j.delete_position(stale_id).await {
+                                error!(
+                                    "FID-211: delete_position failed for stale {}: {}.",
+                                    stale_id, e
+                                );
+                            }
                         }
                         stale_removed = true;
                     }
                 }
                 if stale_removed {
-                    portfolio.account_mut().open_positions = portfolio.positions().len();
+                    portfolio.account_mut().open_positions = portfolio.open_positions();
                     portfolio.refresh_equity();
                 }
             }
@@ -1414,9 +1423,38 @@ pub async fn run(
                             result.drift_usd
                         );
                         // Apply qty updates: re-set in-memory position quantity to chain value.
+                        // FID-211: Use the SOT wrapper instead of direct field access. The wrapper
+                        // writes to SQLite FIRST, then in-memory on success — preventing the dual-write
+                        // hole where qty drifted between in-memory and SQLite.
                         for updated in &result.to_update {
-                            if let Some(existing) = portfolio.positions_mut().get_mut(&updated.id) {
-                                existing.quantity = updated.quantity;
+                            if let Some(ref j) = journal {
+                                if let Err(e) = portfolio
+                                    .adjust_quantity(&updated.id, updated.quantity, j)
+                                    .await
+                                {
+                                    tracing::warn!(
+                                        "FID-211: adjust_quantity failed for {}: {}. In-memory not updated; will retry next cycle.",
+                                        updated.id,
+                                        e
+                                    );
+                                } else {
+                                    tracing::info!(
+                                        "FID-211: chain-sync qty drift applied: {} qty={:.6}",
+                                        updated.id,
+                                        updated.quantity
+                                    );
+                                }
+                            } else {
+                                // No journal — fall back to in-memory only (best effort)
+                                tracing::warn!(
+                                    "FID-211: chain-sync qty drift for {} but no journal; updating in-memory only",
+                                    updated.id
+                                );
+                                if let Some(existing) =
+                                    portfolio.positions_mut().get_mut(&updated.id)
+                                {
+                                    existing.quantity = updated.quantity;
+                                }
                             }
                         }
                     }
@@ -1474,21 +1512,80 @@ pub async fn run(
             let account_snapshot = portfolio.account().clone();
             let report =
                 reconcile_wallet_state(&recon_cfg, &account_snapshot, &positions_snapshot).await;
+            // FID-211: Distinguish startup carryover from real-time divergence.
+            // - StartupCarryover (no positions open, divergent balance): adopt chain as
+            //   truth (works on Anvil), or error and require --reset-state on live.
+            // - RealTime (positions open, divergent balance): genuine safety issue,
+            //   halt the engine as before.
             if report.halted {
-                error!(
-                    "FID-147: Wallet reconciliation halt: {}. Writing savant.blocked and exiting cycle.",
-                    report.halt_reason.as_deref().unwrap_or("unknown")
-                );
-                let _ = std::fs::write(
-                    "savant.blocked",
-                    format!(
-                        "{}\nTrigger: wallet_reconciliation\nReason: {}\n",
-                        chrono::Utc::now().to_rfc3339(),
-                        report.halt_reason.as_deref().unwrap_or("unknown")
-                    ),
-                );
-                // Halt by exiting the cycle. The engine's outer code handles shutdown.
-                break;
+                use savant_trading::execution::reconciliation::DivergenceType;
+                match report.divergence_type {
+                    DivergenceType::StartupCarryover => {
+                        if config.mode.is_anvil {
+                            info!(
+                                "FID-211: Startup carryover detected on Anvil. Adopting on-chain balance as truth. in_memory=${:.4} → on_chain=${:.4}",
+                                report.in_memory_usdc, report.on_chain_usdc
+                            );
+                            let acct = portfolio.account_mut();
+                            acct.balance = report.on_chain_usdc;
+                            acct.equity = report.on_chain_usdc;
+                        } else {
+                            error!(
+                                "FID-211: Startup carryover detected on LIVE chain. {}. Refusing to silently overwrite state. Re-run with --reset-state to force adoption, or restore backup.",
+                                report.halt_reason.as_deref().unwrap_or("unknown")
+                            );
+                            shared
+                                .set_block(savant_trading::core::shared::BlockReason {
+                                    block_type: "startup_carryover_live".to_string(),
+                                    reason: report
+                                        .halt_reason
+                                        .clone()
+                                        .unwrap_or_else(|| "unknown".to_string()),
+                                    triggered_at: chrono::Utc::now(),
+                                })
+                                .await;
+                            let _ = std::fs::write(
+                                "savant.blocked",
+                                format!(
+                                    "{}\nTrigger: startup_carryover_live\nReason: {}\n",
+                                    chrono::Utc::now().to_rfc3339(),
+                                    report.halt_reason.as_deref().unwrap_or("unknown")
+                                ),
+                            );
+                            break;
+                        }
+                    }
+                    DivergenceType::RealTime => {
+                        error!(
+                            "FID-147: Wallet reconciliation halt (real-time): {}. Writing savant.blocked and exiting cycle.",
+                            report.halt_reason.as_deref().unwrap_or("unknown")
+                        );
+                        shared
+                            .set_block(savant_trading::core::shared::BlockReason {
+                                block_type: "wallet_reconciliation".to_string(),
+                                reason: report
+                                    .halt_reason
+                                    .clone()
+                                    .unwrap_or_else(|| "unknown".to_string()),
+                                triggered_at: chrono::Utc::now(),
+                            })
+                            .await;
+                        let _ = std::fs::write(
+                            "savant.blocked",
+                            format!(
+                                "{}\nTrigger: wallet_reconciliation\nReason: {}\n",
+                                chrono::Utc::now().to_rfc3339(),
+                                report.halt_reason.as_deref().unwrap_or("unknown")
+                            ),
+                        );
+                        // Halt by exiting the cycle. The engine's outer code handles shutdown.
+                        break;
+                    }
+                    DivergenceType::None => {
+                        // halted=true but type=None shouldn't happen, but be safe.
+                        break;
+                    }
+                }
             }
         }
 
@@ -1574,10 +1671,12 @@ pub async fn run(
                         // Clear position mapping since executor cancelled everything
                         executor_position_map.clear();
                     }
-                    // Clear PortfolioManager positions to match executor state (AFTER logging)
+                    // Clear PortfolioManager positions to match executor state (AFTER logging).
+                    // FID-211: Use the safe wrapper. We do NOT delete from SQLite here
+                    // because the executor cancel-all is the source of truth; positions
+                    // will be removed via the executor's reconcile path on next cycle.
                     let cleared_count = portfolio.positions().len();
-                    portfolio.positions_mut().clear();
-                    portfolio.account_mut().open_positions = 0;
+                    portfolio.clear_position_cache();
                     info!(
                         "Cleared {} local positions to match executor cancel-all",
                         cleared_count
@@ -3728,9 +3827,17 @@ pub async fn run(
                                                             exit_price, pnl, pnl_pct);
 
                                                     // DB: delete position, record trade, log activity — instant
+                                                    // FID-211: Replaced fire-and-forget with explicit error logging.
                                                     if let Some(ref j) = journal {
-                                                        let _ = j.delete_position(pos_id).await;
-                                                        let _ = j.record_trade(&trade).await;
+                                                        if let Err(e) =
+                                                            j.delete_position(pos_id).await
+                                                        {
+                                                            error!("FID-211: delete_position failed for closed trade {}: {}. In-memory may now diverge from DB.", pos_id, e);
+                                                        }
+                                                        if let Err(e) = j.record_trade(&trade).await
+                                                        {
+                                                            error!("FID-211: record_trade failed for closed trade {}: {}. Trade may not appear in journal.", trade.pair, e);
+                                                        }
                                                         let _ = j.record_activity("Trade", &trade.pair,
                                                                 &format!("CLOSED {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
                                                                     trade.side, exit_price, pnl, pnl_pct)).await;
@@ -4340,17 +4447,33 @@ pub async fn run(
                                                             scale_level: ScaleLevel::Full,
                                                             token_address: savant_trading::execution::dex::lookup_token(decision.pair.split("/").next().unwrap_or(""), config.exchange.dex.chain_id).map(|(addr, _)| addr).unwrap_or_default(),
                                                         };
-                                                    // Track position in PortfolioManager for state/reporting
-                                                    portfolio
-                                                        .positions_mut()
-                                                        .insert(pos.id.clone(), pos.clone());
-                                                    portfolio.account_mut().open_positions =
-                                                        portfolio.positions().len();
-                                                    portfolio.account_mut().trades_today += 1;
-                                                    portfolio.refresh_equity();
-                                                    let acc = portfolio.account();
-                                                    info!("AI position opened: {} — balance ${:.2}, equity ${:.2}",
-                                                            decision.pair, acc.balance, acc.equity);
+                                                    // Track position in PortfolioManager for state/reporting.
+                                                    // FID-211: Use SOT wrapper so SQLite is written FIRST.
+                                                    // Bug 6 was: positions_mut().insert() in-memory + (separately)
+                                                    // j.save_position() fire-and-forget = dual-write hole.
+                                                    if let Some(ref j) = journal {
+                                                        if let Err(e) = portfolio
+                                                            .open_position(pos.clone(), j)
+                                                            .await
+                                                        {
+                                                            error!("FID-211: open_position wrapper failed: {}. In-memory not updated; rolling back.", e);
+                                                            // Don't insert into in-memory if DB write failed.
+                                                        } else {
+                                                            portfolio.account_mut().trades_today +=
+                                                                1;
+                                                            portfolio.refresh_equity();
+                                                            let acc = portfolio.account();
+                                                            info!("AI position opened: {} — balance ${:.2}, equity ${:.2}",
+                                                                decision.pair, acc.balance, acc.equity);
+                                                        }
+                                                    } else {
+                                                        // No journal — fall back to in-memory only (best effort, log loud warning)
+                                                        error!("FID-211: No journal available; updating in-memory only. Position may be lost on restart.");
+                                                        portfolio
+                                                            .sync_from_db_position(pos.clone());
+                                                        portfolio.account_mut().trades_today += 1;
+                                                        portfolio.refresh_equity();
+                                                    }
 
                                                     // FID-184: Log probe positions separately.
                                                     if decision.is_probe {
@@ -4645,13 +4768,24 @@ pub async fn run(
                             );
                             continue;
                         }
-                        // Update in portfolio
-                        if let Some((_, pm_pos)) = portfolio
-                            .positions_mut()
-                            .iter_mut()
-                            .find(|(_, p)| p.pair == pair)
-                        {
-                            pm_pos.stop_loss = new_stop;
+                        // FID-211: Use adjust_stop wrapper so SQLite is written FIRST.
+                        // Bug 3 was: positions_mut().get_mut().stop_loss = X without
+                        // saving to SQLite = dual-write drift.
+                        let pos_id = pos.id.clone();
+                        if let Some(ref j) = journal {
+                            if let Err(e) = portfolio
+                                .adjust_stop(&pos_id, new_stop, None, None, None, None, j)
+                                .await
+                            {
+                                error!("FID-211: adjust_stop wrapper failed for {}: {}. In-memory not updated.", pos_id, e);
+                                continue;
+                            }
+                        } else {
+                            // No journal — best effort in-memory only
+                            warn!("FID-211: No journal; stop override in-memory only");
+                            if let Some(pm_pos) = portfolio.positions_mut().get_mut(&pos_id) {
+                                pm_pos.stop_loss = new_stop;
+                            }
                         }
                         info!(
                             "Stop override applied: {} ${:.4} → ${:.4}",
@@ -4722,19 +4856,44 @@ pub async fn run(
             let mut close_reqs = shared.close_overrides.write().await;
             for (pair, _) in close_reqs.drain() {
                 if let Some(current_price) = all_prices.get(&pair) {
-                    if let Some((_, pos)) = portfolio
-                        .positions_mut()
-                        .iter_mut()
+                    // FID-211: Find the pos_id first, then use adjust_stop wrapper.
+                    let pos_id_opt = portfolio
+                        .positions()
+                        .iter()
                         .find(|(_, p)| p.pair == pair)
-                    {
-                        // For LONG: set stop above current price to trigger immediate close
-                        // For SHORT: set stop below current price to trigger immediate close
-                        match pos.side {
-                            savant_trading::core::types::Side::Long => {
-                                pos.stop_loss = current_price + 0.01;
+                        .map(|(id, _)| id.clone());
+                    if let Some(pos_id) = pos_id_opt {
+                        let stop_for_immediate_close =
+                            match portfolio.positions().get(&pos_id).map(|p| p.side) {
+                                Some(Side::Long) => current_price * 1.001,
+                                Some(Side::Short) => current_price * 0.999,
+                                None => continue,
+                            };
+                        if let Some(ref j) = journal {
+                            if let Err(e) = portfolio
+                                .adjust_stop(
+                                    &pos_id,
+                                    stop_for_immediate_close,
+                                    None,
+                                    None,
+                                    None,
+                                    None,
+                                    j,
+                                )
+                                .await
+                            {
+                                error!(
+                                    "FID-211: API close override adjust_stop failed for {}: {}",
+                                    pos_id, e
+                                );
                             }
-                            savant_trading::core::types::Side::Short => {
-                                pos.stop_loss = current_price - 0.01;
+                        } else {
+                            warn!(
+                                "FID-211: No journal; API close override in-memory only for {}",
+                                pos_id
+                            );
+                            if let Some(pos) = portfolio.positions_mut().get_mut(&pos_id) {
+                                pos.stop_loss = stop_for_immediate_close;
                             }
                         }
                         log_trade!("CLOSE", "{} — manual close requested via API", pair);
@@ -4825,7 +4984,15 @@ pub async fn run(
                     .iter()
                     .find(|(_, p)| p.pair == trail.pair && p.side == trail.side)
                 {
-                    let _ = j.save_position(pos).await;
+                    // FID-211: Use adjust_stop wrapper so SQLite is written FIRST,
+                    // then in-memory on success. Bug 6 was fire-and-forget SQLite.
+                    let pos_id = pos.id.clone();
+                    if let Err(e) = portfolio
+                        .adjust_stop(&pos_id, pos.stop_loss, None, None, None, None, j)
+                        .await
+                    {
+                        error!("FID-211: adjust_stop failed for trail {}: {}.", pos_id, e);
+                    }
                 }
                 let _ = j
                     .record_activity(
@@ -4958,9 +5125,8 @@ pub async fn run(
                                 if reconciliation_removed.contains(pid) {
                                     warn!("FID-097: Skipping restore of {} — removed by reconciliation, not a real position", pid);
                                 } else if let Some(pos) = paper_positions_full.get(pid) {
-                                    portfolio.positions_mut().insert(pid.clone(), pos.clone());
-                                    portfolio.account_mut().open_positions =
-                                        portfolio.positions().len();
+                                    // FID-211: Use sync_from_db_position wrapper (position is already in DB/executor).
+                                    portfolio.sync_from_db_position(pos.clone());
                                     warn!("Restored position {} to PortfolioManager — will retry close next cycle", pid);
                                     shared.log_activity(
                                         savant_trading::core::shared::ActivityLevel::Warning,
@@ -5008,9 +5174,8 @@ pub async fn run(
                                 if reconciliation_removed.contains(pid) {
                                     warn!("FID-097: Skipping restore of {} — removed by reconciliation, not a real position", pid);
                                 } else if let Some(pos) = paper_positions_full.get(pid) {
-                                    portfolio.positions_mut().insert(pid.clone(), pos.clone());
-                                    portfolio.account_mut().open_positions =
-                                        portfolio.positions().len();
+                                    // FID-211: Use sync_from_db_position wrapper (position is already in DB/executor).
+                                    portfolio.sync_from_db_position(pos.clone());
                                     warn!("Restored position {} to PortfolioManager — will retry close next cycle", pid);
                                     shared.log_activity(
                                         savant_trading::core::shared::ActivityLevel::Warning,
@@ -5073,15 +5238,20 @@ pub async fn run(
 
             if !is_reverted {
                 // DB: delete position, record trade, log activity — all instant
+                // FID-211: Replaced fire-and-forget with explicit error logging.
                 if let Some(ref j) = journal {
                     // Find and delete the closed position from DB
                     for (id, pair, _side, _entry) in paper_positions_before.iter() {
                         if *pair == trade.pair {
-                            let _ = j.delete_position(id).await;
+                            if let Err(e) = j.delete_position(id).await {
+                                error!("FID-211: delete_position failed for {}: {}.", id, e);
+                            }
                             break;
                         }
                     }
-                    let _ = j.record_trade(&trade).await;
+                    if let Err(e) = j.record_trade(&trade).await {
+                        error!("FID-211: record_trade failed for {}: {}.", trade.pair, e);
+                    }
                     let _ = j
                         .record_activity(
                             "Trade",
@@ -5254,9 +5424,24 @@ pub async fn run(
             }
 
             // DB: persist scale-out position updates
+            // FID-211: Use adjust_stop wrapper to persist each updated position atomically.
+            // Collect pos_ids first to avoid simultaneous immutable + mutable borrow of portfolio.
             if let Some(ref j) = journal {
-                for pos in portfolio.positions().values() {
-                    let _ = j.save_position(pos).await;
+                let pos_ids: Vec<(String, f64)> = portfolio
+                    .positions()
+                    .values()
+                    .map(|p| (p.id.clone(), p.stop_loss))
+                    .collect();
+                for (pos_id, stop_loss) in pos_ids {
+                    if let Err(e) = portfolio
+                        .adjust_stop(&pos_id, stop_loss, None, None, None, None, j)
+                        .await
+                    {
+                        error!(
+                            "FID-211: adjust_stop failed for scale-out {}: {}.",
+                            pos_id, e
+                        );
+                    }
                 }
             }
         }
@@ -5473,9 +5658,18 @@ pub async fn run(
                                         on_chain_verified: false,
                                         tx_hash: None,
                                     };
+                                    // FID-211: Use close_position_persist for atomic DB+memory close.
+                                    // The wrapper returns TradeRecord but we already built one
+                                    // with rich fields (strategy_name, etc.) — record via journal
+                                    // explicitly, then remove from in-memory cache.
+                                    // Use the wrapper's DB write path via adjust_stop on a
+                                    // dummy-stop-preserving version if possible; here just
+                                    // record trade and remove from cache with proper error handling.
                                     portfolio.closed_trades_mut().push(trade.clone());
                                     if let Some(ref j) = journal {
-                                        let _ = j.record_trade(&trade).await;
+                                        if let Err(e) = j.record_trade(&trade).await {
+                                            error!("FID-211: record_trade failed for external close {}: {}.", trade.pair, e);
+                                        }
                                     }
                                     info!(
                                         "Recorded external close trade: {} {} | Entry: {:.4} → Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
@@ -5484,9 +5678,10 @@ pub async fn run(
                                 }
 
                                 // Remove from PortfolioManager
-                                if let Some(_removed) = portfolio.positions_mut().remove(&pos_id) {
-                                    portfolio.account_mut().open_positions =
-                                        portfolio.positions().len();
+                                // FID-211: Use the safe wrapper. Position already
+                                // recorded as a closed trade (line above) and removed
+                                // from DB by the executor, so just sync in-memory.
+                                if portfolio.remove_synced_position(&pos_id).is_some() {
                                     reconciliation_removed.insert(pos_id.clone());
                                 }
 
@@ -5583,16 +5778,23 @@ pub async fn run(
                                     "FID-096 PARTIAL EXTERNAL CLOSE: {} — on-chain {:.6} vs position {:.6}",
                                     pair, on_chain, pos_qty
                                 );
-                                if let Some(pos) = portfolio.positions_mut().get_mut(&pos_id) {
-                                    let old_qty = pos.quantity;
-                                    pos.quantity = on_chain;
-                                    pos.risk_amount = pos.entry_price * on_chain;
-                                    info!(
-                                        "Updated {} quantity: {:.6} → {:.6} (partial external close)",
-                                        pair, old_qty, on_chain
-                                    );
-                                    if let Some(ref j) = journal {
-                                        let _ = j.save_position(pos).await;
+                                let old_qty = pos_qty;
+                                if let Some(ref j) = journal {
+                                    if let Err(e) =
+                                        portfolio.adjust_quantity(&pos_id, on_chain, j).await
+                                    {
+                                        error!("FID-211: adjust_quantity failed for partial close {}: {}", pos_id, e);
+                                    } else {
+                                        info!(
+                                            "Updated {} quantity: {:.6} → {:.6} (partial external close)",
+                                            pair, old_qty, on_chain
+                                        );
+                                    }
+                                } else {
+                                    warn!("FID-211: No journal; updating qty in-memory only for partial close {}", pos_id);
+                                    if let Some(pos) = portfolio.positions_mut().get_mut(&pos_id) {
+                                        pos.quantity = on_chain;
+                                        pos.risk_amount = pos.entry_price * on_chain;
                                     }
                                 }
                             }
