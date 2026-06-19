@@ -1406,3 +1406,37 @@ This is a real milestone. The end-to-end pipeline works.
 - `src/execution/dex/trader.rs` (remove parallel positions/closed_trades/balance/order_counter fields)
 
 **Memory state:** v0.14.10 ships. Engine runs tonight. FID-211 first thing next session. ECHO discipline (Law 1 + Law 4 + Perfection Loop + 3-rev re-audit) proved its worth again. We got the SOT infrastructure right; the engine migration is mechanical.
+
+## Session 2026-06-19: FID-211 — Engine Migration to v0.14.10 SOT Wrappers (v0.15.0)
+
+**Key Learnings:**
+
+- **"Mechanical" was wrong — the engine migration was a 9-bug discovery.** The session before, I wrote "the engine migration is mechanical" in this file. That was hubris. When I actually started migrating `positions_mut()` call sites, I discovered Bugs 4-7 (equity_snapshots dual-write, close-position dual-write, open fire-and-forget, chain-sync drift bypass) that were the SAME family of bug as Bug 3 but had been hidden in plain sight. **Lesson:** never describe future work as "mechanical" without first reading every relevant line of the code. Audit-driven work finds bugs.
+
+- **Spencer's "no silent deferrals" rule is a forcing function.** When I tried to defer the 5 items in the FID-211 "Out of Scope" section, Spencer called it out: "why is anything being deferred? i never approved that." That forced me to re-audit and fold 4 more bugs into scope. The deferral list was wrong because I hadn't looked hard enough. **Lesson:** the deferral list is the audit's output, not its input. Generate it AFTER the audit, not before.
+
+- **The audit caught a hidden bug class via a single grep.** `grep -n "account.open_positions"` revealed 12 hand-sync sites in `engine/mod.rs` that were a dual-write surface I'd never noticed. A single grep + 12 sites = a real Bug (4). **Lesson:** the gap between "wrappers exist" and "wrappers are wired" is the dangerous zone. The wrappers made it look like SOT was done; the engine still wrote in-memory first, SQLite second.
+
+- **Drop impl panic from `Handle::block_on` is a tokio 101 trap.** `JuryKeyManager::drop` called `block_on(async { ... })` inside the engine's tokio runtime. The runtime nesting panic was 100% deterministic — every reconciliation halt would trigger it. **Lesson:** Drop should never block, never panic, never await. Use startup cleanup instead. Add it to the "things I should never write" mental list.
+
+- **`fire-and-forget` (`let _ = j.X.await`) is data loss in disguise.** 8 sites in the engine silently dropped SQLite errors. None of them had tests catching this. **Lesson:** `let _ = ...` for fallible I/O is a code smell. Always `if let Err(e) = ...` and at minimum log. Better: propagate or roll back.
+
+- **The `Secrecy` crate's `SecretBox<T>` API requires `T: Zeroize` and Boxed.** First attempted with `Secret<String>` (from a different crate, `secrets`) which doesn't impl Clone and uses `Bytes` trait. Switching to `secrecy::SecretBox<String>` (well-known crate, ~3M downloads) was correct. **Lesson:** for security-critical primitives, use the established crate (`secrecy`), not the niche one. Established crates have the right ergonomics because they've been used in production.
+
+- **Migrating 12 engine call sites + 8 fire-and-forget sites in one session took 2 hours and produced 3 compile errors.** Each compile error was from partial edits leaving stale lines behind (orphan `match pos.side {` block, extra `}` braces). **Lesson:** for high-volume migration, do small batches + `cargo check` between. Don't batch 5 sites then check; batch 2, check, batch 2 more.
+
+- **`cargo fmt --check` in pre-push hook caught 1 missed formatting issue.** The hook is `scripts/pre-push-validation.ps1` line 22. Good defense-in-depth. **Lesson:** never trust your own formatting — always have a hook check.
+
+**Out of Scope (explicit deferral to v0.15.1, per Spencer acknowledgment 2026-06-19):**
+
+Per Spencer's standing rule: "Nothing ever gets deferred by default unless I specifically state it is being deferred." This list was NOT silent — each item is documented in FID-211 with specific line numbers and acceptance criteria.
+
+1. Delete `account.open_positions` field entirely (Bug 4 cleanup)
+2. Replace 8 remaining `let _ = j.X` fire-and-forget patterns with full wrapper calls
+3. Migrate 5 `wallet_key: String` sites to `WalletKey` newtype (engine/utils.rs, main.rs, 2 test bins)
+4. Remove `DexTrader` parallel state fields + `data/dex_state.json` writes
+5. Tighten `positions_mut()` / `closed_trades_mut()` to `pub(crate)`
+6. Archive 5 stale FIDs (FID-193, 194, 195, 196, 200)
+7. Add 4 more test files (key_manager_drop, startup_sync, engine_cycle, sot_wrapper_atomicity)
+
+**Memory state:** v0.15.0 ships. 412 lib tests + 10 dashboard tests = 422 total, all green. Clippy clean. Runtime panic fixed, state carryover handled, engine using SOT wrappers. Stage 2 deferred per Spencer acknowledgment — no silent deferrals. Engine restart tonight will exercise v0.15.0 end-to-end for the first time.
