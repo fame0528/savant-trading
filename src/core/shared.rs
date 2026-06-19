@@ -61,6 +61,24 @@ pub struct SharedEngineData {
     pub jury_state: Arc<RwLock<JuryStateSnapshot>>,
     /// Ring buffer of recent jury cycle records (capped 50).
     pub jury_recent: Arc<RwLock<VecDeque<JuryCycleRecord>>>,
+
+    // ---- FID-210: Engine block state (replaces savant.blocked file) ----
+    /// When the engine cannot open new positions (max_positions, drawdown, etc.),
+    /// this holds the reason. None = not blocked. The dashboard reads this for
+    /// the "ENGINE BLOCKED" card. Auto-clears when circuit returns Ok.
+    pub block: Arc<RwLock<Option<BlockReason>>>,
+}
+
+/// FID-210: Reason the engine is blocked. Replaces the savant.blocked text file.
+/// Serialized to the dashboard /api/risk endpoint.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BlockReason {
+    /// One of: "max_positions", "drawdown", "portfolio_heat", "spread", "per_trade_loss".
+    pub block_type: String,
+    /// Human-readable reason (matches the format savant.blocked used to write).
+    pub reason: String,
+    /// When the block was triggered (UTC).
+    pub triggered_at: chrono::DateTime<chrono::Utc>,
 }
 
 /// FID-162: Live jury state for `/api/jury/status`.
@@ -204,6 +222,9 @@ impl SharedEngineData {
             // FID-162: jury observability surfaces
             jury_state: Arc::new(RwLock::new(JuryStateSnapshot::default())),
             jury_recent: Arc::new(RwLock::new(VecDeque::with_capacity(50))),
+
+            // FID-210: engine block state (replaces savant.blocked file)
+            block: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -351,6 +372,33 @@ impl SharedEngineData {
                 e
             );
         }
+    }
+
+    // ---- FID-210: Engine block state helpers ----
+
+    /// Set the engine block state. Called by the engine when a circuit breaker
+    /// trigger fires (max_positions, drawdown, etc.). Replaces savant.blocked file write.
+    pub async fn set_block(&self, block: BlockReason) {
+        *self.block.write().await = Some(block);
+    }
+
+    /// Clear the engine block state. Called by the engine when the circuit
+    /// breaker check returns Ok. Replaces the savant.blocked file deletion
+    /// (which only happened at startup or midnight).
+    pub async fn clear_block(&self) {
+        *self.block.write().await = None;
+    }
+
+    /// Get the current engine block state. Called by the API to serve the
+    /// dashboard "ENGINE BLOCKED" card.
+    pub async fn get_block(&self) -> Option<BlockReason> {
+        self.block.read().await.clone()
+    }
+
+    /// Read the block state without awaiting. Returns None if held by another writer.
+    /// Used by the dashboard's read path (non-blocking).
+    pub fn try_get_block(&self) -> Option<BlockReason> {
+        self.block.try_read().ok().and_then(|g| g.clone())
     }
 }
 

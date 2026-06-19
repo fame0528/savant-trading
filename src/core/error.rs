@@ -30,6 +30,13 @@ pub enum ExecutionError {
     InsufficientBalance { needed: f64, available: f64 },
     #[error("Position not found: {0}")]
     PositionNotFound(String),
+    // FID-210: duplicate position id detected at open time
+    #[error("Duplicate position id: {0}")]
+    DuplicatePositionId(String),
+    // FID-210: invalid stop-loss ratchet (e.g. trying to lower the SL below
+    // the current price for a long, which is a guard against catastrophic fills)
+    #[error("Invalid stop ratchet: old {old}, new {new}")]
+    InvalidStopRatchet { old: f64, new: f64 },
     #[error("Exchange error: {0}")]
     ExchangeError(String),
     #[error("{0}")]

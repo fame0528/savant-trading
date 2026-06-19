@@ -5,6 +5,55 @@ use tracing::info;
 
 use crate::core::types::{Position, ScaleLevel, Side, TradeRecord};
 
+/// FID-210: Migration helper. Runs on every startup. Idempotent via PRAGMA checks.
+/// Adds `token_address` column to `positions` and `real_trade` column to `trades`
+/// for DBs created before v0.14.10. Cleans up legacy `wallet_recovery` placeholder
+/// trade rows.
+async fn migrate_v210(pool: &sqlx::SqlitePool) -> Result<(), sqlx::Error> {
+    let positions_cols: Vec<String> = sqlx::query("PRAGMA table_info(positions)")
+        .fetch_all(pool)
+        .await?
+        .iter()
+        .map(|r| r.get::<String, _>(1))
+        .collect();
+    if !positions_cols.iter().any(|c| c == "token_address") {
+        sqlx::query("ALTER TABLE positions ADD COLUMN token_address TEXT NOT NULL DEFAULT ''")
+            .execute(pool)
+            .await?;
+        info!("FID-210: Migrated positions table — added token_address column");
+    }
+
+    let trades_cols: Vec<String> = sqlx::query("PRAGMA table_info(trades)")
+        .fetch_all(pool)
+        .await?
+        .iter()
+        .map(|r| r.get::<String, _>(1))
+        .collect();
+    if !trades_cols.iter().any(|c| c == "real_trade") {
+        sqlx::query(
+            "ALTER TABLE trades ADD COLUMN real_trade BOOLEAN NOT NULL DEFAULT 1",
+        )
+        .execute(pool)
+        .await?;
+        info!("FID-210: Migrated trades table — added real_trade column");
+    }
+
+    let cleaned = sqlx::query(
+        "DELETE FROM trades WHERE strategy_name = 'wallet_recovery' AND opened_at = '1970-01-01T00:00:00+00:00'",
+    )
+    .execute(pool)
+    .await?
+    .rows_affected();
+    if cleaned > 0 {
+        info!(
+            "FID-210: Cleaned {} legacy wallet_recovery placeholder trade rows",
+            cleaned
+        );
+    }
+
+    Ok(())
+}
+
 pub struct TradeJournal {
     pool: sqlx::SqlitePool,
 }
@@ -43,7 +92,11 @@ impl TradeJournal {
                 strategy_name TEXT NOT NULL,
                 opened_at TEXT NOT NULL,
                 closed_at TEXT NOT NULL,
-                notes TEXT
+                notes TEXT,
+                -- FID-210: true for engine-driven trades, false for wallet_recovery
+                -- placeholder rows from older code paths. Used to filter the dashboard
+                -- Closed Trades panel.
+                real_trade BOOLEAN NOT NULL DEFAULT 1
             )
             "#,
         )
@@ -82,7 +135,9 @@ impl TradeJournal {
                 risk_amount REAL NOT NULL,
                 strategy_name TEXT NOT NULL,
                 scale_level TEXT NOT NULL,
-                opened_at TEXT NOT NULL
+                opened_at TEXT NOT NULL,
+                -- FID-210: on-chain token address for reconciliation heartbeats.
+                token_address TEXT NOT NULL DEFAULT ''
             )
             "#,
         )
@@ -116,6 +171,8 @@ impl TradeJournal {
         .execute(&pool)
         .await?;
 
+        migrate_v210(&pool).await?;
+
         info!("Trade journal initialized");
         Ok(Self { pool })
     }
@@ -128,8 +185,8 @@ impl TradeJournal {
             INSERT OR REPLACE INTO positions
                 (id, pair, side, entry_price, current_price, quantity, stop_loss,
                  take_profit_1, take_profit_2, take_profit_3, unrealized_pnl,
-                 risk_amount, strategy_name, scale_level, opened_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 risk_amount, strategy_name, scale_level, opened_at, token_address)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "#,
         )
         .bind(&pos.id)
@@ -147,6 +204,7 @@ impl TradeJournal {
         .bind(&pos.strategy_name)
         .bind(format!("{:?}", pos.scale_level))
         .bind(pos.opened_at.to_rfc3339())
+        .bind(&pos.token_address)
         .execute(&self.pool)
         .await?;
         Ok(())
@@ -259,10 +317,14 @@ impl TradeJournal {
     // ── Trades ─────────────────────────────────────────────────────────
 
     pub async fn record_trade(&self, trade: &TradeRecord) -> Result<(), sqlx::Error> {
+        // FID-210: real_trade = true for all engine-driven trade records. The
+        // migrate_v210 function also cleans up legacy wallet_recovery rows that
+        // had opened_at=epoch(0); those would have been marked real_trade=true
+        // historically, but they're now deleted. New rows default to 1.
         sqlx::query(
             r#"
-            INSERT INTO trades (id, pair, side, entry_price, exit_price, quantity, pnl, pnl_pct, fees, strategy_name, opened_at, closed_at, notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO trades (id, pair, side, entry_price, exit_price, quantity, pnl, pnl_pct, fees, strategy_name, opened_at, closed_at, notes, real_trade)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
             "#,
         )
         .bind(&trade.id)
@@ -282,6 +344,56 @@ impl TradeJournal {
         .await?;
 
         Ok(())
+    }
+
+    /// FID-210: Load closed trades, capped at `limit` most recent. Used by
+    /// PortfolioManager::load_from_db to populate the in-memory working set
+    /// of closed_trades at engine startup.
+    pub async fn load_closed_trades(&self, limit: i64) -> Result<Vec<TradeRecord>, sqlx::Error> {
+        let rows = sqlx::query(
+            "SELECT id, pair, side, entry_price, exit_price, quantity, pnl, pnl_pct, fees, strategy_name, opened_at, closed_at, notes, real_trade FROM trades WHERE real_trade = 1 ORDER BY closed_at DESC LIMIT ?",
+        )
+        .bind(limit)
+        .fetch_all(&self.pool)
+        .await?;
+
+        let mut trades = Vec::with_capacity(rows.len());
+        for row in rows {
+            let side_str: String = row.get("side");
+            let opened_at_str: String = row.get("opened_at");
+            let closed_at_str: String = row.get("closed_at");
+
+            let opened_at = chrono::DateTime::parse_from_rfc3339(&opened_at_str)
+                .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
+                .with_timezone(&chrono::Utc);
+            let closed_at = chrono::DateTime::parse_from_rfc3339(&closed_at_str)
+                .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
+                .with_timezone(&chrono::Utc);
+
+            trades.push(TradeRecord {
+                id: row.get("id"),
+                pair: row.get("pair"),
+                side: if side_str == "Long" {
+                    Side::Long
+                } else {
+                    Side::Short
+                },
+                entry_price: row.get("entry_price"),
+                exit_price: row.get("exit_price"),
+                quantity: row.get("quantity"),
+                pnl: row.get("pnl"),
+                pnl_pct: row.get("pnl_pct"),
+                fees: row.get("fees"),
+                strategy_name: row.get("strategy_name"),
+                opened_at,
+                closed_at,
+                notes: row.try_get("notes").unwrap_or_default(),
+                on_chain_verified: false,
+                tx_hash: None,
+            });
+        }
+
+        Ok(trades)
     }
 
     pub async fn record_snapshot(

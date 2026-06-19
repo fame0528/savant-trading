@@ -994,6 +994,17 @@ pub struct RegimeConfig {
 #[derive(Debug, Clone, Deserialize)]
 pub struct ModeConfig {
     pub live_execution: bool,
+    /// FID-209: True when running against an Anvil local fork.
+    /// Bypasses the spread filter (which can't validate prices on
+    /// forked tokens because 0x doesn't index them). DO NOT set
+    /// to true on mainnet — the spread filter is the price-protection
+    /// guarantee for real trades.
+    ///
+    /// Set explicitly per-environment:
+    /// - config/test-anvil.toml: true (Anvil local fork)
+    /// - config/default.toml: false (Arbitrum mainnet)
+    /// - config/canary.toml: false (Arbitrum canary)
+    pub is_anvil: bool,
 }
 
 impl AppConfig {
@@ -1129,6 +1140,7 @@ impl Default for AppConfig {
             },
             mode: ModeConfig {
                 live_execution: false,
+                is_anvil: false,
             },
             ai: AiConfig {
                 provider: "nvidia".into(),

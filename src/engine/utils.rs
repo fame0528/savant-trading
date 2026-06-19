@@ -101,6 +101,10 @@ pub(super) async fn create_executor(
             .await
             .map_err(|e| anyhow::anyhow!("Failed to create DexTrader (0x): {}", e))?;
 
+            // FID-209: Enable Anvil spread filter bypass if configured.
+            // MUST be called before the first execute_swap, after DexTrader::new.
+            trader.set_is_anvil(config.mode.is_anvil);
+
             // Register additional chains from config (FID-045)
             for chain_cfg in config.chains.values() {
                 if chain_cfg.enabled && chain_cfg.chain_id != config.exchange.dex.chain_id {
@@ -142,7 +146,7 @@ pub(super) async fn create_executor(
             })?;
 
             let backend = InchBackend::new(api_key);
-            let trader = DexTrader::new(
+            let mut trader = DexTrader::new(
                 backend,
                 &wallet_key,
                 &config.exchange.dex.rpc_url,
@@ -152,6 +156,9 @@ pub(super) async fn create_executor(
             )
             .await
             .map_err(|e| anyhow::anyhow!("Failed to create DexTrader (1inch): {}", e))?;
+
+            // FID-209: Enable Anvil spread filter bypass if configured.
+            trader.set_is_anvil(config.mode.is_anvil);
 
             info!(
                 "LIVE trading mode: DexTrader (1inch) initialized on chain {}",

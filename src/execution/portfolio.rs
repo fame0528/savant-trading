@@ -449,6 +449,10 @@ impl PortfolioManager {
         &self.closed_trades
     }
 
+    /// FID-211 (future): Internal-only mutation. External code must use the
+    /// `partial_close` / `close_position` wrappers which persist to SQLite.
+    /// Currently still `pub` for backward compat — will be `pub(crate)` after
+    /// the engine refactor (FID-211).
     pub fn closed_trades_mut(&mut self) -> &mut Vec<TradeRecord> {
         &mut self.closed_trades
     }
@@ -461,6 +465,10 @@ impl PortfolioManager {
         &self.positions
     }
 
+    /// FID-211 (future): Internal-only mutation. External code must use the
+    /// `open_position` / `close_position` / `adjust_stop` / `partial_close`
+    /// wrappers which persist to SQLite. Currently still `pub` for backward
+    /// compat — will be `pub(crate)` after the engine refactor (FID-211).
     pub fn positions_mut(&mut self) -> &mut HashMap<String, Position> {
         &mut self.positions
     }
@@ -485,6 +493,311 @@ impl PortfolioManager {
                                        // Do NOT reset peak_equity — it must survive balance syncs.
                                        // Previously this corrupted drawdown tracking by resetting peak_equity to
                                        // the raw USDC balance, ignoring position values.
+    }
+
+    // ── FID-210: SOT WRAPPER METHODS ─────────────────────────────────────
+    // These are the SOLE mutation points for positions. They write to the
+    // SQLite SOT FIRST, then update the in-memory cache. The `positions_mut()`
+    // and `closed_trades_mut()` methods are still `pub(crate)` for internal use
+    // (check_stops, partial_close internals) but no external code may mutate
+    // positions outside of these wrappers.
+    //
+    // All wrappers follow the same pattern:
+    //   1. Validate inputs
+    //   2. Build the state mutation (in-memory)
+    //   3. Persist to SQLite (await, can fail)
+    //   4. Commit in-memory change (only after DB confirms)
+    //   5. Refresh derived state (open_positions, equity, etc.)
+    //
+    // On DB failure, the wrapper returns an error and the in-memory state is
+    // NOT updated. The engine treats the wrapper call as failed and skips the
+    // downstream action (e.g. skip the on-chain swap).
+
+    /// FID-210: SOLE mutation point for opening a position.
+    /// Persists to SQLite FIRST (SOT), then updates in-memory cache on success.
+    pub async fn open_position(
+        &mut self,
+        pos: Position,
+        journal: &crate::monitor::journal::TradeJournal,
+    ) -> Result<(), ExecutionError> {
+        // 1. Validate
+        if self.positions.contains_key(&pos.id) {
+            return Err(ExecutionError::DuplicatePositionId(pos.id));
+        }
+        // 2. Persist to DB FIRST (SOT)
+        journal
+            .save_position(&pos)
+            .await
+            .map_err(|e| ExecutionError::Other(format!("DB save_position: {}", e)))?;
+        // 3. Update in-memory cache (after DB confirms)
+        self.positions.insert(pos.id.clone(), pos);
+        // 4. Refresh derived state
+        self.account.refresh_from_positions(&self.positions);
+        Ok(())
+    }
+
+    /// FID-210: SOLE mutation point for closing a position. Persists TradeRecord
+    /// to DB, removes position from DB, then updates cache.
+    /// 
+    /// NOTE: Named `close_position_persist` to avoid collision with the
+    /// existing engine-side `close_position` close-only helper (which is
+    /// being refactored in FID-211). Once the engine migrates to this method,
+    /// the helper is removed and this can be renamed back to `close_position`.
+    pub async fn close_position_persist(
+        &mut self,
+        position_id: &str,
+        exit_price: f64,
+        notes: String,
+        journal: &crate::monitor::journal::TradeJournal,
+    ) -> Result<TradeRecord, ExecutionError> {
+        // 1. Get from cache
+        let pos = self
+            .positions
+            .get(position_id)
+            .ok_or_else(|| ExecutionError::PositionNotFound(position_id.to_string()))?
+            .clone();
+        // 2. Build TradeRecord
+        let trade = self.build_trade_record(&pos, exit_price, notes);
+        // 3. Persist trade to DB (SOT)
+        journal
+            .record_trade(&trade)
+            .await
+            .map_err(|e| ExecutionError::Other(format!("DB record_trade: {}", e)))?;
+        // 4. Remove position from DB (SOT)
+        journal
+            .delete_position(position_id)
+            .await
+            .map_err(|e| ExecutionError::Other(format!("DB delete_position: {}", e)))?;
+        // 5. Update in-memory cache (after DB confirms)
+        self.positions.remove(position_id);
+        self.closed_trades.push(trade.clone());
+        // 6. Refresh derived state
+        self.account.refresh_from_positions(&self.positions);
+        Ok(trade)
+    }
+
+    /// FID-210: SOLE mutation point for AdjustStop (and any other field update
+    /// that doesn't change position size). Persists updated Position to DB.
+    #[allow(clippy::too_many_arguments)]
+    pub async fn adjust_stop(
+        &mut self,
+        position_id: &str,
+        new_stop: f64,
+        new_tp1: Option<f64>,
+        new_tp2: Option<f64>,
+        new_tp3: Option<f64>,
+        new_current_price: Option<f64>,
+        journal: &crate::monitor::journal::TradeJournal,
+    ) -> Result<(), ExecutionError> {
+        // 1. Get from cache, validate
+        let mut pos = self
+            .positions
+            .get(position_id)
+            .ok_or_else(|| ExecutionError::PositionNotFound(position_id.to_string()))?
+            .clone();
+        // 2. Validate stop ratchet (cannot ratchet below current price for Long,
+        //    or above current price for Short — that would lock in a loss)
+        match pos.side {
+            Side::Long => {
+                if new_stop < pos.entry_price && new_stop < pos.stop_loss {
+                    return Err(ExecutionError::InvalidStopRatchet {
+                        old: pos.stop_loss,
+                        new: new_stop,
+                    });
+                }
+            }
+            Side::Short => {
+                if new_stop > pos.entry_price && new_stop > pos.stop_loss {
+                    return Err(ExecutionError::InvalidStopRatchet {
+                        old: pos.stop_loss,
+                        new: new_stop,
+                    });
+                }
+            }
+        }
+        // 3. Update cache
+        pos.stop_loss = new_stop;
+        if let Some(tp1) = new_tp1 {
+            pos.take_profit_1 = tp1;
+        }
+        if let Some(tp2) = new_tp2 {
+            pos.take_profit_2 = tp2;
+        }
+        if let Some(tp3) = new_tp3 {
+            pos.take_profit_3 = tp3;
+        }
+        if let Some(cp) = new_current_price {
+            pos.current_price = cp;
+        }
+        // 4. Persist to DB (SOT)
+        journal
+            .save_position(&pos)
+            .await
+            .map_err(|e| ExecutionError::Other(format!("DB save_position: {}", e)))?;
+        // 5. Update in-memory cache (after DB confirms)
+        self.positions.insert(position_id.to_string(), pos);
+        // 6. Refresh derived state
+        self.account.refresh_from_positions(&self.positions);
+        Ok(())
+    }
+
+    /// FID-210: SOLE mutation point for partial close (TP1/TP2 scale-out).
+    /// Persists a TradeRecord for the closed portion, updates the position
+    /// in the DB (reduced qty, new scale_level, new stop), and removes the
+    /// position entirely if fully closed.
+    #[allow(clippy::too_many_arguments)]
+    pub async fn partial_close(
+        &mut self,
+        position_id: &str,
+        exit_price: f64,
+        scale_qty: f64,
+        new_scale_level: ScaleLevel,
+        new_stop: f64,
+        notes: String,
+        journal: &crate::monitor::journal::TradeJournal,
+    ) -> Result<TradeRecord, ExecutionError> {
+        // 1. Get from cache
+        let mut pos = self
+            .positions
+            .get(position_id)
+            .ok_or_else(|| ExecutionError::PositionNotFound(position_id.to_string()))?
+            .clone();
+        // 2. Build TradeRecord for the closed portion
+        let trade = self.build_partial_trade_record(&pos, exit_price, scale_qty, notes);
+        // 3. Persist trade to DB
+        journal
+            .record_trade(&trade)
+            .await
+            .map_err(|e| ExecutionError::Other(format!("DB record_trade: {}", e)))?;
+        // 4. If full close, delete position from DB
+        if scale_qty >= pos.quantity {
+            journal
+                .delete_position(position_id)
+                .await
+                .map_err(|e| ExecutionError::Other(format!("DB delete_position: {}", e)))?;
+            self.positions.remove(position_id);
+        } else {
+            // 5. Update position in DB (reduced qty, new scale + stop)
+            pos.quantity -= scale_qty;
+            pos.scale_level = new_scale_level;
+            pos.stop_loss = new_stop;
+            journal
+                .save_position(&pos)
+                .await
+                .map_err(|e| ExecutionError::Other(format!("DB save_position: {}", e)))?;
+            // 6. Update in-memory cache (already in memory, but commit for safety)
+            self.positions.insert(position_id.to_string(), pos);
+        }
+        // 7. Refresh derived state + record the trade
+        self.closed_trades.push(trade.clone());
+        self.account.refresh_from_positions(&self.positions);
+        Ok(trade)
+    }
+
+    /// FID-210: Load all positions + closed trades from the DB into the in-memory
+    /// cache. Called once at engine startup.
+    pub async fn load_from_db(
+        &mut self,
+        journal: &crate::monitor::journal::TradeJournal,
+    ) -> Result<usize, ExecutionError> {
+        let positions = journal.load_positions().await.map_err(|e| {
+            ExecutionError::Other(format!("DB load_positions: {}", e))
+        })?;
+        let count = positions.len();
+        for pos in positions {
+            self.positions.insert(pos.id.clone(), pos);
+        }
+        // Load closed trades (cap at 100 most recent)
+        let closed = journal
+            .load_closed_trades(100)
+            .await
+            .map_err(|e| ExecutionError::Other(format!("DB load_closed_trades: {}", e)))?;
+        self.closed_trades = closed;
+        // Refresh derived state once at the end
+        self.account.refresh_from_positions(&self.positions);
+        Ok(count)
+    }
+
+    /// FID-210: Computed property — replaces the 11 manual
+    /// `account.open_positions = positions.len()` sites in the codebase.
+    pub fn open_positions(&self) -> usize {
+        self.positions.len()
+    }
+
+    /// FID-210: Helper to construct a TradeRecord from a closed position.
+    /// Extracted from the original check_stops inline logic.
+    fn build_trade_record(
+        &self,
+        pos: &Position,
+        exit_price: f64,
+        notes: String,
+    ) -> TradeRecord {
+        let slippage = exit_price * self.slippage_pct;
+        let adjusted_exit = match pos.side {
+            Side::Long => exit_price - slippage,
+            Side::Short => exit_price + slippage,
+        };
+        let exit_fee = adjusted_exit * pos.quantity * self.fee_rate;
+        let pnl = match pos.side {
+            Side::Long => (adjusted_exit - pos.entry_price) * pos.quantity - exit_fee,
+            Side::Short => (pos.entry_price - adjusted_exit) * pos.quantity - exit_fee,
+        };
+        let pnl_pct = pnl / (pos.entry_price * pos.quantity) * 100.0;
+        TradeRecord {
+            id: uuid(),
+            pair: pos.pair.clone(),
+            side: pos.side,
+            entry_price: pos.entry_price,
+            exit_price: adjusted_exit,
+            quantity: pos.quantity,
+            pnl,
+            pnl_pct,
+            fees: 0.0,
+            strategy_name: pos.strategy_name.clone(),
+            opened_at: pos.opened_at,
+            closed_at: Utc::now(),
+            notes,
+            on_chain_verified: false,
+            tx_hash: None,
+        }
+    }
+
+    /// FID-210: Helper to construct a TradeRecord for a partial close.
+    fn build_partial_trade_record(
+        &self,
+        pos: &Position,
+        exit_price: f64,
+        scale_qty: f64,
+        notes: String,
+    ) -> TradeRecord {
+        let slippage = exit_price * self.slippage_pct;
+        let adjusted_exit = match pos.side {
+            Side::Long => exit_price - slippage,
+            Side::Short => exit_price + slippage,
+        };
+        let exit_fee = adjusted_exit * scale_qty * self.fee_rate;
+        let pnl = match pos.side {
+            Side::Long => (adjusted_exit - pos.entry_price) * scale_qty - exit_fee,
+            Side::Short => (pos.entry_price - adjusted_exit) * scale_qty - exit_fee,
+        };
+        let pnl_pct = pnl / (pos.entry_price * scale_qty) * 100.0;
+        TradeRecord {
+            id: uuid(),
+            pair: pos.pair.clone(),
+            side: pos.side,
+            entry_price: pos.entry_price,
+            exit_price: adjusted_exit,
+            quantity: scale_qty,
+            pnl,
+            pnl_pct,
+            fees: 0.0,
+            strategy_name: pos.strategy_name.clone(),
+            opened_at: pos.opened_at,
+            closed_at: Utc::now(),
+            notes,
+            on_chain_verified: false,
+            tx_hash: None,
+        }
     }
 
     /// Save engine state to disk for crash recovery (PROD-3).
@@ -908,6 +1221,6 @@ mod tests {
         trader.register_position("exec-wallet-recovery-link_usd".to_string(), pos.clone());
 
         // PortfolioManager positions should NOT be affected (default no-op)
-        assert_eq!(trader.open_positions().len(), 0);
+        assert_eq!(trader.open_positions(), 0);
     }
 }

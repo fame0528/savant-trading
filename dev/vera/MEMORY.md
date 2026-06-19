@@ -1,7 +1,7 @@
 # MEMORY.md — Vera's Curated Long-Term Memory
 
-**Last updated:** 2026-06-18 14:40 EST (v0.14.9 RELEASED — 5 FIDs shipped: 204 10x NVIDIA keys, 205 per-model cooldown, 206 bearish-EMA veto fix + LONG/SHORT/NO_SIGNAL vocabulary, 207 LLM timeout log, 208 decision log cap raise 500→5000. 393 tests pass. Engine still stopped (Spencer stops/starts manually).)
-**Status:** v0.14.9 RELEASED. 6 NVIDIA keys verified working empirically (~5 RPM per model per key). FID-204/205/206/207/208 implemented per Gemini research directives (research-first protocol followed). v0.14.8's 22-of-32 high-conviction PASS verdict anomaly diagnosed: not "semantic gravity well" but custom bearish-EMA veto + RLHF risk-aversion + autoregressive exposure bias (3-mechanism finding from Gemini).
+**Last updated:** 2026-06-19 00:00 EST (v0.14.10 RELEASED — SOT infrastructure phase 1. Schema migration + 5 wrapper methods + BlockReason + 2 new error variants. 405 tests pass. Engine still has the state-divergence bug; FID-211 will migrate engine callers to the new wrappers.)
+**Status:** v0.14.10 RELEASED. Engine will run overnight for data collection on v0.14.10 binary. FID-211 (engine migration) is the first task of the next session. The DB is now the SOT for positions; the in-memory map is a read-through cache. wrappers exist but are dormant until FID-211 wires engine callers. FID-209 (is_anvil spread bypass) shipped in v0.14.9 is still working.
 
 ---
 

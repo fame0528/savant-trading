@@ -148,26 +148,21 @@ atr_volatility_multiplier = 1.5
 [mode]
 # LIVE on the Anvil fork — real transactions, but forked state only
 live_execution = true
+# FID-209: Bypass spread filter on Anvil (0x doesn't index forked tokens).
+# This is what allows the engine to actually execute trades on the local fork.
+is_anvil = true
 
 [ai]
-# FID-200: NVIDIA NIM with M3 (free unlimited, no quota)
-provider = "nvidia"
-endpoint = "https://integrate.api.nvidia.com/v1"
-model = "minimaxai/minimax-m3"
-api_key_env = "NVIDIA_API_KEY"
-# FID-204: per-juror NVIDIA API key rotation (10 keys → ~50 RPM aggregate).
-api_key_envs = [
-    "NVIDIA_API_KEY_1",
-    "NVIDIA_API_KEY_2",
-    "NVIDIA_API_KEY_3",
-    "NVIDIA_API_KEY_4",
-    "NVIDIA_API_KEY_5",
-    "NVIDIA_API_KEY_6",
-    "NVIDIA_API_KEY_7",
-    "NVIDIA_API_KEY_8",
-    "NVIDIA_API_KEY_9",
-    "NVIDIA_API_KEY_10",
-]
+# ROLLBACK 2026-06-18 19:42 EST: NVIDIA NIM rate-limited (5 RPM per key, even
+# with 10-key rotation, M3 batch call still 429s). Reverted to v0.14.6 setup:
+# M3 via TokenRouter (200 OK in 1.88s), jury via OpenRouter (auto-route).
+# FID-200/204/205/206/207/208 code paths PRESERVED — only the active provider
+# changed. To re-enable NVIDIA NIM jury, uncomment NVIDIA_API_KEY* in .env
+# AND change provider back to "nvidia".
+provider = "tokenrouter"
+endpoint = "https://api.tokenrouter.com/v1"
+model = "MiniMax-M3"
+api_key_env = "TOKEN_ROUTER_API_KEY"
 autonomy_level = 3
 max_decisions_per_hour = 20
 context_window_candles = 500

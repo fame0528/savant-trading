@@ -193,6 +193,11 @@ atr_volatility_multiplier = 1.5
 # Set to false for paper-trading / backtesting mode.
 # When false, the engine still evaluates and logs decisions but never submits txns.
 live_execution = false
+# FID-209: is_anvil must be FALSE on mainnet. The spread filter is the
+# price-protection guarantee for real trades. Setting this to true on
+# mainnet would bypass price validation and allow trades at any price.
+# Only test-anvil.toml should have is_anvil = true.
+is_anvil = false
 
 [ai]
 # **FID-200 (NVIDIA NIM):** Switched from TokenRouter M3 to NVIDIA NIM

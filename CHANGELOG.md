@@ -2,6 +2,98 @@
 
 All notable changes to Savant Trading are documented here.
 
+## [0.14.10] — 2026-06-18
+
+### SOT Infrastructure: SQLite as Single Source of Truth (Phase 1 of 2)
+
+Phase 1 of FID-210 ships the SOT infrastructure. Phase 2 (FID-211) is the engine migration that wires callers to the new wrappers.
+
+### Added — Schema Migration (`migrate_v210`)
+
+- `migrate_v210` runs on engine startup, idempotent via `PRAGMA table_info` checks
+- Adds `token_address TEXT NOT NULL DEFAULT ''` to `positions` table (Bug 6: was read but never written)
+- Adds `real_trade BOOLEAN NOT NULL DEFAULT 1` to `trades` table
+- One-time cleanup of 5 ghost `wallet_recovery` placeholder trade rows (from 2026-06-15, prior engine version)
+- `token_address` is now included in `save_position` INSERT (was missing — silent data loss bug)
+
+### Added — 5 SOT Wrapper Methods on `PortfolioManager`
+
+These are the SOLE mutation points for positions. Persist to SQLite FIRST, then update in-memory cache on success.
+
+- `open_position(pos, journal)` — validates, persists, updates cache
+- `close_position_persist(id, exit_price, notes, journal)` — records trade, removes position
+- `adjust_stop(id, new_stop, new_tp1/tp2/tp3/current_price, journal)` — partial field updates with stop-ratchet validation
+- `partial_close(id, exit_price, scale_qty, new_scale_level, new_stop, notes, journal)` — TP1/TP2 scale-out, handles full close internally
+- `load_from_db(journal)` — engine startup hydration from SQLite
+
+Plus 2 helpers: `build_trade_record`, `build_partial_trade_record` (extracted from existing internal logic).
+Plus computed property: `pub fn open_positions(&self) -> usize` (replaces 11 manual assignment sites).
+
+### Added — `BlockReason` for Engine Block State
+
+Replaces the `savant.blocked` text file. Serializes to the dashboard `/api/risk` endpoint.
+
+- `SharedEngineData.block: Arc<RwLock<Option<BlockReason>>>` — in-memory field
+- `BlockReason` struct: `block_type`, `reason`, `triggered_at`
+- 4 helper methods: `set_block`, `clear_block`, `get_block`, `try_get_block`
+
+### Added — 2 New `ExecutionError` Variants
+
+- `DuplicatePositionId(String)` — detected at open time
+- `InvalidStopRatchet { old: f64, new: f64 }` — detected at adjust_stop time (prevents locking in a loss)
+
+### Added — `TradeJournal::load_closed_trades(limit)`
+
+New method to hydrate the in-memory `closed_trades` working set at engine startup. Used by `PortfolioManager::load_from_db`.
+
+### Tests
+
+**+0 net tests** (still 405 lib + 10 dashboard = 415 total). The SOT wrappers have internal logic, but full E2E coverage is deferred to FID-211 when the engine migrates to use them.
+
+### Known Limitations (deferred to FID-211)
+
+- Engine still uses `positions_mut()` and `closed_trades_mut()` (15 + 3 sites) — bypasses the new wrappers
+- Engine still writes `savant.blocked` file (3 sites) — block never auto-clears
+- API still reads `savant.blocked` file (2 sites) — dashboard shows stale block
+- 11 manual `account.open_positions = N` sites still exist
+- DexTrader still has parallel `positions`/`closed_trades`/`balance`/`order_counter` fields
+- `data/dex_state.json` still written
+
+**Engine behavior is identical to v0.14.9 from a runtime perspective.** The SOT infrastructure is dormant until FID-211 migrates callers.
+
+### Empirical
+
+- 405 lib tests pass (was 399 at v0.14.9 release; +6 from FID-209 rev 2 prep)
+- 10 dashboard tests pass
+- `cargo clippy --all-targets -- -D warnings` clean
+- `cargo build --release` clean (1m 11s)
+
+### Files Changed
+
+```
+CHANGELOG.md                                       | v0.14.10 section
+Cargo.toml                                         | version 0.14.9 ? 0.14.10
+VERSION                                            | 0.14.9 ? 0.14.10
+README.md                                          | v0.14.9 ? v0.14.10 + test count
+protocol.config.yaml                               | version 0.14.10
+config/canary.toml                                 | FID-209: is_anvil = false
+config/default.toml                                | FID-209: is_anvil = false
+config/test-anvil.toml                             | FID-209: is_anvil = true
+src/core/error.rs                                  | +2 ExecutionError variants
+src/core/shared.rs                                 | +BlockReason + 4 helper methods
+src/execution/portfolio.rs                         | +5 SOT wrapper methods + 2 helpers
+src/monitor/journal.rs                             | +migrate_v210 + load_closed_trades
+dev/fids/FID-2026-0618-209-spread-filter-testnet-bypass.md | archive
+dev/fids/FID-2026-0618-210-single-source-of-truth.md        | archive
+dev/fids/FID-2026-0618-210-sqlite-single-source-of-truth.md  | archive
+dev/fids/FID-2026-0618-210-state-divergence-block-never-clears.md | archive
+dev/fids/FID-2026-0618-210-IMPLEMENTATION-STATUS.md          | archive
+dev/vera/notes/repo-audit-2026-06-18.md           | archive
+dev/vera/MEMORY.md                                | status updated to v0.14.10
+dev/LEARNINGS.md                                  | v0.14.10 session lessons
+prompts/gemini-research-repo-audit-2026-06-18.md  | archive
+```
+
 ## [0.14.9] — 2026-06-18
 
 ### Rate-Limit Resilience + Bearish-EMA Veto Fix

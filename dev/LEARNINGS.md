@@ -1265,3 +1265,144 @@ The alpha computation block at `src/engine/mod.rs` lines ~3438-3470 has a syntax
 - 6 FIDs archived: 178, 179, 180, 181, 193 (master), 194, 195, 196, 184, 198, 200
 
 **Memory state:** Overnight data collected (v0.14.8 limited by NVIDIA free-tier rate limit + bearish-EMA veto). 11 NVIDIA API keys stored in `.env`, 11/11 verified working. FID-204 written (10x key per-juror rotation), not yet implemented. Engine stopped. Fresh session, new workflow rule established. Next: implement FID-204 (10x keys), FID-205 (per-model cooldown), FID-206 (bearish-EMA prompt fix) → bundle into v0.14.9 release.
+
+## Session 2026-06-18 (late evening, post-v0.14.9): FIRST ON-CHAIN FILL + ECHO Discipline Success
+
+**Context:** Engine was running on v0.14.9 binary at 9:41 PM EST after Spencer ran `start.bat`. Engine loaded config/test-anvil.toml, started M3 proxy on :4000, killed stale anvil and started fresh Anvil fork. First 3 cycles ran between 9:44 PM and 10:03 PM. **At 10:02 PM, the engine made its first on-chain trade: AAVE/USD LONG @ 74.91, tx 0xbe2a40ea7c221d9a0a41fbaade6437b7717221d0860c8547364148a2fb8f6fd5.**
+
+**The path to this milestone involved multiple failures, course corrections, and an ECHO protocol validation:**
+
+### The 5 Major Milestones Tonight
+
+1. **v0.14.9 release (afternoon)** — 5 FIDs shipped: 10x NVIDIA keys, per-model cooldown, bearish-EMA veto fix (LONG/SHORT/NO_SIGNAL vocab), LLM timeout log, decision log cap raise 500→5000. 393 tests pass.
+2. **NVIDIA rate-limit discovered (evening)** — Engine on v0.14.9 binary at 7:54 PM, M3 batch call hit 429 immediately, 2/169 cycles succeeded overnight. Decision: rollback to TokenRouter M3 + OpenRouter jury.
+3. **Spread filter bypass rev 1 failed (FID-209 rev 1)** — chain_id-based check (chain_id == 31337) silently failed because test-anvil.toml uses Arbitrum's chain_id (42161) deliberately for token resolution. 9 BUY verdicts rejected at spread filter, no fills.
+4. **Spencer called out my ECHO Law 1 violation** — "make the FID, run full perfection loop, include questions I should've asked and forgot." I re-read ECHO.md 0-EOF, ran 206-ref chain_id grep, found [mode] block convention, rewrote FID-209 rev 2 with is_anvil config flag.
+5. **FIRST FILL at 10:02 PM** — Engine autonomously: M3 (TokenRouter) batch call → 13-pair batch returned in 36-139s → 10-juror NVIDIA NIM shadow jury (8 verdicts, 1 timeout) → conviction 0.32 AAVE → position sized 0.0701 AAVE → FID-209 is_anvil bypass fired (`[SPREAD] OK: 0bps`) → 0x EIP-1559 quote → tx broadcast → on-chain confirmation. Risk gate `Max positions reached: 1` correctly blocked LDO+CRV subsequent BUY verdicts.
+
+### Critical Lessons — ECHO Discipline Saved the Day
+
+**Lesson 1: Law 1 (Read 0-EOF) is not ceremonial, it's a force multiplier.**
+
+The chain_id silent failure would have shipped if Spencer hadn't made me redo the FID. I read the source code (trader.rs, 2,621 lines) and added the bypass in the right place. I did NOT read the config file (test-anvil.toml, 271 lines) which had a comment explaining the deliberate chain_id=42161. **Source code is necessary but not sufficient. Config is the source of truth for runtime behavior.** I now have a habit: any code change that touches a config-driven path → read the config 0-EOF FIRST.
+
+**Lesson 2: Law 4 (Call-Graph Reachability) caught the wiring before it bit us again.**
+
+When I rewrote FID-209 rev 2, I ran `grep -rn "is_anvil" src/ config/` and got 42 references. The full chain `[mode].is_anvil → ModeConfig.is_anvil → config.mode.is_anvil → trader.set_is_anvil → DexTrader.is_anvil → self.is_anvil (read)` was 1→1→1 traced. If any link had been broken, the bypass wouldn't have fired on cycle 1. **AUDIT phase is not optional, even for 5-line code changes.**
+
+**Lesson 3: Law 2 (Present Before Act) — questions the operator should have answered before coding.**
+
+Spencer's "include the questions I should've asked and forgot" instruction made me write down 10 questions I should have asked before implementing FID-209 rev 1. The most important was #1: "What is the value of `[exchange.dex].chain_id` in `config/test-anvil.toml`?" — that single question would have prevented the rework. I now write the "Questions That Should Have Been Asked" section FIRST in every FID, before any code.
+
+**Lesson 4: Perfection Loop FSM is real, not theater.**
+
+The RED → GREEN → VERIFY → AUDIT → COMPLETE cycle caught the v0.14.8 cycle-orchestrator testing gap (Finding 2.1 of the repo audit), the wallet key zeroization gap (Finding 1.1), and the spread filter chain_id silent failure. Each pass of the loop is supposed to find 1-2 issues. Each pass did. The state machine works because each transition has explicit entry/exit conditions, not vibes.
+
+**Lesson 5: The "bypass Anvil" problem is a different problem than "fix the prompt" problem.**
+
+When the LLM said PASS at high conviction, we thought it was the prompt (Gemini research, 3-mechanism hypothesis). It turned out to be the spread filter, not the prompt. The 22 v0.14.8 PASSes were all `conviction < 0.10` (correct behavior) or `conviction 0.18-0.52` (the prompt anti-pattern) BUT all rejected at spread filter before they could become BUY verdicts. **We were debugging the wrong layer.** The fix was never the prompt — it was the spread filter bypass. When the bypass fired correctly, the M3 model produced action=Buy at conviction 0.32 on cycle 1 of v0.14.9. The 3-mechanism Gemini hypothesis was probably correct, but it was never the binding constraint.
+
+### Workflow Pattern Established (2026-06-18 evening)
+
+**New release workflow (Spencer's directive):**
+1. Work accumulates locally in working tree. No random commits to main throughout the day.
+2. When ready to ship: pick version number → update VERSION, Cargo.toml, protocol.config.yaml, README.md (test count), CHANGELOG.md atomically → single commit → push → `gh release create v{VERSION}` with notes.
+3. End of session = release. Unshippable work stays in FID spec form for next session.
+4. Hotfixes are bundled into release commits, not scattered.
+5. Repo description + topics updated per release if scope shifted significantly.
+
+### First On-Chain Trade — Documented
+
+**Cycle 3, 2026-06-18 22:02:35 UTC (10:02:35 PM EST):**
+- Pair: AAVE/USD
+- Side: LONG (entry)
+- Entry: $74.91
+- Quantity: 0.07008410092110533 AAVE
+- Notional: ~$5.25
+- Stop loss: $74.5350 (client-side, DB-persisted)
+- Take profits: $75.3595 / $75.7830 / $76.2065 (scale out 50/30/20)
+- Risk: $17.50
+- Tx hash: `0xbe2a40ea7c221d9a0a41fbaade6437b7717221d0860c8547364148a2fb8f6fd5`
+- On-chain confirmed: `gas=342547`
+- LLM verdict: action=Buy, conviction=0.32, regime=Trending, confidence=35%
+- Jury: 1 M3-control BUY at 62% confidence + 1 NVIDIA juror-6 BUY at 35% + 6 HOLDs + 2 timeouts
+- Risk gate: LDO+CRV rejected by `Max positions reached: 1`
+- USDC balance: $50.00 → $44.75 (gas + slippage)
+- On-chain AAVE balance: 0.07006768 (after gas + trade)
+
+This is a real milestone. The end-to-end pipeline works.
+
+### What's Next (whenever Spencer calls it)
+
+- Watch AAVE position through stop loss or take profit to verify full position-management loop
+- Package v0.14.10 release with FID-209/204/205/206/207/208 (everything from this session not yet pushed)
+- Update CHANGELOG, README, repo description, GitHub release notes with "first on-chain fill" milestone
+- Update FID-209 to status: verified (with tx hash as evidence)
+- Decide v0.15.0 scope (multi-chain, Hyperliquid, cycle-orchestrator tests)
+- Adopt "Questions That Should Have Been Asked" as standard FID preamble
+
+**Files Touched (this session, in addition to FID-204/205/206/207/208 already shipped in v0.14.9):**
+- `src/core/config.rs` — added is_anvil to ModeConfig (FID-209)
+- `src/execution/dex/trader.rs` — added is_anvil field + setter, rewired bypass, added tests (FID-209)
+- `src/engine/utils.rs` — wired setter at 2 sites (FID-209)
+- `config/test-anvil.toml` — added is_anvil = true
+- `config/default.toml` — added is_anvil = false
+- `config/canary.toml` — added is_anvil = false
+- `dev/vera/MEMORY.md` — this update
+- `dev/LEARNINGS.md` — this entry
+- `dev/fids/FID-2026-0618-209-spread-filter-testnet-bypass.md` — full rev 2 with Perfection Loop documentation
+- `dev/session-summaries/2026-06-18-21-30-FID-209-rework.md` — Law 8 session log
+- `dev/vera/notes/overnight-run-2026-06-18.md` — overnight analysis (pre-fix)
+- `prompts/gemini-research-bearish-ema-prompt-fix-2026-06-18.md` — research prompt for FID-206
+
+**Memory state:** Engine now trades. v0.14.9 binary is the first version that produced an on-chain fill. The "ambitious project" Gemini critique from the earlier audit was true in spirit but wrong in conclusion — the project IS working, just slowly, with the ECHO discipline protecting against silent failures. The 6 FIDs shipped in v0.14.9 + FID-209 in working tree represent the bulk of the work needed to make this engine tradeable on Anvil. Next milestone: a profitable closed trade.
+
+## Session 2026-06-18 (late night → 2026-06-19 00:00 EST): v0.14.10 SOT Infrastructure
+
+**Context:** After the v0.14.9 first-on-chain trade + Aave state-divergence discovery, we wrote FID-210 to refactor position state to be DB-as-SOT. Spencer correctly pushed back: "Why are we using in memory instead of the db for important data?" The FID went through 3 revisions as the re-audit found 2 more bugs (`token_address` schema bug, `current_price` staleness). We stopped at "Phase 1 of 2" — the SOT infrastructure is in place but the engine hasn't migrated to use it yet (that's FID-211).
+
+**Key Lessons (5 new):**
+
+1. **ECHO Law 1 (Read 0-EOF) prevents silent failures — but only if you read EVERYTHING that matters.** The v0.14.9 state-divergence bug happened because the `position.stop_loss` written by AdjustStop in `engine/mod.rs:4654` only updated `portfolio.positions`, never `trader.positions`. The two maps are "parallel" with no enforcement. The same pattern: in-memory cache + DB write that are best-effort, not transactional. **The bug existed for the lifetime of the project — it was only caught by running a real cycle through a real engine and seeing the dashboard show a closed position that the engine still thought was open.**
+
+2. **"Read 0-EOF" includes config files, not just source code.** When the v0.14.9 spec said `chain_id = 31337` for Anvil, that was wrong because `config/test-anvil.toml:8` deliberately uses `chain_id = 42161` (Arbitrum) to reuse the contract addresses from the fork. **The config is the source of truth for runtime behavior; the source code is the source of truth for structure.** Both must be read 0-EOF before any spec change.
+
+3. **Don't optimize for code simplicity at the cost of durability for important data.** My first FID-210 draft proposed in-memory as the SOT ("simpler, no I/O on the hot path"). Spencer correctly rejected: real money = persistence. The DB is already used for trades, decisions, equity snapshots, settings, activity log. **Positions being the odd one out was itself a smell.** The refactor is bigger but right.
+
+4. **FID re-audit catches what the first draft missed.** Rev 1 had 5 bugs. Rev 2 found 2 more (`token_address` column read-but-never-written, `current_price` in DB is stale because the engine doesn't call `save_position()` after updating in-memory). **Each Perfection Loop pass should find 1-2 new issues** — that's the FSM working as designed.
+
+5. **"Pragmatic two-phase delivery" is better than a half-done release.** I tried to refactor all 20+ engine call sites in one FID. The engine started breaking in cascading ways (method name collision at line 3640, etc.). **Stopping at Phase 1 (SOT infrastructure + 405 tests passing) is a valid release.** The engine still works exactly as v0.14.9 did. FID-211 becomes the next session's task. Spencer's instinct to "hold until session is wrapping up" was right.
+
+**State of the project after v0.14.10:**
+- 405 lib tests pass
+- clippy clean
+- release build clean
+- Engine compiles + runs (behavior identical to v0.14.9)
+- 6 ghost GRT/USD wallet_recovery trades will be cleaned on next startup
+- DB schema has `token_address` and `real_trade` columns (migration runs idempotently)
+- 5 SOT wrapper methods are available but not yet called by the engine
+- BlockReason struct + 3 helper methods are available but engine still writes to `savant.blocked` file
+- The Aave state-divergence bug is **NOT fixed** — needs FID-211 to migrate engine callers
+
+**Hand-off for overnight + next session:**
+1. Spencer runs `start.bat` which kills old engine, rebuilds, starts new engine with v0.14.10 binary
+2. Engine starts, runs `migrate_v210` (adds 2 columns + cleans 5 ghost trades)
+3. Engine then operates as v0.14.9 did — same behavior, same Aave state-divergence bug
+4. Data collected overnight will be the basis for FID-211 in next session
+
+**Files modified (Phase 1 of FID-210):**
+- `src/monitor/journal.rs` (+~120 LoC, schema migration + load_closed_trades + token_address in save_position + real_trade in record_trade)
+- `src/core/error.rs` (+5 LoC, 2 new ExecutionError variants)
+- `src/core/shared.rs` (+~50 LoC, BlockReason struct + 4 helper methods)
+- `src/execution/portfolio.rs` (+~250 LoC, 5 SOT wrapper methods + 2 helpers + computed open_positions)
+
+**Net diff:** +~425 LoC. 5 issues found and fixed during implementation (TradeRecord missing fields, super::journal path, close_position name collision, clippy too_many_arguments, test open_positions().len() fix). 1 pre-existing license warning (unrelated).
+
+**Files NOT modified (FID-211 territory):**
+- `src/engine/mod.rs` (15 positions_mut + 3 closed_trades_mut + 3 savant.blocked writes + 8 account.open_positions sites)
+- `src/api/mod.rs` (2 savant.blocked reads + 1 clear-block endpoint)
+- `src/main.rs` (savant.blocked cleanup + load_from_db call + DB backup)
+- `src/execution/reconciliation.rs` (3 positions_mut sites)
+- `src/execution/dex/trader.rs` (remove parallel positions/closed_trades/balance/order_counter fields)
+
+**Memory state:** v0.14.10 ships. Engine runs tonight. FID-211 first thing next session. ECHO discipline (Law 1 + Law 4 + Perfection Loop + 3-rev re-audit) proved its worth again. We got the SOT infrastructure right; the engine migration is mechanical.
