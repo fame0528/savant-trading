@@ -1,4 +1,4 @@
-# SAVANT TRADING v0.15.0
+# SAVANT TRADING v0.15.1
 
 <!-- markdownlint-disable MD033 -->
 <div align="center">
@@ -411,7 +411,7 @@ The risk layer is **independent of the AI brain** — the agent cannot override 
 
 ```bash
 cargo build
-cargo test # 412 tests (+7 security tests from FID-211)
+cargo test # 464 tests (416 lib + 38 integration + 10 main.rs binary; FID-211 Stage 2)
 cargo clippy -- -D warnings
 ```
 
@@ -427,7 +427,7 @@ All development follows the [Savant Protocol](https://github.com/fame0528/savant
 Bugs and improvements tracked via FIDs:
 
 - Active FIDs: 0 (see [MASTER-FID.md](dev/fids/MASTER-FID.md))
-- 177 archived FIDs
+- 216 archived FIDs
 
 ---
 
