@@ -394,18 +394,35 @@ async fn get_risk(State(state): State<AppState>) -> Json<ApiResponse<serde_json:
         "OK"
     };
 
-    let block_path = "savant.blocked";
-    let blocked = std::path::Path::new(block_path).exists();
-    let block_reason = if blocked {
-        std::fs::read_to_string(block_path).unwrap_or_default()
-    } else {
-        String::new()
-    };
+    // FID-210/211: Read block state from shared.block (in-memory, populated by
+    // engine on every circuit-breaker trigger). The file is still the
+    // crash-survived SOT but is no longer read on every API request.
+    //
+    // Dashboard compat: `block_reason` stays a string (the format the dashboard
+    // already parses with regex). We also expose the structured `block` object
+    // for any new consumers.
+    let block = state.shared.try_get_block();
+    let blocked = block.is_some();
+    let block_reason = block
+        .as_ref()
+        .map(|b| format!("Trigger: {}\nReason: {}", b.block_type, b.reason))
+        .unwrap_or_default();
+    let block_json = block
+        .as_ref()
+        .map(|b| {
+            serde_json::json!({
+                "block_type": b.block_type,
+                "reason": b.reason,
+                "triggered_at": b.triggered_at.to_rfc3339(),
+            })
+        })
+        .unwrap_or(serde_json::Value::Null);
 
     Json(ApiResponse::ok(serde_json::json!({
         "circuit_breaker": circuit_status,
         "blocked": blocked,
         "block_reason": block_reason,
+        "block": block_json,
         "daily_loss_pct": if account.equity > 0.0 { account.daily_pnl / account.equity } else { 0.0 },
         "drawdown_pct": account.drawdown_pct,
         "open_positions": positions.len(),
@@ -416,25 +433,50 @@ async fn get_risk(State(state): State<AppState>) -> Json<ApiResponse<serde_json:
     })))
 }
 
-/// POST /api/risk/clear-block — delete savant.blocked to unblock the engine.
-async fn clear_block(State(_state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
+/// POST /api/risk/clear-block — clear the engine block state and delete the
+/// savant.blocked file to unblock the engine.
+async fn clear_block(State(state): State<AppState>) -> Json<ApiResponse<serde_json::Value>> {
+    // FID-210/211: Clear the in-memory block state AND delete the file. The file
+    // is the cross-process SOT (start.bat / dashboard scripts read it); the
+    // shared.block is what the API serves. Both must clear together.
+    let was_blocked = state.shared.try_get_block().is_some();
+    state.shared.clear_block().await;
+
     let block_path = "savant.blocked";
-    if !std::path::Path::new(block_path).exists() {
-        return Json(ApiResponse::ok(serde_json::json!({
-            "cleared": false,
-            "message": "No block file exists — engine is not blocked",
-        })));
-    }
+    let file_existed = std::path::Path::new(block_path).exists();
     match std::fs::remove_file(block_path) {
         Ok(()) => {
-            info!("Cleared savant.blocked via API");
+            info!(
+                "Cleared savant.blocked via API (was_blocked={})",
+                was_blocked
+            );
             Json(ApiResponse::ok(serde_json::json!({
                 "cleared": true,
-                "message": "Block file deleted. Restart the engine to resume trading.",
+                "was_blocked": was_blocked,
+                "file_existed": file_existed,
+                "message": "Engine block cleared. Restart the engine to resume trading.",
+            })))
+        }
+        Err(e) if !file_existed => {
+            // shared.block was Some but no file — happens if engine was started
+            // without a prior block file, or file was deleted by start.bat. Still
+            // report success because in-memory state cleared.
+            warn!(
+                "savant.blocked file did not exist when clearing via API: {}",
+                e
+            );
+            Json(ApiResponse::ok(serde_json::json!({
+                "cleared": true,
+                "was_blocked": was_blocked,
+                "file_existed": false,
+                "message": "Engine block cleared (in-memory). No file existed.",
             })))
         }
         Err(e) => {
             warn!("Failed to delete savant.blocked: {}", e);
+            // shared.block is already cleared; surface the file error but don't
+            // claim "cleared: true" because the file lingers and start.bat or a
+            // restart will re-hydrate shared.block from the file.
             Json(ApiResponse {
                 data: serde_json::json!({"cleared": false}),
                 error: Some(format!("Failed to delete block file: {}", e)),
@@ -804,16 +846,23 @@ async fn get_wallet(State(state): State<AppState>) -> Json<ApiResponse<serde_jso
     let cached_addr = state.shared.wallet_address.read().await;
     let address = if cached_addr.is_empty() {
         // Fallback: derive on first request if startup caching failed
-        let private_key =
-            std::env::var(&state.config.exchange.dex.wallet_key_env).unwrap_or_default();
-        if private_key.is_empty() {
-            return Json(ApiResponse {
-                data: serde_json::json!({"address": null, "error": "WALLET_PRIVATE_KEY not set"}),
-                error: None,
-                timestamp: chrono::Utc::now().to_rfc3339(),
-            });
-        }
-        match derive_wallet_address(&private_key) {
+        // FID-211 (audit Finding 1.1): Wrap in WalletKey. expose_secret()
+        // called once at the address-derivation site.
+        let wallet_key = savant_trading::core::security::WalletKey::from_env(
+            &state.config.exchange.dex.wallet_key_env,
+        )
+        .ok();
+        let wallet_key = match wallet_key {
+            Some(k) => k,
+            None => {
+                return Json(ApiResponse {
+                    data: serde_json::json!({"address": null, "error": "WALLET_PRIVATE_KEY not set"}),
+                    error: None,
+                    timestamp: chrono::Utc::now().to_rfc3339(),
+                });
+            }
+        };
+        match derive_wallet_address(wallet_key.expose_secret()) {
             Ok(addr) => addr,
             Err(e) => {
                 return Json(ApiResponse {

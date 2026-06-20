@@ -5,6 +5,7 @@
 use alloy_core::hex;
 use alloy_core::primitives::Address;
 use k256::ecdsa::SigningKey;
+use savant_trading::core::security::WalletKey;
 use savant_trading::execution::dex::zero_x::ZeroXBackend;
 use savant_trading::execution::dex::{DexBackend, SwapParams};
 use sha3::{Digest, Keccak256};
@@ -15,12 +16,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().ok();
 
     let api_key = std::env::var("ZEROEX_API_KEY")?;
-    let wallet_key = std::env::var("WALLET_PRIVATE_KEY")?;
+    // FID-211 (audit Finding 1.1): Wrap in WalletKey. expose_secret() at the
+    // signing key construction site only.
+    let wallet_key = WalletKey::from_env("WALLET_PRIVATE_KEY")?;
     let rpc_url = std::env::var("ARBITRUM_RPC_URL")
         .unwrap_or_else(|_| "https://arb1.arbitrum.io/rpc".to_string());
 
     // Parse signing key
-    let key_hex = wallet_key.trim_start_matches("0x");
+    let key_hex = wallet_key.expose_secret().trim_start_matches("0x");
     let key_bytes = hex::decode(key_hex)?;
     let signing_key = SigningKey::from_bytes(key_bytes.as_slice().into())?;
 

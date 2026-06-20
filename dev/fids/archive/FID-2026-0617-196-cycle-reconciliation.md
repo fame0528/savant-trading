@@ -3,7 +3,8 @@
 **Filename:** `FID-2026-0617-196-cycle-reconciliation.md`
 **ID:** FID-2026-0617-196
 **Severity:** critical
-**Status:** analyzed
+**Status:** closed
+**Resolution:** Shipped in v0.14.7 (commit 1fda8db5, 2026-06-17). Per-cycle reconciliation with USDC balance + safety halt + telemetry now runs at the start of every engine cycle. Detects on-chain vs in-memory divergence and halts trading until the gap is reconciled. Child of FID-193. Archived 2026-06-19 per FID-211 Stage 2 Item 6 cleanup.
 **Created:** 2026-06-17 21:00 EST
 **Author:** Vera
 **Parent:** FID-193

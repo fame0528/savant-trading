@@ -449,10 +449,13 @@ impl PortfolioManager {
         &self.closed_trades
     }
 
-    /// FID-211 (future): Internal-only mutation. External code must use the
-    /// `partial_close` / `close_position` wrappers which persist to SQLite.
-    /// Currently still `pub` for backward compat — will be `pub(crate)` after
-    /// the engine refactor (FID-211).
+    /// FID-211: Internal-only mutation. External code (integration tests,
+    /// downstream crates) must use the `partial_close` / `close_position`
+    /// wrappers which persist to SQLite. Currently still `pub` for backward
+    /// compat — the engine is in a separate binary crate (`savant`) and
+    /// tightening to `pub(crate)` would break the engine (see FID-211
+    /// Stage 2 Item 5 re-audit). The doc comment + the 2-portfolio.rs
+    /// unit tests on the wrappers are the current enforcement layer.
     pub fn closed_trades_mut(&mut self) -> &mut Vec<TradeRecord> {
         &mut self.closed_trades
     }
@@ -465,10 +468,14 @@ impl PortfolioManager {
         &self.positions
     }
 
-    /// FID-211 (future): Internal-only mutation. External code must use the
-    /// `open_position` / `close_position` / `adjust_stop` / `partial_close`
-    /// wrappers which persist to SQLite. Currently still `pub` for backward
-    /// compat — will be `pub(crate)` after the engine refactor (FID-211).
+    /// FID-211: Internal-only mutation. External code (integration tests,
+    /// downstream crates) must use the `open_position` / `close_position` /
+    /// `adjust_stop` / `partial_close` wrappers which persist to SQLite.
+    /// Currently still `pub` for backward compat — the engine is in a
+    /// separate binary crate (`savant`) and tightening to `pub(crate)` would
+    /// break the engine (see FID-211 Stage 2 Item 5 re-audit). The doc
+    /// comment + the 26 integration tests on the wrappers are the current
+    /// enforcement layer.
     pub fn positions_mut(&mut self) -> &mut HashMap<String, Position> {
         &mut self.positions
     }
@@ -798,6 +805,55 @@ impl PortfolioManager {
             self.account.refresh_from_positions(&self.positions);
         }
         removed
+    }
+
+    /// FID-211 Stage 2: SOLE mutation point for recording a closed trade in the
+    /// in-memory cache. Persists to SQLite FIRST (SOT), then appends to the cache
+    /// on success. Used by the engine's external-close path where the position
+    /// was already removed from the executor/DB by an external party, but a
+    /// TradeRecord still needs to be created and persisted.
+    ///
+    /// Differs from `close_position_persist`: that wrapper does BOTH a
+    /// `record_trade` AND a `delete_position` (atomic close of a still-open
+    /// position). This wrapper only writes a TradeRecord — the position was
+    /// already removed out-of-band. Use this when the executor is the source of
+    /// the removal, not this PortfolioManager.
+    ///
+    /// On DB failure, the trade is NOT added to the in-memory cache (rollback
+    /// invariant — cache must not exceed SOT).
+    pub async fn record_closed_trade_sync(
+        &mut self,
+        trade: &TradeRecord,
+        journal: &crate::monitor::journal::TradeJournal,
+    ) -> Result<(), ExecutionError> {
+        // 1. Persist to DB FIRST (SOT)
+        journal
+            .record_trade(trade)
+            .await
+            .map_err(|e| ExecutionError::Other(format!("DB record_trade: {}", e)))?;
+        // 2. Append to in-memory cache (after DB confirms)
+        self.closed_trades.push(trade.clone());
+        Ok(())
+    }
+
+    /// FID-211 Stage 2: SOLE mutation point for removing a phantom TradeRecord
+    /// from the in-memory cache. Used when an on-chain close FAILED — the engine
+    /// had pre-emptively added a TradeRecord to reflect the would-be close, and
+    /// now needs to revert it. The DB was never written (the on-chain close
+    /// failed before reaching the executor), so this is cache-only.
+    ///
+    /// **Pre-condition:** The trade MUST NOT exist in SQLite. Calling this on a
+    /// trade that IS in the DB will leave a phantom-in-DB hole. The caller
+    /// (engine) is responsible for confirming the trade was never persisted.
+    ///
+    /// Returns true if a matching trade was found and removed, false if no match.
+    pub fn remove_synced_closed_trade<F>(&mut self, predicate: F) -> bool
+    where
+        F: Fn(&TradeRecord) -> bool,
+    {
+        let initial_len = self.closed_trades.len();
+        self.closed_trades.retain(|t| !predicate(t));
+        self.closed_trades.len() != initial_len
     }
 
     /// FID-211: SOLE mutation point for clearing the in-memory position cache.
@@ -1308,5 +1364,98 @@ mod tests {
 
         // PortfolioManager positions should NOT be affected (default no-op)
         assert_eq!(trader.open_positions(), 0);
+    }
+
+    // ── FID-211 Stage 2: closed_trade wrapper tests ──────────────────────
+    // These tests do NOT touch the journal — they verify the cache-only
+    // `remove_synced_closed_trade` path. The DB-persisting
+    // `record_closed_trade_sync` path is covered by tests/engine_cycle.rs
+    // and tests/sot_wrapper_atomicity.rs (integration-level).
+
+    fn make_trade_record(
+        pair: &str,
+        entry: f64,
+        exit: f64,
+        qty: f64,
+        closed_at: chrono::DateTime<chrono::Utc>,
+    ) -> TradeRecord {
+        TradeRecord {
+            id: uuid::Uuid::new_v4().to_string(),
+            pair: pair.to_string(),
+            side: Side::Long,
+            entry_price: entry,
+            exit_price: exit,
+            quantity: qty,
+            pnl: (exit - entry) * qty,
+            pnl_pct: ((exit - entry) / entry) * 100.0,
+            fees: 0.0,
+            strategy_name: "test".to_string(),
+            opened_at: closed_at - chrono::Duration::hours(1),
+            closed_at,
+            notes: "test trade".to_string(),
+            on_chain_verified: false,
+            tx_hash: None,
+        }
+    }
+
+    #[test]
+    fn remove_synced_closed_trade_removes_matching() {
+        // FID-211 Stage 2: phantom trade revert path. Engine adds a TradeRecord
+        // pre-emptively for a close, close fails, engine reverts the cache entry.
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
+        let now = Utc::now();
+        let t1 = make_trade_record("BTC/USD", 100.0, 105.0, 1.0, now);
+        let t2 = make_trade_record("ETH/USD", 50.0, 55.0, 2.0, now);
+        let t3 = make_trade_record("SOL/USD", 20.0, 22.0, 10.0, now);
+        let id_t1 = t1.id.clone();
+
+        trader.set_closed_trades(vec![t1.clone(), t2, t3]);
+        assert_eq!(trader.closed_trades().len(), 3);
+
+        // Revert t1
+        let removed = trader.remove_synced_closed_trade(|t| t.id == id_t1);
+        assert!(removed, "should report removal happened");
+        assert_eq!(trader.closed_trades().len(), 2);
+        assert!(trader.closed_trades().iter().all(|t| t.pair != "BTC/USD"));
+    }
+
+    #[test]
+    fn remove_synced_closed_trade_no_match_returns_false() {
+        // FID-211 Stage 2: predicate doesn't match anything — must report false,
+        // not silently no-op, so the engine can decide whether to alert.
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
+        let now = Utc::now();
+        let t1 = make_trade_record("BTC/USD", 100.0, 105.0, 1.0, now);
+        trader.set_closed_trades(vec![t1]);
+
+        let removed = trader.remove_synced_closed_trade(|t| t.pair == "NONEXISTENT/PAIR");
+        assert!(!removed, "should report no removal happened");
+        assert_eq!(trader.closed_trades().len(), 1);
+    }
+
+    #[test]
+    fn remove_synced_closed_trade_predicate_matches_multiple() {
+        // FID-211 Stage 2: edge case — predicate matches more than one (shouldn't
+        // happen in practice, but must not panic or silently drop extras).
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
+        let now = Utc::now();
+        let t1 = make_trade_record("BTC/USD", 100.0, 105.0, 1.0, now);
+        let t2 = make_trade_record("BTC/USD", 100.0, 106.0, 1.0, now);
+        let t3 = make_trade_record("ETH/USD", 50.0, 55.0, 2.0, now);
+        trader.set_closed_trades(vec![t1, t2, t3]);
+
+        let removed = trader.remove_synced_closed_trade(|t| t.pair == "BTC/USD");
+        assert!(removed);
+        assert_eq!(trader.closed_trades().len(), 1);
+        assert_eq!(trader.closed_trades()[0].pair, "ETH/USD");
+    }
+
+    #[test]
+    fn remove_synced_closed_trade_on_empty_cache() {
+        // FID-211 Stage 2: edge case — empty cache, must not panic, returns false.
+        let mut trader = PortfolioManager::new(1000.0, 0.001, 0.0005);
+        let removed = trader.remove_synced_closed_trade(|_| true);
+        assert!(!removed);
+        assert_eq!(trader.closed_trades().len(), 0);
     }
 }

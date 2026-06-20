@@ -220,7 +220,7 @@ impl TradeJournal {
         let rows = sqlx::query(
             "SELECT id, pair, side, entry_price, current_price, quantity, stop_loss, \
              take_profit_1, take_profit_2, take_profit_3, unrealized_pnl, risk_amount, \
-             strategy_name, scale_level, opened_at FROM positions",
+             strategy_name, scale_level, opened_at, token_address FROM positions",
         )
         .fetch_all(&self.pool)
         .await?;

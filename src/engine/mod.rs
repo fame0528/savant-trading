@@ -362,18 +362,20 @@ impl EngineState {
                         config.exchange.backend
                     );
                     // FID-093 C1: Cache wallet address at startup
-                    if let Ok(pk) = std::env::var(&config.exchange.dex.wallet_key_env) {
-                        if !pk.is_empty() {
-                            if let Ok(addr) = derive_address_from_key(&pk) {
-                                let mut wa = shared.wallet_address.write().await;
-                                *wa = addr.clone();
-                                let masked = if addr.len() > 10 {
-                                    format!("{}...{}", &addr[..6], &addr[addr.len() - 4..])
-                                } else {
-                                    addr.clone()
-                                };
-                                info!("Wallet address cached: {}", masked);
-                            }
+                    // FID-211 (audit Finding 1.1): Wrap in WalletKey. The address
+                    // derivation is the only consumer; expose_secret() called once.
+                    if let Ok(wallet_key) = savant_trading::core::security::WalletKey::from_env(
+                        &config.exchange.dex.wallet_key_env,
+                    ) {
+                        if let Ok(addr) = derive_address_from_key(wallet_key.expose_secret()) {
+                            let mut wa = shared.wallet_address.write().await;
+                            *wa = addr.clone();
+                            let masked = if addr.len() > 10 {
+                                format!("{}...{}", &addr[..6], &addr[addr.len() - 4..])
+                            } else {
+                                addr.clone()
+                            };
+                            info!("Wallet address cached: {}", masked);
                         }
                     }
                     executor = Some(trader);
@@ -1615,6 +1617,10 @@ pub async fn run(
                             warn!("Failed to auto-clear savant.blocked at midnight: {}", e);
                         } else {
                             info!("Auto-cleared daily_loss block at midnight UTC — engine unblocked for new day");
+                            // FID-210/211: Mirror the file removal in shared.block so the
+                            // API's "ENGINE BLOCKED" card clears immediately rather than
+                            // waiting for the next /api/risk request to re-read the file.
+                            shared.clear_block().await;
                         }
                     } else {
                         info!("savant.blocked is NOT a daily_loss trigger — keeping block file overnight");
@@ -3667,6 +3673,11 @@ pub async fn run(
                                     } else {
                                         "unknown"
                                     };
+                                    // FID-210/211: Write the file (persistence + cross-process
+                                    // signal for start.bat / dashboard) AND set shared.block so
+                                    // the API can serve it without a file read. The file is the
+                                    // crash-survived SOT; shared.block is the in-memory cache
+                                    // that hydrates from the file on startup.
                                     let _ = std::fs::write(
                                         "savant.blocked",
                                         format!(
@@ -3676,6 +3687,13 @@ pub async fn run(
                                             reason
                                         ),
                                     );
+                                    shared
+                                        .set_block(savant_trading::core::shared::BlockReason {
+                                            block_type: trigger_type.to_string(),
+                                            reason: reason.clone(),
+                                            triggered_at: Utc::now(),
+                                        })
+                                        .await;
                                     error!("CIRCUIT BREAKER TRIGGERED — wrote savant.blocked.");
                                     false
                                 }
@@ -3781,11 +3799,18 @@ pub async fn run(
                                                                     "FID-148: CIRCUIT BREAKER TRIGGERED — per_trade_loss. {}. Writing savant.blocked.",
                                                                     halt_msg
                                                                 );
+                                                            // FID-210/211: Write file (persistence) AND
+                                                            // shared.set_block (in-memory for API).
                                                             let _ = std::fs::write(
                                                                     "savant.blocked",
                                                                     format!("{}\nTrigger: per_trade_loss\nReason: {}\n",
                                                                         chrono::Utc::now().to_rfc3339(), halt_msg),
                                                                 );
+                                                            shared.set_block(savant_trading::core::shared::BlockReason {
+                                                                block_type: "per_trade_loss".to_string(),
+                                                                reason: halt_msg.clone(),
+                                                                triggered_at: chrono::Utc::now(),
+                                                            }).await;
                                                             // Skip recording this trade as a normal close — the position
                                                             // is stranded with a halts-block file, requiring operator review.
                                                             return Err(anyhow::anyhow!(
@@ -3838,9 +3863,15 @@ pub async fn run(
                                                         {
                                                             error!("FID-211: record_trade failed for closed trade {}: {}. Trade may not appear in journal.", trade.pair, e);
                                                         }
-                                                        let _ = j.record_activity("Trade", &trade.pair,
+                                                        // FID-211 (audit Finding: no silent failures):
+                                                        // log on error, do not swallow. record_activity is
+                                                        // the audit log (not trade-data SQLite), so a
+                                                        // failure here is non-critical but still surfaced.
+                                                        if let Err(e) = j.record_activity("Trade", &trade.pair,
                                                                 &format!("CLOSED {} | Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
-                                                                    trade.side, exit_price, pnl, pnl_pct)).await;
+                                                                    trade.side, exit_price, pnl, pnl_pct)).await {
+                                                            warn!("FID-211: record_activity (close) failed for {}: {}", trade.pair, e);
+                                                        }
                                                     }
                                                     shared.log_activity(
                                                             savant_trading::core::shared::ActivityLevel::Trade,
@@ -4567,10 +4598,15 @@ pub async fn run(
                                                         {
                                                             warn!("Failed to persist position to DB: {}", e);
                                                         }
-                                                        let _ = j.record_activity("Trade", &pos.pair,
+                                                        // FID-211 (audit Finding: no silent failures):
+                                                        // log on error, do not swallow. record_activity is
+                                                        // the audit log; non-critical but still surfaced.
+                                                        if let Err(e) = j.record_activity("Trade", &pos.pair,
                                                                 &format!("OPENED {} {} @ {:.4} | Qty: {:.4} | SL: {:.4} | TP1: {:.4}",
                                                                     decision.side, decision.pair, decision.entry_price,
-                                                                    quantity, decision.stop_loss, decision.take_profit_1)).await;
+                                                                    quantity, decision.stop_loss, decision.take_profit_1)).await {
+                                                            warn!("FID-211: record_activity (open) failed for {}: {}", pos.pair, e);
+                                                        }
                                                     }
 
                                                     // Update shared state immediately
@@ -5104,14 +5140,28 @@ pub async fn run(
                             // FID-074: Revert the PnL that check_stops added to balance,
                             // since the on-chain close didn't actually execute.
                             portfolio.account_mut().balance -= trade.pnl;
-                            // Also remove the phantom TradeRecord from closed_trades
-                            portfolio.closed_trades_mut().retain(|t| {
-                                !(t.pair == trade.pair
-                                    && t.side == trade.side
-                                    && (t.entry_price - trade.entry_price).abs() < 0.0001
-                                    && (t.exit_price - trade.exit_price).abs() < 0.0001
-                                    && t.closed_at == trade.closed_at)
+                            // FID-211 Stage 2: Remove the phantom TradeRecord from cache via
+                            // remove_synced_closed_trade wrapper. The on-chain close failed
+                            // BEFORE the trade was persisted to DB, so this is cache-only
+                            // (the wrapper's documented pre-condition).
+                            let trade_pair = trade.pair.clone();
+                            let trade_side = trade.side;
+                            let trade_entry = trade.entry_price;
+                            let trade_exit = trade.exit_price;
+                            let trade_closed_at = trade.closed_at;
+                            let removed = portfolio.remove_synced_closed_trade(|t| {
+                                t.pair == trade_pair
+                                    && t.side == trade_side
+                                    && (t.entry_price - trade_entry).abs() < 0.0001
+                                    && (t.exit_price - trade_exit).abs() < 0.0001
+                                    && t.closed_at == trade_closed_at
                             });
+                            if !removed {
+                                warn!(
+                                    "FID-211: remove_synced_closed_trade found no match for failed close {} (expected phantom trade)",
+                                    trade.pair
+                                );
+                            }
                             // FID-087 Bug H: Track reverted trade so journal save is skipped
                             reverted_trades.push((
                                 trade.pair.clone(),
@@ -5153,14 +5203,27 @@ pub async fn run(
                             );
                             // FID-074: Revert balance on failed close
                             portfolio.account_mut().balance -= trade.pnl;
-                            // Remove phantom TradeRecord
-                            portfolio.closed_trades_mut().retain(|t| {
-                                !(t.pair == trade.pair
-                                    && t.side == trade.side
-                                    && (t.entry_price - trade.entry_price).abs() < 0.0001
-                                    && (t.exit_price - trade.exit_price).abs() < 0.0001
-                                    && t.closed_at == trade.closed_at)
+                            // FID-211 Stage 2: Remove the phantom TradeRecord from cache via
+                            // remove_synced_closed_trade wrapper (same semantics as primary
+                            // path above — on-chain close failed before DB write).
+                            let trade_pair = trade.pair.clone();
+                            let trade_side = trade.side;
+                            let trade_entry = trade.entry_price;
+                            let trade_exit = trade.exit_price;
+                            let trade_closed_at = trade.closed_at;
+                            let removed = portfolio.remove_synced_closed_trade(|t| {
+                                t.pair == trade_pair
+                                    && t.side == trade_side
+                                    && (t.entry_price - trade_entry).abs() < 0.0001
+                                    && (t.exit_price - trade_exit).abs() < 0.0001
+                                    && t.closed_at == trade_closed_at
                             });
+                            if !removed {
+                                warn!(
+                                    "FID-211: remove_synced_closed_trade (fallback path) found no match for failed close {}",
+                                    trade.pair
+                                );
+                            }
                             // FID-087 Bug H: Track reverted trade so journal save is skipped
                             reverted_trades.push((
                                 trade.pair.clone(),
@@ -5658,23 +5721,33 @@ pub async fn run(
                                         on_chain_verified: false,
                                         tx_hash: None,
                                     };
-                                    // FID-211: Use close_position_persist for atomic DB+memory close.
-                                    // The wrapper returns TradeRecord but we already built one
-                                    // with rich fields (strategy_name, etc.) — record via journal
-                                    // explicitly, then remove from in-memory cache.
-                                    // Use the wrapper's DB write path via adjust_stop on a
-                                    // dummy-stop-preserving version if possible; here just
-                                    // record trade and remove from cache with proper error handling.
-                                    portfolio.closed_trades_mut().push(trade.clone());
+                                    // FID-211 Stage 2: Use record_closed_trade_sync wrapper for
+                                    // atomic DB+cache write of the external close. The position
+                                    // is removed by the executor out-of-band (line below via
+                                    // remove_synced_position), so close_position_persist is
+                                    // not the right tool — that one also calls delete_position.
+                                    // This wrapper writes the TradeRecord to DB first, then
+                                    // appends to the in-memory cache only on DB success.
                                     if let Some(ref j) = journal {
-                                        if let Err(e) = j.record_trade(&trade).await {
-                                            error!("FID-211: record_trade failed for external close {}: {}.", trade.pair, e);
+                                        if let Err(e) =
+                                            portfolio.record_closed_trade_sync(&trade, j).await
+                                        {
+                                            error!("FID-211: record_closed_trade_sync failed for external close {}: {}. In-memory not updated.", trade.pair, e);
+                                        } else {
+                                            info!(
+                                                "Recorded external close trade: {} {} | Entry: {:.4} → Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
+                                                pair, pos.side, pos.entry_price, market_price, ext_pnl, ext_pnl_pct
+                                            );
                                         }
+                                    } else {
+                                        // No journal — best effort in-memory only
+                                        warn!("FID-211: No journal; external close recorded in-memory only for {}", trade.pair);
+                                        portfolio.closed_trades_mut().push(trade.clone());
+                                        info!(
+                                            "Recorded external close trade (in-memory only): {} {} | Entry: {:.4} → Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
+                                            pair, pos.side, pos.entry_price, market_price, ext_pnl, ext_pnl_pct
+                                        );
                                     }
-                                    info!(
-                                        "Recorded external close trade: {} {} | Entry: {:.4} → Exit: {:.4} | PnL: ${:.2} ({:.2}%)",
-                                        pair, pos.side, pos.entry_price, market_price, ext_pnl, ext_pnl_pct
-                                    );
                                 }
 
                                 // Remove from PortfolioManager

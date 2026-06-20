@@ -2,6 +2,7 @@ use tracing::{info, warn};
 
 use savant_trading::agent::knowledge::KnowledgeBase;
 use savant_trading::core::config::AppConfig;
+use savant_trading::core::security::WalletKey;
 use savant_trading::execution::dex::inch::InchBackend;
 use savant_trading::execution::dex::zero_x::ZeroXBackend;
 use savant_trading::execution::dex::DexTrader;
@@ -69,12 +70,17 @@ pub(super) async fn create_executor(
 
     match config.exchange.backend.as_str() {
         "0x" => {
-            let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env).map_err(|_| {
-                anyhow::anyhow!(
-                    "{} not set — required for 0x DEX trading",
-                    config.exchange.dex.wallet_key_env
-                )
-            })?;
+            // FID-211 (audit Finding 1.1): Wrap in WalletKey so the secret is
+            // type-safe (Display/Debug redact, zeroize-on-drop). Only the
+            // SigningKey construction and the DexTrader::new call get the
+            // raw value via expose_secret().
+            let wallet_key =
+                WalletKey::from_env(&config.exchange.dex.wallet_key_env).map_err(|_| {
+                    anyhow::anyhow!(
+                        "{} not set — required for 0x DEX trading",
+                        config.exchange.dex.wallet_key_env
+                    )
+                })?;
             let api_key = std::env::var(&config.exchange.dex.api_key_env).map_err(|_| {
                 anyhow::anyhow!(
                     "{} not set — required for 0x API",
@@ -83,7 +89,8 @@ pub(super) async fn create_executor(
             })?;
 
             let signing_key = {
-                let key_hex = wallet_key.trim_start_matches("0x");
+                // expose_secret() is called only at the actual signing site.
+                let key_hex = wallet_key.expose_secret().trim_start_matches("0x");
                 let key_bytes = alloy_core::primitives::hex::decode(key_hex)
                     .map_err(|e| anyhow::anyhow!("Invalid wallet key hex: {}", e))?;
                 k256::ecdsa::SigningKey::from_bytes(key_bytes.as_slice().into())
@@ -92,7 +99,7 @@ pub(super) async fn create_executor(
             let backend = ZeroXBackend::new(api_key, signing_key);
             let mut trader = DexTrader::new(
                 backend,
-                &wallet_key,
+                wallet_key.expose_secret(),
                 &config.exchange.dex.rpc_url,
                 config.exchange.dex.chain_id,
                 config.exchange.dex.slippage_pct,
@@ -132,12 +139,18 @@ pub(super) async fn create_executor(
             Ok(Some(Box::new(trader)))
         }
         "1inch" => {
-            let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env).map_err(|_| {
-                anyhow::anyhow!(
-                    "{} not set — required for 1inch DEX trading",
-                    config.exchange.dex.wallet_key_env
-                )
-            })?;
+            // FID-211 (audit Finding 1.1): Wrap in WalletKey (see 0x branch
+            // above for rationale). InchBackend doesn't need a signing key
+            // (it delegates signing to the 1inch API), but DexTrader::new
+            // still needs the raw key for nonce / gas estimation, so we
+            // expose_secret() at that call site only.
+            let wallet_key =
+                WalletKey::from_env(&config.exchange.dex.wallet_key_env).map_err(|_| {
+                    anyhow::anyhow!(
+                        "{} not set — required for 1inch DEX trading",
+                        config.exchange.dex.wallet_key_env
+                    )
+                })?;
             let api_key = std::env::var(&config.exchange.dex.api_key_env).map_err(|_| {
                 anyhow::anyhow!(
                     "{} not set — required for 1inch API",
@@ -148,7 +161,7 @@ pub(super) async fn create_executor(
             let backend = InchBackend::new(api_key);
             let mut trader = DexTrader::new(
                 backend,
-                &wallet_key,
+                wallet_key.expose_secret(),
                 &config.exchange.dex.rpc_url,
                 config.exchange.dex.chain_id,
                 config.exchange.dex.slippage_pct,

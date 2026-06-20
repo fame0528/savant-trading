@@ -3,7 +3,8 @@
 **Filename:** `FID-2026-0618-200-multi-model-jury-nvidia.md`
 **ID:** FID-2026-0618-200
 **Severity:** medium
-**Status:** analyzed
+**Status:** closed
+**Resolution:** Shipped in v0.14.8 (commit f08cd8ca, 2026-06-18). Multi-model jury expanded to 10 NVIDIA NIM models with OpenRouter preserved as the provider layer. Per-juror model slugs (configurable via `models: Vec<String>` in `[ai.jury]`) replace the legacy single-model `model` field. FID-204 (10x keys) followed. Archived 2026-06-19 per FID-211 Stage 2 Item 6 cleanup.
 **Created:** 2026-06-18 00:57 EST
 **Author:** Vera
 **Supersedes:** partial work in commit `f8982550`

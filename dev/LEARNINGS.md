@@ -1440,3 +1440,123 @@ Per Spencer's standing rule: "Nothing ever gets deferred by default unless I spe
 7. Add 4 more test files (key_manager_drop, startup_sync, engine_cycle, sot_wrapper_atomicity)
 
 **Memory state:** v0.15.0 ships. 412 lib tests + 10 dashboard tests = 422 total, all green. Clippy clean. Runtime panic fixed, state carryover handled, engine using SOT wrappers. Stage 2 deferred per Spencer acknowledgment — no silent deferrals. Engine restart tonight will exercise v0.15.0 end-to-end for the first time.
+
+## Session 2026-06-19 (continued): FID-211 Stage 2 kickoff (zcode / GLM 5.2 substrate)
+
+**Context:** Cold-boot in zcode harness. Read the handoff doc, ECHO, config,
+FID-211 archive. Before touching Stage 2 work, ran the Cross-Agent Claim
+Rule against the prior session's "Stage 1 DONE" claims. Found the claims
+overstated the work that shipped in v0.15.0.
+
+**Key Learnings:**
+
+- **A passing test suite is not the same as a complete migration.** v0.15.0
+  shipped with 412 tests green, but the "engine migrated to SOT wrappers"
+  headline was ~60% true — 11 `positions_mut`/`closed_trades_mut` call
+  sites still bypassed the wrappers in `engine/mod.rs` +
+  `reconciliation.rs`. The prior session marked Bug 3 DONE because the
+  wrappers existed and the suite passed, but no test asserted "no raw
+  mutation remains." **Lesson:** a migration's completion criterion is a
+  grep that returns zero, not a test run that returns green. The grep is
+  the AUDIT phase output; the tests are the GREEN phase output. Both
+  required.
+
+- **Cross-Agent Claim Rule fired on first contact.** The handoff doc said
+  "12+ hand-sync sites for account.open_positions" — actual count was 5.
+  Said "8 remaining fire-and-forget SQLite writes" — actual count was 2,
+  and they were audit-log writes, not trade-data. Said "tighten to
+  pub(crate)" as Stage 2 — the methods are still `pub`. The rule (treat
+  prior-session claims as hypotheses, grep before acting) caught all
+  three in 30 seconds. **Lesson:** when the substrate changes, the new
+  agent's first job is to re-verify the prior agent's claims against the
+  tree. The handoff is a map, not the territory.
+
+- **The engine_cycle integration test found a real production bug on its
+  first run.** `load_positions()` in `monitor/journal.rs` SELECTed 15
+  columns but the row-mapping code tried to read a 16th (`token_address`)
+  via `try_get(...).unwrap_or_default()` — which silently fell back to
+  `""` because the column wasn't in the result set. Every engine restart
+  lost every position's on-chain token address. The `unwrap_or_default()`
+  masked a Law 14 violation (silent column-not-found). The test caught it
+  in 0.05s. **Lesson:** integration tests that re-load state from the SOT
+  after mutation are higher-leverage than unit tests on the wrapper alone,
+  because they exercise the full save→load round-trip that production
+  depends on. The round-trip is where silent data loss hides.
+
+- **"No silent deferrals" applies to test scope too.** I could not write
+  a true DB-failure-injection atomicity test without refactoring
+  `TradeJournal` into a trait (so a mock could substitute). That refactor
+  touches every wrapper signature — real work, not test-only. Documented
+  the gap explicitly at the top of `sot_wrapper_atomicity.rs` and in the
+  FID-211 re-audit rather than writing a weaker test and calling it
+  complete. **Lesson:** when a test can't cover a path honestly, say so
+  in the test file and promote the unblocker (trait refactor) to a
+  tracked work item. Don't pretend coverage you don't have.
+
+- **Borrow-checker caught a chained-method lifetime bug in the test.**
+  `db_positions(&journal).await.get("p1").expect(...)` — the temporary
+  HashMap was dropped at the end of the statement, but the `&Position`
+  borrowed from it lived into the next line. Fixed by binding the
+  HashMap to a `let` first. **Lesson:** for helper functions that return
+  owned collections, bind the result before chaining `.get()` if you
+  need to keep the borrow across lines. The compiler is the friend here.
+
+**Out of Scope (explicit Stage 2 deferral, FID-211 re-audit section):**
+
+1. Finish engine migration: 11 remaining `positions_mut`/`closed_trades_mut` sites
+2. Migrate `savant.blocked` → `shared.block` (14+ refs)
+3. Replace 2 `let _ = j.record_activity` with error-aware logging
+4. Delete `account.open_positions` field (5 write sites + readers)
+5. Migrate 5 `wallet_key: String` sites to `WalletKey`
+6. Strip `DexTrader` parallel state + `data/dex_state.json` writes
+7. Tighten `positions_mut()`/`closed_trades_mut()` to `pub(crate)` + fix stale docs
+8. Archive 5 stale FIDs
+9. Add 2 remaining test files (`key_manager_drop`, `startup_sync`)
+10. (Recommended follow-up) Refactor `TradeJournal` into a trait so
+    DB-failure injection tests are possible — unblocks true atomicity tests
+
+**Memory state:** v0.15.0 still on origin/main (no ship yet this session).
+Added 19 integration tests (engine_cycle: 9, sot_wrapper_atomicity: 10).
+Fixed Bug 10 (token_address silent drop). FID-211 re-audited honestly.
+New baseline: 412 lib + 19 integration = 431 tests, clippy clean. Next:
+engine migration proper (the 11 sites), with the new test net under it.
+
+## Session 2026-06-19 (continued): FID-211 Stage 2 — v0.15.1 completion (kilo / model substrate)
+
+**Substrate:** Picked up at the handoff checkpoint on kilo. GLM 5.2 on zcode
+hit its .10/month free-tier cap after ~30m (per HF pricing docs —
+$0.10 is the free cap, not "5 days unlimited" as the marketing tweet
+implied). Switched to kilo to continue.
+
+**Stage 2 shipped in v0.15.1:**
+- Engine closed_trades migration (3 of 8 sites; 4 no-journal fallbacks
+  left as-is, documented as dead code with audit evidence at main.rs:840,974
+  where journal is constructed)
+- savant.blocked → shared.block (file-as-SOT + in-memory cache; 27 hits
+  audited, 6 sites changed, 7 new integration tests)
+- wallet_key String → WalletKey newtype (7 sites — handoff listed 5, re-audit
+  found 2 more in engine/mod.rs:365 and api/mod.rs:842)
+- 3 remaining let _ = j.X fire-and-forget → error-aware logging
+- 2 new test files (key_manager_drop: 6, startup_sync: 6 with Bug 10
+  regression coverage) + 1 bonus (shared_block_state: 7)
+- 5 stale FIDs archived (193, 194, 195, 196, 200) with status:closed +
+  resolution linking to shipping commit
+
+**DEFERRED with architectural finding:** Item 5 (pub(crate) tightening of
+positions_mut/closed_trades_mut). The handoff was wrong about crate topology
+— src/engine/mod.rs is in the **binary** crate (savant) via mod engine;
+in main.rs:15, not the **library** crate (savant-trading) which has no
+pub mod engine; in lib.rs. Tightening to pub(crate) would block the
+engine. Three options documented in FID-211 re-audit; Option 1 (move engine
+to library) is the right architectural move but is its own FID. Lesson:
+**always re-verify handoff claims about code structure with grep, never
+trust them** — the prior session had a wrong assumption that took an
+edit-build-undo cycle to surface.
+
+**Final test count:** 416 lib + 38 integration (engine_cycle 9, key_manager_drop 6,
+shared_block_state 7, sot_wrapper_atomicity 10, startup_sync 6) + 10 main
+binary = **464 tests passing**. Clippy clean for all targets.
+
+**v0.15.1 release:** bumped Cargo.toml 0.15.0 → 0.15.1, prepended CHANGELOG
+section. Single atomic commit at session end per Spencer's standing rule
+("don't commit mid-session, batch into the v0.15.1 release commit").

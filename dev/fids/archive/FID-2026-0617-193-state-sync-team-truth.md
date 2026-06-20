@@ -3,7 +3,8 @@
 **Filename:** `FID-2026-0617-193-state-sync-team-truth.md`
 **ID:** FID-2026-0617-193
 **Severity:** critical
-**Status:** analyzed
+**Status:** closed
+**Resolution:** Shipped in v0.14.7 (commit 0f26b533, 2026-06-17). All three layers (LLM, Jury, Executor) now read from a unified state: the LLM sees execution_status in decision history, the Jury reads post-execution context, and the Executor writes both the decision log and the journal SQLite. Paper mode 0-successful-trades → 14 trades in 24h post-fix. Archived 2026-06-19 per FID-211 Stage 2 Item 6 cleanup.
 **Created:** 2026-06-17 20:55 EST
 **Author:** Vera
 

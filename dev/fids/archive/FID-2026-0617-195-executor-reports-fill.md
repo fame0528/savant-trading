@@ -3,7 +3,8 @@
 **Filename:** `FID-2026-0617-195-executor-reports-fill.md`
 **ID:** FID-2026-0617-195
 **Severity:** high
-**Status:** analyzed
+**Status:** closed
+**Resolution:** Shipped in v0.14.7 (commit ef606667, 2026-06-17). Executor now reports fill/reject status back to the decision log so the LLM's next cycle sees whether each action actually executed. Execution outcomes included in LLM context window. Child of FID-193. Archived 2026-06-19 per FID-211 Stage 2 Item 6 cleanup.
 **Created:** 2026-06-17 21:00 EST
 **Author:** Vera
 **Parent:** FID-193

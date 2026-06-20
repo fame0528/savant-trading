@@ -3,7 +3,8 @@
 **Filename:** `FID-2026-0617-194-preflight-guard.md`
 **ID:** FID-2026-0617-194
 **Severity:** high
-**Status:** analyzed
+**Status:** closed
+**Resolution:** Shipped in v0.14.7 (commit b207b9e8, 2026-06-17). The pre-flight guard now cross-references open positions before the LLM can emit Adjust/Close actions, rejecting phantom management attempts at the engine level. Child of FID-193 (state sync). Archived 2026-06-19 per FID-211 Stage 2 Item 6 cleanup.
 **Created:** 2026-06-17 21:00 EST
 **Author:** Vera
 **Parent:** FID-193

@@ -15,6 +15,7 @@
 //!
 //! Usage: cargo run --bin test_e2e_fid160
 
+use savant_trading::core::security::WalletKey;
 use savant_trading::execution::dex::trader::DexTrader;
 use savant_trading::execution::dex::zero_x::ZeroXBackend;
 use savant_trading::execution::dex::SwapParams;
@@ -25,14 +26,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().ok();
 
     let api_key = std::env::var("ZEROEX_API_KEY")?;
-    let wallet_key = std::env::var("WALLET_PRIVATE_KEY")?;
+    // FID-211 (audit Finding 1.1): Wrap in WalletKey. expose_secret() at the
+    // signing key + DexTrader::new sites only.
+    let wallet_key = WalletKey::from_env("WALLET_PRIVATE_KEY")?;
     let rpc_url = "http://127.0.0.1:8545";
 
     // Derive wallet address (same as test_swap.rs)
     use alloy_core::hex;
     use k256::ecdsa::SigningKey;
     use sha3::{Digest, Keccak256};
-    let key_hex = wallet_key.trim_start_matches("0x");
+    let key_hex = wallet_key.expose_secret().trim_start_matches("0x");
     let key_bytes = hex::decode(key_hex)?;
     let signing_key = SigningKey::from_bytes(key_bytes.as_slice().into())?;
     let verifying_key = signing_key.verifying_key();
@@ -54,7 +57,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let backend = ZeroXBackend::new(api_key, signing_key);
     let trader: DexTrader<ZeroXBackend> = DexTrader::new(
         backend,
-        &wallet_key,
+        wallet_key.expose_secret(),
         rpc_url,
         42161,
         0.005, // slippage

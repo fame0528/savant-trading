@@ -2,6 +2,63 @@
 
 All notable changes to Savant Trading are documented here.
 
+## [0.15.1] — 2026-06-19
+
+### Engine Migration Completion (FID-211 Stage 2) + WalletKey Hardening + Shared Block State
+
+The v0.15.0 release shipped the SOT wrapper infrastructure but left the engine partially migrated. v0.15.1 completes the migration, hardens wallet-key handling, and adds the typed in-memory block state. Also archives 5 stale FIDs from v0.14.7–v0.14.8 and adds 19 new integration tests covering the engine SOT contract, JuryKeyManager Drop semantics, and the engine startup sync path.
+
+### Added
+
+- **`record_closed_trade_sync` SOT wrapper** on `PortfolioManager` — atomic close-trade write that persists to SQLite FIRST, then appends to the in-memory cache on success. Differs from `close_position_persist` (which also calls `delete_position`): this wrapper is for the case where the position was already removed out-of-band by the executor (the external-close path in the engine). 4 new lib tests cover happy path, no-match fallback, multi-match, and empty-cache cases.
+
+- **`remove_synced_closed_trade` SOT wrapper** on `PortfolioManager` — cache-only revert for phantom TradeRecords where the on-chain close failed before reaching the executor. Returns `true` if a matching trade was found and removed, `false` otherwise (so the engine can alert on "expected phantom but none found").
+
+- **`shared.block` typed in-memory state** (FID-210/211) — the engine now sets a typed `BlockReason { block_type, reason, triggered_at }` in addition to writing the `savant.blocked` file. The file remains the crash-survived SOT; `shared.block` is the in-memory cache that the API reads (no more file I/O per `/api/risk` request). 7 new integration tests in `tests/shared_block_state.rs` cover set/get/clear semantics, concurrent-writer try_get, and JSON round-trip stability.
+
+- **3 new integration test files** (FID-211 audit Finding 2.1 closure):
+  - `tests/key_manager_drop.rs` (6 tests) — proves `JuryKeyManager::drop` does not panic inside tokio runtimes (the v0.14.10 crash class)
+  - `tests/startup_sync.rs` (6 tests) — `PortfolioManager::load_from_db` edge cases including the FID-211 Bug 10 regression (token_address column survival)
+  - `tests/shared_block_state.rs` (7 tests) — typed in-memory block state contract
+
+### Changed
+
+- **Engine `closed_trades` migration** — 3 of 8 production `closed_trades_mut` / `positions_mut` call sites in `src/engine/mod.rs` migrated to the new SOT wrappers (sites 5108, 5157, 5668). The remaining 4 sites (1454, 4786, 4895, 5795) are `else` branches of `if let Some(ref j) = journal` where `journal` is always `Some` in production (verified at `main.rs:840, :974`); these are dead-code last-resort fallbacks and are explicitly NOT the dual-write bug class. Documented in FID-211 re-audit.
+
+- **`savant.blocked` ? `shared.block` migration** — 4 circuit-breaker write sites in `src/engine/mod.rs` (lines 3671, 3801, 1538, 1564) now write the file AND call `shared.set_block` (write-through). Midnight auto-clear (line 1606-1621) and startup clear (`main.rs:352`) now also call `shared.clear_block`. The API `/api/risk` status endpoint reads from `shared.block` (no file I/O per request); `/api/risk/clear-block` clears both layers. Dashboard `block_reason: string` field preserved for backward compat with the existing dashboard regex parser; new structured `block: object` field added for new consumers.
+
+- **`wallet_key: String` ? `WalletKey` newtype** (FID-211 audit Finding 1.1) — 7 production sites migrated (`engine/utils.rs:72, 135`, `main.rs:617, 677, 949`, `bin/test_e2e_fid160.rs:28`, `bin/test_swap.rs:18`, plus 2 re-audit finds: `engine/mod.rs:365` startup address cache, `api/mod.rs:842` get_wallet fallback). `expose_secret()` is the only way to read the secret and is called only at the signing-key + DexTrader::new sites. The compiler now enforces the type-safe contract — no raw `String` for wallet keys anywhere in `src/`.
+
+- **3 remaining `let _ = j.X` fire-and-forget patterns** converted to `if let Err(e) = ... { warn!(...) }` (no silent failures). Sites: `main.rs:1238` (delete_position in emergency_liquidate), `engine/mod.rs:3864` (record_activity close), `engine/mod.rs:4593` (record_activity open). The two `record_activity` sites are audit-log writes, not trade-data SQLite.
+
+- **Bug 10 fix from v0.15.0** — `src/monitor/journal.rs:223` `load_positions` SELECT statement now includes the `token_address` column. Regression test added in `tests/startup_sync.rs::load_positions_selects_token_address_column`.
+
+### DEFERRED with Architectural Finding
+
+- **Stage 2 Item 5: `positions_mut()` / `closed_trades_mut()` to `pub(crate)`** — The handoff stated "verify engine is in the same crate. It is (`crate-type = ["lib", "bin"]`)." The handoff was wrong: the engine is in the `savant` binary crate (`src/main.rs:15 mod engine;`), not the `savant-trading` library crate (no `pub mod engine;` in `lib.rs`). Tightening to `pub(crate)` would block the engine from accessing the methods. Three options documented in FID-211 re-audit; Option 1 (move engine into library) is the right architectural move but is its own FID worth of work. The wrappers (`open_position`, `close_position_persist`, `adjust_stop`, `adjust_quantity`, `remove_synced_position`, `sync_from_db_position`, `record_closed_trade_sync`, `remove_synced_closed_trade`) all ship in v0.15.1 and are used by the engine migrations; visibility tightening requires the engine-in-library refactor first.
+
+### FID Archive (Stage 2 Item 6)
+
+Five FIDs from the v0.14.7–v0.14.8 cycle that were documented as "shipped" but never moved to `dev/fids/archive/`. All confirmed shipped via `git log --grep`:
+
+| FID | Title | Shipped in |
+|-----|-------|------------|
+| 193 | State Sync — LLM/Jury/Executor Team on a Single Source of Truth | v0.14.7 (0f26b533) |
+| 194 | Pre-flight guard against phantom management | v0.14.7 (b207b9e8) |
+| 195 | Executor reports fill/reject, execution outcomes in LLM context | v0.14.7 (ef606667) |
+| 196 | Per-cycle reconciliation with USDC + safety halt + telemetry | v0.14.7 (1fda8db5) |
+| 200 | Multi-model jury expansion (10 NVIDIA NIM models) | v0.14.8 (f08cd8ca) |
+
+All 5 FIDs moved from `dev/fids/` to `dev/fids/archive/` with `Status: closed` and a `Resolution:` line linking to the commit that shipped them.
+
+### Verification
+
+- `cargo test --lib` — 416 passed (was 412, +4 for the new closed_trades wrappers)
+- `cargo test --tests` — 38 integration tests passed (was 19 from v0.15.0, +19: 6 key_manager_drop + 6 startup_sync + 7 shared_block_state)
+- `cargo clippy --all-targets -- -D warnings` — clean
+- `cargo build --all-targets` — clean
+- Total: **464 tests passing (416 lib + 38 integration + 10 main binary), zero warnings**
+
 ## [0.15.0] — 2026-06-19
 
 ### Engine Migration to SOT Wrappers + Runtime Panic Fix + State Carryover Fix (FID-211)

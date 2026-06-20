@@ -6,6 +6,7 @@ use tracing_subscriber::prelude::*;
 
 use savant_trading::backtest::engine::{run_backtest, BacktestConfig};
 use savant_trading::core::config::AppConfig;
+use savant_trading::core::security::WalletKey;
 use savant_trading::core::shared::SharedEngineData;
 use savant_trading::data::candle_client::CandleClient;
 use savant_trading::tui::TuiApp;
@@ -355,6 +356,11 @@ async fn main() -> anyhow::Result<()> {
             }
             info!("=== SAVANT — Engine + Dashboard ===");
             let shared = SharedEngineData::new();
+            // FID-210/211: shared.block is already None on fresh init, but call
+            // clear_block() defensively in case SharedEngineData::default() or a
+            // test helper ever populates it. The file is the crash-survived SOT;
+            // this keeps the in-memory cache consistent with the file we just deleted.
+            shared.clear_block().await;
             let engine_running = Arc::new(AtomicBool::new(true));
 
             // On Windows, npm is a .ps1 script — use cmd /c to invoke it
@@ -609,11 +615,15 @@ async fn emergency_liquidate() -> anyhow::Result<()> {
         .cloned()
         .unwrap_or_else(|| "config/default.toml".to_string());
     let config = savant_trading::core::config::AppConfig::load(std::path::Path::new(&config_path))?;
-    let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)?;
+    // FID-211 (audit Finding 1.1): Wrap in WalletKey so the secret is type-safe
+    // (Display/Debug redact, zeroize-on-drop). expose_secret() is called only at
+    // the signing key construction + DexTrader::new call sites below.
+    let wallet_key = WalletKey::from_env(&config.exchange.dex.wallet_key_env)
+        .map_err(|e| anyhow::anyhow!("wallet key env: {}", e))?;
     let api_key = std::env::var(&config.exchange.dex.api_key_env)?;
 
     let signing_key = {
-        let key_hex = wallet_key.trim_start_matches("0x");
+        let key_hex = wallet_key.expose_secret().trim_start_matches("0x");
         let key_bytes = alloy_core::primitives::hex::decode(key_hex)
             .map_err(|e| anyhow::anyhow!("Invalid wallet key hex: {}", e))?;
         k256::ecdsa::SigningKey::from_bytes(key_bytes.as_slice().into())
@@ -622,7 +632,7 @@ async fn emergency_liquidate() -> anyhow::Result<()> {
     let backend = ZeroXBackend::new(api_key, signing_key);
     let mut trader = DexTrader::new(
         backend,
-        &wallet_key,
+        wallet_key.expose_secret(),
         &config.exchange.dex.rpc_url,
         config.exchange.dex.chain_id,
         config.exchange.dex.slippage_pct,
@@ -669,10 +679,13 @@ async fn recover_positions(config: &savant_trading::core::config::AppConfig) -> 
     use savant_trading::monitor::journal::TradeJournal;
 
     // Derive wallet address from private key
-    let private_key = std::env::var(&config.exchange.dex.wallet_key_env)
+    // FID-211 (audit Finding 1.1): Wrap in WalletKey. expose_secret() called
+    // only at the hex decode site below — the signing key and address
+    // derivation don't need the WalletKey after that.
+    let wallet_key = WalletKey::from_env(&config.exchange.dex.wallet_key_env)
         .map_err(|_| anyhow::anyhow!("WALLET_PRIVATE_KEY not set"))?;
 
-    let key_bytes = hex::decode(private_key.trim_start_matches("0x"))
+    let key_bytes = hex::decode(wallet_key.expose_secret().trim_start_matches("0x"))
         .map_err(|e| anyhow::anyhow!("Invalid key hex: {}", e))?;
     let signing_key =
         SigningKey::from_slice(&key_bytes).map_err(|e| anyhow::anyhow!("Invalid key: {}", e))?;
@@ -941,13 +954,15 @@ async fn close_all_positions(
     use savant_trading::execution::dex::{DexTrader, SwapParams};
     use savant_trading::monitor::journal::TradeJournal;
 
-    let wallet_key = std::env::var(&config.exchange.dex.wallet_key_env)
+    // FID-211 (audit Finding 1.1): Wrap in WalletKey. expose_secret() at
+    // the signing key construction + DexTrader::new call sites only.
+    let wallet_key = WalletKey::from_env(&config.exchange.dex.wallet_key_env)
         .map_err(|_| anyhow::anyhow!("WALLET_PRIVATE_KEY not set"))?;
     let api_key = std::env::var(&config.exchange.dex.api_key_env)
         .map_err(|_| anyhow::anyhow!("ZEROEX_API_KEY not set"))?;
 
     let signing_key = {
-        let key_hex = wallet_key.trim_start_matches("0x");
+        let key_hex = wallet_key.expose_secret().trim_start_matches("0x");
         let key_bytes = alloy_core::primitives::hex::decode(key_hex)
             .map_err(|e| anyhow::anyhow!("Invalid wallet key hex: {}", e))?;
         SigningKey::from_bytes(key_bytes.as_slice().into())
@@ -956,7 +971,7 @@ async fn close_all_positions(
     let backend = ZeroXBackend::new(api_key.clone(), signing_key);
     let trader = DexTrader::new(
         backend,
-        &wallet_key,
+        wallet_key.expose_secret(),
         &config.exchange.dex.rpc_url,
         config.exchange.dex.chain_id,
         config.exchange.dex.slippage_pct,
@@ -1220,7 +1235,16 @@ async fn close_all_positions(
         }
 
         // Delete from DB after all chunks complete
-        let _ = journal.delete_position(&pos.id).await;
+        // FID-211 (audit Finding: no silent failures): log on error, do not
+        // swallow. The position is no longer on-chain at this point (the
+        // emergency_liquidate flow has already sold it), so a DB-only failure
+        // is recoverable on next startup via reconciliation.
+        if let Err(e) = journal.delete_position(&pos.id).await {
+            warn!(
+                "FID-211: delete_position failed for {}: {}. Position will be removed by startup reconciliation.",
+                pos.id, e
+            );
+        }
     }
 
     println!("\n=== DONE ===");
