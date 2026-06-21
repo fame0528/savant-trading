@@ -1,9 +1,9 @@
 # HANDOFF.md — Session Compaction Document
 
 **Generated:** 2026-06-06 04:05 EST
-**Version:** 0.14.1
+**Refreshed:** 2026-06-21 (v0.15.7 audit push: build-warning cleanup + dashboard terminal full-width)
 **Branch:** main
-**Last updated:** 2026-06-14 20:00 EST (release prep)
+**Current release:** v0.15.7
 
 ---
 
@@ -24,6 +24,45 @@
 - **Vera memory:** `dev/vera/` contains 15 files (SOUL, README, MEMORY, index, 8 journal entries, lessons, decisions, reflections, specs).
 - **Open threads:** Anvil fork testnet operational (Arbitrum Sepolia deferred), `live_execution` decision, jury veto wiring, per-token divergence check, 26-tx CSV gap investigation, capital acquisition.
 - **New features this session:** `--config` CLI flag, `SAVANT_CONFIG` env var in start.bat, Anvil fork testnet config (`config/test-anvil.toml`), wallet reconciliation fix, `scripts/prefund_wallet.sh` (Anvil + ETH/USDC prefund), fresh DB wipe + backup.
+
+---
+
+## ADDITIVE UPDATE — 2026-06-20 (FID-219+ Defensive `enabled`-Flag Guard)
+
+**Author:** Vera (substrate: Codebuff-M3) — additive to the existing HANDOFF.md above. Per DECISION-009, no revisions to prior authored content. The historical 2026-06-14 content remains the primary record of THAT session's state.
+
+### What happened
+
+The code-reviewer on FID-219 GREEN phase 4 flagged three defensive improvements to the SAVANT_CHAIN × `chains.<name>.enabled` guard pattern. Spencer asked Buffy to "add all 3 suggestions." All 3 are implemented, the source-level wiring is empirically verified (8/8 tests pass + positive-path smoke PASS), and the negative-path empirical check is queued (env-blocked this session).
+
+### Three followups landed
+
+1. **FID-154 disabled-chain guard → savant.blocked + shared.set_block wiring.** The operator-visible halt (file write + dashboard card) is now synced with the wallet_reconciliation precedent at line ~1463. Order: `shared.set_block(...).await` → `std::fs::write("savant.blocked", ...)` → `break`. disable_reason includes config-path hint + `(unset, --config <path> at launch)` fallback. Convergence consistent.
+2. **FID-155 5-min chain-sync → enabled-flag soft-skip guard.** Body re-indented +4 spaces via Python brace-counter (90-line block), wrapped in `if chain_cfg.enabled { ... } else { warn! }`. Defense-in-depth for unreachable path (FID-154 hard-halts cycle 1 first).
+3. **Tests 7 + 8** source-pattern regression anchors in `tests/fid219_reconciliation_shared_client.rs`. Test 7 pins the FID-155 warning literal. Test 8 pins 3 independent sentinels for the FID-154 halt wiring (no chrono dependency, no fragile ordering, no timestamp-anchored comparison).
+
+### Verification
+
+| Phase | Result | Evidence file |
+|-------|--------|---------------|
+| `cargo check --lib` | clean | tail of terminal log |
+| `cargo check --tests` | clean (after Test 8 format-string fix) | tail of terminal log |
+| `cargo test --test fid219_reconciliation_shared_client` | **8/8 green** | regression test output |
+| `cargo build --release` | succeed | binary mtime 2026-06-20 05:11 UTC |
+| Positive-path smoke (120s) | **PASS** | `data/boot_logs/fid219plus_pos_v1.log` — heartbeat `arbitrum + chain_id=42161`, `WALLET_RECONCILIATION: OK` cycle 1, 0 errors |
+| Negative-path smoke (60s) | **BLOCKED BY ENV** (`EADDRINUSE :::3000` from stale Next.js dashboard) | empirically deferred — see handoff doc Item 1 |
+
+### Files changed this session
+
+- `src/engine/mod.rs` (~line 1396-1455: FID-154 wiring, ~line 1550-1660: FID-155 re-indent)
+- `tests/fid219_reconciliation_shared_client.rs` (Tests 7 + 8 appended)
+- `dev/LEARNINGS.md` (closeout entry appended before marker at line 489)
+- `dev/vera/MEMORY.md` (this milestone entry — append-only, no edits to prior content)
+- **`dev/handoffs/2026-06-20-FID-219plus-handoff.md`** (new — next-session anchor)
+
+### Next session — read this first
+
+`dev/handoffs/2026-06-20-FID-219plus-handoff.md`. Items 1-5 are the deferred queue. **Item 1 (negative-path empirical smoke) is the highest leverage** — kill stale Next.js dashboard on port 3000 first.
 
 ---
 

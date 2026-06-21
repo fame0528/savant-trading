@@ -386,7 +386,16 @@ export default function Dashboard() {
        * and gets the full vertical space of the bento grid. Closed Trades and
        * Activity are normal single-row panels.
        */}
-      <div className="flex-1 grid grid-cols-3 grid-rows-[1fr_1fr_1fr] gap-1.5 min-h-0">
+      {/* Bento grid: 3 cols × 4 rows.
+       *   row 1 (1fr):  Equity | Performance | Market Insight
+       *   row 2 (1fr):  Positions | Risk | Decisions
+       *   row 3 (1fr):  Jury (full-width strip) | Closed Trades | Activity
+       *   row 4 (2fr):  Terminal (col-span-3, full-width bottom strip)
+       * Terminal moved to a full-width bottom row so the live log stream
+       * gets horizontal real estate proportional to its width. The 2fr
+       * row height gives the terminal ~40% of vertical bento space,
+       * comfortable for scrolling logs during long runs. */}
+      <div className="flex-1 grid grid-cols-3 grid-rows-[1fr_1fr_1fr_2fr] gap-1.5 min-h-0">
 
         {/* Row 1: Equity | Performance | Market Insight */}
         <div className="bg-(--panel) border border-(--line) backdrop-blur-md flex flex-col overflow-hidden">
@@ -801,11 +810,12 @@ export default function Dashboard() {
            </div>
          </div>
 
-        {/* Row 3 col 3: Terminal (row-span-3 — full-height right column).
-            Swapped with Closed Trades per FID-180 followup. The terminal log
-            is the most useful real-time signal during a run, so it gets
-            the tall column. Closed Trades moves to col 1 (single row). */}
-        <div className="bg-[#0a0c14] border border-(--line) flex flex-col overflow-hidden row-span-3">
+        {/* Row 4 (full-width): Terminal.
+            col-span-3 makes this a full-width bottom strip. The terminal
+            log is the most useful real-time signal during a run, so it
+            gets the wide row instead of a tall column. Closed Trades and
+            Activity retain their positions in row 3. */}
+        <div className="bg-[#0a0c14] border border-(--line) flex flex-col overflow-hidden col-span-3">
           <div className="flex items-center gap-2 px-3 py-1.5 border-b border-(--line)">
             <i className="fa-solid fa-terminal text-(--dim) text-[9px]" />
             <span className="text-[10px] text-(--dim) tracking-wider font-mono leading-none">savant — terminal</span>

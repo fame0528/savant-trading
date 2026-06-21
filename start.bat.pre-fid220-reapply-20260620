@@ -1,0 +1,154 @@
+@echo off
+title SAVANT Trading Engine
+:: ============================================================
+:: CRLF LINE ENDINGS REQUIRED
+:: ============================================================
+:: This file uses Windows CRLF line endings. LF-only or CR-only
+:: lines break cmd.exe's backward-label scan, which fires when a
+:: :label is invoked by call/goto from below. Symptom:
+::   "The system cannot find the batch label specified - <label>"
+::
+:: If you see that error after editing, run:
+::     powershell -ExecutionPolicy Bypass -File scripts\normalize_crlf.ps1
+:: or (the cmd wrapper):
+::     scripts\normalize_crlf.bat
+:: The .gitattributes at project root also forces CRLF for .bat
+:: and .ps1 files so fresh checkouts stay clean.
+:: ============================================================
+echo.
+echo  ========================================
+echo   SAVANT Trading Engine
+echo   Building + starting engine + dashboard...
+echo  ========================================
+echo.
+cd /d "%~dp0"
+:: Load environment variables from .env (GITHUB_TOKEN for gh CLI, etc.)
+if exist .env (
+    for /f "tokens=1,* delims==" %%a in ('findstr /v /b "#" .env') do (
+        if not "%%a"=="" set "%%a=%%b"
+    )
+    echo  .env loaded.
+) else (
+    echo  WARNING: .env not found. API keys may be missing.
+)
+:: Config override: set SAVANT_CONFIG env var to use a custom config file.
+:: Example: set SAVANT_CONFIG=config\default.toml
+:: FID-177: default reverted to test-anvil.toml (Anvil). Spencer's working dev
+:: setup is Anvil. FID-167 changed the default to default.toml (Ethereum
+:: mainnet) but that broke the Anvil workflow. Use SAVANT_CONFIG env var
+:: to override for mainnet/multi-chain testing.
+if not defined SAVANT_CONFIG set "SAVANT_CONFIG=config\test-anvil.toml"
+
+:: FID-167: Active chain selection. Set SAVANT_CHAIN to one of the chains
+:: declared in [chains.*] in config/test-anvil.toml. Default: arbitrum.
+:: The Anvil workflow only enables Arbitrum. For other chains, use
+:: config\default.toml and SAVANT_CHAIN=ethereum (or base, optimism, bsc).
+if not defined SAVANT_CHAIN set "SAVANT_CHAIN=arbitrum"
+
+:: FID-126-R3: bypass conviction + confidence gates for sub-$500 balances.
+:: This restores the pre-FID-127 "all-in" path. Remove if balance > $500.
+set "SAVANT_GATE_DISABLED=1"
+
+:: ============================================================
+:: PRE-BUILD CLEANUP (FID-163)
+:: Kill stale processes that would otherwise hold the release
+:: binary open and block `cargo build --release` with
+:: "failed to remove file target\release\savant.exe".
+:: Scoped by .exe name + path filter so we never kill cargo
+:: itself or unrelated processes.
+:: ============================================================
+echo  Pre-build cleanup...
+echo.
+
+:: Pre-build cleanup runs as a SINGLE PowerShell invocation so:
+::   * Three sequential PS cold-starts collapse to one (~1.5-2s saved).
+::   * Node processes are killed via a single batched WMI query
+::     (`Get-CimInstance Win32_Process -Filter "Name='node.exe'"`)
+::     instead of N+1 queries (one per PID). Batched query is
+::     both faster and more robust to flaky WMI.
+::   * Per-phase Write-Host echoes make any hang IMMEDIATELY visible
+::     (you'll see "phase X/3..." but no "killed X" if WMI is wedged).
+::   * `2>nul` is dropped from the powershell call so any actual
+::     error surfaces instead of being hidden behind a silent freeze.
+set "PS_TEMP=%TEMP%\savant_prebuild_%RANDOM%.ps1"
+
+>  "%PS_TEMP%" echo $ErrorActionPreference = 'SilentlyContinue'
+>> "%PS_TEMP%" echo Write-Host "  pre-build cleanup: phase 1/3 (engine)..."
+>> "%PS_TEMP%" echo Get-Process -Name savant -ErrorAction SilentlyContinue ^| Where-Object { $_.Path -and $_.Path -like '*savant-trading*' } ^| ForEach-Object { Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue ; Write-Host ("    killed savant.exe PID " + $_.Id) }
+>> "%PS_TEMP%" echo Write-Host "  pre-build cleanup: phase 2/3 (node)..."
+>> "%PS_TEMP%" echo $cims = Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue
+>> "%PS_TEMP%" echo if ($cims) { $cims ^| Where-Object { $_.CommandLine -and ($_.CommandLine -like '*savant-trading*' -or $_.CommandLine -like '*m3-proxy*') } ^| ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue ; Write-Host ("    killed node PID " + $_.ProcessId) } }
+>> "%PS_TEMP%" echo Write-Host "  pre-build cleanup: phase 3/3 (anvil)..."
+>> "%PS_TEMP%" echo Get-Process -Name anvil -ErrorAction SilentlyContinue ^| ForEach-Object { Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue ; Write-Host ("    killed anvil PID " + $_.Id) }
+>> "%PS_TEMP%" echo Write-Host "  pre-build cleanup: done."
+powershell -NoProfile -ExecutionPolicy Bypass -File "%PS_TEMP%"
+del "%PS_TEMP%" 2>nul
+set "PS_TEMP="
+
+:: Give Windows a moment to release the file locks.
+timeout /t 2 /nobreak >nul
+
+:: ============================================================
+:: Start M3 Thinking Killer Proxy (required for MiniMax M3 in kilo + freebuff)
+:: ============================================================
+call "%~dp0scripts\m3-proxy-controller.bat"
+if errorlevel 1 (
+    echo  WARNING: M3 proxy failed to start. Kilo will get think tags.
+) else (
+    echo  M3 proxy running on :4000.
+)
+echo.
+
+:: ============================================================
+:: Auto-start Anvil fork if not running (self-recovery).
+:: start-anvil.bat is idempotent — exits quickly if Anvil is up.
+:: Unconditional call avoids the cmd.exe parens-block parse error
+:: that the previous if/else/findstr pattern produced. (FID-178/179)
+:: ============================================================
+call "%~dp0scripts\start-anvil.bat"
+if errorlevel 1 (
+    echo  WARNING: Anvil failed to start. Engine will retry RPC but may hang.
+)
+echo.
+
+:: Kill stale processes holding port 3000 (deduplicated — was
+:: printing the same PID twice due to a for-loop bug).
+set "KILLED_3000="
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":3000 " ^| findstr "LISTENING"') do (
+    if not defined KILLED_3000 (
+        echo  Killing stale process on port 3000 [PID %%a]...
+        taskkill /F /PID %%a >nul 2>&1
+        set "KILLED_3000=1"
+    )
+)
+timeout /t 2 /nobreak >nul
+
+echo  Building Rust engine...
+echo.
+cargo build --release 2>&1
+if errorlevel 1 (
+    echo.
+    echo  ENGINE BUILD FAILED. Fix errors and restart.
+    pause
+    exit /b 1
+)
+echo.
+echo  Engine build complete. Building dashboard...
+echo.
+cd dashboard
+call npm run build 2>&1
+if errorlevel 1 (
+    echo.
+    echo  DASHBOARD BUILD FAILED. Fix errors and restart.
+    cd ..
+    pause
+    exit /b 1
+)
+cd ..
+echo.
+echo  Both builds complete. Starting engine + dashboard...
+echo.
+target\release\savant.exe --config "%SAVANT_CONFIG%" serve
+echo.
+echo  Engine stopped. Press any key to exit.
+pause >nul

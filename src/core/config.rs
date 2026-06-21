@@ -922,6 +922,10 @@ pub struct TradingConfig {
     /// FID-120: Dynamic token database
     #[serde(default)]
     pub token_store: TokenStoreConfig,
+    /// FID-222: Funnel v1 momentum pre-scorer + top-K selector.
+    /// When `enabled=false`, entanglement is pass-through and P95 verdict rate is unchanged.
+    #[serde(default)]
+    pub funnel_v1: FunnelConfig,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -1073,6 +1077,7 @@ impl Default for AppConfig {
                 dex: DexConfig::default(),
             },
             trading: TradingConfig {
+                funnel_v1: FunnelConfig::default(),
                 pairs: vec!["BTC/USD".into(), "ETH/USD".into()],
                 scan_all_pairs: false,
                 min_volume_24h_usd: 1_500_000.0,
@@ -1330,5 +1335,121 @@ mod tests {
                 assert_eq!(keys, vec!["k1", "k2"]); // legacy not included
             },
         );
+    }
+}
+
+// ============================================================================
+// FID-222 Funnel v1 configuration.
+//
+// Default OFF. Backed by `crate::strategy::pre_scorer` runtime. The
+// `weights_override` block is optional — when None, `pre_scorer::FunnelWeights::for_regime`
+// returns the built-in per-regime defaults.
+// ============================================================================
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FunnelConfig {
+    #[serde(default = "default_funnel_enabled")]
+    pub enabled: bool,
+    #[serde(default = "default_funnel_top_k")]
+    pub top_k: usize,
+    #[serde(default = "default_funnel_min_score_threshold")]
+    pub min_score_threshold: f64,
+    /// Optional per-regime weight override. `None` → use pre_scorer defaults.
+    #[serde(default)]
+    pub weights_override: Option<FunnelWeightsTriple>,
+}
+
+impl Default for FunnelConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_funnel_enabled(),
+            top_k: default_funnel_top_k(),
+            min_score_threshold: default_funnel_min_score_threshold(),
+            weights_override: None,
+        }
+    }
+}
+
+fn default_funnel_enabled() -> bool {
+    false
+}
+fn default_funnel_top_k() -> usize {
+    12
+}
+fn default_funnel_min_score_threshold() -> f64 {
+    0.20
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FunnelWeightsTriple {
+    pub trending: FunnelWeightsFields,
+    pub ranging: FunnelWeightsFields,
+    pub volatile: FunnelWeightsFields,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct FunnelWeightsFields {
+    #[serde(default)]
+    pub ema: f64,
+    #[serde(default)]
+    pub rsi: f64,
+    #[serde(default)]
+    pub adx: f64,
+    #[serde(default)]
+    pub vol: f64,
+    #[serde(default)]
+    pub vwap: f64,
+    #[serde(default)]
+    pub bb: f64,
+}
+
+impl FunnelConfig {
+    /// Resolve the effective weight table for the given regime. Honors
+    /// `weights_override` when present; falls back to pre_scorer built-in
+    /// defaults. Always returns a FunnelWeights (never None).
+    pub fn weights_for(
+        &self,
+        regime: crate::core::types::MarketRegime,
+    ) -> crate::strategy::pre_scorer::FunnelWeights {
+        use crate::core::types::MarketRegime;
+        use crate::strategy::pre_scorer::FunnelWeights;
+        match regime {
+            MarketRegime::Trending => self
+                .weights_override
+                .as_ref()
+                .map(|o| FunnelWeights {
+                    ema: o.trending.ema,
+                    rsi: o.trending.rsi,
+                    adx: o.trending.adx,
+                    vol: o.trending.vol,
+                    vwap: o.trending.vwap,
+                    bb: o.trending.bb,
+                })
+                .unwrap_or_else(|| FunnelWeights::for_regime(MarketRegime::Trending)),
+            MarketRegime::Ranging => self
+                .weights_override
+                .as_ref()
+                .map(|o| FunnelWeights {
+                    ema: o.ranging.ema,
+                    rsi: o.ranging.rsi,
+                    adx: o.ranging.adx,
+                    vol: o.ranging.vol,
+                    vwap: o.ranging.vwap,
+                    bb: o.ranging.bb,
+                })
+                .unwrap_or_else(|| FunnelWeights::for_regime(MarketRegime::Ranging)),
+            MarketRegime::Volatile => self
+                .weights_override
+                .as_ref()
+                .map(|o| FunnelWeights {
+                    ema: o.volatile.ema,
+                    rsi: o.volatile.rsi,
+                    adx: o.volatile.adx,
+                    vol: o.volatile.vol,
+                    vwap: o.volatile.vwap,
+                    bb: o.volatile.bb,
+                })
+                .unwrap_or_else(|| FunnelWeights::for_regime(MarketRegime::Volatile)),
+        }
     }
 }

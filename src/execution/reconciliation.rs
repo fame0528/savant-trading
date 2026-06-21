@@ -11,12 +11,42 @@
 //! 2026-06-13 incident.
 
 use std::collections::HashMap;
+use std::sync::OnceLock;
 
 use serde::{Deserialize, Serialize};
 
 use crate::core::types::{AccountState, Position};
 use crate::execution::dex::{usdc_address_for_chain, usdc_decimals_for_chain};
 
+// ---------------------------------------------------------------------------
+// FID-219: Process-global shared reqwest::Client for reconciliation queries.
+//
+// See FID-219 archive at dev/fids/FID-2026-0620-219-cycle1-reconciliation-query-client-construction.md
+// §5.1 for the design rationale. Without the shared static, query_token_balance
+// constructed a fresh reqwest::Client on every reconcile, racing the constructor's
+// 17-connection sync_balance() burst (FID-213 R9 FID-ANVIL-BOOT-PERF) against Anvil's
+// concurrent-connection limit; the 18th cold connection surfaces as
+// "error decoding response body" in the cycle-1 warn at line ~140 below.
+// ---------------------------------------------------------------------------
+static RECONCILIATION_CLIENT: OnceLock<reqwest::Client> = OnceLock::new();
+
+fn shared_reconciliation_client() -> reqwest::Client {
+    // OnceLock::get_or_init is the stable API; get_or_try_init was the unstable
+    // alternative (gated `once_cell_try` feature pre-Rust 1.86). The Client::build()
+    // call virtually never fails in practice — only on system resource exhaustion,
+    // in which case the engine can't make any HTTP requests at all, so panicking
+    // with a clear message is the right failure mode.
+    RECONCILIATION_CLIENT
+        .get_or_init(|| {
+            reqwest::Client::builder()
+                .timeout(std::time::Duration::from_secs(10))
+                .build()
+                .expect("reqwest::Client::build() failed — system resource exhaustion")
+        })
+        .clone()
+}
+
+// ---------------------------------------------------------------------------
 /// Configuration for the wallet reconciliation heartbeat.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReconciliationConfig {
@@ -497,19 +527,89 @@ async fn query_token_balance(
         ]
     });
 
-    let client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(10))
-        .build()
-        .map_err(|e| format!("reqwest client: {}", e))?;
+    // FID-219: REPLACED per-call reqwest::Client::builder() with the shared static.
+    // The per-call Client constructed a fresh connection on every reconcile, throwing
+    // away keep-alive, and racing the constructor's 17-connection sync_balance() burst
+    // (FID-213 R9 FID-ANVIL-BOOT-PERF) against Anvil's concurrent-connection limit.
+    // The shared static joins the existing pool, eliminating the cold-connection race.
+    let client = shared_reconciliation_client();
 
-    let resp = client
-        .post(rpc_url)
-        .json(&body)
-        .send()
-        .await
-        .map_err(|e| format!("rpc send: {}", e))?;
-
-    let json: serde_json::Value = resp.json().await.map_err(|e| format!("rpc parse: {}", e))?;
+    // FID-219: 3-retry loop with 500ms backoff to tolerate Anvil's archive-fork
+    // state-trie warming, which intermittently returns truncated HTTP bodies on the
+    // first call to a contract after fork start (surface as "rpc parse: error
+    // decoding response body" via reqwest::Error::decode()). The OnceLock shared
+    // client joined the existing pool but lazy init still opens the cold TCP
+    // connect during cycle 1 — the retry loop absorbs the transient truncation.
+    // After the initial Anvil warmup every subsequent call succeeds on attempt 1;
+    // 3 attempts × 500ms backoff = ≤1.5s worst-case latency.
+    // FID-219 GREEN phase 3: status-check + raw-bytes-inspection + body[:200] snippet
+    // in error message. Phase 2's retry loop alone was insufficient because the
+    // body's actual shape was unknown — `reqwest::Error::decode()` from
+    // `resp.json::<serde_json::Value>()` only echoes 'expected value' without
+    // showing what the body actually was. This phase replaces `.json()` with
+    // `.bytes()` + manual `serde_json::from_slice` so we can identify the actual
+    // failure shape (empty body, HTML error page, JSON-RPC error envelope, or
+    // truncated JSON) from the smoke-test log alone. The retry loop structure is
+    // preserved; what changes is the body-read path.
+    let mut last_err = String::from("unknown error");
+    let json: serde_json::Value = {
+        let mut value_opt: Option<serde_json::Value> = None;
+        for _attempt in 0..3 {
+            let resp = match client.post(rpc_url).json(&body).send().await {
+                Ok(r) => r,
+                Err(e) => {
+                    last_err = format!("rpc send: {}", e);
+                    if _attempt < 2 {
+                        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+                    }
+                    continue;
+                }
+            };
+            let status = resp.status();
+            let bytes = match resp.bytes().await {
+                Ok(b) => b,
+                Err(e) => {
+                    last_err = format!("rpc read: {}", e);
+                    if _attempt < 2 {
+                        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+                    }
+                    continue;
+                }
+            };
+            // Capture a 200-byte UTF-8-safe snippet for the error message so the
+            // operator can see what Anvil actually returned on the failure path.
+            let snippet_len = bytes.len().min(200);
+            let snippet = String::from_utf8_lossy(&bytes[..snippet_len]);
+            if !status.is_success() || bytes.is_empty() {
+                last_err = format!(
+                    "rpc status {} body {} bytes body[:200]={:?}",
+                    status.as_u16(),
+                    bytes.len(),
+                    snippet
+                );
+                if _attempt < 2 {
+                    tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+                }
+                continue;
+            }
+            match serde_json::from_slice::<serde_json::Value>(&bytes) {
+                Ok(j) => {
+                    value_opt = Some(j);
+                    break;
+                }
+                Err(e) => {
+                    last_err = format!("rpc parse: {} body[:200]={:?}", e, snippet);
+                    if _attempt < 2 {
+                        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+                    }
+                }
+            }
+        }
+        match value_opt {
+            Some(j) => j,
+            None => return Err(last_err),
+        }
+    };
 
     // Check for JSON-RPC error first (Anvil and other nodes return {"error": {...}})
     if let Some(err) = json.get("error") {

@@ -44,6 +44,10 @@ use savant_trading::monitor::metrics::PerformanceMetrics;
 use savant_trading::risk::circuit_breaker::{CircuitBreaker, CircuitBreakerResult};
 use savant_trading::risk::position::{PositionSize, PositionSizer};
 use savant_trading::strategy::regime::RegimeDetector;
+// FID-222.7: pre_scorer runtime wiring — see src/strategy/pre_scorer.rs.
+use savant_trading::strategy::pre_scorer::{
+    self as pre_scorer, CandidateInput, FunnelRankingRecord,
+};
 use savant_trading::vault::config::VaultConfig;
 use savant_trading::vault::watcher::VaultWatcher;
 use savant_trading::vault::writer::VaultWriter;
@@ -1356,112 +1360,122 @@ pub async fn run(
             let elapsed = now.duration_since(last_chain_sync);
             if elapsed >= std::time::Duration::from_secs(300) {
                 let active_chain_name =
-                    std::env::var("SAVANT_CHAIN").unwrap_or_else(|_| "ethereum".to_string());
+                    std::env::var("SAVANT_CHAIN").unwrap_or_else(|_| "arbitrum".to_string());
                 if let Some(chain_cfg) = config.chains.get(&active_chain_name) {
-                    let recovery = ChainPositionRecovery::new(ChainRecoveryConfig {
-                        rpc_url: chain_cfg.rpc_url.clone(),
-                        wallet_address: shared.wallet_address.read().await.clone(),
-                        chain_id: chain_cfg.chain_id,
-                    });
-                    let known_tokens: Vec<(String, String, u8)> =
-                        savant_trading::data::token_discovery::load_token_store("data/tokens.json")
+                    // FID-219+: skip 5-min sync when chain is disabled in config.
+                    if !chain_cfg.enabled {
+                        warn!(
+                        "FID-155: chain '{}' is disabled in config.chains — skipping 5-min sync",
+                        active_chain_name
+                    );
+                    } else {
+                        let recovery = ChainPositionRecovery::new(ChainRecoveryConfig {
+                            rpc_url: chain_cfg.rpc_url.clone(),
+                            wallet_address: shared.wallet_address.read().await.clone(),
+                            chain_id: chain_cfg.chain_id,
+                        });
+                        let known_tokens: Vec<(String, String, u8)> =
+                            savant_trading::data::token_discovery::load_token_store(
+                                "data/tokens.json",
+                            )
                             .into_iter()
                             .map(|t| (t.symbol, t.address, t.decimals))
                             .collect();
-                    let positions_snapshot: std::collections::HashMap<
-                        String,
-                        savant_trading::core::types::Position,
-                    > = portfolio
-                        .positions()
-                        .iter()
-                        .map(|(k, v)| (k.clone(), v.clone()))
-                        .collect();
-                    let in_mem_usdc = portfolio.account().balance;
-                    // Reuse the heartbeat helper to get on-chain USDC.
-                    // We pass a single dummy position so the helper does its work.
-                    let recon_helper_cfg =
-                        savant_trading::execution::reconciliation::ReconciliationConfig {
-                            chain_id: chain_cfg.chain_id,
-                            wallet_address: shared.wallet_address.read().await.clone(),
-                            rpc_url: chain_cfg.rpc_url.clone(),
-                            divergence_threshold_usd: 0.10,
-                            divergence_threshold_pct: 0.01,
-                            interval_cycles: 1,
-                            safety_halt_threshold_pct: 0.50,
+                        let positions_snapshot: std::collections::HashMap<
+                            String,
+                            savant_trading::core::types::Position,
+                        > = portfolio
+                            .positions()
+                            .iter()
+                            .map(|(k, v)| (k.clone(), v.clone()))
+                            .collect();
+                        let in_mem_usdc = portfolio.account().balance;
+                        // Reuse the heartbeat helper to get on-chain USDC.
+                        // We pass a single dummy position so the helper does its work.
+                        let recon_helper_cfg =
+                            savant_trading::execution::reconciliation::ReconciliationConfig {
+                                chain_id: chain_cfg.chain_id,
+                                wallet_address: shared.wallet_address.read().await.clone(),
+                                rpc_url: chain_cfg.rpc_url.clone(),
+                                divergence_threshold_usd: 0.10,
+                                divergence_threshold_pct: 0.01,
+                                interval_cycles: 1,
+                                safety_halt_threshold_pct: 0.50,
+                            };
+                        let dummy_pos = std::collections::HashMap::new();
+                        let acct = portfolio.account().clone();
+                        let usdc_report =
+                            savant_trading::execution::reconciliation::reconcile_wallet_state(
+                                &recon_helper_cfg,
+                                &acct,
+                                &dummy_pos,
+                            )
+                            .await;
+                        let on_chain_usdc = if usdc_report.rpc_failure {
+                            in_mem_usdc // RPC failed — assume no drift to avoid false positives
+                        } else {
+                            usdc_report.on_chain_usdc
                         };
-                    let dummy_pos = std::collections::HashMap::new();
-                    let acct = portfolio.account().clone();
-                    let usdc_report =
-                        savant_trading::execution::reconciliation::reconcile_wallet_state(
-                            &recon_helper_cfg,
-                            &acct,
-                            &dummy_pos,
-                        )
-                        .await;
-                    let on_chain_usdc = if usdc_report.rpc_failure {
-                        in_mem_usdc // RPC failed — assume no drift to avoid false positives
-                    } else {
-                        usdc_report.on_chain_usdc
-                    };
-                    let result = recovery
-                        .reconcile_with(
-                            &positions_snapshot,
-                            &known_tokens,
-                            in_mem_usdc,
-                            on_chain_usdc,
-                        )
-                        .await;
-                    if result.is_clean() {
-                        debug!(
-                            "FID-155: 5-min chain sync clean. {} positions tracked.",
-                            positions_snapshot.len()
-                        );
-                    } else {
-                        info!(
+                        let result = recovery
+                            .reconcile_with(
+                                &positions_snapshot,
+                                &known_tokens,
+                                in_mem_usdc,
+                                on_chain_usdc,
+                            )
+                            .await;
+                        if result.is_clean() {
+                            debug!(
+                                "FID-155: 5-min chain sync clean. {} positions tracked.",
+                                positions_snapshot.len()
+                            );
+                        } else {
+                            info!(
                             "FID-155: 5-min chain sync drift detected. to_add={} to_close={} to_update={} drift_usd={:.2}",
                             result.to_add.len(),
                             result.to_close.len(),
                             result.to_update.len(),
                             result.drift_usd
                         );
-                        // Apply qty updates: re-set in-memory position quantity to chain value.
-                        // FID-211: Use the SOT wrapper instead of direct field access. The wrapper
-                        // writes to SQLite FIRST, then in-memory on success — preventing the dual-write
-                        // hole where qty drifted between in-memory and SQLite.
-                        for updated in &result.to_update {
-                            if let Some(ref j) = journal {
-                                if let Err(e) = portfolio
-                                    .adjust_quantity(&updated.id, updated.quantity, j)
-                                    .await
-                                {
-                                    tracing::warn!(
+                            // Apply qty updates: re-set in-memory position quantity to chain value.
+                            // FID-211: Use the SOT wrapper instead of direct field access. The wrapper
+                            // writes to SQLite FIRST, then in-memory on success — preventing the dual-write
+                            // hole where qty drifted between in-memory and SQLite.
+                            for updated in &result.to_update {
+                                if let Some(ref j) = journal {
+                                    if let Err(e) = portfolio
+                                        .adjust_quantity(&updated.id, updated.quantity, j)
+                                        .await
+                                    {
+                                        tracing::warn!(
                                         "FID-211: adjust_quantity failed for {}: {}. In-memory not updated; will retry next cycle.",
                                         updated.id,
                                         e
                                     );
+                                    } else {
+                                        tracing::info!(
+                                            "FID-211: chain-sync qty drift applied: {} qty={:.6}",
+                                            updated.id,
+                                            updated.quantity
+                                        );
+                                    }
                                 } else {
-                                    tracing::info!(
-                                        "FID-211: chain-sync qty drift applied: {} qty={:.6}",
-                                        updated.id,
-                                        updated.quantity
-                                    );
-                                }
-                            } else {
-                                // No journal — fall back to in-memory only (best effort)
-                                tracing::warn!(
+                                    // No journal — fall back to in-memory only (best effort)
+                                    tracing::warn!(
                                     "FID-211: chain-sync qty drift for {} but no journal; updating in-memory only",
                                     updated.id
                                 );
-                                if let Some(existing) =
-                                    portfolio.positions_mut().get_mut(&updated.id)
-                                {
-                                    existing.quantity = updated.quantity;
+                                    if let Some(existing) =
+                                        portfolio.positions_mut().get_mut(&updated.id)
+                                    {
+                                        existing.quantity = updated.quantity;
+                                    }
                                 }
                             }
                         }
                     }
+                    last_chain_sync = now;
                 }
-                last_chain_sync = now;
             }
         }
 
@@ -1479,7 +1493,7 @@ pub async fn run(
                 reconcile_wallet_state, ReconciliationConfig,
             };
             let active_chain_name =
-                std::env::var("SAVANT_CHAIN").unwrap_or_else(|_| "ethereum".to_string());
+                std::env::var("SAVANT_CHAIN").unwrap_or_else(|_| "arbitrum".to_string());
             let active_chain = config.chains.get(&active_chain_name);
             if active_chain.is_none() {
                 error!(
@@ -1490,6 +1504,31 @@ pub async fn run(
                 break;
             }
             let active_chain = active_chain.unwrap();
+            // FID-219+: heartbeat probe-time guard — refuse to probe if active chain is disabled.
+            if !active_chain.enabled {
+                warn!(
+                    "FID-219+: chain '{}' is disabled in config.chains. Refusing to probe.",
+                    active_chain_name
+                );
+                shared
+                    .set_block(savant_trading::core::shared::BlockReason {
+                        block_type: "chain_disabled".to_string(),
+                        reason: format!(
+                            "Active chain '{}' is disabled in config.chains. Refusing to probe.",
+                            active_chain_name
+                        ),
+                        triggered_at: chrono::Utc::now(),
+                    })
+                    .await;
+                let _ = std::fs::write("savant.blocked",
+                    format!(
+                        "{}\nTrigger: chain_disabled\nReason: Active chain '{}' is disabled in config.chains.\n",
+                        chrono::Utc::now().to_rfc3339(),
+                        active_chain_name
+                    ),
+                );
+                break;
+            }
             let recon_cfg = ReconciliationConfig {
                 chain_id: active_chain.chain_id,
                 wallet_address: shared.wallet_address.read().await.clone(),
@@ -1818,6 +1857,8 @@ pub async fn run(
             );
         }
         let mut pair_data_vec: Vec<PairData> = Vec::new();
+        // FID-222.8: funnel_inputs decl (populated inside the for-pair loop below).
+        let mut funnel_inputs: Vec<CandidateInput> = Vec::new();
         let market_ctx = insight.cached().clone();
         let positions: Vec<Position> = portfolio.positions().values().cloned().collect();
         let recent_trades = portfolio.closed_trades().to_vec();
@@ -2438,6 +2479,8 @@ pub async fn run(
                 // FID-118: Reset dead streak — pair has live candles and passed all filters
                 dead_streaks.remove(pair.as_str());
 
+                // FID-222.8: clone indicators for funnel; PairData still consumes the original.
+                let indicators_for_funnel = indicators.clone();
                 pair_data_vec.push(PairData {
                     pair: pair.clone(),
                     indicators,
@@ -2446,6 +2489,12 @@ pub async fn run(
                     system_prompt,
                     user_message,
                 });
+                // FID-222.8: collect funnel input alongside pair_data_vec.push.
+                funnel_inputs.push(CandidateInput::new(
+                    pair.clone(),
+                    None,
+                    indicators_for_funnel,
+                ));
             }
         }
 
@@ -2480,6 +2529,65 @@ pub async fn run(
             jp.flush_metrics();
         }
 
+        // FID-222.7 + FID-222.8: Funnel v1 runtime wiring — post-loop runner.
+        {
+            use savant_trading::core::types::{IndicatorValues, MarketRegime};
+            let cycle_regime = MarketRegime::Trending;
+            // TODO(FID-222.9): compute real regime from RegimeDetector.observe(market_stores)
+            let funnel_result = pre_scorer::run_funnel(
+                funnel_inputs.clone(),
+                cycle_regime,
+                &config.trading.funnel_v1,
+                hunt_mode,
+            );
+            let positioned_set: std::collections::HashSet<String> =
+                positions.iter().map(|p| p.pair.clone()).collect();
+            let mut retained_pairs_local: Vec<String> = funnel_result.pairs();
+            let mut force_injected_pairs_local: Vec<String> = Vec::new();
+            for pos_pair in &positioned_set {
+                if !retained_pairs_local.iter().any(|p| p == pos_pair) {
+                    let inj_last_candle =
+                        market_stores.get(pos_pair).and_then(|s| s.last().cloned());
+                    funnel_inputs.push(CandidateInput::new(
+                        pos_pair.clone(),
+                        inj_last_candle,
+                        IndicatorValues::default(),
+                    ));
+                    retained_pairs_local.push(pos_pair.clone());
+                    force_injected_pairs_local.push(pos_pair.clone());
+                }
+            }
+            debug!(
+                "FUNNEL_V1 force-injected {} positioned pairs (open-position safety guard)",
+                force_injected_pairs_local.len()
+            );
+            let positioned_pairs_vec: Vec<String> = positioned_set.iter().cloned().collect();
+            let orphaned_retained: usize = funnel_result.pairs().len();
+            let funnel_ranking_record = FunnelRankingRecord::build(
+                tick,
+                cycle_regime,
+                hunt_mode,
+                config.trading.funnel_v1.enabled,
+                positioned_pairs_vec.clone(),
+                retained_pairs_local.clone(),
+                orphaned_retained,
+                &force_injected_pairs_local,
+                &funnel_result,
+            );
+            let record_clone = funnel_ranking_record.clone();
+            std::thread::spawn(move || {
+                pre_scorer::append_funnel_jsonl(&record_clone);
+            });
+            pre_scorer::record_funnel_runtime(&shared, cycle_regime, hunt_mode, &funnel_result)
+                .await;
+            pre_scorer::record_funnel_heartbeat(
+                &shared,
+                cycle_regime,
+                config.trading.funnel_v1.enabled,
+            )
+            .await;
+            active_pairs = retained_pairs_local;
+        }
         // === PHASE 2: Send all LLM calls in parallel via streaming ===
         // FID-073 Issue 2: Skip if previous eval still running
         if eval_in_progress.load(std::sync::atomic::Ordering::Relaxed) {

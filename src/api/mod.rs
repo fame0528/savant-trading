@@ -18,7 +18,7 @@ use tokio::sync::RwLock;
 use tracing::{info, warn};
 
 use savant_trading::core::config::AppConfig;
-use savant_trading::core::shared::{DecisionRecord, SharedEngineData};
+use savant_trading::core::shared::{DecisionRecord, FunnelRuntimeState, SharedEngineData};
 use serde::{Deserialize, Serialize};
 
 /// Shared application state accessible by both engine and API.
@@ -142,6 +142,8 @@ pub async fn start_server(
         .route("/api/jury/status", get(get_jury_status))
         .route("/api/jury/recent", get(get_jury_recent))
         .route("/api/jury/verdicts/{cycle_id}", get(get_jury_verdicts))
+        // FID-222: Funnel v1 observability endpoint
+        .route("/api/funnel/v1", get(get_funnel_v1))
         .with_state(state)
         .layer(cors)
         .layer(middleware::from_fn(auth_middleware))
@@ -550,6 +552,13 @@ async fn get_activity(State(state): State<AppState>) -> Json<ApiResponse<Vec<ser
         })
         .collect();
     Json(ApiResponse::ok(items))
+}
+
+// FID-222: Funnel v1 observability handler.
+
+async fn get_funnel_v1(State(state): State<AppState>) -> Json<ApiResponse<FunnelRuntimeState>> {
+    let snap = state.shared.funnel_v1.read().await.clone();
+    Json(ApiResponse::ok(snap))
 }
 
 // FID-162: Jury observability handlers.

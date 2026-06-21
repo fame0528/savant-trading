@@ -1,4 +1,15 @@
-# AUDIT REPORT — Savant Trading v0.8.0
+# AUDIT REPORT — Savant Trading v0.8.0 *(HISTORICAL — superseded by later releases)*
+
+> **Historical banner (added 2026-06-21 during v0.15.7 audit push):** This document
+> reflects a snapshot of the codebase as of **v0.8.0 (2026-06-04)**. It is preserved
+> as a historical record but most findings have been addressed in subsequent releases
+> (F-01, F-04, F-05, F-08, F-09 fixed in v0.10.x; F-14 partially addressed via wallet
+> reconciliation in v0.15.1; F-07 deferred). For the **current** state, see:
+>
+> - `dev/fids/MASTER-FID.md` — FID tracker (177 archived → 220 archived at v0.15.7)
+> - `dev/fids/archive/` — closed FIDs with status + resolution narratives
+> - `dev/vera/` — Vera's current memory, lessons, decisions
+> - `CHANGELOG.md` — what shipped per release
 
 **Auditor:** Nova (read-only)
 **Date:** 2026-06-04 (Updated: 2026-06-06)

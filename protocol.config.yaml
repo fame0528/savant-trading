@@ -8,10 +8,10 @@
 project:
   name: "savant-trading"
   description: "AI-native autonomous crypto trading engine — DEX-only via 0x API"
-  version: "0.15.0"
+  version: "0.15.6"
 
 protocol:
-  version: "0.1.0"
+  version: "0.15.6"
   strict_mode: true  # true = all 15 laws active (default), false = core 4 laws only
 
 language: "rust"

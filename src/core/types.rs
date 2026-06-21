@@ -367,7 +367,7 @@ pub struct VolumeLevel {
     pub volume: f64,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct IndicatorValues {
     pub ema_fast: Option<f64>,
     pub ema_slow: Option<f64>,

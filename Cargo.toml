@@ -1,11 +1,13 @@
 [package]
 name = "savant-trading"
-version = "0.15.1"
+version = "0.15.7"
 edition = "2021"
 rust-version = "1.91"
 description = "AI-native autonomous crypto trading engine — Multi-chain DEX (Arbitrum, 0x API)"
 default-run = "savant"
-license = "Proprietary"
+# Suppress cargo warning: license-file points to the real LICENSE file at the repo root.
+# (The `license` field is omitted because we ship a custom LICENSE file rather
+# than an SPDX-expression string. cargo accepts one OR the other, not both.)
 license-file = "LICENSE"
 repository = "https://github.com/fame0528/savant-trading"
 homepage = "https://github.com/fame0528/savant-trading"

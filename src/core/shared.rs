@@ -67,6 +67,14 @@ pub struct SharedEngineData {
     /// this holds the reason. None = not blocked. The dashboard reads this for
     /// the "ENGINE BLOCKED" card. Auto-clears when circuit returns Ok.
     pub block: Arc<RwLock<Option<BlockReason>>>,
+
+    // ---- FID-222: Funnel v1 observability ----
+    /// Live FID-222 funnel runtime state — populated by the engine's PHASE2
+    /// funnel invocation each cycle (when `trading.funnel_v1.enabled` AND not
+    /// HUNT MODE active; see FID-222 Loop 1.7). Dashboard reads via the
+    /// `/api/funnel/v1` route handler. Engineers read this to confirm the
+    /// funnel is ranking, scoring uniquely, and respecting the HUNT bypass.
+    pub funnel_v1: Arc<RwLock<FunnelRuntimeState>>,
 }
 
 /// FID-210: Reason the engine is blocked. Replaces the savant.blocked text file.
@@ -79,6 +87,41 @@ pub struct BlockReason {
     pub reason: String,
     /// When the block was triggered (UTC).
     pub triggered_at: chrono::DateTime<chrono::Utc>,
+}
+
+/// FID-222: Funnel v1 runtime state, exposed via `SharedEngineData::funnel_v1`
+/// and serialized through the dashboard `/api/funnel/v1` route handler.
+///
+/// Each cycle, the engine mutates this state AFTER running the funnel (or after
+/// passing through if `enabled=false` or `hunt_mode=true`). The state captures:
+/// - whether the funnel actually ran (vs pass-through),
+/// - the universe → top-K reduction (input_N, output_K, threshold_drop),
+/// - the most recent cycle's top scores + regimes,
+/// - HUNT MODE bypass flag (per FID-222 Loop 1.7).
+///
+/// Diagnostic only — does not gate execution. The FID-126 conviction gate
+/// still owns the BUY/HOLD decision; the funnel narrows the universe ONLY.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct FunnelRuntimeState {
+    /// True when the funnel ran this cycle (vs pass-through).
+    pub enabled_at_last_cycle: bool,
+    /// Universe size post-hygiene, before funnel ranking.
+    pub last_universe_post_hygiene: usize,
+    /// Top-K size the funnel returned this cycle (0 if pass-through).
+    pub last_top_k_size: usize,
+    /// Best-of-K funnel score from this cycle (None if not run).
+    pub last_top_score: Option<f64>,
+    /// Worst-of-K funnel score from this cycle (None if not run).
+    pub last_min_top_score: Option<f64>,
+    /// Regime at score time.
+    pub last_regime: Option<crate::core::types::MarketRegime>,
+    /// When the most recent funnel run finished (UTC).
+    pub last_run_at: Option<chrono::DateTime<chrono::Utc>>,
+    /// HUNT MODE bypass flag — when true, funnel was *skipped* (FID-222
+    /// Loop 1.7 preserves FID-063 intent).
+    pub hunt_mode_bypass: bool,
+    /// Optional override or auto-disable reason (e.g. cycle-time exceeded).
+    pub disabled_reason: Option<String>,
 }
 
 /// FID-162: Live jury state for `/api/jury/status`.
@@ -225,6 +268,9 @@ impl SharedEngineData {
 
             // FID-210: engine block state (replaces savant.blocked file)
             block: Arc::new(RwLock::new(None)),
+
+            // FID-222: funnel v1 observability (default zero-state; engine populates each cycle)
+            funnel_v1: Arc::new(RwLock::new(FunnelRuntimeState::default())),
         }
     }
 

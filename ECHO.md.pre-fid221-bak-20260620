@@ -244,48 +244,6 @@ This rule is the inter-agent version of the AUDIT phase's call-graph reachabilit
 
 ---
 
-## Engine Startup Pre-Flight
-
-When the operator (Spencer) is about to run `start.bat` and launch the engine, the agent's contract is:
-
-**Required agent-side verification BEFORE acknowledging "ready to launch":**
-
-1. **`savant.blocked` file absent.** If `savant.blocked` exists at the project root (or `data/savant.blocked`), the engine will refuse to start. The agent must call the configured halt-clear path (currently `GET /api/risk/clear-block` via `http://127.0.0.1:8080/api/risk/clear-block`) and confirm the file is deleted. If the API is unreachable, the agent must warn Spencer to manually `rm savant.blocked` before proceeding.
-
-2. **No conflicting stale processes.** The agent must `Get-Process` for `savant`, `anvil`, `node`, and inspect for any savant-trading-related ones. If found, the agent must warn Spencer.
-
-   - Stale *Rust engine* is benign (`start.bat` pre-build kills it cleanly via the FID-220 + FID-221 pre-build blocks).
-   - Stale *Anvil fork* on `:8545` is benign (`start-anvil.bat` is idempotent and reuses).
-   - Stale *m3-proxy* on `:4000` is benign (m3-proxy-controller.bat reuses).
-   - Stale *Node dashboard* on `:3000` is the FID-220 + FID-221 footgun. **The agent MUST specifically warn Spencer about this and recommend the manual-fix command BEFORE Spencer runs `start.bat`.** The post-FID-221 start.bat WILL abort loudly on `:3000`-still-held-after-3-retries WITH a FATAL message, but the agent may help Spencer by surfacing the issue proactively.
-
-3. **Source tree clean.** `git status --short` should be empty. If working tree has uncommitted modifications, the agent must surface them so Spencer can decide whether to commit-then-run or stash-then-run.
-
-**Required agent-side documentation AFTER launching:**
-
-4. **Capture the boot log path.** As soon as `start.bat` is running, identify where the boot log is writing (typically `data/boot_logs/savant_boot_*.log` or via the `TELEMETRY_LOG_DIR` env var if set). The agent MUST hand this path to Spencer before the conversation ends so a future session can read it.
-
-5. **Interval sanity check.** During long-running sessions (Spencer typically runs 24/7 monitoring), the agent MUST NOT autonomously restart the engine - only Spencer triggers engine launches. If the engine dies mid-session and Spencer's hands-off, the agent documents the death in `dev/sessions/...` but does NO action to recover.
-
-**Common failure modes the agent must recognize in boot logs (Spencer provides a boot log excerpt; the agent diagnoses):**
-
-| Failure pattern | FID / root cause | Agent's diagnostic command | Recommended manual fix |
-|---|---|---|---|
-| `EADDRINUSE :::3000` | FID-221 HUNK C: stale dashboard | `netstat -aon | findstr ":3000" | findstr LISTENING` | `taskkill /F /PID <PID>` |
-| `EADDRINUSE :::4000` | m3-proxy runaway | `netstat -aon | findstr ":4000" | findstr LISTENING` | Kill stale m3-proxy node PID; rerun `start.bat` |
-| `EADDRINUSE :::8080` | API server already bound | `netstat -aon | findstr ":8080" | findstr LISTENING` | Kill stale savant.exe process first |
-| `EADDRINUSE :::8545` | Anvil already up (benign) | `netstat -aon | findstr ":8545" | findstr LISTENING` | Confirm it's the intended Anvil; otherwise kill |
-| `panic` in Rust log | engine code path | grep the panic message for file:line | Trace the affected FID + revert/fix |
-| `starting_balance != on_chain_balance` | FID-117 reconciliation drift | `cat data/savant.db` journal inspect | WARN about drift; do NOT autonomously reconcile |
-| `WalletKey` redaction failure (`Display`/`Debug` shows raw key) | **Security invariant broken** | n/a | **HALT the launch**; private key may have leaked - escalate |
-
-**The agent's principle (RED - Wrong, GREEN - Right):**
-
-- **WRONG:** Read ECHO.md, then help Spencer run `start.bat` without port-cleanup verification - set Spencer up for the FID-220/FID-221 crash.
-- **RIGHT:** Read ECHO.md AND this Pre-Flight section, then run the verifications above BEFORE acknowledging "ready to launch." Surface the conflict proactively so Spencer can resolve it cleanly.
-
----
-
 ## FID Lifecycle
 
 FIDs (Feature Implementation Documents) track discovered issues through resolution:

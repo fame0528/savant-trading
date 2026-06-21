@@ -1,0 +1,28 @@
+# .gitattributes — line-ending policy
+# ============================================================
+# Force CRLF on Windows shell-script files. cmd.exe requires
+# CRLF; LF-only .bat files produce the runtime error:
+#   "The system cannot find the batch label specified - <label>"
+# (cmd's backward-label scan aborts when it encounters bare LF
+# lines near the top of the file before the labels it needs.)
+#
+# If a file ever drifts away from canonical CRLF, run
+#   scripts/normalize_crlf.bat
+# which byte-level rewrites every .bat under the project root.
+# ============================================================
+
+*.bat	text eol=crlf
+*.cmd	text eol=crlf
+*.ps1	text eol=crlf
+
+# Source code defaults to LF (POSIX convention); the engine
+# team works on Windows but the Rust / TypeScript / TOML code
+# is portable, and editor support for LF is universal.
+*.rs		text eol=lf
+*.ts		text eol=lf
+*.tsx		text eol=lf
+*.js		text eol=lf
+*.jsx		text eol=lf
+*.toml		text eol=lf
+*.json		text eol=lf
+*.md		text eol=lf

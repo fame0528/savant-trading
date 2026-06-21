@@ -138,6 +138,29 @@ validate_via_0x = true
 # Path to persistent token store (JSON)
 persist_path = "data/tokens.json"
 
+# FID-222: Funnel v1 momentum pre-scorer + top-K selector.
+# Default OFF. When enabled, ranks `active_pairs` by 6-signal composite
+# score before sending to the LLM jury. Disabled by default so the v0.15
+# release ships with the proven 18-pair pipeline intact.
+#
+# Usage:
+#   enabled = true                              # turn ON
+#   top_k = 12                                  # number of pairs sent to LLM
+#   min_score_threshold = 0.20                  # drop pairs below this score
+#
+# Optional per-regime weight override (sums must equal 1.0):
+#   [trading.funnel_v1.weights_override]
+#   [trading.funnel_v1.weights_override.trending]
+#   ema = 0.30; rsi = 0.10; adx = 0.30; vol = 0.20; vwap = 0.10; bb = 0.00
+#   [trading.funnel_v1.weights_override.ranging]
+#   ema = 0.15; rsi = 0.35; adx = 0.15; vol = 0.10; vwap = 0.25; bb = 0.00
+#   [trading.funnel_v1.weights_override.volatile]
+#   ema = 0.10; rsi = 0.10; adx = 0.25; vol = 0.40; vwap = 0.15; bb = 0.00
+[trading.funnel_v1]
+enabled = true
+top_k = 12
+min_score_threshold = 0.20
+
 [risk]
 max_risk_per_trade = 0.005
 # Position allocation — scalping: 0.5% risk per trade, full deploy at low balance

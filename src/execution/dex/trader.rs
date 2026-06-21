@@ -11,7 +11,7 @@ use futures_util::FutureExt;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 
 use crate::core::error::ExecutionError;
 use crate::core::types::{Order, OrderStatus, OrderType, Position, ScaleLevel, Side, TradeRecord};
@@ -24,6 +24,19 @@ use alloy_core::primitives::hex;
 use alloy_core::primitives::{Address, U256};
 use k256::ecdsa::{RecoveryId, Signature, SigningKey};
 use sha3::{Digest, Keccak256};
+
+// ---------------------------------------------------------------------------
+// FID-213: Anvil fresh-startup balance override helper
+// ---------------------------------------------------------------------------
+
+/// Detect Anvil mode from `rpc_url` at construction time. A loopback URL
+/// (`127.0.0.1` / `localhost`) is a strong signal of a local Anvil fork.
+/// Production uses `https://arb1.arbitrum.io/rpc` and will not match this
+/// heuristic — the engine can also flip this later via
+/// `set_is_anvil(config.mode.is_anvil)` for explicit override.
+pub fn is_anvil_rpc(url: &str) -> bool {
+    url.contains("127.0.0.1") || url.contains("localhost")
+}
 
 // ---------------------------------------------------------------------------
 // FID-108: Error categorization + failure tracking
@@ -556,6 +569,12 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             },
         );
 
+        // FID-213: Detect Anvil mode from rpc_url at construction time so the
+        // override block below can adopt config.starting_balance on fresh
+        // startups. Engine may later override via set_is_anvil, but the
+        // constructor-time heuristic determines what sync_balance() does.
+        let is_anvil_at_startup = is_anvil_rpc(rpc_url);
+
         let mut trader = Self {
             backend,
             signing_key,
@@ -573,7 +592,7 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             order_counter: 0,
             state_path: PathBuf::from("data/dex_state.json"),
             gas_halted: false,
-            is_anvil: false, // FID-209: engine calls set_is_anvil(config.mode.is_anvil) after construction
+            is_anvil: is_anvil_at_startup, // FID-209/FID-213: heuristic at construction; engine may override via set_is_anvil(config.mode.is_anvil)
             retry_queue: Vec::new(),
             max_retries: 3,
             balance_cache: HashMap::new(),
@@ -585,6 +604,25 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             info!("DexTrader: restored state from {:?}", state_path);
         }
 
+        // FID-213 PRE-SYNC INTENT LOG: emit the audit line at second 1 of boot,
+        // BEFORE sync_balance() runs, so operator visibility is instant — even when
+        // sync_balance spends additional seconds warming Anvil's archive-node cache
+        // for the per-token balanceOf loop below. The actual drift compare +
+        // save_state + warn/info emission lives in the post-sync override block
+        // below using the SAME state_file_present gate, so semantics stay consistent
+        // across both phases (and the FID-213 source-pattern tests still see both
+        // gates reading the same file path).
+        let pre_sync_state_file_present = trader.state_path.exists();
+        if trader.is_anvil && !pre_sync_state_file_present {
+            info!(
+                "FID-213: Anvil fresh-startup override PENDING — \
+                 rpc_url={} detected as loopback; \
+                 state_path={:?} absent; \
+                 config.starting_balance=${:.4} will be adopted as canonical after sync.",
+                trader.rpc_url, trader.state_path, initial_balance
+            );
+        }
+
         // Sync real on-chain balances immediately — don't trust config starting_balance
         let balance_before_sync = trader.balance;
         if let Err(e) = trader.sync_balance().await {
@@ -592,6 +630,69 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                 "DexTrader: initial sync_balance failed ({}), using config balance",
                 e
             );
+        }
+
+        // FID-213: Anvil fresh-startup balance override. On Anvil local forks we
+        // control the chain, so trust config.starting_balance over whatever
+        // sync_balance() just read from the chain (often a stale default-state $0).
+        // Only applies on a FRESH startup — a previously-persisted
+        // `data/dex_state.json` means we already reconciled and should respect chain
+        // truth. Adopting the drift is logged as a warn! audit line so the operator
+        // can see exactly what was overridden without combing through multiple files.
+        // FID-213-FIX: Use the pre_sync_state_file_present captured BEFORE sync_balance
+        // ran. Without this, sync_balance's tail-call let _ = self.save_state() would
+        // write data/dex_state.json, after which state_file_present here returns TRUE
+        // and the override block silently skips (the pre-existing bug unmasked by
+        // the FID-ANVIL-BOOT-PERF fix that finally lets sync_balance complete in <8s).
+        if trader.is_anvil && !pre_sync_state_file_present {
+            let chain_reported = trader.balance;
+            let drift_adopted = (initial_balance - chain_reported).abs();
+            trader.balance = initial_balance;
+            // FID-213 persist: save the adopted starting_balance to data/dex_state.json
+            // so a subsequent restart on the same Anvil fork re-reads the adopted value
+            // rather than reverting to the stale (chain-truth) value the previous session
+            // left on disk. This is INSIDE the outer override `if` so it fires for ALL
+            // overrides — including drift_adopted <= 0.10 (info branch). Without this,
+            // the in-memory `trader.balance = initial_balance` mutation persists only as
+            // long as the engine runs; the next restart reads stale data/dex_state.json
+            // and re-applies sync_balance() to revert. Matches the
+            // `save_state().ok()` lines on lines ~636 (PhantomPositions block) and
+            // elsewhere already in this function.
+            if let Err(e) = trader.save_state() {
+                // Surface file_state so operator can distinguish save_state failure modes:
+                //   - present(size, readonly) -> likely readonly attr | disk-full | fsync error
+                //   - absent(kind)             -> likely parent dir missing | permission on parent
+                let file_state = match std::fs::metadata(&trader.state_path) {
+                    Ok(m) => format!(
+                        "present(size_bytes={}, is_readonly={})",
+                        m.len(),
+                        m.permissions().readonly()
+                    ),
+                    Err(meta_err) => format!("absent({:?})", meta_err.kind()),
+                };
+                warn!(
+                    "FID-213: failed to persist adopted starting_balance to {:?}: {} \
+                     -- file_state={} \
+                     -- restart will re-fire override (drift ${:.4})",
+                    trader.state_path, e, file_state, drift_adopted
+                );
+            }
+            if drift_adopted > 0.10 {
+                warn!(
+                    "FID-213: Anvil fresh-startup balance override adopted \
+                     starting_balance=${:.4} (chain reported ${:.4}, drift ${:.4}, \
+                     is_anvil=true, state_file_present=false, state_path={:?}). \
+                     On Anvil we control the chain; config.starting_balance is canonical.",
+                    trader.balance, chain_reported, drift_adopted, trader.state_path
+                );
+            } else {
+                info!(
+                    "FID-213: Anvil fresh-startup — chain reported ${:.4} already \
+                     matches config.starting_balance=${:.4} within FID-212 0.10 USD \
+                     tolerance; no override needed.",
+                    chain_reported, trader.balance
+                );
+            }
         }
 
         // Reconcile: if tracked balance drifted significantly from actual on-chain balance,
@@ -1904,6 +2005,26 @@ impl<B: DexBackend + 'static> DexTrader<B> {
             "data": call_data
         }, "latest"]);
 
+        // FID-212: Apples-to-apples USDC comparison.
+        // The OLD code mixed domains: `gained = usdc_after (chain) - usdc_balance_before (in-memory)`.
+        // When the wallet reconciliation heartbeat (FID-147) had already detected drift, the
+        // in-memory `self.balance` was STALE relative to the chain, and the close path would
+        // see a phantom gain/loss. The clearest example: chain has $0 USDC after a UNI dust
+        // return, engine believes $50, so `gained = -$50`, dust fallback fires, phantom $-50
+        // is logged, but `self.balance` stays at $50. Cycle 2 then trips WALLET_RECONCILIATION_HALT.
+        // Fix: read PRE-trade on-chain USDC and use it for the gain calculation. Fall back to
+        // in-memory only if the RPC fails (logged but non-fatal — next-cycle heartbeat catches it).
+        let usdc_on_chain_before: f64 = match self.query_token_balance(usdc_addr, usdc_dec).await {
+            Some(b) => b,
+            None => {
+                warn!(
+                    "FID-212: pre-trade {} USDC chain read failed; using in-memory self.balance=${:.4} as fallback (RPC erratic — next-cycle heartbeat will reconcile)",
+                    self.chain_id, self.balance
+                );
+                self.balance
+            }
+        };
+
         // FID-146: Retry USDC verification 3x with backoff. On final failure OR dust
         // return ($0 USDC), trust the on-chain close tx (status=1, tx_hash confirmed)
         // and return 0.0 — the position will be removed with breakeven PnL. This prevents
@@ -1921,7 +2042,9 @@ impl<B: DexBackend + 'static> DexTrader<B> {
                             let divisor = 10f64.powi(usdc_dec as i32);
                             let usdc_after: f64 =
                                 usdc_wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
-                            let gained = usdc_after - usdc_balance_before;
+                            // FID-212: Apples-to-apples. Compare chain→chain, not chain→memory.
+                            // See FID-212 archive for the dust-return phantom-divergence incident.
+                            let gained = usdc_after - usdc_on_chain_before;
                             if gained <= 0.0 {
                                 // Dust return — close succeeded on-chain but delivered $0.
                                 // This is the CATASTOPHIC case. Trust the close, log error,
@@ -2011,7 +2134,42 @@ impl<B: DexBackend + 'static> DexTrader<B> {
         };
         let fee_est = exit_price * actual_close_qty * 0.003; // FID-113: 0.3% Uniswap v3 LP fee (was 0.1%)
         let pnl = gross_pnl - fee_est;
-        self.balance = usdc_balance_before + verified_proceeds;
+
+        // FID-212: Adopt chain as truth on self.balance.
+        // The OLD `self.balance = usdc_balance_before + verified_proceeds` is now REMOVED
+        // because it relied on a stale in-memory snapshot that the FID-147 heartbeat had
+        // (rightfully) flagged. Instead, re-read on-chain USDC after the close tx — the
+        // chain is the only source of truth for phantom-prevention (FID-149 rule: "we
+        // only use real data"). Match the reconciliation heartbeats 0.10 USD threshold so
+        // dust changes don't trigger spurious reconciliation storms.
+        // ECHO Law 14: all error paths handled. RPC failure here must NOT block the close;
+        // the next-cycle heartbeat catches the stale state.
+        const BALANCE_RECONCILE_THRESHOLD_USD: f64 = 0.10;
+        match self.query_token_balance(usdc_addr, usdc_dec).await {
+            Some(on_chain_after_close) => {
+                let drift = (on_chain_after_close - self.balance).abs();
+                if drift > BALANCE_RECONCILE_THRESHOLD_USD {
+                    warn!(
+                        "FID-212: Reconciling self.balance to chain truth: \
+                         in_memory=${:.4} → on_chain=${:.4} (drift=${:.4}) after {} close (tx={})",
+                        self.balance, on_chain_after_close, drift, pos.pair, tx_hash
+                    );
+                    self.balance = on_chain_after_close;
+                } else {
+                    debug!(
+                        "FID-212: self.balance agrees with chain (drift=${:.4} <= threshold) after {} close",
+                        drift, pos.pair
+                    );
+                }
+            }
+            None => {
+                warn!(
+                    "FID-212: post-close {} chain re-read failed for tx={}; \
+                     self.balance stays at ${:.4} (next-cycle heartbeat will reconcile)",
+                    pos.pair, tx_hash, self.balance
+                );
+            }
+        }
 
         self.closed_trades.push(TradeRecord {
             id: uuid::Uuid::new_v4().to_string(),
@@ -2372,14 +2530,44 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
             .map(|(sym, addr, dec)| (sym.to_string(), addr.to_string(), *dec))
             .collect();
 
-        for (sym, token_addr, decimals) in &pair_tokens {
-            let bal_call = serde_json::json!([{
-                "to": token_addr,
-                "data": format!("0x70a08231{}", padded_addr)
-            }, "latest"]);
+        // FID-ANVIL-BOOT-PERF: Fire all per-token balanceOf calls concurrently via
+        // futures_util::future::join_all so Anvil's lazy archive-node fetches happen
+        // in parallel rather than sequentially. On a fresh Anvil fork, each token's
+        // first call triggers an upstream archive-node fetch (~3-5s each). 17 tokens
+        // sequentially = 35-60s and breaches any reasonable smoke-test window;
+        // concurrently = <8s. self.rpc_call takes &self (immutable borrow) so
+        // concurrent N*&self is allowed (Rust allows multiple immutable borrows
+        // simultaneously). After join_all completes, all borrows are released and
+        // &mut self.balance_cache.insert works exactly as before.
+        let query_futures = pair_tokens.iter().map(|(sym, token_addr, decimals)| {
+            let pad = format!("0x70a08231{}", padded_addr);
+            // Clone the iterator refs to OWNED values BEFORE the async move
+            // block so they can be moved (captured by value) into each future.
+            // Without cloning, async move would try to move the &String refs
+            // from `pair_tokens.iter()`, which is impossible on borrowed state.
+            let sym_owned: String = sym.clone();
+            let token_addr_owned: String = token_addr.clone();
+            let decimals_owned: u8 = *decimals;
+            // Re-borrow self as `&Self` (a Copy type). async move captures
+            // the COPY of the immutable borrow — N parallel closures each get
+            // their own &Self without fighting over `self`. After join_all
+            // completes, all immutable borrows are released and &mut
+            // self.balance_cache.insert(...) works on the post-await loop.
+            let self_ref: &Self = &*self;
+            async move {
+                let bal_call = serde_json::json!([{
+                    "to": token_addr_owned,
+                    "data": pad
+                }, "latest"]);
+                let result = self_ref.rpc_call("eth_call", bal_call).await;
+                (sym_owned, token_addr_owned, decimals_owned, result)
+            }
+        });
+        let query_results = futures_util::future::join_all(query_futures).await;
 
-            if let Ok(result) = self.rpc_call("eth_call", bal_call).await {
-                if let Some(hex) = result.as_str() {
+        for (sym, token_addr, decimals, result) in query_results {
+            if let Ok(rpc_result) = result {
+                if let Some(hex) = rpc_result.as_str() {
                     let hex_clean = hex.trim_start_matches("0x");
                     // FID-089: Use match instead of unwrap_or(U256::ZERO)
                     let wei = match U256::from_str_radix(hex_clean, 16) {
@@ -2394,12 +2582,12 @@ impl<B: DexBackend + 'static> ExecutionEngine for DexTrader<B> {
                             continue;
                         }
                     };
-                    let divisor = 10f64.powi(*decimals as i32);
+                    let divisor = 10f64.powi(decimals as i32);
                     let bal: f64 = wei.to_string().parse::<f64>().unwrap_or(0.0) / divisor;
                     if bal > 0.0001 {
                         info!("On-chain {} balance: {:.8}", sym, bal);
                         // P0-1a: Cache the balance for fallback during close
-                        self.balance_cache.insert(token_addr.clone(), bal);
+                        self.balance_cache.insert(token_addr, bal);
                     }
                 }
             }
