@@ -40,6 +40,7 @@ fn default_cfg() -> ReconciliationConfig {
         divergence_threshold_pct: 0.01,
         interval_cycles: 1,
         safety_halt_threshold_pct: 0.50,
+        token_divergence_threshold_usd: 5.00,
     }
 }
 

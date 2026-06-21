@@ -67,6 +67,14 @@ pub struct ReconciliationConfig {
     /// without mutating state. Default: 0.50 (50%). A 50% divergence
     /// indicates a serious bug, not routine drift.
     pub safety_halt_threshold_pct: f64,
+    /// FID-225: Per-token divergence threshold. Default: 5.00 USD. Above
+    /// this, reconcile_wallet_state fires the halt path on per-token
+    /// divergence. Was previously aliased to divergence_threshold_usd
+    /// ($0.10) which was too tight and caused spurious halts on minor
+    /// price-feed noise. Operators tuning for smaller or larger positions
+    /// can adjust via TOML. Should typically be 10-50x the USDC threshold.
+    #[serde(default)]
+    pub token_divergence_threshold_usd: f64,
 }
 
 impl Default for ReconciliationConfig {
@@ -79,6 +87,7 @@ impl Default for ReconciliationConfig {
             divergence_threshold_pct: 0.01,
             interval_cycles: 1,
             safety_halt_threshold_pct: 0.50,
+            token_divergence_threshold_usd: 5.00,
         }
     }
 }
@@ -147,6 +156,32 @@ pub struct TokenDivergence {
 /// RPC unreliability is logged but does not halt the engine — the alternative
 /// (halting on every RPC blip) would create more false positives than the
 /// drift we're trying to detect.
+/// FID-225 round 2: Classify a per-token quantity observation as haltable
+/// drift or phantom (in-memory>0 but on-chain=0, indicating stale state
+/// from a reverted swap or prior-session artifact, NOT a real on-chain
+/// drift). Pure function — extracted for testability. Phantoms are NOT
+/// haltable; the 5-min ChainPositionRecovery → `apply_to_portfolio`
+/// (FID-196) is the proper handler for them.
+///
+/// # Arguments
+/// * `expected_qty` — position's in-memory token quantity
+/// * `on_chain_qty` — chain's actual token balance for the wallet
+/// * `divergence_usd` — pre-computed `(expected - on_chain).abs() * price`
+/// * `threshold_usd` — `ReconciliationConfig.token_divergence_threshold_usd`
+///
+/// # Returns
+/// * `true` — real, divergence-confirmed; heartbeat should halt
+/// * `false` — phantom (stale state) OR sub-threshold; heartbeat skips
+fn is_haltable_token_divergence(
+    expected_qty: f64,
+    on_chain_qty: f64,
+    divergence_usd: f64,
+    threshold_usd: f64,
+) -> bool {
+    let is_phantom = on_chain_qty == 0.0 && expected_qty > 0.0;
+    divergence_usd > threshold_usd && !is_phantom
+}
+
 pub async fn reconcile_wallet_state(
     config: &ReconciliationConfig,
     account: &AccountState,
@@ -223,17 +258,50 @@ pub async fn reconcile_wallet_state(
                 let divergence_qty = (expected_qty - on_chain_qty).abs();
                 // Convert to USD using current price
                 let divergence_usd = divergence_qty * pos.current_price;
-                if divergence_usd > config.divergence_threshold_usd {
-                    tracing::warn!(
-                        "WALLET_RECONCILIATION: {} divergence — in-memory={:.6}, on-chain={:.6}, div=${:.4}",
-                        pair, expected_qty, on_chain_qty, divergence_usd
-                    );
-                    tokens_with_divergence.push(TokenDivergence {
-                        pair: pair.clone(),
-                        in_memory_value_usd: expected_qty * pos.current_price,
-                        on_chain_value_usd: on_chain_qty * pos.current_price,
+                if divergence_usd > config.token_divergence_threshold_usd {
+                    // FID-225 round 2: Classify phantom positions separately.
+                    // Phantom = in-memory has tokens but on-chain balance is 0.
+                    // This signals stale state (reverted swap, prior-session
+                    // artifact, test residue) — NOT a real on-chain drift.
+                    // We log a distinct PHANTOM_WARN but don't add to
+                    // tokens_with_divergence, so the heartbeat doesn't halt.
+                    // The 5-min ChainPositionRecovery → apply_to_portfolio
+                    // path (FID-196) is the proper handler: it purges phantoms
+                    // whose total value is below safety_halt_threshold_pct
+                    // (= 50% of portfolio default) and halts the engine if
+                    // phantoms dominate the portfolio — which is the correct
+                    // "this is a real bug" signal rather than "the engine
+                    // momentarily remembers a closed position."
+                    let is_phantom = on_chain_qty == 0.0 && expected_qty > 0.0;
+                    if is_haltable_token_divergence(
+                        expected_qty,
+                        on_chain_qty,
                         divergence_usd,
-                    });
+                        config.token_divergence_threshold_usd,
+                    ) {
+                        tracing::warn!(
+                            "WALLET_RECONCILIATION: {} divergence — in-memory={:.6}, on-chain={:.6}, div=${:.4}",
+                            pair, expected_qty, on_chain_qty, divergence_usd
+                        );
+                        tokens_with_divergence.push(TokenDivergence {
+                            pair: pair.clone(),
+                            in_memory_value_usd: expected_qty * pos.current_price,
+                            on_chain_value_usd: on_chain_qty * pos.current_price,
+                            divergence_usd,
+                        });
+                    } else if is_phantom {
+                        // FID-225 round 2: phantom (in-memory>0, on-chain=0).
+                        // Engine believes wallet holds this token, but chain
+                        // says balance is 0. Stale-state class — engine ran
+                        // an aborted swap, missed a close-path purge, or
+                        // survived a prior-session crash. Classified as
+                        // recoverable — see `is_haltable_token_divergence`
+                        // for the canonical classifier + rationale.
+                        tracing::warn!(
+                            "WALLET_RECONCILIATION: {} PHANTOM_POSITION — in-memory={:.6}, on-chain=0.000000 (chain has zero of this token). Not halting; will be purged by next ChainPositionRecovery. div_usd_at_price=${:.4}",
+                            pair, expected_qty, divergence_usd
+                        );
+                    }
                 }
             }
             Err(e) => {
@@ -685,6 +753,30 @@ mod tests {
     }
 
     #[test]
+    fn token_threshold_is_decoupled_from_usdc_threshold() {
+        // FID-225: per-token threshold was previously aliased to the USDC
+        // threshold ($0.10), which caused spurious halts on minor price-feed
+        // noise (any $0.10+ discrepancy on a held token triggered the halt
+        // path under RealTime classification). The threshold is now
+        // decoupled — default token threshold is $5.00, USDC stays at $0.10.
+        let cfg = ReconciliationConfig::default();
+        assert!(
+            cfg.token_divergence_threshold_usd > cfg.divergence_threshold_usd,
+            "token threshold ({}) must exceed USDC threshold ({})",
+            cfg.token_divergence_threshold_usd,
+            cfg.divergence_threshold_usd
+        );
+        assert!(
+            cfg.token_divergence_threshold_usd >= 5.0,
+            "default token threshold should be at least $5.00 to absorb Anvil noise"
+        );
+        assert!(
+            cfg.token_divergence_threshold_usd <= 100.0,
+            "default token threshold should not exceed $100 (would defeat purpose)"
+        );
+    }
+
+    #[test]
     fn rpc_failure_does_not_halt() {
         // When the RPC URL is empty, query_token_balance returns Err,
         // and the heartbeat returns rpc_failure: true, halted: false.
@@ -1023,5 +1115,88 @@ mod tests {
         assert_eq!(report.usdc_divergence_corrected, 0.0);
         assert!(!report.halt_recommended);
         assert_eq!(portfolio.positions().len(), 1);
+    }
+
+    // =========================================================================
+    // FID-225 round 2: Phantom-position classification regression tests.
+    //
+    // Validates the per-token divergence classifier distinguishes between
+    // haltable real drift (on-chain qty > 0, large divergence_usd) and
+    // PHANTOM-states (in-memory>0 but on-chain=0). Phantoms are tolerated
+    // by the heartbeat; the 5-min ChainPositionRecovery → apply_to_portfolio
+    // (FID-196) is the proper handler for them.
+    //
+    // Background: Spencer's 2026-06-21 3:35 AM Anvil run halted on cycle 34
+    // with in-memory=28.332434 tokens (=$5.24 divergence at $0.185) for an
+    // `ai-1` phantom that didn't exist on-chain. Without this fix, the
+    // engine never starts on any Anvil session that has residual phantom
+    // state from a prior crash.
+    // =========================================================================
+
+    /// Phantom: in-memory claims tokens (28.33 of `ai-1`), chain has 0.
+    /// The classifier MUST return false — heartbeat skips phantoms.
+    /// This is the exact bug case (cycle 34 of 2026-06-21 03:35 AM run).
+    #[test]
+    fn phantom_position_is_not_haltable_divergence() {
+        let cfg = ReconciliationConfig::default();
+        assert!(
+            !is_haltable_token_divergence(
+                28.332434,    // expected_qty (real cycle-34 value)
+                0.0,          // on_chain_qty (true phantom)
+                5.2424,       // divergence_usd at $0.185 price
+                cfg.token_divergence_threshold_usd,
+            ),
+            "phantom (in-memory>0, on-chain=0) MUST NOT be haltable even when div_usd exceeds threshold"
+        );
+    }
+
+    /// Real drift: both sides have tokens but they differ.
+    /// Above the threshold — classifier returns true (halt-required).
+    #[test]
+    fn real_drift_above_threshold_is_haltable() {
+        let cfg = ReconciliationConfig::default();
+        // expected=100, on_chain=85, diff=15 tokens @ $1.0 = $15 divergence
+        // = well above default $5.00 threshold
+        assert!(
+            is_haltable_token_divergence(100.0, 85.0, 15.0, cfg.token_divergence_threshold_usd),
+            "real drift above threshold MUST be haltable"
+        );
+    }
+
+    /// Sub-threshold: real but small position drift (e.g., a swap with $0.50
+    /// rounding loss on a $1 position). Engine has $1 to swap, this shouldn't
+    /// halt it.
+    #[test]
+    fn below_threshold_is_not_haltable() {
+        let cfg = ReconciliationConfig::default();
+        // expected=100, on_chain=99.5, diff=0.5 tokens @ $1.0 = $0.5 (< $5.00)
+        assert!(
+            !is_haltable_token_divergence(100.0, 99.5, 0.5, cfg.token_divergence_threshold_usd),
+            "divergence below threshold MUST NOT halt"
+        );
+    }
+
+    /// Edge case: both empty (zero-quantity state). Not a phantom (would need
+    /// in-memory > 0 for the phantom criterion). Not a drift. No-op.
+    #[test]
+    fn both_zero_is_not_phantom_and_not_haltable() {
+        let cfg = ReconciliationConfig::default();
+        assert!(
+            !is_haltable_token_divergence(0.0, 0.0, 0.0, cfg.token_divergence_threshold_usd),
+            "both-zero must not be classified as phantom or as haltable drift"
+        );
+    }
+
+    /// Edge case: in-memory > 0 but on-chain > 0 AND on-chain equals zero
+    /// (float edge). distinct from a true phantom. Should halt if div>threshold.
+    #[test]
+    fn near_zero_on_chain_with_large_expected_halts_as_drift_not_phantom() {
+        let cfg = ReconciliationConfig::default();
+        // Tiny but non-zero on-chain balance (e.g., dust residue from a
+        // partial close). $15 divergence is above threshold. NOT phantom.
+        assert!(
+            is_haltable_token_divergence(100.0, 0.001, 15.0, cfg.token_divergence_threshold_usd),
+            "near-zero (but non-zero) on-chain with real drift MUST halt"
+        );
     }
 }

@@ -1401,6 +1401,7 @@ pub async fn run(
                                 divergence_threshold_pct: 0.01,
                                 interval_cycles: 1,
                                 safety_halt_threshold_pct: 0.50,
+                                token_divergence_threshold_usd: 5.00,
                             };
                         let dummy_pos = std::collections::HashMap::new();
                         let acct = portfolio.account().clone();
@@ -1537,6 +1538,7 @@ pub async fn run(
                 divergence_threshold_pct: 0.01,
                 interval_cycles: 1,
                 safety_halt_threshold_pct: 0.50,
+                token_divergence_threshold_usd: 5.00,
             };
             info!(
                 "FID-154: Heartbeat using chain '{}' (chain_id={})",

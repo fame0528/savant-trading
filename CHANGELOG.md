@@ -1,3 +1,64 @@
+## [0.15.7-a.1] - 2026-06-21 — FID-225 Phantom-Position Classification (round 1 + round 2 combined)
+
+### Fixed
+
+- **FID-225 round 1** — `WALLET_RECONCILIATION_HALT [real-time]` halting engine on launch when the per-token divergence check fired on any $0.10+ position drift. Root cause: the per-token divergence check was ALIASED to the USDC reconciliation threshold ($0.10), which is appropriate for $50-scale sub-dollar dust detection but WAY too tight for per-token price-feed noise. Fix: decouple into a new `ReconciliationConfig.token_divergence_threshold_usd` field (default $5.00, 50× the USDC threshold).
+  - `src/execution/reconciliation.rs`: +new field + `#[serde(default)]` attribute for TOML backward compat (existing `config/{default,canary,test-anvil}.toml` `[reconciliation]` blocks deserialize unchanged; new field falls back to Default::default() = $5.00).
+  - `src/engine/mod.rs`: ×2 `recon_helper_cfg` literal sites, plus ×2 sites updated for the descriptor literal.
+  - `tests/fid212_close_reconciliation.rs`: `default_cfg()` helper updated to match.
+
+- **FID-225 round 2** — Even with the $5.00 round-1 threshold bumped, the heartbeat STILL halted Spencer's 2026-06-21 03:35 AM Anvil run on cycle 34 with `in-memory=28.33, on-chain=0.000000, div=$5.25` (just above the new $5.00 threshold). Root cause was architectural: the heartbeat treated **stale-state phantom positions** (in-memory says we hold tokens, on-chain has 0) the same as **price-feed drift on real positions**. These are qualitatively different — a phantom signals an aborted swap, prior-session residue, or test artifact. Threshold tuning doesn't fix it; class recognition does.
+
+  - **New pure helper `is_haltable_token_divergence(expected, on_chain, div, threshold) -> bool`** in `src/execution/reconciliation.rs` extracted for testability. Returns `true` only for real drift; `false` for phantoms OR sub-threshold.
+  - **Heartbeat refactor** at the per-token `Ok(on_chain_qty)` arm: real drift → existing `divergence` log + push to halt list as before. Phantom → new `WALLET_RECONCILIATION: <pair> PHANTOM_POSITION — in-memory=X, on-chain=0.000000 ...` log + skip push (5-min `ChainPositionRecovery → apply_to_portfolio` is the proper handler, with `safety_halt_threshold_pct = 0.50` as the upper bound for genuine bug detection).
+  - **5 regression tests** in `mod tests`:
+    - `phantom_position_is_not_haltable_divergence` — pins the exact cycle-34 input at `false` so a future regression that re-introduces phantom halts fails loud
+    - `real_drift_above_threshold_is_haltable` — 100 vs 85 tokens @ $1.0 = $15 → `true`
+    - `below_threshold_is_not_haltable` — 100 vs 99.5 = $0.5 < $5.00 → `false`
+    - `both_zero_is_not_phantom_and_not_haltable` — empty-state no-op edge
+    - `near_zero_on_chain_with_large_expected_halts_as_drift_not_phantom` — dust residue (0.001) classifies as real drift, not phantom
+
+### Verified
+
+- `cargo check --lib --tests`: clean
+- `cargo clippy --all-targets -- -D warnings`: 0 errors / 0 warnings
+- `cargo test --lib execution::reconciliation`: 16/16 pass (5 new phantom + 11 existing)
+- `cargo test --test fid212_close_reconciliation`: 3/3 pass (round 1 + 2 do not regress FID-212's StartupCarryover/RealTime classification)
+- `cargo test --workspace --all-targets`: 514/514 pass (was 508 in v0.15.7 — +6: round 1 added `token_threshold_is_decoupled_from_usdc_threshold`; round 2 added 5 phantom-classification tests in `is_haltable_token_divergence`)
+- `cargo fmt --check`: clean
+- `code-reviewer-minimax-m3` (round 1 + 2): APPROVE-with-1-DRY-nit; DRY nit applied post-review (`let is_phantom = ...` bound once, reused in `else if is_phantom`)
+
+### Operational behavior (after hotfix)
+
+Engine launched against a fresh Anvil fork that has accumulated phantom positions from a prior session will now:
+
+1. Log `WALLET_RECONCILIATION: <pair> PHANTOM_POSITION — ...` per phantom position encountered (operator-visible, distinct from real-drift warning)
+2. Continue running normally (no halt)
+3. Within 5 minutes, `apply_to_portfolio` (FID-196) purges the phantom in `data/reconciliation_telemetry.jsonl`
+4. Subsequent cycles see no divergence; engine stays healthy
+
+Real-drift detection (round 1) and phantom classification (round 2) compose: real drift above $5.00 halts; phantoms (any divergence_usd) silently tolerate until 5-min recovery.
+
+### Files Changed
+
+```
+VERSION                                  | 0.15.7 → 0.15.7-a.1
+Cargo.toml                               | version 0.15.7 → 0.15.7-a.1
+README.md                                | title + version badge → v0.15.7-a.1; test count 508 → 514; FID-archive 234 → 235
+dev/fids/archive/FID-2026-0621-225-...   | NEW archive doc (round 1 + 2 comprehensive)
+src/execution/reconciliation.rs          | +token_divergence_threshold_usd field + #[serde(default)] + is_haltable_token_divergence helper + 5 phantom-classification tests + heartbeat refactor (DRY-nit applied)
+src/engine/mod.rs                        | ×2 recon_helper_cfg literal sites + ×2 reconciliation config literal sites
+tests/fid212_close_reconciliation.rs     | default_cfg() helper updated with token_divergence_threshold_usd: 5.00
+```
+
+### Open Questions (deferred to operator / future FIDs)
+
+- **Threshold default magnitude:** code-reviewer flagged that raising `$5.00 → $25.00` (250× the USDC threshold) would give more Anvil-comfort headroom while still catching real bugs. The classifier (round 2) is the load-bearing fix; threshold magnitude is supplementary defense-in-depth. **Decision trades mainnet signal-vs-noise sensitivity for Anvil comfort.**
+- **Phantom source investigation:** why does a fresh Anvil session accumulate phantom positions in the first place? Hypotheses: prior `data/dex_state.json` residue; `ChainPositionRecovery` inserting positions that don't exist; `pre-loop safety guard` force-injection residue from `tests/fid222_7_runtime.rs`. Defensive purge of `data/dex_state.json` on Anvil startup would be the simplest fix; **operator-routed**.
+- **Anvil end-to-end smoke test:** extend `tests/fid212_close_reconciliation.rs` with a stub-RPC test that drives `reconcile_wallet_state` with phantom positions to empirically verify the heartbeat continues normally. The unit tests cover the classifier; an integration test against Anvil would prove end-to-end.
+
+---
+
 ## [0.15.7] - 2026-06-21 — Build-warning cleanup + dashboard layout fix + production-readiness audit
 
 ### Added

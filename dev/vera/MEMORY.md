@@ -444,3 +444,42 @@ If you find yourself writing "the negative-path smoke is unreachable" — STOP. 
 ---
 
 *Vera (substrate: Codebuff-M3) signing off — 2026-06-20 05:35 UTC. Next boot: Vera in whatever harness the env block names. Session work is additive-only; all prior content is preserved verbatim. The handoff doc + this milestone entry have everything the next session needs.*
+
+## v0.15.7 milestone (2026-06-21 close-of-session) — APPEND ONLY
+Funnel v1 production stack shipped. 508 tests pass, 234 archived FIDs. Pre-push gate (FID-191) clean.
+
+---
+
+# 2026-06-21 — Session v0.15.7 Ship + FID-225 Hotfix
+
+*v0.15.7a (Funnel v1 production stack + SAVANT_CHAIN default + build cleanup)* shipped today on commit `f297b835` origin/main. 508 tests / 0 warnings / 234 archived FIDs. Details in `dev/vera/memory/2026-06-21-v0157-release.md`.
+
+## v0.15.7 → FID-225 bridge (same session, post-ship unresolved)
+
+After v0.15.7 archive, an immediately-reported runtime bug surfaced: engine halted on first launch with `WALLET_RECONCILIATION_HALT [real-time]` due to per-token divergence ($5.25 on a held token) crossing the USDC-targeted $0.10 threshold. Root cause was architectural confusion in `src/execution/reconciliation.rs` — same field was used for both USDC and per-token checks.
+
+Hotfix (8 edits / 4 files) decoupled via new `token_divergence_threshold_usd` field (default $5.00, `#[serde(default)]` for TOML compat). Validation green: cargo check / clippy -D warnings / 11 module tests / 3 fid212 integration tests / fmt. **Working tree dirty, awaiting operator commit + push.**
+
+Operator is responsible for:
+- Deciding whether FID-225 ship is independent (v0.15.7a.1) or rolled into next minor (v0.15.8)
+- Updating CHANGELOG.md + README test count (was 508 → will be 509 after FID-225 ships)
+- Creating FID-225 archive doc when committing
+- Engines of record: v0.15.7 ship docs are comprehensive; FID-225 docs deferred per operator `take it or leave it` rhythm.
+
+## Subagent substrate notes
+
+- Cooperation between code-reviewer-minimax-m3 and basher validation: parallel pattern (review + cargo check simultaneously) caught compile-broken state before operator would have hit it on next launch. Standard order-of-operations: read inventory → surgical str_replace → re-validate → update docs. Cost: small; benefit: high.
+- Mid-validation nit-flag review pattern surfaced a real bug (3 stale construction sites) that the prior pass missed. Lesson: when adding a new struct field, run `grep -rn 'StructName\s*{' src/ tests/` to enumerate ALL construction sites BEFORE writing the struct change. Document this in dev/LEARNINGS.md next session.
+
+## Closing acknowledgement
+
+Operator: `good work today vera`. Cool wind-down after a 6-hour session spanning:
+- FID-219+ / 222.x Funnel v1 stack archive + ship
+- Pre-push hook clippy-error sweep (12 fixes)
+- Stale script removal, FID-2026-0620 doc delete, About section update
+- Multi-model jury expansion verification (FID-200 NIM preservation)
+- Runtime crash bug triage + hotfix to validated-ready state
+
+Next session bootstrap: load `dev/vera/memory/2026-06-21-v0157-release.md` first, then check git status (4 files dirty post FID-225) + decide commit/push posture.
+
+Vera signin
